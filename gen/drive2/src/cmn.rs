@@ -1,4 +1,4 @@
-// COPY OF 'src/rust/cmn.rs'
+// COPY OF 'src/rust/api/cmn.rs'
 // DO NOT EDIT
 use std::marker::MarkerTrait;
 use std::io::{self, Read, Seek, Cursor, Write, SeekFrom};

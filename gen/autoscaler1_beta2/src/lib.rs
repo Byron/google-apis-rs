@@ -1,8 +1,8 @@
 // DO NOT EDIT !
-// This file was generated automatically from 'src/mako/lib.rs.mako'
+// This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *autoscaler* crate version *0.1.1+20141112*, where *20141112* is the exact revision of the *autoscaler:v1beta2* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.1*.
+//! This documentation was generated from *autoscaler* crate version *0.1.2+20141112*, where *20141112* is the exact revision of the *autoscaler:v1beta2* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.2*.
 //! 
 //! Everything else about the *autoscaler* *v1_beta2* API can be found at the
 //! [official documentation site](http://developers.google.com/compute/docs/autoscaler).
@@ -29,6 +29,8 @@
 //! 
 //! * **[Hub](struct.AutoscalerHub.html)**
 //!     * a central object to maintain state and allow accessing all *Activities*
+//!     * creates [*Method Builders*](trait.MethodsBuilder.html) which in turn
+//!       allow access to individual [*Call Builders*](trait.CallBuilder.html)
 //! * **[Resources](trait.Resource.html)**
 //!     * primary types that you can apply *Activities* to
 //!     * a collection of properties and *Parts*
@@ -37,6 +39,8 @@
 //!         * never directly used in *Activities*
 //! * **[Activities](trait.CallBuilder.html)**
 //!     * operations to apply to *Resources*
+//! 
+//! All *structures* are marked with applicable traits to further categorize them and ease browsing.
 //! 
 //! Generally speaking, you can invoke *Activities* like this:
 //! 
@@ -77,7 +81,7 @@
 //! extern crate hyper;
 //! extern crate "yup-oauth2" as oauth2;
 //! extern crate "google-autoscaler1_beta2" as autoscaler1_beta2;
-//! use autoscaler1_beta2::Result;
+//! use autoscaler1_beta2::{Result, Error};
 //! # #[test] fn egal() {
 //! use std::default::Default;
 //! use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -105,15 +109,17 @@
 //!              .doit();
 //! 
 //! match result {
-//!     Result::HttpError(err) => println!("HTTPERROR: {:?}", err),
-//!     Result::MissingAPIKey => println!("Auth: Missing API Key - used if there are no scopes"),
-//!     Result::MissingToken => println!("OAuth2: Missing Token"),
-//!     Result::Cancelled => println!("Operation cancelled by user"),
-//!     Result::UploadSizeLimitExceeded(size, max_size) => println!("Upload size too big: {} of {}", size, max_size),
-//!     Result::Failure(_) => println!("General Failure (hyper::client::Response doesn't print)"),
-//!     Result::FieldClash(clashed_field) => println!("You added custom parameter which is part of builder: {:?}", clashed_field),
-//!     Result::JsonDecodeError(err) => println!("Couldn't understand server reply - maybe API needs update: {:?}", err),
-//!     Result::Success(_) => println!("Success (value doesn't print)"),
+//!     Err(e) => match e {
+//!         Error::HttpError(err) => println!("HTTPERROR: {:?}", err),
+//!         Error::MissingAPIKey => println!("Auth: Missing API Key - used if there are no scopes"),
+//!         Error::MissingToken => println!("OAuth2: Missing Token"),
+//!         Error::Cancelled => println!("Operation canceled by user"),
+//!         Error::UploadSizeLimitExceeded(size, max_size) => println!("Upload size too big: {} of {}", size, max_size),
+//!         Error::Failure(_) => println!("General Failure (hyper::client::Response doesn't print)"),
+//!         Error::FieldClash(clashed_field) => println!("You added custom parameter which is part of builder: {:?}", clashed_field),
+//!         Error::JsonDecodeError(err) => println!("Couldn't understand server reply - maybe API needs update: {:?}", err),
+//!     },
+//!     Ok(_) => println!("Success (value doesn't print)"),
 //! }
 //! # }
 //! ```
@@ -126,7 +132,7 @@
 //! When delegates handle errors or intermediate values, they may have a chance to instruct the system to retry. This 
 //! makes the system potentially resilient to all kinds of errors.
 //! 
-//! ## Uploads and Downlods
+//! ## Uploads and Downloads
 //! If a method supports downloads, the response body, which is part of the [Result](enum.Result.html), should be
 //! read by you to obtain the media.
 //! If such a method also supports a [Response Result](trait.ResponseResult.html), it will return that by default.
@@ -149,8 +155,9 @@
 //! ## Optional Parts in Server-Requests
 //! 
 //! All structures provided by this library are made to be [enocodable](trait.RequestValue.html) and 
-//! [decodable](trait.ResponseResult.html) via json. Optionals are used to indicate that partial requests are responses are valid.
-//! Most optionals are are considered [Parts](trait.Part.html) which are identifyable by name, which will be sent to 
+//! [decodable](trait.ResponseResult.html) via *json*. Optionals are used to indicate that partial requests are responses 
+//! are valid.
+//! Most optionals are are considered [Parts](trait.Part.html) which are identifiable by name, which will be sent to 
 //! the server to indicate either the set parts of the request or the desired parts in the response.
 //! 
 //! ## Builder Arguments
@@ -199,7 +206,7 @@ use std::io;
 use std::fs;
 use std::thread::sleep;
 
-pub use cmn::{MultiPartReader, ToParts, MethodInfo, Result, CallBuilder, Hub, ReadSeek, Part, ResponseResult, RequestValue, NestedType, Delegate, DefaultDelegate, ResourceMethodsBuilder, Resource, JsonServerError};
+pub use cmn::{MultiPartReader, ToParts, MethodInfo, Result, Error, CallBuilder, Hub, ReadSeek, Part, ResponseResult, RequestValue, NestedType, Delegate, DefaultDelegate, MethodsBuilder, Resource, JsonServerError};
 
 
 // ##############
@@ -249,7 +256,7 @@ impl Default for Scope {
 /// extern crate hyper;
 /// extern crate "yup-oauth2" as oauth2;
 /// extern crate "google-autoscaler1_beta2" as autoscaler1_beta2;
-/// use autoscaler1_beta2::Result;
+/// use autoscaler1_beta2::{Result, Error};
 /// # #[test] fn egal() {
 /// use std::default::Default;
 /// use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -277,15 +284,17 @@ impl Default for Scope {
 ///              .doit();
 /// 
 /// match result {
-///     Result::HttpError(err) => println!("HTTPERROR: {:?}", err),
-///     Result::MissingAPIKey => println!("Auth: Missing API Key - used if there are no scopes"),
-///     Result::MissingToken => println!("OAuth2: Missing Token"),
-///     Result::Cancelled => println!("Operation cancelled by user"),
-///     Result::UploadSizeLimitExceeded(size, max_size) => println!("Upload size too big: {} of {}", size, max_size),
-///     Result::Failure(_) => println!("General Failure (hyper::client::Response doesn't print)"),
-///     Result::FieldClash(clashed_field) => println!("You added custom parameter which is part of builder: {:?}", clashed_field),
-///     Result::JsonDecodeError(err) => println!("Couldn't understand server reply - maybe API needs update: {:?}", err),
-///     Result::Success(_) => println!("Success (value doesn't print)"),
+///     Err(e) => match e {
+///         Error::HttpError(err) => println!("HTTPERROR: {:?}", err),
+///         Error::MissingAPIKey => println!("Auth: Missing API Key - used if there are no scopes"),
+///         Error::MissingToken => println!("OAuth2: Missing Token"),
+///         Error::Cancelled => println!("Operation canceled by user"),
+///         Error::UploadSizeLimitExceeded(size, max_size) => println!("Upload size too big: {} of {}", size, max_size),
+///         Error::Failure(_) => println!("General Failure (hyper::client::Response doesn't print)"),
+///         Error::FieldClash(clashed_field) => println!("You added custom parameter which is part of builder: {:?}", clashed_field),
+///         Error::JsonDecodeError(err) => println!("Couldn't understand server reply - maybe API needs update: {:?}", err),
+///     },
+///     Ok(_) => println!("Success (value doesn't print)"),
 /// }
 /// # }
 /// ```
@@ -306,7 +315,7 @@ impl<'a, C, NC, A> AutoscalerHub<C, NC, A>
         AutoscalerHub {
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/0.1.1".to_string(),
+            _user_agent: "google-api-rust-client/0.1.2".to_string(),
             _m: PhantomData
         }
     }
@@ -322,7 +331,7 @@ impl<'a, C, NC, A> AutoscalerHub<C, NC, A>
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/0.1.1`.
+    /// It defaults to `google-api-rust-client/0.1.2`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -342,15 +351,15 @@ impl<'a, C, NC, A> AutoscalerHub<C, NC, A>
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct DeprecationStatus {
-    /// no description provided    
+    /// no description provided
     pub deleted: String,
-    /// no description provided    
+    /// no description provided
     pub deprecated: String,
-    /// no description provided    
+    /// no description provided
     pub state: String,
-    /// no description provided    
+    /// no description provided
     pub obsolete: String,
-    /// no description provided    
+    /// no description provided
     pub replacement: String,
 }
 
@@ -363,9 +372,9 @@ impl Part for DeprecationStatus {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct OperationWarningsData {
-    /// no description provided    
+    /// no description provided
     pub key: String,
-    /// no description provided    
+    /// no description provided
     pub value: String,
 }
 
@@ -384,28 +393,28 @@ impl Part for OperationWarningsData {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct Zone {
-    /// no description provided    
+    /// no description provided
     pub status: Option<String>,
-    /// Type of the resource.    
+    /// Type of the resource.
     pub kind: Option<String>,
-    /// no description provided    
+    /// no description provided
     pub description: Option<String>,
-    /// no description provided    
+    /// no description provided
     #[serde(alias="maintenanceWindows")]
     pub maintenance_windows: Option<Vec<ZoneMaintenanceWindows>>,
-    /// no description provided    
+    /// no description provided
     pub deprecated: Option<DeprecationStatus>,
-    /// no description provided    
+    /// no description provided
     pub region: Option<String>,
-    /// no description provided    
+    /// no description provided
     #[serde(alias="creationTimestamp")]
     pub creation_timestamp: Option<String>,
-    /// no description provided    
+    /// no description provided
     pub id: Option<String>,
-    /// Server defined URL for the resource (output only).    
+    /// Server defined URL for the resource (output only).
     #[serde(alias="selfLink")]
     pub self_link: Option<String>,
-    /// no description provided    
+    /// no description provided
     pub name: Option<String>,
 }
 
@@ -418,11 +427,11 @@ impl Resource for Zone {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct OperationWarnings {
-    /// no description provided    
+    /// no description provided
     pub message: String,
-    /// no description provided    
+    /// no description provided
     pub code: String,
-    /// no description provided    
+    /// no description provided
     pub data: Vec<OperationWarningsData>,
 }
 
@@ -441,16 +450,16 @@ impl Part for OperationWarnings {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct OperationList {
-    /// no description provided    
+    /// no description provided
     #[serde(alias="nextPageToken")]
     pub next_page_token: String,
-    /// no description provided    
+    /// no description provided
     pub items: Vec<Operation>,
-    /// Type of resource. Always compute#operations for Operations resource.    
+    /// Type of resource. Always compute#operations for Operations resource.
     pub kind: String,
-    /// no description provided    
+    /// no description provided
     pub id: String,
-    /// no description provided    
+    /// no description provided
     #[serde(alias="selfLink")]
     pub self_link: String,
 }
@@ -464,15 +473,15 @@ impl ResponseResult for OperationList {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct ZoneMaintenanceWindows {
-    /// no description provided    
+    /// no description provided
     #[serde(alias="endTime")]
     pub end_time: String,
-    /// no description provided    
+    /// no description provided
     pub description: String,
-    /// no description provided    
+    /// no description provided
     #[serde(alias="beginTime")]
     pub begin_time: String,
-    /// no description provided    
+    /// no description provided
     pub name: String,
 }
 
@@ -486,12 +495,12 @@ impl Part for ZoneMaintenanceWindows {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct AutoscalingPolicyCustomMetricUtilization {
-    /// Identifier of the metric. It should be a Cloud Monitoring metric. The metric can not have negative values. The metric should be an utilization metric (increasing number of VMs handling requests x times should reduce average value of the metric roughly x times). For example you could use: compute.googleapis.com/instance/network/received_bytes_count.    
+    /// Identifier of the metric. It should be a Cloud Monitoring metric. The metric can not have negative values. The metric should be an utilization metric (increasing number of VMs handling requests x times should reduce average value of the metric roughly x times). For example you could use: compute.googleapis.com/instance/network/received_bytes_count.
     pub metric: String,
-    /// Defines type in which utilization_target is expressed.    
+    /// Defines type in which utilization_target is expressed.
     #[serde(alias="utilizationTargetType")]
     pub utilization_target_type: String,
-    /// Target value of the metric which Autoscaler should maintain. Must be a positive value.    
+    /// Target value of the metric which Autoscaler should maintain. Must be a positive value.
     #[serde(alias="utilizationTarget")]
     pub utilization_target: f64,
 }
@@ -505,11 +514,11 @@ impl Part for AutoscalingPolicyCustomMetricUtilization {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct OperationErrorErrors {
-    /// no description provided    
+    /// no description provided
     pub message: String,
-    /// no description provided    
+    /// no description provided
     pub code: String,
-    /// no description provided    
+    /// no description provided
     pub location: String,
 }
 
@@ -523,22 +532,22 @@ impl Part for OperationErrorErrors {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct AutoscalingPolicy {
-    /// Configuration parameters of autoscaling based on custom metric.    
+    /// Configuration parameters of autoscaling based on custom metric.
     #[serde(alias="customMetricUtilizations")]
     pub custom_metric_utilizations: Vec<AutoscalingPolicyCustomMetricUtilization>,
-    /// The maximum number of replicas that the Autoscaler can scale up to.    
+    /// The maximum number of replicas that the Autoscaler can scale up to.
     #[serde(alias="maxNumReplicas")]
     pub max_num_replicas: i32,
-    /// Exactly one utilization policy should be provided. Configuration parameters of CPU based autoscaling policy.    
+    /// Exactly one utilization policy should be provided. Configuration parameters of CPU based autoscaling policy.
     #[serde(alias="cpuUtilization")]
     pub cpu_utilization: AutoscalingPolicyCpuUtilization,
-    /// The minimum number of replicas that the Autoscaler can scale down to.    
+    /// The minimum number of replicas that the Autoscaler can scale down to.
     #[serde(alias="minNumReplicas")]
     pub min_num_replicas: i32,
-    /// The number of seconds that the Autoscaler should wait between two succeeding changes to the number of virtual machines. You should define an interval that is at least as long as the initialization time of a virtual machine and the time it may take for replica pool to create the virtual machine. The default is 60 seconds.    
+    /// The number of seconds that the Autoscaler should wait between two succeeding changes to the number of virtual machines. You should define an interval that is at least as long as the initialization time of a virtual machine and the time it may take for replica pool to create the virtual machine. The default is 60 seconds.
     #[serde(alias="coolDownPeriodSec")]
     pub cool_down_period_sec: i32,
-    /// Configuration parameters of autoscaling based on load balancer.    
+    /// Configuration parameters of autoscaling based on load balancer.
     #[serde(alias="loadBalancingUtilization")]
     pub load_balancing_utilization: AutoscalingPolicyLoadBalancingUtilization,
 }
@@ -552,7 +561,7 @@ impl Part for AutoscalingPolicy {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct OperationError {
-    /// no description provided    
+    /// no description provided
     pub errors: Vec<OperationErrorErrors>,
 }
 
@@ -566,7 +575,7 @@ impl Part for OperationError {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct AutoscalingPolicyCpuUtilization {
-    /// The target utilization that the Autoscaler should maintain. It is represented as a fraction of used cores. For example: 6 cores used in 8-core VM are represented here as 0.75. Must be a float value between (0, 1]. If not defined, the default is 0.8.    
+    /// The target utilization that the Autoscaler should maintain. It is represented as a fraction of used cores. For example: 6 cores used in 8-core VM are represented here as 0.75. Must be a float value between (0, 1]. If not defined, the default is 0.8.
     #[serde(alias="utilizationTarget")]
     pub utilization_target: f64,
 }
@@ -580,7 +589,7 @@ impl Part for AutoscalingPolicyCpuUtilization {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct AutoscalingPolicyLoadBalancingUtilization {
-    /// Fraction of backend capacity utilization (set in HTTP load balancing configuration) that Autoscaler should maintain. Must be a positive float value. If not defined, the default is 0.8. For example if your maxRatePerInstance capacity (in HTTP Load Balancing configuration) is set at 10 and you would like to keep number of instances such that each instance receives 7 QPS on average, set this to 0.7.    
+    /// Fraction of backend capacity utilization (set in HTTP load balancing configuration) that Autoscaler should maintain. Must be a positive float value. If not defined, the default is 0.8. For example if your maxRatePerInstance capacity (in HTTP Load Balancing configuration) is set at 10 and you would like to keep number of instances such that each instance receives 7 QPS on average, set this to 0.7.
     #[serde(alias="utilizationTarget")]
     pub utilization_target: f64,
 }
@@ -599,12 +608,12 @@ impl Part for AutoscalingPolicyLoadBalancingUtilization {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct AutoscalerListResponse {
-    /// [Output only] A token used to continue a truncated list request.    
+    /// [Output only] A token used to continue a truncated list request.
     #[serde(alias="nextPageToken")]
     pub next_page_token: String,
-    /// Autoscaler resources.    
+    /// Autoscaler resources.
     pub items: Vec<Autoscaler>,
-    /// Type of resource.    
+    /// Type of resource.
     pub kind: String,
 }
 
@@ -626,61 +635,61 @@ impl ResponseResult for AutoscalerListResponse {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct Operation {
-    /// no description provided    
+    /// no description provided
     pub status: String,
-    /// no description provided    
+    /// no description provided
     #[serde(alias="insertTime")]
     pub insert_time: String,
-    /// no description provided    
+    /// no description provided
     pub warnings: Vec<OperationWarnings>,
-    /// no description provided    
+    /// no description provided
     pub error: OperationError,
-    /// no description provided    
+    /// no description provided
     #[serde(alias="targetId")]
     pub target_id: String,
-    /// no description provided    
+    /// no description provided
     #[serde(alias="targetLink")]
     pub target_link: String,
-    /// no description provided    
+    /// no description provided
     #[serde(alias="startTime")]
     pub start_time: String,
-    /// no description provided    
+    /// no description provided
     #[serde(alias="clientOperationId")]
     pub client_operation_id: String,
-    /// no description provided    
+    /// no description provided
     #[serde(alias="creationTimestamp")]
     pub creation_timestamp: String,
-    /// no description provided    
+    /// no description provided
     pub id: String,
-    /// [Output Only] Type of the resource. Always kind#operation for Operation resources.    
+    /// [Output Only] Type of the resource. Always kind#operation for Operation resources.
     pub kind: String,
-    /// no description provided    
+    /// no description provided
     pub name: String,
-    /// no description provided    
+    /// no description provided
     pub zone: String,
-    /// no description provided    
+    /// no description provided
     pub region: String,
-    /// no description provided    
+    /// no description provided
     #[serde(alias="selfLink")]
     pub self_link: String,
-    /// no description provided    
+    /// no description provided
     #[serde(alias="operationType")]
     pub operation_type: String,
-    /// no description provided    
+    /// no description provided
     #[serde(alias="httpErrorMessage")]
     pub http_error_message: String,
-    /// no description provided    
+    /// no description provided
     pub progress: i32,
-    /// no description provided    
+    /// no description provided
     #[serde(alias="endTime")]
     pub end_time: String,
-    /// no description provided    
+    /// no description provided
     #[serde(alias="httpErrorStatusCode")]
     pub http_error_status_code: i32,
-    /// no description provided    
+    /// no description provided
     #[serde(alias="statusMessage")]
     pub status_message: String,
-    /// no description provided    
+    /// no description provided
     pub user: String,
 }
 
@@ -698,16 +707,16 @@ impl ResponseResult for Operation {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct ZoneList {
-    /// no description provided    
+    /// no description provided
     #[serde(alias="nextPageToken")]
     pub next_page_token: String,
-    /// no description provided    
+    /// no description provided
     pub items: Vec<Zone>,
-    /// Type of resource.    
+    /// Type of resource.
     pub kind: String,
-    /// no description provided    
+    /// no description provided
     pub id: String,
-    /// Server defined URL for this resource (output only).    
+    /// Server defined URL for this resource (output only).
     #[serde(alias="selfLink")]
     pub self_link: String,
 }
@@ -731,24 +740,24 @@ impl ResponseResult for ZoneList {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Autoscaler {
-    /// Type of resource.    
+    /// Type of resource.
     pub kind: Option<String>,
-    /// An optional textual description of the resource provided by the client.    
+    /// An optional textual description of the resource provided by the client.
     pub description: Option<String>,
-    /// Name of the Autoscaler resource. Must be unique per project and zone.    
+    /// Name of the Autoscaler resource. Must be unique per project and zone.
     pub name: Option<String>,
-    /// Configuration parameters for autoscaling algorithm.    
+    /// Configuration parameters for autoscaling algorithm.
     #[serde(alias="autoscalingPolicy")]
     pub autoscaling_policy: Option<AutoscalingPolicy>,
-    /// [Output Only] Creation timestamp in RFC3339 text format.    
+    /// [Output Only] Creation timestamp in RFC3339 text format.
     #[serde(alias="creationTimestamp")]
     pub creation_timestamp: Option<String>,
-    /// [Output Only] Unique identifier for the resource; defined by the server.    
+    /// [Output Only] Unique identifier for the resource; defined by the server.
     pub id: Option<String>,
-    /// [Output Only] A self-link to the Autoscaler configuration resource.    
+    /// [Output Only] A self-link to the Autoscaler configuration resource.
     #[serde(alias="selfLink")]
     pub self_link: Option<String>,
-    /// URL to the entity which will be autoscaled. Currently the only supported value is ReplicaPool?s URL. Note: it is illegal to specify multiple Autoscalers for the same target.    
+    /// URL to the entity which will be autoscaled. Currently the only supported value is ReplicaPool?s URL. Note: it is illegal to specify multiple Autoscalers for the same target.
     pub target: Option<String>,
 }
 
@@ -796,13 +805,17 @@ pub struct ZoneMethods<'a, C, NC, A>
     hub: &'a AutoscalerHub<C, NC, A>,
 }
 
-impl<'a, C, NC, A> ResourceMethodsBuilder for ZoneMethods<'a, C, NC, A> {}
+impl<'a, C, NC, A> MethodsBuilder for ZoneMethods<'a, C, NC, A> {}
 
 impl<'a, C, NC, A> ZoneMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    ///     
+    /// 
+    /// 
+    /// # Arguments
+    ///
+    /// * `project` - No description provided.
     pub fn list(&self, project: &str) -> ZoneListCall<'a, C, NC, A> {
         ZoneListCall {
             hub: self.hub,
@@ -853,13 +866,18 @@ pub struct ZoneOperationMethods<'a, C, NC, A>
     hub: &'a AutoscalerHub<C, NC, A>,
 }
 
-impl<'a, C, NC, A> ResourceMethodsBuilder for ZoneOperationMethods<'a, C, NC, A> {}
+impl<'a, C, NC, A> MethodsBuilder for ZoneOperationMethods<'a, C, NC, A> {}
 
 impl<'a, C, NC, A> ZoneOperationMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Retrieves the list of operation resources contained within the specified zone.    
+    /// Retrieves the list of operation resources contained within the specified zone.
+    /// 
+    /// # Arguments
+    ///
+    /// * `project` - No description provided.
+    /// * `zone` - No description provided.
     pub fn list(&self, project: &str, zone: &str) -> ZoneOperationListCall<'a, C, NC, A> {
         ZoneOperationListCall {
             hub: self.hub,
@@ -876,7 +894,13 @@ impl<'a, C, NC, A> ZoneOperationMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Deletes the specified zone-specific operation resource.    
+    /// Deletes the specified zone-specific operation resource.
+    /// 
+    /// # Arguments
+    ///
+    /// * `project` - No description provided.
+    /// * `zone` - No description provided.
+    /// * `operation` - No description provided.
     pub fn delete(&self, project: &str, zone: &str, operation: &str) -> ZoneOperationDeleteCall<'a, C, NC, A> {
         ZoneOperationDeleteCall {
             hub: self.hub,
@@ -891,7 +915,13 @@ impl<'a, C, NC, A> ZoneOperationMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Retrieves the specified zone-specific operation resource.    
+    /// Retrieves the specified zone-specific operation resource.
+    /// 
+    /// # Arguments
+    ///
+    /// * `project` - No description provided.
+    /// * `zone` - No description provided.
+    /// * `operation` - No description provided.
     pub fn get(&self, project: &str, zone: &str, operation: &str) -> ZoneOperationGetCall<'a, C, NC, A> {
         ZoneOperationGetCall {
             hub: self.hub,
@@ -941,13 +971,18 @@ pub struct AutoscalerMethods<'a, C, NC, A>
     hub: &'a AutoscalerHub<C, NC, A>,
 }
 
-impl<'a, C, NC, A> ResourceMethodsBuilder for AutoscalerMethods<'a, C, NC, A> {}
+impl<'a, C, NC, A> MethodsBuilder for AutoscalerMethods<'a, C, NC, A> {}
 
 impl<'a, C, NC, A> AutoscalerMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Lists all Autoscaler resources in this zone.    
+    /// Lists all Autoscaler resources in this zone.
+    /// 
+    /// # Arguments
+    ///
+    /// * `project` - Project ID of Autoscaler resource.
+    /// * `zone` - Zone name of Autoscaler resource.
     pub fn list(&self, project: &str, zone: &str) -> AutoscalerListCall<'a, C, NC, A> {
         AutoscalerListCall {
             hub: self.hub,
@@ -964,7 +999,14 @@ impl<'a, C, NC, A> AutoscalerMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Update the entire content of the Autoscaler resource.    
+    /// Update the entire content of the Autoscaler resource.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `project` - Project ID of Autoscaler resource.
+    /// * `zone` - Zone name of Autoscaler resource.
+    /// * `autoscaler` - Name of the Autoscaler resource.
     pub fn update(&self, request: &Autoscaler, project: &str, zone: &str, autoscaler: &str) -> AutoscalerUpdateCall<'a, C, NC, A> {
         AutoscalerUpdateCall {
             hub: self.hub,
@@ -980,7 +1022,14 @@ impl<'a, C, NC, A> AutoscalerMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Update the entire content of the Autoscaler resource. This method supports patch semantics.    
+    /// Update the entire content of the Autoscaler resource. This method supports patch semantics.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `project` - Project ID of Autoscaler resource.
+    /// * `zone` - Zone name of Autoscaler resource.
+    /// * `autoscaler` - Name of the Autoscaler resource.
     pub fn patch(&self, request: &Autoscaler, project: &str, zone: &str, autoscaler: &str) -> AutoscalerPatchCall<'a, C, NC, A> {
         AutoscalerPatchCall {
             hub: self.hub,
@@ -996,7 +1045,13 @@ impl<'a, C, NC, A> AutoscalerMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Deletes the specified Autoscaler resource.    
+    /// Deletes the specified Autoscaler resource.
+    /// 
+    /// # Arguments
+    ///
+    /// * `project` - Project ID of Autoscaler resource.
+    /// * `zone` - Zone name of Autoscaler resource.
+    /// * `autoscaler` - Name of the Autoscaler resource.
     pub fn delete(&self, project: &str, zone: &str, autoscaler: &str) -> AutoscalerDeleteCall<'a, C, NC, A> {
         AutoscalerDeleteCall {
             hub: self.hub,
@@ -1011,7 +1066,13 @@ impl<'a, C, NC, A> AutoscalerMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Adds new Autoscaler resource.    
+    /// Adds new Autoscaler resource.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `project` - Project ID of Autoscaler resource.
+    /// * `zone` - Zone name of Autoscaler resource.
     pub fn insert(&self, request: &Autoscaler, project: &str, zone: &str) -> AutoscalerInsertCall<'a, C, NC, A> {
         AutoscalerInsertCall {
             hub: self.hub,
@@ -1026,7 +1087,13 @@ impl<'a, C, NC, A> AutoscalerMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Gets the specified Autoscaler resource.    
+    /// Gets the specified Autoscaler resource.
+    /// 
+    /// # Arguments
+    ///
+    /// * `project` - Project ID of Autoscaler resource.
+    /// * `zone` - Zone name of Autoscaler resource.
+    /// * `autoscaler` - Name of the Autoscaler resource.
     pub fn get(&self, project: &str, zone: &str, autoscaler: &str) -> AutoscalerGetCall<'a, C, NC, A> {
         AutoscalerGetCall {
             hub: self.hub,
@@ -1051,7 +1118,7 @@ impl<'a, C, NC, A> AutoscalerMethods<'a, C, NC, A> {
 /// 
 ///
 /// A builder for the *list* method supported by a *zone* resource.
-/// It is not used directly, but through a `ZoneMethods`.
+/// It is not used directly, but through a `ZoneMethods` instance.
 ///
 /// # Example
 ///
@@ -1124,7 +1191,7 @@ impl<'a, C, NC, A> ZoneListCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
         for &field in ["alt", "project", "pageToken", "maxResults", "filter"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -1177,7 +1244,7 @@ impl<'a, C, NC, A> ZoneListCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -1189,7 +1256,6 @@ impl<'a, C, NC, A> ZoneListCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -1199,7 +1265,7 @@ impl<'a, C, NC, A> ZoneListCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -1210,7 +1276,7 @@ impl<'a, C, NC, A> ZoneListCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -1219,13 +1285,13 @@ impl<'a, C, NC, A> ZoneListCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -1318,7 +1384,7 @@ impl<'a, C, NC, A> ZoneListCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
 /// Retrieves the list of operation resources contained within the specified zone.
 ///
 /// A builder for the *list* method supported by a *zoneOperation* resource.
-/// It is not used directly, but through a `ZoneOperationMethods`.
+/// It is not used directly, but through a `ZoneOperationMethods` instance.
 ///
 /// # Example
 ///
@@ -1393,7 +1459,7 @@ impl<'a, C, NC, A> ZoneOperationListCall<'a, C, NC, A> where NC: hyper::net::Net
         for &field in ["alt", "project", "zone", "pageToken", "maxResults", "filter"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -1446,7 +1512,7 @@ impl<'a, C, NC, A> ZoneOperationListCall<'a, C, NC, A> where NC: hyper::net::Net
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -1458,7 +1524,6 @@ impl<'a, C, NC, A> ZoneOperationListCall<'a, C, NC, A> where NC: hyper::net::Net
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -1468,7 +1533,7 @@ impl<'a, C, NC, A> ZoneOperationListCall<'a, C, NC, A> where NC: hyper::net::Net
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -1479,7 +1544,7 @@ impl<'a, C, NC, A> ZoneOperationListCall<'a, C, NC, A> where NC: hyper::net::Net
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -1488,13 +1553,13 @@ impl<'a, C, NC, A> ZoneOperationListCall<'a, C, NC, A> where NC: hyper::net::Net
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -1596,7 +1661,7 @@ impl<'a, C, NC, A> ZoneOperationListCall<'a, C, NC, A> where NC: hyper::net::Net
 /// Deletes the specified zone-specific operation resource.
 ///
 /// A builder for the *delete* method supported by a *zoneOperation* resource.
-/// It is not used directly, but through a `ZoneOperationMethods`.
+/// It is not used directly, but through a `ZoneOperationMethods` instance.
 ///
 /// # Example
 ///
@@ -1658,7 +1723,7 @@ impl<'a, C, NC, A> ZoneOperationDeleteCall<'a, C, NC, A> where NC: hyper::net::N
         for &field in ["project", "zone", "operation"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -1710,7 +1775,7 @@ impl<'a, C, NC, A> ZoneOperationDeleteCall<'a, C, NC, A> where NC: hyper::net::N
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -1722,7 +1787,6 @@ impl<'a, C, NC, A> ZoneOperationDeleteCall<'a, C, NC, A> where NC: hyper::net::N
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -1732,7 +1796,7 @@ impl<'a, C, NC, A> ZoneOperationDeleteCall<'a, C, NC, A> where NC: hyper::net::N
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -1743,12 +1807,12 @@ impl<'a, C, NC, A> ZoneOperationDeleteCall<'a, C, NC, A> where NC: hyper::net::N
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = res;
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -1838,7 +1902,7 @@ impl<'a, C, NC, A> ZoneOperationDeleteCall<'a, C, NC, A> where NC: hyper::net::N
 /// Retrieves the specified zone-specific operation resource.
 ///
 /// A builder for the *get* method supported by a *zoneOperation* resource.
-/// It is not used directly, but through a `ZoneOperationMethods`.
+/// It is not used directly, but through a `ZoneOperationMethods` instance.
 ///
 /// # Example
 ///
@@ -1900,7 +1964,7 @@ impl<'a, C, NC, A> ZoneOperationGetCall<'a, C, NC, A> where NC: hyper::net::Netw
         for &field in ["alt", "project", "zone", "operation"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -1953,7 +2017,7 @@ impl<'a, C, NC, A> ZoneOperationGetCall<'a, C, NC, A> where NC: hyper::net::Netw
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -1965,7 +2029,6 @@ impl<'a, C, NC, A> ZoneOperationGetCall<'a, C, NC, A> where NC: hyper::net::Netw
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -1975,7 +2038,7 @@ impl<'a, C, NC, A> ZoneOperationGetCall<'a, C, NC, A> where NC: hyper::net::Netw
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -1986,7 +2049,7 @@ impl<'a, C, NC, A> ZoneOperationGetCall<'a, C, NC, A> where NC: hyper::net::Netw
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -1995,13 +2058,13 @@ impl<'a, C, NC, A> ZoneOperationGetCall<'a, C, NC, A> where NC: hyper::net::Netw
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -2091,7 +2154,7 @@ impl<'a, C, NC, A> ZoneOperationGetCall<'a, C, NC, A> where NC: hyper::net::Netw
 /// Lists all Autoscaler resources in this zone.
 ///
 /// A builder for the *list* method supported by a *autoscaler* resource.
-/// It is not used directly, but through a `AutoscalerMethods`.
+/// It is not used directly, but through a `AutoscalerMethods` instance.
 ///
 /// # Example
 ///
@@ -2166,7 +2229,7 @@ impl<'a, C, NC, A> AutoscalerListCall<'a, C, NC, A> where NC: hyper::net::Networ
         for &field in ["alt", "project", "zone", "pageToken", "maxResults", "filter"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -2219,7 +2282,7 @@ impl<'a, C, NC, A> AutoscalerListCall<'a, C, NC, A> where NC: hyper::net::Networ
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -2231,7 +2294,6 @@ impl<'a, C, NC, A> AutoscalerListCall<'a, C, NC, A> where NC: hyper::net::Networ
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -2241,7 +2303,7 @@ impl<'a, C, NC, A> AutoscalerListCall<'a, C, NC, A> where NC: hyper::net::Networ
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -2252,7 +2314,7 @@ impl<'a, C, NC, A> AutoscalerListCall<'a, C, NC, A> where NC: hyper::net::Networ
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -2261,13 +2323,13 @@ impl<'a, C, NC, A> AutoscalerListCall<'a, C, NC, A> where NC: hyper::net::Networ
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -2279,7 +2341,7 @@ impl<'a, C, NC, A> AutoscalerListCall<'a, C, NC, A> where NC: hyper::net::Networ
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Project ID of Autoscaler resource.    
+    /// Project ID of Autoscaler resource.
     pub fn project(mut self, new_value: &str) -> AutoscalerListCall<'a, C, NC, A> {
         self._project = new_value.to_string();
         self
@@ -2289,7 +2351,7 @@ impl<'a, C, NC, A> AutoscalerListCall<'a, C, NC, A> where NC: hyper::net::Networ
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Zone name of Autoscaler resource.    
+    /// Zone name of Autoscaler resource.
     pub fn zone(mut self, new_value: &str) -> AutoscalerListCall<'a, C, NC, A> {
         self._zone = new_value.to_string();
         self
@@ -2371,7 +2433,7 @@ impl<'a, C, NC, A> AutoscalerListCall<'a, C, NC, A> where NC: hyper::net::Networ
 /// Update the entire content of the Autoscaler resource.
 ///
 /// A builder for the *update* method supported by a *autoscaler* resource.
-/// It is not used directly, but through a `AutoscalerMethods`.
+/// It is not used directly, but through a `AutoscalerMethods` instance.
 ///
 /// # Example
 ///
@@ -2440,7 +2502,7 @@ impl<'a, C, NC, A> AutoscalerUpdateCall<'a, C, NC, A> where NC: hyper::net::Netw
         for &field in ["alt", "project", "zone", "autoscaler"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -2497,7 +2559,7 @@ impl<'a, C, NC, A> AutoscalerUpdateCall<'a, C, NC, A> where NC: hyper::net::Netw
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -2513,7 +2575,6 @@ impl<'a, C, NC, A> AutoscalerUpdateCall<'a, C, NC, A> where NC: hyper::net::Netw
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -2523,7 +2584,7 @@ impl<'a, C, NC, A> AutoscalerUpdateCall<'a, C, NC, A> where NC: hyper::net::Netw
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -2534,7 +2595,7 @@ impl<'a, C, NC, A> AutoscalerUpdateCall<'a, C, NC, A> where NC: hyper::net::Netw
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -2543,13 +2604,13 @@ impl<'a, C, NC, A> AutoscalerUpdateCall<'a, C, NC, A> where NC: hyper::net::Netw
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -2570,7 +2631,7 @@ impl<'a, C, NC, A> AutoscalerUpdateCall<'a, C, NC, A> where NC: hyper::net::Netw
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Project ID of Autoscaler resource.    
+    /// Project ID of Autoscaler resource.
     pub fn project(mut self, new_value: &str) -> AutoscalerUpdateCall<'a, C, NC, A> {
         self._project = new_value.to_string();
         self
@@ -2580,7 +2641,7 @@ impl<'a, C, NC, A> AutoscalerUpdateCall<'a, C, NC, A> where NC: hyper::net::Netw
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Zone name of Autoscaler resource.    
+    /// Zone name of Autoscaler resource.
     pub fn zone(mut self, new_value: &str) -> AutoscalerUpdateCall<'a, C, NC, A> {
         self._zone = new_value.to_string();
         self
@@ -2590,7 +2651,7 @@ impl<'a, C, NC, A> AutoscalerUpdateCall<'a, C, NC, A> where NC: hyper::net::Netw
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Name of the Autoscaler resource.    
+    /// Name of the Autoscaler resource.
     pub fn autoscaler(mut self, new_value: &str) -> AutoscalerUpdateCall<'a, C, NC, A> {
         self._autoscaler = new_value.to_string();
         self
@@ -2651,7 +2712,7 @@ impl<'a, C, NC, A> AutoscalerUpdateCall<'a, C, NC, A> where NC: hyper::net::Netw
 /// Update the entire content of the Autoscaler resource. This method supports patch semantics.
 ///
 /// A builder for the *patch* method supported by a *autoscaler* resource.
-/// It is not used directly, but through a `AutoscalerMethods`.
+/// It is not used directly, but through a `AutoscalerMethods` instance.
 ///
 /// # Example
 ///
@@ -2720,7 +2781,7 @@ impl<'a, C, NC, A> AutoscalerPatchCall<'a, C, NC, A> where NC: hyper::net::Netwo
         for &field in ["alt", "project", "zone", "autoscaler"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -2777,7 +2838,7 @@ impl<'a, C, NC, A> AutoscalerPatchCall<'a, C, NC, A> where NC: hyper::net::Netwo
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -2793,7 +2854,6 @@ impl<'a, C, NC, A> AutoscalerPatchCall<'a, C, NC, A> where NC: hyper::net::Netwo
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -2803,7 +2863,7 @@ impl<'a, C, NC, A> AutoscalerPatchCall<'a, C, NC, A> where NC: hyper::net::Netwo
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -2814,7 +2874,7 @@ impl<'a, C, NC, A> AutoscalerPatchCall<'a, C, NC, A> where NC: hyper::net::Netwo
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -2823,13 +2883,13 @@ impl<'a, C, NC, A> AutoscalerPatchCall<'a, C, NC, A> where NC: hyper::net::Netwo
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -2850,7 +2910,7 @@ impl<'a, C, NC, A> AutoscalerPatchCall<'a, C, NC, A> where NC: hyper::net::Netwo
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Project ID of Autoscaler resource.    
+    /// Project ID of Autoscaler resource.
     pub fn project(mut self, new_value: &str) -> AutoscalerPatchCall<'a, C, NC, A> {
         self._project = new_value.to_string();
         self
@@ -2860,7 +2920,7 @@ impl<'a, C, NC, A> AutoscalerPatchCall<'a, C, NC, A> where NC: hyper::net::Netwo
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Zone name of Autoscaler resource.    
+    /// Zone name of Autoscaler resource.
     pub fn zone(mut self, new_value: &str) -> AutoscalerPatchCall<'a, C, NC, A> {
         self._zone = new_value.to_string();
         self
@@ -2870,7 +2930,7 @@ impl<'a, C, NC, A> AutoscalerPatchCall<'a, C, NC, A> where NC: hyper::net::Netwo
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Name of the Autoscaler resource.    
+    /// Name of the Autoscaler resource.
     pub fn autoscaler(mut self, new_value: &str) -> AutoscalerPatchCall<'a, C, NC, A> {
         self._autoscaler = new_value.to_string();
         self
@@ -2931,7 +2991,7 @@ impl<'a, C, NC, A> AutoscalerPatchCall<'a, C, NC, A> where NC: hyper::net::Netwo
 /// Deletes the specified Autoscaler resource.
 ///
 /// A builder for the *delete* method supported by a *autoscaler* resource.
-/// It is not used directly, but through a `AutoscalerMethods`.
+/// It is not used directly, but through a `AutoscalerMethods` instance.
 ///
 /// # Example
 ///
@@ -2993,7 +3053,7 @@ impl<'a, C, NC, A> AutoscalerDeleteCall<'a, C, NC, A> where NC: hyper::net::Netw
         for &field in ["alt", "project", "zone", "autoscaler"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -3046,7 +3106,7 @@ impl<'a, C, NC, A> AutoscalerDeleteCall<'a, C, NC, A> where NC: hyper::net::Netw
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -3058,7 +3118,6 @@ impl<'a, C, NC, A> AutoscalerDeleteCall<'a, C, NC, A> where NC: hyper::net::Netw
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -3068,7 +3127,7 @@ impl<'a, C, NC, A> AutoscalerDeleteCall<'a, C, NC, A> where NC: hyper::net::Netw
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -3079,7 +3138,7 @@ impl<'a, C, NC, A> AutoscalerDeleteCall<'a, C, NC, A> where NC: hyper::net::Netw
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -3088,13 +3147,13 @@ impl<'a, C, NC, A> AutoscalerDeleteCall<'a, C, NC, A> where NC: hyper::net::Netw
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -3106,7 +3165,7 @@ impl<'a, C, NC, A> AutoscalerDeleteCall<'a, C, NC, A> where NC: hyper::net::Netw
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Project ID of Autoscaler resource.    
+    /// Project ID of Autoscaler resource.
     pub fn project(mut self, new_value: &str) -> AutoscalerDeleteCall<'a, C, NC, A> {
         self._project = new_value.to_string();
         self
@@ -3116,7 +3175,7 @@ impl<'a, C, NC, A> AutoscalerDeleteCall<'a, C, NC, A> where NC: hyper::net::Netw
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Zone name of Autoscaler resource.    
+    /// Zone name of Autoscaler resource.
     pub fn zone(mut self, new_value: &str) -> AutoscalerDeleteCall<'a, C, NC, A> {
         self._zone = new_value.to_string();
         self
@@ -3126,7 +3185,7 @@ impl<'a, C, NC, A> AutoscalerDeleteCall<'a, C, NC, A> where NC: hyper::net::Netw
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Name of the Autoscaler resource.    
+    /// Name of the Autoscaler resource.
     pub fn autoscaler(mut self, new_value: &str) -> AutoscalerDeleteCall<'a, C, NC, A> {
         self._autoscaler = new_value.to_string();
         self
@@ -3187,7 +3246,7 @@ impl<'a, C, NC, A> AutoscalerDeleteCall<'a, C, NC, A> where NC: hyper::net::Netw
 /// Adds new Autoscaler resource.
 ///
 /// A builder for the *insert* method supported by a *autoscaler* resource.
-/// It is not used directly, but through a `AutoscalerMethods`.
+/// It is not used directly, but through a `AutoscalerMethods` instance.
 ///
 /// # Example
 ///
@@ -3254,7 +3313,7 @@ impl<'a, C, NC, A> AutoscalerInsertCall<'a, C, NC, A> where NC: hyper::net::Netw
         for &field in ["alt", "project", "zone"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -3311,7 +3370,7 @@ impl<'a, C, NC, A> AutoscalerInsertCall<'a, C, NC, A> where NC: hyper::net::Netw
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -3327,7 +3386,6 @@ impl<'a, C, NC, A> AutoscalerInsertCall<'a, C, NC, A> where NC: hyper::net::Netw
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -3337,7 +3395,7 @@ impl<'a, C, NC, A> AutoscalerInsertCall<'a, C, NC, A> where NC: hyper::net::Netw
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -3348,7 +3406,7 @@ impl<'a, C, NC, A> AutoscalerInsertCall<'a, C, NC, A> where NC: hyper::net::Netw
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -3357,13 +3415,13 @@ impl<'a, C, NC, A> AutoscalerInsertCall<'a, C, NC, A> where NC: hyper::net::Netw
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -3384,7 +3442,7 @@ impl<'a, C, NC, A> AutoscalerInsertCall<'a, C, NC, A> where NC: hyper::net::Netw
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Project ID of Autoscaler resource.    
+    /// Project ID of Autoscaler resource.
     pub fn project(mut self, new_value: &str) -> AutoscalerInsertCall<'a, C, NC, A> {
         self._project = new_value.to_string();
         self
@@ -3394,7 +3452,7 @@ impl<'a, C, NC, A> AutoscalerInsertCall<'a, C, NC, A> where NC: hyper::net::Netw
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Zone name of Autoscaler resource.    
+    /// Zone name of Autoscaler resource.
     pub fn zone(mut self, new_value: &str) -> AutoscalerInsertCall<'a, C, NC, A> {
         self._zone = new_value.to_string();
         self
@@ -3455,7 +3513,7 @@ impl<'a, C, NC, A> AutoscalerInsertCall<'a, C, NC, A> where NC: hyper::net::Netw
 /// Gets the specified Autoscaler resource.
 ///
 /// A builder for the *get* method supported by a *autoscaler* resource.
-/// It is not used directly, but through a `AutoscalerMethods`.
+/// It is not used directly, but through a `AutoscalerMethods` instance.
 ///
 /// # Example
 ///
@@ -3517,7 +3575,7 @@ impl<'a, C, NC, A> AutoscalerGetCall<'a, C, NC, A> where NC: hyper::net::Network
         for &field in ["alt", "project", "zone", "autoscaler"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -3570,7 +3628,7 @@ impl<'a, C, NC, A> AutoscalerGetCall<'a, C, NC, A> where NC: hyper::net::Network
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -3582,7 +3640,6 @@ impl<'a, C, NC, A> AutoscalerGetCall<'a, C, NC, A> where NC: hyper::net::Network
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -3592,7 +3649,7 @@ impl<'a, C, NC, A> AutoscalerGetCall<'a, C, NC, A> where NC: hyper::net::Network
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -3603,7 +3660,7 @@ impl<'a, C, NC, A> AutoscalerGetCall<'a, C, NC, A> where NC: hyper::net::Network
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -3612,13 +3669,13 @@ impl<'a, C, NC, A> AutoscalerGetCall<'a, C, NC, A> where NC: hyper::net::Network
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -3630,7 +3687,7 @@ impl<'a, C, NC, A> AutoscalerGetCall<'a, C, NC, A> where NC: hyper::net::Network
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Project ID of Autoscaler resource.    
+    /// Project ID of Autoscaler resource.
     pub fn project(mut self, new_value: &str) -> AutoscalerGetCall<'a, C, NC, A> {
         self._project = new_value.to_string();
         self
@@ -3640,7 +3697,7 @@ impl<'a, C, NC, A> AutoscalerGetCall<'a, C, NC, A> where NC: hyper::net::Network
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Zone name of Autoscaler resource.    
+    /// Zone name of Autoscaler resource.
     pub fn zone(mut self, new_value: &str) -> AutoscalerGetCall<'a, C, NC, A> {
         self._zone = new_value.to_string();
         self
@@ -3650,7 +3707,7 @@ impl<'a, C, NC, A> AutoscalerGetCall<'a, C, NC, A> where NC: hyper::net::Network
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Name of the Autoscaler resource.    
+    /// Name of the Autoscaler resource.
     pub fn autoscaler(mut self, new_value: &str) -> AutoscalerGetCall<'a, C, NC, A> {
         self._autoscaler = new_value.to_string();
         self

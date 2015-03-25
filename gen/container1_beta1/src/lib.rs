@@ -1,8 +1,8 @@
 // DO NOT EDIT !
-// This file was generated automatically from 'src/mako/lib.rs.mako'
+// This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *container* crate version *0.1.1+20150223*, where *20150223* is the exact revision of the *container:v1beta1* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.1*.
+//! This documentation was generated from *container* crate version *0.1.2+20150316*, where *20150316* is the exact revision of the *container:v1beta1* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.2*.
 //! 
 //! Everything else about the *container* *v1_beta1* API can be found at the
 //! [official documentation site](https://cloud.google.com/container-engine/docs/v1beta1/).
@@ -25,6 +25,8 @@
 //! 
 //! * **[Hub](struct.Container.html)**
 //!     * a central object to maintain state and allow accessing all *Activities*
+//!     * creates [*Method Builders*](trait.MethodsBuilder.html) which in turn
+//!       allow access to individual [*Call Builders*](trait.CallBuilder.html)
 //! * **[Resources](trait.Resource.html)**
 //!     * primary types that you can apply *Activities* to
 //!     * a collection of properties and *Parts*
@@ -33,6 +35,8 @@
 //!         * never directly used in *Activities*
 //! * **[Activities](trait.CallBuilder.html)**
 //!     * operations to apply to *Resources*
+//! 
+//! All *structures* are marked with applicable traits to further categorize them and ease browsing.
 //! 
 //! Generally speaking, you can invoke *Activities* like this:
 //! 
@@ -70,7 +74,7 @@
 //! extern crate hyper;
 //! extern crate "yup-oauth2" as oauth2;
 //! extern crate "google-container1_beta1" as container1_beta1;
-//! use container1_beta1::Result;
+//! use container1_beta1::{Result, Error};
 //! # #[test] fn egal() {
 //! use std::default::Default;
 //! use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -95,15 +99,17 @@
 //!              .doit();
 //! 
 //! match result {
-//!     Result::HttpError(err) => println!("HTTPERROR: {:?}", err),
-//!     Result::MissingAPIKey => println!("Auth: Missing API Key - used if there are no scopes"),
-//!     Result::MissingToken => println!("OAuth2: Missing Token"),
-//!     Result::Cancelled => println!("Operation cancelled by user"),
-//!     Result::UploadSizeLimitExceeded(size, max_size) => println!("Upload size too big: {} of {}", size, max_size),
-//!     Result::Failure(_) => println!("General Failure (hyper::client::Response doesn't print)"),
-//!     Result::FieldClash(clashed_field) => println!("You added custom parameter which is part of builder: {:?}", clashed_field),
-//!     Result::JsonDecodeError(err) => println!("Couldn't understand server reply - maybe API needs update: {:?}", err),
-//!     Result::Success(_) => println!("Success (value doesn't print)"),
+//!     Err(e) => match e {
+//!         Error::HttpError(err) => println!("HTTPERROR: {:?}", err),
+//!         Error::MissingAPIKey => println!("Auth: Missing API Key - used if there are no scopes"),
+//!         Error::MissingToken => println!("OAuth2: Missing Token"),
+//!         Error::Cancelled => println!("Operation canceled by user"),
+//!         Error::UploadSizeLimitExceeded(size, max_size) => println!("Upload size too big: {} of {}", size, max_size),
+//!         Error::Failure(_) => println!("General Failure (hyper::client::Response doesn't print)"),
+//!         Error::FieldClash(clashed_field) => println!("You added custom parameter which is part of builder: {:?}", clashed_field),
+//!         Error::JsonDecodeError(err) => println!("Couldn't understand server reply - maybe API needs update: {:?}", err),
+//!     },
+//!     Ok(_) => println!("Success (value doesn't print)"),
 //! }
 //! # }
 //! ```
@@ -116,7 +122,7 @@
 //! When delegates handle errors or intermediate values, they may have a chance to instruct the system to retry. This 
 //! makes the system potentially resilient to all kinds of errors.
 //! 
-//! ## Uploads and Downlods
+//! ## Uploads and Downloads
 //! If a method supports downloads, the response body, which is part of the [Result](enum.Result.html), should be
 //! read by you to obtain the media.
 //! If such a method also supports a [Response Result](trait.ResponseResult.html), it will return that by default.
@@ -139,8 +145,9 @@
 //! ## Optional Parts in Server-Requests
 //! 
 //! All structures provided by this library are made to be [enocodable](trait.RequestValue.html) and 
-//! [decodable](trait.ResponseResult.html) via json. Optionals are used to indicate that partial requests are responses are valid.
-//! Most optionals are are considered [Parts](trait.Part.html) which are identifyable by name, which will be sent to 
+//! [decodable](trait.ResponseResult.html) via *json*. Optionals are used to indicate that partial requests are responses 
+//! are valid.
+//! Most optionals are are considered [Parts](trait.Part.html) which are identifiable by name, which will be sent to 
 //! the server to indicate either the set parts of the request or the desired parts in the response.
 //! 
 //! ## Builder Arguments
@@ -189,7 +196,7 @@ use std::io;
 use std::fs;
 use std::thread::sleep;
 
-pub use cmn::{MultiPartReader, ToParts, MethodInfo, Result, CallBuilder, Hub, ReadSeek, Part, ResponseResult, RequestValue, NestedType, Delegate, DefaultDelegate, ResourceMethodsBuilder, Resource, JsonServerError};
+pub use cmn::{MultiPartReader, ToParts, MethodInfo, Result, Error, CallBuilder, Hub, ReadSeek, Part, ResponseResult, RequestValue, NestedType, Delegate, DefaultDelegate, MethodsBuilder, Resource, JsonServerError};
 
 
 // ##############
@@ -235,7 +242,7 @@ impl Default for Scope {
 /// extern crate hyper;
 /// extern crate "yup-oauth2" as oauth2;
 /// extern crate "google-container1_beta1" as container1_beta1;
-/// use container1_beta1::Result;
+/// use container1_beta1::{Result, Error};
 /// # #[test] fn egal() {
 /// use std::default::Default;
 /// use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -260,15 +267,17 @@ impl Default for Scope {
 ///              .doit();
 /// 
 /// match result {
-///     Result::HttpError(err) => println!("HTTPERROR: {:?}", err),
-///     Result::MissingAPIKey => println!("Auth: Missing API Key - used if there are no scopes"),
-///     Result::MissingToken => println!("OAuth2: Missing Token"),
-///     Result::Cancelled => println!("Operation cancelled by user"),
-///     Result::UploadSizeLimitExceeded(size, max_size) => println!("Upload size too big: {} of {}", size, max_size),
-///     Result::Failure(_) => println!("General Failure (hyper::client::Response doesn't print)"),
-///     Result::FieldClash(clashed_field) => println!("You added custom parameter which is part of builder: {:?}", clashed_field),
-///     Result::JsonDecodeError(err) => println!("Couldn't understand server reply - maybe API needs update: {:?}", err),
-///     Result::Success(_) => println!("Success (value doesn't print)"),
+///     Err(e) => match e {
+///         Error::HttpError(err) => println!("HTTPERROR: {:?}", err),
+///         Error::MissingAPIKey => println!("Auth: Missing API Key - used if there are no scopes"),
+///         Error::MissingToken => println!("OAuth2: Missing Token"),
+///         Error::Cancelled => println!("Operation canceled by user"),
+///         Error::UploadSizeLimitExceeded(size, max_size) => println!("Upload size too big: {} of {}", size, max_size),
+///         Error::Failure(_) => println!("General Failure (hyper::client::Response doesn't print)"),
+///         Error::FieldClash(clashed_field) => println!("You added custom parameter which is part of builder: {:?}", clashed_field),
+///         Error::JsonDecodeError(err) => println!("Couldn't understand server reply - maybe API needs update: {:?}", err),
+///     },
+///     Ok(_) => println!("Success (value doesn't print)"),
 /// }
 /// # }
 /// ```
@@ -289,7 +298,7 @@ impl<'a, C, NC, A> Container<C, NC, A>
         Container {
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/0.1.1".to_string(),
+            _user_agent: "google-api-rust-client/0.1.2".to_string(),
             _m: PhantomData
         }
     }
@@ -299,7 +308,7 @@ impl<'a, C, NC, A> Container<C, NC, A>
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/0.1.1`.
+    /// It defaults to `google-api-rust-client/0.1.2`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -324,7 +333,7 @@ impl<'a, C, NC, A> Container<C, NC, A>
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct ListOperationsResponse {
-    /// A list of operations in the project in the specified zone.    
+    /// A list of operations in the project in the specified zone.
     pub operations: Vec<Operation>,
 }
 
@@ -342,7 +351,7 @@ impl ResponseResult for ListOperationsResponse {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct ListAggregatedClustersResponse {
-    /// A list of clusters in the project, across all zones.    
+    /// A list of clusters in the project, across all zones.
     pub clusters: Vec<Cluster>,
 }
 
@@ -360,7 +369,7 @@ impl ResponseResult for ListAggregatedClustersResponse {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct ListClustersResponse {
-    /// A list of clusters in the project in the specified zone.    
+    /// A list of clusters in the project in the specified zone.
     pub clusters: Vec<Cluster>,
 }
 
@@ -373,9 +382,9 @@ impl ResponseResult for ListClustersResponse {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct MasterAuth {
-    /// The password to use when accessing the Kubernetes master endpoint.    
+    /// The password to use when accessing the Kubernetes master endpoint.
     pub password: String,
-    /// The username to use when accessing the Kubernetes master endpoint.    
+    /// The username to use when accessing the Kubernetes master endpoint.
     pub user: String,
 }
 
@@ -393,23 +402,23 @@ impl Part for MasterAuth {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Cluster {
-    /// [Output only] The current status of this cluster.    
+    /// [Output only] The current status of this cluster.
     pub status: String,
-    /// [Output only] The IP addresses of the container pods in this cluster, in  CIDR notation (e.g. 1.2.3.4/29).    
+    /// [Output only] The IP addresses of the container pods in this cluster, in  CIDR notation (e.g. 1.2.3.4/29).
     #[serde(alias="containerIpv4Cidr")]
     pub container_ipv4_cidr: String,
-    /// An optional description of this cluster.    
+    /// An optional description of this cluster.
     pub description: String,
-    /// [Output only] The size of the address space on each node for hosting containers.    
+    /// [Output only] The size of the address space on each node for hosting containers.
     #[serde(alias="nodeRoutingPrefixSize")]
     pub node_routing_prefix_size: i32,
-    /// The HTTP basic authentication information for accessing the master. Because the master endpoint is open to the internet, you should create a strong password.    
+    /// The HTTP basic authentication information for accessing the master. Because the master endpoint is open to the internet, you should create a strong password.
     #[serde(alias="masterAuth")]
     pub master_auth: MasterAuth,
-    /// The API version of the Kubernetes master and kubelets running in this cluster. Leave blank to pick up the latest stable release, or specify a version of the form "x.y.z". The Google Container Engine release notes lists the currently supported versions. If an incorrect version is specified, the server returns an error listing the currently supported versions.    
+    /// The API version of the Kubernetes master and kubelets running in this cluster. Leave blank to pick up the latest stable release, or specify a version of the form "x.y.z". The Google Container Engine release notes lists the currently supported versions. If an incorrect version is specified, the server returns an error listing the currently supported versions.
     #[serde(alias="clusterApiVersion")]
     pub cluster_api_version: String,
-    /// [Output only] The time the cluster was created, in RFC3339 text format.    
+    /// [Output only] The time the cluster was created, in RFC3339 text format.
     #[serde(alias="creationTimestamp")]
     pub creation_timestamp: String,
     /// The name of this cluster. The name must be unique within this project and zone, and can be up to 40 characters with the following restrictions:  
@@ -421,23 +430,23 @@ pub struct Cluster {
     /// 
     /// See the masterAuth property of this resource for username and password information.
     pub endpoint: String,
-    /// The name of the Google Compute Engine network to which the cluster is connected.    
+    /// The name of the Google Compute Engine network to which the cluster is connected.
     pub network: String,
-    /// [Output only] The name of the Google Compute Engine zone in which the cluster resides.    
+    /// [Output only] The name of the Google Compute Engine zone in which the cluster resides.
     pub zone: String,
-    /// The number of nodes to create in this cluster. You must ensure that your Compute Engine resource quota is sufficient for this number of instances plus one (to include the master). You must also have available firewall and routes quota.    
+    /// The number of nodes to create in this cluster. You must ensure that your Compute Engine resource quota is sufficient for this number of instances plus one (to include the master). You must also have available firewall and routes quota.
     #[serde(alias="numNodes")]
     pub num_nodes: i32,
-    /// The machine type and image to use for all nodes in this cluster. See the descriptions of the child properties of nodeConfig.    
+    /// The machine type and image to use for all nodes in this cluster. See the descriptions of the child properties of nodeConfig.
     #[serde(alias="nodeConfig")]
     pub node_config: NodeConfig,
-    /// [Output only] Server-defined URL for the resource.    
+    /// [Output only] Server-defined URL for the resource.
     #[serde(alias="selfLink")]
     pub self_link: String,
-    /// [Output only] Additional information about the current status of this cluster, if available.    
+    /// [Output only] Additional information about the current status of this cluster, if available.
     #[serde(alias="statusMessage")]
     pub status_message: String,
-    /// [Output only] The IP addresses of the Kubernetes services in this cluster, in  CIDR notation (e.g. 1.2.3.4/29). Service addresses are always in the 10.0.0.0/16 range.    
+    /// [Output only] The IP addresses of the Kubernetes services in this cluster, in  CIDR notation (e.g. 1.2.3.4/29). Service addresses are always in the 10.0.0.0/16 range.
     #[serde(alias="servicesIpv4Cidr")]
     pub services_ipv4_cidr: String,
 }
@@ -477,9 +486,9 @@ impl Part for NodeConfig {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ServiceAccount {
-    /// The list of scopes to be made available for this service account.    
+    /// The list of scopes to be made available for this service account.
     pub scopes: Vec<String>,
-    /// Email address of the service account.    
+    /// Email address of the service account.
     pub email: String,
 }
 
@@ -499,25 +508,25 @@ impl Part for ServiceAccount {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct Operation {
-    /// The current status of the operation.    
+    /// The current status of the operation.
     pub status: String,
-    /// The server-assigned ID for this operation. If the operation is fulfilled upfront, it may not have a resource name.    
+    /// The server-assigned ID for this operation. If the operation is fulfilled upfront, it may not have a resource name.
     pub name: String,
-    /// The name of the Google Compute Engine zone in which the operation is taking place.    
+    /// The name of the Google Compute Engine zone in which the operation is taking place.
     pub zone: String,
-    /// If an error has occurred, a textual description of the error.    
+    /// If an error has occurred, a textual description of the error.
     #[serde(alias="errorMessage")]
     pub error_message: String,
-    /// Server-defined URL for the target of the operation.    
+    /// Server-defined URL for the target of the operation.
     #[serde(alias="targetLink")]
     pub target_link: String,
-    /// The operation type.    
+    /// The operation type.
     #[serde(alias="operationType")]
     pub operation_type: String,
-    /// Server-defined URL for the resource.    
+    /// Server-defined URL for the resource.
     #[serde(alias="selfLink")]
     pub self_link: String,
-    /// [Optional] The URL of the cluster resource that this operation is associated with.    
+    /// [Optional] The URL of the cluster resource that this operation is associated with.
     pub target: String,
 }
 
@@ -535,7 +544,7 @@ impl ResponseResult for Operation {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct ListAggregatedOperationsResponse {
-    /// A list of operations in the project, across all zones.    
+    /// A list of operations in the project, across all zones.
     pub operations: Vec<Operation>,
 }
 
@@ -553,7 +562,7 @@ impl ResponseResult for ListAggregatedOperationsResponse {}
 /// 
 #[derive(Default, Clone, Debug, Serialize)]
 pub struct CreateClusterRequest {
-    /// A cluster resource.    
+    /// A cluster resource.
     pub cluster: Option<Cluster>,
 }
 
@@ -599,13 +608,19 @@ pub struct ProjectMethods<'a, C, NC, A>
     hub: &'a Container<C, NC, A>,
 }
 
-impl<'a, C, NC, A> ResourceMethodsBuilder for ProjectMethods<'a, C, NC, A> {}
+impl<'a, C, NC, A> MethodsBuilder for ProjectMethods<'a, C, NC, A> {}
 
 impl<'a, C, NC, A> ProjectMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Gets a specific cluster.    
+    /// Gets a specific cluster.
+    /// 
+    /// # Arguments
+    ///
+    /// * `projectId` - The Google Developers Console project ID or  project number.
+    /// * `zoneId` - The name of the Google Compute Engine zone in which the cluster resides.
+    /// * `clusterId` - The name of the cluster to retrieve.
     pub fn zones_clusters_get(&self, project_id: &str, zone_id: &str, cluster_id: &str) -> ProjectZoneClusterGetCall<'a, C, NC, A> {
         ProjectZoneClusterGetCall {
             hub: self.hub,
@@ -620,7 +635,11 @@ impl<'a, C, NC, A> ProjectMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Lists all operations in a project, across all zones.    
+    /// Lists all operations in a project, across all zones.
+    /// 
+    /// # Arguments
+    ///
+    /// * `projectId` - The Google Developers Console project ID or  project number.
     pub fn operations_list(&self, project_id: &str) -> ProjectOperationListCall<'a, C, NC, A> {
         ProjectOperationListCall {
             hub: self.hub,
@@ -636,6 +655,12 @@ impl<'a, C, NC, A> ProjectMethods<'a, C, NC, A> {
     /// Deletes the cluster, including the Kubernetes master and all worker nodes.
     /// 
     /// Firewalls and routes that were configured at cluster creation are also deleted.
+    /// 
+    /// # Arguments
+    ///
+    /// * `projectId` - The Google Developers Console project ID or  project number.
+    /// * `zoneId` - The name of the Google Compute Engine zone in which the cluster resides.
+    /// * `clusterId` - The name of the cluster to delete.
     pub fn zones_clusters_delete(&self, project_id: &str, zone_id: &str, cluster_id: &str) -> ProjectZoneClusterDeleteCall<'a, C, NC, A> {
         ProjectZoneClusterDeleteCall {
             hub: self.hub,
@@ -650,7 +675,11 @@ impl<'a, C, NC, A> ProjectMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Lists all clusters owned by a project across all zones.    
+    /// Lists all clusters owned by a project across all zones.
+    /// 
+    /// # Arguments
+    ///
+    /// * `projectId` - The Google Developers Console project ID or  project number.
     pub fn clusters_list(&self, project_id: &str) -> ProjectClusterListCall<'a, C, NC, A> {
         ProjectClusterListCall {
             hub: self.hub,
@@ -663,7 +692,13 @@ impl<'a, C, NC, A> ProjectMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Gets the specified operation.    
+    /// Gets the specified operation.
+    /// 
+    /// # Arguments
+    ///
+    /// * `projectId` - The Google Developers Console project ID or  project number.
+    /// * `zoneId` - The name of the Google Compute Engine zone in which the operation resides. This is always the same zone as the cluster with which the operation is associated.
+    /// * `operationId` - The server-assigned name of the operation.
     pub fn zones_operations_get(&self, project_id: &str, zone_id: &str, operation_id: &str) -> ProjectZoneOperationGetCall<'a, C, NC, A> {
         ProjectZoneOperationGetCall {
             hub: self.hub,
@@ -678,7 +713,12 @@ impl<'a, C, NC, A> ProjectMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Lists all operations in a project in a specific zone.    
+    /// Lists all operations in a project in a specific zone.
+    /// 
+    /// # Arguments
+    ///
+    /// * `projectId` - The Google Developers Console project ID or  project number.
+    /// * `zoneId` - The name of the Google Compute Engine zone to return operations for.
     pub fn zones_operations_list(&self, project_id: &str, zone_id: &str) -> ProjectZoneOperationListCall<'a, C, NC, A> {
         ProjectZoneOperationListCall {
             hub: self.hub,
@@ -692,7 +732,12 @@ impl<'a, C, NC, A> ProjectMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Lists all clusters owned by a project in the specified zone.    
+    /// Lists all clusters owned by a project in the specified zone.
+    /// 
+    /// # Arguments
+    ///
+    /// * `projectId` - The Google Developers Console project ID or  project number.
+    /// * `zoneId` - The name of the Google Compute Engine zone in which the cluster resides.
     pub fn zones_clusters_list(&self, project_id: &str, zone_id: &str) -> ProjectZoneClusterListCall<'a, C, NC, A> {
         ProjectZoneClusterListCall {
             hub: self.hub,
@@ -713,6 +758,12 @@ impl<'a, C, NC, A> ProjectMethods<'a, C, NC, A> {
     /// A firewall is added that allows traffic into port 443 on the master, which enables HTTPS. A firewall and a route is added for each node to allow the containers on that node to communicate with all other instances in the cluster.
     /// 
     /// Finally, a route named k8s-iproute-10-xx-0-0 is created to track that the cluster's 10.xx.0.0/16 CIDR has been assigned.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `projectId` - The Google Developers Console project ID or  project number.
+    /// * `zoneId` - The name of the Google Compute Engine zone in which the cluster resides.
     pub fn zones_clusters_create(&self, request: &CreateClusterRequest, project_id: &str, zone_id: &str) -> ProjectZoneClusterCreateCall<'a, C, NC, A> {
         ProjectZoneClusterCreateCall {
             hub: self.hub,
@@ -737,7 +788,7 @@ impl<'a, C, NC, A> ProjectMethods<'a, C, NC, A> {
 /// Gets a specific cluster.
 ///
 /// A builder for the *zones.clusters.get* method supported by a *project* resource.
-/// It is not used directly, but through a `ProjectMethods`.
+/// It is not used directly, but through a `ProjectMethods` instance.
 ///
 /// # Example
 ///
@@ -799,7 +850,7 @@ impl<'a, C, NC, A> ProjectZoneClusterGetCall<'a, C, NC, A> where NC: hyper::net:
         for &field in ["alt", "projectId", "zoneId", "clusterId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -852,7 +903,7 @@ impl<'a, C, NC, A> ProjectZoneClusterGetCall<'a, C, NC, A> where NC: hyper::net:
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -864,7 +915,6 @@ impl<'a, C, NC, A> ProjectZoneClusterGetCall<'a, C, NC, A> where NC: hyper::net:
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -874,7 +924,7 @@ impl<'a, C, NC, A> ProjectZoneClusterGetCall<'a, C, NC, A> where NC: hyper::net:
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -885,7 +935,7 @@ impl<'a, C, NC, A> ProjectZoneClusterGetCall<'a, C, NC, A> where NC: hyper::net:
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -894,13 +944,13 @@ impl<'a, C, NC, A> ProjectZoneClusterGetCall<'a, C, NC, A> where NC: hyper::net:
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -912,7 +962,7 @@ impl<'a, C, NC, A> ProjectZoneClusterGetCall<'a, C, NC, A> where NC: hyper::net:
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The Google Developers Console project ID or  project number.    
+    /// The Google Developers Console project ID or  project number.
     pub fn project_id(mut self, new_value: &str) -> ProjectZoneClusterGetCall<'a, C, NC, A> {
         self._project_id = new_value.to_string();
         self
@@ -922,7 +972,7 @@ impl<'a, C, NC, A> ProjectZoneClusterGetCall<'a, C, NC, A> where NC: hyper::net:
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The name of the Google Compute Engine zone in which the cluster resides.    
+    /// The name of the Google Compute Engine zone in which the cluster resides.
     pub fn zone_id(mut self, new_value: &str) -> ProjectZoneClusterGetCall<'a, C, NC, A> {
         self._zone_id = new_value.to_string();
         self
@@ -932,7 +982,7 @@ impl<'a, C, NC, A> ProjectZoneClusterGetCall<'a, C, NC, A> where NC: hyper::net:
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The name of the cluster to retrieve.    
+    /// The name of the cluster to retrieve.
     pub fn cluster_id(mut self, new_value: &str) -> ProjectZoneClusterGetCall<'a, C, NC, A> {
         self._cluster_id = new_value.to_string();
         self
@@ -993,7 +1043,7 @@ impl<'a, C, NC, A> ProjectZoneClusterGetCall<'a, C, NC, A> where NC: hyper::net:
 /// Lists all operations in a project, across all zones.
 ///
 /// A builder for the *operations.list* method supported by a *project* resource.
-/// It is not used directly, but through a `ProjectMethods`.
+/// It is not used directly, but through a `ProjectMethods` instance.
 ///
 /// # Example
 ///
@@ -1051,7 +1101,7 @@ impl<'a, C, NC, A> ProjectOperationListCall<'a, C, NC, A> where NC: hyper::net::
         for &field in ["alt", "projectId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -1104,7 +1154,7 @@ impl<'a, C, NC, A> ProjectOperationListCall<'a, C, NC, A> where NC: hyper::net::
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -1116,7 +1166,6 @@ impl<'a, C, NC, A> ProjectOperationListCall<'a, C, NC, A> where NC: hyper::net::
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -1126,7 +1175,7 @@ impl<'a, C, NC, A> ProjectOperationListCall<'a, C, NC, A> where NC: hyper::net::
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -1137,7 +1186,7 @@ impl<'a, C, NC, A> ProjectOperationListCall<'a, C, NC, A> where NC: hyper::net::
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -1146,13 +1195,13 @@ impl<'a, C, NC, A> ProjectOperationListCall<'a, C, NC, A> where NC: hyper::net::
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -1164,7 +1213,7 @@ impl<'a, C, NC, A> ProjectOperationListCall<'a, C, NC, A> where NC: hyper::net::
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The Google Developers Console project ID or  project number.    
+    /// The Google Developers Console project ID or  project number.
     pub fn project_id(mut self, new_value: &str) -> ProjectOperationListCall<'a, C, NC, A> {
         self._project_id = new_value.to_string();
         self
@@ -1227,7 +1276,7 @@ impl<'a, C, NC, A> ProjectOperationListCall<'a, C, NC, A> where NC: hyper::net::
 /// Firewalls and routes that were configured at cluster creation are also deleted.
 ///
 /// A builder for the *zones.clusters.delete* method supported by a *project* resource.
-/// It is not used directly, but through a `ProjectMethods`.
+/// It is not used directly, but through a `ProjectMethods` instance.
 ///
 /// # Example
 ///
@@ -1289,7 +1338,7 @@ impl<'a, C, NC, A> ProjectZoneClusterDeleteCall<'a, C, NC, A> where NC: hyper::n
         for &field in ["alt", "projectId", "zoneId", "clusterId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -1342,7 +1391,7 @@ impl<'a, C, NC, A> ProjectZoneClusterDeleteCall<'a, C, NC, A> where NC: hyper::n
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -1354,7 +1403,6 @@ impl<'a, C, NC, A> ProjectZoneClusterDeleteCall<'a, C, NC, A> where NC: hyper::n
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -1364,7 +1412,7 @@ impl<'a, C, NC, A> ProjectZoneClusterDeleteCall<'a, C, NC, A> where NC: hyper::n
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -1375,7 +1423,7 @@ impl<'a, C, NC, A> ProjectZoneClusterDeleteCall<'a, C, NC, A> where NC: hyper::n
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -1384,13 +1432,13 @@ impl<'a, C, NC, A> ProjectZoneClusterDeleteCall<'a, C, NC, A> where NC: hyper::n
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -1402,7 +1450,7 @@ impl<'a, C, NC, A> ProjectZoneClusterDeleteCall<'a, C, NC, A> where NC: hyper::n
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The Google Developers Console project ID or  project number.    
+    /// The Google Developers Console project ID or  project number.
     pub fn project_id(mut self, new_value: &str) -> ProjectZoneClusterDeleteCall<'a, C, NC, A> {
         self._project_id = new_value.to_string();
         self
@@ -1412,7 +1460,7 @@ impl<'a, C, NC, A> ProjectZoneClusterDeleteCall<'a, C, NC, A> where NC: hyper::n
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The name of the Google Compute Engine zone in which the cluster resides.    
+    /// The name of the Google Compute Engine zone in which the cluster resides.
     pub fn zone_id(mut self, new_value: &str) -> ProjectZoneClusterDeleteCall<'a, C, NC, A> {
         self._zone_id = new_value.to_string();
         self
@@ -1422,7 +1470,7 @@ impl<'a, C, NC, A> ProjectZoneClusterDeleteCall<'a, C, NC, A> where NC: hyper::n
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The name of the cluster to delete.    
+    /// The name of the cluster to delete.
     pub fn cluster_id(mut self, new_value: &str) -> ProjectZoneClusterDeleteCall<'a, C, NC, A> {
         self._cluster_id = new_value.to_string();
         self
@@ -1483,7 +1531,7 @@ impl<'a, C, NC, A> ProjectZoneClusterDeleteCall<'a, C, NC, A> where NC: hyper::n
 /// Lists all clusters owned by a project across all zones.
 ///
 /// A builder for the *clusters.list* method supported by a *project* resource.
-/// It is not used directly, but through a `ProjectMethods`.
+/// It is not used directly, but through a `ProjectMethods` instance.
 ///
 /// # Example
 ///
@@ -1541,7 +1589,7 @@ impl<'a, C, NC, A> ProjectClusterListCall<'a, C, NC, A> where NC: hyper::net::Ne
         for &field in ["alt", "projectId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -1594,7 +1642,7 @@ impl<'a, C, NC, A> ProjectClusterListCall<'a, C, NC, A> where NC: hyper::net::Ne
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -1606,7 +1654,6 @@ impl<'a, C, NC, A> ProjectClusterListCall<'a, C, NC, A> where NC: hyper::net::Ne
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -1616,7 +1663,7 @@ impl<'a, C, NC, A> ProjectClusterListCall<'a, C, NC, A> where NC: hyper::net::Ne
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -1627,7 +1674,7 @@ impl<'a, C, NC, A> ProjectClusterListCall<'a, C, NC, A> where NC: hyper::net::Ne
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -1636,13 +1683,13 @@ impl<'a, C, NC, A> ProjectClusterListCall<'a, C, NC, A> where NC: hyper::net::Ne
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -1654,7 +1701,7 @@ impl<'a, C, NC, A> ProjectClusterListCall<'a, C, NC, A> where NC: hyper::net::Ne
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The Google Developers Console project ID or  project number.    
+    /// The Google Developers Console project ID or  project number.
     pub fn project_id(mut self, new_value: &str) -> ProjectClusterListCall<'a, C, NC, A> {
         self._project_id = new_value.to_string();
         self
@@ -1715,7 +1762,7 @@ impl<'a, C, NC, A> ProjectClusterListCall<'a, C, NC, A> where NC: hyper::net::Ne
 /// Gets the specified operation.
 ///
 /// A builder for the *zones.operations.get* method supported by a *project* resource.
-/// It is not used directly, but through a `ProjectMethods`.
+/// It is not used directly, but through a `ProjectMethods` instance.
 ///
 /// # Example
 ///
@@ -1777,7 +1824,7 @@ impl<'a, C, NC, A> ProjectZoneOperationGetCall<'a, C, NC, A> where NC: hyper::ne
         for &field in ["alt", "projectId", "zoneId", "operationId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -1830,7 +1877,7 @@ impl<'a, C, NC, A> ProjectZoneOperationGetCall<'a, C, NC, A> where NC: hyper::ne
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -1842,7 +1889,6 @@ impl<'a, C, NC, A> ProjectZoneOperationGetCall<'a, C, NC, A> where NC: hyper::ne
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -1852,7 +1898,7 @@ impl<'a, C, NC, A> ProjectZoneOperationGetCall<'a, C, NC, A> where NC: hyper::ne
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -1863,7 +1909,7 @@ impl<'a, C, NC, A> ProjectZoneOperationGetCall<'a, C, NC, A> where NC: hyper::ne
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -1872,13 +1918,13 @@ impl<'a, C, NC, A> ProjectZoneOperationGetCall<'a, C, NC, A> where NC: hyper::ne
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -1890,7 +1936,7 @@ impl<'a, C, NC, A> ProjectZoneOperationGetCall<'a, C, NC, A> where NC: hyper::ne
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The Google Developers Console project ID or  project number.    
+    /// The Google Developers Console project ID or  project number.
     pub fn project_id(mut self, new_value: &str) -> ProjectZoneOperationGetCall<'a, C, NC, A> {
         self._project_id = new_value.to_string();
         self
@@ -1900,7 +1946,7 @@ impl<'a, C, NC, A> ProjectZoneOperationGetCall<'a, C, NC, A> where NC: hyper::ne
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The name of the Google Compute Engine zone in which the operation resides. This is always the same zone as the cluster with which the operation is associated.    
+    /// The name of the Google Compute Engine zone in which the operation resides. This is always the same zone as the cluster with which the operation is associated.
     pub fn zone_id(mut self, new_value: &str) -> ProjectZoneOperationGetCall<'a, C, NC, A> {
         self._zone_id = new_value.to_string();
         self
@@ -1910,7 +1956,7 @@ impl<'a, C, NC, A> ProjectZoneOperationGetCall<'a, C, NC, A> where NC: hyper::ne
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The server-assigned name of the operation.    
+    /// The server-assigned name of the operation.
     pub fn operation_id(mut self, new_value: &str) -> ProjectZoneOperationGetCall<'a, C, NC, A> {
         self._operation_id = new_value.to_string();
         self
@@ -1971,7 +2017,7 @@ impl<'a, C, NC, A> ProjectZoneOperationGetCall<'a, C, NC, A> where NC: hyper::ne
 /// Lists all operations in a project in a specific zone.
 ///
 /// A builder for the *zones.operations.list* method supported by a *project* resource.
-/// It is not used directly, but through a `ProjectMethods`.
+/// It is not used directly, but through a `ProjectMethods` instance.
 ///
 /// # Example
 ///
@@ -2031,7 +2077,7 @@ impl<'a, C, NC, A> ProjectZoneOperationListCall<'a, C, NC, A> where NC: hyper::n
         for &field in ["alt", "projectId", "zoneId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -2084,7 +2130,7 @@ impl<'a, C, NC, A> ProjectZoneOperationListCall<'a, C, NC, A> where NC: hyper::n
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -2096,7 +2142,6 @@ impl<'a, C, NC, A> ProjectZoneOperationListCall<'a, C, NC, A> where NC: hyper::n
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -2106,7 +2151,7 @@ impl<'a, C, NC, A> ProjectZoneOperationListCall<'a, C, NC, A> where NC: hyper::n
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -2117,7 +2162,7 @@ impl<'a, C, NC, A> ProjectZoneOperationListCall<'a, C, NC, A> where NC: hyper::n
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -2126,13 +2171,13 @@ impl<'a, C, NC, A> ProjectZoneOperationListCall<'a, C, NC, A> where NC: hyper::n
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -2144,7 +2189,7 @@ impl<'a, C, NC, A> ProjectZoneOperationListCall<'a, C, NC, A> where NC: hyper::n
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The Google Developers Console project ID or  project number.    
+    /// The Google Developers Console project ID or  project number.
     pub fn project_id(mut self, new_value: &str) -> ProjectZoneOperationListCall<'a, C, NC, A> {
         self._project_id = new_value.to_string();
         self
@@ -2154,7 +2199,7 @@ impl<'a, C, NC, A> ProjectZoneOperationListCall<'a, C, NC, A> where NC: hyper::n
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The name of the Google Compute Engine zone to return operations for.    
+    /// The name of the Google Compute Engine zone to return operations for.
     pub fn zone_id(mut self, new_value: &str) -> ProjectZoneOperationListCall<'a, C, NC, A> {
         self._zone_id = new_value.to_string();
         self
@@ -2215,7 +2260,7 @@ impl<'a, C, NC, A> ProjectZoneOperationListCall<'a, C, NC, A> where NC: hyper::n
 /// Lists all clusters owned by a project in the specified zone.
 ///
 /// A builder for the *zones.clusters.list* method supported by a *project* resource.
-/// It is not used directly, but through a `ProjectMethods`.
+/// It is not used directly, but through a `ProjectMethods` instance.
 ///
 /// # Example
 ///
@@ -2275,7 +2320,7 @@ impl<'a, C, NC, A> ProjectZoneClusterListCall<'a, C, NC, A> where NC: hyper::net
         for &field in ["alt", "projectId", "zoneId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -2328,7 +2373,7 @@ impl<'a, C, NC, A> ProjectZoneClusterListCall<'a, C, NC, A> where NC: hyper::net
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -2340,7 +2385,6 @@ impl<'a, C, NC, A> ProjectZoneClusterListCall<'a, C, NC, A> where NC: hyper::net
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -2350,7 +2394,7 @@ impl<'a, C, NC, A> ProjectZoneClusterListCall<'a, C, NC, A> where NC: hyper::net
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -2361,7 +2405,7 @@ impl<'a, C, NC, A> ProjectZoneClusterListCall<'a, C, NC, A> where NC: hyper::net
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -2370,13 +2414,13 @@ impl<'a, C, NC, A> ProjectZoneClusterListCall<'a, C, NC, A> where NC: hyper::net
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -2388,7 +2432,7 @@ impl<'a, C, NC, A> ProjectZoneClusterListCall<'a, C, NC, A> where NC: hyper::net
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The Google Developers Console project ID or  project number.    
+    /// The Google Developers Console project ID or  project number.
     pub fn project_id(mut self, new_value: &str) -> ProjectZoneClusterListCall<'a, C, NC, A> {
         self._project_id = new_value.to_string();
         self
@@ -2398,7 +2442,7 @@ impl<'a, C, NC, A> ProjectZoneClusterListCall<'a, C, NC, A> where NC: hyper::net
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The name of the Google Compute Engine zone in which the cluster resides.    
+    /// The name of the Google Compute Engine zone in which the cluster resides.
     pub fn zone_id(mut self, new_value: &str) -> ProjectZoneClusterListCall<'a, C, NC, A> {
         self._zone_id = new_value.to_string();
         self
@@ -2465,7 +2509,7 @@ impl<'a, C, NC, A> ProjectZoneClusterListCall<'a, C, NC, A> where NC: hyper::net
 /// Finally, a route named k8s-iproute-10-xx-0-0 is created to track that the cluster's 10.xx.0.0/16 CIDR has been assigned.
 ///
 /// A builder for the *zones.clusters.create* method supported by a *project* resource.
-/// It is not used directly, but through a `ProjectMethods`.
+/// It is not used directly, but through a `ProjectMethods` instance.
 ///
 /// # Example
 ///
@@ -2532,7 +2576,7 @@ impl<'a, C, NC, A> ProjectZoneClusterCreateCall<'a, C, NC, A> where NC: hyper::n
         for &field in ["alt", "projectId", "zoneId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -2589,7 +2633,7 @@ impl<'a, C, NC, A> ProjectZoneClusterCreateCall<'a, C, NC, A> where NC: hyper::n
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -2605,7 +2649,6 @@ impl<'a, C, NC, A> ProjectZoneClusterCreateCall<'a, C, NC, A> where NC: hyper::n
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -2615,7 +2658,7 @@ impl<'a, C, NC, A> ProjectZoneClusterCreateCall<'a, C, NC, A> where NC: hyper::n
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -2626,7 +2669,7 @@ impl<'a, C, NC, A> ProjectZoneClusterCreateCall<'a, C, NC, A> where NC: hyper::n
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -2635,13 +2678,13 @@ impl<'a, C, NC, A> ProjectZoneClusterCreateCall<'a, C, NC, A> where NC: hyper::n
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -2662,7 +2705,7 @@ impl<'a, C, NC, A> ProjectZoneClusterCreateCall<'a, C, NC, A> where NC: hyper::n
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The Google Developers Console project ID or  project number.    
+    /// The Google Developers Console project ID or  project number.
     pub fn project_id(mut self, new_value: &str) -> ProjectZoneClusterCreateCall<'a, C, NC, A> {
         self._project_id = new_value.to_string();
         self
@@ -2672,7 +2715,7 @@ impl<'a, C, NC, A> ProjectZoneClusterCreateCall<'a, C, NC, A> where NC: hyper::n
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The name of the Google Compute Engine zone in which the cluster resides.    
+    /// The name of the Google Compute Engine zone in which the cluster resides.
     pub fn zone_id(mut self, new_value: &str) -> ProjectZoneClusterCreateCall<'a, C, NC, A> {
         self._zone_id = new_value.to_string();
         self

@@ -1,11 +1,11 @@
 <!---
 DO NOT EDIT !
-This file was generated automatically from 'src/mako/README.md.mako'
+This file was generated automatically from 'src/mako/api/README.md.mako'
 DO NOT EDIT !
 -->
 The `google-dataflow1_b4` library allows access to all features of the *Google dataflow* service.
 
-This documentation was generated from *dataflow* crate version *0.1.1+20150130*, where *20150130* is the exact revision of the *dataflow:v1b4* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.1*.
+This documentation was generated from *dataflow* crate version *0.1.2+20150130*, where *20150130* is the exact revision of the *dataflow:v1b4* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.2*.
 # Features
 
 It seems there is nothing you can do here ... .
@@ -20,6 +20,8 @@ The API is structured into the following primary items:
 
 * **[Hub](http://byron.github.io/google-apis-rs/google-dataflow1_b4/struct.Dataflow.html)**
     * a central object to maintain state and allow accessing all *Activities*
+    * creates [*Method Builders*](http://byron.github.io/google-apis-rs/google-dataflow1_b4/trait.MethodsBuilder.html) which in turn
+      allow access to individual [*Call Builders*](http://byron.github.io/google-apis-rs/google-dataflow1_b4/trait.CallBuilder.html)
 * **[Resources](http://byron.github.io/google-apis-rs/google-dataflow1_b4/trait.Resource.html)**
     * primary types that you can apply *Activities* to
     * a collection of properties and *Parts*
@@ -28,6 +30,8 @@ The API is structured into the following primary items:
         * never directly used in *Activities*
 * **[Activities](http://byron.github.io/google-apis-rs/google-dataflow1_b4/trait.CallBuilder.html)**
     * operations to apply to *Resources*
+
+All *structures* are marked with applicable traits to further categorize them and ease browsing.
 
 Generally speaking, you can invoke *Activities* like this:
 
@@ -87,7 +91,7 @@ the doit() methods, or handed as possibly intermediate results to either the
 When delegates handle errors or intermediate values, they may have a chance to instruct the system to retry. This 
 makes the system potentially resilient to all kinds of errors.
 
-## Uploads and Downlods
+## Uploads and Downloads
 If a method supports downloads, the response body, which is part of the [Result](http://byron.github.io/google-apis-rs/google-dataflow1_b4/enum.Result.html), should be
 read by you to obtain the media.
 If such a method also supports a [Response Result](http://byron.github.io/google-apis-rs/google-dataflow1_b4/trait.ResponseResult.html), it will return that by default.
@@ -110,8 +114,9 @@ The [delegate trait](http://byron.github.io/google-apis-rs/google-dataflow1_b4/t
 ## Optional Parts in Server-Requests
 
 All structures provided by this library are made to be [enocodable](http://byron.github.io/google-apis-rs/google-dataflow1_b4/trait.RequestValue.html) and 
-[decodable](http://byron.github.io/google-apis-rs/google-dataflow1_b4/trait.ResponseResult.html) via json. Optionals are used to indicate that partial requests are responses are valid.
-Most optionals are are considered [Parts](http://byron.github.io/google-apis-rs/google-dataflow1_b4/trait.Part.html) which are identifyable by name, which will be sent to 
+[decodable](http://byron.github.io/google-apis-rs/google-dataflow1_b4/trait.ResponseResult.html) via *json*. Optionals are used to indicate that partial requests are responses 
+are valid.
+Most optionals are are considered [Parts](http://byron.github.io/google-apis-rs/google-dataflow1_b4/trait.Part.html) which are identifiable by name, which will be sent to 
 the server to indicate either the set parts of the request or the desired parts in the response.
 
 ## Builder Arguments

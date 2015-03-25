@@ -4,7 +4,7 @@
 [package]
 
 name = "google-fitness1"
-version = "0.1.1+20150222"
+version = "0.1.2+20150222"
 authors = ["Sebastian Thiel <byronimo@gmail>"]
 description = "A complete library to interact with fitness (protocol v1)"
 repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/fitness1"
@@ -16,7 +16,7 @@ keywords = ["fitness", "google", "protocol", "web", "api"]
 [dependencies]
 hyper = "*"
 mime = "*"
+yup-oauth2 = "*"
 url = "*"
 serde = "*"
 serde_macros = "*"
-yup-oauth2 = "*"

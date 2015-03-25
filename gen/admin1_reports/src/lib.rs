@@ -1,8 +1,8 @@
 // DO NOT EDIT !
-// This file was generated automatically from 'src/mako/lib.rs.mako'
+// This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *reports* crate version *0.1.1+20150115*, where *20150115* is the exact revision of the *admin:reports_v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.1*.
+//! This documentation was generated from *reports* crate version *0.1.2+20150115*, where *20150115* is the exact revision of the *admin:reports_v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.2*.
 //! 
 //! Everything else about the *reports* *v1_reports* API can be found at the
 //! [official documentation site](https://developers.google.com/admin-sdk/reports/).
@@ -36,6 +36,8 @@
 //! 
 //! * **[Hub](struct.Reports.html)**
 //!     * a central object to maintain state and allow accessing all *Activities*
+//!     * creates [*Method Builders*](trait.MethodsBuilder.html) which in turn
+//!       allow access to individual [*Call Builders*](trait.CallBuilder.html)
 //! * **[Resources](trait.Resource.html)**
 //!     * primary types that you can apply *Activities* to
 //!     * a collection of properties and *Parts*
@@ -44,6 +46,8 @@
 //!         * never directly used in *Activities*
 //! * **[Activities](trait.CallBuilder.html)**
 //!     * operations to apply to *Resources*
+//! 
+//! All *structures* are marked with applicable traits to further categorize them and ease browsing.
 //! 
 //! Generally speaking, you can invoke *Activities* like this:
 //! 
@@ -81,7 +85,7 @@
 //! extern crate "yup-oauth2" as oauth2;
 //! extern crate "google-admin1_reports" as admin1_reports;
 //! use admin1_reports::Channel;
-//! use admin1_reports::Result;
+//! use admin1_reports::{Result, Error};
 //! # #[test] fn egal() {
 //! use std::default::Default;
 //! use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -119,15 +123,17 @@
 //!              .doit();
 //! 
 //! match result {
-//!     Result::HttpError(err) => println!("HTTPERROR: {:?}", err),
-//!     Result::MissingAPIKey => println!("Auth: Missing API Key - used if there are no scopes"),
-//!     Result::MissingToken => println!("OAuth2: Missing Token"),
-//!     Result::Cancelled => println!("Operation cancelled by user"),
-//!     Result::UploadSizeLimitExceeded(size, max_size) => println!("Upload size too big: {} of {}", size, max_size),
-//!     Result::Failure(_) => println!("General Failure (hyper::client::Response doesn't print)"),
-//!     Result::FieldClash(clashed_field) => println!("You added custom parameter which is part of builder: {:?}", clashed_field),
-//!     Result::JsonDecodeError(err) => println!("Couldn't understand server reply - maybe API needs update: {:?}", err),
-//!     Result::Success(_) => println!("Success (value doesn't print)"),
+//!     Err(e) => match e {
+//!         Error::HttpError(err) => println!("HTTPERROR: {:?}", err),
+//!         Error::MissingAPIKey => println!("Auth: Missing API Key - used if there are no scopes"),
+//!         Error::MissingToken => println!("OAuth2: Missing Token"),
+//!         Error::Cancelled => println!("Operation canceled by user"),
+//!         Error::UploadSizeLimitExceeded(size, max_size) => println!("Upload size too big: {} of {}", size, max_size),
+//!         Error::Failure(_) => println!("General Failure (hyper::client::Response doesn't print)"),
+//!         Error::FieldClash(clashed_field) => println!("You added custom parameter which is part of builder: {:?}", clashed_field),
+//!         Error::JsonDecodeError(err) => println!("Couldn't understand server reply - maybe API needs update: {:?}", err),
+//!     },
+//!     Ok(_) => println!("Success (value doesn't print)"),
 //! }
 //! # }
 //! ```
@@ -140,7 +146,7 @@
 //! When delegates handle errors or intermediate values, they may have a chance to instruct the system to retry. This 
 //! makes the system potentially resilient to all kinds of errors.
 //! 
-//! ## Uploads and Downlods
+//! ## Uploads and Downloads
 //! If a method supports downloads, the response body, which is part of the [Result](enum.Result.html), should be
 //! read by you to obtain the media.
 //! If such a method also supports a [Response Result](trait.ResponseResult.html), it will return that by default.
@@ -163,8 +169,9 @@
 //! ## Optional Parts in Server-Requests
 //! 
 //! All structures provided by this library are made to be [enocodable](trait.RequestValue.html) and 
-//! [decodable](trait.ResponseResult.html) via json. Optionals are used to indicate that partial requests are responses are valid.
-//! Most optionals are are considered [Parts](trait.Part.html) which are identifyable by name, which will be sent to 
+//! [decodable](trait.ResponseResult.html) via *json*. Optionals are used to indicate that partial requests are responses 
+//! are valid.
+//! Most optionals are are considered [Parts](trait.Part.html) which are identifiable by name, which will be sent to 
 //! the server to indicate either the set parts of the request or the desired parts in the response.
 //! 
 //! ## Builder Arguments
@@ -213,7 +220,7 @@ use std::io;
 use std::fs;
 use std::thread::sleep;
 
-pub use cmn::{MultiPartReader, ToParts, MethodInfo, Result, CallBuilder, Hub, ReadSeek, Part, ResponseResult, RequestValue, NestedType, Delegate, DefaultDelegate, ResourceMethodsBuilder, Resource, JsonServerError};
+pub use cmn::{MultiPartReader, ToParts, MethodInfo, Result, Error, CallBuilder, Hub, ReadSeek, Part, ResponseResult, RequestValue, NestedType, Delegate, DefaultDelegate, MethodsBuilder, Resource, JsonServerError};
 
 
 // ##############
@@ -264,7 +271,7 @@ impl Default for Scope {
 /// extern crate "yup-oauth2" as oauth2;
 /// extern crate "google-admin1_reports" as admin1_reports;
 /// use admin1_reports::Channel;
-/// use admin1_reports::Result;
+/// use admin1_reports::{Result, Error};
 /// # #[test] fn egal() {
 /// use std::default::Default;
 /// use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -302,15 +309,17 @@ impl Default for Scope {
 ///              .doit();
 /// 
 /// match result {
-///     Result::HttpError(err) => println!("HTTPERROR: {:?}", err),
-///     Result::MissingAPIKey => println!("Auth: Missing API Key - used if there are no scopes"),
-///     Result::MissingToken => println!("OAuth2: Missing Token"),
-///     Result::Cancelled => println!("Operation cancelled by user"),
-///     Result::UploadSizeLimitExceeded(size, max_size) => println!("Upload size too big: {} of {}", size, max_size),
-///     Result::Failure(_) => println!("General Failure (hyper::client::Response doesn't print)"),
-///     Result::FieldClash(clashed_field) => println!("You added custom parameter which is part of builder: {:?}", clashed_field),
-///     Result::JsonDecodeError(err) => println!("Couldn't understand server reply - maybe API needs update: {:?}", err),
-///     Result::Success(_) => println!("Success (value doesn't print)"),
+///     Err(e) => match e {
+///         Error::HttpError(err) => println!("HTTPERROR: {:?}", err),
+///         Error::MissingAPIKey => println!("Auth: Missing API Key - used if there are no scopes"),
+///         Error::MissingToken => println!("OAuth2: Missing Token"),
+///         Error::Cancelled => println!("Operation canceled by user"),
+///         Error::UploadSizeLimitExceeded(size, max_size) => println!("Upload size too big: {} of {}", size, max_size),
+///         Error::Failure(_) => println!("General Failure (hyper::client::Response doesn't print)"),
+///         Error::FieldClash(clashed_field) => println!("You added custom parameter which is part of builder: {:?}", clashed_field),
+///         Error::JsonDecodeError(err) => println!("Couldn't understand server reply - maybe API needs update: {:?}", err),
+///     },
+///     Ok(_) => println!("Success (value doesn't print)"),
 /// }
 /// # }
 /// ```
@@ -331,7 +340,7 @@ impl<'a, C, NC, A> Reports<C, NC, A>
         Reports {
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/0.1.1".to_string(),
+            _user_agent: "google-api-rust-client/0.1.2".to_string(),
             _m: PhantomData
         }
     }
@@ -350,7 +359,7 @@ impl<'a, C, NC, A> Reports<C, NC, A>
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/0.1.1`.
+    /// It defaults to `google-api-rust-client/0.1.2`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -375,14 +384,14 @@ impl<'a, C, NC, A> Reports<C, NC, A>
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct Activities {
-    /// Token for retrieving the next page    
+    /// Token for retrieving the next page
     #[serde(alias="nextPageToken")]
     pub next_page_token: String,
-    /// Each record in read response.    
+    /// Each record in read response.
     pub items: Vec<Activity>,
-    /// Kind of list response this is.    
+    /// Kind of list response this is.
     pub kind: String,
-    /// ETag of the resource.    
+    /// ETag of the resource.
     pub etag: String,
 }
 
@@ -395,9 +404,9 @@ impl ResponseResult for Activities {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct UsageReportsWarningsData {
-    /// Key associated with a key-value pair to give detailed information on the warning.    
+    /// Key associated with a key-value pair to give detailed information on the warning.
     pub key: String,
-    /// Value associated with a key-value pair to give detailed information on the warning.    
+    /// Value associated with a key-value pair to give detailed information on the warning.
     pub value: String,
 }
 
@@ -411,15 +420,15 @@ impl Part for UsageReportsWarningsData {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct UsageReport {
-    /// The date to which the record belongs.    
+    /// The date to which the record belongs.
     pub date: String,
-    /// The kind of object.    
+    /// The kind of object.
     pub kind: String,
-    /// ETag of the resource.    
+    /// ETag of the resource.
     pub etag: String,
-    /// Parameter value pairs for various applications.    
+    /// Parameter value pairs for various applications.
     pub parameters: Vec<UsageReportParameters>,
-    /// Information about the type of the item.    
+    /// Information about the type of the item.
     pub entity: UsageReportEntity,
 }
 
@@ -432,21 +441,21 @@ impl Part for UsageReport {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct UsageReportParameters {
-    /// Nested message value of the parameter.    
+    /// Nested message value of the parameter.
     #[serde(alias="msgValue")]
     pub msg_value: Vec<HashMap<String, String>>,
-    /// RFC 3339 formatted value of the parameter.    
+    /// RFC 3339 formatted value of the parameter.
     #[serde(alias="datetimeValue")]
     pub datetime_value: String,
-    /// The name of the parameter.    
+    /// The name of the parameter.
     pub name: String,
-    /// String value of the parameter.    
+    /// String value of the parameter.
     #[serde(alias="stringValue")]
     pub string_value: String,
-    /// Boolean value of the parameter.    
+    /// Boolean value of the parameter.
     #[serde(alias="boolValue")]
     pub bool_value: bool,
-    /// Integral value of the parameter.    
+    /// Integral value of the parameter.
     #[serde(alias="intValue")]
     pub int_value: String,
 }
@@ -461,14 +470,14 @@ impl Part for UsageReportParameters {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct ActivityActor {
-    /// Obfuscated user id of the user.    
+    /// Obfuscated user id of the user.
     #[serde(alias="profileId")]
     pub profile_id: String,
-    /// Email address of the user.    
+    /// Email address of the user.
     pub email: String,
-    /// For OAuth 2LO API requests, consumer_key of the requestor.    
+    /// For OAuth 2LO API requests, consumer_key of the requestor.
     pub key: String,
-    /// User or OAuth 2LO request.    
+    /// User or OAuth 2LO request.
     #[serde(alias="callerType")]
     pub caller_type: String,
 }
@@ -483,16 +492,16 @@ impl Part for ActivityActor {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct ActivityId {
-    /// Application name to which the event belongs.    
+    /// Application name to which the event belongs.
     #[serde(alias="applicationName")]
     pub application_name: String,
-    /// Unique qualifier if multiple events have the same time.    
+    /// Unique qualifier if multiple events have the same time.
     #[serde(alias="uniqueQualifier")]
     pub unique_qualifier: String,
-    /// Obfuscated customer ID of the source customer.    
+    /// Obfuscated customer ID of the source customer.
     #[serde(alias="customerId")]
     pub customer_id: String,
-    /// Time of occurrence of the activity.    
+    /// Time of occurrence of the activity.
     pub time: String,
 }
 
@@ -506,11 +515,11 @@ impl Part for ActivityId {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct UsageReportsWarnings {
-    /// Human readable message for the warning.    
+    /// Human readable message for the warning.
     pub message: String,
-    /// Machine readable code / warning type.    
+    /// Machine readable code / warning type.
     pub code: String,
-    /// Key-Value pairs to give detailed information on the warning.    
+    /// Key-Value pairs to give detailed information on the warning.
     pub data: Vec<UsageReportsWarningsData>,
 }
 
@@ -530,17 +539,17 @@ impl Part for UsageReportsWarnings {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct UsageReports {
-    /// Token for retrieving the next page    
+    /// Token for retrieving the next page
     #[serde(alias="nextPageToken")]
     pub next_page_token: String,
-    /// The kind of object.    
+    /// The kind of object.
     pub kind: String,
-    /// ETag of the resource.    
+    /// ETag of the resource.
     pub etag: String,
-    /// Various application parameter records.    
+    /// Various application parameter records.
     #[serde(alias="usageReports")]
     pub usage_reports: Vec<UsageReport>,
-    /// Warnings if any.    
+    /// Warnings if any.
     pub warnings: Vec<UsageReportsWarnings>,
 }
 
@@ -553,21 +562,21 @@ impl ResponseResult for UsageReports {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct Activity {
-    /// Kind of resource this is.    
+    /// Kind of resource this is.
     pub kind: String,
-    /// ETag of the entry.    
+    /// ETag of the entry.
     pub etag: String,
-    /// Activity events.    
+    /// Activity events.
     pub events: Vec<ActivityEvents>,
-    /// IP Address of the user doing the action.    
+    /// IP Address of the user doing the action.
     #[serde(alias="ipAddress")]
     pub ip_address: String,
-    /// Domain of source customer.    
+    /// Domain of source customer.
     #[serde(alias="ownerDomain")]
     pub owner_domain: String,
-    /// User doing the action.    
+    /// User doing the action.
     pub actor: ActivityActor,
-    /// Unique identifier for each activity record.    
+    /// Unique identifier for each activity record.
     pub id: ActivityId,
 }
 
@@ -580,21 +589,21 @@ impl Part for Activity {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct ActivityEventsParameters {
-    /// Boolean value of the parameter.    
+    /// Boolean value of the parameter.
     #[serde(alias="boolValue")]
     pub bool_value: bool,
-    /// Multi-string value of the parameter.    
+    /// Multi-string value of the parameter.
     #[serde(alias="multiValue")]
     pub multi_value: Vec<String>,
-    /// The name of the parameter.    
+    /// The name of the parameter.
     pub name: String,
-    /// Multi-int value of the parameter.    
+    /// Multi-int value of the parameter.
     #[serde(alias="multiIntValue")]
     pub multi_int_value: Vec<String>,
-    /// Integral value of the parameter.    
+    /// Integral value of the parameter.
     #[serde(alias="intValue")]
     pub int_value: String,
-    /// String value of the parameter.    
+    /// String value of the parameter.
     pub value: String,
 }
 
@@ -608,12 +617,12 @@ impl Part for ActivityEventsParameters {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct ActivityEvents {
-    /// Type of event.    
+    /// Type of event.
     #[serde(alias="type")]
     pub type_: String,
-    /// Name of event.    
+    /// Name of event.
     pub name: String,
-    /// Parameter value pairs for various applications.    
+    /// Parameter value pairs for various applications.
     pub parameters: Vec<ActivityEventsParameters>,
 }
 
@@ -627,16 +636,16 @@ impl Part for ActivityEvents {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct UsageReportEntity {
-    /// Obfuscated user id for the record.    
+    /// Obfuscated user id for the record.
     #[serde(alias="profileId")]
     pub profile_id: String,
-    /// user's email.    
+    /// user's email.
     #[serde(alias="userEmail")]
     pub user_email: String,
-    /// The type of item, can be a customer or user.    
+    /// The type of item, can be a customer or user.
     #[serde(alias="type")]
     pub type_: String,
-    /// Obfuscated customer id for the record.    
+    /// Obfuscated customer id for the record.
     #[serde(alias="customerId")]
     pub customer_id: String,
 }
@@ -657,28 +666,28 @@ impl Part for UsageReportEntity {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Channel {
-    /// A version-specific identifier for the watched resource.    
+    /// A version-specific identifier for the watched resource.
     #[serde(alias="resourceUri")]
     pub resource_uri: Option<String>,
-    /// Identifies this as a notification channel used to watch for changes to a resource. Value: the fixed string "api#channel".    
+    /// Identifies this as a notification channel used to watch for changes to a resource. Value: the fixed string "api#channel".
     pub kind: Option<String>,
-    /// An opaque ID that identifies the resource being watched on this channel. Stable across different API versions.    
+    /// An opaque ID that identifies the resource being watched on this channel. Stable across different API versions.
     #[serde(alias="resourceId")]
     pub resource_id: Option<String>,
-    /// A UUID or similar unique string that identifies this channel.    
+    /// A UUID or similar unique string that identifies this channel.
     pub id: Option<String>,
-    /// An arbitrary string delivered to the target address with each notification delivered over this channel. Optional.    
+    /// An arbitrary string delivered to the target address with each notification delivered over this channel. Optional.
     pub token: Option<String>,
-    /// Additional parameters controlling delivery channel behavior. Optional.    
+    /// Additional parameters controlling delivery channel behavior. Optional.
     pub params: Option<HashMap<String, String>>,
-    /// Date and time of notification channel expiration, expressed as a Unix timestamp, in milliseconds. Optional.    
+    /// Date and time of notification channel expiration, expressed as a Unix timestamp, in milliseconds. Optional.
     pub expiration: Option<String>,
-    /// The address where notifications are delivered for this channel.    
+    /// The address where notifications are delivered for this channel.
     pub address: Option<String>,
-    /// The type of delivery mechanism used for this channel.    
+    /// The type of delivery mechanism used for this channel.
     #[serde(alias="type")]
     pub type_: Option<String>,
-    /// A Boolean value to indicate whether payload is wanted. Optional.    
+    /// A Boolean value to indicate whether payload is wanted. Optional.
     pub payload: Option<bool>,
 }
 
@@ -726,13 +735,17 @@ pub struct ChannelMethods<'a, C, NC, A>
     hub: &'a Reports<C, NC, A>,
 }
 
-impl<'a, C, NC, A> ResourceMethodsBuilder for ChannelMethods<'a, C, NC, A> {}
+impl<'a, C, NC, A> MethodsBuilder for ChannelMethods<'a, C, NC, A> {}
 
 impl<'a, C, NC, A> ChannelMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Stop watching resources through this channel    
+    /// Stop watching resources through this channel
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
     pub fn stop(&self, request: &Channel) -> ChannelStopCall<'a, C, NC, A> {
         ChannelStopCall {
             hub: self.hub,
@@ -780,13 +793,19 @@ pub struct ActivityMethods<'a, C, NC, A>
     hub: &'a Reports<C, NC, A>,
 }
 
-impl<'a, C, NC, A> ResourceMethodsBuilder for ActivityMethods<'a, C, NC, A> {}
+impl<'a, C, NC, A> MethodsBuilder for ActivityMethods<'a, C, NC, A> {}
 
 impl<'a, C, NC, A> ActivityMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Push changes to activities    
+    /// Push changes to activities
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `userKey` - Represents the profile id or the user email for which the data should be filtered. When 'all' is specified as the userKey, it returns usageReports for all users.
+    /// * `applicationName` - Application name for which the events are to be retrieved.
     pub fn watch(&self, request: &Channel, user_key: &str, application_name: &str) -> ActivityWatchCall<'a, C, NC, A> {
         ActivityWatchCall {
             hub: self.hub,
@@ -809,7 +828,12 @@ impl<'a, C, NC, A> ActivityMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Retrieves a list of activities for a specific customer and application.    
+    /// Retrieves a list of activities for a specific customer and application.
+    /// 
+    /// # Arguments
+    ///
+    /// * `userKey` - Represents the profile id or the user email for which the data should be filtered. When 'all' is specified as the userKey, it returns usageReports for all users.
+    /// * `applicationName` - Application name for which the events are to be retrieved.
     pub fn list(&self, user_key: &str, application_name: &str) -> ActivityListCall<'a, C, NC, A> {
         ActivityListCall {
             hub: self.hub,
@@ -866,13 +890,17 @@ pub struct CustomerUsageReportMethods<'a, C, NC, A>
     hub: &'a Reports<C, NC, A>,
 }
 
-impl<'a, C, NC, A> ResourceMethodsBuilder for CustomerUsageReportMethods<'a, C, NC, A> {}
+impl<'a, C, NC, A> MethodsBuilder for CustomerUsageReportMethods<'a, C, NC, A> {}
 
 impl<'a, C, NC, A> CustomerUsageReportMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Retrieves a report which is a collection of properties / statistics for a specific customer.    
+    /// Retrieves a report which is a collection of properties / statistics for a specific customer.
+    /// 
+    /// # Arguments
+    ///
+    /// * `date` - Represents the date in yyyy-mm-dd format for which the data is to be fetched.
     pub fn get(&self, date: &str) -> CustomerUsageReportGetCall<'a, C, NC, A> {
         CustomerUsageReportGetCall {
             hub: self.hub,
@@ -923,13 +951,18 @@ pub struct UserUsageReportMethods<'a, C, NC, A>
     hub: &'a Reports<C, NC, A>,
 }
 
-impl<'a, C, NC, A> ResourceMethodsBuilder for UserUsageReportMethods<'a, C, NC, A> {}
+impl<'a, C, NC, A> MethodsBuilder for UserUsageReportMethods<'a, C, NC, A> {}
 
 impl<'a, C, NC, A> UserUsageReportMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Retrieves a report which is a collection of properties / statistics for a set of users.    
+    /// Retrieves a report which is a collection of properties / statistics for a set of users.
+    /// 
+    /// # Arguments
+    ///
+    /// * `userKey` - Represents the profile id or the user email for which the data should be filtered.
+    /// * `date` - Represents the date in yyyy-mm-dd format for which the data is to be fetched.
     pub fn get(&self, user_key: &str, date: &str) -> UserUsageReportGetCall<'a, C, NC, A> {
         UserUsageReportGetCall {
             hub: self.hub,
@@ -958,7 +991,7 @@ impl<'a, C, NC, A> UserUsageReportMethods<'a, C, NC, A> {
 /// Stop watching resources through this channel
 ///
 /// A builder for the *stop* method supported by a *channel* resource.
-/// It is not used directly, but through a `ChannelMethods`.
+/// It is not used directly, but through a `ChannelMethods` instance.
 ///
 /// # Example
 ///
@@ -1021,7 +1054,7 @@ impl<'a, C, NC, A> ChannelStopCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
         for &field in [].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -1053,7 +1086,7 @@ impl<'a, C, NC, A> ChannelStopCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -1069,7 +1102,6 @@ impl<'a, C, NC, A> ChannelStopCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -1079,7 +1111,7 @@ impl<'a, C, NC, A> ChannelStopCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -1090,12 +1122,12 @@ impl<'a, C, NC, A> ChannelStopCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = res;
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -1167,7 +1199,7 @@ impl<'a, C, NC, A> ChannelStopCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
 /// Push changes to activities
 ///
 /// A builder for the *watch* method supported by a *activity* resource.
-/// It is not used directly, but through a `ActivityMethods`.
+/// It is not used directly, but through a `ActivityMethods` instance.
 ///
 /// # Example
 ///
@@ -1274,7 +1306,7 @@ impl<'a, C, NC, A> ActivityWatchCall<'a, C, NC, A> where NC: hyper::net::Network
         for &field in ["alt", "userKey", "applicationName", "startTime", "pageToken", "maxResults", "filters", "eventName", "endTime", "customerId", "actorIpAddress"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -1331,7 +1363,7 @@ impl<'a, C, NC, A> ActivityWatchCall<'a, C, NC, A> where NC: hyper::net::Network
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -1347,7 +1379,6 @@ impl<'a, C, NC, A> ActivityWatchCall<'a, C, NC, A> where NC: hyper::net::Network
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -1357,7 +1388,7 @@ impl<'a, C, NC, A> ActivityWatchCall<'a, C, NC, A> where NC: hyper::net::Network
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -1368,7 +1399,7 @@ impl<'a, C, NC, A> ActivityWatchCall<'a, C, NC, A> where NC: hyper::net::Network
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -1377,13 +1408,13 @@ impl<'a, C, NC, A> ActivityWatchCall<'a, C, NC, A> where NC: hyper::net::Network
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -1404,7 +1435,7 @@ impl<'a, C, NC, A> ActivityWatchCall<'a, C, NC, A> where NC: hyper::net::Network
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Represents the profile id or the user email for which the data should be filtered. When 'all' is specified as the userKey, it returns usageReports for all users.    
+    /// Represents the profile id or the user email for which the data should be filtered. When 'all' is specified as the userKey, it returns usageReports for all users.
     pub fn user_key(mut self, new_value: &str) -> ActivityWatchCall<'a, C, NC, A> {
         self._user_key = new_value.to_string();
         self
@@ -1414,7 +1445,7 @@ impl<'a, C, NC, A> ActivityWatchCall<'a, C, NC, A> where NC: hyper::net::Network
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Application name for which the events are to be retrieved.    
+    /// Application name for which the events are to be retrieved.
     pub fn application_name(mut self, new_value: &str) -> ActivityWatchCall<'a, C, NC, A> {
         self._application_name = new_value.to_string();
         self
@@ -1422,7 +1453,7 @@ impl<'a, C, NC, A> ActivityWatchCall<'a, C, NC, A> where NC: hyper::net::Network
     /// Sets the *start time* query property to the given value.
     ///
     /// 
-    /// Return events which occured at or after this time.    
+    /// Return events which occured at or after this time.
     pub fn start_time(mut self, new_value: &str) -> ActivityWatchCall<'a, C, NC, A> {
         self._start_time = Some(new_value.to_string());
         self
@@ -1430,7 +1461,7 @@ impl<'a, C, NC, A> ActivityWatchCall<'a, C, NC, A> where NC: hyper::net::Network
     /// Sets the *page token* query property to the given value.
     ///
     /// 
-    /// Token to specify next page.    
+    /// Token to specify next page.
     pub fn page_token(mut self, new_value: &str) -> ActivityWatchCall<'a, C, NC, A> {
         self._page_token = Some(new_value.to_string());
         self
@@ -1438,7 +1469,7 @@ impl<'a, C, NC, A> ActivityWatchCall<'a, C, NC, A> where NC: hyper::net::Network
     /// Sets the *max results* query property to the given value.
     ///
     /// 
-    /// Number of activity records to be shown in each page.    
+    /// Number of activity records to be shown in each page.
     pub fn max_results(mut self, new_value: i32) -> ActivityWatchCall<'a, C, NC, A> {
         self._max_results = Some(new_value);
         self
@@ -1446,7 +1477,7 @@ impl<'a, C, NC, A> ActivityWatchCall<'a, C, NC, A> where NC: hyper::net::Network
     /// Sets the *filters* query property to the given value.
     ///
     /// 
-    /// Event parameters in the form [parameter1 name][operator][parameter1 value],[parameter2 name][operator][parameter2 value],...    
+    /// Event parameters in the form [parameter1 name][operator][parameter1 value],[parameter2 name][operator][parameter2 value],...
     pub fn filters(mut self, new_value: &str) -> ActivityWatchCall<'a, C, NC, A> {
         self._filters = Some(new_value.to_string());
         self
@@ -1454,7 +1485,7 @@ impl<'a, C, NC, A> ActivityWatchCall<'a, C, NC, A> where NC: hyper::net::Network
     /// Sets the *event name* query property to the given value.
     ///
     /// 
-    /// Name of the event being queried.    
+    /// Name of the event being queried.
     pub fn event_name(mut self, new_value: &str) -> ActivityWatchCall<'a, C, NC, A> {
         self._event_name = Some(new_value.to_string());
         self
@@ -1462,7 +1493,7 @@ impl<'a, C, NC, A> ActivityWatchCall<'a, C, NC, A> where NC: hyper::net::Network
     /// Sets the *end time* query property to the given value.
     ///
     /// 
-    /// Return events which occured at or before this time.    
+    /// Return events which occured at or before this time.
     pub fn end_time(mut self, new_value: &str) -> ActivityWatchCall<'a, C, NC, A> {
         self._end_time = Some(new_value.to_string());
         self
@@ -1470,7 +1501,7 @@ impl<'a, C, NC, A> ActivityWatchCall<'a, C, NC, A> where NC: hyper::net::Network
     /// Sets the *customer id* query property to the given value.
     ///
     /// 
-    /// Represents the customer for which the data is to be fetched.    
+    /// Represents the customer for which the data is to be fetched.
     pub fn customer_id(mut self, new_value: &str) -> ActivityWatchCall<'a, C, NC, A> {
         self._customer_id = Some(new_value.to_string());
         self
@@ -1478,7 +1509,7 @@ impl<'a, C, NC, A> ActivityWatchCall<'a, C, NC, A> where NC: hyper::net::Network
     /// Sets the *actor ip address* query property to the given value.
     ///
     /// 
-    /// IP Address of host where the event was performed. Supports both IPv4 and IPv6 addresses.    
+    /// IP Address of host where the event was performed. Supports both IPv4 and IPv6 addresses.
     pub fn actor_ip_address(mut self, new_value: &str) -> ActivityWatchCall<'a, C, NC, A> {
         self._actor_ip_address = Some(new_value.to_string());
         self
@@ -1539,7 +1570,7 @@ impl<'a, C, NC, A> ActivityWatchCall<'a, C, NC, A> where NC: hyper::net::Network
 /// Retrieves a list of activities for a specific customer and application.
 ///
 /// A builder for the *list* method supported by a *activity* resource.
-/// It is not used directly, but through a `ActivityMethods`.
+/// It is not used directly, but through a `ActivityMethods` instance.
 ///
 /// # Example
 ///
@@ -1639,7 +1670,7 @@ impl<'a, C, NC, A> ActivityListCall<'a, C, NC, A> where NC: hyper::net::NetworkC
         for &field in ["alt", "userKey", "applicationName", "startTime", "pageToken", "maxResults", "filters", "eventName", "endTime", "customerId", "actorIpAddress"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -1692,7 +1723,7 @@ impl<'a, C, NC, A> ActivityListCall<'a, C, NC, A> where NC: hyper::net::NetworkC
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -1704,7 +1735,6 @@ impl<'a, C, NC, A> ActivityListCall<'a, C, NC, A> where NC: hyper::net::NetworkC
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -1714,7 +1744,7 @@ impl<'a, C, NC, A> ActivityListCall<'a, C, NC, A> where NC: hyper::net::NetworkC
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -1725,7 +1755,7 @@ impl<'a, C, NC, A> ActivityListCall<'a, C, NC, A> where NC: hyper::net::NetworkC
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -1734,13 +1764,13 @@ impl<'a, C, NC, A> ActivityListCall<'a, C, NC, A> where NC: hyper::net::NetworkC
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -1752,7 +1782,7 @@ impl<'a, C, NC, A> ActivityListCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Represents the profile id or the user email for which the data should be filtered. When 'all' is specified as the userKey, it returns usageReports for all users.    
+    /// Represents the profile id or the user email for which the data should be filtered. When 'all' is specified as the userKey, it returns usageReports for all users.
     pub fn user_key(mut self, new_value: &str) -> ActivityListCall<'a, C, NC, A> {
         self._user_key = new_value.to_string();
         self
@@ -1762,7 +1792,7 @@ impl<'a, C, NC, A> ActivityListCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Application name for which the events are to be retrieved.    
+    /// Application name for which the events are to be retrieved.
     pub fn application_name(mut self, new_value: &str) -> ActivityListCall<'a, C, NC, A> {
         self._application_name = new_value.to_string();
         self
@@ -1770,7 +1800,7 @@ impl<'a, C, NC, A> ActivityListCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// Sets the *start time* query property to the given value.
     ///
     /// 
-    /// Return events which occured at or after this time.    
+    /// Return events which occured at or after this time.
     pub fn start_time(mut self, new_value: &str) -> ActivityListCall<'a, C, NC, A> {
         self._start_time = Some(new_value.to_string());
         self
@@ -1778,7 +1808,7 @@ impl<'a, C, NC, A> ActivityListCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// Sets the *page token* query property to the given value.
     ///
     /// 
-    /// Token to specify next page.    
+    /// Token to specify next page.
     pub fn page_token(mut self, new_value: &str) -> ActivityListCall<'a, C, NC, A> {
         self._page_token = Some(new_value.to_string());
         self
@@ -1786,7 +1816,7 @@ impl<'a, C, NC, A> ActivityListCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// Sets the *max results* query property to the given value.
     ///
     /// 
-    /// Number of activity records to be shown in each page.    
+    /// Number of activity records to be shown in each page.
     pub fn max_results(mut self, new_value: i32) -> ActivityListCall<'a, C, NC, A> {
         self._max_results = Some(new_value);
         self
@@ -1794,7 +1824,7 @@ impl<'a, C, NC, A> ActivityListCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// Sets the *filters* query property to the given value.
     ///
     /// 
-    /// Event parameters in the form [parameter1 name][operator][parameter1 value],[parameter2 name][operator][parameter2 value],...    
+    /// Event parameters in the form [parameter1 name][operator][parameter1 value],[parameter2 name][operator][parameter2 value],...
     pub fn filters(mut self, new_value: &str) -> ActivityListCall<'a, C, NC, A> {
         self._filters = Some(new_value.to_string());
         self
@@ -1802,7 +1832,7 @@ impl<'a, C, NC, A> ActivityListCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// Sets the *event name* query property to the given value.
     ///
     /// 
-    /// Name of the event being queried.    
+    /// Name of the event being queried.
     pub fn event_name(mut self, new_value: &str) -> ActivityListCall<'a, C, NC, A> {
         self._event_name = Some(new_value.to_string());
         self
@@ -1810,7 +1840,7 @@ impl<'a, C, NC, A> ActivityListCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// Sets the *end time* query property to the given value.
     ///
     /// 
-    /// Return events which occured at or before this time.    
+    /// Return events which occured at or before this time.
     pub fn end_time(mut self, new_value: &str) -> ActivityListCall<'a, C, NC, A> {
         self._end_time = Some(new_value.to_string());
         self
@@ -1818,7 +1848,7 @@ impl<'a, C, NC, A> ActivityListCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// Sets the *customer id* query property to the given value.
     ///
     /// 
-    /// Represents the customer for which the data is to be fetched.    
+    /// Represents the customer for which the data is to be fetched.
     pub fn customer_id(mut self, new_value: &str) -> ActivityListCall<'a, C, NC, A> {
         self._customer_id = Some(new_value.to_string());
         self
@@ -1826,7 +1856,7 @@ impl<'a, C, NC, A> ActivityListCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// Sets the *actor ip address* query property to the given value.
     ///
     /// 
-    /// IP Address of host where the event was performed. Supports both IPv4 and IPv6 addresses.    
+    /// IP Address of host where the event was performed. Supports both IPv4 and IPv6 addresses.
     pub fn actor_ip_address(mut self, new_value: &str) -> ActivityListCall<'a, C, NC, A> {
         self._actor_ip_address = Some(new_value.to_string());
         self
@@ -1887,7 +1917,7 @@ impl<'a, C, NC, A> ActivityListCall<'a, C, NC, A> where NC: hyper::net::NetworkC
 /// Retrieves a report which is a collection of properties / statistics for a specific customer.
 ///
 /// A builder for the *get* method supported by a *customerUsageReport* resource.
-/// It is not used directly, but through a `CustomerUsageReportMethods`.
+/// It is not used directly, but through a `CustomerUsageReportMethods` instance.
 ///
 /// # Example
 ///
@@ -1960,7 +1990,7 @@ impl<'a, C, NC, A> CustomerUsageReportGetCall<'a, C, NC, A> where NC: hyper::net
         for &field in ["alt", "date", "parameters", "pageToken", "customerId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -2013,7 +2043,7 @@ impl<'a, C, NC, A> CustomerUsageReportGetCall<'a, C, NC, A> where NC: hyper::net
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -2025,7 +2055,6 @@ impl<'a, C, NC, A> CustomerUsageReportGetCall<'a, C, NC, A> where NC: hyper::net
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -2035,7 +2064,7 @@ impl<'a, C, NC, A> CustomerUsageReportGetCall<'a, C, NC, A> where NC: hyper::net
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -2046,7 +2075,7 @@ impl<'a, C, NC, A> CustomerUsageReportGetCall<'a, C, NC, A> where NC: hyper::net
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -2055,13 +2084,13 @@ impl<'a, C, NC, A> CustomerUsageReportGetCall<'a, C, NC, A> where NC: hyper::net
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -2073,7 +2102,7 @@ impl<'a, C, NC, A> CustomerUsageReportGetCall<'a, C, NC, A> where NC: hyper::net
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Represents the date in yyyy-mm-dd format for which the data is to be fetched.    
+    /// Represents the date in yyyy-mm-dd format for which the data is to be fetched.
     pub fn date(mut self, new_value: &str) -> CustomerUsageReportGetCall<'a, C, NC, A> {
         self._date = new_value.to_string();
         self
@@ -2081,7 +2110,7 @@ impl<'a, C, NC, A> CustomerUsageReportGetCall<'a, C, NC, A> where NC: hyper::net
     /// Sets the *parameters* query property to the given value.
     ///
     /// 
-    /// Represents the application name, parameter name pairs to fetch in csv as app_name1:param_name1, app_name2:param_name2.    
+    /// Represents the application name, parameter name pairs to fetch in csv as app_name1:param_name1, app_name2:param_name2.
     pub fn parameters(mut self, new_value: &str) -> CustomerUsageReportGetCall<'a, C, NC, A> {
         self._parameters = Some(new_value.to_string());
         self
@@ -2089,7 +2118,7 @@ impl<'a, C, NC, A> CustomerUsageReportGetCall<'a, C, NC, A> where NC: hyper::net
     /// Sets the *page token* query property to the given value.
     ///
     /// 
-    /// Token to specify next page.    
+    /// Token to specify next page.
     pub fn page_token(mut self, new_value: &str) -> CustomerUsageReportGetCall<'a, C, NC, A> {
         self._page_token = Some(new_value.to_string());
         self
@@ -2097,7 +2126,7 @@ impl<'a, C, NC, A> CustomerUsageReportGetCall<'a, C, NC, A> where NC: hyper::net
     /// Sets the *customer id* query property to the given value.
     ///
     /// 
-    /// Represents the customer for which the data is to be fetched.    
+    /// Represents the customer for which the data is to be fetched.
     pub fn customer_id(mut self, new_value: &str) -> CustomerUsageReportGetCall<'a, C, NC, A> {
         self._customer_id = Some(new_value.to_string());
         self
@@ -2158,7 +2187,7 @@ impl<'a, C, NC, A> CustomerUsageReportGetCall<'a, C, NC, A> where NC: hyper::net
 /// Retrieves a report which is a collection of properties / statistics for a set of users.
 ///
 /// A builder for the *get* method supported by a *userUsageReport* resource.
-/// It is not used directly, but through a `UserUsageReportMethods`.
+/// It is not used directly, but through a `UserUsageReportMethods` instance.
 ///
 /// # Example
 ///
@@ -2243,7 +2272,7 @@ impl<'a, C, NC, A> UserUsageReportGetCall<'a, C, NC, A> where NC: hyper::net::Ne
         for &field in ["alt", "userKey", "date", "parameters", "pageToken", "maxResults", "filters", "customerId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -2296,7 +2325,7 @@ impl<'a, C, NC, A> UserUsageReportGetCall<'a, C, NC, A> where NC: hyper::net::Ne
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -2308,7 +2337,6 @@ impl<'a, C, NC, A> UserUsageReportGetCall<'a, C, NC, A> where NC: hyper::net::Ne
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -2318,7 +2346,7 @@ impl<'a, C, NC, A> UserUsageReportGetCall<'a, C, NC, A> where NC: hyper::net::Ne
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -2329,7 +2357,7 @@ impl<'a, C, NC, A> UserUsageReportGetCall<'a, C, NC, A> where NC: hyper::net::Ne
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -2338,13 +2366,13 @@ impl<'a, C, NC, A> UserUsageReportGetCall<'a, C, NC, A> where NC: hyper::net::Ne
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -2356,7 +2384,7 @@ impl<'a, C, NC, A> UserUsageReportGetCall<'a, C, NC, A> where NC: hyper::net::Ne
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Represents the profile id or the user email for which the data should be filtered.    
+    /// Represents the profile id or the user email for which the data should be filtered.
     pub fn user_key(mut self, new_value: &str) -> UserUsageReportGetCall<'a, C, NC, A> {
         self._user_key = new_value.to_string();
         self
@@ -2366,7 +2394,7 @@ impl<'a, C, NC, A> UserUsageReportGetCall<'a, C, NC, A> where NC: hyper::net::Ne
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Represents the date in yyyy-mm-dd format for which the data is to be fetched.    
+    /// Represents the date in yyyy-mm-dd format for which the data is to be fetched.
     pub fn date(mut self, new_value: &str) -> UserUsageReportGetCall<'a, C, NC, A> {
         self._date = new_value.to_string();
         self
@@ -2374,7 +2402,7 @@ impl<'a, C, NC, A> UserUsageReportGetCall<'a, C, NC, A> where NC: hyper::net::Ne
     /// Sets the *parameters* query property to the given value.
     ///
     /// 
-    /// Represents the application name, parameter name pairs to fetch in csv as app_name1:param_name1, app_name2:param_name2.    
+    /// Represents the application name, parameter name pairs to fetch in csv as app_name1:param_name1, app_name2:param_name2.
     pub fn parameters(mut self, new_value: &str) -> UserUsageReportGetCall<'a, C, NC, A> {
         self._parameters = Some(new_value.to_string());
         self
@@ -2382,7 +2410,7 @@ impl<'a, C, NC, A> UserUsageReportGetCall<'a, C, NC, A> where NC: hyper::net::Ne
     /// Sets the *page token* query property to the given value.
     ///
     /// 
-    /// Token to specify next page.    
+    /// Token to specify next page.
     pub fn page_token(mut self, new_value: &str) -> UserUsageReportGetCall<'a, C, NC, A> {
         self._page_token = Some(new_value.to_string());
         self
@@ -2390,7 +2418,7 @@ impl<'a, C, NC, A> UserUsageReportGetCall<'a, C, NC, A> where NC: hyper::net::Ne
     /// Sets the *max results* query property to the given value.
     ///
     /// 
-    /// Maximum number of results to return. Maximum allowed is 1000    
+    /// Maximum number of results to return. Maximum allowed is 1000
     pub fn max_results(mut self, new_value: u32) -> UserUsageReportGetCall<'a, C, NC, A> {
         self._max_results = Some(new_value);
         self
@@ -2398,7 +2426,7 @@ impl<'a, C, NC, A> UserUsageReportGetCall<'a, C, NC, A> where NC: hyper::net::Ne
     /// Sets the *filters* query property to the given value.
     ///
     /// 
-    /// Represents the set of filters including parameter operator value.    
+    /// Represents the set of filters including parameter operator value.
     pub fn filters(mut self, new_value: &str) -> UserUsageReportGetCall<'a, C, NC, A> {
         self._filters = Some(new_value.to_string());
         self
@@ -2406,7 +2434,7 @@ impl<'a, C, NC, A> UserUsageReportGetCall<'a, C, NC, A> where NC: hyper::net::Ne
     /// Sets the *customer id* query property to the given value.
     ///
     /// 
-    /// Represents the customer for which the data is to be fetched.    
+    /// Represents the customer for which the data is to be fetched.
     pub fn customer_id(mut self, new_value: &str) -> UserUsageReportGetCall<'a, C, NC, A> {
         self._customer_id = Some(new_value.to_string());
         self

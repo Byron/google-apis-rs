@@ -1,8 +1,8 @@
 // DO NOT EDIT !
-// This file was generated automatically from 'src/mako/lib.rs.mako'
+// This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *webfonts* crate version *0.1.1+20140210*, where *20140210* is the exact revision of the *webfonts:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.1*.
+//! This documentation was generated from *webfonts* crate version *0.1.2+20140210*, where *20140210* is the exact revision of the *webfonts:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.2*.
 //! 
 //! Everything else about the *webfonts* *v1* API can be found at the
 //! [official documentation site](https://developers.google.com/fonts/docs/developer_api).
@@ -25,6 +25,8 @@
 //! 
 //! * **[Hub](struct.Webfonts.html)**
 //!     * a central object to maintain state and allow accessing all *Activities*
+//!     * creates [*Method Builders*](trait.MethodsBuilder.html) which in turn
+//!       allow access to individual [*Call Builders*](trait.CallBuilder.html)
 //! * **[Resources](trait.Resource.html)**
 //!     * primary types that you can apply *Activities* to
 //!     * a collection of properties and *Parts*
@@ -33,6 +35,8 @@
 //!         * never directly used in *Activities*
 //! * **[Activities](trait.CallBuilder.html)**
 //!     * operations to apply to *Resources*
+//! 
+//! All *structures* are marked with applicable traits to further categorize them and ease browsing.
 //! 
 //! Generally speaking, you can invoke *Activities* like this:
 //! 
@@ -68,7 +72,7 @@
 //! extern crate hyper;
 //! extern crate "yup-oauth2" as oauth2;
 //! extern crate "google-webfonts1" as webfonts1;
-//! use webfonts1::Result;
+//! use webfonts1::{Result, Error};
 //! # #[test] fn egal() {
 //! use std::default::Default;
 //! use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -94,15 +98,17 @@
 //!              .doit();
 //! 
 //! match result {
-//!     Result::HttpError(err) => println!("HTTPERROR: {:?}", err),
-//!     Result::MissingAPIKey => println!("Auth: Missing API Key - used if there are no scopes"),
-//!     Result::MissingToken => println!("OAuth2: Missing Token"),
-//!     Result::Cancelled => println!("Operation cancelled by user"),
-//!     Result::UploadSizeLimitExceeded(size, max_size) => println!("Upload size too big: {} of {}", size, max_size),
-//!     Result::Failure(_) => println!("General Failure (hyper::client::Response doesn't print)"),
-//!     Result::FieldClash(clashed_field) => println!("You added custom parameter which is part of builder: {:?}", clashed_field),
-//!     Result::JsonDecodeError(err) => println!("Couldn't understand server reply - maybe API needs update: {:?}", err),
-//!     Result::Success(_) => println!("Success (value doesn't print)"),
+//!     Err(e) => match e {
+//!         Error::HttpError(err) => println!("HTTPERROR: {:?}", err),
+//!         Error::MissingAPIKey => println!("Auth: Missing API Key - used if there are no scopes"),
+//!         Error::MissingToken => println!("OAuth2: Missing Token"),
+//!         Error::Cancelled => println!("Operation canceled by user"),
+//!         Error::UploadSizeLimitExceeded(size, max_size) => println!("Upload size too big: {} of {}", size, max_size),
+//!         Error::Failure(_) => println!("General Failure (hyper::client::Response doesn't print)"),
+//!         Error::FieldClash(clashed_field) => println!("You added custom parameter which is part of builder: {:?}", clashed_field),
+//!         Error::JsonDecodeError(err) => println!("Couldn't understand server reply - maybe API needs update: {:?}", err),
+//!     },
+//!     Ok(_) => println!("Success (value doesn't print)"),
 //! }
 //! # }
 //! ```
@@ -115,7 +121,7 @@
 //! When delegates handle errors or intermediate values, they may have a chance to instruct the system to retry. This 
 //! makes the system potentially resilient to all kinds of errors.
 //! 
-//! ## Uploads and Downlods
+//! ## Uploads and Downloads
 //! If a method supports downloads, the response body, which is part of the [Result](enum.Result.html), should be
 //! read by you to obtain the media.
 //! If such a method also supports a [Response Result](trait.ResponseResult.html), it will return that by default.
@@ -138,8 +144,9 @@
 //! ## Optional Parts in Server-Requests
 //! 
 //! All structures provided by this library are made to be [enocodable](trait.RequestValue.html) and 
-//! [decodable](trait.ResponseResult.html) via json. Optionals are used to indicate that partial requests are responses are valid.
-//! Most optionals are are considered [Parts](trait.Part.html) which are identifyable by name, which will be sent to 
+//! [decodable](trait.ResponseResult.html) via *json*. Optionals are used to indicate that partial requests are responses 
+//! are valid.
+//! Most optionals are are considered [Parts](trait.Part.html) which are identifiable by name, which will be sent to 
 //! the server to indicate either the set parts of the request or the desired parts in the response.
 //! 
 //! ## Builder Arguments
@@ -188,7 +195,7 @@ use std::io;
 use std::fs;
 use std::thread::sleep;
 
-pub use cmn::{MultiPartReader, ToParts, MethodInfo, Result, CallBuilder, Hub, ReadSeek, Part, ResponseResult, RequestValue, NestedType, Delegate, DefaultDelegate, ResourceMethodsBuilder, Resource, JsonServerError};
+pub use cmn::{MultiPartReader, ToParts, MethodInfo, Result, Error, CallBuilder, Hub, ReadSeek, Part, ResponseResult, RequestValue, NestedType, Delegate, DefaultDelegate, MethodsBuilder, Resource, JsonServerError};
 
 
 // ##############
@@ -212,7 +219,7 @@ pub use cmn::{MultiPartReader, ToParts, MethodInfo, Result, CallBuilder, Hub, Re
 /// extern crate hyper;
 /// extern crate "yup-oauth2" as oauth2;
 /// extern crate "google-webfonts1" as webfonts1;
-/// use webfonts1::Result;
+/// use webfonts1::{Result, Error};
 /// # #[test] fn egal() {
 /// use std::default::Default;
 /// use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -238,15 +245,17 @@ pub use cmn::{MultiPartReader, ToParts, MethodInfo, Result, CallBuilder, Hub, Re
 ///              .doit();
 /// 
 /// match result {
-///     Result::HttpError(err) => println!("HTTPERROR: {:?}", err),
-///     Result::MissingAPIKey => println!("Auth: Missing API Key - used if there are no scopes"),
-///     Result::MissingToken => println!("OAuth2: Missing Token"),
-///     Result::Cancelled => println!("Operation cancelled by user"),
-///     Result::UploadSizeLimitExceeded(size, max_size) => println!("Upload size too big: {} of {}", size, max_size),
-///     Result::Failure(_) => println!("General Failure (hyper::client::Response doesn't print)"),
-///     Result::FieldClash(clashed_field) => println!("You added custom parameter which is part of builder: {:?}", clashed_field),
-///     Result::JsonDecodeError(err) => println!("Couldn't understand server reply - maybe API needs update: {:?}", err),
-///     Result::Success(_) => println!("Success (value doesn't print)"),
+///     Err(e) => match e {
+///         Error::HttpError(err) => println!("HTTPERROR: {:?}", err),
+///         Error::MissingAPIKey => println!("Auth: Missing API Key - used if there are no scopes"),
+///         Error::MissingToken => println!("OAuth2: Missing Token"),
+///         Error::Cancelled => println!("Operation canceled by user"),
+///         Error::UploadSizeLimitExceeded(size, max_size) => println!("Upload size too big: {} of {}", size, max_size),
+///         Error::Failure(_) => println!("General Failure (hyper::client::Response doesn't print)"),
+///         Error::FieldClash(clashed_field) => println!("You added custom parameter which is part of builder: {:?}", clashed_field),
+///         Error::JsonDecodeError(err) => println!("Couldn't understand server reply - maybe API needs update: {:?}", err),
+///     },
+///     Ok(_) => println!("Success (value doesn't print)"),
 /// }
 /// # }
 /// ```
@@ -267,7 +276,7 @@ impl<'a, C, NC, A> Webfonts<C, NC, A>
         Webfonts {
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/0.1.1".to_string(),
+            _user_agent: "google-api-rust-client/0.1.2".to_string(),
             _m: PhantomData
         }
     }
@@ -277,7 +286,7 @@ impl<'a, C, NC, A> Webfonts<C, NC, A>
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/0.1.1`.
+    /// It defaults to `google-api-rust-client/0.1.2`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -302,22 +311,22 @@ impl<'a, C, NC, A> Webfonts<C, NC, A>
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct Webfont {
-    /// The category of the font.    
+    /// The category of the font.
     pub category: Option<String>,
-    /// The font files (with all supported scripts) for each one of the available variants, as a key : value map.    
+    /// The font files (with all supported scripts) for each one of the available variants, as a key : value map.
     pub files: Option<HashMap<String, String>>,
-    /// This kind represents a webfont object in the webfonts service.    
+    /// This kind represents a webfont object in the webfonts service.
     pub kind: Option<String>,
-    /// The name of the font.    
+    /// The name of the font.
     pub family: Option<String>,
-    /// The scripts supported by the font.    
+    /// The scripts supported by the font.
     pub subsets: Option<Vec<String>>,
-    /// The date (format "yyyy-MM-dd") the font was modified for the last time.    
+    /// The date (format "yyyy-MM-dd") the font was modified for the last time.
     #[serde(alias="lastModified")]
     pub last_modified: Option<String>,
-    /// The font version.    
+    /// The font version.
     pub version: Option<String>,
-    /// The available variants for the font.    
+    /// The available variants for the font.
     pub variants: Option<Vec<String>>,
 }
 
@@ -335,9 +344,9 @@ impl Resource for Webfont {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct WebfontList {
-    /// The list of fonts currently served by the Google Fonts API.    
+    /// The list of fonts currently served by the Google Fonts API.
     pub items: Vec<Webfont>,
-    /// This kind represents a list of webfont objects in the webfonts service.    
+    /// This kind represents a list of webfont objects in the webfonts service.
     pub kind: String,
 }
 
@@ -383,13 +392,13 @@ pub struct WebfontMethods<'a, C, NC, A>
     hub: &'a Webfonts<C, NC, A>,
 }
 
-impl<'a, C, NC, A> ResourceMethodsBuilder for WebfontMethods<'a, C, NC, A> {}
+impl<'a, C, NC, A> MethodsBuilder for WebfontMethods<'a, C, NC, A> {}
 
 impl<'a, C, NC, A> WebfontMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Retrieves the list of fonts currently served by the Google Fonts Developer API    
+    /// Retrieves the list of fonts currently served by the Google Fonts Developer API
     pub fn list(&self) -> WebfontListCall<'a, C, NC, A> {
         WebfontListCall {
             hub: self.hub,
@@ -411,7 +420,7 @@ impl<'a, C, NC, A> WebfontMethods<'a, C, NC, A> {
 /// Retrieves the list of fonts currently served by the Google Fonts Developer API
 ///
 /// A builder for the *list* method supported by a *webfont* resource.
-/// It is not used directly, but through a `WebfontMethods`.
+/// It is not used directly, but through a `WebfontMethods` instance.
 ///
 /// # Example
 ///
@@ -471,7 +480,7 @@ impl<'a, C, NC, A> WebfontListCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
         for &field in ["alt", "sort"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -490,7 +499,7 @@ impl<'a, C, NC, A> WebfontListCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
             Some(value) => params.push(("key", value)),
             None => {
                 dlg.finished(false);
-                return Result::MissingAPIKey
+                return Err(Error::MissingAPIKey)
             }
         }
 
@@ -510,7 +519,6 @@ impl<'a, C, NC, A> WebfontListCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -520,7 +528,7 @@ impl<'a, C, NC, A> WebfontListCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -531,7 +539,7 @@ impl<'a, C, NC, A> WebfontListCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -540,13 +548,13 @@ impl<'a, C, NC, A> WebfontListCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -556,7 +564,7 @@ impl<'a, C, NC, A> WebfontListCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// Sets the *sort* query property to the given value.
     ///
     /// 
-    /// Enables sorting of the list    
+    /// Enables sorting of the list
     pub fn sort(mut self, new_value: &str) -> WebfontListCall<'a, C, NC, A> {
         self._sort = Some(new_value.to_string());
         self

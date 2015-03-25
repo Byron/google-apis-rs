@@ -1,8 +1,8 @@
 // DO NOT EDIT !
-// This file was generated automatically from 'src/mako/lib.rs.mako'
+// This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *QPX Express* crate version *0.1.1+20140321*, where *20140321* is the exact revision of the *qpxExpress:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.1*.
+//! This documentation was generated from *QPX Express* crate version *0.1.2+20140321*, where *20140321* is the exact revision of the *qpxExpress:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.2*.
 //! 
 //! Everything else about the *QPX Express* *v1* API can be found at the
 //! [official documentation site](http://developers.google.com/qpx-express).
@@ -25,6 +25,8 @@
 //! 
 //! * **[Hub](struct.QPXExpress.html)**
 //!     * a central object to maintain state and allow accessing all *Activities*
+//!     * creates [*Method Builders*](trait.MethodsBuilder.html) which in turn
+//!       allow access to individual [*Call Builders*](trait.CallBuilder.html)
 //! * **[Resources](trait.Resource.html)**
 //!     * primary types that you can apply *Activities* to
 //!     * a collection of properties and *Parts*
@@ -33,6 +35,8 @@
 //!         * never directly used in *Activities*
 //! * **[Activities](trait.CallBuilder.html)**
 //!     * operations to apply to *Resources*
+//! 
+//! All *structures* are marked with applicable traits to further categorize them and ease browsing.
 //! 
 //! Generally speaking, you can invoke *Activities* like this:
 //! 
@@ -69,7 +73,7 @@
 //! extern crate "yup-oauth2" as oauth2;
 //! extern crate "google-qpxexpress1" as qpxexpress1;
 //! use qpxexpress1::TripsSearchRequest;
-//! use qpxexpress1::Result;
+//! use qpxexpress1::{Result, Error};
 //! # #[test] fn egal() {
 //! use std::default::Default;
 //! use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -99,15 +103,17 @@
 //!              .doit();
 //! 
 //! match result {
-//!     Result::HttpError(err) => println!("HTTPERROR: {:?}", err),
-//!     Result::MissingAPIKey => println!("Auth: Missing API Key - used if there are no scopes"),
-//!     Result::MissingToken => println!("OAuth2: Missing Token"),
-//!     Result::Cancelled => println!("Operation cancelled by user"),
-//!     Result::UploadSizeLimitExceeded(size, max_size) => println!("Upload size too big: {} of {}", size, max_size),
-//!     Result::Failure(_) => println!("General Failure (hyper::client::Response doesn't print)"),
-//!     Result::FieldClash(clashed_field) => println!("You added custom parameter which is part of builder: {:?}", clashed_field),
-//!     Result::JsonDecodeError(err) => println!("Couldn't understand server reply - maybe API needs update: {:?}", err),
-//!     Result::Success(_) => println!("Success (value doesn't print)"),
+//!     Err(e) => match e {
+//!         Error::HttpError(err) => println!("HTTPERROR: {:?}", err),
+//!         Error::MissingAPIKey => println!("Auth: Missing API Key - used if there are no scopes"),
+//!         Error::MissingToken => println!("OAuth2: Missing Token"),
+//!         Error::Cancelled => println!("Operation canceled by user"),
+//!         Error::UploadSizeLimitExceeded(size, max_size) => println!("Upload size too big: {} of {}", size, max_size),
+//!         Error::Failure(_) => println!("General Failure (hyper::client::Response doesn't print)"),
+//!         Error::FieldClash(clashed_field) => println!("You added custom parameter which is part of builder: {:?}", clashed_field),
+//!         Error::JsonDecodeError(err) => println!("Couldn't understand server reply - maybe API needs update: {:?}", err),
+//!     },
+//!     Ok(_) => println!("Success (value doesn't print)"),
 //! }
 //! # }
 //! ```
@@ -120,7 +126,7 @@
 //! When delegates handle errors or intermediate values, they may have a chance to instruct the system to retry. This 
 //! makes the system potentially resilient to all kinds of errors.
 //! 
-//! ## Uploads and Downlods
+//! ## Uploads and Downloads
 //! If a method supports downloads, the response body, which is part of the [Result](enum.Result.html), should be
 //! read by you to obtain the media.
 //! If such a method also supports a [Response Result](trait.ResponseResult.html), it will return that by default.
@@ -143,8 +149,9 @@
 //! ## Optional Parts in Server-Requests
 //! 
 //! All structures provided by this library are made to be [enocodable](trait.RequestValue.html) and 
-//! [decodable](trait.ResponseResult.html) via json. Optionals are used to indicate that partial requests are responses are valid.
-//! Most optionals are are considered [Parts](trait.Part.html) which are identifyable by name, which will be sent to 
+//! [decodable](trait.ResponseResult.html) via *json*. Optionals are used to indicate that partial requests are responses 
+//! are valid.
+//! Most optionals are are considered [Parts](trait.Part.html) which are identifiable by name, which will be sent to 
 //! the server to indicate either the set parts of the request or the desired parts in the response.
 //! 
 //! ## Builder Arguments
@@ -193,7 +200,7 @@ use std::io;
 use std::fs;
 use std::thread::sleep;
 
-pub use cmn::{MultiPartReader, ToParts, MethodInfo, Result, CallBuilder, Hub, ReadSeek, Part, ResponseResult, RequestValue, NestedType, Delegate, DefaultDelegate, ResourceMethodsBuilder, Resource, JsonServerError};
+pub use cmn::{MultiPartReader, ToParts, MethodInfo, Result, Error, CallBuilder, Hub, ReadSeek, Part, ResponseResult, RequestValue, NestedType, Delegate, DefaultDelegate, MethodsBuilder, Resource, JsonServerError};
 
 
 // ##############
@@ -218,7 +225,7 @@ pub use cmn::{MultiPartReader, ToParts, MethodInfo, Result, CallBuilder, Hub, Re
 /// extern crate "yup-oauth2" as oauth2;
 /// extern crate "google-qpxexpress1" as qpxexpress1;
 /// use qpxexpress1::TripsSearchRequest;
-/// use qpxexpress1::Result;
+/// use qpxexpress1::{Result, Error};
 /// # #[test] fn egal() {
 /// use std::default::Default;
 /// use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -248,15 +255,17 @@ pub use cmn::{MultiPartReader, ToParts, MethodInfo, Result, CallBuilder, Hub, Re
 ///              .doit();
 /// 
 /// match result {
-///     Result::HttpError(err) => println!("HTTPERROR: {:?}", err),
-///     Result::MissingAPIKey => println!("Auth: Missing API Key - used if there are no scopes"),
-///     Result::MissingToken => println!("OAuth2: Missing Token"),
-///     Result::Cancelled => println!("Operation cancelled by user"),
-///     Result::UploadSizeLimitExceeded(size, max_size) => println!("Upload size too big: {} of {}", size, max_size),
-///     Result::Failure(_) => println!("General Failure (hyper::client::Response doesn't print)"),
-///     Result::FieldClash(clashed_field) => println!("You added custom parameter which is part of builder: {:?}", clashed_field),
-///     Result::JsonDecodeError(err) => println!("Couldn't understand server reply - maybe API needs update: {:?}", err),
-///     Result::Success(_) => println!("Success (value doesn't print)"),
+///     Err(e) => match e {
+///         Error::HttpError(err) => println!("HTTPERROR: {:?}", err),
+///         Error::MissingAPIKey => println!("Auth: Missing API Key - used if there are no scopes"),
+///         Error::MissingToken => println!("OAuth2: Missing Token"),
+///         Error::Cancelled => println!("Operation canceled by user"),
+///         Error::UploadSizeLimitExceeded(size, max_size) => println!("Upload size too big: {} of {}", size, max_size),
+///         Error::Failure(_) => println!("General Failure (hyper::client::Response doesn't print)"),
+///         Error::FieldClash(clashed_field) => println!("You added custom parameter which is part of builder: {:?}", clashed_field),
+///         Error::JsonDecodeError(err) => println!("Couldn't understand server reply - maybe API needs update: {:?}", err),
+///     },
+///     Ok(_) => println!("Success (value doesn't print)"),
 /// }
 /// # }
 /// ```
@@ -277,7 +286,7 @@ impl<'a, C, NC, A> QPXExpress<C, NC, A>
         QPXExpress {
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/0.1.1".to_string(),
+            _user_agent: "google-api-rust-client/0.1.2".to_string(),
             _m: PhantomData
         }
     }
@@ -287,7 +296,7 @@ impl<'a, C, NC, A> QPXExpress<C, NC, A>
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/0.1.1`.
+    /// It defaults to `google-api-rust-client/0.1.2`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -307,21 +316,21 @@ impl<'a, C, NC, A> QPXExpress<C, NC, A>
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct PassengerCounts {
-    /// The number of passengers that are infants travelling in the lap of an adult.    
+    /// The number of passengers that are infants travelling in the lap of an adult.
     #[serde(alias="infantInLapCount")]
     pub infant_in_lap_count: i32,
-    /// Identifies this as a passenger count object, representing the number of passengers. Value: the fixed string qpxexpress#passengerCounts.    
+    /// Identifies this as a passenger count object, representing the number of passengers. Value: the fixed string qpxexpress#passengerCounts.
     pub kind: String,
-    /// The number of passengers that are infants each assigned a seat.    
+    /// The number of passengers that are infants each assigned a seat.
     #[serde(alias="infantInSeatCount")]
     pub infant_in_seat_count: i32,
-    /// The number of passengers that are adults.    
+    /// The number of passengers that are adults.
     #[serde(alias="adultCount")]
     pub adult_count: i32,
-    /// The number of passengers that are senior citizens.    
+    /// The number of passengers that are senior citizens.
     #[serde(alias="seniorCount")]
     pub senior_count: i32,
-    /// The number of passengers that are children.    
+    /// The number of passengers that are children.
     #[serde(alias="childCount")]
     pub child_count: i32,
 }
@@ -335,15 +344,15 @@ impl Part for PassengerCounts {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct SegmentPricing {
-    /// Identifies this as a segment pricing object, representing the price of this segment. Value: the fixed string qpxexpress#segmentPricing.    
+    /// Identifies this as a segment pricing object, representing the price of this segment. Value: the fixed string qpxexpress#segmentPricing.
     pub kind: String,
-    /// A segment identifier unique within a single solution. It is used to refer to different parts of the same solution.    
+    /// A segment identifier unique within a single solution. It is used to refer to different parts of the same solution.
     #[serde(alias="fareId")]
     pub fare_id: String,
-    /// Details of the free baggage allowance on this segment.    
+    /// Details of the free baggage allowance on this segment.
     #[serde(alias="freeBaggageOption")]
     pub free_baggage_option: Vec<FreeBaggageAllowance>,
-    /// Unique identifier in the response of this segment.    
+    /// Unique identifier in the response of this segment.
     #[serde(alias="segmentId")]
     pub segment_id: String,
 }
@@ -357,47 +366,47 @@ impl Part for SegmentPricing {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct LegInfo {
-    /// The leg origin as a city and airport.    
+    /// The leg origin as a city and airport.
     pub origin: String,
-    /// The terminal the flight is scheduled to depart from.    
+    /// The terminal the flight is scheduled to depart from.
     #[serde(alias="originTerminal")]
     pub origin_terminal: String,
-    /// The number of miles in this leg.    
+    /// The number of miles in this leg.
     pub mileage: i32,
-    /// Whether passenger information must be furnished to the United States Transportation Security Administration (TSA) prior to departure.    
+    /// Whether passenger information must be furnished to the United States Transportation Security Administration (TSA) prior to departure.
     pub secure: bool,
-    /// Duration of a connection following this leg, in minutes.    
+    /// Duration of a connection following this leg, in minutes.
     #[serde(alias="connectionDuration")]
     pub connection_duration: i32,
-    /// The scheduled departure time of the leg, local to the point of departure.    
+    /// The scheduled departure time of the leg, local to the point of departure.
     #[serde(alias="departureTime")]
     pub departure_time: String,
-    /// The aircraft (or bus, ferry, railcar, etc) travelling between the two points of this leg.    
+    /// The aircraft (or bus, ferry, railcar, etc) travelling between the two points of this leg.
     pub aircraft: String,
-    /// In percent, the published on time performance on this leg.    
+    /// In percent, the published on time performance on this leg.
     #[serde(alias="onTimePerformance")]
     pub on_time_performance: i32,
-    /// The scheduled time of arrival at the destination of the leg, local to the point of arrival.    
+    /// The scheduled time of arrival at the destination of the leg, local to the point of arrival.
     #[serde(alias="arrivalTime")]
     pub arrival_time: String,
-    /// The scheduled travelling time from the origin to the destination.    
+    /// The scheduled travelling time from the origin to the destination.
     pub duration: i32,
-    /// The leg destination as a city and airport.    
+    /// The leg destination as a city and airport.
     pub destination: String,
-    /// An identifier that uniquely identifies this leg in the solution.    
+    /// An identifier that uniquely identifies this leg in the solution.
     pub id: String,
-    /// Identifies this as a leg object. A leg is the smallest unit of travel, in the case of a flight a takeoff immediately followed by a landing at two set points on a particular carrier with a particular flight number. Value: the fixed string qpxexpress#legInfo.    
+    /// Identifies this as a leg object. A leg is the smallest unit of travel, in the case of a flight a takeoff immediately followed by a landing at two set points on a particular carrier with a particular flight number. Value: the fixed string qpxexpress#legInfo.
     pub kind: String,
-    /// The terminal the flight is scheduled to arrive at.    
+    /// The terminal the flight is scheduled to arrive at.
     #[serde(alias="destinationTerminal")]
     pub destination_terminal: String,
-    /// Whether you have to change planes following this leg. Only applies to the next leg.    
+    /// Whether you have to change planes following this leg. Only applies to the next leg.
     #[serde(alias="changePlane")]
     pub change_plane: bool,
-    /// Department of Transportation disclosure information on the actual operator of a flight in a code share. (A code share refers to a marketing agreement between two carriers, where one carrier will list in its schedules (and take bookings for) flights that are actually operated by another carrier.)    
+    /// Department of Transportation disclosure information on the actual operator of a flight in a code share. (A code share refers to a marketing agreement between two carriers, where one carrier will list in its schedules (and take bookings for) flights that are actually operated by another carrier.)
     #[serde(alias="operatingDisclosure")]
     pub operating_disclosure: String,
-    /// A simple, general description of the meal(s) served on the flight, for example: "Hot meal".    
+    /// A simple, general description of the meal(s) served on the flight, for example: "Hot meal".
     pub meal: String,
 }
 
@@ -410,20 +419,20 @@ impl Part for LegInfo {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct FareInfo {
-    /// no description provided    
+    /// no description provided
     #[serde(alias="basisCode")]
     pub basis_code: String,
-    /// The city code of the city the trip begins at.    
+    /// The city code of the city the trip begins at.
     pub origin: String,
-    /// Identifies this as a fare object. Value: the fixed string qpxexpress#fareInfo.    
+    /// Identifies this as a fare object. Value: the fixed string qpxexpress#fareInfo.
     pub kind: String,
-    /// The carrier of the aircraft or other vehicle commuting between two points.    
+    /// The carrier of the aircraft or other vehicle commuting between two points.
     pub carrier: String,
-    /// The city code of the city the trip ends at.    
+    /// The city code of the city the trip ends at.
     pub destination: String,
-    /// A unique identifier of the fare.    
+    /// A unique identifier of the fare.
     pub id: String,
-    /// Whether this is a private fare, for example one offered only to select customers rather than the general public.    
+    /// Whether this is a private fare, for example one offered only to select customers rather than the general public.
     pub private: bool,
 }
 
@@ -436,31 +445,31 @@ impl Part for FareInfo {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct SegmentInfo {
-    /// Identifies this as a segment object. A segment is one or more consecutive legs on the same flight. For example a hypothetical flight ZZ001, from DFW to OGG, could have one segment with two legs: DFW to HNL (leg 1), HNL to OGG (leg 2). Value: the fixed string qpxexpress#segmentInfo.    
+    /// Identifies this as a segment object. A segment is one or more consecutive legs on the same flight. For example a hypothetical flight ZZ001, from DFW to OGG, could have one segment with two legs: DFW to HNL (leg 1), HNL to OGG (leg 2). Value: the fixed string qpxexpress#segmentInfo.
     pub kind: String,
-    /// The number of seats available in this booking code on this segment.    
+    /// The number of seats available in this booking code on this segment.
     #[serde(alias="bookingCodeCount")]
     pub booking_code_count: i32,
-    /// The flight this is a segment of.    
+    /// The flight this is a segment of.
     pub flight: FlightInfo,
-    /// The legs composing this segment.    
+    /// The legs composing this segment.
     pub leg: Vec<LegInfo>,
-    /// Whether the operation of this segment remains subject to government approval.    
+    /// Whether the operation of this segment remains subject to government approval.
     #[serde(alias="subjectToGovernmentApproval")]
     pub subject_to_government_approval: bool,
-    /// In minutes, the duration of the connection following this segment.    
+    /// In minutes, the duration of the connection following this segment.
     #[serde(alias="connectionDuration")]
     pub connection_duration: i32,
-    /// The booking code or class for this segment.    
+    /// The booking code or class for this segment.
     #[serde(alias="bookingCode")]
     pub booking_code: String,
-    /// The duration of the flight segment in minutes.    
+    /// The duration of the flight segment in minutes.
     pub duration: i32,
-    /// An id uniquely identifying the segment in the solution.    
+    /// An id uniquely identifying the segment in the solution.
     pub id: String,
-    /// The cabin booked for this segment.    
+    /// The cabin booked for this segment.
     pub cabin: String,
-    /// The solution-based index of a segment in a married segment group. Married segments can only be booked together. For example, an airline might report a certain booking code as sold out from Boston to Pittsburgh, but as available as part of two married segments Boston to Chicago connecting through Pittsburgh. For example content of this field, consider the round-trip flight ZZ1 PHX-PHL ZZ2 PHL-CLT ZZ3 CLT-PHX. This has three segments, with the two outbound ones (ZZ1 ZZ2) married. In this case, the two outbound segments belong to married segment group 0, and the return segment belongs to married segment group 1.    
+    /// The solution-based index of a segment in a married segment group. Married segments can only be booked together. For example, an airline might report a certain booking code as sold out from Boston to Pittsburgh, but as available as part of two married segments Boston to Chicago connecting through Pittsburgh. For example content of this field, consider the round-trip flight ZZ1 PHX-PHL ZZ2 PHL-CLT ZZ3 CLT-PHX. This has three segments, with the two outbound ones (ZZ1 ZZ2) married. In this case, the two outbound segments belong to married segment group 0, and the return segment belongs to married segment group 1.
     #[serde(alias="marriedSegmentGroup")]
     pub married_segment_group: String,
 }
@@ -474,18 +483,18 @@ impl Part for SegmentInfo {}
 /// 
 #[derive(Default, Clone, Debug, Serialize)]
 pub struct TripOptionsRequest {
-    /// Counts for each passenger type in the request.    
+    /// Counts for each passenger type in the request.
     pub passengers: PassengerCounts,
-    /// The slices that make up the itinerary of this trip. A slice represents a traveler's intent, the portion of a low-fare search corresponding to a traveler's request to get between two points. One-way journeys are generally expressed using one slice, round-trips using two. An example of a one slice trip with three segments might be BOS-SYD, SYD-LAX, LAX-BOS if the traveler only stopped in SYD and LAX just long enough to change planes.    
+    /// The slices that make up the itinerary of this trip. A slice represents a traveler's intent, the portion of a low-fare search corresponding to a traveler's request to get between two points. One-way journeys are generally expressed using one slice, round-trips using two. An example of a one slice trip with three segments might be BOS-SYD, SYD-LAX, LAX-BOS if the traveler only stopped in SYD and LAX just long enough to change planes.
     pub slice: Vec<SliceInput>,
-    /// The number of solutions to return, maximum 500.    
+    /// The number of solutions to return, maximum 500.
     pub solutions: i32,
-    /// Return only solutions with refundable fares.    
+    /// Return only solutions with refundable fares.
     pub refundable: bool,
-    /// IATA country code representing the point of sale. This determines the "equivalent amount paid" currency for the ticket.    
+    /// IATA country code representing the point of sale. This determines the "equivalent amount paid" currency for the ticket.
     #[serde(alias="saleCountry")]
     pub sale_country: i64,
-    /// Do not return solutions that cost more than this price. The alphabetical part of the price is in ISO 4217. The format, in regex, is [A-Z]{3}\d+(\.\d+)? Example: $102.07    
+    /// Do not return solutions that cost more than this price. The alphabetical part of the price is in ISO 4217. The format, in regex, is [A-Z]{3}\d+(\.\d+)? Example: $102.07
     #[serde(alias="maxPrice")]
     pub max_price: String,
 }
@@ -499,11 +508,11 @@ impl Part for TripOptionsRequest {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct AircraftData {
-    /// Identifies this as an aircraftData object. Value: the fixed string qpxexpress#aircraftData    
+    /// Identifies this as an aircraftData object. Value: the fixed string qpxexpress#aircraftData
     pub kind: String,
-    /// The aircraft code. For example, for a Boeing 777 the code would be 777.    
+    /// The aircraft code. For example, for a Boeing 777 the code would be 777.
     pub code: String,
-    /// The name of an aircraft, for example Boeing 777.    
+    /// The name of an aircraft, for example Boeing 777.
     pub name: String,
 }
 
@@ -516,37 +525,37 @@ impl Part for AircraftData {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct PricingInfo {
-    /// The fare used to price one or more segments.    
+    /// The fare used to price one or more segments.
     pub fare: Vec<FareInfo>,
-    /// The horizontal fare calculation. This is a field on a ticket that displays all of the relevant items that go into the calculation of the fare.    
+    /// The horizontal fare calculation. This is a field on a ticket that displays all of the relevant items that go into the calculation of the fare.
     #[serde(alias="fareCalculation")]
     pub fare_calculation: String,
-    /// Identifies this as a pricing object, representing the price of one or more travel segments. Value: the fixed string qpxexpress#pricingInfo.    
+    /// Identifies this as a pricing object, representing the price of one or more travel segments. Value: the fixed string qpxexpress#pricingInfo.
     pub kind: String,
-    /// The per-segment price and baggage information.    
+    /// The per-segment price and baggage information.
     #[serde(alias="segmentPricing")]
     pub segment_pricing: Vec<SegmentPricing>,
-    /// Total per-passenger price (fare and tax) in the sale or equivalent currency.    
+    /// Total per-passenger price (fare and tax) in the sale or equivalent currency.
     #[serde(alias="saleTotal")]
     pub sale_total: String,
-    /// The passenger type code for this pricing. An alphanumeric code used by a carrier to restrict fares to certain categories of passenger. For instance, a fare might be valid only for senior citizens.    
+    /// The passenger type code for this pricing. An alphanumeric code used by a carrier to restrict fares to certain categories of passenger. For instance, a fare might be valid only for senior citizens.
     pub ptc: String,
-    /// The number of passengers to which this price applies.    
+    /// The number of passengers to which this price applies.
     pub passengers: PassengerCounts,
-    /// The taxes used to calculate the tax total per ticket.    
+    /// The taxes used to calculate the tax total per ticket.
     pub tax: Vec<TaxInfo>,
-    /// The total fare in the sale or equivalent currency.    
+    /// The total fare in the sale or equivalent currency.
     #[serde(alias="saleFareTotal")]
     pub sale_fare_total: String,
-    /// The total fare in the base fare currency (the currency of the country of origin). This element is only present when the sales currency and the currency of the country of commencement are different.    
+    /// The total fare in the base fare currency (the currency of the country of origin). This element is only present when the sales currency and the currency of the country of commencement are different.
     #[serde(alias="baseFareTotal")]
     pub base_fare_total: String,
-    /// Whether the fares on this pricing are refundable.    
+    /// Whether the fares on this pricing are refundable.
     pub refundable: bool,
-    /// The taxes in the sale or equivalent currency.    
+    /// The taxes in the sale or equivalent currency.
     #[serde(alias="saleTaxTotal")]
     pub sale_tax_total: String,
-    /// The latest ticketing time for this pricing assuming the reservation occurs at ticketing time and there is no change in fares/rules. The time is local to the point of sale (POS).    
+    /// The latest ticketing time for this pricing assuming the reservation occurs at ticketing time and there is no change in fares/rules. The time is local to the point of sale (POS).
     #[serde(alias="latestTicketingTime")]
     pub latest_ticketing_time: String,
 }
@@ -560,12 +569,12 @@ impl Part for PricingInfo {}
 /// 
 #[derive(Default, Clone, Debug, Serialize)]
 pub struct TimeOfDayRange {
-    /// The earliest time of day in HH:MM format.    
+    /// The earliest time of day in HH:MM format.
     #[serde(alias="earliestTime")]
     pub earliest_time: String,
-    /// Identifies this as a time of day range object, representing two times in a single day defining a time range. Value: the fixed string qpxexpress#timeOfDayRange.    
+    /// Identifies this as a time of day range object, representing two times in a single day defining a time range. Value: the fixed string qpxexpress#timeOfDayRange.
     pub kind: String,
-    /// The latest time of day in HH:MM format.    
+    /// The latest time of day in HH:MM format.
     #[serde(alias="latestTime")]
     pub latest_time: String,
 }
@@ -579,13 +588,13 @@ impl Part for TimeOfDayRange {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct AirportData {
-    /// The city code an airport is located in. For example, for JFK airport, this is NYC.    
+    /// The city code an airport is located in. For example, for JFK airport, this is NYC.
     pub city: String,
-    /// Identifies this as an airport object. Value: the fixed string qpxexpress#airportData.    
+    /// Identifies this as an airport object. Value: the fixed string qpxexpress#airportData.
     pub kind: String,
-    /// An airport's code. For example, for Boston Logan airport, this is BOS.    
+    /// An airport's code. For example, for Boston Logan airport, this is BOS.
     pub code: String,
-    /// The name of an airport. For example, for airport BOS the name is "Boston Logan International".    
+    /// The name of an airport. For example, for airport BOS the name is "Boston Logan International".
     pub name: String,
 }
 
@@ -598,11 +607,11 @@ impl Part for AirportData {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct CarrierData {
-    /// Identifies this as a kind of carrier (ie. an airline, bus line, railroad, etc). Value: the fixed string qpxexpress#carrierData.    
+    /// Identifies this as a kind of carrier (ie. an airline, bus line, railroad, etc). Value: the fixed string qpxexpress#carrierData.
     pub kind: String,
-    /// The IATA designator of a carrier (airline, etc). For example, for American Airlines, the code is AA.    
+    /// The IATA designator of a carrier (airline, etc). For example, for American Airlines, the code is AA.
     pub code: String,
-    /// The long, full name of a carrier. For example: American Airlines.    
+    /// The long, full name of a carrier. For example: American Airlines.
     pub name: String,
 }
 
@@ -615,11 +624,11 @@ impl Part for CarrierData {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct TaxData {
-    /// Identifies this as a tax data object, representing some tax. Value: the fixed string qpxexpress#taxData.    
+    /// Identifies this as a tax data object, representing some tax. Value: the fixed string qpxexpress#taxData.
     pub kind: String,
-    /// An identifier uniquely identifying a tax in a response.    
+    /// An identifier uniquely identifying a tax in a response.
     pub id: String,
-    /// The name of a tax.    
+    /// The name of a tax.
     pub name: String,
 }
 
@@ -632,19 +641,19 @@ impl Part for TaxData {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct TaxInfo {
-    /// Identifies this as a tax information object. Value: the fixed string qpxexpress#taxInfo.    
+    /// Identifies this as a tax information object. Value: the fixed string qpxexpress#taxInfo.
     pub kind: String,
-    /// The code to enter in the ticket's tax box.    
+    /// The code to enter in the ticket's tax box.
     pub code: String,
-    /// The price of the tax in the sales or equivalent currency.    
+    /// The price of the tax in the sales or equivalent currency.
     #[serde(alias="salePrice")]
     pub sale_price: String,
-    /// Whether this is a government charge or a carrier surcharge.    
+    /// Whether this is a government charge or a carrier surcharge.
     #[serde(alias="chargeType")]
     pub charge_type: String,
-    /// For government charges, the country levying the charge.    
+    /// For government charges, the country levying the charge.
     pub country: String,
-    /// Identifier uniquely identifying this tax in a response. Not present for unnamed carrier surcharges.    
+    /// Identifier uniquely identifying this tax in a response. Not present for unnamed carrier surcharges.
     pub id: String,
 }
 
@@ -657,14 +666,14 @@ impl Part for TaxInfo {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct TripOptionsResponse {
-    /// A list of priced itinerary solutions to the QPX Express query.    
+    /// A list of priced itinerary solutions to the QPX Express query.
     #[serde(alias="tripOption")]
     pub trip_option: Vec<TripOption>,
-    /// Identifies this as a QPX Express trip response object, which consists of zero or more solutions. Value: the fixed string qpxexpress#tripOptions.    
+    /// Identifies this as a QPX Express trip response object, which consists of zero or more solutions. Value: the fixed string qpxexpress#tripOptions.
     pub kind: String,
-    /// Informational data global to list of solutions.    
+    /// Informational data global to list of solutions.
     pub data: Data,
-    /// An identifier uniquely identifying this response.    
+    /// An identifier uniquely identifying this response.
     #[serde(alias="requestId")]
     pub request_id: String,
 }
@@ -678,9 +687,9 @@ impl Part for TripOptionsResponse {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct FlightInfo {
-    /// no description provided    
+    /// no description provided
     pub carrier: String,
-    /// The flight number.    
+    /// The flight number.
     pub number: String,
 }
 
@@ -698,7 +707,7 @@ impl Part for FlightInfo {}
 /// 
 #[derive(Default, Clone, Debug, Serialize)]
 pub struct TripsSearchRequest {
-    /// A QPX Express search request. Required values are at least one adult or senior passenger, an origin, a destination, and a date.    
+    /// A QPX Express search request. Required values are at least one adult or senior passenger, an origin, a destination, and a date.
     pub request: Option<TripOptionsRequest>,
 }
 
@@ -711,32 +720,32 @@ impl RequestValue for TripsSearchRequest {}
 /// 
 #[derive(Default, Clone, Debug, Serialize)]
 pub struct SliceInput {
-    /// Airport or city IATA designator of the origin.    
+    /// Airport or city IATA designator of the origin.
     pub origin: String,
-    /// Identifies this as a slice input object, representing the criteria a desired slice must satisfy. Value: the fixed string qpxexpress#sliceInput.    
+    /// Identifies this as a slice input object, representing the criteria a desired slice must satisfy. Value: the fixed string qpxexpress#sliceInput.
     pub kind: String,
-    /// Slices with only the carriers in this alliance should be returned; do not use this field with permittedCarrier. Allowed values are ONEWORLD, SKYTEAM, and STAR.    
+    /// Slices with only the carriers in this alliance should be returned; do not use this field with permittedCarrier. Allowed values are ONEWORLD, SKYTEAM, and STAR.
     pub alliance: String,
-    /// Departure date in YYYY-MM-DD format.    
+    /// Departure date in YYYY-MM-DD format.
     pub date: String,
-    /// Airport or city IATA designator of the destination.    
+    /// Airport or city IATA designator of the destination.
     pub destination: String,
-    /// The maximum number of stops you are willing to accept in this slice.    
+    /// The maximum number of stops you are willing to accept in this slice.
     #[serde(alias="maxStops")]
     pub max_stops: i32,
-    /// Slices must depart in this time of day range, local to the point of departure.    
+    /// Slices must depart in this time of day range, local to the point of departure.
     #[serde(alias="permittedDepartureTime")]
     pub permitted_departure_time: TimeOfDayRange,
-    /// A list of 2-letter IATA airline designators. Slices with only these carriers should be returned.    
+    /// A list of 2-letter IATA airline designators. Slices with only these carriers should be returned.
     #[serde(alias="permittedCarrier")]
     pub permitted_carrier: Vec<String>,
-    /// The longest connection between two legs, in minutes, you are willing to accept.    
+    /// The longest connection between two legs, in minutes, you are willing to accept.
     #[serde(alias="maxConnectionDuration")]
     pub max_connection_duration: i32,
-    /// Prefer solutions that book in this cabin for this slice. Allowed values are COACH, PREMIUM_COACH, BUSINESS, and FIRST.    
+    /// Prefer solutions that book in this cabin for this slice. Allowed values are COACH, PREMIUM_COACH, BUSINESS, and FIRST.
     #[serde(alias="preferredCabin")]
     pub preferred_cabin: String,
-    /// A list of 2-letter IATA airline designators. Exclude slices that use these carriers.    
+    /// A list of 2-letter IATA airline designators. Exclude slices that use these carriers.
     #[serde(alias="prohibitedCarrier")]
     pub prohibited_carrier: Vec<String>,
 }
@@ -755,9 +764,9 @@ impl Part for SliceInput {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct TripsSearchResponse {
-    /// Identifies this as a QPX Express API search response resource. Value: the fixed string qpxExpress#tripsSearch.    
+    /// Identifies this as a QPX Express API search response resource. Value: the fixed string qpxExpress#tripsSearch.
     pub kind: String,
-    /// All possible solutions to the QPX Express search request.    
+    /// All possible solutions to the QPX Express search request.
     pub trips: TripOptionsResponse,
 }
 
@@ -770,15 +779,15 @@ impl ResponseResult for TripsSearchResponse {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct BagDescriptor {
-    /// How many of this type of bag will be checked on this flight.    
+    /// How many of this type of bag will be checked on this flight.
     pub count: i32,
-    /// The standard IATA subcode used to identify this optional service.    
+    /// The standard IATA subcode used to identify this optional service.
     pub subcode: String,
-    /// A description of the baggage.    
+    /// A description of the baggage.
     pub description: Vec<String>,
-    /// Identifies this as a baggage object. Value: the fixed string qpxexpress#bagDescriptor.    
+    /// Identifies this as a baggage object. Value: the fixed string qpxexpress#bagDescriptor.
     pub kind: String,
-    /// Provides the commercial name for an optional service.    
+    /// Provides the commercial name for an optional service.
     #[serde(alias="commercialName")]
     pub commercial_name: String,
 }
@@ -792,13 +801,13 @@ impl Part for BagDescriptor {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct CityData {
-    /// The two-character country code of the country the city is located in. For example, US for the United States of America.    
+    /// The two-character country code of the country the city is located in. For example, US for the United States of America.
     pub country: String,
-    /// Identifies this as a city, typically with one or more airports. Value: the fixed string qpxexpress#cityData.    
+    /// Identifies this as a city, typically with one or more airports. Value: the fixed string qpxexpress#cityData.
     pub kind: String,
-    /// The IATA character ID of a city. For example, for Boston this is BOS.    
+    /// The IATA character ID of a city. For example, for Boston this is BOS.
     pub code: String,
-    /// The full name of a city. An example would be: New York.    
+    /// The full name of a city. An example would be: New York.
     pub name: String,
 }
 
@@ -813,11 +822,11 @@ impl Part for CityData {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct SliceInfo {
-    /// The duration of the slice in minutes.    
+    /// The duration of the slice in minutes.
     pub duration: i32,
-    /// Identifies this as a slice object. A slice represents a traveller's intent, the portion of a low-fare search corresponding to a traveler's request to get between two points. One-way journeys are generally expressed using 1 slice, round-trips using 2. Value: the fixed string qpxexpress#sliceInfo.    
+    /// Identifies this as a slice object. A slice represents a traveller's intent, the portion of a low-fare search corresponding to a traveler's request to get between two points. One-way journeys are generally expressed using 1 slice, round-trips using 2. Value: the fixed string qpxexpress#sliceInfo.
     pub kind: String,
-    /// The segment(s) constituting the slice.    
+    /// The segment(s) constituting the slice.
     pub segment: Vec<SegmentInfo>,
 }
 
@@ -830,16 +839,16 @@ impl Part for SliceInfo {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct TripOption {
-    /// The total price for all passengers on the trip, in the form of a currency followed by an amount, e.g. USD253.35.    
+    /// The total price for all passengers on the trip, in the form of a currency followed by an amount, e.g. USD253.35.
     #[serde(alias="saleTotal")]
     pub sale_total: String,
-    /// Identifies this as a trip information object. Value: the fixed string qpxexpress#tripOption.    
+    /// Identifies this as a trip information object. Value: the fixed string qpxexpress#tripOption.
     pub kind: String,
-    /// The slices that make up this trip's itinerary.    
+    /// The slices that make up this trip's itinerary.
     pub slice: Vec<SliceInfo>,
-    /// Identifier uniquely identifying this trip in a response.    
+    /// Identifier uniquely identifying this trip in a response.
     pub id: String,
-    /// Per passenger pricing information.    
+    /// Per passenger pricing information.
     pub pricing: Vec<PricingInfo>,
 }
 
@@ -852,17 +861,17 @@ impl Part for TripOption {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct Data {
-    /// The city that is either the origin or destination of part of a trip.    
+    /// The city that is either the origin or destination of part of a trip.
     pub city: Vec<CityData>,
-    /// Identifies this as QPX Express response resource, including a trip's airport, city, taxes, airline, and aircraft. Value: the fixed string qpxexpress#data.    
+    /// Identifies this as QPX Express response resource, including a trip's airport, city, taxes, airline, and aircraft. Value: the fixed string qpxexpress#data.
     pub kind: String,
-    /// The airline carrier of the aircraft flying between an origin and destination. Allowed values are IATA carrier codes.    
+    /// The airline carrier of the aircraft flying between an origin and destination. Allowed values are IATA carrier codes.
     pub carrier: Vec<CarrierData>,
-    /// The airport of an origin or destination.    
+    /// The airport of an origin or destination.
     pub airport: Vec<AirportData>,
-    /// The taxes due for flying between an origin and a destination.    
+    /// The taxes due for flying between an origin and a destination.
     pub tax: Vec<TaxData>,
-    /// The aircraft that is flying between an origin and destination.    
+    /// The aircraft that is flying between an origin and destination.
     pub aircraft: Vec<AircraftData>,
 }
 
@@ -875,19 +884,19 @@ impl Part for Data {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct FreeBaggageAllowance {
-    /// The maximum number of kilos any one piece of baggage may weigh.    
+    /// The maximum number of kilos any one piece of baggage may weigh.
     #[serde(alias="kilosPerPiece")]
     pub kilos_per_piece: i32,
-    /// A representation of a type of bag, such as an ATPCo subcode, Commercial Name, or other description.    
+    /// A representation of a type of bag, such as an ATPCo subcode, Commercial Name, or other description.
     #[serde(alias="bagDescriptor")]
     pub bag_descriptor: Vec<BagDescriptor>,
-    /// The number of pounds of free baggage allowed.    
+    /// The number of pounds of free baggage allowed.
     pub pounds: i32,
-    /// The number of free pieces of baggage allowed.    
+    /// The number of free pieces of baggage allowed.
     pub pieces: i32,
-    /// Identifies this as free baggage object, allowed on one segment of a trip. Value: the fixed string qpxexpress#freeBaggageAllowance.    
+    /// Identifies this as free baggage object, allowed on one segment of a trip. Value: the fixed string qpxexpress#freeBaggageAllowance.
     pub kind: String,
-    /// The maximum number of kilos all the free baggage together may weigh.    
+    /// The maximum number of kilos all the free baggage together may weigh.
     pub kilos: i32,
 }
 
@@ -933,13 +942,17 @@ pub struct TripMethods<'a, C, NC, A>
     hub: &'a QPXExpress<C, NC, A>,
 }
 
-impl<'a, C, NC, A> ResourceMethodsBuilder for TripMethods<'a, C, NC, A> {}
+impl<'a, C, NC, A> MethodsBuilder for TripMethods<'a, C, NC, A> {}
 
 impl<'a, C, NC, A> TripMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Returns a list of flights.    
+    /// Returns a list of flights.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
     pub fn search(&self, request: &TripsSearchRequest) -> TripSearchCall<'a, C, NC, A> {
         TripSearchCall {
             hub: self.hub,
@@ -961,7 +974,7 @@ impl<'a, C, NC, A> TripMethods<'a, C, NC, A> {
 /// Returns a list of flights.
 ///
 /// A builder for the *search* method supported by a *trip* resource.
-/// It is not used directly, but through a `TripMethods`.
+/// It is not used directly, but through a `TripMethods` instance.
 ///
 /// # Example
 ///
@@ -1023,7 +1036,7 @@ impl<'a, C, NC, A> TripSearchCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
         for &field in ["alt"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -1042,7 +1055,7 @@ impl<'a, C, NC, A> TripSearchCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
             Some(value) => params.push(("key", value)),
             None => {
                 dlg.finished(false);
-                return Result::MissingAPIKey
+                return Err(Error::MissingAPIKey)
             }
         }
 
@@ -1070,7 +1083,6 @@ impl<'a, C, NC, A> TripSearchCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -1080,7 +1092,7 @@ impl<'a, C, NC, A> TripSearchCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -1091,7 +1103,7 @@ impl<'a, C, NC, A> TripSearchCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -1100,13 +1112,13 @@ impl<'a, C, NC, A> TripSearchCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }

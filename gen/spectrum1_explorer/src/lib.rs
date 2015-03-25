@@ -1,8 +1,8 @@
 // DO NOT EDIT !
-// This file was generated automatically from 'src/mako/lib.rs.mako'
+// This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *spectrum* crate version *0.1.1+20150112*, where *20150112* is the exact revision of the *spectrum:v1explorer* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.1*.
+//! This documentation was generated from *spectrum* crate version *0.1.2+20150112*, where *20150112* is the exact revision of the *spectrum:v1explorer* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.2*.
 //! 
 //! Everything else about the *spectrum* *v1_explorer* API can be found at the
 //! [official documentation site](http://developers.google.com/spectrum).
@@ -25,6 +25,8 @@
 //! 
 //! * **[Hub](struct.Spectrum.html)**
 //!     * a central object to maintain state and allow accessing all *Activities*
+//!     * creates [*Method Builders*](trait.MethodsBuilder.html) which in turn
+//!       allow access to individual [*Call Builders*](trait.CallBuilder.html)
 //! * **[Resources](trait.Resource.html)**
 //!     * primary types that you can apply *Activities* to
 //!     * a collection of properties and *Parts*
@@ -33,6 +35,8 @@
 //!         * never directly used in *Activities*
 //! * **[Activities](trait.CallBuilder.html)**
 //!     * operations to apply to *Resources*
+//! 
+//! All *structures* are marked with applicable traits to further categorize them and ease browsing.
 //! 
 //! Generally speaking, you can invoke *Activities* like this:
 //! 
@@ -69,7 +73,7 @@
 //! extern crate "yup-oauth2" as oauth2;
 //! extern crate "google-spectrum1_explorer" as spectrum1_explorer;
 //! use spectrum1_explorer::PawsGetSpectrumBatchRequest;
-//! use spectrum1_explorer::Result;
+//! use spectrum1_explorer::{Result, Error};
 //! # #[test] fn egal() {
 //! use std::default::Default;
 //! use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -99,15 +103,17 @@
 //!              .doit();
 //! 
 //! match result {
-//!     Result::HttpError(err) => println!("HTTPERROR: {:?}", err),
-//!     Result::MissingAPIKey => println!("Auth: Missing API Key - used if there are no scopes"),
-//!     Result::MissingToken => println!("OAuth2: Missing Token"),
-//!     Result::Cancelled => println!("Operation cancelled by user"),
-//!     Result::UploadSizeLimitExceeded(size, max_size) => println!("Upload size too big: {} of {}", size, max_size),
-//!     Result::Failure(_) => println!("General Failure (hyper::client::Response doesn't print)"),
-//!     Result::FieldClash(clashed_field) => println!("You added custom parameter which is part of builder: {:?}", clashed_field),
-//!     Result::JsonDecodeError(err) => println!("Couldn't understand server reply - maybe API needs update: {:?}", err),
-//!     Result::Success(_) => println!("Success (value doesn't print)"),
+//!     Err(e) => match e {
+//!         Error::HttpError(err) => println!("HTTPERROR: {:?}", err),
+//!         Error::MissingAPIKey => println!("Auth: Missing API Key - used if there are no scopes"),
+//!         Error::MissingToken => println!("OAuth2: Missing Token"),
+//!         Error::Cancelled => println!("Operation canceled by user"),
+//!         Error::UploadSizeLimitExceeded(size, max_size) => println!("Upload size too big: {} of {}", size, max_size),
+//!         Error::Failure(_) => println!("General Failure (hyper::client::Response doesn't print)"),
+//!         Error::FieldClash(clashed_field) => println!("You added custom parameter which is part of builder: {:?}", clashed_field),
+//!         Error::JsonDecodeError(err) => println!("Couldn't understand server reply - maybe API needs update: {:?}", err),
+//!     },
+//!     Ok(_) => println!("Success (value doesn't print)"),
 //! }
 //! # }
 //! ```
@@ -120,7 +126,7 @@
 //! When delegates handle errors or intermediate values, they may have a chance to instruct the system to retry. This 
 //! makes the system potentially resilient to all kinds of errors.
 //! 
-//! ## Uploads and Downlods
+//! ## Uploads and Downloads
 //! If a method supports downloads, the response body, which is part of the [Result](enum.Result.html), should be
 //! read by you to obtain the media.
 //! If such a method also supports a [Response Result](trait.ResponseResult.html), it will return that by default.
@@ -143,8 +149,9 @@
 //! ## Optional Parts in Server-Requests
 //! 
 //! All structures provided by this library are made to be [enocodable](trait.RequestValue.html) and 
-//! [decodable](trait.ResponseResult.html) via json. Optionals are used to indicate that partial requests are responses are valid.
-//! Most optionals are are considered [Parts](trait.Part.html) which are identifyable by name, which will be sent to 
+//! [decodable](trait.ResponseResult.html) via *json*. Optionals are used to indicate that partial requests are responses 
+//! are valid.
+//! Most optionals are are considered [Parts](trait.Part.html) which are identifiable by name, which will be sent to 
 //! the server to indicate either the set parts of the request or the desired parts in the response.
 //! 
 //! ## Builder Arguments
@@ -193,7 +200,7 @@ use std::io;
 use std::fs;
 use std::thread::sleep;
 
-pub use cmn::{MultiPartReader, ToParts, MethodInfo, Result, CallBuilder, Hub, ReadSeek, Part, ResponseResult, RequestValue, NestedType, Delegate, DefaultDelegate, ResourceMethodsBuilder, Resource, JsonServerError};
+pub use cmn::{MultiPartReader, ToParts, MethodInfo, Result, Error, CallBuilder, Hub, ReadSeek, Part, ResponseResult, RequestValue, NestedType, Delegate, DefaultDelegate, MethodsBuilder, Resource, JsonServerError};
 
 
 // ##############
@@ -218,7 +225,7 @@ pub use cmn::{MultiPartReader, ToParts, MethodInfo, Result, CallBuilder, Hub, Re
 /// extern crate "yup-oauth2" as oauth2;
 /// extern crate "google-spectrum1_explorer" as spectrum1_explorer;
 /// use spectrum1_explorer::PawsGetSpectrumBatchRequest;
-/// use spectrum1_explorer::Result;
+/// use spectrum1_explorer::{Result, Error};
 /// # #[test] fn egal() {
 /// use std::default::Default;
 /// use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -248,15 +255,17 @@ pub use cmn::{MultiPartReader, ToParts, MethodInfo, Result, CallBuilder, Hub, Re
 ///              .doit();
 /// 
 /// match result {
-///     Result::HttpError(err) => println!("HTTPERROR: {:?}", err),
-///     Result::MissingAPIKey => println!("Auth: Missing API Key - used if there are no scopes"),
-///     Result::MissingToken => println!("OAuth2: Missing Token"),
-///     Result::Cancelled => println!("Operation cancelled by user"),
-///     Result::UploadSizeLimitExceeded(size, max_size) => println!("Upload size too big: {} of {}", size, max_size),
-///     Result::Failure(_) => println!("General Failure (hyper::client::Response doesn't print)"),
-///     Result::FieldClash(clashed_field) => println!("You added custom parameter which is part of builder: {:?}", clashed_field),
-///     Result::JsonDecodeError(err) => println!("Couldn't understand server reply - maybe API needs update: {:?}", err),
-///     Result::Success(_) => println!("Success (value doesn't print)"),
+///     Err(e) => match e {
+///         Error::HttpError(err) => println!("HTTPERROR: {:?}", err),
+///         Error::MissingAPIKey => println!("Auth: Missing API Key - used if there are no scopes"),
+///         Error::MissingToken => println!("OAuth2: Missing Token"),
+///         Error::Cancelled => println!("Operation canceled by user"),
+///         Error::UploadSizeLimitExceeded(size, max_size) => println!("Upload size too big: {} of {}", size, max_size),
+///         Error::Failure(_) => println!("General Failure (hyper::client::Response doesn't print)"),
+///         Error::FieldClash(clashed_field) => println!("You added custom parameter which is part of builder: {:?}", clashed_field),
+///         Error::JsonDecodeError(err) => println!("Couldn't understand server reply - maybe API needs update: {:?}", err),
+///     },
+///     Ok(_) => println!("Success (value doesn't print)"),
 /// }
 /// # }
 /// ```
@@ -277,7 +286,7 @@ impl<'a, C, NC, A> Spectrum<C, NC, A>
         Spectrum {
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/0.1.1".to_string(),
+            _user_agent: "google-api-rust-client/0.1.2".to_string(),
             _m: PhantomData
         }
     }
@@ -287,7 +296,7 @@ impl<'a, C, NC, A> Spectrum<C, NC, A>
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/0.1.1`.
+    /// It defaults to `google-api-rust-client/0.1.2`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -307,11 +316,11 @@ impl<'a, C, NC, A> Spectrum<C, NC, A>
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GeoLocation {
-    /// The location confidence level, as an integer percentage, may be required, depending on the regulatory domain. When the parameter is optional and not provided, its value is assumed to be 95. Valid values range from 0 to 99, since, in practice, 100-percent confidence is not achievable. The confidence value is meaningful only when geolocation refers to a point with uncertainty.    
+    /// The location confidence level, as an integer percentage, may be required, depending on the regulatory domain. When the parameter is optional and not provided, its value is assumed to be 95. Valid values range from 0 to 99, since, in practice, 100-percent confidence is not achievable. The confidence value is meaningful only when geolocation refers to a point with uncertainty.
     pub confidence: i32,
-    /// If present, indicates that the geolocation represents a region. Database support for regions is optional.    
+    /// If present, indicates that the geolocation represents a region. Database support for regions is optional.
     pub region: GeoLocationPolygon,
-    /// If present, indicates that the geolocation represents a point. Paradoxically, a point is parameterized using an ellipse, where the center represents the location of the point and the distances along the major and minor axes represent the uncertainty. The uncertainty values may be required, depending on the regulatory domain.    
+    /// If present, indicates that the geolocation represents a point. Paradoxically, a point is parameterized using an ellipse, where the center represents the location of the point and the distances along the major and minor axes represent the uncertainty. The uncertainty values may be required, depending on the regulatory domain.
     pub point: GeoLocationEllipse,
 }
 
@@ -324,14 +333,14 @@ impl Part for GeoLocation {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GeoLocationEllipse {
-    /// A required geo-spatial point representing the center of the ellipse.    
+    /// A required geo-spatial point representing the center of the ellipse.
     pub center: GeoLocationPoint,
-    /// A floating-point number that expresses the location uncertainty along the minor axis of the ellipse. May be required by the regulatory domain. When the uncertainty is optional, the default value is 0.    
+    /// A floating-point number that expresses the location uncertainty along the minor axis of the ellipse. May be required by the regulatory domain. When the uncertainty is optional, the default value is 0.
     #[serde(alias="semiMinorAxis")]
     pub semi_minor_axis: f64,
-    /// A floating-point number that expresses the orientation of the ellipse, representing the rotation, in degrees, of the semi-major axis from North towards the East. For example, when the uncertainty is greatest along the North-South direction, orientation is 0 degrees; conversely, if the uncertainty is greatest along the East-West direction, orientation is 90 degrees. When orientation is not present, the orientation is assumed to be 0.    
+    /// A floating-point number that expresses the orientation of the ellipse, representing the rotation, in degrees, of the semi-major axis from North towards the East. For example, when the uncertainty is greatest along the North-South direction, orientation is 0 degrees; conversely, if the uncertainty is greatest along the East-West direction, orientation is 90 degrees. When orientation is not present, the orientation is assumed to be 0.
     pub orientation: f64,
-    /// A floating-point number that expresses the location uncertainty along the major axis of the ellipse. May be required by the regulatory domain. When the uncertainty is optional, the default value is 0.    
+    /// A floating-point number that expresses the location uncertainty along the major axis of the ellipse. May be required by the regulatory domain. When the uncertainty is optional, the default value is 0.
     #[serde(alias="semiMajorAxis")]
     pub semi_major_axis: f64,
 }
@@ -345,7 +354,7 @@ impl Part for GeoLocationEllipse {}
 /// 
 #[derive(Default, Clone, Debug, Serialize)]
 pub struct VcardTypedText {
-    /// The text string associated with this item. For example, for an org field: ACME, inc. For an email field: smith@example.com.    
+    /// The text string associated with this item. For example, for an org field: ACME, inc. For an email field: smith@example.com.
     pub text: String,
 }
 
@@ -363,7 +372,7 @@ impl Part for VcardTypedText {}
 /// 
 #[derive(Default, Clone, Debug, Serialize)]
 pub struct PawsNotifySpectrumUseRequest {
-    /// Device descriptor information is required in the spectrum-use notification message.    
+    /// Device descriptor information is required in the spectrum-use notification message.
     #[serde(alias="deviceDesc")]
     pub device_desc: Option<DeviceDescriptor>,
     /// The message type (e.g., INIT_REQ, AVAIL_SPECTRUM_REQ, ...).
@@ -371,13 +380,13 @@ pub struct PawsNotifySpectrumUseRequest {
     /// Required field.
     #[serde(alias="type")]
     pub type_: Option<String>,
-    /// The geolocation of the master device (the device that is sending the spectrum-use notification) to the database is required in the spectrum-use notification message.    
+    /// The geolocation of the master device (the device that is sending the spectrum-use notification) to the database is required in the spectrum-use notification message.
     pub location: Option<GeoLocation>,
     /// The PAWS version. Must be exactly 1.0.
     /// 
     /// Required field.
     pub version: Option<String>,
-    /// A spectrum list is required in the spectrum-use notification. The list specifies the spectrum that the device expects to use, which includes frequency ranges and maximum power levels. The list may be empty if the device decides not to use any of spectrum. For consistency, the psdBandwidthHz value should match that from one of the spectrum elements in the corresponding available spectrum response previously sent to the device by the database. Note that maximum power levels in the spectrum element must be expressed as power spectral density over the specified psdBandwidthHz value. The actual bandwidth to be used (as computed from the start and stop frequencies) may be different from the psdBandwidthHz value. As an example, when regulatory rules express maximum power spectral density in terms of maximum power over any 100 kHz band, then the psdBandwidthHz value should be set to 100 kHz, even though the actual bandwidth used can be 20 kHz.    
+    /// A spectrum list is required in the spectrum-use notification. The list specifies the spectrum that the device expects to use, which includes frequency ranges and maximum power levels. The list may be empty if the device decides not to use any of spectrum. For consistency, the psdBandwidthHz value should match that from one of the spectrum elements in the corresponding available spectrum response previously sent to the device by the database. Note that maximum power levels in the spectrum element must be expressed as power spectral density over the specified psdBandwidthHz value. The actual bandwidth to be used (as computed from the start and stop frequencies) may be different from the psdBandwidthHz value. As an example, when regulatory rules express maximum power spectral density in terms of maximum power over any 100 kHz band, then the psdBandwidthHz value should be set to 100 kHz, even though the actual bandwidth used can be 20 kHz.
     pub spectra: Option<Vec<SpectrumMessage>>,
 }
 
@@ -399,9 +408,9 @@ impl RequestValue for PawsNotifySpectrumUseRequest {}
 /// 
 #[derive(Default, Clone, Debug, Serialize)]
 pub struct DeviceOwner {
-    /// The vCard contact information for the device operator is optional, but may be required by specific regulatory domains.    
+    /// The vCard contact information for the device operator is optional, but may be required by specific regulatory domains.
     pub operator: Vcard,
-    /// The vCard contact information for the individual or business that owns the device is required.    
+    /// The vCard contact information for the individual or business that owns the device is required.
     pub owner: Vcard,
 }
 
@@ -416,10 +425,10 @@ impl Part for DeviceOwner {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct EventTime {
-    /// The exclusive end of the event. It will be present.    
+    /// The exclusive end of the event. It will be present.
     #[serde(alias="stopTime")]
     pub stop_time: String,
-    /// The inclusive start of the event. It will be present.    
+    /// The inclusive start of the event. It will be present.
     #[serde(alias="startTime")]
     pub start_time: String,
 }
@@ -433,16 +442,16 @@ impl Part for EventTime {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct FrequencyRange {
-    /// The required inclusive start of the frequency range (in Hertz).    
+    /// The required inclusive start of the frequency range (in Hertz).
     #[serde(alias="startHz")]
     pub start_hz: f64,
-    /// The database may include a channel identifier, when applicable. When it is included, the device should treat it as informative. The length of the identifier should not exceed 16 characters.    
+    /// The database may include a channel identifier, when applicable. When it is included, the device should treat it as informative. The length of the identifier should not exceed 16 characters.
     #[serde(alias="channelId")]
     pub channel_id: String,
-    /// The required exclusive end of the frequency range (in Hertz).    
+    /// The required exclusive end of the frequency range (in Hertz).
     #[serde(alias="stopHz")]
     pub stop_hz: f64,
-    /// The maximum total power level (EIRP)—computed over the corresponding operating bandwidth—that is permitted within the frequency range. Depending on the context in which the frequency-range element appears, this value may be required. For example, it is required in the available-spectrum response, available-spectrum-batch response, and spectrum-use notification message, but it should not be present (it is not applicable) when the frequency range appears inside a device-capabilities message.    
+    /// The maximum total power level (EIRP)—computed over the corresponding operating bandwidth—that is permitted within the frequency range. Depending on the context in which the frequency-range element appears, this value may be required. For example, it is required in the available-spectrum response, available-spectrum-batch response, and spectrum-use notification message, but it should not be present (it is not applicable) when the frequency range appears inside a device-capabilities message.
     #[serde(alias="maxPowerDBm")]
     pub max_power_d_bm: f64,
 }
@@ -461,33 +470,33 @@ impl Part for FrequencyRange {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct PawsGetSpectrumBatchResponse {
-    /// The available spectrum batch response must contain a geo-spectrum schedule list, The list may be empty if spectrum is not available. The database may return more than one geo-spectrum schedule to represent future changes to the available spectrum. How far in advance a schedule may be provided depends upon the applicable regulatory domain. The database may return available spectrum for fewer geolocations than requested. The device must not make assumptions about the order of the entries in the list, and must use the geolocation value in each geo-spectrum schedule entry to match available spectrum to a location.    
+    /// The available spectrum batch response must contain a geo-spectrum schedule list, The list may be empty if spectrum is not available. The database may return more than one geo-spectrum schedule to represent future changes to the available spectrum. How far in advance a schedule may be provided depends upon the applicable regulatory domain. The database may return available spectrum for fewer geolocations than requested. The device must not make assumptions about the order of the entries in the list, and must use the geolocation value in each geo-spectrum schedule entry to match available spectrum to a location.
     #[serde(alias="geoSpectrumSchedules")]
     pub geo_spectrum_schedules: Vec<GeoSpectrumSchedule>,
-    /// Identifies what kind of resource this is. Value: the fixed string "spectrum#pawsGetSpectrumBatchResponse".    
+    /// Identifies what kind of resource this is. Value: the fixed string "spectrum#pawsGetSpectrumBatchResponse".
     pub kind: String,
-    /// The database must return in its available spectrum response the device descriptor information it received in the master device's available spectrum batch request.    
+    /// The database must return in its available spectrum response the device descriptor information it received in the master device's available spectrum batch request.
     #[serde(alias="deviceDesc")]
     pub device_desc: DeviceDescriptor,
-    /// A database may include the databaseChange parameter to notify a device of a change to its database URI, providing one or more alternate database URIs. The device should use this information to update its list of pre-configured databases by (only) replacing its entry for the responding database with the list of alternate URIs.    
+    /// A database may include the databaseChange parameter to notify a device of a change to its database URI, providing one or more alternate database URIs. The device should use this information to update its list of pre-configured databases by (only) replacing its entry for the responding database with the list of alternate URIs.
     #[serde(alias="databaseChange")]
     pub database_change: DbUpdateSpec,
-    /// The database may return a constraint on the allowed maximum total bandwidth (in Hertz), which does not need to be contiguous. A regulatory domain may require the database to return this parameter. When this parameter is present in the available spectrum batch response, the device must apply this constraint to its spectrum-selection logic to ensure that total bandwidth does not exceed this value.    
+    /// The database may return a constraint on the allowed maximum total bandwidth (in Hertz), which does not need to be contiguous. A regulatory domain may require the database to return this parameter. When this parameter is present in the available spectrum batch response, the device must apply this constraint to its spectrum-selection logic to ensure that total bandwidth does not exceed this value.
     #[serde(alias="maxTotalBwHz")]
     pub max_total_bw_hz: f64,
-    /// The database may return a constraint on the allowed maximum contiguous bandwidth (in Hertz). A regulatory domain may require the database to return this parameter. When this parameter is present in the response, the device must apply this constraint to its spectrum-selection logic to ensure that no single block of spectrum has bandwidth that exceeds this value.    
+    /// The database may return a constraint on the allowed maximum contiguous bandwidth (in Hertz). A regulatory domain may require the database to return this parameter. When this parameter is present in the response, the device must apply this constraint to its spectrum-selection logic to ensure that no single block of spectrum has bandwidth that exceeds this value.
     #[serde(alias="maxContiguousBwHz")]
     pub max_contiguous_bw_hz: f64,
     /// The PAWS version. Must be exactly 1.0.
     /// 
     /// Required field.
     pub version: String,
-    /// The database includes a timestamp of the form, YYYY-MM-DDThh:mm:ssZ (Internet timestamp format per RFC3339), in its available spectrum batch response. The timestamp should be used by the device as a reference for the start and stop times specified in the response spectrum schedules.    
+    /// The database includes a timestamp of the form, YYYY-MM-DDThh:mm:ssZ (Internet timestamp format per RFC3339), in its available spectrum batch response. The timestamp should be used by the device as a reference for the start and stop times specified in the response spectrum schedules.
     pub timestamp: String,
-    /// The database should return ruleset information, which identifies the applicable regulatory authority and ruleset for the available spectrum batch response. If included, the device must use the corresponding ruleset to interpret the response. Values provided in the returned ruleset information, such as maxLocationChange, take precedence over any conflicting values provided in the ruleset information returned in a prior initialization response sent by the database to the device.    
+    /// The database should return ruleset information, which identifies the applicable regulatory authority and ruleset for the available spectrum batch response. If included, the device must use the corresponding ruleset to interpret the response. Values provided in the returned ruleset information, such as maxLocationChange, take precedence over any conflicting values provided in the ruleset information returned in a prior initialization response sent by the database to the device.
     #[serde(alias="rulesetInfo")]
     pub ruleset_info: RulesetInfo,
-    /// For regulatory domains that require a spectrum-usage report from devices, the database must return true for this parameter if the geo-spectrum schedules list is not empty; otherwise, the database should either return false or omit this parameter. If this parameter is present and its value is true, the device must send a spectrum use notify message to the database; otherwise, the device should not send the notification.    
+    /// For regulatory domains that require a spectrum-usage report from devices, the database must return true for this parameter if the geo-spectrum schedules list is not empty; otherwise, the database should either return false or omit this parameter. If this parameter is present and its value is true, the device must send a spectrum use notify message to the database; otherwise, the device should not send the notification.
     #[serde(alias="needsSpectrumReport")]
     pub needs_spectrum_report: bool,
     /// The message type (e.g., INIT_REQ, AVAIL_SPECTRUM_REQ, ...).
@@ -506,7 +515,7 @@ impl ResponseResult for PawsGetSpectrumBatchResponse {}
 /// 
 #[derive(Default, Clone, Debug, Serialize)]
 pub struct VcardTelephone {
-    /// A nested telephone URI of the form: tel:+1-123-456-7890.    
+    /// A nested telephone URI of the form: tel:+1-123-456-7890.
     pub uri: String,
 }
 
@@ -519,12 +528,12 @@ impl Part for VcardTelephone {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct DeviceValidity {
-    /// The validity status: true if the device is valid for operation, false otherwise. It will always be present.    
+    /// The validity status: true if the device is valid for operation, false otherwise. It will always be present.
     #[serde(alias="isValid")]
     pub is_valid: bool,
-    /// If the device identifier is not valid, the database may include a reason. The reason may be in any language. The length of the value should not exceed 128 characters.    
+    /// If the device identifier is not valid, the database may include a reason. The reason may be in any language. The length of the value should not exceed 128 characters.
     pub reason: String,
-    /// The descriptor of the device for which the validity check was requested. It will always be present.    
+    /// The descriptor of the device for which the validity check was requested. It will always be present.
     #[serde(alias="deviceDesc")]
     pub device_desc: DeviceDescriptor,
 }
@@ -543,10 +552,10 @@ impl Part for DeviceValidity {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct PawsInitResponse {
-    /// A database may include the databaseChange parameter to notify a device of a change to its database URI, providing one or more alternate database URIs. The device should use this information to update its list of pre-configured databases by (only) replacing its entry for the responding database with the list of alternate URIs.    
+    /// A database may include the databaseChange parameter to notify a device of a change to its database URI, providing one or more alternate database URIs. The device should use this information to update its list of pre-configured databases by (only) replacing its entry for the responding database with the list of alternate URIs.
     #[serde(alias="databaseChange")]
     pub database_change: DbUpdateSpec,
-    /// Identifies what kind of resource this is. Value: the fixed string "spectrum#pawsInitResponse".    
+    /// Identifies what kind of resource this is. Value: the fixed string "spectrum#pawsInitResponse".
     pub kind: String,
     /// The PAWS version. Must be exactly 1.0.
     /// 
@@ -557,7 +566,7 @@ pub struct PawsInitResponse {
     /// Required field.
     #[serde(alias="type")]
     pub type_: String,
-    /// The rulesetInfo parameter must be included in the response. This parameter specifies the regulatory domain and parameters applicable to that domain. The database must include the authority field, which defines the regulatory domain for the location specified in the INIT_REQ message.    
+    /// The rulesetInfo parameter must be included in the response. This parameter specifies the regulatory domain and parameters applicable to that domain. The database must include the authority field, which defines the regulatory domain for the location specified in the INIT_REQ message.
     #[serde(alias="rulesetInfo")]
     pub ruleset_info: RulesetInfo,
 }
@@ -576,7 +585,7 @@ impl ResponseResult for PawsInitResponse {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct PawsNotifySpectrumUseResponse {
-    /// Identifies what kind of resource this is. Value: the fixed string "spectrum#pawsNotifySpectrumUseResponse".    
+    /// Identifies what kind of resource this is. Value: the fixed string "spectrum#pawsNotifySpectrumUseResponse".
     pub kind: String,
     /// The PAWS version. Must be exactly 1.0.
     /// 
@@ -603,16 +612,16 @@ impl ResponseResult for PawsNotifySpectrumUseResponse {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct PawsVerifyDeviceResponse {
-    /// A database may include the databaseChange parameter to notify a device of a change to its database URI, providing one or more alternate database URIs. The device should use this information to update its list of pre-configured databases by (only) replacing its entry for the responding database with the list of alternate URIs.    
+    /// A database may include the databaseChange parameter to notify a device of a change to its database URI, providing one or more alternate database URIs. The device should use this information to update its list of pre-configured databases by (only) replacing its entry for the responding database with the list of alternate URIs.
     #[serde(alias="databaseChange")]
     pub database_change: DbUpdateSpec,
-    /// Identifies what kind of resource this is. Value: the fixed string "spectrum#pawsVerifyDeviceResponse".    
+    /// Identifies what kind of resource this is. Value: the fixed string "spectrum#pawsVerifyDeviceResponse".
     pub kind: String,
     /// The PAWS version. Must be exactly 1.0.
     /// 
     /// Required field.
     pub version: String,
-    /// A device validities list is required in the device validation response to report whether each slave device listed in a previous device validation request is valid. The number of entries must match the number of device descriptors listed in the previous device validation request.    
+    /// A device validities list is required in the device validation response to report whether each slave device listed in a previous device validation request is valid. The number of entries must match the number of device descriptors listed in the previous device validation request.
     #[serde(alias="deviceValidities")]
     pub device_validities: Vec<DeviceValidity>,
     /// The message type (e.g., INIT_REQ, AVAIL_SPECTRUM_REQ, ...).
@@ -631,13 +640,13 @@ impl ResponseResult for PawsVerifyDeviceResponse {}
 /// 
 #[derive(Default, Clone, Debug, Serialize)]
 pub struct AntennaCharacteristics {
-    /// If the height is required, then the height type (AGL for above ground level or AMSL for above mean sea level) is also required. The default is AGL.    
+    /// If the height is required, then the height type (AGL for above ground level or AMSL for above mean sea level) is also required. The default is AGL.
     #[serde(alias="heightType")]
     pub height_type: String,
-    /// The height uncertainty in meters. Whether this is required depends on the regulatory domain.    
+    /// The height uncertainty in meters. Whether this is required depends on the regulatory domain.
     #[serde(alias="heightUncertainty")]
     pub height_uncertainty: f64,
-    /// The antenna height in meters. Whether the antenna height is required depends on the device type and the regulatory domain. Note that the height may be negative.    
+    /// The antenna height in meters. Whether the antenna height is required depends on the device type and the regulatory domain. Note that the height may be negative.
     pub height: f64,
 }
 
@@ -650,9 +659,9 @@ impl Part for AntennaCharacteristics {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GeoLocationPoint {
-    /// A required floating-point number that expresses the latitude in degrees using the WGS84 datum. For details on this encoding, see the National Imagery and Mapping Agency's Technical Report TR8350.2.    
+    /// A required floating-point number that expresses the latitude in degrees using the WGS84 datum. For details on this encoding, see the National Imagery and Mapping Agency's Technical Report TR8350.2.
     pub latitude: f64,
-    /// A required floating-point number that expresses the longitude in degrees using the WGS84 datum. For details on this encoding, see the National Imagery and Mapping Agency's Technical Report TR8350.2.    
+    /// A required floating-point number that expresses the longitude in degrees using the WGS84 datum. For details on this encoding, see the National Imagery and Mapping Agency's Technical Report TR8350.2.
     pub longitude: f64,
 }
 
@@ -670,10 +679,10 @@ impl Part for GeoLocationPoint {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct PawsRegisterResponse {
-    /// A database may include the databaseChange parameter to notify a device of a change to its database URI, providing one or more alternate database URIs. The device should use this information to update its list of pre-configured databases by (only) replacing its entry for the responding database with the list of alternate URIs.    
+    /// A database may include the databaseChange parameter to notify a device of a change to its database URI, providing one or more alternate database URIs. The device should use this information to update its list of pre-configured databases by (only) replacing its entry for the responding database with the list of alternate URIs.
     #[serde(alias="databaseChange")]
     pub database_change: DbUpdateSpec,
-    /// Identifies what kind of resource this is. Value: the fixed string "spectrum#pawsRegisterResponse".    
+    /// Identifies what kind of resource this is. Value: the fixed string "spectrum#pawsRegisterResponse".
     pub kind: String,
     /// The PAWS version. Must be exactly 1.0.
     /// 
@@ -700,16 +709,16 @@ impl ResponseResult for PawsRegisterResponse {}
 /// 
 #[derive(Default, Clone, Debug, Serialize)]
 pub struct Vcard {
-    /// The organization associated with the registering entity.    
+    /// The organization associated with the registering entity.
     pub org: VcardTypedText,
-    /// A telephone number that can be used to call the contact.    
+    /// A telephone number that can be used to call the contact.
     pub tel: VcardTelephone,
-    /// An email address that can be used to reach the contact.    
+    /// An email address that can be used to reach the contact.
     pub email: VcardTypedText,
-    /// The full name of the contact person. For example: John A. Smith.    
+    /// The full name of the contact person. For example: John A. Smith.
     #[serde(alias="fn")]
     pub fn_: String,
-    /// The street address of the entity.    
+    /// The street address of the entity.
     pub adr: VcardAddress,
 }
 
@@ -727,28 +736,28 @@ impl Part for Vcard {}
 /// 
 #[derive(Default, Clone, Debug, Serialize)]
 pub struct PawsGetSpectrumBatchRequest {
-    /// When the available spectrum request is made on behalf of a specific device (a master or slave device), device descriptor information for the device on whose behalf the request is made is required (in such cases, the requestType parameter must be empty). When a requestType value is specified, device descriptor information may be optional or required according to the rules of the applicable regulatory domain.    
+    /// When the available spectrum request is made on behalf of a specific device (a master or slave device), device descriptor information for the device on whose behalf the request is made is required (in such cases, the requestType parameter must be empty). When a requestType value is specified, device descriptor information may be optional or required according to the rules of the applicable regulatory domain.
     #[serde(alias="deviceDesc")]
     pub device_desc: Option<DeviceDescriptor>,
-    /// Depending on device type and regulatory domain, antenna characteristics may be required.    
+    /// Depending on device type and regulatory domain, antenna characteristics may be required.
     pub antenna: Option<AntennaCharacteristics>,
-    /// The request type parameter is an optional parameter that can be used to modify an available spectrum batch request, but its use depends on applicable regulatory rules. For example, It may be used to request generic slave device parameters without having to specify the device descriptor for a specific device. When the requestType parameter is missing, the request is for a specific device (master or slave), and the device descriptor parameter for the device on whose behalf the batch request is made is required.    
+    /// The request type parameter is an optional parameter that can be used to modify an available spectrum batch request, but its use depends on applicable regulatory rules. For example, It may be used to request generic slave device parameters without having to specify the device descriptor for a specific device. When the requestType parameter is missing, the request is for a specific device (master or slave), and the device descriptor parameter for the device on whose behalf the batch request is made is required.
     #[serde(alias="requestType")]
     pub request_type: Option<String>,
-    /// When an available spectrum batch request is made by the master device (a device with geolocation capability) on behalf of a slave device (a device without geolocation capability), the rules of the applicable regulatory domain may require the master device to provide its own device descriptor information (in addition to device descriptor information for the slave device in a separate parameter).    
+    /// When an available spectrum batch request is made by the master device (a device with geolocation capability) on behalf of a slave device (a device without geolocation capability), the rules of the applicable regulatory domain may require the master device to provide its own device descriptor information (in addition to device descriptor information for the slave device in a separate parameter).
     #[serde(alias="masterDeviceDesc")]
     pub master_device_desc: Option<DeviceDescriptor>,
     /// A geolocation list is required. This allows a device to specify its current location plus additional anticipated locations when allowed by the regulatory domain. At least one location must be included. Geolocation must be given as the location of the radiation center of the device's antenna. If a location specifies a region, rather than a point, the database may return an UNIMPLEMENTED error if it does not support query by region.
     /// 
     /// There is no upper limit on the number of locations included in a available spectrum batch request, but the database may restrict the number of locations it supports by returning a response with fewer locations than specified in the batch request. Note that geolocations must be those of the master device (a device with geolocation capability that makes an available spectrum batch request), whether the master device is making the request on its own behalf or on behalf of a slave device (one without geolocation capability).
     pub locations: Option<Vec<GeoLocation>>,
-    /// The master device may include its device capabilities to limit the available-spectrum batch response to the spectrum that is compatible with its capabilities. The database should not return spectrum that is incompatible with the specified capabilities.    
+    /// The master device may include its device capabilities to limit the available-spectrum batch response to the spectrum that is compatible with its capabilities. The database should not return spectrum that is incompatible with the specified capabilities.
     pub capabilities: Option<DeviceCapabilities>,
     /// The PAWS version. Must be exactly 1.0.
     /// 
     /// Required field.
     pub version: Option<String>,
-    /// Depending on device type and regulatory domain, device owner information may be included in an available spectrum batch request. This allows the device to register and get spectrum-availability information in a single request.    
+    /// Depending on device type and regulatory domain, device owner information may be included in an available spectrum batch request. This allows the device to register and get spectrum-availability information in a single request.
     pub owner: Option<DeviceOwner>,
     /// The message type (e.g., INIT_REQ, AVAIL_SPECTRUM_REQ, ...).
     /// 
@@ -766,7 +775,7 @@ impl RequestValue for PawsGetSpectrumBatchRequest {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct DbUpdateSpec {
-    /// A required list of one or more databases. A device should update its preconfigured list of databases to replace (only) the database that provided the response with the specified entries.    
+    /// A required list of one or more databases. A device should update its preconfigured list of databases to replace (only) the database that provided the response with the specified entries.
     pub databases: Vec<DatabaseSpec>,
 }
 
@@ -797,10 +806,10 @@ impl Part for GeoLocationPolygon {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct GeoSpectrumSchedule {
-    /// A list of available spectrum profiles and associated times. It will always be present, and at least one schedule must be included (though it may be empty if there is no available spectrum). More than one schedule may be included to represent future changes to the available spectrum.    
+    /// A list of available spectrum profiles and associated times. It will always be present, and at least one schedule must be included (though it may be empty if there is no available spectrum). More than one schedule may be included to represent future changes to the available spectrum.
     #[serde(alias="spectrumSchedules")]
     pub spectrum_schedules: Vec<SpectrumSchedule>,
-    /// The geolocation identifies the location at which the spectrum schedule applies. It will always be present.    
+    /// The geolocation identifies the location at which the spectrum schedule applies. It will always be present.
     pub location: GeoLocation,
 }
 
@@ -818,7 +827,7 @@ impl Part for GeoSpectrumSchedule {}
 /// 
 #[derive(Default, Clone, Debug, Serialize)]
 pub struct PawsInitRequest {
-    /// The DeviceDescriptor parameter is required. If the database does not support the device or any of the rulesets specified in the device descriptor, it must return an UNSUPPORTED error code in the error response.    
+    /// The DeviceDescriptor parameter is required. If the database does not support the device or any of the rulesets specified in the device descriptor, it must return an UNSUPPORTED error code in the error response.
     #[serde(alias="deviceDesc")]
     pub device_desc: Option<DeviceDescriptor>,
     /// The message type (e.g., INIT_REQ, AVAIL_SPECTRUM_REQ, ...).
@@ -826,7 +835,7 @@ pub struct PawsInitRequest {
     /// Required field.
     #[serde(alias="type")]
     pub type_: Option<String>,
-    /// A device's geolocation is required.    
+    /// A device's geolocation is required.
     pub location: Option<GeoLocation>,
     /// The PAWS version. Must be exactly 1.0.
     /// 
@@ -843,17 +852,17 @@ impl RequestValue for PawsInitRequest {}
 /// 
 #[derive(Default, Clone, Debug, Serialize)]
 pub struct VcardAddress {
-    /// The postal code associated with the address. For example: 94423.    
+    /// The postal code associated with the address. For example: 94423.
     pub code: String,
-    /// The street number and name. For example: 123 Any St.    
+    /// The street number and name. For example: 123 Any St.
     pub street: String,
-    /// The city or local equivalent portion of the address. For example: San Jose.    
+    /// The city or local equivalent portion of the address. For example: San Jose.
     pub locality: String,
-    /// The country name. For example: US.    
+    /// The country name. For example: US.
     pub country: String,
-    /// The state or local equivalent portion of the address. For example: CA.    
+    /// The state or local equivalent portion of the address. For example: CA.
     pub region: String,
-    /// An optional post office box number.    
+    /// An optional post office box number.
     pub pobox: String,
 }
 
@@ -866,22 +875,22 @@ impl Part for VcardAddress {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct DeviceDescriptor {
-    /// Specifies the ETSI white space device type. Valid values are single-letter strings, such as A, B, etc. Consult the ETSI documentation for details about the device types.    
+    /// Specifies the ETSI white space device type. Valid values are single-letter strings, such as A, B, etc. Consult the ETSI documentation for details about the device types.
     #[serde(alias="etsiEnDeviceType")]
     pub etsi_en_device_type: String,
-    /// Specifies the device's FCC certification identifier. The value is an identifier string whose length should not exceed 32 characters. Note that, in practice, a valid FCC ID may be limited to 19 characters.    
+    /// Specifies the device's FCC certification identifier. The value is an identifier string whose length should not exceed 32 characters. Note that, in practice, a valid FCC ID may be limited to 19 characters.
     #[serde(alias="fccId")]
     pub fcc_id: String,
-    /// The manufacturer's device serial number; required by the applicable regulatory domain. The length of the value must not exceed 64 characters.    
+    /// The manufacturer's device serial number; required by the applicable regulatory domain. The length of the value must not exceed 64 characters.
     #[serde(alias="serialNumber")]
     pub serial_number: String,
-    /// Specifies the ETSI white space device technology identifier. The string value must not exceed 64 characters in length. Consult the ETSI documentation for details about the device types.    
+    /// Specifies the ETSI white space device technology identifier. The string value must not exceed 64 characters in length. Consult the ETSI documentation for details about the device types.
     #[serde(alias="etsiEnTechnologyId")]
     pub etsi_en_technology_id: String,
-    /// Specifies the TV Band White Space device type, as defined by the FCC. Valid values are FIXED, MODE_1, MODE_2.    
+    /// Specifies the TV Band White Space device type, as defined by the FCC. Valid values are FIXED, MODE_1, MODE_2.
     #[serde(alias="fccTvbdDeviceType")]
     pub fcc_tvbd_device_type: String,
-    /// Specifies the ETSI white space device category. Valid values are the strings master and slave. This field is case-insensitive. Consult the ETSI documentation for details about the device types.    
+    /// Specifies the ETSI white space device category. Valid values are the strings master and slave. This field is case-insensitive. Consult the ETSI documentation for details about the device types.
     #[serde(alias="etsiEnDeviceCategory")]
     pub etsi_en_device_category: String,
     /// The list of identifiers for rulesets supported by the device. A database may require that the device provide this list before servicing the device requests. If the database does not support any of the rulesets specified in the list, the database may refuse to service the device requests. If present, the list must contain at least one entry.
@@ -889,13 +898,13 @@ pub struct DeviceDescriptor {
     /// For information about the valid requests, see section 9.2 of the PAWS specification. Currently, FccTvBandWhiteSpace-2010 is the only supported ruleset.
     #[serde(alias="rulesetIds")]
     pub ruleset_ids: Vec<String>,
-    /// Specifies the ETSI white space device emissions class. The values are represented by numeric strings, such as 1, 2, etc. Consult the ETSI documentation for details about the device types.    
+    /// Specifies the ETSI white space device emissions class. The values are represented by numeric strings, such as 1, 2, etc. Consult the ETSI documentation for details about the device types.
     #[serde(alias="etsiEnDeviceEmissionsClass")]
     pub etsi_en_device_emissions_class: String,
-    /// The manufacturer's ID may be required by the regulatory domain. This should represent the name of the device manufacturer, should be consistent across all devices from the same manufacturer, and should be distinct from that of other manufacturers. The string value must not exceed 64 characters in length.    
+    /// The manufacturer's ID may be required by the regulatory domain. This should represent the name of the device manufacturer, should be consistent across all devices from the same manufacturer, and should be distinct from that of other manufacturers. The string value must not exceed 64 characters in length.
     #[serde(alias="manufacturerId")]
     pub manufacturer_id: String,
-    /// The device's model ID may be required by the regulatory domain. The string value must not exceed 64 characters in length.    
+    /// The device's model ID may be required by the regulatory domain. The string value must not exceed 64 characters in length.
     #[serde(alias="modelId")]
     pub model_id: String,
 }
@@ -909,15 +918,15 @@ impl Part for DeviceDescriptor {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct RulesetInfo {
-    /// The identifiers of the rulesets supported for the device's location. The database should include at least one applicable ruleset in the initialization response. The device may use the ruleset identifiers to determine parameters to include in subsequent requests. Within the context of the available-spectrum responses, the database should include the identifier of the ruleset that it used to determine the available-spectrum response. If included, the device must use the specified ruleset to interpret the response. If the device does not support the indicated ruleset, it must not operate in the spectrum governed by the ruleset.    
+    /// The identifiers of the rulesets supported for the device's location. The database should include at least one applicable ruleset in the initialization response. The device may use the ruleset identifiers to determine parameters to include in subsequent requests. Within the context of the available-spectrum responses, the database should include the identifier of the ruleset that it used to determine the available-spectrum response. If included, the device must use the specified ruleset to interpret the response. If the device does not support the indicated ruleset, it must not operate in the spectrum governed by the ruleset.
     #[serde(alias="rulesetIds")]
     pub ruleset_ids: Vec<String>,
-    /// The maximum duration, in seconds, between requests for available spectrum. It is required in the initialization response, but optional otherwise. The device must contact the database to get available spectrum no less frequently than this duration. If the new spectrum information indicates that the device is using spectrum that is no longer available, it must immediately cease use of those frequencies under rules for database-managed spectrum. If this value is provided within the context of an available-spectrum response, it takes precedence over the value within the initialization response.    
+    /// The maximum duration, in seconds, between requests for available spectrum. It is required in the initialization response, but optional otherwise. The device must contact the database to get available spectrum no less frequently than this duration. If the new spectrum information indicates that the device is using spectrum that is no longer available, it must immediately cease use of those frequencies under rules for database-managed spectrum. If this value is provided within the context of an available-spectrum response, it takes precedence over the value within the initialization response.
     #[serde(alias="maxPollingSecs")]
     pub max_polling_secs: i32,
-    /// The regulatory domain to which the ruleset belongs is required. It must be a 2-letter country code. The device should use this to determine additional device behavior required by the associated regulatory domain.    
+    /// The regulatory domain to which the ruleset belongs is required. It must be a 2-letter country code. The device should use this to determine additional device behavior required by the associated regulatory domain.
     pub authority: String,
-    /// The maximum location change in meters is required in the initialization response, but optional otherwise. When the device changes location by more than this specified distance, it must contact the database to get the available spectrum for the new location. If the device is using spectrum that is no longer available, it must immediately cease use of the spectrum under rules for database-managed spectrum. If this value is provided within the context of an available-spectrum response, it takes precedence over the value within the initialization response.    
+    /// The maximum location change in meters is required in the initialization response, but optional otherwise. When the device changes location by more than this specified distance, it must contact the database to get the available spectrum for the new location. If the device is using spectrum that is no longer available, it must immediately cease use of the spectrum under rules for database-managed spectrum. If this value is provided within the context of an available-spectrum response, it takes precedence over the value within the initialization response.
     #[serde(alias="maxLocationChange")]
     pub max_location_change: f64,
 }
@@ -931,9 +940,9 @@ impl Part for RulesetInfo {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct DatabaseSpec {
-    /// The display name for a database.    
+    /// The display name for a database.
     pub name: String,
-    /// The corresponding URI of the database.    
+    /// The corresponding URI of the database.
     pub uri: String,
 }
 
@@ -951,24 +960,24 @@ impl Part for DatabaseSpec {}
 /// 
 #[derive(Default, Clone, Debug, Serialize)]
 pub struct PawsRegisterRequest {
-    /// A DeviceDescriptor is required.    
+    /// A DeviceDescriptor is required.
     #[serde(alias="deviceDesc")]
     pub device_desc: Option<DeviceDescriptor>,
     /// The PAWS version. Must be exactly 1.0.
     /// 
     /// Required field.
     pub version: Option<String>,
-    /// Antenna characteristics, including its height and height type.    
+    /// Antenna characteristics, including its height and height type.
     pub antenna: Option<AntennaCharacteristics>,
     /// The message type (e.g., INIT_REQ, AVAIL_SPECTRUM_REQ, ...).
     /// 
     /// Required field.
     #[serde(alias="type")]
     pub type_: Option<String>,
-    /// Device owner information is required.    
+    /// Device owner information is required.
     #[serde(alias="deviceOwner")]
     pub device_owner: Option<DeviceOwner>,
-    /// A device's geolocation is required.    
+    /// A device's geolocation is required.
     pub location: Option<GeoLocation>,
 }
 
@@ -981,9 +990,9 @@ impl RequestValue for PawsRegisterRequest {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct SpectrumMessage {
-    /// The bandwidth (in Hertz) for which permissible power levels are specified. For example, FCC regulation would require only one spectrum specification at 6MHz bandwidth, but Ofcom regulation would require two specifications, at 0.1MHz and 8MHz. This parameter may be empty if there is no available spectrum. It will be present otherwise.    
+    /// The bandwidth (in Hertz) for which permissible power levels are specified. For example, FCC regulation would require only one spectrum specification at 6MHz bandwidth, but Ofcom regulation would require two specifications, at 0.1MHz and 8MHz. This parameter may be empty if there is no available spectrum. It will be present otherwise.
     pub bandwidth: f64,
-    /// The list of frequency ranges and permissible power levels. The list may be empty if there is no available spectrum, otherwise it will be present.    
+    /// The list of frequency ranges and permissible power levels. The list may be empty if there is no available spectrum, otherwise it will be present.
     #[serde(alias="frequencyRanges")]
     pub frequency_ranges: Vec<FrequencyRange>,
 }
@@ -1002,33 +1011,33 @@ impl Part for SpectrumMessage {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct PawsGetSpectrumResponse {
-    /// Identifies what kind of resource this is. Value: the fixed string "spectrum#pawsGetSpectrumResponse".    
+    /// Identifies what kind of resource this is. Value: the fixed string "spectrum#pawsGetSpectrumResponse".
     pub kind: String,
-    /// The database must return, in its available spectrum response, the device descriptor information it received in the master device's available spectrum request.    
+    /// The database must return, in its available spectrum response, the device descriptor information it received in the master device's available spectrum request.
     #[serde(alias="deviceDesc")]
     pub device_desc: DeviceDescriptor,
-    /// A database may include the databaseChange parameter to notify a device of a change to its database URI, providing one or more alternate database URIs. The device should use this information to update its list of pre-configured databases by (only) replacing its entry for the responding database with the list of alternate URIs.    
+    /// A database may include the databaseChange parameter to notify a device of a change to its database URI, providing one or more alternate database URIs. The device should use this information to update its list of pre-configured databases by (only) replacing its entry for the responding database with the list of alternate URIs.
     #[serde(alias="databaseChange")]
     pub database_change: DbUpdateSpec,
-    /// The database may return a constraint on the allowed maximum total bandwidth (in Hertz), which need not be contiguous. A regulatory domain may require the database to return this parameter. When this parameter is present in the available spectrum response, the device must apply this constraint to its spectrum-selection logic to ensure that total bandwidth does not exceed this value.    
+    /// The database may return a constraint on the allowed maximum total bandwidth (in Hertz), which need not be contiguous. A regulatory domain may require the database to return this parameter. When this parameter is present in the available spectrum response, the device must apply this constraint to its spectrum-selection logic to ensure that total bandwidth does not exceed this value.
     #[serde(alias="maxTotalBwHz")]
     pub max_total_bw_hz: f64,
-    /// The available spectrum response must contain a spectrum schedule list. The list may be empty if spectrum is not available. The database may return more than one spectrum schedule to represent future changes to the available spectrum. How far in advance a schedule may be provided depends on the applicable regulatory domain.    
+    /// The available spectrum response must contain a spectrum schedule list. The list may be empty if spectrum is not available. The database may return more than one spectrum schedule to represent future changes to the available spectrum. How far in advance a schedule may be provided depends on the applicable regulatory domain.
     #[serde(alias="spectrumSchedules")]
     pub spectrum_schedules: Vec<SpectrumSchedule>,
-    /// The database may return a constraint on the allowed maximum contiguous bandwidth (in Hertz). A regulatory domain may require the database to return this parameter. When this parameter is present in the response, the device must apply this constraint to its spectrum-selection logic to ensure that no single block of spectrum has bandwidth that exceeds this value.    
+    /// The database may return a constraint on the allowed maximum contiguous bandwidth (in Hertz). A regulatory domain may require the database to return this parameter. When this parameter is present in the response, the device must apply this constraint to its spectrum-selection logic to ensure that no single block of spectrum has bandwidth that exceeds this value.
     #[serde(alias="maxContiguousBwHz")]
     pub max_contiguous_bw_hz: f64,
     /// The PAWS version. Must be exactly 1.0.
     /// 
     /// Required field.
     pub version: String,
-    /// The database includes a timestamp of the form YYYY-MM-DDThh:mm:ssZ (Internet timestamp format per RFC3339) in its available spectrum response. The timestamp should be used by the device as a reference for the start and stop times specified in the response spectrum schedules.    
+    /// The database includes a timestamp of the form YYYY-MM-DDThh:mm:ssZ (Internet timestamp format per RFC3339) in its available spectrum response. The timestamp should be used by the device as a reference for the start and stop times specified in the response spectrum schedules.
     pub timestamp: String,
-    /// The database should return ruleset information, which identifies the applicable regulatory authority and ruleset for the available spectrum response. If included, the device must use the corresponding ruleset to interpret the response. Values provided in the returned ruleset information, such as maxLocationChange, take precedence over any conflicting values provided in the ruleset information returned in a prior initialization response sent by the database to the device.    
+    /// The database should return ruleset information, which identifies the applicable regulatory authority and ruleset for the available spectrum response. If included, the device must use the corresponding ruleset to interpret the response. Values provided in the returned ruleset information, such as maxLocationChange, take precedence over any conflicting values provided in the ruleset information returned in a prior initialization response sent by the database to the device.
     #[serde(alias="rulesetInfo")]
     pub ruleset_info: RulesetInfo,
-    /// For regulatory domains that require a spectrum-usage report from devices, the database must return true for this parameter if the spectrum schedule list is not empty; otherwise, the database will either return false or omit this parameter. If this parameter is present and its value is true, the device must send a spectrum use notify message to the database; otherwise, the device must not send the notification.    
+    /// For regulatory domains that require a spectrum-usage report from devices, the database must return true for this parameter if the spectrum schedule list is not empty; otherwise, the database will either return false or omit this parameter. If this parameter is present and its value is true, the device must send a spectrum use notify message to the database; otherwise, the device must not send the notification.
     #[serde(alias="needsSpectrumReport")]
     pub needs_spectrum_report: bool,
     /// The message type (e.g., INIT_REQ, AVAIL_SPECTRUM_REQ, ...).
@@ -1047,7 +1056,7 @@ impl ResponseResult for PawsGetSpectrumResponse {}
 /// 
 #[derive(Default, Clone, Debug, Serialize)]
 pub struct DeviceCapabilities {
-    /// An optional list of frequency ranges supported by the device. Each element must contain start and stop frequencies in which the device can operate. Channel identifiers are optional. When specified, the database should not return available spectrum that falls outside these ranges or channel IDs.    
+    /// An optional list of frequency ranges supported by the device. Each element must contain start and stop frequencies in which the device can operate. Channel identifiers are optional. When specified, the database should not return available spectrum that falls outside these ranges or channel IDs.
     #[serde(alias="frequencyRanges")]
     pub frequency_ranges: Vec<FrequencyRange>,
 }
@@ -1061,10 +1070,10 @@ impl Part for DeviceCapabilities {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct SpectrumSchedule {
-    /// The event time expresses when the spectrum profile is valid. It will always be present.    
+    /// The event time expresses when the spectrum profile is valid. It will always be present.
     #[serde(alias="eventTime")]
     pub event_time: EventTime,
-    /// A list of spectrum messages representing the usable profile. It will always be present, but may be empty when there is no available spectrum.    
+    /// A list of spectrum messages representing the usable profile. It will always be present, but may be empty when there is no available spectrum.
     pub spectra: Vec<SpectrumMessage>,
 }
 
@@ -1082,7 +1091,7 @@ impl Part for SpectrumSchedule {}
 /// 
 #[derive(Default, Clone, Debug, Serialize)]
 pub struct PawsVerifyDeviceRequest {
-    /// A list of device descriptors, which specifies the slave devices to be validated, is required.    
+    /// A list of device descriptors, which specifies the slave devices to be validated, is required.
     #[serde(alias="deviceDescs")]
     pub device_descs: Option<Vec<DeviceDescriptor>>,
     /// The message type (e.g., INIT_REQ, AVAIL_SPECTRUM_REQ, ...).
@@ -1110,26 +1119,26 @@ impl RequestValue for PawsVerifyDeviceRequest {}
 /// 
 #[derive(Default, Clone, Debug, Serialize)]
 pub struct PawsGetSpectrumRequest {
-    /// When the available spectrum request is made on behalf of a specific device (a master or slave device), device descriptor information for that device is required (in such cases, the requestType parameter must be empty). When a requestType value is specified, device descriptor information may be optional or required according to the rules of the applicable regulatory domain.    
+    /// When the available spectrum request is made on behalf of a specific device (a master or slave device), device descriptor information for that device is required (in such cases, the requestType parameter must be empty). When a requestType value is specified, device descriptor information may be optional or required according to the rules of the applicable regulatory domain.
     #[serde(alias="deviceDesc")]
     pub device_desc: Option<DeviceDescriptor>,
     /// The PAWS version. Must be exactly 1.0.
     /// 
     /// Required field.
     pub version: Option<String>,
-    /// Depending on device type and regulatory domain, the characteristics of the antenna may be required.    
+    /// Depending on device type and regulatory domain, the characteristics of the antenna may be required.
     pub antenna: Option<AntennaCharacteristics>,
-    /// The request type parameter is an optional parameter that can be used to modify an available spectrum request, but its use depends on applicable regulatory rules. It may be used, for example, to request generic slave device parameters without having to specify the device descriptor for a specific device. When the requestType parameter is missing, the request is for a specific device (master or slave), and the deviceDesc parameter for the device on whose behalf the request is made is required.    
+    /// The request type parameter is an optional parameter that can be used to modify an available spectrum request, but its use depends on applicable regulatory rules. It may be used, for example, to request generic slave device parameters without having to specify the device descriptor for a specific device. When the requestType parameter is missing, the request is for a specific device (master or slave), and the deviceDesc parameter for the device on whose behalf the request is made is required.
     #[serde(alias="requestType")]
     pub request_type: Option<String>,
-    /// The master device may include its device capabilities to limit the available-spectrum response to the spectrum that is compatible with its capabilities. The database should not return spectrum that is incompatible with the specified capabilities.    
+    /// The master device may include its device capabilities to limit the available-spectrum response to the spectrum that is compatible with its capabilities. The database should not return spectrum that is incompatible with the specified capabilities.
     pub capabilities: Option<DeviceCapabilities>,
-    /// When an available spectrum request is made by the master device (a device with geolocation capability) on behalf of a slave device (a device without geolocation capability), the rules of the applicable regulatory domain may require the master device to provide its own device descriptor information (in addition to device descriptor information for the slave device, which is provided in a separate parameter).    
+    /// When an available spectrum request is made by the master device (a device with geolocation capability) on behalf of a slave device (a device without geolocation capability), the rules of the applicable regulatory domain may require the master device to provide its own device descriptor information (in addition to device descriptor information for the slave device, which is provided in a separate parameter).
     #[serde(alias="masterDeviceDesc")]
     pub master_device_desc: Option<DeviceDescriptor>,
-    /// The geolocation of the master device (a device with geolocation capability that makes an available spectrum request) is required whether the master device is making the request on its own behalf or on behalf of a slave device (one without geolocation capability). The location must be the location of the radiation center of the master device's antenna. To support mobile devices, a regulatory domain may allow the anticipated position of the master device to be given instead. If the location specifies a region, rather than a point, the database may return an UNIMPLEMENTED error code if it does not support query by region.    
+    /// The geolocation of the master device (a device with geolocation capability that makes an available spectrum request) is required whether the master device is making the request on its own behalf or on behalf of a slave device (one without geolocation capability). The location must be the location of the radiation center of the master device's antenna. To support mobile devices, a regulatory domain may allow the anticipated position of the master device to be given instead. If the location specifies a region, rather than a point, the database may return an UNIMPLEMENTED error code if it does not support query by region.
     pub location: Option<GeoLocation>,
-    /// Depending on device type and regulatory domain, device owner information may be included in an available spectrum request. This allows the device to register and get spectrum-availability information in a single request.    
+    /// Depending on device type and regulatory domain, device owner information may be included in an available spectrum request. This allows the device to register and get spectrum-availability information in a single request.
     pub owner: Option<DeviceOwner>,
     /// The message type (e.g., INIT_REQ, AVAIL_SPECTRUM_REQ, ...).
     /// 
@@ -1180,13 +1189,17 @@ pub struct PawMethods<'a, C, NC, A>
     hub: &'a Spectrum<C, NC, A>,
 }
 
-impl<'a, C, NC, A> ResourceMethodsBuilder for PawMethods<'a, C, NC, A> {}
+impl<'a, C, NC, A> MethodsBuilder for PawMethods<'a, C, NC, A> {}
 
 impl<'a, C, NC, A> PawMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Notifies the database that the device has selected certain frequency ranges for transmission. Only to be invoked when required by the regulator. The Google Spectrum Database does not operate in domains that require notification, so this always yields an UNIMPLEMENTED error.    
+    /// Notifies the database that the device has selected certain frequency ranges for transmission. Only to be invoked when required by the regulator. The Google Spectrum Database does not operate in domains that require notification, so this always yields an UNIMPLEMENTED error.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
     pub fn notify_spectrum_use(&self, request: &PawsNotifySpectrumUseRequest) -> PawNotifySpectrumUseCall<'a, C, NC, A> {
         PawNotifySpectrumUseCall {
             hub: self.hub,
@@ -1198,7 +1211,11 @@ impl<'a, C, NC, A> PawMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// The Google Spectrum Database implements registration in the getSpectrum method. As such this always returns an UNIMPLEMENTED error.    
+    /// The Google Spectrum Database implements registration in the getSpectrum method. As such this always returns an UNIMPLEMENTED error.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
     pub fn register(&self, request: &PawsRegisterRequest) -> PawRegisterCall<'a, C, NC, A> {
         PawRegisterCall {
             hub: self.hub,
@@ -1210,7 +1227,11 @@ impl<'a, C, NC, A> PawMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Requests information about the available spectrum for a device at a location. Requests from a fixed-mode device must include owner information so the device can be registered with the database.    
+    /// Requests information about the available spectrum for a device at a location. Requests from a fixed-mode device must include owner information so the device can be registered with the database.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
     pub fn get_spectrum(&self, request: &PawsGetSpectrumRequest) -> PawGetSpectrumCall<'a, C, NC, A> {
         PawGetSpectrumCall {
             hub: self.hub,
@@ -1222,7 +1243,11 @@ impl<'a, C, NC, A> PawMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Initializes the connection between a white space device and the database.    
+    /// Initializes the connection between a white space device and the database.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
     pub fn init(&self, request: &PawsInitRequest) -> PawInitCall<'a, C, NC, A> {
         PawInitCall {
             hub: self.hub,
@@ -1234,7 +1259,11 @@ impl<'a, C, NC, A> PawMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// The Google Spectrum Database does not support batch requests, so this method always yields an UNIMPLEMENTED error.    
+    /// The Google Spectrum Database does not support batch requests, so this method always yields an UNIMPLEMENTED error.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
     pub fn get_spectrum_batch(&self, request: &PawsGetSpectrumBatchRequest) -> PawGetSpectrumBatchCall<'a, C, NC, A> {
         PawGetSpectrumBatchCall {
             hub: self.hub,
@@ -1246,7 +1275,11 @@ impl<'a, C, NC, A> PawMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Validates a device for white space use in accordance with regulatory rules. The Google Spectrum Database does not support master/slave configurations, so this always yields an UNIMPLEMENTED error.    
+    /// Validates a device for white space use in accordance with regulatory rules. The Google Spectrum Database does not support master/slave configurations, so this always yields an UNIMPLEMENTED error.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
     pub fn verify_device(&self, request: &PawsVerifyDeviceRequest) -> PawVerifyDeviceCall<'a, C, NC, A> {
         PawVerifyDeviceCall {
             hub: self.hub,
@@ -1268,7 +1301,7 @@ impl<'a, C, NC, A> PawMethods<'a, C, NC, A> {
 /// Notifies the database that the device has selected certain frequency ranges for transmission. Only to be invoked when required by the regulator. The Google Spectrum Database does not operate in domains that require notification, so this always yields an UNIMPLEMENTED error.
 ///
 /// A builder for the *notifySpectrumUse* method supported by a *paw* resource.
-/// It is not used directly, but through a `PawMethods`.
+/// It is not used directly, but through a `PawMethods` instance.
 ///
 /// # Example
 ///
@@ -1330,7 +1363,7 @@ impl<'a, C, NC, A> PawNotifySpectrumUseCall<'a, C, NC, A> where NC: hyper::net::
         for &field in ["alt"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -1349,7 +1382,7 @@ impl<'a, C, NC, A> PawNotifySpectrumUseCall<'a, C, NC, A> where NC: hyper::net::
             Some(value) => params.push(("key", value)),
             None => {
                 dlg.finished(false);
-                return Result::MissingAPIKey
+                return Err(Error::MissingAPIKey)
             }
         }
 
@@ -1377,7 +1410,6 @@ impl<'a, C, NC, A> PawNotifySpectrumUseCall<'a, C, NC, A> where NC: hyper::net::
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -1387,7 +1419,7 @@ impl<'a, C, NC, A> PawNotifySpectrumUseCall<'a, C, NC, A> where NC: hyper::net::
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -1398,7 +1430,7 @@ impl<'a, C, NC, A> PawNotifySpectrumUseCall<'a, C, NC, A> where NC: hyper::net::
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -1407,13 +1439,13 @@ impl<'a, C, NC, A> PawNotifySpectrumUseCall<'a, C, NC, A> where NC: hyper::net::
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -1469,7 +1501,7 @@ impl<'a, C, NC, A> PawNotifySpectrumUseCall<'a, C, NC, A> where NC: hyper::net::
 /// The Google Spectrum Database implements registration in the getSpectrum method. As such this always returns an UNIMPLEMENTED error.
 ///
 /// A builder for the *register* method supported by a *paw* resource.
-/// It is not used directly, but through a `PawMethods`.
+/// It is not used directly, but through a `PawMethods` instance.
 ///
 /// # Example
 ///
@@ -1531,7 +1563,7 @@ impl<'a, C, NC, A> PawRegisterCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
         for &field in ["alt"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -1550,7 +1582,7 @@ impl<'a, C, NC, A> PawRegisterCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
             Some(value) => params.push(("key", value)),
             None => {
                 dlg.finished(false);
-                return Result::MissingAPIKey
+                return Err(Error::MissingAPIKey)
             }
         }
 
@@ -1578,7 +1610,6 @@ impl<'a, C, NC, A> PawRegisterCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -1588,7 +1619,7 @@ impl<'a, C, NC, A> PawRegisterCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -1599,7 +1630,7 @@ impl<'a, C, NC, A> PawRegisterCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -1608,13 +1639,13 @@ impl<'a, C, NC, A> PawRegisterCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -1670,7 +1701,7 @@ impl<'a, C, NC, A> PawRegisterCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
 /// Requests information about the available spectrum for a device at a location. Requests from a fixed-mode device must include owner information so the device can be registered with the database.
 ///
 /// A builder for the *getSpectrum* method supported by a *paw* resource.
-/// It is not used directly, but through a `PawMethods`.
+/// It is not used directly, but through a `PawMethods` instance.
 ///
 /// # Example
 ///
@@ -1732,7 +1763,7 @@ impl<'a, C, NC, A> PawGetSpectrumCall<'a, C, NC, A> where NC: hyper::net::Networ
         for &field in ["alt"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -1751,7 +1782,7 @@ impl<'a, C, NC, A> PawGetSpectrumCall<'a, C, NC, A> where NC: hyper::net::Networ
             Some(value) => params.push(("key", value)),
             None => {
                 dlg.finished(false);
-                return Result::MissingAPIKey
+                return Err(Error::MissingAPIKey)
             }
         }
 
@@ -1779,7 +1810,6 @@ impl<'a, C, NC, A> PawGetSpectrumCall<'a, C, NC, A> where NC: hyper::net::Networ
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -1789,7 +1819,7 @@ impl<'a, C, NC, A> PawGetSpectrumCall<'a, C, NC, A> where NC: hyper::net::Networ
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -1800,7 +1830,7 @@ impl<'a, C, NC, A> PawGetSpectrumCall<'a, C, NC, A> where NC: hyper::net::Networ
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -1809,13 +1839,13 @@ impl<'a, C, NC, A> PawGetSpectrumCall<'a, C, NC, A> where NC: hyper::net::Networ
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -1871,7 +1901,7 @@ impl<'a, C, NC, A> PawGetSpectrumCall<'a, C, NC, A> where NC: hyper::net::Networ
 /// Initializes the connection between a white space device and the database.
 ///
 /// A builder for the *init* method supported by a *paw* resource.
-/// It is not used directly, but through a `PawMethods`.
+/// It is not used directly, but through a `PawMethods` instance.
 ///
 /// # Example
 ///
@@ -1933,7 +1963,7 @@ impl<'a, C, NC, A> PawInitCall<'a, C, NC, A> where NC: hyper::net::NetworkConnec
         for &field in ["alt"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -1952,7 +1982,7 @@ impl<'a, C, NC, A> PawInitCall<'a, C, NC, A> where NC: hyper::net::NetworkConnec
             Some(value) => params.push(("key", value)),
             None => {
                 dlg.finished(false);
-                return Result::MissingAPIKey
+                return Err(Error::MissingAPIKey)
             }
         }
 
@@ -1980,7 +2010,6 @@ impl<'a, C, NC, A> PawInitCall<'a, C, NC, A> where NC: hyper::net::NetworkConnec
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -1990,7 +2019,7 @@ impl<'a, C, NC, A> PawInitCall<'a, C, NC, A> where NC: hyper::net::NetworkConnec
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -2001,7 +2030,7 @@ impl<'a, C, NC, A> PawInitCall<'a, C, NC, A> where NC: hyper::net::NetworkConnec
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -2010,13 +2039,13 @@ impl<'a, C, NC, A> PawInitCall<'a, C, NC, A> where NC: hyper::net::NetworkConnec
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -2072,7 +2101,7 @@ impl<'a, C, NC, A> PawInitCall<'a, C, NC, A> where NC: hyper::net::NetworkConnec
 /// The Google Spectrum Database does not support batch requests, so this method always yields an UNIMPLEMENTED error.
 ///
 /// A builder for the *getSpectrumBatch* method supported by a *paw* resource.
-/// It is not used directly, but through a `PawMethods`.
+/// It is not used directly, but through a `PawMethods` instance.
 ///
 /// # Example
 ///
@@ -2134,7 +2163,7 @@ impl<'a, C, NC, A> PawGetSpectrumBatchCall<'a, C, NC, A> where NC: hyper::net::N
         for &field in ["alt"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -2153,7 +2182,7 @@ impl<'a, C, NC, A> PawGetSpectrumBatchCall<'a, C, NC, A> where NC: hyper::net::N
             Some(value) => params.push(("key", value)),
             None => {
                 dlg.finished(false);
-                return Result::MissingAPIKey
+                return Err(Error::MissingAPIKey)
             }
         }
 
@@ -2181,7 +2210,6 @@ impl<'a, C, NC, A> PawGetSpectrumBatchCall<'a, C, NC, A> where NC: hyper::net::N
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -2191,7 +2219,7 @@ impl<'a, C, NC, A> PawGetSpectrumBatchCall<'a, C, NC, A> where NC: hyper::net::N
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -2202,7 +2230,7 @@ impl<'a, C, NC, A> PawGetSpectrumBatchCall<'a, C, NC, A> where NC: hyper::net::N
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -2211,13 +2239,13 @@ impl<'a, C, NC, A> PawGetSpectrumBatchCall<'a, C, NC, A> where NC: hyper::net::N
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -2273,7 +2301,7 @@ impl<'a, C, NC, A> PawGetSpectrumBatchCall<'a, C, NC, A> where NC: hyper::net::N
 /// Validates a device for white space use in accordance with regulatory rules. The Google Spectrum Database does not support master/slave configurations, so this always yields an UNIMPLEMENTED error.
 ///
 /// A builder for the *verifyDevice* method supported by a *paw* resource.
-/// It is not used directly, but through a `PawMethods`.
+/// It is not used directly, but through a `PawMethods` instance.
 ///
 /// # Example
 ///
@@ -2335,7 +2363,7 @@ impl<'a, C, NC, A> PawVerifyDeviceCall<'a, C, NC, A> where NC: hyper::net::Netwo
         for &field in ["alt"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -2354,7 +2382,7 @@ impl<'a, C, NC, A> PawVerifyDeviceCall<'a, C, NC, A> where NC: hyper::net::Netwo
             Some(value) => params.push(("key", value)),
             None => {
                 dlg.finished(false);
-                return Result::MissingAPIKey
+                return Err(Error::MissingAPIKey)
             }
         }
 
@@ -2382,7 +2410,6 @@ impl<'a, C, NC, A> PawVerifyDeviceCall<'a, C, NC, A> where NC: hyper::net::Netwo
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -2392,7 +2419,7 @@ impl<'a, C, NC, A> PawVerifyDeviceCall<'a, C, NC, A> where NC: hyper::net::Netwo
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -2403,7 +2430,7 @@ impl<'a, C, NC, A> PawVerifyDeviceCall<'a, C, NC, A> where NC: hyper::net::Netwo
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -2412,13 +2439,13 @@ impl<'a, C, NC, A> PawVerifyDeviceCall<'a, C, NC, A> where NC: hyper::net::Netwo
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }

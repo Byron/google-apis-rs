@@ -4,7 +4,7 @@
 [package]
 
 name = "google-resourceviews1_beta2"
-version = "0.1.1+20140904"
+version = "0.1.2+20140904"
 authors = ["Sebastian Thiel <byronimo@gmail>"]
 description = "A complete library to interact with resourceviews (protocol v1beta2)"
 repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/resourceviews1_beta2"
@@ -16,7 +16,7 @@ keywords = ["resourceviews", "google", "protocol", "web", "api"]
 [dependencies]
 hyper = "*"
 mime = "*"
+yup-oauth2 = "*"
 url = "*"
 serde = "*"
 serde_macros = "*"
-yup-oauth2 = "*"

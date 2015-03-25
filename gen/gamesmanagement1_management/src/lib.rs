@@ -1,8 +1,8 @@
 // DO NOT EDIT !
-// This file was generated automatically from 'src/mako/lib.rs.mako'
+// This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *Games Management* crate version *0.1.1+20150309*, where *20150309* is the exact revision of the *gamesManagement:v1management* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.1*.
+//! This documentation was generated from *Games Management* crate version *0.1.2+20150316*, where *20150316* is the exact revision of the *gamesManagement:v1management* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.2*.
 //! 
 //! Everything else about the *Games Management* *v1_management* API can be found at the
 //! [official documentation site](https://developers.google.com/games/services).
@@ -39,6 +39,8 @@
 //! 
 //! * **[Hub](struct.GamesManagement.html)**
 //!     * a central object to maintain state and allow accessing all *Activities*
+//!     * creates [*Method Builders*](trait.MethodsBuilder.html) which in turn
+//!       allow access to individual [*Call Builders*](trait.CallBuilder.html)
 //! * **[Resources](trait.Resource.html)**
 //!     * primary types that you can apply *Activities* to
 //!     * a collection of properties and *Parts*
@@ -47,6 +49,8 @@
 //!         * never directly used in *Activities*
 //! * **[Activities](trait.CallBuilder.html)**
 //!     * operations to apply to *Resources*
+//! 
+//! All *structures* are marked with applicable traits to further categorize them and ease browsing.
 //! 
 //! Generally speaking, you can invoke *Activities* like this:
 //! 
@@ -83,7 +87,7 @@
 //! extern crate hyper;
 //! extern crate "yup-oauth2" as oauth2;
 //! extern crate "google-gamesmanagement1_management" as gamesmanagement1_management;
-//! use gamesmanagement1_management::Result;
+//! use gamesmanagement1_management::{Result, Error};
 //! # #[test] fn egal() {
 //! use std::default::Default;
 //! use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -108,15 +112,17 @@
 //!              .doit();
 //! 
 //! match result {
-//!     Result::HttpError(err) => println!("HTTPERROR: {:?}", err),
-//!     Result::MissingAPIKey => println!("Auth: Missing API Key - used if there are no scopes"),
-//!     Result::MissingToken => println!("OAuth2: Missing Token"),
-//!     Result::Cancelled => println!("Operation cancelled by user"),
-//!     Result::UploadSizeLimitExceeded(size, max_size) => println!("Upload size too big: {} of {}", size, max_size),
-//!     Result::Failure(_) => println!("General Failure (hyper::client::Response doesn't print)"),
-//!     Result::FieldClash(clashed_field) => println!("You added custom parameter which is part of builder: {:?}", clashed_field),
-//!     Result::JsonDecodeError(err) => println!("Couldn't understand server reply - maybe API needs update: {:?}", err),
-//!     Result::Success(_) => println!("Success (value doesn't print)"),
+//!     Err(e) => match e {
+//!         Error::HttpError(err) => println!("HTTPERROR: {:?}", err),
+//!         Error::MissingAPIKey => println!("Auth: Missing API Key - used if there are no scopes"),
+//!         Error::MissingToken => println!("OAuth2: Missing Token"),
+//!         Error::Cancelled => println!("Operation canceled by user"),
+//!         Error::UploadSizeLimitExceeded(size, max_size) => println!("Upload size too big: {} of {}", size, max_size),
+//!         Error::Failure(_) => println!("General Failure (hyper::client::Response doesn't print)"),
+//!         Error::FieldClash(clashed_field) => println!("You added custom parameter which is part of builder: {:?}", clashed_field),
+//!         Error::JsonDecodeError(err) => println!("Couldn't understand server reply - maybe API needs update: {:?}", err),
+//!     },
+//!     Ok(_) => println!("Success (value doesn't print)"),
 //! }
 //! # }
 //! ```
@@ -129,7 +135,7 @@
 //! When delegates handle errors or intermediate values, they may have a chance to instruct the system to retry. This 
 //! makes the system potentially resilient to all kinds of errors.
 //! 
-//! ## Uploads and Downlods
+//! ## Uploads and Downloads
 //! If a method supports downloads, the response body, which is part of the [Result](enum.Result.html), should be
 //! read by you to obtain the media.
 //! If such a method also supports a [Response Result](trait.ResponseResult.html), it will return that by default.
@@ -152,8 +158,9 @@
 //! ## Optional Parts in Server-Requests
 //! 
 //! All structures provided by this library are made to be [enocodable](trait.RequestValue.html) and 
-//! [decodable](trait.ResponseResult.html) via json. Optionals are used to indicate that partial requests are responses are valid.
-//! Most optionals are are considered [Parts](trait.Part.html) which are identifyable by name, which will be sent to 
+//! [decodable](trait.ResponseResult.html) via *json*. Optionals are used to indicate that partial requests are responses 
+//! are valid.
+//! Most optionals are are considered [Parts](trait.Part.html) which are identifiable by name, which will be sent to 
 //! the server to indicate either the set parts of the request or the desired parts in the response.
 //! 
 //! ## Builder Arguments
@@ -202,7 +209,7 @@ use std::io;
 use std::fs;
 use std::thread::sleep;
 
-pub use cmn::{MultiPartReader, ToParts, MethodInfo, Result, CallBuilder, Hub, ReadSeek, Part, ResponseResult, RequestValue, NestedType, Delegate, DefaultDelegate, ResourceMethodsBuilder, Resource, JsonServerError};
+pub use cmn::{MultiPartReader, ToParts, MethodInfo, Result, Error, CallBuilder, Hub, ReadSeek, Part, ResponseResult, RequestValue, NestedType, Delegate, DefaultDelegate, MethodsBuilder, Resource, JsonServerError};
 
 
 // ##############
@@ -252,7 +259,7 @@ impl Default for Scope {
 /// extern crate hyper;
 /// extern crate "yup-oauth2" as oauth2;
 /// extern crate "google-gamesmanagement1_management" as gamesmanagement1_management;
-/// use gamesmanagement1_management::Result;
+/// use gamesmanagement1_management::{Result, Error};
 /// # #[test] fn egal() {
 /// use std::default::Default;
 /// use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -277,15 +284,17 @@ impl Default for Scope {
 ///              .doit();
 /// 
 /// match result {
-///     Result::HttpError(err) => println!("HTTPERROR: {:?}", err),
-///     Result::MissingAPIKey => println!("Auth: Missing API Key - used if there are no scopes"),
-///     Result::MissingToken => println!("OAuth2: Missing Token"),
-///     Result::Cancelled => println!("Operation cancelled by user"),
-///     Result::UploadSizeLimitExceeded(size, max_size) => println!("Upload size too big: {} of {}", size, max_size),
-///     Result::Failure(_) => println!("General Failure (hyper::client::Response doesn't print)"),
-///     Result::FieldClash(clashed_field) => println!("You added custom parameter which is part of builder: {:?}", clashed_field),
-///     Result::JsonDecodeError(err) => println!("Couldn't understand server reply - maybe API needs update: {:?}", err),
-///     Result::Success(_) => println!("Success (value doesn't print)"),
+///     Err(e) => match e {
+///         Error::HttpError(err) => println!("HTTPERROR: {:?}", err),
+///         Error::MissingAPIKey => println!("Auth: Missing API Key - used if there are no scopes"),
+///         Error::MissingToken => println!("OAuth2: Missing Token"),
+///         Error::Cancelled => println!("Operation canceled by user"),
+///         Error::UploadSizeLimitExceeded(size, max_size) => println!("Upload size too big: {} of {}", size, max_size),
+///         Error::Failure(_) => println!("General Failure (hyper::client::Response doesn't print)"),
+///         Error::FieldClash(clashed_field) => println!("You added custom parameter which is part of builder: {:?}", clashed_field),
+///         Error::JsonDecodeError(err) => println!("Couldn't understand server reply - maybe API needs update: {:?}", err),
+///     },
+///     Ok(_) => println!("Success (value doesn't print)"),
 /// }
 /// # }
 /// ```
@@ -306,7 +315,7 @@ impl<'a, C, NC, A> GamesManagement<C, NC, A>
         GamesManagement {
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/0.1.1".to_string(),
+            _user_agent: "google-api-rust-client/0.1.2".to_string(),
             _m: PhantomData
         }
     }
@@ -337,7 +346,7 @@ impl<'a, C, NC, A> GamesManagement<C, NC, A>
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/0.1.1`.
+    /// It defaults to `google-api-rust-client/0.1.2`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -362,12 +371,12 @@ impl<'a, C, NC, A> GamesManagement<C, NC, A>
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct AchievementResetResponse {
-    /// The ID of an achievement for which player state has been updated.    
+    /// The ID of an achievement for which player state has been updated.
     #[serde(alias="definitionId")]
     pub definition_id: String,
-    /// Uniquely identifies the type of this resource. Value is always the fixed string gamesManagement#achievementResetResponse.    
+    /// Uniquely identifies the type of this resource. Value is always the fixed string gamesManagement#achievementResetResponse.
     pub kind: String,
-    /// Flag to indicate if the requested update actually occurred.    
+    /// Flag to indicate if the requested update actually occurred.
     #[serde(alias="updateOccurred")]
     pub update_occurred: bool,
     /// The current state of the achievement. This is the same as the initial state of the achievement.
@@ -388,10 +397,10 @@ impl ResponseResult for AchievementResetResponse {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct PlayerName {
-    /// The given name of this player. In some places, this is known as the first name.    
+    /// The given name of this player. In some places, this is known as the first name.
     #[serde(alias="givenName")]
     pub given_name: String,
-    /// The family name of this player. In some places, this is known as the last name.    
+    /// The family name of this player. In some places, this is known as the last name.
     #[serde(alias="familyName")]
     pub family_name: String,
 }
@@ -406,16 +415,16 @@ impl Part for PlayerName {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct GamesPlayerExperienceInfoResource {
-    /// The current number of experience points for the player.    
+    /// The current number of experience points for the player.
     #[serde(alias="currentExperiencePoints")]
     pub current_experience_points: String,
-    /// The next level of the player. If the current level is the maximum level, this should be same as the current level.    
+    /// The next level of the player. If the current level is the maximum level, this should be same as the current level.
     #[serde(alias="nextLevel")]
     pub next_level: GamesPlayerLevelResource,
-    /// The timestamp when the player was leveled up, in millis since Unix epoch UTC.    
+    /// The timestamp when the player was leveled up, in millis since Unix epoch UTC.
     #[serde(alias="lastLevelUpTimestampMillis")]
     pub last_level_up_timestamp_millis: String,
-    /// The current level of the player.    
+    /// The current level of the player.
     #[serde(alias="currentLevel")]
     pub current_level: GamesPlayerLevelResource,
 }
@@ -434,9 +443,9 @@ impl Part for GamesPlayerExperienceInfoResource {}
 /// 
 #[derive(Default, Clone, Debug, Serialize)]
 pub struct EventsResetMultipleForAllRequest {
-    /// The IDs of events to reset.    
+    /// The IDs of events to reset.
     pub event_ids: Option<Vec<String>>,
-    /// Uniquely identifies the type of this resource. Value is always the fixed string gamesManagement#eventsResetMultipleForAllRequest.    
+    /// Uniquely identifies the type of this resource. Value is always the fixed string gamesManagement#eventsResetMultipleForAllRequest.
     pub kind: Option<String>,
 }
 
@@ -454,9 +463,9 @@ impl RequestValue for EventsResetMultipleForAllRequest {}
 /// 
 #[derive(Default, Clone, Debug, Serialize)]
 pub struct AchievementResetMultipleForAllRequest {
-    /// The IDs of achievements to reset.    
+    /// The IDs of achievements to reset.
     pub achievement_ids: Option<Vec<String>>,
-    /// Uniquely identifies the type of this resource. Value is always the fixed string gamesManagement#achievementResetMultipleForAllRequest.    
+    /// Uniquely identifies the type of this resource. Value is always the fixed string gamesManagement#achievementResetMultipleForAllRequest.
     pub kind: Option<String>,
 }
 
@@ -469,10 +478,10 @@ impl RequestValue for AchievementResetMultipleForAllRequest {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct GamesPlayedResource {
-    /// True if the player was auto-matched with the currently authenticated user.    
+    /// True if the player was auto-matched with the currently authenticated user.
     #[serde(alias="autoMatched")]
     pub auto_matched: bool,
-    /// The last time the player played the game in milliseconds since the epoch in UTC.    
+    /// The last time the player played the game in milliseconds since the epoch in UTC.
     #[serde(alias="timeMillis")]
     pub time_millis: String,
 }
@@ -491,9 +500,9 @@ impl Part for GamesPlayedResource {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct PlayerScoreResetAllResponse {
-    /// Uniquely identifies the type of this resource. Value is always the fixed string gamesManagement#playerScoreResetResponse.    
+    /// Uniquely identifies the type of this resource. Value is always the fixed string gamesManagement#playerScoreResetResponse.
     pub kind: String,
-    /// The leaderboard reset results.    
+    /// The leaderboard reset results.
     pub results: Vec<PlayerScoreResetResponse>,
 }
 
@@ -512,25 +521,25 @@ impl ResponseResult for PlayerScoreResetAllResponse {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct Player {
-    /// Uniquely identifies the type of this resource. Value is always the fixed string gamesManagement#player.    
+    /// Uniquely identifies the type of this resource. Value is always the fixed string gamesManagement#player.
     pub kind: Option<String>,
-    /// The name to display for the player.    
+    /// The name to display for the player.
     #[serde(alias="displayName")]
     pub display_name: Option<String>,
-    /// An object representation of the individual components of the player's name. For some players, these fields may not be present.    
+    /// An object representation of the individual components of the player's name. For some players, these fields may not be present.
     pub name: Option<PlayerName>,
-    /// The player's title rewarded for their game activities.    
+    /// The player's title rewarded for their game activities.
     pub title: Option<String>,
-    /// The ID of the player.    
+    /// The ID of the player.
     #[serde(alias="playerId")]
     pub player_id: Option<String>,
-    /// Details about the last time this player played a multiplayer game with the currently authenticated player. Populated for PLAYED_WITH player collection members.    
+    /// Details about the last time this player played a multiplayer game with the currently authenticated player. Populated for PLAYED_WITH player collection members.
     #[serde(alias="lastPlayedWith")]
     pub last_played_with: Option<GamesPlayedResource>,
-    /// An object to represent Play Game experience information for the player.    
+    /// An object to represent Play Game experience information for the player.
     #[serde(alias="experienceInfo")]
     pub experience_info: Option<GamesPlayerExperienceInfoResource>,
-    /// The base URL for the image that represents the player.    
+    /// The base URL for the image that represents the player.
     #[serde(alias="avatarImageUrl")]
     pub avatar_image_url: Option<String>,
 }
@@ -549,9 +558,9 @@ impl Resource for Player {}
 /// 
 #[derive(Default, Clone, Debug, Serialize)]
 pub struct QuestsResetMultipleForAllRequest {
-    /// The IDs of quests to reset.    
+    /// The IDs of quests to reset.
     pub quest_ids: Option<Vec<String>>,
-    /// Uniquely identifies the type of this resource. Value is always the fixed string gamesManagement#questsResetMultipleForAllRequest.    
+    /// Uniquely identifies the type of this resource. Value is always the fixed string gamesManagement#questsResetMultipleForAllRequest.
     pub kind: Option<String>,
 }
 
@@ -564,13 +573,13 @@ impl RequestValue for QuestsResetMultipleForAllRequest {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct GamesPlayerLevelResource {
-    /// The maximum experience points for this level.    
+    /// The maximum experience points for this level.
     #[serde(alias="maxExperiencePoints")]
     pub max_experience_points: String,
-    /// The minimum experience points for this level.    
+    /// The minimum experience points for this level.
     #[serde(alias="minExperiencePoints")]
     pub min_experience_points: String,
-    /// The level for the user.    
+    /// The level for the user.
     pub level: i32,
 }
 
@@ -588,12 +597,12 @@ impl Part for GamesPlayerLevelResource {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct HiddenPlayerList {
-    /// The pagination token for the next page of results.    
+    /// The pagination token for the next page of results.
     #[serde(alias="nextPageToken")]
     pub next_page_token: String,
-    /// The players.    
+    /// The players.
     pub items: Vec<HiddenPlayer>,
-    /// Uniquely identifies the type of this resource. Value is always the fixed string gamesManagement#hiddenPlayerList.    
+    /// Uniquely identifies the type of this resource. Value is always the fixed string gamesManagement#hiddenPlayerList.
     pub kind: String,
 }
 
@@ -611,9 +620,9 @@ impl ResponseResult for HiddenPlayerList {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct AchievementResetAllResponse {
-    /// Uniquely identifies the type of this resource. Value is always the fixed string gamesManagement#achievementResetAllResponse.    
+    /// Uniquely identifies the type of this resource. Value is always the fixed string gamesManagement#achievementResetAllResponse.
     pub kind: String,
-    /// The achievement reset results.    
+    /// The achievement reset results.
     pub results: Vec<AchievementResetResponse>,
 }
 
@@ -631,9 +640,9 @@ impl ResponseResult for AchievementResetAllResponse {}
 /// 
 #[derive(Default, Clone, Debug, Serialize)]
 pub struct ScoresResetMultipleForAllRequest {
-    /// The IDs of leaderboards to reset.    
+    /// The IDs of leaderboards to reset.
     pub leaderboard_ids: Option<Vec<String>>,
-    /// Uniquely identifies the type of this resource. Value is always the fixed string gamesManagement#scoresResetMultipleForAllRequest.    
+    /// Uniquely identifies the type of this resource. Value is always the fixed string gamesManagement#scoresResetMultipleForAllRequest.
     pub kind: Option<String>,
 }
 
@@ -651,10 +660,10 @@ impl RequestValue for ScoresResetMultipleForAllRequest {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct PlayerScoreResetResponse {
-    /// The ID of an leaderboard for which player state has been updated.    
+    /// The ID of an leaderboard for which player state has been updated.
     #[serde(alias="definitionId")]
     pub definition_id: String,
-    /// Uniquely identifies the type of this resource. Value is always the fixed string gamesManagement#playerScoreResetResponse.    
+    /// Uniquely identifies the type of this resource. Value is always the fixed string gamesManagement#playerScoreResetResponse.
     pub kind: String,
     /// The time spans of the updated score.
     /// Possible values are:  
@@ -674,11 +683,11 @@ impl ResponseResult for PlayerScoreResetResponse {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct HiddenPlayer {
-    /// The player information.    
+    /// The player information.
     pub player: Player,
-    /// Uniquely identifies the type of this resource. Value is always the fixed string gamesManagement#hiddenPlayer.    
+    /// Uniquely identifies the type of this resource. Value is always the fixed string gamesManagement#hiddenPlayer.
     pub kind: String,
-    /// The time this player was hidden.    
+    /// The time this player was hidden.
     #[serde(alias="hiddenTimeMillis")]
     pub hidden_time_millis: String,
 }
@@ -725,13 +734,13 @@ pub struct AchievementMethods<'a, C, NC, A>
     hub: &'a GamesManagement<C, NC, A>,
 }
 
-impl<'a, C, NC, A> ResourceMethodsBuilder for AchievementMethods<'a, C, NC, A> {}
+impl<'a, C, NC, A> MethodsBuilder for AchievementMethods<'a, C, NC, A> {}
 
 impl<'a, C, NC, A> AchievementMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Resets all draft achievements for all players. This method is only available to user accounts for your developer console.    
+    /// Resets all draft achievements for all players. This method is only available to user accounts for your developer console.
     pub fn reset_all_for_all_players(&self) -> AchievementResetAllForAllPlayerCall<'a, C, NC, A> {
         AchievementResetAllForAllPlayerCall {
             hub: self.hub,
@@ -743,7 +752,11 @@ impl<'a, C, NC, A> AchievementMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Resets the achievement with the given ID for all players. This method is only available to user accounts for your developer console. Only draft achievements can be reset.    
+    /// Resets the achievement with the given ID for all players. This method is only available to user accounts for your developer console. Only draft achievements can be reset.
+    /// 
+    /// # Arguments
+    ///
+    /// * `achievementId` - The ID of the achievement used by this method.
     pub fn reset_for_all_players(&self, achievement_id: &str) -> AchievementResetForAllPlayerCall<'a, C, NC, A> {
         AchievementResetForAllPlayerCall {
             hub: self.hub,
@@ -756,7 +769,11 @@ impl<'a, C, NC, A> AchievementMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Resets the achievement with the given ID for the currently authenticated player. This method is only accessible to whitelisted tester accounts for your application.    
+    /// Resets the achievement with the given ID for the currently authenticated player. This method is only accessible to whitelisted tester accounts for your application.
+    /// 
+    /// # Arguments
+    ///
+    /// * `achievementId` - The ID of the achievement used by this method.
     pub fn reset(&self, achievement_id: &str) -> AchievementResetCall<'a, C, NC, A> {
         AchievementResetCall {
             hub: self.hub,
@@ -769,7 +786,11 @@ impl<'a, C, NC, A> AchievementMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Resets achievements with the given IDs for all players. This method is only available to user accounts for your developer console. Only draft achievements may be reset.    
+    /// Resets achievements with the given IDs for all players. This method is only available to user accounts for your developer console. Only draft achievements may be reset.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
     pub fn reset_multiple_for_all_players(&self, request: &AchievementResetMultipleForAllRequest) -> AchievementResetMultipleForAllPlayerCall<'a, C, NC, A> {
         AchievementResetMultipleForAllPlayerCall {
             hub: self.hub,
@@ -782,7 +803,7 @@ impl<'a, C, NC, A> AchievementMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Resets all achievements for the currently authenticated player for your application. This method is only accessible to whitelisted tester accounts for your application.    
+    /// Resets all achievements for the currently authenticated player for your application. This method is only accessible to whitelisted tester accounts for your application.
     pub fn reset_all(&self) -> AchievementResetAllCall<'a, C, NC, A> {
         AchievementResetAllCall {
             hub: self.hub,
@@ -829,13 +850,18 @@ pub struct PlayerMethods<'a, C, NC, A>
     hub: &'a GamesManagement<C, NC, A>,
 }
 
-impl<'a, C, NC, A> ResourceMethodsBuilder for PlayerMethods<'a, C, NC, A> {}
+impl<'a, C, NC, A> MethodsBuilder for PlayerMethods<'a, C, NC, A> {}
 
 impl<'a, C, NC, A> PlayerMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Hide the given player's leaderboard scores from the given application. This method is only available to user accounts for your developer console.    
+    /// Hide the given player's leaderboard scores from the given application. This method is only available to user accounts for your developer console.
+    /// 
+    /// # Arguments
+    ///
+    /// * `applicationId` - The application ID from the Google Play developer console.
+    /// * `playerId` - A player ID. A value of me may be used in place of the authenticated player's ID.
     pub fn hide(&self, application_id: &str, player_id: &str) -> PlayerHideCall<'a, C, NC, A> {
         PlayerHideCall {
             hub: self.hub,
@@ -849,7 +875,12 @@ impl<'a, C, NC, A> PlayerMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Unhide the given player's leaderboard scores from the given application. This method is only available to user accounts for your developer console.    
+    /// Unhide the given player's leaderboard scores from the given application. This method is only available to user accounts for your developer console.
+    /// 
+    /// # Arguments
+    ///
+    /// * `applicationId` - The application ID from the Google Play developer console.
+    /// * `playerId` - A player ID. A value of me may be used in place of the authenticated player's ID.
     pub fn unhide(&self, application_id: &str, player_id: &str) -> PlayerUnhideCall<'a, C, NC, A> {
         PlayerUnhideCall {
             hub: self.hub,
@@ -898,13 +929,17 @@ pub struct ScoreMethods<'a, C, NC, A>
     hub: &'a GamesManagement<C, NC, A>,
 }
 
-impl<'a, C, NC, A> ResourceMethodsBuilder for ScoreMethods<'a, C, NC, A> {}
+impl<'a, C, NC, A> MethodsBuilder for ScoreMethods<'a, C, NC, A> {}
 
 impl<'a, C, NC, A> ScoreMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Resets scores for the leaderboards with the given IDs for all players. This method is only available to user accounts for your developer console. Only draft leaderboards may be reset.    
+    /// Resets scores for the leaderboards with the given IDs for all players. This method is only available to user accounts for your developer console. Only draft leaderboards may be reset.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
     pub fn reset_multiple_for_all_players(&self, request: &ScoresResetMultipleForAllRequest) -> ScoreResetMultipleForAllPlayerCall<'a, C, NC, A> {
         ScoreResetMultipleForAllPlayerCall {
             hub: self.hub,
@@ -917,7 +952,7 @@ impl<'a, C, NC, A> ScoreMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Resets scores for all draft leaderboards for all players. This method is only available to user accounts for your developer console.    
+    /// Resets scores for all draft leaderboards for all players. This method is only available to user accounts for your developer console.
     pub fn reset_all_for_all_players(&self) -> ScoreResetAllForAllPlayerCall<'a, C, NC, A> {
         ScoreResetAllForAllPlayerCall {
             hub: self.hub,
@@ -929,7 +964,7 @@ impl<'a, C, NC, A> ScoreMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Resets all scores for all leaderboards for the currently authenticated players. This method is only accessible to whitelisted tester accounts for your application.    
+    /// Resets all scores for all leaderboards for the currently authenticated players. This method is only accessible to whitelisted tester accounts for your application.
     pub fn reset_all(&self) -> ScoreResetAllCall<'a, C, NC, A> {
         ScoreResetAllCall {
             hub: self.hub,
@@ -941,7 +976,11 @@ impl<'a, C, NC, A> ScoreMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Resets scores for the leaderboard with the given ID for all players. This method is only available to user accounts for your developer console. Only draft leaderboards can be reset.    
+    /// Resets scores for the leaderboard with the given ID for all players. This method is only available to user accounts for your developer console. Only draft leaderboards can be reset.
+    /// 
+    /// # Arguments
+    ///
+    /// * `leaderboardId` - The ID of the leaderboard.
     pub fn reset_for_all_players(&self, leaderboard_id: &str) -> ScoreResetForAllPlayerCall<'a, C, NC, A> {
         ScoreResetForAllPlayerCall {
             hub: self.hub,
@@ -954,7 +993,11 @@ impl<'a, C, NC, A> ScoreMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Resets scores for the leaderboard with the given ID for the currently authenticated player. This method is only accessible to whitelisted tester accounts for your application.    
+    /// Resets scores for the leaderboard with the given ID for the currently authenticated player. This method is only accessible to whitelisted tester accounts for your application.
+    /// 
+    /// # Arguments
+    ///
+    /// * `leaderboardId` - The ID of the leaderboard.
     pub fn reset(&self, leaderboard_id: &str) -> ScoreResetCall<'a, C, NC, A> {
         ScoreResetCall {
             hub: self.hub,
@@ -1002,13 +1045,13 @@ pub struct TurnBasedMatcheMethods<'a, C, NC, A>
     hub: &'a GamesManagement<C, NC, A>,
 }
 
-impl<'a, C, NC, A> ResourceMethodsBuilder for TurnBasedMatcheMethods<'a, C, NC, A> {}
+impl<'a, C, NC, A> MethodsBuilder for TurnBasedMatcheMethods<'a, C, NC, A> {}
 
 impl<'a, C, NC, A> TurnBasedMatcheMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Reset all turn-based match data for a user. This method is only accessible to whitelisted tester accounts for your application.    
+    /// Reset all turn-based match data for a user. This method is only accessible to whitelisted tester accounts for your application.
     pub fn reset(&self) -> TurnBasedMatcheResetCall<'a, C, NC, A> {
         TurnBasedMatcheResetCall {
             hub: self.hub,
@@ -1020,7 +1063,7 @@ impl<'a, C, NC, A> TurnBasedMatcheMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Deletes turn-based matches where the only match participants are from whitelisted tester accounts for your application. This method is only available to user accounts for your developer console.    
+    /// Deletes turn-based matches where the only match participants are from whitelisted tester accounts for your application. This method is only available to user accounts for your developer console.
     pub fn reset_for_all_players(&self) -> TurnBasedMatcheResetForAllPlayerCall<'a, C, NC, A> {
         TurnBasedMatcheResetForAllPlayerCall {
             hub: self.hub,
@@ -1067,13 +1110,17 @@ pub struct ApplicationMethods<'a, C, NC, A>
     hub: &'a GamesManagement<C, NC, A>,
 }
 
-impl<'a, C, NC, A> ResourceMethodsBuilder for ApplicationMethods<'a, C, NC, A> {}
+impl<'a, C, NC, A> MethodsBuilder for ApplicationMethods<'a, C, NC, A> {}
 
 impl<'a, C, NC, A> ApplicationMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Get the list of players hidden from the given application. This method is only available to user accounts for your developer console.    
+    /// Get the list of players hidden from the given application. This method is only available to user accounts for your developer console.
+    /// 
+    /// # Arguments
+    ///
+    /// * `applicationId` - The application ID from the Google Play developer console.
     pub fn list_hidden(&self, application_id: &str) -> ApplicationListHiddenCall<'a, C, NC, A> {
         ApplicationListHiddenCall {
             hub: self.hub,
@@ -1123,13 +1170,13 @@ pub struct RoomMethods<'a, C, NC, A>
     hub: &'a GamesManagement<C, NC, A>,
 }
 
-impl<'a, C, NC, A> ResourceMethodsBuilder for RoomMethods<'a, C, NC, A> {}
+impl<'a, C, NC, A> MethodsBuilder for RoomMethods<'a, C, NC, A> {}
 
 impl<'a, C, NC, A> RoomMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Deletes rooms where the only room participants are from whitelisted tester accounts for your application. This method is only available to user accounts for your developer console.    
+    /// Deletes rooms where the only room participants are from whitelisted tester accounts for your application. This method is only available to user accounts for your developer console.
     pub fn reset_for_all_players(&self) -> RoomResetForAllPlayerCall<'a, C, NC, A> {
         RoomResetForAllPlayerCall {
             hub: self.hub,
@@ -1141,7 +1188,7 @@ impl<'a, C, NC, A> RoomMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Reset all rooms for the currently authenticated player for your application. This method is only accessible to whitelisted tester accounts for your application.    
+    /// Reset all rooms for the currently authenticated player for your application. This method is only accessible to whitelisted tester accounts for your application.
     pub fn reset(&self) -> RoomResetCall<'a, C, NC, A> {
         RoomResetCall {
             hub: self.hub,
@@ -1188,13 +1235,13 @@ pub struct QuestMethods<'a, C, NC, A>
     hub: &'a GamesManagement<C, NC, A>,
 }
 
-impl<'a, C, NC, A> ResourceMethodsBuilder for QuestMethods<'a, C, NC, A> {}
+impl<'a, C, NC, A> MethodsBuilder for QuestMethods<'a, C, NC, A> {}
 
 impl<'a, C, NC, A> QuestMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Resets all draft quests for all players. This method is only available to user accounts for your developer console.    
+    /// Resets all draft quests for all players. This method is only available to user accounts for your developer console.
     pub fn reset_all_for_all_players(&self) -> QuestResetAllForAllPlayerCall<'a, C, NC, A> {
         QuestResetAllForAllPlayerCall {
             hub: self.hub,
@@ -1206,7 +1253,11 @@ impl<'a, C, NC, A> QuestMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Resets quests with the given IDs for all players. This method is only available to user accounts for your developer console. Only draft quests may be reset.    
+    /// Resets quests with the given IDs for all players. This method is only available to user accounts for your developer console. Only draft quests may be reset.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
     pub fn reset_multiple_for_all_players(&self, request: &QuestsResetMultipleForAllRequest) -> QuestResetMultipleForAllPlayerCall<'a, C, NC, A> {
         QuestResetMultipleForAllPlayerCall {
             hub: self.hub,
@@ -1219,7 +1270,7 @@ impl<'a, C, NC, A> QuestMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Resets all player progress on all quests for the currently authenticated player. This method is only accessible to whitelisted tester accounts for your application.    
+    /// Resets all player progress on all quests for the currently authenticated player. This method is only accessible to whitelisted tester accounts for your application.
     pub fn reset_all(&self) -> QuestResetAllCall<'a, C, NC, A> {
         QuestResetAllCall {
             hub: self.hub,
@@ -1231,7 +1282,11 @@ impl<'a, C, NC, A> QuestMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Resets all player progress on the quest with the given ID for all players. This method is only available to user accounts for your developer console. Only draft quests can be reset.    
+    /// Resets all player progress on the quest with the given ID for all players. This method is only available to user accounts for your developer console. Only draft quests can be reset.
+    /// 
+    /// # Arguments
+    ///
+    /// * `questId` - The ID of the quest.
     pub fn reset_for_all_players(&self, quest_id: &str) -> QuestResetForAllPlayerCall<'a, C, NC, A> {
         QuestResetForAllPlayerCall {
             hub: self.hub,
@@ -1244,7 +1299,11 @@ impl<'a, C, NC, A> QuestMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Resets all player progress on the quest with the given ID for the currently authenticated player. This method is only accessible to whitelisted tester accounts for your application.    
+    /// Resets all player progress on the quest with the given ID for the currently authenticated player. This method is only accessible to whitelisted tester accounts for your application.
+    /// 
+    /// # Arguments
+    ///
+    /// * `questId` - The ID of the quest.
     pub fn reset(&self, quest_id: &str) -> QuestResetCall<'a, C, NC, A> {
         QuestResetCall {
             hub: self.hub,
@@ -1292,13 +1351,13 @@ pub struct EventMethods<'a, C, NC, A>
     hub: &'a GamesManagement<C, NC, A>,
 }
 
-impl<'a, C, NC, A> ResourceMethodsBuilder for EventMethods<'a, C, NC, A> {}
+impl<'a, C, NC, A> MethodsBuilder for EventMethods<'a, C, NC, A> {}
 
 impl<'a, C, NC, A> EventMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Resets all draft events for all players. This method is only available to user accounts for your developer console. All quests that use any of these events will also be reset.    
+    /// Resets all draft events for all players. This method is only available to user accounts for your developer console. All quests that use any of these events will also be reset.
     pub fn reset_all_for_all_players(&self) -> EventResetAllForAllPlayerCall<'a, C, NC, A> {
         EventResetAllForAllPlayerCall {
             hub: self.hub,
@@ -1310,7 +1369,11 @@ impl<'a, C, NC, A> EventMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Resets all player progress on the event with the given ID for the currently authenticated player. This method is only accessible to whitelisted tester accounts for your application. All quests for this player that use the event will also be reset.    
+    /// Resets all player progress on the event with the given ID for the currently authenticated player. This method is only accessible to whitelisted tester accounts for your application. All quests for this player that use the event will also be reset.
+    /// 
+    /// # Arguments
+    ///
+    /// * `eventId` - The ID of the event.
     pub fn reset(&self, event_id: &str) -> EventResetCall<'a, C, NC, A> {
         EventResetCall {
             hub: self.hub,
@@ -1323,7 +1386,7 @@ impl<'a, C, NC, A> EventMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Resets all player progress on all events for the currently authenticated player. This method is only accessible to whitelisted tester accounts for your application. All quests for this player will also be reset.    
+    /// Resets all player progress on all events for the currently authenticated player. This method is only accessible to whitelisted tester accounts for your application. All quests for this player will also be reset.
     pub fn reset_all(&self) -> EventResetAllCall<'a, C, NC, A> {
         EventResetAllCall {
             hub: self.hub,
@@ -1335,7 +1398,11 @@ impl<'a, C, NC, A> EventMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Resets events with the given IDs for all players. This method is only available to user accounts for your developer console. Only draft events may be reset. All quests that use any of the events will also be reset.    
+    /// Resets events with the given IDs for all players. This method is only available to user accounts for your developer console. Only draft events may be reset. All quests that use any of the events will also be reset.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
     pub fn reset_multiple_for_all_players(&self, request: &EventsResetMultipleForAllRequest) -> EventResetMultipleForAllPlayerCall<'a, C, NC, A> {
         EventResetMultipleForAllPlayerCall {
             hub: self.hub,
@@ -1348,7 +1415,11 @@ impl<'a, C, NC, A> EventMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Resets the event with the given ID for all players. This method is only available to user accounts for your developer console. Only draft events can be reset. All quests that use the event will also be reset.    
+    /// Resets the event with the given ID for all players. This method is only available to user accounts for your developer console. Only draft events can be reset. All quests that use the event will also be reset.
+    /// 
+    /// # Arguments
+    ///
+    /// * `eventId` - The ID of the event.
     pub fn reset_for_all_players(&self, event_id: &str) -> EventResetForAllPlayerCall<'a, C, NC, A> {
         EventResetForAllPlayerCall {
             hub: self.hub,
@@ -1371,7 +1442,7 @@ impl<'a, C, NC, A> EventMethods<'a, C, NC, A> {
 /// Resets all draft achievements for all players. This method is only available to user accounts for your developer console.
 ///
 /// A builder for the *resetAllForAllPlayers* method supported by a *achievement* resource.
-/// It is not used directly, but through a `AchievementMethods`.
+/// It is not used directly, but through a `AchievementMethods` instance.
 ///
 /// # Example
 ///
@@ -1427,7 +1498,7 @@ impl<'a, C, NC, A> AchievementResetAllForAllPlayerCall<'a, C, NC, A> where NC: h
         for &field in [].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -1455,7 +1526,7 @@ impl<'a, C, NC, A> AchievementResetAllForAllPlayerCall<'a, C, NC, A> where NC: h
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -1467,7 +1538,6 @@ impl<'a, C, NC, A> AchievementResetAllForAllPlayerCall<'a, C, NC, A> where NC: h
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -1477,7 +1547,7 @@ impl<'a, C, NC, A> AchievementResetAllForAllPlayerCall<'a, C, NC, A> where NC: h
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -1488,12 +1558,12 @@ impl<'a, C, NC, A> AchievementResetAllForAllPlayerCall<'a, C, NC, A> where NC: h
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = res;
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -1556,7 +1626,7 @@ impl<'a, C, NC, A> AchievementResetAllForAllPlayerCall<'a, C, NC, A> where NC: h
 /// Resets the achievement with the given ID for all players. This method is only available to user accounts for your developer console. Only draft achievements can be reset.
 ///
 /// A builder for the *resetForAllPlayers* method supported by a *achievement* resource.
-/// It is not used directly, but through a `AchievementMethods`.
+/// It is not used directly, but through a `AchievementMethods` instance.
 ///
 /// # Example
 ///
@@ -1614,7 +1684,7 @@ impl<'a, C, NC, A> AchievementResetForAllPlayerCall<'a, C, NC, A> where NC: hype
         for &field in ["achievementId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -1666,7 +1736,7 @@ impl<'a, C, NC, A> AchievementResetForAllPlayerCall<'a, C, NC, A> where NC: hype
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -1678,7 +1748,6 @@ impl<'a, C, NC, A> AchievementResetForAllPlayerCall<'a, C, NC, A> where NC: hype
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -1688,7 +1757,7 @@ impl<'a, C, NC, A> AchievementResetForAllPlayerCall<'a, C, NC, A> where NC: hype
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -1699,12 +1768,12 @@ impl<'a, C, NC, A> AchievementResetForAllPlayerCall<'a, C, NC, A> where NC: hype
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = res;
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -1716,7 +1785,7 @@ impl<'a, C, NC, A> AchievementResetForAllPlayerCall<'a, C, NC, A> where NC: hype
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The ID of the achievement used by this method.    
+    /// The ID of the achievement used by this method.
     pub fn achievement_id(mut self, new_value: &str) -> AchievementResetForAllPlayerCall<'a, C, NC, A> {
         self._achievement_id = new_value.to_string();
         self
@@ -1777,7 +1846,7 @@ impl<'a, C, NC, A> AchievementResetForAllPlayerCall<'a, C, NC, A> where NC: hype
 /// Resets the achievement with the given ID for the currently authenticated player. This method is only accessible to whitelisted tester accounts for your application.
 ///
 /// A builder for the *reset* method supported by a *achievement* resource.
-/// It is not used directly, but through a `AchievementMethods`.
+/// It is not used directly, but through a `AchievementMethods` instance.
 ///
 /// # Example
 ///
@@ -1835,7 +1904,7 @@ impl<'a, C, NC, A> AchievementResetCall<'a, C, NC, A> where NC: hyper::net::Netw
         for &field in ["alt", "achievementId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -1888,7 +1957,7 @@ impl<'a, C, NC, A> AchievementResetCall<'a, C, NC, A> where NC: hyper::net::Netw
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -1900,7 +1969,6 @@ impl<'a, C, NC, A> AchievementResetCall<'a, C, NC, A> where NC: hyper::net::Netw
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -1910,7 +1978,7 @@ impl<'a, C, NC, A> AchievementResetCall<'a, C, NC, A> where NC: hyper::net::Netw
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -1921,7 +1989,7 @@ impl<'a, C, NC, A> AchievementResetCall<'a, C, NC, A> where NC: hyper::net::Netw
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -1930,13 +1998,13 @@ impl<'a, C, NC, A> AchievementResetCall<'a, C, NC, A> where NC: hyper::net::Netw
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -1948,7 +2016,7 @@ impl<'a, C, NC, A> AchievementResetCall<'a, C, NC, A> where NC: hyper::net::Netw
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The ID of the achievement used by this method.    
+    /// The ID of the achievement used by this method.
     pub fn achievement_id(mut self, new_value: &str) -> AchievementResetCall<'a, C, NC, A> {
         self._achievement_id = new_value.to_string();
         self
@@ -2009,7 +2077,7 @@ impl<'a, C, NC, A> AchievementResetCall<'a, C, NC, A> where NC: hyper::net::Netw
 /// Resets achievements with the given IDs for all players. This method is only available to user accounts for your developer console. Only draft achievements may be reset.
 ///
 /// A builder for the *resetMultipleForAllPlayers* method supported by a *achievement* resource.
-/// It is not used directly, but through a `AchievementMethods`.
+/// It is not used directly, but through a `AchievementMethods` instance.
 ///
 /// # Example
 ///
@@ -2072,7 +2140,7 @@ impl<'a, C, NC, A> AchievementResetMultipleForAllPlayerCall<'a, C, NC, A> where 
         for &field in [].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -2104,7 +2172,7 @@ impl<'a, C, NC, A> AchievementResetMultipleForAllPlayerCall<'a, C, NC, A> where 
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -2120,7 +2188,6 @@ impl<'a, C, NC, A> AchievementResetMultipleForAllPlayerCall<'a, C, NC, A> where 
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -2130,7 +2197,7 @@ impl<'a, C, NC, A> AchievementResetMultipleForAllPlayerCall<'a, C, NC, A> where 
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -2141,12 +2208,12 @@ impl<'a, C, NC, A> AchievementResetMultipleForAllPlayerCall<'a, C, NC, A> where 
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = res;
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -2218,7 +2285,7 @@ impl<'a, C, NC, A> AchievementResetMultipleForAllPlayerCall<'a, C, NC, A> where 
 /// Resets all achievements for the currently authenticated player for your application. This method is only accessible to whitelisted tester accounts for your application.
 ///
 /// A builder for the *resetAll* method supported by a *achievement* resource.
-/// It is not used directly, but through a `AchievementMethods`.
+/// It is not used directly, but through a `AchievementMethods` instance.
 ///
 /// # Example
 ///
@@ -2274,7 +2341,7 @@ impl<'a, C, NC, A> AchievementResetAllCall<'a, C, NC, A> where NC: hyper::net::N
         for &field in ["alt"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -2303,7 +2370,7 @@ impl<'a, C, NC, A> AchievementResetAllCall<'a, C, NC, A> where NC: hyper::net::N
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -2315,7 +2382,6 @@ impl<'a, C, NC, A> AchievementResetAllCall<'a, C, NC, A> where NC: hyper::net::N
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -2325,7 +2391,7 @@ impl<'a, C, NC, A> AchievementResetAllCall<'a, C, NC, A> where NC: hyper::net::N
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -2336,7 +2402,7 @@ impl<'a, C, NC, A> AchievementResetAllCall<'a, C, NC, A> where NC: hyper::net::N
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -2345,13 +2411,13 @@ impl<'a, C, NC, A> AchievementResetAllCall<'a, C, NC, A> where NC: hyper::net::N
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -2414,7 +2480,7 @@ impl<'a, C, NC, A> AchievementResetAllCall<'a, C, NC, A> where NC: hyper::net::N
 /// Hide the given player's leaderboard scores from the given application. This method is only available to user accounts for your developer console.
 ///
 /// A builder for the *hide* method supported by a *player* resource.
-/// It is not used directly, but through a `PlayerMethods`.
+/// It is not used directly, but through a `PlayerMethods` instance.
 ///
 /// # Example
 ///
@@ -2474,7 +2540,7 @@ impl<'a, C, NC, A> PlayerHideCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
         for &field in ["applicationId", "playerId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -2526,7 +2592,7 @@ impl<'a, C, NC, A> PlayerHideCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -2538,7 +2604,6 @@ impl<'a, C, NC, A> PlayerHideCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -2548,7 +2613,7 @@ impl<'a, C, NC, A> PlayerHideCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -2559,12 +2624,12 @@ impl<'a, C, NC, A> PlayerHideCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = res;
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -2576,7 +2641,7 @@ impl<'a, C, NC, A> PlayerHideCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The application ID from the Google Play developer console.    
+    /// The application ID from the Google Play developer console.
     pub fn application_id(mut self, new_value: &str) -> PlayerHideCall<'a, C, NC, A> {
         self._application_id = new_value.to_string();
         self
@@ -2586,7 +2651,7 @@ impl<'a, C, NC, A> PlayerHideCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// A player ID. A value of me may be used in place of the authenticated player's ID.    
+    /// A player ID. A value of me may be used in place of the authenticated player's ID.
     pub fn player_id(mut self, new_value: &str) -> PlayerHideCall<'a, C, NC, A> {
         self._player_id = new_value.to_string();
         self
@@ -2647,7 +2712,7 @@ impl<'a, C, NC, A> PlayerHideCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
 /// Unhide the given player's leaderboard scores from the given application. This method is only available to user accounts for your developer console.
 ///
 /// A builder for the *unhide* method supported by a *player* resource.
-/// It is not used directly, but through a `PlayerMethods`.
+/// It is not used directly, but through a `PlayerMethods` instance.
 ///
 /// # Example
 ///
@@ -2707,7 +2772,7 @@ impl<'a, C, NC, A> PlayerUnhideCall<'a, C, NC, A> where NC: hyper::net::NetworkC
         for &field in ["applicationId", "playerId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -2759,7 +2824,7 @@ impl<'a, C, NC, A> PlayerUnhideCall<'a, C, NC, A> where NC: hyper::net::NetworkC
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -2771,7 +2836,6 @@ impl<'a, C, NC, A> PlayerUnhideCall<'a, C, NC, A> where NC: hyper::net::NetworkC
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -2781,7 +2845,7 @@ impl<'a, C, NC, A> PlayerUnhideCall<'a, C, NC, A> where NC: hyper::net::NetworkC
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -2792,12 +2856,12 @@ impl<'a, C, NC, A> PlayerUnhideCall<'a, C, NC, A> where NC: hyper::net::NetworkC
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = res;
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -2809,7 +2873,7 @@ impl<'a, C, NC, A> PlayerUnhideCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The application ID from the Google Play developer console.    
+    /// The application ID from the Google Play developer console.
     pub fn application_id(mut self, new_value: &str) -> PlayerUnhideCall<'a, C, NC, A> {
         self._application_id = new_value.to_string();
         self
@@ -2819,7 +2883,7 @@ impl<'a, C, NC, A> PlayerUnhideCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// A player ID. A value of me may be used in place of the authenticated player's ID.    
+    /// A player ID. A value of me may be used in place of the authenticated player's ID.
     pub fn player_id(mut self, new_value: &str) -> PlayerUnhideCall<'a, C, NC, A> {
         self._player_id = new_value.to_string();
         self
@@ -2880,7 +2944,7 @@ impl<'a, C, NC, A> PlayerUnhideCall<'a, C, NC, A> where NC: hyper::net::NetworkC
 /// Resets scores for the leaderboards with the given IDs for all players. This method is only available to user accounts for your developer console. Only draft leaderboards may be reset.
 ///
 /// A builder for the *resetMultipleForAllPlayers* method supported by a *score* resource.
-/// It is not used directly, but through a `ScoreMethods`.
+/// It is not used directly, but through a `ScoreMethods` instance.
 ///
 /// # Example
 ///
@@ -2943,7 +3007,7 @@ impl<'a, C, NC, A> ScoreResetMultipleForAllPlayerCall<'a, C, NC, A> where NC: hy
         for &field in [].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -2975,7 +3039,7 @@ impl<'a, C, NC, A> ScoreResetMultipleForAllPlayerCall<'a, C, NC, A> where NC: hy
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -2991,7 +3055,6 @@ impl<'a, C, NC, A> ScoreResetMultipleForAllPlayerCall<'a, C, NC, A> where NC: hy
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -3001,7 +3064,7 @@ impl<'a, C, NC, A> ScoreResetMultipleForAllPlayerCall<'a, C, NC, A> where NC: hy
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -3012,12 +3075,12 @@ impl<'a, C, NC, A> ScoreResetMultipleForAllPlayerCall<'a, C, NC, A> where NC: hy
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = res;
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -3089,7 +3152,7 @@ impl<'a, C, NC, A> ScoreResetMultipleForAllPlayerCall<'a, C, NC, A> where NC: hy
 /// Resets scores for all draft leaderboards for all players. This method is only available to user accounts for your developer console.
 ///
 /// A builder for the *resetAllForAllPlayers* method supported by a *score* resource.
-/// It is not used directly, but through a `ScoreMethods`.
+/// It is not used directly, but through a `ScoreMethods` instance.
 ///
 /// # Example
 ///
@@ -3145,7 +3208,7 @@ impl<'a, C, NC, A> ScoreResetAllForAllPlayerCall<'a, C, NC, A> where NC: hyper::
         for &field in [].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -3173,7 +3236,7 @@ impl<'a, C, NC, A> ScoreResetAllForAllPlayerCall<'a, C, NC, A> where NC: hyper::
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -3185,7 +3248,6 @@ impl<'a, C, NC, A> ScoreResetAllForAllPlayerCall<'a, C, NC, A> where NC: hyper::
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -3195,7 +3257,7 @@ impl<'a, C, NC, A> ScoreResetAllForAllPlayerCall<'a, C, NC, A> where NC: hyper::
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -3206,12 +3268,12 @@ impl<'a, C, NC, A> ScoreResetAllForAllPlayerCall<'a, C, NC, A> where NC: hyper::
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = res;
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -3274,7 +3336,7 @@ impl<'a, C, NC, A> ScoreResetAllForAllPlayerCall<'a, C, NC, A> where NC: hyper::
 /// Resets all scores for all leaderboards for the currently authenticated players. This method is only accessible to whitelisted tester accounts for your application.
 ///
 /// A builder for the *resetAll* method supported by a *score* resource.
-/// It is not used directly, but through a `ScoreMethods`.
+/// It is not used directly, but through a `ScoreMethods` instance.
 ///
 /// # Example
 ///
@@ -3330,7 +3392,7 @@ impl<'a, C, NC, A> ScoreResetAllCall<'a, C, NC, A> where NC: hyper::net::Network
         for &field in ["alt"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -3359,7 +3421,7 @@ impl<'a, C, NC, A> ScoreResetAllCall<'a, C, NC, A> where NC: hyper::net::Network
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -3371,7 +3433,6 @@ impl<'a, C, NC, A> ScoreResetAllCall<'a, C, NC, A> where NC: hyper::net::Network
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -3381,7 +3442,7 @@ impl<'a, C, NC, A> ScoreResetAllCall<'a, C, NC, A> where NC: hyper::net::Network
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -3392,7 +3453,7 @@ impl<'a, C, NC, A> ScoreResetAllCall<'a, C, NC, A> where NC: hyper::net::Network
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -3401,13 +3462,13 @@ impl<'a, C, NC, A> ScoreResetAllCall<'a, C, NC, A> where NC: hyper::net::Network
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -3470,7 +3531,7 @@ impl<'a, C, NC, A> ScoreResetAllCall<'a, C, NC, A> where NC: hyper::net::Network
 /// Resets scores for the leaderboard with the given ID for all players. This method is only available to user accounts for your developer console. Only draft leaderboards can be reset.
 ///
 /// A builder for the *resetForAllPlayers* method supported by a *score* resource.
-/// It is not used directly, but through a `ScoreMethods`.
+/// It is not used directly, but through a `ScoreMethods` instance.
 ///
 /// # Example
 ///
@@ -3528,7 +3589,7 @@ impl<'a, C, NC, A> ScoreResetForAllPlayerCall<'a, C, NC, A> where NC: hyper::net
         for &field in ["leaderboardId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -3580,7 +3641,7 @@ impl<'a, C, NC, A> ScoreResetForAllPlayerCall<'a, C, NC, A> where NC: hyper::net
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -3592,7 +3653,6 @@ impl<'a, C, NC, A> ScoreResetForAllPlayerCall<'a, C, NC, A> where NC: hyper::net
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -3602,7 +3662,7 @@ impl<'a, C, NC, A> ScoreResetForAllPlayerCall<'a, C, NC, A> where NC: hyper::net
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -3613,12 +3673,12 @@ impl<'a, C, NC, A> ScoreResetForAllPlayerCall<'a, C, NC, A> where NC: hyper::net
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = res;
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -3630,7 +3690,7 @@ impl<'a, C, NC, A> ScoreResetForAllPlayerCall<'a, C, NC, A> where NC: hyper::net
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The ID of the leaderboard.    
+    /// The ID of the leaderboard.
     pub fn leaderboard_id(mut self, new_value: &str) -> ScoreResetForAllPlayerCall<'a, C, NC, A> {
         self._leaderboard_id = new_value.to_string();
         self
@@ -3691,7 +3751,7 @@ impl<'a, C, NC, A> ScoreResetForAllPlayerCall<'a, C, NC, A> where NC: hyper::net
 /// Resets scores for the leaderboard with the given ID for the currently authenticated player. This method is only accessible to whitelisted tester accounts for your application.
 ///
 /// A builder for the *reset* method supported by a *score* resource.
-/// It is not used directly, but through a `ScoreMethods`.
+/// It is not used directly, but through a `ScoreMethods` instance.
 ///
 /// # Example
 ///
@@ -3749,7 +3809,7 @@ impl<'a, C, NC, A> ScoreResetCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
         for &field in ["alt", "leaderboardId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -3802,7 +3862,7 @@ impl<'a, C, NC, A> ScoreResetCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -3814,7 +3874,6 @@ impl<'a, C, NC, A> ScoreResetCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -3824,7 +3883,7 @@ impl<'a, C, NC, A> ScoreResetCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -3835,7 +3894,7 @@ impl<'a, C, NC, A> ScoreResetCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -3844,13 +3903,13 @@ impl<'a, C, NC, A> ScoreResetCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -3862,7 +3921,7 @@ impl<'a, C, NC, A> ScoreResetCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The ID of the leaderboard.    
+    /// The ID of the leaderboard.
     pub fn leaderboard_id(mut self, new_value: &str) -> ScoreResetCall<'a, C, NC, A> {
         self._leaderboard_id = new_value.to_string();
         self
@@ -3923,7 +3982,7 @@ impl<'a, C, NC, A> ScoreResetCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
 /// Reset all turn-based match data for a user. This method is only accessible to whitelisted tester accounts for your application.
 ///
 /// A builder for the *reset* method supported by a *turnBasedMatche* resource.
-/// It is not used directly, but through a `TurnBasedMatcheMethods`.
+/// It is not used directly, but through a `TurnBasedMatcheMethods` instance.
 ///
 /// # Example
 ///
@@ -3979,7 +4038,7 @@ impl<'a, C, NC, A> TurnBasedMatcheResetCall<'a, C, NC, A> where NC: hyper::net::
         for &field in [].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -4007,7 +4066,7 @@ impl<'a, C, NC, A> TurnBasedMatcheResetCall<'a, C, NC, A> where NC: hyper::net::
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -4019,7 +4078,6 @@ impl<'a, C, NC, A> TurnBasedMatcheResetCall<'a, C, NC, A> where NC: hyper::net::
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -4029,7 +4087,7 @@ impl<'a, C, NC, A> TurnBasedMatcheResetCall<'a, C, NC, A> where NC: hyper::net::
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -4040,12 +4098,12 @@ impl<'a, C, NC, A> TurnBasedMatcheResetCall<'a, C, NC, A> where NC: hyper::net::
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = res;
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -4108,7 +4166,7 @@ impl<'a, C, NC, A> TurnBasedMatcheResetCall<'a, C, NC, A> where NC: hyper::net::
 /// Deletes turn-based matches where the only match participants are from whitelisted tester accounts for your application. This method is only available to user accounts for your developer console.
 ///
 /// A builder for the *resetForAllPlayers* method supported by a *turnBasedMatche* resource.
-/// It is not used directly, but through a `TurnBasedMatcheMethods`.
+/// It is not used directly, but through a `TurnBasedMatcheMethods` instance.
 ///
 /// # Example
 ///
@@ -4164,7 +4222,7 @@ impl<'a, C, NC, A> TurnBasedMatcheResetForAllPlayerCall<'a, C, NC, A> where NC: 
         for &field in [].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -4192,7 +4250,7 @@ impl<'a, C, NC, A> TurnBasedMatcheResetForAllPlayerCall<'a, C, NC, A> where NC: 
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -4204,7 +4262,6 @@ impl<'a, C, NC, A> TurnBasedMatcheResetForAllPlayerCall<'a, C, NC, A> where NC: 
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -4214,7 +4271,7 @@ impl<'a, C, NC, A> TurnBasedMatcheResetForAllPlayerCall<'a, C, NC, A> where NC: 
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -4225,12 +4282,12 @@ impl<'a, C, NC, A> TurnBasedMatcheResetForAllPlayerCall<'a, C, NC, A> where NC: 
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = res;
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -4293,7 +4350,7 @@ impl<'a, C, NC, A> TurnBasedMatcheResetForAllPlayerCall<'a, C, NC, A> where NC: 
 /// Get the list of players hidden from the given application. This method is only available to user accounts for your developer console.
 ///
 /// A builder for the *listHidden* method supported by a *application* resource.
-/// It is not used directly, but through a `ApplicationMethods`.
+/// It is not used directly, but through a `ApplicationMethods` instance.
 ///
 /// # Example
 ///
@@ -4361,7 +4418,7 @@ impl<'a, C, NC, A> ApplicationListHiddenCall<'a, C, NC, A> where NC: hyper::net:
         for &field in ["alt", "applicationId", "pageToken", "maxResults"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -4414,7 +4471,7 @@ impl<'a, C, NC, A> ApplicationListHiddenCall<'a, C, NC, A> where NC: hyper::net:
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -4426,7 +4483,6 @@ impl<'a, C, NC, A> ApplicationListHiddenCall<'a, C, NC, A> where NC: hyper::net:
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -4436,7 +4492,7 @@ impl<'a, C, NC, A> ApplicationListHiddenCall<'a, C, NC, A> where NC: hyper::net:
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -4447,7 +4503,7 @@ impl<'a, C, NC, A> ApplicationListHiddenCall<'a, C, NC, A> where NC: hyper::net:
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -4456,13 +4512,13 @@ impl<'a, C, NC, A> ApplicationListHiddenCall<'a, C, NC, A> where NC: hyper::net:
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -4474,7 +4530,7 @@ impl<'a, C, NC, A> ApplicationListHiddenCall<'a, C, NC, A> where NC: hyper::net:
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The application ID from the Google Play developer console.    
+    /// The application ID from the Google Play developer console.
     pub fn application_id(mut self, new_value: &str) -> ApplicationListHiddenCall<'a, C, NC, A> {
         self._application_id = new_value.to_string();
         self
@@ -4482,7 +4538,7 @@ impl<'a, C, NC, A> ApplicationListHiddenCall<'a, C, NC, A> where NC: hyper::net:
     /// Sets the *page token* query property to the given value.
     ///
     /// 
-    /// The token returned by the previous request.    
+    /// The token returned by the previous request.
     pub fn page_token(mut self, new_value: &str) -> ApplicationListHiddenCall<'a, C, NC, A> {
         self._page_token = Some(new_value.to_string());
         self
@@ -4490,7 +4546,7 @@ impl<'a, C, NC, A> ApplicationListHiddenCall<'a, C, NC, A> where NC: hyper::net:
     /// Sets the *max results* query property to the given value.
     ///
     /// 
-    /// The maximum number of player resources to return in the response, used for paging. For any response, the actual number of player resources returned may be less than the specified maxResults.    
+    /// The maximum number of player resources to return in the response, used for paging. For any response, the actual number of player resources returned may be less than the specified maxResults.
     pub fn max_results(mut self, new_value: i32) -> ApplicationListHiddenCall<'a, C, NC, A> {
         self._max_results = Some(new_value);
         self
@@ -4551,7 +4607,7 @@ impl<'a, C, NC, A> ApplicationListHiddenCall<'a, C, NC, A> where NC: hyper::net:
 /// Deletes rooms where the only room participants are from whitelisted tester accounts for your application. This method is only available to user accounts for your developer console.
 ///
 /// A builder for the *resetForAllPlayers* method supported by a *room* resource.
-/// It is not used directly, but through a `RoomMethods`.
+/// It is not used directly, but through a `RoomMethods` instance.
 ///
 /// # Example
 ///
@@ -4607,7 +4663,7 @@ impl<'a, C, NC, A> RoomResetForAllPlayerCall<'a, C, NC, A> where NC: hyper::net:
         for &field in [].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -4635,7 +4691,7 @@ impl<'a, C, NC, A> RoomResetForAllPlayerCall<'a, C, NC, A> where NC: hyper::net:
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -4647,7 +4703,6 @@ impl<'a, C, NC, A> RoomResetForAllPlayerCall<'a, C, NC, A> where NC: hyper::net:
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -4657,7 +4712,7 @@ impl<'a, C, NC, A> RoomResetForAllPlayerCall<'a, C, NC, A> where NC: hyper::net:
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -4668,12 +4723,12 @@ impl<'a, C, NC, A> RoomResetForAllPlayerCall<'a, C, NC, A> where NC: hyper::net:
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = res;
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -4736,7 +4791,7 @@ impl<'a, C, NC, A> RoomResetForAllPlayerCall<'a, C, NC, A> where NC: hyper::net:
 /// Reset all rooms for the currently authenticated player for your application. This method is only accessible to whitelisted tester accounts for your application.
 ///
 /// A builder for the *reset* method supported by a *room* resource.
-/// It is not used directly, but through a `RoomMethods`.
+/// It is not used directly, but through a `RoomMethods` instance.
 ///
 /// # Example
 ///
@@ -4792,7 +4847,7 @@ impl<'a, C, NC, A> RoomResetCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
         for &field in [].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -4820,7 +4875,7 @@ impl<'a, C, NC, A> RoomResetCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -4832,7 +4887,6 @@ impl<'a, C, NC, A> RoomResetCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -4842,7 +4896,7 @@ impl<'a, C, NC, A> RoomResetCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -4853,12 +4907,12 @@ impl<'a, C, NC, A> RoomResetCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = res;
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -4921,7 +4975,7 @@ impl<'a, C, NC, A> RoomResetCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
 /// Resets all draft quests for all players. This method is only available to user accounts for your developer console.
 ///
 /// A builder for the *resetAllForAllPlayers* method supported by a *quest* resource.
-/// It is not used directly, but through a `QuestMethods`.
+/// It is not used directly, but through a `QuestMethods` instance.
 ///
 /// # Example
 ///
@@ -4977,7 +5031,7 @@ impl<'a, C, NC, A> QuestResetAllForAllPlayerCall<'a, C, NC, A> where NC: hyper::
         for &field in [].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -5005,7 +5059,7 @@ impl<'a, C, NC, A> QuestResetAllForAllPlayerCall<'a, C, NC, A> where NC: hyper::
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -5017,7 +5071,6 @@ impl<'a, C, NC, A> QuestResetAllForAllPlayerCall<'a, C, NC, A> where NC: hyper::
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -5027,7 +5080,7 @@ impl<'a, C, NC, A> QuestResetAllForAllPlayerCall<'a, C, NC, A> where NC: hyper::
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -5038,12 +5091,12 @@ impl<'a, C, NC, A> QuestResetAllForAllPlayerCall<'a, C, NC, A> where NC: hyper::
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = res;
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -5106,7 +5159,7 @@ impl<'a, C, NC, A> QuestResetAllForAllPlayerCall<'a, C, NC, A> where NC: hyper::
 /// Resets quests with the given IDs for all players. This method is only available to user accounts for your developer console. Only draft quests may be reset.
 ///
 /// A builder for the *resetMultipleForAllPlayers* method supported by a *quest* resource.
-/// It is not used directly, but through a `QuestMethods`.
+/// It is not used directly, but through a `QuestMethods` instance.
 ///
 /// # Example
 ///
@@ -5169,7 +5222,7 @@ impl<'a, C, NC, A> QuestResetMultipleForAllPlayerCall<'a, C, NC, A> where NC: hy
         for &field in [].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -5201,7 +5254,7 @@ impl<'a, C, NC, A> QuestResetMultipleForAllPlayerCall<'a, C, NC, A> where NC: hy
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -5217,7 +5270,6 @@ impl<'a, C, NC, A> QuestResetMultipleForAllPlayerCall<'a, C, NC, A> where NC: hy
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -5227,7 +5279,7 @@ impl<'a, C, NC, A> QuestResetMultipleForAllPlayerCall<'a, C, NC, A> where NC: hy
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -5238,12 +5290,12 @@ impl<'a, C, NC, A> QuestResetMultipleForAllPlayerCall<'a, C, NC, A> where NC: hy
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = res;
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -5315,7 +5367,7 @@ impl<'a, C, NC, A> QuestResetMultipleForAllPlayerCall<'a, C, NC, A> where NC: hy
 /// Resets all player progress on all quests for the currently authenticated player. This method is only accessible to whitelisted tester accounts for your application.
 ///
 /// A builder for the *resetAll* method supported by a *quest* resource.
-/// It is not used directly, but through a `QuestMethods`.
+/// It is not used directly, but through a `QuestMethods` instance.
 ///
 /// # Example
 ///
@@ -5371,7 +5423,7 @@ impl<'a, C, NC, A> QuestResetAllCall<'a, C, NC, A> where NC: hyper::net::Network
         for &field in [].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -5399,7 +5451,7 @@ impl<'a, C, NC, A> QuestResetAllCall<'a, C, NC, A> where NC: hyper::net::Network
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -5411,7 +5463,6 @@ impl<'a, C, NC, A> QuestResetAllCall<'a, C, NC, A> where NC: hyper::net::Network
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -5421,7 +5472,7 @@ impl<'a, C, NC, A> QuestResetAllCall<'a, C, NC, A> where NC: hyper::net::Network
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -5432,12 +5483,12 @@ impl<'a, C, NC, A> QuestResetAllCall<'a, C, NC, A> where NC: hyper::net::Network
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = res;
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -5500,7 +5551,7 @@ impl<'a, C, NC, A> QuestResetAllCall<'a, C, NC, A> where NC: hyper::net::Network
 /// Resets all player progress on the quest with the given ID for all players. This method is only available to user accounts for your developer console. Only draft quests can be reset.
 ///
 /// A builder for the *resetForAllPlayers* method supported by a *quest* resource.
-/// It is not used directly, but through a `QuestMethods`.
+/// It is not used directly, but through a `QuestMethods` instance.
 ///
 /// # Example
 ///
@@ -5558,7 +5609,7 @@ impl<'a, C, NC, A> QuestResetForAllPlayerCall<'a, C, NC, A> where NC: hyper::net
         for &field in ["questId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -5610,7 +5661,7 @@ impl<'a, C, NC, A> QuestResetForAllPlayerCall<'a, C, NC, A> where NC: hyper::net
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -5622,7 +5673,6 @@ impl<'a, C, NC, A> QuestResetForAllPlayerCall<'a, C, NC, A> where NC: hyper::net
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -5632,7 +5682,7 @@ impl<'a, C, NC, A> QuestResetForAllPlayerCall<'a, C, NC, A> where NC: hyper::net
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -5643,12 +5693,12 @@ impl<'a, C, NC, A> QuestResetForAllPlayerCall<'a, C, NC, A> where NC: hyper::net
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = res;
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -5660,7 +5710,7 @@ impl<'a, C, NC, A> QuestResetForAllPlayerCall<'a, C, NC, A> where NC: hyper::net
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The ID of the quest.    
+    /// The ID of the quest.
     pub fn quest_id(mut self, new_value: &str) -> QuestResetForAllPlayerCall<'a, C, NC, A> {
         self._quest_id = new_value.to_string();
         self
@@ -5721,7 +5771,7 @@ impl<'a, C, NC, A> QuestResetForAllPlayerCall<'a, C, NC, A> where NC: hyper::net
 /// Resets all player progress on the quest with the given ID for the currently authenticated player. This method is only accessible to whitelisted tester accounts for your application.
 ///
 /// A builder for the *reset* method supported by a *quest* resource.
-/// It is not used directly, but through a `QuestMethods`.
+/// It is not used directly, but through a `QuestMethods` instance.
 ///
 /// # Example
 ///
@@ -5779,7 +5829,7 @@ impl<'a, C, NC, A> QuestResetCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
         for &field in ["questId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -5831,7 +5881,7 @@ impl<'a, C, NC, A> QuestResetCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -5843,7 +5893,6 @@ impl<'a, C, NC, A> QuestResetCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -5853,7 +5902,7 @@ impl<'a, C, NC, A> QuestResetCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -5864,12 +5913,12 @@ impl<'a, C, NC, A> QuestResetCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = res;
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -5881,7 +5930,7 @@ impl<'a, C, NC, A> QuestResetCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The ID of the quest.    
+    /// The ID of the quest.
     pub fn quest_id(mut self, new_value: &str) -> QuestResetCall<'a, C, NC, A> {
         self._quest_id = new_value.to_string();
         self
@@ -5942,7 +5991,7 @@ impl<'a, C, NC, A> QuestResetCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
 /// Resets all draft events for all players. This method is only available to user accounts for your developer console. All quests that use any of these events will also be reset.
 ///
 /// A builder for the *resetAllForAllPlayers* method supported by a *event* resource.
-/// It is not used directly, but through a `EventMethods`.
+/// It is not used directly, but through a `EventMethods` instance.
 ///
 /// # Example
 ///
@@ -5998,7 +6047,7 @@ impl<'a, C, NC, A> EventResetAllForAllPlayerCall<'a, C, NC, A> where NC: hyper::
         for &field in [].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -6026,7 +6075,7 @@ impl<'a, C, NC, A> EventResetAllForAllPlayerCall<'a, C, NC, A> where NC: hyper::
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -6038,7 +6087,6 @@ impl<'a, C, NC, A> EventResetAllForAllPlayerCall<'a, C, NC, A> where NC: hyper::
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -6048,7 +6096,7 @@ impl<'a, C, NC, A> EventResetAllForAllPlayerCall<'a, C, NC, A> where NC: hyper::
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -6059,12 +6107,12 @@ impl<'a, C, NC, A> EventResetAllForAllPlayerCall<'a, C, NC, A> where NC: hyper::
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = res;
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -6127,7 +6175,7 @@ impl<'a, C, NC, A> EventResetAllForAllPlayerCall<'a, C, NC, A> where NC: hyper::
 /// Resets all player progress on the event with the given ID for the currently authenticated player. This method is only accessible to whitelisted tester accounts for your application. All quests for this player that use the event will also be reset.
 ///
 /// A builder for the *reset* method supported by a *event* resource.
-/// It is not used directly, but through a `EventMethods`.
+/// It is not used directly, but through a `EventMethods` instance.
 ///
 /// # Example
 ///
@@ -6185,7 +6233,7 @@ impl<'a, C, NC, A> EventResetCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
         for &field in ["eventId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -6237,7 +6285,7 @@ impl<'a, C, NC, A> EventResetCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -6249,7 +6297,6 @@ impl<'a, C, NC, A> EventResetCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -6259,7 +6306,7 @@ impl<'a, C, NC, A> EventResetCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -6270,12 +6317,12 @@ impl<'a, C, NC, A> EventResetCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = res;
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -6287,7 +6334,7 @@ impl<'a, C, NC, A> EventResetCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The ID of the event.    
+    /// The ID of the event.
     pub fn event_id(mut self, new_value: &str) -> EventResetCall<'a, C, NC, A> {
         self._event_id = new_value.to_string();
         self
@@ -6348,7 +6395,7 @@ impl<'a, C, NC, A> EventResetCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
 /// Resets all player progress on all events for the currently authenticated player. This method is only accessible to whitelisted tester accounts for your application. All quests for this player will also be reset.
 ///
 /// A builder for the *resetAll* method supported by a *event* resource.
-/// It is not used directly, but through a `EventMethods`.
+/// It is not used directly, but through a `EventMethods` instance.
 ///
 /// # Example
 ///
@@ -6404,7 +6451,7 @@ impl<'a, C, NC, A> EventResetAllCall<'a, C, NC, A> where NC: hyper::net::Network
         for &field in [].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -6432,7 +6479,7 @@ impl<'a, C, NC, A> EventResetAllCall<'a, C, NC, A> where NC: hyper::net::Network
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -6444,7 +6491,6 @@ impl<'a, C, NC, A> EventResetAllCall<'a, C, NC, A> where NC: hyper::net::Network
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -6454,7 +6500,7 @@ impl<'a, C, NC, A> EventResetAllCall<'a, C, NC, A> where NC: hyper::net::Network
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -6465,12 +6511,12 @@ impl<'a, C, NC, A> EventResetAllCall<'a, C, NC, A> where NC: hyper::net::Network
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = res;
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -6533,7 +6579,7 @@ impl<'a, C, NC, A> EventResetAllCall<'a, C, NC, A> where NC: hyper::net::Network
 /// Resets events with the given IDs for all players. This method is only available to user accounts for your developer console. Only draft events may be reset. All quests that use any of the events will also be reset.
 ///
 /// A builder for the *resetMultipleForAllPlayers* method supported by a *event* resource.
-/// It is not used directly, but through a `EventMethods`.
+/// It is not used directly, but through a `EventMethods` instance.
 ///
 /// # Example
 ///
@@ -6596,7 +6642,7 @@ impl<'a, C, NC, A> EventResetMultipleForAllPlayerCall<'a, C, NC, A> where NC: hy
         for &field in [].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -6628,7 +6674,7 @@ impl<'a, C, NC, A> EventResetMultipleForAllPlayerCall<'a, C, NC, A> where NC: hy
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -6644,7 +6690,6 @@ impl<'a, C, NC, A> EventResetMultipleForAllPlayerCall<'a, C, NC, A> where NC: hy
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -6654,7 +6699,7 @@ impl<'a, C, NC, A> EventResetMultipleForAllPlayerCall<'a, C, NC, A> where NC: hy
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -6665,12 +6710,12 @@ impl<'a, C, NC, A> EventResetMultipleForAllPlayerCall<'a, C, NC, A> where NC: hy
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = res;
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -6742,7 +6787,7 @@ impl<'a, C, NC, A> EventResetMultipleForAllPlayerCall<'a, C, NC, A> where NC: hy
 /// Resets the event with the given ID for all players. This method is only available to user accounts for your developer console. Only draft events can be reset. All quests that use the event will also be reset.
 ///
 /// A builder for the *resetForAllPlayers* method supported by a *event* resource.
-/// It is not used directly, but through a `EventMethods`.
+/// It is not used directly, but through a `EventMethods` instance.
 ///
 /// # Example
 ///
@@ -6800,7 +6845,7 @@ impl<'a, C, NC, A> EventResetForAllPlayerCall<'a, C, NC, A> where NC: hyper::net
         for &field in ["eventId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -6852,7 +6897,7 @@ impl<'a, C, NC, A> EventResetForAllPlayerCall<'a, C, NC, A> where NC: hyper::net
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -6864,7 +6909,6 @@ impl<'a, C, NC, A> EventResetForAllPlayerCall<'a, C, NC, A> where NC: hyper::net
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -6874,7 +6918,7 @@ impl<'a, C, NC, A> EventResetForAllPlayerCall<'a, C, NC, A> where NC: hyper::net
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -6885,12 +6929,12 @@ impl<'a, C, NC, A> EventResetForAllPlayerCall<'a, C, NC, A> where NC: hyper::net
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = res;
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -6902,7 +6946,7 @@ impl<'a, C, NC, A> EventResetForAllPlayerCall<'a, C, NC, A> where NC: hyper::net
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The ID of the event.    
+    /// The ID of the event.
     pub fn event_id(mut self, new_value: &str) -> EventResetForAllPlayerCall<'a, C, NC, A> {
         self._event_id = new_value.to_string();
         self

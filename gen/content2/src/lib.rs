@@ -1,8 +1,8 @@
 // DO NOT EDIT !
-// This file was generated automatically from 'src/mako/lib.rs.mako'
+// This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *Shopping Content* crate version *0.1.1+20150311*, where *20150311* is the exact revision of the *content:v2* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.1*.
+//! This documentation was generated from *Shopping Content* crate version *0.1.2+20150317*, where *20150317* is the exact revision of the *content:v2* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.2*.
 //! 
 //! Everything else about the *Shopping Content* *v2* API can be found at the
 //! [official documentation site](https://developers.google.com/shopping-content/v2/).
@@ -41,6 +41,8 @@
 //! 
 //! * **[Hub](struct.ShoppingContent.html)**
 //!     * a central object to maintain state and allow accessing all *Activities*
+//!     * creates [*Method Builders*](trait.MethodsBuilder.html) which in turn
+//!       allow access to individual [*Call Builders*](trait.CallBuilder.html)
 //! * **[Resources](trait.Resource.html)**
 //!     * primary types that you can apply *Activities* to
 //!     * a collection of properties and *Parts*
@@ -49,6 +51,8 @@
 //!         * never directly used in *Activities*
 //! * **[Activities](trait.CallBuilder.html)**
 //!     * operations to apply to *Resources*
+//! 
+//! All *structures* are marked with applicable traits to further categorize them and ease browsing.
 //! 
 //! Generally speaking, you can invoke *Activities* like this:
 //! 
@@ -92,7 +96,7 @@
 //! extern crate "yup-oauth2" as oauth2;
 //! extern crate "google-content2" as content2;
 //! use content2::Account;
-//! use content2::Result;
+//! use content2::{Result, Error};
 //! # #[test] fn egal() {
 //! use std::default::Default;
 //! use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -122,15 +126,17 @@
 //!              .doit();
 //! 
 //! match result {
-//!     Result::HttpError(err) => println!("HTTPERROR: {:?}", err),
-//!     Result::MissingAPIKey => println!("Auth: Missing API Key - used if there are no scopes"),
-//!     Result::MissingToken => println!("OAuth2: Missing Token"),
-//!     Result::Cancelled => println!("Operation cancelled by user"),
-//!     Result::UploadSizeLimitExceeded(size, max_size) => println!("Upload size too big: {} of {}", size, max_size),
-//!     Result::Failure(_) => println!("General Failure (hyper::client::Response doesn't print)"),
-//!     Result::FieldClash(clashed_field) => println!("You added custom parameter which is part of builder: {:?}", clashed_field),
-//!     Result::JsonDecodeError(err) => println!("Couldn't understand server reply - maybe API needs update: {:?}", err),
-//!     Result::Success(_) => println!("Success (value doesn't print)"),
+//!     Err(e) => match e {
+//!         Error::HttpError(err) => println!("HTTPERROR: {:?}", err),
+//!         Error::MissingAPIKey => println!("Auth: Missing API Key - used if there are no scopes"),
+//!         Error::MissingToken => println!("OAuth2: Missing Token"),
+//!         Error::Cancelled => println!("Operation canceled by user"),
+//!         Error::UploadSizeLimitExceeded(size, max_size) => println!("Upload size too big: {} of {}", size, max_size),
+//!         Error::Failure(_) => println!("General Failure (hyper::client::Response doesn't print)"),
+//!         Error::FieldClash(clashed_field) => println!("You added custom parameter which is part of builder: {:?}", clashed_field),
+//!         Error::JsonDecodeError(err) => println!("Couldn't understand server reply - maybe API needs update: {:?}", err),
+//!     },
+//!     Ok(_) => println!("Success (value doesn't print)"),
 //! }
 //! # }
 //! ```
@@ -143,7 +149,7 @@
 //! When delegates handle errors or intermediate values, they may have a chance to instruct the system to retry. This 
 //! makes the system potentially resilient to all kinds of errors.
 //! 
-//! ## Uploads and Downlods
+//! ## Uploads and Downloads
 //! If a method supports downloads, the response body, which is part of the [Result](enum.Result.html), should be
 //! read by you to obtain the media.
 //! If such a method also supports a [Response Result](trait.ResponseResult.html), it will return that by default.
@@ -166,8 +172,9 @@
 //! ## Optional Parts in Server-Requests
 //! 
 //! All structures provided by this library are made to be [enocodable](trait.RequestValue.html) and 
-//! [decodable](trait.ResponseResult.html) via json. Optionals are used to indicate that partial requests are responses are valid.
-//! Most optionals are are considered [Parts](trait.Part.html) which are identifyable by name, which will be sent to 
+//! [decodable](trait.ResponseResult.html) via *json*. Optionals are used to indicate that partial requests are responses 
+//! are valid.
+//! Most optionals are are considered [Parts](trait.Part.html) which are identifiable by name, which will be sent to 
 //! the server to indicate either the set parts of the request or the desired parts in the response.
 //! 
 //! ## Builder Arguments
@@ -216,7 +223,7 @@ use std::io;
 use std::fs;
 use std::thread::sleep;
 
-pub use cmn::{MultiPartReader, ToParts, MethodInfo, Result, CallBuilder, Hub, ReadSeek, Part, ResponseResult, RequestValue, NestedType, Delegate, DefaultDelegate, ResourceMethodsBuilder, Resource, JsonServerError};
+pub use cmn::{MultiPartReader, ToParts, MethodInfo, Result, Error, CallBuilder, Hub, ReadSeek, Part, ResponseResult, RequestValue, NestedType, Delegate, DefaultDelegate, MethodsBuilder, Resource, JsonServerError};
 
 
 // ##############
@@ -263,7 +270,7 @@ impl Default for Scope {
 /// extern crate "yup-oauth2" as oauth2;
 /// extern crate "google-content2" as content2;
 /// use content2::Account;
-/// use content2::Result;
+/// use content2::{Result, Error};
 /// # #[test] fn egal() {
 /// use std::default::Default;
 /// use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -293,15 +300,17 @@ impl Default for Scope {
 ///              .doit();
 /// 
 /// match result {
-///     Result::HttpError(err) => println!("HTTPERROR: {:?}", err),
-///     Result::MissingAPIKey => println!("Auth: Missing API Key - used if there are no scopes"),
-///     Result::MissingToken => println!("OAuth2: Missing Token"),
-///     Result::Cancelled => println!("Operation cancelled by user"),
-///     Result::UploadSizeLimitExceeded(size, max_size) => println!("Upload size too big: {} of {}", size, max_size),
-///     Result::Failure(_) => println!("General Failure (hyper::client::Response doesn't print)"),
-///     Result::FieldClash(clashed_field) => println!("You added custom parameter which is part of builder: {:?}", clashed_field),
-///     Result::JsonDecodeError(err) => println!("Couldn't understand server reply - maybe API needs update: {:?}", err),
-///     Result::Success(_) => println!("Success (value doesn't print)"),
+///     Err(e) => match e {
+///         Error::HttpError(err) => println!("HTTPERROR: {:?}", err),
+///         Error::MissingAPIKey => println!("Auth: Missing API Key - used if there are no scopes"),
+///         Error::MissingToken => println!("OAuth2: Missing Token"),
+///         Error::Cancelled => println!("Operation canceled by user"),
+///         Error::UploadSizeLimitExceeded(size, max_size) => println!("Upload size too big: {} of {}", size, max_size),
+///         Error::Failure(_) => println!("General Failure (hyper::client::Response doesn't print)"),
+///         Error::FieldClash(clashed_field) => println!("You added custom parameter which is part of builder: {:?}", clashed_field),
+///         Error::JsonDecodeError(err) => println!("Couldn't understand server reply - maybe API needs update: {:?}", err),
+///     },
+///     Ok(_) => println!("Success (value doesn't print)"),
 /// }
 /// # }
 /// ```
@@ -322,7 +331,7 @@ impl<'a, C, NC, A> ShoppingContent<C, NC, A>
         ShoppingContent {
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/0.1.1".to_string(),
+            _user_agent: "google-api-rust-client/0.1.2".to_string(),
             _m: PhantomData
         }
     }
@@ -356,7 +365,7 @@ impl<'a, C, NC, A> ShoppingContent<C, NC, A>
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/0.1.1`.
+    /// It defaults to `google-api-rust-client/0.1.2`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -376,15 +385,34 @@ impl<'a, C, NC, A> ShoppingContent<C, NC, A>
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct Errors {
-    /// The message of the first error in errors.    
+    /// The message of the first error in errors.
     pub message: String,
-    /// The HTTP status of the first error in errors.    
+    /// The HTTP status of the first error in errors.
     pub code: u32,
-    /// A list of errors.    
-    pub errors: Vec<Error>,
+    /// A list of errors.
+    pub errors: Vec<ErrorType>,
 }
 
 impl Part for Errors {}
+
+
+/// There is no detailed description.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct ProductAspect {
+    /// Whether the aspect is required, excluded or should be validated.
+    pub intention: String,
+    /// The name of the aspect.
+    #[serde(alias="aspectName")]
+    pub aspect_name: String,
+    /// The name of the destination. Leave out to apply to all destinations.
+    #[serde(alias="destinationName")]
+    pub destination_name: String,
+}
+
+impl Part for ProductAspect {}
 
 
 /// A batch entry encoding a single non-batch products response.
@@ -393,14 +421,14 @@ impl Part for Errors {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct ProductsCustomBatchResponseEntry {
-    /// The ID of the request entry this entry responds to.    
+    /// The ID of the request entry this entry responds to.
     #[serde(alias="batchId")]
     pub batch_id: u32,
-    /// Identifies what kind of resource this is. Value: the fixed string "content#productsCustomBatchResponseEntry".    
+    /// Identifies what kind of resource this is. Value: the fixed string "content#productsCustomBatchResponseEntry".
     pub kind: String,
-    /// A list of errors defined if and only if the request failed.    
+    /// A list of errors defined if and only if the request failed.
     pub errors: Errors,
-    /// The inserted product. Only defined if the method is insert and if the request was successful.    
+    /// The inserted product. Only defined if the method is insert and if the request was successful.
     pub product: Product,
 }
 
@@ -418,9 +446,9 @@ impl Part for ProductsCustomBatchResponseEntry {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct AccounttaxCustomBatchResponse {
-    /// Identifies what kind of resource this is. Value: the fixed string "content#accounttaxCustomBatchResponse".    
+    /// Identifies what kind of resource this is. Value: the fixed string "content#accounttaxCustomBatchResponse".
     pub kind: String,
-    /// The result of the execution of the batch requests.    
+    /// The result of the execution of the batch requests.
     pub entries: Vec<AccounttaxCustomBatchResponseEntry>,
 }
 
@@ -438,9 +466,9 @@ impl ResponseResult for AccounttaxCustomBatchResponse {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct AccountshippingCustomBatchResponse {
-    /// Identifies what kind of resource this is. Value: the fixed string "content#accountshippingCustomBatchResponse".    
+    /// Identifies what kind of resource this is. Value: the fixed string "content#accountshippingCustomBatchResponse".
     pub kind: String,
-    /// The result of the execution of the batch requests.    
+    /// The result of the execution of the batch requests.
     pub entries: Vec<AccountshippingCustomBatchResponseEntry>,
 }
 
@@ -458,9 +486,9 @@ impl ResponseResult for AccountshippingCustomBatchResponse {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct InventoryCustomBatchResponse {
-    /// Identifies what kind of resource this is. Value: the fixed string "content#inventoryCustomBatchResponse".    
+    /// Identifies what kind of resource this is. Value: the fixed string "content#inventoryCustomBatchResponse".
     pub kind: String,
-    /// The result of the execution of the batch requests.    
+    /// The result of the execution of the batch requests.
     pub entries: Vec<InventoryCustomBatchResponseEntry>,
 }
 
@@ -473,9 +501,9 @@ impl ResponseResult for InventoryCustomBatchResponse {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct AccountUser {
-    /// Whether user is an admin.    
+    /// Whether user is an admin.
     pub admin: bool,
-    /// User's email address.    
+    /// User's email address.
     #[serde(alias="emailAddress")]
     pub email_address: String,
 }
@@ -489,9 +517,9 @@ impl Part for AccountUser {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct AccountShippingRateTableCell {
-    /// The rate applicable if the cell conditions are matched.    
+    /// The rate applicable if the cell conditions are matched.
     pub rate: Price,
-    /// Conditions for which the cell is valid. All cells in a table must use the same dimension or pair of dimensions among price, weight, shipping label or delivery location. If no condition is specified, the cell acts as a catch-all and matches all the elements that are not matched by other cells in this dimension.    
+    /// Conditions for which the cell is valid. All cells in a table must use the same dimension or pair of dimensions among price, weight, shipping label or delivery location. If no condition is specified, the cell acts as a catch-all and matches all the elements that are not matched by other cells in this dimension.
     pub condition: AccountShippingCondition,
 }
 
@@ -509,7 +537,7 @@ impl Part for AccountShippingRateTableCell {}
 /// 
 #[derive(Default, Clone, Debug, Serialize)]
 pub struct ProductstatusesCustomBatchRequest {
-    /// The request entries to be processed in the batch.    
+    /// The request entries to be processed in the batch.
     pub entries: Option<Vec<ProductstatusesCustomBatchRequestEntry>>,
 }
 
@@ -527,9 +555,9 @@ impl RequestValue for ProductstatusesCustomBatchRequest {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct DatafeedsCustomBatchResponse {
-    /// Identifies what kind of resource this is. Value: the fixed string "content#datafeedsCustomBatchResponse".    
+    /// Identifies what kind of resource this is. Value: the fixed string "content#datafeedsCustomBatchResponse".
     pub kind: String,
-    /// The result of the execution of the batch requests.    
+    /// The result of the execution of the batch requests.
     pub entries: Vec<DatafeedsCustomBatchResponseEntry>,
 }
 
@@ -542,15 +570,15 @@ impl ResponseResult for DatafeedsCustomBatchResponse {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct AccountShippingLocationGroup {
-    /// A postal code range representing a city or a set of cities.    
+    /// A postal code range representing a city or a set of cities.
     #[serde(alias="postalCodeRanges")]
     pub postal_code_ranges: Vec<AccountShippingPostalCodeRange>,
-    /// The country in which this location group is, represented as ISO 3166-1 Alpha-2 code.    
+    /// The country in which this location group is, represented as ISO 3166-1 Alpha-2 code.
     pub country: String,
-    /// A location ID (also called criteria ID) representing administrative areas, smaller country subdivisions (counties), or cities.    
+    /// A location ID (also called criteria ID) representing administrative areas, smaller country subdivisions (counties), or cities.
     #[serde(alias="locationIds")]
     pub location_ids: Vec<String>,
-    /// The name of the location group.    
+    /// The name of the location group.
     pub name: String,
     /// A postal code representing a city or a set of cities.  
     /// - A single postal code (e.g., 12345)
@@ -573,7 +601,7 @@ impl Part for AccountShippingLocationGroup {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct InventorySetResponse {
-    /// Identifies what kind of resource this is. Value: the fixed string "content#inventorySetResponse".    
+    /// Identifies what kind of resource this is. Value: the fixed string "content#inventorySetResponse".
     pub kind: String,
 }
 
@@ -591,28 +619,28 @@ impl ResponseResult for InventorySetResponse {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct ProductStatus {
-    /// Date on which the item expires in Google Shopping, in ISO 8601 format.    
+    /// Date on which the item expires in Google Shopping, in ISO 8601 format.
     #[serde(alias="googleExpirationDate")]
     pub google_expiration_date: String,
-    /// The intended destinations for the product.    
+    /// The intended destinations for the product.
     #[serde(alias="destinationStatuses")]
     pub destination_statuses: Vec<ProductStatusDestinationStatus>,
-    /// The title of the product.    
+    /// The title of the product.
     pub title: String,
-    /// Identifies what kind of resource this is. Value: the fixed string "content#productStatus".    
+    /// Identifies what kind of resource this is. Value: the fixed string "content#productStatus".
     pub kind: String,
-    /// Date on which the item has been last updated, in ISO 8601 format.    
+    /// Date on which the item has been last updated, in ISO 8601 format.
     #[serde(alias="lastUpdateDate")]
     pub last_update_date: String,
-    /// The link to the product.    
+    /// The link to the product.
     pub link: String,
-    /// Date on which the item has been created, in ISO 8601 format.    
+    /// Date on which the item has been created, in ISO 8601 format.
     #[serde(alias="creationDate")]
     pub creation_date: String,
-    /// A list of data quality issues associated with the product.    
+    /// A list of data quality issues associated with the product.
     #[serde(alias="dataQualityIssues")]
     pub data_quality_issues: Vec<ProductStatusDataQualityIssue>,
-    /// The id of the product for which status is reported.    
+    /// The id of the product for which status is reported.
     #[serde(alias="productId")]
     pub product_id: String,
 }
@@ -626,21 +654,21 @@ impl ResponseResult for ProductStatus {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct DatafeedFetchSchedule {
-    /// An optional user name for fetch_url.    
+    /// An optional user name for fetch_url.
     pub username: String,
-    /// An optional password for fetch_url.    
+    /// An optional password for fetch_url.
     pub password: String,
-    /// The day of the week the feed file should be fetched.    
+    /// The day of the week the feed file should be fetched.
     pub weekday: String,
-    /// The hour of the day the feed file should be fetched (0-24).    
+    /// The hour of the day the feed file should be fetched (0-24).
     pub hour: u32,
-    /// Time zone used for schedule. UTC by default. E.g., "America/Los_Angeles".    
+    /// Time zone used for schedule. UTC by default. E.g., "America/Los_Angeles".
     #[serde(alias="timeZone")]
     pub time_zone: String,
-    /// The URL where the feed file can be fetched. Google Merchant Center will support automatic scheduled uploads using the HTTP, HTTPS, FTP, or SFTP protocols, so the value will need to be a valid link using one of those four protocols.    
+    /// The URL where the feed file can be fetched. Google Merchant Center will support automatic scheduled uploads using the HTTP, HTTPS, FTP, or SFTP protocols, so the value will need to be a valid link using one of those four protocols.
     #[serde(alias="fetchUrl")]
     pub fetch_url: String,
-    /// The day of the month the feed file should be fetched (1-31).    
+    /// The day of the month the feed file should be fetched (1-31).
     #[serde(alias="dayOfMonth")]
     pub day_of_month: u32,
 }
@@ -659,23 +687,23 @@ impl Part for DatafeedFetchSchedule {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct DatafeedStatus {
-    /// The number of items in the feed that were valid.    
+    /// The number of items in the feed that were valid.
     #[serde(alias="itemsValid")]
     pub items_valid: String,
-    /// Identifies what kind of resource this is. Value: the fixed string "content#datafeedStatus".    
+    /// Identifies what kind of resource this is. Value: the fixed string "content#datafeedStatus".
     pub kind: String,
-    /// The list of errors occurring in the feed.    
+    /// The list of errors occurring in the feed.
     pub errors: Vec<DatafeedStatusError>,
-    /// The processing status of the feed.    
+    /// The processing status of the feed.
     #[serde(alias="processingStatus")]
     pub processing_status: String,
-    /// The number of items in the feed that were processed.    
+    /// The number of items in the feed that were processed.
     #[serde(alias="itemsTotal")]
     pub items_total: String,
-    /// The ID of the feed for which the status is reported.    
+    /// The ID of the feed for which the status is reported.
     #[serde(alias="datafeedId")]
     pub datafeed_id: String,
-    /// The list of errors occurring in the feed.    
+    /// The list of errors occurring in the feed.
     pub warnings: Vec<DatafeedStatusError>,
 }
 
@@ -688,16 +716,16 @@ impl ResponseResult for DatafeedStatus {}
 /// 
 #[derive(Default, Clone, Debug, Serialize)]
 pub struct DatafeedstatusesCustomBatchRequestEntry {
-    /// An entry ID, unique within the batch request.    
+    /// An entry ID, unique within the batch request.
     #[serde(alias="batchId")]
     pub batch_id: u32,
-    /// The ID of the data feed to get or delete.    
+    /// The ID of the data feed to get or delete.
     #[serde(alias="datafeedId")]
     pub datafeed_id: String,
-    /// The ID of the managing account.    
+    /// The ID of the managing account.
     #[serde(alias="merchantId")]
     pub merchant_id: String,
-    /// no description provided    
+    /// no description provided
     pub method: String,
 }
 
@@ -710,15 +738,15 @@ impl Part for DatafeedstatusesCustomBatchRequestEntry {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct AccounttaxCustomBatchResponseEntry {
-    /// The ID of the request entry this entry responds to.    
+    /// The ID of the request entry this entry responds to.
     #[serde(alias="batchId")]
     pub batch_id: u32,
-    /// The retrieved or updated account tax settings.    
+    /// The retrieved or updated account tax settings.
     #[serde(alias="accountTax")]
     pub account_tax: AccountTax,
-    /// A list of errors defined if and only if the request failed.    
+    /// A list of errors defined if and only if the request failed.
     pub errors: Errors,
-    /// Identifies what kind of resource this is. Value: the fixed string "content#accounttaxCustomBatchResponseEntry".    
+    /// Identifies what kind of resource this is. Value: the fixed string "content#accounttaxCustomBatchResponseEntry".
     pub kind: String,
 }
 
@@ -736,7 +764,7 @@ impl Part for AccounttaxCustomBatchResponseEntry {}
 /// 
 #[derive(Default, Clone, Debug, Serialize)]
 pub struct AccountstatusesCustomBatchRequest {
-    /// The request entries to be processed in the batch.    
+    /// The request entries to be processed in the batch.
     pub entries: Option<Vec<AccountstatusesCustomBatchRequestEntry>>,
 }
 
@@ -753,12 +781,12 @@ impl RequestValue for AccountstatusesCustomBatchRequest {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct AccountShippingShippingServiceCostRule {
-    /// Final calculation method to be used only in leaf nodes.    
+    /// Final calculation method to be used only in leaf nodes.
     #[serde(alias="calculationMethod")]
     pub calculation_method: AccountShippingShippingServiceCalculationMethod,
-    /// Condition for this rule to be applicable. If no condition is specified, the rule acts as a catch-all.    
+    /// Condition for this rule to be applicable. If no condition is specified, the rule acts as a catch-all.
     pub condition: AccountShippingCondition,
-    /// Subsequent rules to be applied, only for inner nodes. The last child must not specify a condition and acts as a catch-all.    
+    /// Subsequent rules to be applied, only for inner nodes. The last child must not specify a condition and acts as a catch-all.
     pub children: Vec<AccountShippingShippingServiceCostRule>,
 }
 
@@ -783,28 +811,28 @@ impl Part for AccountShippingShippingServiceCostRule {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Account {
-    /// URL for individual seller reviews, i.e., reviews for each child account.    
+    /// URL for individual seller reviews, i.e., reviews for each child account.
     #[serde(alias="reviewsUrl")]
     pub reviews_url: Option<String>,
-    /// Identifies what kind of resource this is. Value: the fixed string "content#account".    
+    /// Identifies what kind of resource this is. Value: the fixed string "content#account".
     pub kind: Option<String>,
-    /// Display name for the account.    
+    /// Display name for the account.
     pub name: Option<String>,
-    /// Indicates whether the merchant sells adult content.    
+    /// Indicates whether the merchant sells adult content.
     #[serde(alias="adultContent")]
     pub adult_content: Option<bool>,
-    /// List of linked AdWords accounts.    
+    /// List of linked AdWords accounts.
     #[serde(alias="adwordsLinks")]
     pub adwords_links: Option<Vec<AccountAdwordsLink>>,
-    /// The merchant's website.    
+    /// The merchant's website.
     #[serde(alias="websiteUrl")]
     pub website_url: Option<String>,
-    /// Client-specific, locally-unique, internal ID for the child account.    
+    /// Client-specific, locally-unique, internal ID for the child account.
     #[serde(alias="sellerId")]
     pub seller_id: Option<String>,
-    /// Merchant Center account ID.    
+    /// Merchant Center account ID.
     pub id: Option<String>,
-    /// Users with access to the account. Every account (except for subaccounts) must have at least one admin user.    
+    /// Users with access to the account. Every account (except for subaccounts) must have at least one admin user.
     pub users: Option<Vec<AccountUser>>,
 }
 
@@ -813,19 +841,16 @@ impl Resource for Account {}
 impl ResponseResult for Account {}
 
 
-/// Account identifier corresponding to the authenticated user.  
-/// - For an individual account: only the merchant ID is defined
-/// - For an aggregator: only the aggregator ID is defined
-/// - For a subaccount of an MCA: both the merchant ID and the aggregator ID are defined.
+/// There is no detailed description.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct AccountIdentifier {
-    /// The aggregator ID, set for aggregators and subaccounts (in that case, it represents the aggregator of the subaccount).    
+    /// The aggregator ID, set for aggregators and subaccounts (in that case, it represents the aggregator of the subaccount).
     #[serde(alias="aggregatorId")]
     pub aggregator_id: String,
-    /// The merchant account ID, set for individual accounts and subaccounts.    
+    /// The merchant account ID, set for individual accounts and subaccounts.
     #[serde(alias="merchantId")]
     pub merchant_id: String,
 }
@@ -839,12 +864,12 @@ impl Part for AccountIdentifier {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct InventoryCustomBatchResponseEntry {
-    /// The ID of the request entry this entry responds to.    
+    /// The ID of the request entry this entry responds to.
     #[serde(alias="batchId")]
     pub batch_id: u32,
-    /// Identifies what kind of resource this is. Value: the fixed string "content#inventoryCustomBatchResponseEntry".    
+    /// Identifies what kind of resource this is. Value: the fixed string "content#inventoryCustomBatchResponseEntry".
     pub kind: String,
-    /// A list of errors defined if and only if the request failed.    
+    /// A list of errors defined if and only if the request failed.
     pub errors: Errors,
 }
 
@@ -857,9 +882,9 @@ impl Part for InventoryCustomBatchResponseEntry {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ProductCustomGroup {
-    /// The sub-attributes.    
+    /// The sub-attributes.
     pub attributes: Vec<ProductCustomAttribute>,
-    /// The name of the group. Underscores will be replaced by spaces upon insertion.    
+    /// The name of the group. Underscores will be replaced by spaces upon insertion.
     pub name: String,
 }
 
@@ -878,7 +903,7 @@ pub struct ProductShippingDimension {
     /// - "cm" 
     /// - "in"
     pub unit: String,
-    /// The dimension of the product used to calculate the shipping cost of the item.    
+    /// The dimension of the product used to calculate the shipping cost of the item.
     pub value: f64,
 }
 
@@ -891,12 +916,12 @@ impl Part for ProductShippingDimension {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct AccountstatusesCustomBatchResponseEntry {
-    /// The ID of the request entry this entry responds to.    
+    /// The ID of the request entry this entry responds to.
     #[serde(alias="batchId")]
     pub batch_id: u32,
-    /// A list of errors defined if and only if the request failed.    
+    /// A list of errors defined if and only if the request failed.
     pub errors: Errors,
-    /// The requested account status. Defined if and only if the request was successful.    
+    /// The requested account status. Defined if and only if the request was successful.
     #[serde(alias="accountStatus")]
     pub account_status: AccountStatus,
 }
@@ -910,16 +935,16 @@ impl Part for AccountstatusesCustomBatchResponseEntry {}
 /// 
 #[derive(Default, Clone, Debug, Serialize)]
 pub struct AccountstatusesCustomBatchRequestEntry {
-    /// An entry ID, unique within the batch request.    
+    /// An entry ID, unique within the batch request.
     #[serde(alias="batchId")]
     pub batch_id: u32,
-    /// The ID of the (sub-)account whose status to get.    
+    /// The ID of the (sub-)account whose status to get.
     #[serde(alias="accountId")]
     pub account_id: String,
-    /// The ID of the managing account.    
+    /// The ID of the managing account.
     #[serde(alias="merchantId")]
     pub merchant_id: String,
-    /// The method (get).    
+    /// The method (get).
     pub method: String,
 }
 
@@ -937,12 +962,12 @@ impl Part for AccountstatusesCustomBatchRequestEntry {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct AccounttaxListResponse {
-    /// The token for the retrieval of the next page of account tax settings.    
+    /// The token for the retrieval of the next page of account tax settings.
     #[serde(alias="nextPageToken")]
     pub next_page_token: String,
-    /// Identifies what kind of resource this is. Value: the fixed string "content#accounttaxListResponse".    
+    /// Identifies what kind of resource this is. Value: the fixed string "content#accounttaxListResponse".
     pub kind: String,
-    /// no description provided    
+    /// no description provided
     pub resources: Vec<AccountTax>,
 }
 
@@ -960,7 +985,7 @@ impl ResponseResult for AccounttaxListResponse {}
 /// 
 #[derive(Default, Clone, Debug, Serialize)]
 pub struct DatafeedstatusesCustomBatchRequest {
-    /// The request entries to be processed in the batch.    
+    /// The request entries to be processed in the batch.
     pub entries: Option<Vec<DatafeedstatusesCustomBatchRequestEntry>>,
 }
 
@@ -972,16 +997,16 @@ impl RequestValue for DatafeedstatusesCustomBatchRequest {}
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct Error {
-    /// The error code.    
+pub struct ErrorType {
+    /// The error code.
     pub reason: String,
-    /// A description of the error.    
+    /// A description of the error.
     pub message: String,
-    /// The domain of the error.    
+    /// The domain of the error.
     pub domain: String,
 }
 
-impl Part for Error {}
+impl Part for ErrorType {}
 
 
 /// A batch entry encoding a single non-batch datafeeds response.
@@ -990,12 +1015,12 @@ impl Part for Error {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct DatafeedsCustomBatchResponseEntry {
-    /// The ID of the request entry this entry responds to.    
+    /// The ID of the request entry this entry responds to.
     #[serde(alias="batchId")]
     pub batch_id: u32,
-    /// A list of errors defined if and only if the request failed.    
+    /// A list of errors defined if and only if the request failed.
     pub errors: Errors,
-    /// The requested data feed. Defined if and only if the request was successful.    
+    /// The requested data feed. Defined if and only if the request was successful.
     pub datafeed: Datafeed,
 }
 
@@ -1008,18 +1033,18 @@ impl Part for DatafeedsCustomBatchResponseEntry {}
 /// 
 #[derive(Default, Clone, Debug, Serialize)]
 pub struct AccountshippingCustomBatchRequestEntry {
-    /// An entry ID, unique within the batch request.    
+    /// An entry ID, unique within the batch request.
     #[serde(alias="batchId")]
     pub batch_id: u32,
-    /// The ID of the account for which to get/update account shipping settings.    
+    /// The ID of the account for which to get/update account shipping settings.
     #[serde(alias="accountId")]
     pub account_id: String,
-    /// The account shipping settings to update. Only defined if the method is update.    
+    /// The account shipping settings to update. Only defined if the method is update.
     #[serde(alias="accountShipping")]
     pub account_shipping: AccountShipping,
-    /// no description provided    
+    /// no description provided
     pub method: String,
-    /// The ID of the managing account.    
+    /// The ID of the managing account.
     #[serde(alias="merchantId")]
     pub merchant_id: String,
 }
@@ -1038,12 +1063,12 @@ impl Part for AccountshippingCustomBatchRequestEntry {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct DatafeedsListResponse {
-    /// The token for the retrieval of the next page of datafeeds.    
+    /// The token for the retrieval of the next page of datafeeds.
     #[serde(alias="nextPageToken")]
     pub next_page_token: String,
-    /// Identifies what kind of resource this is. Value: the fixed string "content#datafeedsListResponse".    
+    /// Identifies what kind of resource this is. Value: the fixed string "content#datafeedsListResponse".
     pub kind: String,
-    /// no description provided    
+    /// no description provided
     pub resources: Vec<Datafeed>,
 }
 
@@ -1056,21 +1081,21 @@ impl ResponseResult for DatafeedsListResponse {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ProductShipping {
-    /// The numeric id of a location that the shipping rate applies to as defined in the AdWords API.    
+    /// The numeric id of a location that the shipping rate applies to as defined in the AdWords API.
     #[serde(alias="locationId")]
     pub location_id: String,
-    /// A free-form description of the service class or delivery speed.    
+    /// A free-form description of the service class or delivery speed.
     pub service: String,
-    /// The postal code range that the shipping rate applies to, represented by a postal code, a postal code prefix followed by a * wildcard, a range between two postal codes or two postal code prefixes of equal length.    
+    /// The postal code range that the shipping rate applies to, represented by a postal code, a postal code prefix followed by a * wildcard, a range between two postal codes or two postal code prefixes of equal length.
     #[serde(alias="postalCode")]
     pub postal_code: String,
-    /// The two-letter ISO 3166 country code for the country to which an item will ship.    
+    /// The two-letter ISO 3166 country code for the country to which an item will ship.
     pub country: String,
-    /// Fixed shipping price, represented as a number.    
+    /// Fixed shipping price, represented as a number.
     pub price: Price,
-    /// The geographic region to which a shipping rate applies (e.g. zip code).    
+    /// The geographic region to which a shipping rate applies (e.g. zip code).
     pub region: String,
-    /// The location where the shipping is applicable, represented by a location group name.    
+    /// The location where the shipping is applicable, represented by a location group name.
     #[serde(alias="locationGroupName")]
     pub location_group_name: String,
 }
@@ -1091,11 +1116,11 @@ impl Part for ProductShipping {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct AccountTax {
-    /// Tax rules. Updating the tax rules will enable US taxes (not reversible). Defining no rules is equivalent to not charging tax at all.    
+    /// Tax rules. Updating the tax rules will enable US taxes (not reversible). Defining no rules is equivalent to not charging tax at all.
     pub rules: Option<Vec<AccountTaxTaxRule>>,
-    /// Identifies what kind of resource this is. Value: the fixed string "content#accountTax".    
+    /// Identifies what kind of resource this is. Value: the fixed string "content#accountTax".
     pub kind: Option<String>,
-    /// The ID of the account to which these account tax settings belong.    
+    /// The ID of the account to which these account tax settings belong.
     #[serde(alias="accountId")]
     pub account_id: Option<String>,
 }
@@ -1110,17 +1135,17 @@ impl ResponseResult for AccountTax {}
 /// 
 #[derive(Default, Clone, Debug, Serialize)]
 pub struct ProductsCustomBatchRequestEntry {
-    /// An entry ID, unique within the batch request.    
+    /// An entry ID, unique within the batch request.
     #[serde(alias="batchId")]
     pub batch_id: u32,
-    /// The product to insert. Only required if the method is insert.    
+    /// The product to insert. Only required if the method is insert.
     pub product: Product,
-    /// The ID of the managing account.    
+    /// The ID of the managing account.
     #[serde(alias="merchantId")]
     pub merchant_id: String,
-    /// no description provided    
+    /// no description provided
     pub method: String,
-    /// The ID of the product to get or delete. Only defined if the method is get or delete.    
+    /// The ID of the product to get or delete. Only defined if the method is get or delete.
     #[serde(alias="productId")]
     pub product_id: String,
 }
@@ -1134,14 +1159,14 @@ impl Part for ProductsCustomBatchRequestEntry {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct AccountsCustomBatchResponseEntry {
-    /// The ID of the request entry this entry responds to.    
+    /// The ID of the request entry this entry responds to.
     #[serde(alias="batchId")]
     pub batch_id: u32,
-    /// The retrieved, created, or updated account. Not defined if the method was delete.    
+    /// The retrieved, created, or updated account. Not defined if the method was delete.
     pub account: Account,
-    /// A list of errors defined if and only if the request failed.    
+    /// A list of errors defined if and only if the request failed.
     pub errors: Errors,
-    /// Identifies what kind of resource this is. Value: the fixed string "content#accountsCustomBatchResponseEntry".    
+    /// Identifies what kind of resource this is. Value: the fixed string "content#accountsCustomBatchResponseEntry".
     pub kind: String,
 }
 
@@ -1159,7 +1184,7 @@ impl Part for AccountsCustomBatchResponseEntry {}
 /// 
 #[derive(Default, Clone, Debug, Serialize)]
 pub struct AccountsCustomBatchRequest {
-    /// The request entries to be processed in the batch.    
+    /// The request entries to be processed in the batch.
     pub entries: Option<Vec<AccountsCustomBatchRequestEntry>>,
 }
 
@@ -1177,9 +1202,9 @@ impl RequestValue for AccountsCustomBatchRequest {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct ProductstatusesCustomBatchResponse {
-    /// Identifies what kind of resource this is. Value: the fixed string "content#productstatusesCustomBatchResponse".    
+    /// Identifies what kind of resource this is. Value: the fixed string "content#productstatusesCustomBatchResponse".
     pub kind: String,
-    /// The result of the execution of the batch requests.    
+    /// The result of the execution of the batch requests.
     pub entries: Vec<ProductstatusesCustomBatchResponseEntry>,
 }
 
@@ -1192,23 +1217,23 @@ impl ResponseResult for ProductstatusesCustomBatchResponse {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct AccountShippingCarrierRate {
-    /// Shipping origin represented as a postal code.    
+    /// Shipping origin represented as a postal code.
     #[serde(alias="shippingOrigin")]
     pub shipping_origin: String,
-    /// The carrier that is responsible for the shipping, such as "UPS", "FedEx", or "USPS".    
+    /// The carrier that is responsible for the shipping, such as "UPS", "FedEx", or "USPS".
     pub carrier: String,
-    /// The name of the carrier rate.    
+    /// The name of the carrier rate.
     pub name: String,
-    /// Sale country for which this carrier rate is valid, represented as an ISO 3166-1 Alpha-2 code.    
+    /// Sale country for which this carrier rate is valid, represented as an ISO 3166-1 Alpha-2 code.
     #[serde(alias="saleCountry")]
     pub sale_country: i64,
-    /// The carrier service, such as "Ground" or "2Day".    
+    /// The carrier service, such as "Ground" or "2Day".
     #[serde(alias="carrierService")]
     pub carrier_service: String,
-    /// Additive shipping rate modifier.    
+    /// Additive shipping rate modifier.
     #[serde(alias="modifierFlatRate")]
     pub modifier_flat_rate: Price,
-    /// Multiplicative shipping rate modifier in percent. Represented as a floating point number without the percentage character.    
+    /// Multiplicative shipping rate modifier in percent. Represented as a floating point number without the percentage character.
     #[serde(alias="modifierPercent")]
     pub modifier_percent: String,
 }
@@ -1233,33 +1258,33 @@ impl Part for AccountShippingCarrierRate {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Datafeed {
-    /// Identifies what kind of resource this is. Value: the fixed string "content#datafeed".    
+    /// Identifies what kind of resource this is. Value: the fixed string "content#datafeed".
     pub kind: Option<String>,
-    /// The type of data feed.    
+    /// The type of data feed.
     #[serde(alias="contentType")]
     pub content_type: Option<String>,
-    /// A descriptive name of the data feed.    
+    /// A descriptive name of the data feed.
     pub name: Option<String>,
-    /// The two-letter ISO 639-1 language of the items in the feed.    
+    /// The two-letter ISO 639-1 language of the items in the feed.
     #[serde(alias="contentLanguage")]
     pub content_language: Option<String>,
-    /// Format of the feed file.    
+    /// Format of the feed file.
     pub format: Option<DatafeedFormat>,
-    /// Fetch schedule for the feed file.    
+    /// Fetch schedule for the feed file.
     #[serde(alias="fetchSchedule")]
     pub fetch_schedule: Option<DatafeedFetchSchedule>,
-    /// The two-letter ISO 3166 country where the items in the feed will be included in the search index.    
+    /// The two-letter ISO 3166 country where the items in the feed will be included in the search index.
     #[serde(alias="targetCountry")]
     pub target_country: Option<i64>,
-    /// The filename of the feed. All feeds must have a unique file name.    
+    /// The filename of the feed. All feeds must have a unique file name.
     #[serde(alias="fileName")]
     pub file_name: Option<String>,
-    /// The ID of the data feed.    
+    /// The ID of the data feed.
     pub id: Option<String>,
-    /// The list of intended destinations (corresponds to checked check boxes in Merchant Center).    
+    /// The list of intended destinations (corresponds to checked check boxes in Merchant Center).
     #[serde(alias="intendedDestinations")]
     pub intended_destinations: Option<Vec<String>>,
-    /// The two-letter ISO 639-1 language in which the attributes are defined in the data feed.    
+    /// The two-letter ISO 639-1 language in which the attributes are defined in the data feed.
     #[serde(alias="attributeLanguage")]
     pub attribute_language: Option<String>,
 }
@@ -1275,18 +1300,18 @@ impl ResponseResult for Datafeed {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct AccountShippingShippingServiceCalculationMethod {
-    /// Percentage of the price, represented as a floating point number without the percentage character.    
+    /// Percentage of the price, represented as a floating point number without the percentage character.
     #[serde(alias="percentageRate")]
     pub percentage_rate: String,
-    /// Name of the carrier rate to use for the calculation.    
+    /// Name of the carrier rate to use for the calculation.
     #[serde(alias="carrierRate")]
     pub carrier_rate: String,
-    /// Name of the rate table to use for the calculation.    
+    /// Name of the rate table to use for the calculation.
     #[serde(alias="rateTable")]
     pub rate_table: String,
-    /// Delivery is excluded. Valid only within cost rules tree.    
+    /// Delivery is excluded. Valid only within cost rules tree.
     pub excluded: bool,
-    /// Fixed price shipping, represented as a floating point number associated with a currency.    
+    /// Fixed price shipping, represented as a floating point number associated with a currency.
     #[serde(alias="flatRate")]
     pub flat_rate: Price,
 }
@@ -1300,19 +1325,19 @@ impl Part for AccountShippingShippingServiceCalculationMethod {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ProductTax {
-    /// The percentage of tax rate that applies to the item price.    
+    /// The percentage of tax rate that applies to the item price.
     pub rate: f64,
-    /// The numeric id of a location that the tax rate applies to as defined in the AdWords API.    
+    /// The numeric id of a location that the tax rate applies to as defined in the AdWords API.
     #[serde(alias="locationId")]
     pub location_id: String,
-    /// The postal code range that the tax rate applies to, represented by a ZIP code, a ZIP code prefix using * wildcard, a range between two ZIP codes or two ZIP code prefixes of equal length. Examples: 94114, 94*, 94002-95460, 94*-95*.    
+    /// The postal code range that the tax rate applies to, represented by a ZIP code, a ZIP code prefix using * wildcard, a range between two ZIP codes or two ZIP code prefixes of equal length. Examples: 94114, 94*, 94002-95460, 94*-95*.
     #[serde(alias="postalCode")]
     pub postal_code: String,
-    /// The country within which the item is taxed, specified with a two-letter ISO 3166 country code.    
+    /// The country within which the item is taxed, specified with a two-letter ISO 3166 country code.
     pub country: String,
-    /// The geographic region to which the tax rate applies.    
+    /// The geographic region to which the tax rate applies.
     pub region: String,
-    /// Set to true if tax is charged on shipping.    
+    /// Set to true if tax is charged on shipping.
     #[serde(alias="taxShip")]
     pub tax_ship: bool,
 }
@@ -1331,9 +1356,9 @@ impl Part for ProductTax {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct DatafeedstatusesCustomBatchResponse {
-    /// Identifies what kind of resource this is. Value: the fixed string "content#datafeedstatusesCustomBatchResponse".    
+    /// Identifies what kind of resource this is. Value: the fixed string "content#datafeedstatusesCustomBatchResponse".
     pub kind: String,
-    /// The result of the execution of the batch requests.    
+    /// The result of the execution of the batch requests.
     pub entries: Vec<DatafeedstatusesCustomBatchResponseEntry>,
 }
 
@@ -1346,18 +1371,18 @@ impl ResponseResult for DatafeedstatusesCustomBatchResponse {}
 /// 
 #[derive(Default, Clone, Debug, Serialize)]
 pub struct AccountsCustomBatchRequestEntry {
-    /// An entry ID, unique within the batch request.    
+    /// An entry ID, unique within the batch request.
     #[serde(alias="batchId")]
     pub batch_id: u32,
-    /// The account to create or update. Only defined if the method is insert or update.    
+    /// The account to create or update. Only defined if the method is insert or update.
     pub account: Account,
-    /// The ID of the account to get or delete. Only defined if the method is get or delete.    
+    /// The ID of the account to get or delete. Only defined if the method is get or delete.
     #[serde(alias="accountId")]
     pub account_id: String,
-    /// The ID of the managing account.    
+    /// The ID of the managing account.
     #[serde(alias="merchantId")]
     pub merchant_id: String,
-    /// no description provided    
+    /// no description provided
     pub method: String,
 }
 
@@ -1375,9 +1400,12 @@ impl Part for AccountsCustomBatchRequestEntry {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct AccountsAuthInfoResponse {
-    /// Identifies what kind of resource this is. Value: the fixed string "content#accountsAuthInfoResponse".    
+    /// Identifies what kind of resource this is. Value: the fixed string "content#accountsAuthInfoResponse".
     pub kind: String,
-    /// The account identifiers corresponding to the authenticated user.    
+    /// The account identifiers corresponding to the authenticated user.
+    /// - For an individual account: only the merchant ID is defined
+    /// - For an aggregator: only the aggregator ID is defined
+    /// - For a subaccount of an MCA: both the merchant ID and the aggregator ID are defined.
     #[serde(alias="accountIdentifiers")]
     pub account_identifiers: Vec<AccountIdentifier>,
 }
@@ -1396,7 +1424,7 @@ impl ResponseResult for AccountsAuthInfoResponse {}
 /// 
 #[derive(Default, Clone, Debug, Serialize)]
 pub struct ProductsCustomBatchRequest {
-    /// The request entries to be processed in the batch.    
+    /// The request entries to be processed in the batch.
     pub entries: Option<Vec<ProductsCustomBatchRequestEntry>>,
 }
 
@@ -1414,12 +1442,12 @@ impl RequestValue for ProductsCustomBatchRequest {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct DatafeedstatusesListResponse {
-    /// The token for the retrieval of the next page of datafeed statuses.    
+    /// The token for the retrieval of the next page of datafeed statuses.
     #[serde(alias="nextPageToken")]
     pub next_page_token: String,
-    /// Identifies what kind of resource this is. Value: the fixed string "content#datafeedstatusesListResponse".    
+    /// Identifies what kind of resource this is. Value: the fixed string "content#datafeedstatusesListResponse".
     pub kind: String,
-    /// no description provided    
+    /// no description provided
     pub resources: Vec<DatafeedStatus>,
 }
 
@@ -1432,9 +1460,9 @@ impl ResponseResult for DatafeedstatusesListResponse {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ProductUnitPricingMeasure {
-    /// The unit of the measure.    
+    /// The unit of the measure.
     pub unit: String,
-    /// The measure of an item.    
+    /// The measure of an item.
     pub value: f64,
 }
 
@@ -1452,9 +1480,9 @@ impl Part for ProductUnitPricingMeasure {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct AccountstatusesCustomBatchResponse {
-    /// Identifies what kind of resource this is. Value: the fixed string "content#accountstatusesCustomBatchResponse".    
+    /// Identifies what kind of resource this is. Value: the fixed string "content#accountstatusesCustomBatchResponse".
     pub kind: String,
-    /// The result of the execution of the batch requests.    
+    /// The result of the execution of the batch requests.
     pub entries: Vec<AccountstatusesCustomBatchResponseEntry>,
 }
 
@@ -1472,12 +1500,12 @@ impl ResponseResult for AccountstatusesCustomBatchResponse {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct AccountStatus {
-    /// Identifies what kind of resource this is. Value: the fixed string "content#accountStatus".    
+    /// Identifies what kind of resource this is. Value: the fixed string "content#accountStatus".
     pub kind: String,
-    /// A list of data quality issues.    
+    /// A list of data quality issues.
     #[serde(alias="dataQualityIssues")]
     pub data_quality_issues: Vec<AccountStatusDataQualityIssue>,
-    /// The ID of the account for which the status is reported.    
+    /// The ID of the account for which the status is reported.
     #[serde(alias="accountId")]
     pub account_id: String,
 }
@@ -1491,9 +1519,9 @@ impl ResponseResult for AccountStatus {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ProductInstallment {
-    /// The amount the buyer has to pay per month.    
+    /// The amount the buyer has to pay per month.
     pub amount: Price,
-    /// The number of installments the buyer has to pay.    
+    /// The number of installments the buyer has to pay.
     pub months: String,
 }
 
@@ -1506,12 +1534,12 @@ impl Part for ProductInstallment {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct DatafeedstatusesCustomBatchResponseEntry {
-    /// The ID of the request entry this entry responds to.    
+    /// The ID of the request entry this entry responds to.
     #[serde(alias="batchId")]
     pub batch_id: u32,
-    /// A list of errors defined if and only if the request failed.    
+    /// A list of errors defined if and only if the request failed.
     pub errors: Errors,
-    /// The requested data feed status. Defined if and only if the request was successful.    
+    /// The requested data feed status. Defined if and only if the request was successful.
     #[serde(alias="datafeedStatus")]
     pub datafeed_status: DatafeedStatus,
 }
@@ -1525,19 +1553,19 @@ impl Part for DatafeedstatusesCustomBatchResponseEntry {}
 /// 
 #[derive(Default, Clone, Debug, Serialize)]
 pub struct Inventory {
-    /// Identifies what kind of resource this is. Value: the fixed string "content#inventory".    
+    /// Identifies what kind of resource this is. Value: the fixed string "content#inventory".
     pub kind: String,
-    /// The sale price of the product. Mandatory if sale_price_effective_date is defined.    
+    /// The sale price of the product. Mandatory if sale_price_effective_date is defined.
     #[serde(alias="salePrice")]
     pub sale_price: Price,
-    /// A date range represented by a pair of ISO 8601 dates separated by a space, comma, or slash. Both dates might be specified as 'null' if undecided.    
+    /// A date range represented by a pair of ISO 8601 dates separated by a space, comma, or slash. Both dates might be specified as 'null' if undecided.
     #[serde(alias="salePriceEffectiveDate")]
     pub sale_price_effective_date: String,
-    /// The price of the product.    
+    /// The price of the product.
     pub price: Price,
-    /// The availability of the product.    
+    /// The availability of the product.
     pub availability: String,
-    /// The quantity of the product. Must be equal to or greater than zero. Supported only for local products.    
+    /// The quantity of the product. Must be equal to or greater than zero. Supported only for local products.
     pub quantity: u32,
 }
 
@@ -1550,12 +1578,12 @@ impl Part for Inventory {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct AccountShippingRateTable {
-    /// One-dimensional table cells define one condition along the same dimension. Bi-dimensional table cells use two dimensions with respectively M and N distinct values and must contain exactly M * N cells with distinct conditions (for each possible value pairs).    
+    /// One-dimensional table cells define one condition along the same dimension. Bi-dimensional table cells use two dimensions with respectively M and N distinct values and must contain exactly M * N cells with distinct conditions (for each possible value pairs).
     pub content: Vec<AccountShippingRateTableCell>,
-    /// Sale country for which this table is valid, represented as an ISO 3166-1 Alpha-2 code.    
+    /// Sale country for which this table is valid, represented as an ISO 3166-1 Alpha-2 code.
     #[serde(alias="saleCountry")]
     pub sale_country: i64,
-    /// The name of the rate table.    
+    /// The name of the rate table.
     pub name: String,
 }
 
@@ -1568,12 +1596,12 @@ impl Part for AccountShippingRateTable {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct ProductStatusDestinationStatus {
-    /// The destination's approval status.    
+    /// The destination's approval status.
     #[serde(alias="approvalStatus")]
     pub approval_status: String,
-    /// The name of the destination    
+    /// The name of the destination
     pub destination: String,
-    /// Whether the destination is required, excluded, selected by default or should be validated.    
+    /// Whether the destination is required, excluded, selected by default or should be validated.
     pub intention: String,
 }
 
@@ -1591,7 +1619,7 @@ impl Part for ProductStatusDestinationStatus {}
 /// 
 #[derive(Default, Clone, Debug, Serialize)]
 pub struct AccounttaxCustomBatchRequest {
-    /// The request entries to be processed in the batch.    
+    /// The request entries to be processed in the batch.
     pub entries: Option<Vec<AccounttaxCustomBatchRequestEntry>>,
 }
 
@@ -1604,18 +1632,18 @@ impl RequestValue for AccounttaxCustomBatchRequest {}
 /// 
 #[derive(Default, Clone, Debug, Serialize)]
 pub struct InventoryCustomBatchRequestEntry {
-    /// An entry ID, unique within the batch request.    
+    /// An entry ID, unique within the batch request.
     #[serde(alias="batchId")]
     pub batch_id: u32,
-    /// The code of the store for which to update price and availability. Use online to update price and availability of an online product.    
+    /// The code of the store for which to update price and availability. Use online to update price and availability of an online product.
     #[serde(alias="storeCode")]
     pub store_code: String,
-    /// The ID of the managing account.    
+    /// The ID of the managing account.
     #[serde(alias="merchantId")]
     pub merchant_id: String,
-    /// Price and availability of the product.    
+    /// Price and availability of the product.
     pub inventory: Inventory,
-    /// The ID of the product for which to update price and availability.    
+    /// The ID of the product for which to update price and availability.
     #[serde(alias="productId")]
     pub product_id: String,
 }
@@ -1634,9 +1662,9 @@ impl Part for InventoryCustomBatchRequestEntry {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct ProductsCustomBatchResponse {
-    /// Identifies what kind of resource this is. Value: the fixed string "content#productsCustomBatchResponse".    
+    /// Identifies what kind of resource this is. Value: the fixed string "content#productsCustomBatchResponse".
     pub kind: String,
-    /// The result of the execution of the batch requests.    
+    /// The result of the execution of the batch requests.
     pub entries: Vec<ProductsCustomBatchResponseEntry>,
 }
 
@@ -1654,12 +1682,12 @@ impl ResponseResult for ProductsCustomBatchResponse {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct AccountshippingListResponse {
-    /// The token for the retrieval of the next page of account shipping settings.    
+    /// The token for the retrieval of the next page of account shipping settings.
     #[serde(alias="nextPageToken")]
     pub next_page_token: String,
-    /// Identifies what kind of resource this is. Value: the fixed string "content#accountshippingListResponse".    
+    /// Identifies what kind of resource this is. Value: the fixed string "content#accountshippingListResponse".
     pub kind: String,
-    /// no description provided    
+    /// no description provided
     pub resources: Vec<AccountShipping>,
 }
 
@@ -1672,18 +1700,18 @@ impl ResponseResult for AccountshippingListResponse {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct AccountStatusExampleItem {
-    /// Unique item ID as specified in the uploaded product data.    
+    /// Unique item ID as specified in the uploaded product data.
     #[serde(alias="itemId")]
     pub item_id: String,
-    /// The item value that was submitted.    
+    /// The item value that was submitted.
     #[serde(alias="submittedValue")]
     pub submitted_value: String,
-    /// Landing page of the item.    
+    /// Landing page of the item.
     pub link: String,
-    /// The actual value on the landing page.    
+    /// The actual value on the landing page.
     #[serde(alias="valueOnLandingPage")]
     pub value_on_landing_page: String,
-    /// Title of the item.    
+    /// Title of the item.
     pub title: String,
 }
 
@@ -1696,15 +1724,15 @@ impl Part for AccountStatusExampleItem {}
 /// 
 #[derive(Default, Clone, Debug, Serialize)]
 pub struct ProductstatusesCustomBatchRequestEntry {
-    /// An entry ID, unique within the batch request.    
+    /// An entry ID, unique within the batch request.
     #[serde(alias="batchId")]
     pub batch_id: u32,
-    /// The ID of the managing account.    
+    /// The ID of the managing account.
     #[serde(alias="merchantId")]
     pub merchant_id: String,
-    /// no description provided    
+    /// no description provided
     pub method: String,
-    /// The ID of the product whose status to get.    
+    /// The ID of the product whose status to get.
     #[serde(alias="productId")]
     pub product_id: String,
 }
@@ -1718,9 +1746,9 @@ impl Part for ProductstatusesCustomBatchRequestEntry {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Price {
-    /// The currency of the price.    
+    /// The currency of the price.
     pub currency: String,
-    /// The price represented as a number.    
+    /// The price represented as a number.
     pub value: String,
 }
 
@@ -1733,13 +1761,13 @@ impl Part for Price {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct DatafeedStatusError {
-    /// The number of occurrences of the error in the feed.    
+    /// The number of occurrences of the error in the feed.
     pub count: String,
-    /// The error message, e.g., "Invalid price".    
+    /// The error message, e.g., "Invalid price".
     pub message: String,
-    /// The code of the error, e.g., "validation/invalid_value".    
+    /// The code of the error, e.g., "validation/invalid_value".
     pub code: String,
-    /// A list of example occurrences of the error, grouped by product.    
+    /// A list of example occurrences of the error, grouped by product.
     pub examples: Vec<DatafeedStatusExample>,
 }
 
@@ -1752,12 +1780,12 @@ impl Part for DatafeedStatusError {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct DatafeedStatusExample {
-    /// The ID of the example item.    
+    /// The ID of the example item.
     #[serde(alias="itemId")]
     pub item_id: String,
-    /// The problematic value.    
+    /// The problematic value.
     pub value: String,
-    /// Line number in the data feed where the example is found.    
+    /// Line number in the data feed where the example is found.
     #[serde(alias="lineNumber")]
     pub line_number: String,
 }
@@ -1771,9 +1799,9 @@ impl Part for DatafeedStatusExample {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ProductShippingWeight {
-    /// The unit of value.    
+    /// The unit of value.
     pub unit: String,
-    /// The weight of the product used to calculate the shipping cost of the item.    
+    /// The weight of the product used to calculate the shipping cost of the item.
     pub value: f64,
 }
 
@@ -1786,19 +1814,19 @@ impl Part for ProductShippingWeight {}
 /// 
 #[derive(Default, Clone, Debug, Serialize)]
 pub struct AccounttaxCustomBatchRequestEntry {
-    /// An entry ID, unique within the batch request.    
+    /// An entry ID, unique within the batch request.
     #[serde(alias="batchId")]
     pub batch_id: u32,
-    /// The account tax settings to update. Only defined if the method is update.    
+    /// The account tax settings to update. Only defined if the method is update.
     #[serde(alias="accountTax")]
     pub account_tax: AccountTax,
-    /// The ID of the account for which to get/update account tax settings.    
+    /// The ID of the account for which to get/update account tax settings.
     #[serde(alias="accountId")]
     pub account_id: String,
-    /// The ID of the managing account.    
+    /// The ID of the managing account.
     #[serde(alias="merchantId")]
     pub merchant_id: String,
-    /// no description provided    
+    /// no description provided
     pub method: String,
 }
 
@@ -1818,20 +1846,20 @@ impl Part for AccounttaxCustomBatchRequestEntry {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct AccountShipping {
-    /// Carrier-based shipping calculations.    
+    /// Carrier-based shipping calculations.
     #[serde(alias="carrierRates")]
     pub carrier_rates: Option<Vec<AccountShippingCarrierRate>>,
-    /// Identifies what kind of resource this is. Value: the fixed string "content#accountShipping".    
+    /// Identifies what kind of resource this is. Value: the fixed string "content#accountShipping".
     pub kind: Option<String>,
-    /// Location groups for shipping.    
+    /// Location groups for shipping.
     #[serde(alias="locationGroups")]
     pub location_groups: Option<Vec<AccountShippingLocationGroup>>,
-    /// Shipping services describing shipping fees calculation.    
+    /// Shipping services describing shipping fees calculation.
     pub services: Option<Vec<AccountShippingShippingService>>,
-    /// The ID of the account to which these account shipping settings belong.    
+    /// The ID of the account to which these account shipping settings belong.
     #[serde(alias="accountId")]
     pub account_id: Option<String>,
-    /// Rate tables definitions.    
+    /// Rate tables definitions.
     #[serde(alias="rateTables")]
     pub rate_tables: Option<Vec<AccountShippingRateTable>>,
 }
@@ -1846,9 +1874,9 @@ impl ResponseResult for AccountShipping {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ProductUnitPricingBaseMeasure {
-    /// The unit of the denominator.    
+    /// The unit of the denominator.
     pub unit: String,
-    /// The denominator of the unit price.    
+    /// The denominator of the unit price.
     pub value: String,
 }
 
@@ -1861,18 +1889,18 @@ impl Part for ProductUnitPricingBaseMeasure {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct AccountTaxTaxRule {
-    /// Country code in which tax is applicable.    
+    /// Country code in which tax is applicable.
     pub country: String,
-    /// Explicit tax rate in percent, represented as a floating point number without the percentage character. Must not be negative.    
+    /// Explicit tax rate in percent, represented as a floating point number without the percentage character. Must not be negative.
     #[serde(alias="ratePercent")]
     pub rate_percent: String,
-    /// If true, shipping charges are also taxed.    
+    /// If true, shipping charges are also taxed.
     #[serde(alias="shippingTaxed")]
     pub shipping_taxed: bool,
-    /// State (or province) is which the tax is applicable, described by its location id (also called criteria id).    
+    /// State (or province) is which the tax is applicable, described by its location id (also called criteria id).
     #[serde(alias="locationId")]
     pub location_id: String,
-    /// Whether the tax rate is taken from a global tax table or specified explicitly.    
+    /// Whether the tax rate is taken from a global tax table or specified explicitly.
     #[serde(alias="useGlobalRate")]
     pub use_global_rate: bool,
 }
@@ -1886,14 +1914,14 @@ impl Part for AccountTaxTaxRule {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ProductCustomAttribute {
-    /// Free-form unit of the attribute. Unit can only be used for values of type INT or FLOAT.    
+    /// Free-form unit of the attribute. Unit can only be used for values of type INT or FLOAT.
     pub unit: String,
-    /// The type of the attribute.    
+    /// The type of the attribute.
     #[serde(alias="type")]
     pub type_: String,
-    /// The name of the attribute. Underscores will be replaced by spaces upon insertion.    
+    /// The name of the attribute. Underscores will be replaced by spaces upon insertion.
     pub name: String,
-    /// The value of the attribute.    
+    /// The value of the attribute.
     pub value: String,
 }
 
@@ -1911,12 +1939,12 @@ impl Part for ProductCustomAttribute {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct AccountstatusesListResponse {
-    /// The token for the retrieval of the next page of account statuses.    
+    /// The token for the retrieval of the next page of account statuses.
     #[serde(alias="nextPageToken")]
     pub next_page_token: String,
-    /// Identifies what kind of resource this is. Value: the fixed string "content#accountstatusesListResponse".    
+    /// Identifies what kind of resource this is. Value: the fixed string "content#accountstatusesListResponse".
     pub kind: String,
-    /// no description provided    
+    /// no description provided
     pub resources: Vec<AccountStatus>,
 }
 
@@ -1929,25 +1957,25 @@ impl ResponseResult for AccountstatusesListResponse {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct AccountShippingCondition {
-    /// Maximum shipping weight. Forms an interval between the maximum of smaller weight (exclusive) and this weight (inclusive).    
+    /// Maximum shipping weight. Forms an interval between the maximum of smaller weight (exclusive) and this weight (inclusive).
     #[serde(alias="weightMax")]
     pub weight_max: Weight,
-    /// Delivery location in terms of a location ID. Can be used to represent administrative areas, smaller country subdivisions, or cities.    
+    /// Delivery location in terms of a location ID. Can be used to represent administrative areas, smaller country subdivisions, or cities.
     #[serde(alias="deliveryLocationId")]
     pub delivery_location_id: String,
-    /// Shipping label of the product. The products with the label are matched.    
+    /// Shipping label of the product. The products with the label are matched.
     #[serde(alias="shippingLabel")]
     pub shipping_label: String,
-    /// Delivery location in terms of a location group name. A location group with this name must be specified among location groups.    
+    /// Delivery location in terms of a location group name. A location group with this name must be specified among location groups.
     #[serde(alias="deliveryLocationGroup")]
     pub delivery_location_group: String,
-    /// Delivery location in terms of a postal code.    
+    /// Delivery location in terms of a postal code.
     #[serde(alias="deliveryPostalCode")]
     pub delivery_postal_code: String,
-    /// Maximum shipping price. Forms an interval between the maximum of smaller prices (exclusive) and this price (inclusive).    
+    /// Maximum shipping price. Forms an interval between the maximum of smaller prices (exclusive) and this price (inclusive).
     #[serde(alias="priceMax")]
     pub price_max: Price,
-    /// Delivery location in terms of a postal code range.    
+    /// Delivery location in terms of a postal code range.
     #[serde(alias="deliveryPostalCodeRange")]
     pub delivery_postal_code_range: AccountShippingPostalCodeRange,
 }
@@ -1966,7 +1994,7 @@ impl Part for AccountShippingCondition {}
 /// 
 #[derive(Default, Clone, Debug, Serialize)]
 pub struct InventoryCustomBatchRequest {
-    /// The request entries to be processed in the batch.    
+    /// The request entries to be processed in the batch.
     pub entries: Option<Vec<InventoryCustomBatchRequestEntry>>,
 }
 
@@ -1988,184 +2016,186 @@ impl RequestValue for InventoryCustomBatchRequest {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Product {
-    /// Set to true if the item is targeted towards adults.    
+    /// Set to true if the item is targeted towards adults.
     pub adult: Option<bool>,
-    /// Color of the item.    
+    /// Color of the item.
     pub color: Option<String>,
-    /// Similar to adwords_grouping, but only works on CPC.    
+    /// Similar to adwords_grouping, but only works on CPC.
     #[serde(alias="adwordsLabels")]
     pub adwords_labels: Option<Vec<String>>,
-    /// Shared identifier for all variants of the same product.    
+    /// Shared identifier for all variants of the same product.
     #[serde(alias="itemGroupId")]
     pub item_group_id: Option<String>,
-    /// Date on which the item should expire, as specified upon insertion, in ISO 8601 format. The actual expiration date in Google Shopping is exposed in productstatuses as googleExpirationDate and might be earlier if expirationDate is too far in the future.    
+    /// Date on which the item should expire, as specified upon insertion, in ISO 8601 format. The actual expiration date in Google Shopping is exposed in productstatuses as googleExpirationDate and might be earlier if expirationDate is too far in the future.
     #[serde(alias="expirationDate")]
     pub expiration_date: Option<String>,
-    /// Availability status of the item.    
+    /// Availability status of the item.
     pub availability: Option<String>,
-    /// Used to group items in an arbitrary way. Only for CPA%, discouraged otherwise.    
+    /// Used to group items in an arbitrary way. Only for CPA%, discouraged otherwise.
     #[serde(alias="adwordsGrouping")]
     pub adwords_grouping: Option<String>,
-    /// Specifies the intended destinations for the product.    
+    /// Specifies the intended destinations for the product.
     pub destinations: Option<Vec<ProductDestination>>,
-    /// The two-letter ISO 3166 country code for the item.    
+    /// The two-letter ISO 3166 country code for the item.
     #[serde(alias="targetCountry")]
     pub target_country: Option<i64>,
-    /// Custom label 4 for custom grouping of items in a Shopping campaign.    
+    /// Custom label 4 for custom grouping of items in a Shopping campaign.
     #[serde(alias="customLabel4")]
     pub custom_label4: Option<String>,
-    /// Title of the item.    
+    /// Title of the item.
     pub title: Option<String>,
-    /// Whether an item is available for purchase only online.    
+    /// Whether an item is available for purchase only online.
     #[serde(alias="onlineOnly")]
     pub online_only: Option<bool>,
-    /// Link to a mobile-optimized version of the landing page.    
+    /// Link to a mobile-optimized version of the landing page.
     #[serde(alias="mobileLink")]
     pub mobile_link: Option<String>,
-    /// Height of the item for shipping.    
+    /// Specifies the intended aspects for the product.
+    pub aspects: Option<Vec<ProductAspect>>,
+    /// Height of the item for shipping.
     #[serde(alias="shippingHeight")]
     pub shipping_height: Option<ProductShippingDimension>,
-    /// The two-letter ISO 639-1 language code for the item.    
+    /// The two-letter ISO 639-1 language code for the item.
     #[serde(alias="contentLanguage")]
     pub content_language: Option<String>,
-    /// Manufacturer Part Number (MPN) of the item.    
+    /// Manufacturer Part Number (MPN) of the item.
     pub mpn: Option<String>,
-    /// Date range during which the item is on sale (see product feed specifications).    
+    /// Date range during which the item is on sale (see product feed specifications).
     #[serde(alias="salePriceEffectiveDate")]
     pub sale_price_effective_date: Option<String>,
-    /// Brand of the item.    
+    /// Brand of the item.
     pub brand: Option<String>,
-    /// The material of which the item is made.    
+    /// The material of which the item is made.
     pub material: Option<String>,
-    /// URL directly linking to your item's page on your website.    
+    /// URL directly linking to your item's page on your website.
     pub link: Option<String>,
-    /// Allows advertisers to override the item URL when the product is shown within the context of Product Ads.    
+    /// Allows advertisers to override the item URL when the product is shown within the context of Product Ads.
     #[serde(alias="adwordsRedirect")]
     pub adwords_redirect: Option<String>,
-    /// The energy efficiency class as defined in EU directive 2010/30/EU.    
+    /// The energy efficiency class as defined in EU directive 2010/30/EU.
     #[serde(alias="energyEfficiencyClass")]
     pub energy_efficiency_class: Option<String>,
-    /// System in which the size is specified. Recommended for apparel items.    
+    /// System in which the size is specified. Recommended for apparel items.
     #[serde(alias="sizeSystem")]
     pub size_system: Option<String>,
-    /// The cut of the item. Recommended for apparel items.    
+    /// The cut of the item. Recommended for apparel items.
     #[serde(alias="sizeType")]
     pub size_type: Option<String>,
-    /// Custom label 3 for custom grouping of items in a Shopping campaign.    
+    /// Custom label 3 for custom grouping of items in a Shopping campaign.
     #[serde(alias="customLabel3")]
     pub custom_label3: Option<String>,
-    /// Custom label 2 for custom grouping of items in a Shopping campaign.    
+    /// Custom label 2 for custom grouping of items in a Shopping campaign.
     #[serde(alias="customLabel2")]
     pub custom_label2: Option<String>,
-    /// Condition or state of the item.    
+    /// Condition or state of the item.
     pub condition: Option<String>,
-    /// Custom label 0 for custom grouping of items in a Shopping campaign.    
+    /// Custom label 0 for custom grouping of items in a Shopping campaign.
     #[serde(alias="customLabel0")]
     pub custom_label0: Option<String>,
-    /// Identifies what kind of resource this is. Value: the fixed string "content#product".    
+    /// Identifies what kind of resource this is. Value: the fixed string "content#product".
     pub kind: Option<String>,
-    /// Number and amount of installments to pay for an item. Brazil only.    
+    /// Number and amount of installments to pay for an item. Brazil only.
     pub installment: Option<ProductInstallment>,
-    /// Size of the item.    
+    /// Size of the item.
     pub sizes: Option<Vec<String>>,
-    /// Target gender of the item.    
+    /// Target gender of the item.
     pub gender: Option<String>,
-    /// Tax information.    
+    /// Tax information.
     pub taxes: Option<Vec<ProductTax>>,
-    /// False when the item does not have unique product identifiers appropriate to its category, such as GTIN, MPN, and brand. Required according to the Unique Product Identifier Rules for all target countries except for Canada.    
+    /// False when the item does not have unique product identifiers appropriate to its category, such as GTIN, MPN, and brand. Required according to the Unique Product Identifier Rules for all target countries except for Canada.
     #[serde(alias="identifierExists")]
     pub identifier_exists: Option<bool>,
-    /// Advertised sale price of the item.    
+    /// Advertised sale price of the item.
     #[serde(alias="salePrice")]
     pub sale_price: Option<Price>,
-    /// Your category of the item (formatted as in product feeds specification).    
+    /// Your category of the item (formatted as in product feeds specification).
     #[serde(alias="productType")]
     pub product_type: Option<String>,
-    /// Advertiser-specified recommendations.    
+    /// Advertiser-specified recommendations.
     #[serde(alias="displayAdsSimilarIds")]
     pub display_ads_similar_ids: Option<Vec<String>>,
-    /// Custom label 1 for custom grouping of items in a Shopping campaign.    
+    /// Custom label 1 for custom grouping of items in a Shopping campaign.
     #[serde(alias="customLabel1")]
     pub custom_label1: Option<String>,
-    /// Target age group of the item.    
+    /// Target age group of the item.
     #[serde(alias="ageGroup")]
     pub age_group: Option<String>,
-    /// Additional URLs of images of the item.    
+    /// Additional URLs of images of the item.
     #[serde(alias="additionalImageLinks")]
     pub additional_image_links: Option<Vec<String>>,
-    /// An identifier of the item.    
+    /// An identifier of the item.
     #[serde(alias="offerId")]
     pub offer_id: Option<String>,
-    /// Global Trade Item Number (GTIN) of the item.    
+    /// Global Trade Item Number (GTIN) of the item.
     pub gtin: Option<String>,
-    /// The shipping label of the product, used to group product in account-level shipping rules.    
+    /// The shipping label of the product, used to group product in account-level shipping rules.
     #[serde(alias="shippingLabel")]
     pub shipping_label: Option<String>,
-    /// Google's category of the item (see Google product taxonomy).    
+    /// Google's category of the item (see Google product taxonomy).
     #[serde(alias="googleProductCategory")]
     pub google_product_category: Option<String>,
-    /// The number of identical products in a merchant-defined multipack.    
+    /// The number of identical products in a merchant-defined multipack.
     pub multipack: Option<String>,
-    /// An identifier for an item for dynamic remarketing campaigns.    
+    /// An identifier for an item for dynamic remarketing campaigns.
     #[serde(alias="displayAdsId")]
     pub display_ads_id: Option<String>,
-    /// Offer margin for dynamic remarketing campaigns.    
+    /// Offer margin for dynamic remarketing campaigns.
     #[serde(alias="displayAdsValue")]
     pub display_ads_value: Option<f64>,
-    /// The REST id of the product.    
+    /// The REST id of the product.
     pub id: Option<String>,
-    /// Width of the item for shipping.    
+    /// Width of the item for shipping.
     #[serde(alias="shippingWidth")]
     pub shipping_width: Option<ProductShippingDimension>,
-    /// The item's pattern (e.g. polka dots).    
+    /// The item's pattern (e.g. polka dots).
     pub pattern: Option<String>,
-    /// The measure and dimension of an item.    
+    /// The measure and dimension of an item.
     #[serde(alias="unitPricingMeasure")]
     pub unit_pricing_measure: Option<ProductUnitPricingMeasure>,
-    /// A list of custom (merchant-provided) attributes. It can also be used for submitting any attribute of the feed specification in its generic form (e.g., { "name": "size type", "type": "text", "value": "regular" }). This is useful for submitting attributes not explicitly exposed by the API.    
+    /// A list of custom (merchant-provided) attributes. It can also be used for submitting any attribute of the feed specification in its generic form (e.g., { "name": "size type", "type": "text", "value": "regular" }). This is useful for submitting attributes not explicitly exposed by the API.
     #[serde(alias="customAttributes")]
     pub custom_attributes: Option<Vec<ProductCustomAttribute>>,
-    /// The day a pre-ordered product becomes available for delivery, in ISO 8601 format.    
+    /// The day a pre-ordered product becomes available for delivery, in ISO 8601 format.
     #[serde(alias="availabilityDate")]
     pub availability_date: Option<String>,
-    /// Whether the item is a merchant-defined bundle. A bundle is a custom grouping of different products sold by a merchant for a single price.    
+    /// Whether the item is a merchant-defined bundle. A bundle is a custom grouping of different products sold by a merchant for a single price.
     #[serde(alias="isBundle")]
     pub is_bundle: Option<bool>,
-    /// The item's channel (online or local).    
+    /// The item's channel (online or local).
     pub channel: Option<String>,
-    /// Description of the item.    
+    /// Description of the item.
     pub description: Option<String>,
-    /// Read-only warnings.    
-    pub warnings: Option<Vec<Error>>,
-    /// Price of the item.    
+    /// Read-only warnings.
+    pub warnings: Option<Vec<ErrorType>>,
+    /// Price of the item.
     pub price: Option<Price>,
-    /// Length of the item for shipping.    
+    /// Length of the item for shipping.
     #[serde(alias="shippingLength")]
     pub shipping_length: Option<ProductShippingDimension>,
-    /// URL directly to your item's landing page for dynamic remarketing campaigns.    
+    /// URL directly to your item's landing page for dynamic remarketing campaigns.
     #[serde(alias="displayAdsLink")]
     pub display_ads_link: Option<String>,
-    /// The read-only list of intended destinations which passed validation.    
+    /// The read-only list of intended destinations which passed validation.
     #[serde(alias="validatedDestinations")]
     pub validated_destinations: Option<Vec<String>>,
-    /// A list of custom (merchant-provided) custom attribute groups.    
+    /// A list of custom (merchant-provided) custom attribute groups.
     #[serde(alias="customGroups")]
     pub custom_groups: Option<Vec<ProductCustomGroup>>,
-    /// Loyalty points that users receive after purchasing the item. Japan only.    
+    /// Loyalty points that users receive after purchasing the item. Japan only.
     #[serde(alias="loyaltyPoints")]
     pub loyalty_points: Option<LoyaltyPoints>,
-    /// The preference of the denominator of the unit price.    
+    /// The preference of the denominator of the unit price.
     #[serde(alias="unitPricingBaseMeasure")]
     pub unit_pricing_base_measure: Option<ProductUnitPricingBaseMeasure>,
-    /// Shipping rules.    
+    /// Shipping rules.
     pub shipping: Option<Vec<ProductShipping>>,
-    /// Weight of the item for shipping.    
+    /// Weight of the item for shipping.
     #[serde(alias="shippingWeight")]
     pub shipping_weight: Option<ProductShippingWeight>,
-    /// URL of an image of the item.    
+    /// URL of an image of the item.
     #[serde(alias="imageLink")]
     pub image_link: Option<String>,
-    /// Title of an item for dynamic remarketing campaigns.    
+    /// Title of an item for dynamic remarketing campaigns.
     #[serde(alias="displayAdsTitle")]
     pub display_ads_title: Option<String>,
 }
@@ -2181,23 +2211,23 @@ impl ResponseResult for Product {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct ProductStatusDataQualityIssue {
-    /// The value the attribute had at time of evaluation.    
+    /// The value the attribute had at time of evaluation.
     #[serde(alias="valueProvided")]
     pub value_provided: String,
-    /// The severity of the data quality issue.    
+    /// The severity of the data quality issue.
     pub severity: String,
-    /// The time stamp of the data quality issue.    
+    /// The time stamp of the data quality issue.
     pub timestamp: String,
-    /// A more detailed error string.    
+    /// A more detailed error string.
     pub detail: String,
-    /// The attribute name that is relevant for the issue.    
+    /// The attribute name that is relevant for the issue.
     pub location: String,
-    /// The value of that attribute that was found on the landing page    
+    /// The value of that attribute that was found on the landing page
     #[serde(alias="valueOnLandingPage")]
     pub value_on_landing_page: String,
-    /// The id of the data quality issue.    
+    /// The id of the data quality issue.
     pub id: String,
-    /// The fetch status for landing_page_errors.    
+    /// The fetch status for landing_page_errors.
     #[serde(alias="fetchStatus")]
     pub fetch_status: String,
 }
@@ -2216,12 +2246,12 @@ impl Part for ProductStatusDataQualityIssue {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct ProductsListResponse {
-    /// The token for the retrieval of the next page of products.    
+    /// The token for the retrieval of the next page of products.
     #[serde(alias="nextPageToken")]
     pub next_page_token: String,
-    /// Identifies what kind of resource this is. Value: the fixed string "content#productsListResponse".    
+    /// Identifies what kind of resource this is. Value: the fixed string "content#productsListResponse".
     pub kind: String,
-    /// no description provided    
+    /// no description provided
     pub resources: Vec<Product>,
 }
 
@@ -2234,18 +2264,18 @@ impl ResponseResult for ProductsListResponse {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct AccountShippingShippingService {
-    /// Whether the shipping service is available.    
+    /// Whether the shipping service is available.
     pub active: bool,
-    /// Decision tree for "complicated" shipping cost calculation.    
+    /// Decision tree for "complicated" shipping cost calculation.
     #[serde(alias="costRuleTree")]
     pub cost_rule_tree: AccountShippingShippingServiceCostRule,
-    /// Sale country for which this service can be used, represented as an ISO 3166-1 Alpha-2 code.    
+    /// Sale country for which this service can be used, represented as an ISO 3166-1 Alpha-2 code.
     #[serde(alias="saleCountry")]
     pub sale_country: i64,
-    /// Calculation method for the "simple" case that needs no rules.    
+    /// Calculation method for the "simple" case that needs no rules.
     #[serde(alias="calculationMethod")]
     pub calculation_method: AccountShippingShippingServiceCalculationMethod,
-    /// The name of this shipping service.    
+    /// The name of this shipping service.
     pub name: String,
 }
 
@@ -2258,14 +2288,14 @@ impl Part for AccountShippingShippingService {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct AccountshippingCustomBatchResponseEntry {
-    /// The ID of the request entry this entry responds to.    
+    /// The ID of the request entry this entry responds to.
     #[serde(alias="batchId")]
     pub batch_id: u32,
-    /// Identifies what kind of resource this is. Value: the fixed string "content#accountshippingCustomBatchResponseEntry".    
+    /// Identifies what kind of resource this is. Value: the fixed string "content#accountshippingCustomBatchResponseEntry".
     pub kind: String,
-    /// A list of errors defined if and only if the request failed.    
+    /// A list of errors defined if and only if the request failed.
     pub errors: Errors,
-    /// The retrieved or updated account shipping settings.    
+    /// The retrieved or updated account shipping settings.
     #[serde(alias="accountShipping")]
     pub account_shipping: AccountShipping,
 }
@@ -2284,16 +2314,16 @@ impl Part for AccountshippingCustomBatchResponseEntry {}
 /// 
 #[derive(Default, Clone, Debug, Serialize)]
 pub struct InventorySetRequest {
-    /// A date range represented by a pair of ISO 8601 dates separated by a space, comma, or slash. Both dates might be specified as 'null' if undecided.    
+    /// A date range represented by a pair of ISO 8601 dates separated by a space, comma, or slash. Both dates might be specified as 'null' if undecided.
     #[serde(alias="salePriceEffectiveDate")]
     pub sale_price_effective_date: Option<String>,
-    /// The price of the product.    
+    /// The price of the product.
     pub price: Option<Price>,
-    /// The quantity of the product. Must be equal to or greater than zero. Supported only for local products.    
+    /// The quantity of the product. Must be equal to or greater than zero. Supported only for local products.
     pub quantity: Option<u32>,
-    /// The availability of the product.    
+    /// The availability of the product.
     pub availability: Option<String>,
-    /// The sale price of the product. Mandatory if sale_price_effective_date is defined.    
+    /// The sale price of the product. Mandatory if sale_price_effective_date is defined.
     #[serde(alias="salePrice")]
     pub sale_price: Option<Price>,
 }
@@ -2307,9 +2337,9 @@ impl RequestValue for InventorySetRequest {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ProductDestination {
-    /// Whether the destination is required, excluded or should be validated.    
+    /// Whether the destination is required, excluded or should be validated.
     pub intention: String,
-    /// The name of the destination.    
+    /// The name of the destination.
     #[serde(alias="destinationName")]
     pub destination_name: String,
 }
@@ -2328,9 +2358,9 @@ impl Part for ProductDestination {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct AccountsCustomBatchResponse {
-    /// Identifies what kind of resource this is. Value: the fixed string "content#accountsCustomBatchResponse".    
+    /// Identifies what kind of resource this is. Value: the fixed string "content#accountsCustomBatchResponse".
     pub kind: String,
-    /// The result of the execution of the batch requests.    
+    /// The result of the execution of the batch requests.
     pub entries: Vec<AccountsCustomBatchResponseEntry>,
 }
 
@@ -2343,18 +2373,18 @@ impl ResponseResult for AccountsCustomBatchResponse {}
 /// 
 #[derive(Default, Clone, Debug, Serialize)]
 pub struct DatafeedsCustomBatchRequestEntry {
-    /// An entry ID, unique within the batch request.    
+    /// An entry ID, unique within the batch request.
     #[serde(alias="batchId")]
     pub batch_id: u32,
-    /// The ID of the data feed to get or delete.    
+    /// The ID of the data feed to get or delete.
     #[serde(alias="datafeedId")]
     pub datafeed_id: String,
-    /// The data feed to insert.    
+    /// The data feed to insert.
     pub datafeed: Datafeed,
-    /// The ID of the managing account.    
+    /// The ID of the managing account.
     #[serde(alias="merchantId")]
     pub merchant_id: String,
-    /// no description provided    
+    /// no description provided
     pub method: String,
 }
 
@@ -2372,12 +2402,12 @@ impl Part for DatafeedsCustomBatchRequestEntry {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct ProductstatusesListResponse {
-    /// The token for the retrieval of the next page of products statuses.    
+    /// The token for the retrieval of the next page of products statuses.
     #[serde(alias="nextPageToken")]
     pub next_page_token: String,
-    /// Identifies what kind of resource this is. Value: the fixed string "content#productstatusesListResponse".    
+    /// Identifies what kind of resource this is. Value: the fixed string "content#productstatusesListResponse".
     pub kind: String,
-    /// no description provided    
+    /// no description provided
     pub resources: Vec<ProductStatus>,
 }
 
@@ -2390,9 +2420,9 @@ impl ResponseResult for ProductstatusesListResponse {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Weight {
-    /// The weight unit.    
+    /// The weight unit.
     pub unit: String,
-    /// The weight represented as a number.    
+    /// The weight represented as a number.
     pub value: String,
 }
 
@@ -2405,26 +2435,26 @@ impl Part for Weight {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct AccountStatusDataQualityIssue {
-    /// Actual value displayed on the landing page.    
+    /// Actual value displayed on the landing page.
     #[serde(alias="displayedValue")]
     pub displayed_value: String,
-    /// Severity of the problem.    
+    /// Severity of the problem.
     pub severity: String,
-    /// Last time the account was checked for this issue.    
+    /// Last time the account was checked for this issue.
     #[serde(alias="lastChecked")]
     pub last_checked: String,
-    /// Country for which this issue is reported.    
+    /// Country for which this issue is reported.
     pub country: String,
-    /// Example items featuring the issue.    
+    /// Example items featuring the issue.
     #[serde(alias="exampleItems")]
     pub example_items: Vec<AccountStatusExampleItem>,
-    /// Submitted value that causes the issue.    
+    /// Submitted value that causes the issue.
     #[serde(alias="submittedValue")]
     pub submitted_value: String,
-    /// Number of items in the account found to have the said issue.    
+    /// Number of items in the account found to have the said issue.
     #[serde(alias="numItems")]
     pub num_items: u32,
-    /// Issue identifier.    
+    /// Issue identifier.
     pub id: String,
 }
 
@@ -2442,12 +2472,12 @@ impl Part for AccountStatusDataQualityIssue {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct AccountsListResponse {
-    /// The token for the retrieval of the next page of accounts.    
+    /// The token for the retrieval of the next page of accounts.
     #[serde(alias="nextPageToken")]
     pub next_page_token: String,
-    /// Identifies what kind of resource this is. Value: the fixed string "content#accountsListResponse".    
+    /// Identifies what kind of resource this is. Value: the fixed string "content#accountsListResponse".
     pub kind: String,
-    /// no description provided    
+    /// no description provided
     pub resources: Vec<Account>,
 }
 
@@ -2460,14 +2490,14 @@ impl ResponseResult for AccountsListResponse {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct ProductstatusesCustomBatchResponseEntry {
-    /// The ID of the request entry this entry responds to.    
+    /// The ID of the request entry this entry responds to.
     #[serde(alias="batchId")]
     pub batch_id: u32,
-    /// Identifies what kind of resource this is. Value: the fixed string "content#productstatusesCustomBatchResponseEntry".    
+    /// Identifies what kind of resource this is. Value: the fixed string "content#productstatusesCustomBatchResponseEntry".
     pub kind: String,
-    /// A list of errors, if the request failed.    
+    /// A list of errors, if the request failed.
     pub errors: Errors,
-    /// The requested product status. Only defined if the request was successful.    
+    /// The requested product status. Only defined if the request was successful.
     #[serde(alias="productStatus")]
     pub product_status: ProductStatus,
 }
@@ -2486,7 +2516,7 @@ impl Part for ProductstatusesCustomBatchResponseEntry {}
 /// 
 #[derive(Default, Clone, Debug, Serialize)]
 pub struct AccountshippingCustomBatchRequest {
-    /// The request entries to be processed in the batch.    
+    /// The request entries to be processed in the batch.
     pub entries: Option<Vec<AccountshippingCustomBatchRequestEntry>>,
 }
 
@@ -2499,11 +2529,11 @@ impl RequestValue for AccountshippingCustomBatchRequest {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct LoyaltyPoints {
-    /// The ratio of a point when converted to currency. Google assumes currency based on Merchant Center settings. If ratio is left out, it defaults to 1.0.    
+    /// The ratio of a point when converted to currency. Google assumes currency based on Merchant Center settings. If ratio is left out, it defaults to 1.0.
     pub ratio: f64,
-    /// Name of loyalty points program. It is recommended to limit the name to 12 full-width characters or 24 Roman characters.    
+    /// Name of loyalty points program. It is recommended to limit the name to 12 full-width characters or 24 Roman characters.
     pub name: String,
-    /// The retailer's loyalty points in absolute value.    
+    /// The retailer's loyalty points in absolute value.
     #[serde(alias="pointsValue")]
     pub points_value: String,
 }
@@ -2522,7 +2552,7 @@ impl Part for LoyaltyPoints {}
 /// 
 #[derive(Default, Clone, Debug, Serialize)]
 pub struct DatafeedsCustomBatchRequest {
-    /// The request entries to be processed in the batch.    
+    /// The request entries to be processed in the batch.
     pub entries: Option<Vec<DatafeedsCustomBatchRequestEntry>>,
 }
 
@@ -2535,13 +2565,13 @@ impl RequestValue for DatafeedsCustomBatchRequest {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct DatafeedFormat {
-    /// Character encoding scheme of the data feed. If not specified, the encoding will be auto-detected.    
+    /// Character encoding scheme of the data feed. If not specified, the encoding will be auto-detected.
     #[serde(alias="fileEncoding")]
     pub file_encoding: String,
-    /// Specifies how double quotes are interpreted. If not specified, the mode will be auto-detected. Ignored for non-DSV data feeds.    
+    /// Specifies how double quotes are interpreted. If not specified, the mode will be auto-detected. Ignored for non-DSV data feeds.
     #[serde(alias="quotingMode")]
     pub quoting_mode: String,
-    /// Delimiter for the separation of values in a delimiter-separated values feed. If not specified, the delimiter will be auto-detected. Ignored for non-DSV data feeds.    
+    /// Delimiter for the separation of values in a delimiter-separated values feed. If not specified, the delimiter will be auto-detected. Ignored for non-DSV data feeds.
     #[serde(alias="columnDelimiter")]
     pub column_delimiter: String,
 }
@@ -2555,9 +2585,9 @@ impl Part for DatafeedFormat {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct AccountAdwordsLink {
-    /// Status of the link between this Merchant Center account and the AdWords account.    
+    /// Status of the link between this Merchant Center account and the AdWords account.
     pub status: String,
-    /// Customer ID of the AdWords account.    
+    /// Customer ID of the AdWords account.
     #[serde(alias="adwordsId")]
     pub adwords_id: String,
 }
@@ -2573,9 +2603,9 @@ impl Part for AccountAdwordsLink {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct AccountShippingPostalCodeRange {
-    /// The first (inclusive) postal code or prefix of the range.    
+    /// The first (inclusive) postal code or prefix of the range.
     pub start: String,
-    /// The last (inclusive) postal code or prefix of the range.    
+    /// The last (inclusive) postal code or prefix of the range.
     pub end: String,
 }
 
@@ -2621,13 +2651,17 @@ pub struct AccounttaxMethods<'a, C, NC, A>
     hub: &'a ShoppingContent<C, NC, A>,
 }
 
-impl<'a, C, NC, A> ResourceMethodsBuilder for AccounttaxMethods<'a, C, NC, A> {}
+impl<'a, C, NC, A> MethodsBuilder for AccounttaxMethods<'a, C, NC, A> {}
 
 impl<'a, C, NC, A> AccounttaxMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Retrieves and updates tax settings of multiple accounts in a single request.    
+    /// Retrieves and updates tax settings of multiple accounts in a single request.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
     pub fn custombatch(&self, request: &AccounttaxCustomBatchRequest) -> AccounttaxCustombatchCall<'a, C, NC, A> {
         AccounttaxCustombatchCall {
             hub: self.hub,
@@ -2640,7 +2674,13 @@ impl<'a, C, NC, A> AccounttaxMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Updates the tax settings of the account. This method supports patch semantics.    
+    /// Updates the tax settings of the account. This method supports patch semantics.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `merchantId` - The ID of the managing account.
+    /// * `accountId` - The ID of the account for which to get/update account tax settings.
     pub fn patch(&self, request: &AccountTax, merchant_id: &str, account_id: &str) -> AccounttaxPatchCall<'a, C, NC, A> {
         AccounttaxPatchCall {
             hub: self.hub,
@@ -2655,7 +2695,11 @@ impl<'a, C, NC, A> AccounttaxMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Lists the tax settings of the sub-accounts in your Merchant Center account.    
+    /// Lists the tax settings of the sub-accounts in your Merchant Center account.
+    /// 
+    /// # Arguments
+    ///
+    /// * `merchantId` - The ID of the managing account.
     pub fn list(&self, merchant_id: &str) -> AccounttaxListCall<'a, C, NC, A> {
         AccounttaxListCall {
             hub: self.hub,
@@ -2670,7 +2714,13 @@ impl<'a, C, NC, A> AccounttaxMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Updates the tax settings of the account.    
+    /// Updates the tax settings of the account.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `merchantId` - The ID of the managing account.
+    /// * `accountId` - The ID of the account for which to get/update account tax settings.
     pub fn update(&self, request: &AccountTax, merchant_id: &str, account_id: &str) -> AccounttaxUpdateCall<'a, C, NC, A> {
         AccounttaxUpdateCall {
             hub: self.hub,
@@ -2685,7 +2735,12 @@ impl<'a, C, NC, A> AccounttaxMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Retrieves the tax settings of the account.    
+    /// Retrieves the tax settings of the account.
+    /// 
+    /// # Arguments
+    ///
+    /// * `merchantId` - The ID of the managing account.
+    /// * `accountId` - The ID of the account for which to get/update account tax settings.
     pub fn get(&self, merchant_id: &str, account_id: &str) -> AccounttaxGetCall<'a, C, NC, A> {
         AccounttaxGetCall {
             hub: self.hub,
@@ -2734,13 +2789,18 @@ pub struct DatafeedstatuseMethods<'a, C, NC, A>
     hub: &'a ShoppingContent<C, NC, A>,
 }
 
-impl<'a, C, NC, A> ResourceMethodsBuilder for DatafeedstatuseMethods<'a, C, NC, A> {}
+impl<'a, C, NC, A> MethodsBuilder for DatafeedstatuseMethods<'a, C, NC, A> {}
 
 impl<'a, C, NC, A> DatafeedstatuseMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Retrieves the status of a datafeed from your Merchant Center account.    
+    /// Retrieves the status of a datafeed from your Merchant Center account.
+    /// 
+    /// # Arguments
+    ///
+    /// * `merchantId` - No description provided.
+    /// * `datafeedId` - No description provided.
     pub fn get(&self, merchant_id: &str, datafeed_id: &str) -> DatafeedstatuseGetCall<'a, C, NC, A> {
         DatafeedstatuseGetCall {
             hub: self.hub,
@@ -2754,7 +2814,11 @@ impl<'a, C, NC, A> DatafeedstatuseMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Lists the statuses of the datafeeds in your Merchant Center account.    
+    /// Lists the statuses of the datafeeds in your Merchant Center account.
+    /// 
+    /// # Arguments
+    ///
+    /// * `merchantId` - The ID of the managing account.
     pub fn list(&self, merchant_id: &str) -> DatafeedstatuseListCall<'a, C, NC, A> {
         DatafeedstatuseListCall {
             hub: self.hub,
@@ -2767,6 +2831,10 @@ impl<'a, C, NC, A> DatafeedstatuseMethods<'a, C, NC, A> {
         }
     }
     
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
     pub fn custombatch(&self, request: &DatafeedstatusesCustomBatchRequest) -> DatafeedstatuseCustombatchCall<'a, C, NC, A> {
         DatafeedstatuseCustombatchCall {
             hub: self.hub,
@@ -2814,10 +2882,14 @@ pub struct DatafeedMethods<'a, C, NC, A>
     hub: &'a ShoppingContent<C, NC, A>,
 }
 
-impl<'a, C, NC, A> ResourceMethodsBuilder for DatafeedMethods<'a, C, NC, A> {}
+impl<'a, C, NC, A> MethodsBuilder for DatafeedMethods<'a, C, NC, A> {}
 
 impl<'a, C, NC, A> DatafeedMethods<'a, C, NC, A> {
     
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
     pub fn custombatch(&self, request: &DatafeedsCustomBatchRequest) -> DatafeedCustombatchCall<'a, C, NC, A> {
         DatafeedCustombatchCall {
             hub: self.hub,
@@ -2830,7 +2902,12 @@ impl<'a, C, NC, A> DatafeedMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Retrieves a datafeed from your Merchant Center account.    
+    /// Retrieves a datafeed from your Merchant Center account.
+    /// 
+    /// # Arguments
+    ///
+    /// * `merchantId` - No description provided.
+    /// * `datafeedId` - No description provided.
     pub fn get(&self, merchant_id: &str, datafeed_id: &str) -> DatafeedGetCall<'a, C, NC, A> {
         DatafeedGetCall {
             hub: self.hub,
@@ -2844,7 +2921,13 @@ impl<'a, C, NC, A> DatafeedMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Updates a datafeed of your Merchant Center account. This method supports patch semantics.    
+    /// Updates a datafeed of your Merchant Center account. This method supports patch semantics.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `merchantId` - No description provided.
+    /// * `datafeedId` - No description provided.
     pub fn patch(&self, request: &Datafeed, merchant_id: &str, datafeed_id: &str) -> DatafeedPatchCall<'a, C, NC, A> {
         DatafeedPatchCall {
             hub: self.hub,
@@ -2859,7 +2942,12 @@ impl<'a, C, NC, A> DatafeedMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Deletes a datafeed from your Merchant Center account.    
+    /// Deletes a datafeed from your Merchant Center account.
+    /// 
+    /// # Arguments
+    ///
+    /// * `merchantId` - No description provided.
+    /// * `datafeedId` - No description provided.
     pub fn delete(&self, merchant_id: &str, datafeed_id: &str) -> DatafeedDeleteCall<'a, C, NC, A> {
         DatafeedDeleteCall {
             hub: self.hub,
@@ -2873,7 +2961,12 @@ impl<'a, C, NC, A> DatafeedMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Registers a datafeed with your Merchant Center account.    
+    /// Registers a datafeed with your Merchant Center account.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `merchantId` - No description provided.
     pub fn insert(&self, request: &Datafeed, merchant_id: &str) -> DatafeedInsertCall<'a, C, NC, A> {
         DatafeedInsertCall {
             hub: self.hub,
@@ -2887,7 +2980,11 @@ impl<'a, C, NC, A> DatafeedMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Lists the datafeeds in your Merchant Center account.    
+    /// Lists the datafeeds in your Merchant Center account.
+    /// 
+    /// # Arguments
+    ///
+    /// * `merchantId` - The ID of the managing account.
     pub fn list(&self, merchant_id: &str) -> DatafeedListCall<'a, C, NC, A> {
         DatafeedListCall {
             hub: self.hub,
@@ -2902,7 +2999,13 @@ impl<'a, C, NC, A> DatafeedMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Updates a datafeed of your Merchant Center account.    
+    /// Updates a datafeed of your Merchant Center account.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `merchantId` - No description provided.
+    /// * `datafeedId` - No description provided.
     pub fn update(&self, request: &Datafeed, merchant_id: &str, datafeed_id: &str) -> DatafeedUpdateCall<'a, C, NC, A> {
         DatafeedUpdateCall {
             hub: self.hub,
@@ -2952,13 +3055,18 @@ pub struct ProductstatuseMethods<'a, C, NC, A>
     hub: &'a ShoppingContent<C, NC, A>,
 }
 
-impl<'a, C, NC, A> ResourceMethodsBuilder for ProductstatuseMethods<'a, C, NC, A> {}
+impl<'a, C, NC, A> MethodsBuilder for ProductstatuseMethods<'a, C, NC, A> {}
 
 impl<'a, C, NC, A> ProductstatuseMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Gets the status of a product from your Merchant Center account.    
+    /// Gets the status of a product from your Merchant Center account.
+    /// 
+    /// # Arguments
+    ///
+    /// * `merchantId` - The ID of the managing account.
+    /// * `productId` - The ID of the product.
     pub fn get(&self, merchant_id: &str, product_id: &str) -> ProductstatuseGetCall<'a, C, NC, A> {
         ProductstatuseGetCall {
             hub: self.hub,
@@ -2972,7 +3080,11 @@ impl<'a, C, NC, A> ProductstatuseMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Lists the statuses of the products in your Merchant Center account.    
+    /// Lists the statuses of the products in your Merchant Center account.
+    /// 
+    /// # Arguments
+    ///
+    /// * `merchantId` - The ID of the managing account.
     pub fn list(&self, merchant_id: &str) -> ProductstatuseListCall<'a, C, NC, A> {
         ProductstatuseListCall {
             hub: self.hub,
@@ -2987,7 +3099,11 @@ impl<'a, C, NC, A> ProductstatuseMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Gets the statuses of multiple products in a single request.    
+    /// Gets the statuses of multiple products in a single request.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
     pub fn custombatch(&self, request: &ProductstatusesCustomBatchRequest) -> ProductstatuseCustombatchCall<'a, C, NC, A> {
         ProductstatuseCustombatchCall {
             hub: self.hub,
@@ -3035,13 +3151,13 @@ pub struct AccountMethods<'a, C, NC, A>
     hub: &'a ShoppingContent<C, NC, A>,
 }
 
-impl<'a, C, NC, A> ResourceMethodsBuilder for AccountMethods<'a, C, NC, A> {}
+impl<'a, C, NC, A> MethodsBuilder for AccountMethods<'a, C, NC, A> {}
 
 impl<'a, C, NC, A> AccountMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Returns information about the authenticated user.    
+    /// Returns information about the authenticated user.
     pub fn authinfo(&self) -> AccountAuthinfoCall<'a, C, NC, A> {
         AccountAuthinfoCall {
             hub: self.hub,
@@ -3053,7 +3169,13 @@ impl<'a, C, NC, A> AccountMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Updates a Merchant Center account. This method supports patch semantics.    
+    /// Updates a Merchant Center account. This method supports patch semantics.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `merchantId` - The ID of the managing account.
+    /// * `accountId` - The ID of the account.
     pub fn patch(&self, request: &Account, merchant_id: &str, account_id: &str) -> AccountPatchCall<'a, C, NC, A> {
         AccountPatchCall {
             hub: self.hub,
@@ -3068,7 +3190,12 @@ impl<'a, C, NC, A> AccountMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Retrieves a Merchant Center account.    
+    /// Retrieves a Merchant Center account.
+    /// 
+    /// # Arguments
+    ///
+    /// * `merchantId` - The ID of the managing account.
+    /// * `accountId` - The ID of the account.
     pub fn get(&self, merchant_id: &str, account_id: &str) -> AccountGetCall<'a, C, NC, A> {
         AccountGetCall {
             hub: self.hub,
@@ -3082,7 +3209,13 @@ impl<'a, C, NC, A> AccountMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Updates a Merchant Center account.    
+    /// Updates a Merchant Center account.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `merchantId` - The ID of the managing account.
+    /// * `accountId` - The ID of the account.
     pub fn update(&self, request: &Account, merchant_id: &str, account_id: &str) -> AccountUpdateCall<'a, C, NC, A> {
         AccountUpdateCall {
             hub: self.hub,
@@ -3097,7 +3230,11 @@ impl<'a, C, NC, A> AccountMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Lists the sub-accounts in your Merchant Center account.    
+    /// Lists the sub-accounts in your Merchant Center account.
+    /// 
+    /// # Arguments
+    ///
+    /// * `merchantId` - The ID of the managing account.
     pub fn list(&self, merchant_id: &str) -> AccountListCall<'a, C, NC, A> {
         AccountListCall {
             hub: self.hub,
@@ -3112,7 +3249,12 @@ impl<'a, C, NC, A> AccountMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Deletes a Merchant Center sub-account.    
+    /// Deletes a Merchant Center sub-account.
+    /// 
+    /// # Arguments
+    ///
+    /// * `merchantId` - The ID of the managing account.
+    /// * `accountId` - The ID of the account.
     pub fn delete(&self, merchant_id: &str, account_id: &str) -> AccountDeleteCall<'a, C, NC, A> {
         AccountDeleteCall {
             hub: self.hub,
@@ -3126,7 +3268,11 @@ impl<'a, C, NC, A> AccountMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Retrieves, inserts, updates, and deletes multiple Merchant Center (sub-)accounts in a single request.    
+    /// Retrieves, inserts, updates, and deletes multiple Merchant Center (sub-)accounts in a single request.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
     pub fn custombatch(&self, request: &AccountsCustomBatchRequest) -> AccountCustombatchCall<'a, C, NC, A> {
         AccountCustombatchCall {
             hub: self.hub,
@@ -3139,7 +3285,12 @@ impl<'a, C, NC, A> AccountMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Creates a Merchant Center sub-account.    
+    /// Creates a Merchant Center sub-account.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `merchantId` - The ID of the managing account.
     pub fn insert(&self, request: &Account, merchant_id: &str) -> AccountInsertCall<'a, C, NC, A> {
         AccountInsertCall {
             hub: self.hub,
@@ -3188,13 +3339,20 @@ pub struct InventoryMethods<'a, C, NC, A>
     hub: &'a ShoppingContent<C, NC, A>,
 }
 
-impl<'a, C, NC, A> ResourceMethodsBuilder for InventoryMethods<'a, C, NC, A> {}
+impl<'a, C, NC, A> MethodsBuilder for InventoryMethods<'a, C, NC, A> {}
 
 impl<'a, C, NC, A> InventoryMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Updates price and availability of a product in your Merchant Center account.    
+    /// Updates price and availability of a product in your Merchant Center account.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `merchantId` - The ID of the managing account.
+    /// * `storeCode` - The code of the store for which to update price and availability. Use online to update price and availability of an online product.
+    /// * `productId` - The ID of the product for which to update price and availability.
     pub fn set(&self, request: &InventorySetRequest, merchant_id: &str, store_code: &str, product_id: &str) -> InventorySetCall<'a, C, NC, A> {
         InventorySetCall {
             hub: self.hub,
@@ -3210,7 +3368,11 @@ impl<'a, C, NC, A> InventoryMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Updates price and availability for multiple products or stores in a single request.    
+    /// Updates price and availability for multiple products or stores in a single request.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
     pub fn custombatch(&self, request: &InventoryCustomBatchRequest) -> InventoryCustombatchCall<'a, C, NC, A> {
         InventoryCustombatchCall {
             hub: self.hub,
@@ -3258,13 +3420,18 @@ pub struct AccountstatuseMethods<'a, C, NC, A>
     hub: &'a ShoppingContent<C, NC, A>,
 }
 
-impl<'a, C, NC, A> ResourceMethodsBuilder for AccountstatuseMethods<'a, C, NC, A> {}
+impl<'a, C, NC, A> MethodsBuilder for AccountstatuseMethods<'a, C, NC, A> {}
 
 impl<'a, C, NC, A> AccountstatuseMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Retrieves the status of a Merchant Center account.    
+    /// Retrieves the status of a Merchant Center account.
+    /// 
+    /// # Arguments
+    ///
+    /// * `merchantId` - The ID of the managing account.
+    /// * `accountId` - The ID of the account.
     pub fn get(&self, merchant_id: &str, account_id: &str) -> AccountstatuseGetCall<'a, C, NC, A> {
         AccountstatuseGetCall {
             hub: self.hub,
@@ -3278,7 +3445,11 @@ impl<'a, C, NC, A> AccountstatuseMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Lists the statuses of the sub-accounts in your Merchant Center account.    
+    /// Lists the statuses of the sub-accounts in your Merchant Center account.
+    /// 
+    /// # Arguments
+    ///
+    /// * `merchantId` - The ID of the managing account.
     pub fn list(&self, merchant_id: &str) -> AccountstatuseListCall<'a, C, NC, A> {
         AccountstatuseListCall {
             hub: self.hub,
@@ -3291,6 +3462,10 @@ impl<'a, C, NC, A> AccountstatuseMethods<'a, C, NC, A> {
         }
     }
     
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
     pub fn custombatch(&self, request: &AccountstatusesCustomBatchRequest) -> AccountstatuseCustombatchCall<'a, C, NC, A> {
         AccountstatuseCustombatchCall {
             hub: self.hub,
@@ -3338,13 +3513,17 @@ pub struct ProductMethods<'a, C, NC, A>
     hub: &'a ShoppingContent<C, NC, A>,
 }
 
-impl<'a, C, NC, A> ResourceMethodsBuilder for ProductMethods<'a, C, NC, A> {}
+impl<'a, C, NC, A> MethodsBuilder for ProductMethods<'a, C, NC, A> {}
 
 impl<'a, C, NC, A> ProductMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Lists the products in your Merchant Center account.    
+    /// Lists the products in your Merchant Center account.
+    /// 
+    /// # Arguments
+    ///
+    /// * `merchantId` - The ID of the managing account.
     pub fn list(&self, merchant_id: &str) -> ProductListCall<'a, C, NC, A> {
         ProductListCall {
             hub: self.hub,
@@ -3359,7 +3538,12 @@ impl<'a, C, NC, A> ProductMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Retrieves a product from your Merchant Center account.    
+    /// Retrieves a product from your Merchant Center account.
+    /// 
+    /// # Arguments
+    ///
+    /// * `merchantId` - The ID of the managing account.
+    /// * `productId` - The ID of the product.
     pub fn get(&self, merchant_id: &str, product_id: &str) -> ProductGetCall<'a, C, NC, A> {
         ProductGetCall {
             hub: self.hub,
@@ -3373,7 +3557,12 @@ impl<'a, C, NC, A> ProductMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Deletes a product from your Merchant Center account.    
+    /// Deletes a product from your Merchant Center account.
+    /// 
+    /// # Arguments
+    ///
+    /// * `merchantId` - The ID of the managing account.
+    /// * `productId` - The ID of the product.
     pub fn delete(&self, merchant_id: &str, product_id: &str) -> ProductDeleteCall<'a, C, NC, A> {
         ProductDeleteCall {
             hub: self.hub,
@@ -3388,7 +3577,11 @@ impl<'a, C, NC, A> ProductMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Retrieves, inserts, and deletes multiple products in a single request.    
+    /// Retrieves, inserts, and deletes multiple products in a single request.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
     pub fn custombatch(&self, request: &ProductsCustomBatchRequest) -> ProductCustombatchCall<'a, C, NC, A> {
         ProductCustombatchCall {
             hub: self.hub,
@@ -3402,7 +3595,12 @@ impl<'a, C, NC, A> ProductMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Uploads a product to your Merchant Center account.    
+    /// Uploads a product to your Merchant Center account.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `merchantId` - The ID of the managing account.
     pub fn insert(&self, request: &Product, merchant_id: &str) -> ProductInsertCall<'a, C, NC, A> {
         ProductInsertCall {
             hub: self.hub,
@@ -3452,13 +3650,17 @@ pub struct AccountshippingMethods<'a, C, NC, A>
     hub: &'a ShoppingContent<C, NC, A>,
 }
 
-impl<'a, C, NC, A> ResourceMethodsBuilder for AccountshippingMethods<'a, C, NC, A> {}
+impl<'a, C, NC, A> MethodsBuilder for AccountshippingMethods<'a, C, NC, A> {}
 
 impl<'a, C, NC, A> AccountshippingMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Lists the shipping settings of the sub-accounts in your Merchant Center account.    
+    /// Lists the shipping settings of the sub-accounts in your Merchant Center account.
+    /// 
+    /// # Arguments
+    ///
+    /// * `merchantId` - The ID of the managing account.
     pub fn list(&self, merchant_id: &str) -> AccountshippingListCall<'a, C, NC, A> {
         AccountshippingListCall {
             hub: self.hub,
@@ -3473,7 +3675,13 @@ impl<'a, C, NC, A> AccountshippingMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Updates the shipping settings of the account. This method supports patch semantics.    
+    /// Updates the shipping settings of the account. This method supports patch semantics.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `merchantId` - The ID of the managing account.
+    /// * `accountId` - The ID of the account for which to get/update account shipping settings.
     pub fn patch(&self, request: &AccountShipping, merchant_id: &str, account_id: &str) -> AccountshippingPatchCall<'a, C, NC, A> {
         AccountshippingPatchCall {
             hub: self.hub,
@@ -3488,7 +3696,13 @@ impl<'a, C, NC, A> AccountshippingMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Updates the shipping settings of the account.    
+    /// Updates the shipping settings of the account.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `merchantId` - The ID of the managing account.
+    /// * `accountId` - The ID of the account for which to get/update account shipping settings.
     pub fn update(&self, request: &AccountShipping, merchant_id: &str, account_id: &str) -> AccountshippingUpdateCall<'a, C, NC, A> {
         AccountshippingUpdateCall {
             hub: self.hub,
@@ -3503,7 +3717,11 @@ impl<'a, C, NC, A> AccountshippingMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Retrieves and updates the shipping settings of multiple accounts in a single request.    
+    /// Retrieves and updates the shipping settings of multiple accounts in a single request.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
     pub fn custombatch(&self, request: &AccountshippingCustomBatchRequest) -> AccountshippingCustombatchCall<'a, C, NC, A> {
         AccountshippingCustombatchCall {
             hub: self.hub,
@@ -3516,7 +3734,12 @@ impl<'a, C, NC, A> AccountshippingMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Retrieves the shipping settings of the account.    
+    /// Retrieves the shipping settings of the account.
+    /// 
+    /// # Arguments
+    ///
+    /// * `merchantId` - The ID of the managing account.
+    /// * `accountId` - The ID of the account for which to get/update account shipping settings.
     pub fn get(&self, merchant_id: &str, account_id: &str) -> AccountshippingGetCall<'a, C, NC, A> {
         AccountshippingGetCall {
             hub: self.hub,
@@ -3540,7 +3763,7 @@ impl<'a, C, NC, A> AccountshippingMethods<'a, C, NC, A> {
 /// Retrieves and updates tax settings of multiple accounts in a single request.
 ///
 /// A builder for the *custombatch* method supported by a *accounttax* resource.
-/// It is not used directly, but through a `AccounttaxMethods`.
+/// It is not used directly, but through a `AccounttaxMethods` instance.
 ///
 /// # Example
 ///
@@ -3603,7 +3826,7 @@ impl<'a, C, NC, A> AccounttaxCustombatchCall<'a, C, NC, A> where NC: hyper::net:
         for &field in ["alt"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -3636,7 +3859,7 @@ impl<'a, C, NC, A> AccounttaxCustombatchCall<'a, C, NC, A> where NC: hyper::net:
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -3652,7 +3875,6 @@ impl<'a, C, NC, A> AccounttaxCustombatchCall<'a, C, NC, A> where NC: hyper::net:
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -3662,7 +3884,7 @@ impl<'a, C, NC, A> AccounttaxCustombatchCall<'a, C, NC, A> where NC: hyper::net:
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -3673,7 +3895,7 @@ impl<'a, C, NC, A> AccounttaxCustombatchCall<'a, C, NC, A> where NC: hyper::net:
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -3682,13 +3904,13 @@ impl<'a, C, NC, A> AccounttaxCustombatchCall<'a, C, NC, A> where NC: hyper::net:
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -3760,7 +3982,7 @@ impl<'a, C, NC, A> AccounttaxCustombatchCall<'a, C, NC, A> where NC: hyper::net:
 /// Updates the tax settings of the account. This method supports patch semantics.
 ///
 /// A builder for the *patch* method supported by a *accounttax* resource.
-/// It is not used directly, but through a `AccounttaxMethods`.
+/// It is not used directly, but through a `AccounttaxMethods` instance.
 ///
 /// # Example
 ///
@@ -3827,7 +4049,7 @@ impl<'a, C, NC, A> AccounttaxPatchCall<'a, C, NC, A> where NC: hyper::net::Netwo
         for &field in ["alt", "merchantId", "accountId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -3884,7 +4106,7 @@ impl<'a, C, NC, A> AccounttaxPatchCall<'a, C, NC, A> where NC: hyper::net::Netwo
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -3900,7 +4122,6 @@ impl<'a, C, NC, A> AccounttaxPatchCall<'a, C, NC, A> where NC: hyper::net::Netwo
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -3910,7 +4131,7 @@ impl<'a, C, NC, A> AccounttaxPatchCall<'a, C, NC, A> where NC: hyper::net::Netwo
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -3921,7 +4142,7 @@ impl<'a, C, NC, A> AccounttaxPatchCall<'a, C, NC, A> where NC: hyper::net::Netwo
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -3930,13 +4151,13 @@ impl<'a, C, NC, A> AccounttaxPatchCall<'a, C, NC, A> where NC: hyper::net::Netwo
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -3957,7 +4178,7 @@ impl<'a, C, NC, A> AccounttaxPatchCall<'a, C, NC, A> where NC: hyper::net::Netwo
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The ID of the managing account.    
+    /// The ID of the managing account.
     pub fn merchant_id(mut self, new_value: &str) -> AccounttaxPatchCall<'a, C, NC, A> {
         self._merchant_id = new_value.to_string();
         self
@@ -3967,7 +4188,7 @@ impl<'a, C, NC, A> AccounttaxPatchCall<'a, C, NC, A> where NC: hyper::net::Netwo
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The ID of the account for which to get/update account tax settings.    
+    /// The ID of the account for which to get/update account tax settings.
     pub fn account_id(mut self, new_value: &str) -> AccounttaxPatchCall<'a, C, NC, A> {
         self._account_id = new_value.to_string();
         self
@@ -4028,7 +4249,7 @@ impl<'a, C, NC, A> AccounttaxPatchCall<'a, C, NC, A> where NC: hyper::net::Netwo
 /// Lists the tax settings of the sub-accounts in your Merchant Center account.
 ///
 /// A builder for the *list* method supported by a *accounttax* resource.
-/// It is not used directly, but through a `AccounttaxMethods`.
+/// It is not used directly, but through a `AccounttaxMethods` instance.
 ///
 /// # Example
 ///
@@ -4096,7 +4317,7 @@ impl<'a, C, NC, A> AccounttaxListCall<'a, C, NC, A> where NC: hyper::net::Networ
         for &field in ["alt", "merchantId", "pageToken", "maxResults"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -4149,7 +4370,7 @@ impl<'a, C, NC, A> AccounttaxListCall<'a, C, NC, A> where NC: hyper::net::Networ
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -4161,7 +4382,6 @@ impl<'a, C, NC, A> AccounttaxListCall<'a, C, NC, A> where NC: hyper::net::Networ
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -4171,7 +4391,7 @@ impl<'a, C, NC, A> AccounttaxListCall<'a, C, NC, A> where NC: hyper::net::Networ
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -4182,7 +4402,7 @@ impl<'a, C, NC, A> AccounttaxListCall<'a, C, NC, A> where NC: hyper::net::Networ
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -4191,13 +4411,13 @@ impl<'a, C, NC, A> AccounttaxListCall<'a, C, NC, A> where NC: hyper::net::Networ
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -4209,7 +4429,7 @@ impl<'a, C, NC, A> AccounttaxListCall<'a, C, NC, A> where NC: hyper::net::Networ
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The ID of the managing account.    
+    /// The ID of the managing account.
     pub fn merchant_id(mut self, new_value: &str) -> AccounttaxListCall<'a, C, NC, A> {
         self._merchant_id = new_value.to_string();
         self
@@ -4217,7 +4437,7 @@ impl<'a, C, NC, A> AccounttaxListCall<'a, C, NC, A> where NC: hyper::net::Networ
     /// Sets the *page token* query property to the given value.
     ///
     /// 
-    /// The token returned by the previous request.    
+    /// The token returned by the previous request.
     pub fn page_token(mut self, new_value: &str) -> AccounttaxListCall<'a, C, NC, A> {
         self._page_token = Some(new_value.to_string());
         self
@@ -4225,7 +4445,7 @@ impl<'a, C, NC, A> AccounttaxListCall<'a, C, NC, A> where NC: hyper::net::Networ
     /// Sets the *max results* query property to the given value.
     ///
     /// 
-    /// The maximum number of tax settings to return in the response, used for paging.    
+    /// The maximum number of tax settings to return in the response, used for paging.
     pub fn max_results(mut self, new_value: u32) -> AccounttaxListCall<'a, C, NC, A> {
         self._max_results = Some(new_value);
         self
@@ -4286,7 +4506,7 @@ impl<'a, C, NC, A> AccounttaxListCall<'a, C, NC, A> where NC: hyper::net::Networ
 /// Updates the tax settings of the account.
 ///
 /// A builder for the *update* method supported by a *accounttax* resource.
-/// It is not used directly, but through a `AccounttaxMethods`.
+/// It is not used directly, but through a `AccounttaxMethods` instance.
 ///
 /// # Example
 ///
@@ -4353,7 +4573,7 @@ impl<'a, C, NC, A> AccounttaxUpdateCall<'a, C, NC, A> where NC: hyper::net::Netw
         for &field in ["alt", "merchantId", "accountId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -4410,7 +4630,7 @@ impl<'a, C, NC, A> AccounttaxUpdateCall<'a, C, NC, A> where NC: hyper::net::Netw
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -4426,7 +4646,6 @@ impl<'a, C, NC, A> AccounttaxUpdateCall<'a, C, NC, A> where NC: hyper::net::Netw
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -4436,7 +4655,7 @@ impl<'a, C, NC, A> AccounttaxUpdateCall<'a, C, NC, A> where NC: hyper::net::Netw
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -4447,7 +4666,7 @@ impl<'a, C, NC, A> AccounttaxUpdateCall<'a, C, NC, A> where NC: hyper::net::Netw
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -4456,13 +4675,13 @@ impl<'a, C, NC, A> AccounttaxUpdateCall<'a, C, NC, A> where NC: hyper::net::Netw
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -4483,7 +4702,7 @@ impl<'a, C, NC, A> AccounttaxUpdateCall<'a, C, NC, A> where NC: hyper::net::Netw
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The ID of the managing account.    
+    /// The ID of the managing account.
     pub fn merchant_id(mut self, new_value: &str) -> AccounttaxUpdateCall<'a, C, NC, A> {
         self._merchant_id = new_value.to_string();
         self
@@ -4493,7 +4712,7 @@ impl<'a, C, NC, A> AccounttaxUpdateCall<'a, C, NC, A> where NC: hyper::net::Netw
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The ID of the account for which to get/update account tax settings.    
+    /// The ID of the account for which to get/update account tax settings.
     pub fn account_id(mut self, new_value: &str) -> AccounttaxUpdateCall<'a, C, NC, A> {
         self._account_id = new_value.to_string();
         self
@@ -4554,7 +4773,7 @@ impl<'a, C, NC, A> AccounttaxUpdateCall<'a, C, NC, A> where NC: hyper::net::Netw
 /// Retrieves the tax settings of the account.
 ///
 /// A builder for the *get* method supported by a *accounttax* resource.
-/// It is not used directly, but through a `AccounttaxMethods`.
+/// It is not used directly, but through a `AccounttaxMethods` instance.
 ///
 /// # Example
 ///
@@ -4614,7 +4833,7 @@ impl<'a, C, NC, A> AccounttaxGetCall<'a, C, NC, A> where NC: hyper::net::Network
         for &field in ["alt", "merchantId", "accountId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -4667,7 +4886,7 @@ impl<'a, C, NC, A> AccounttaxGetCall<'a, C, NC, A> where NC: hyper::net::Network
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -4679,7 +4898,6 @@ impl<'a, C, NC, A> AccounttaxGetCall<'a, C, NC, A> where NC: hyper::net::Network
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -4689,7 +4907,7 @@ impl<'a, C, NC, A> AccounttaxGetCall<'a, C, NC, A> where NC: hyper::net::Network
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -4700,7 +4918,7 @@ impl<'a, C, NC, A> AccounttaxGetCall<'a, C, NC, A> where NC: hyper::net::Network
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -4709,13 +4927,13 @@ impl<'a, C, NC, A> AccounttaxGetCall<'a, C, NC, A> where NC: hyper::net::Network
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -4727,7 +4945,7 @@ impl<'a, C, NC, A> AccounttaxGetCall<'a, C, NC, A> where NC: hyper::net::Network
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The ID of the managing account.    
+    /// The ID of the managing account.
     pub fn merchant_id(mut self, new_value: &str) -> AccounttaxGetCall<'a, C, NC, A> {
         self._merchant_id = new_value.to_string();
         self
@@ -4737,7 +4955,7 @@ impl<'a, C, NC, A> AccounttaxGetCall<'a, C, NC, A> where NC: hyper::net::Network
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The ID of the account for which to get/update account tax settings.    
+    /// The ID of the account for which to get/update account tax settings.
     pub fn account_id(mut self, new_value: &str) -> AccounttaxGetCall<'a, C, NC, A> {
         self._account_id = new_value.to_string();
         self
@@ -4798,7 +5016,7 @@ impl<'a, C, NC, A> AccounttaxGetCall<'a, C, NC, A> where NC: hyper::net::Network
 /// Retrieves the status of a datafeed from your Merchant Center account.
 ///
 /// A builder for the *get* method supported by a *datafeedstatuse* resource.
-/// It is not used directly, but through a `DatafeedstatuseMethods`.
+/// It is not used directly, but through a `DatafeedstatuseMethods` instance.
 ///
 /// # Example
 ///
@@ -4858,7 +5076,7 @@ impl<'a, C, NC, A> DatafeedstatuseGetCall<'a, C, NC, A> where NC: hyper::net::Ne
         for &field in ["alt", "merchantId", "datafeedId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -4911,7 +5129,7 @@ impl<'a, C, NC, A> DatafeedstatuseGetCall<'a, C, NC, A> where NC: hyper::net::Ne
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -4923,7 +5141,6 @@ impl<'a, C, NC, A> DatafeedstatuseGetCall<'a, C, NC, A> where NC: hyper::net::Ne
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -4933,7 +5150,7 @@ impl<'a, C, NC, A> DatafeedstatuseGetCall<'a, C, NC, A> where NC: hyper::net::Ne
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -4944,7 +5161,7 @@ impl<'a, C, NC, A> DatafeedstatuseGetCall<'a, C, NC, A> where NC: hyper::net::Ne
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -4953,13 +5170,13 @@ impl<'a, C, NC, A> DatafeedstatuseGetCall<'a, C, NC, A> where NC: hyper::net::Ne
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -5040,7 +5257,7 @@ impl<'a, C, NC, A> DatafeedstatuseGetCall<'a, C, NC, A> where NC: hyper::net::Ne
 /// Lists the statuses of the datafeeds in your Merchant Center account.
 ///
 /// A builder for the *list* method supported by a *datafeedstatuse* resource.
-/// It is not used directly, but through a `DatafeedstatuseMethods`.
+/// It is not used directly, but through a `DatafeedstatuseMethods` instance.
 ///
 /// # Example
 ///
@@ -5108,7 +5325,7 @@ impl<'a, C, NC, A> DatafeedstatuseListCall<'a, C, NC, A> where NC: hyper::net::N
         for &field in ["alt", "merchantId", "pageToken", "maxResults"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -5161,7 +5378,7 @@ impl<'a, C, NC, A> DatafeedstatuseListCall<'a, C, NC, A> where NC: hyper::net::N
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -5173,7 +5390,6 @@ impl<'a, C, NC, A> DatafeedstatuseListCall<'a, C, NC, A> where NC: hyper::net::N
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -5183,7 +5399,7 @@ impl<'a, C, NC, A> DatafeedstatuseListCall<'a, C, NC, A> where NC: hyper::net::N
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -5194,7 +5410,7 @@ impl<'a, C, NC, A> DatafeedstatuseListCall<'a, C, NC, A> where NC: hyper::net::N
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -5203,13 +5419,13 @@ impl<'a, C, NC, A> DatafeedstatuseListCall<'a, C, NC, A> where NC: hyper::net::N
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -5221,7 +5437,7 @@ impl<'a, C, NC, A> DatafeedstatuseListCall<'a, C, NC, A> where NC: hyper::net::N
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The ID of the managing account.    
+    /// The ID of the managing account.
     pub fn merchant_id(mut self, new_value: &str) -> DatafeedstatuseListCall<'a, C, NC, A> {
         self._merchant_id = new_value.to_string();
         self
@@ -5229,7 +5445,7 @@ impl<'a, C, NC, A> DatafeedstatuseListCall<'a, C, NC, A> where NC: hyper::net::N
     /// Sets the *page token* query property to the given value.
     ///
     /// 
-    /// The token returned by the previous request.    
+    /// The token returned by the previous request.
     pub fn page_token(mut self, new_value: &str) -> DatafeedstatuseListCall<'a, C, NC, A> {
         self._page_token = Some(new_value.to_string());
         self
@@ -5237,7 +5453,7 @@ impl<'a, C, NC, A> DatafeedstatuseListCall<'a, C, NC, A> where NC: hyper::net::N
     /// Sets the *max results* query property to the given value.
     ///
     /// 
-    /// The maximum number of products to return in the response, used for paging.    
+    /// The maximum number of products to return in the response, used for paging.
     pub fn max_results(mut self, new_value: u32) -> DatafeedstatuseListCall<'a, C, NC, A> {
         self._max_results = Some(new_value);
         self
@@ -5296,7 +5512,7 @@ impl<'a, C, NC, A> DatafeedstatuseListCall<'a, C, NC, A> where NC: hyper::net::N
 
 
 /// A builder for the *custombatch* method supported by a *datafeedstatuse* resource.
-/// It is not used directly, but through a `DatafeedstatuseMethods`.
+/// It is not used directly, but through a `DatafeedstatuseMethods` instance.
 ///
 /// # Example
 ///
@@ -5359,7 +5575,7 @@ impl<'a, C, NC, A> DatafeedstatuseCustombatchCall<'a, C, NC, A> where NC: hyper:
         for &field in ["alt"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -5392,7 +5608,7 @@ impl<'a, C, NC, A> DatafeedstatuseCustombatchCall<'a, C, NC, A> where NC: hyper:
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -5408,7 +5624,6 @@ impl<'a, C, NC, A> DatafeedstatuseCustombatchCall<'a, C, NC, A> where NC: hyper:
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -5418,7 +5633,7 @@ impl<'a, C, NC, A> DatafeedstatuseCustombatchCall<'a, C, NC, A> where NC: hyper:
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -5429,7 +5644,7 @@ impl<'a, C, NC, A> DatafeedstatuseCustombatchCall<'a, C, NC, A> where NC: hyper:
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -5438,13 +5653,13 @@ impl<'a, C, NC, A> DatafeedstatuseCustombatchCall<'a, C, NC, A> where NC: hyper:
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -5514,7 +5729,7 @@ impl<'a, C, NC, A> DatafeedstatuseCustombatchCall<'a, C, NC, A> where NC: hyper:
 
 
 /// A builder for the *custombatch* method supported by a *datafeed* resource.
-/// It is not used directly, but through a `DatafeedMethods`.
+/// It is not used directly, but through a `DatafeedMethods` instance.
 ///
 /// # Example
 ///
@@ -5577,7 +5792,7 @@ impl<'a, C, NC, A> DatafeedCustombatchCall<'a, C, NC, A> where NC: hyper::net::N
         for &field in ["alt"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -5610,7 +5825,7 @@ impl<'a, C, NC, A> DatafeedCustombatchCall<'a, C, NC, A> where NC: hyper::net::N
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -5626,7 +5841,6 @@ impl<'a, C, NC, A> DatafeedCustombatchCall<'a, C, NC, A> where NC: hyper::net::N
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -5636,7 +5850,7 @@ impl<'a, C, NC, A> DatafeedCustombatchCall<'a, C, NC, A> where NC: hyper::net::N
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -5647,7 +5861,7 @@ impl<'a, C, NC, A> DatafeedCustombatchCall<'a, C, NC, A> where NC: hyper::net::N
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -5656,13 +5870,13 @@ impl<'a, C, NC, A> DatafeedCustombatchCall<'a, C, NC, A> where NC: hyper::net::N
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -5734,7 +5948,7 @@ impl<'a, C, NC, A> DatafeedCustombatchCall<'a, C, NC, A> where NC: hyper::net::N
 /// Retrieves a datafeed from your Merchant Center account.
 ///
 /// A builder for the *get* method supported by a *datafeed* resource.
-/// It is not used directly, but through a `DatafeedMethods`.
+/// It is not used directly, but through a `DatafeedMethods` instance.
 ///
 /// # Example
 ///
@@ -5794,7 +6008,7 @@ impl<'a, C, NC, A> DatafeedGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
         for &field in ["alt", "merchantId", "datafeedId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -5847,7 +6061,7 @@ impl<'a, C, NC, A> DatafeedGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -5859,7 +6073,6 @@ impl<'a, C, NC, A> DatafeedGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -5869,7 +6082,7 @@ impl<'a, C, NC, A> DatafeedGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -5880,7 +6093,7 @@ impl<'a, C, NC, A> DatafeedGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -5889,13 +6102,13 @@ impl<'a, C, NC, A> DatafeedGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -5976,7 +6189,7 @@ impl<'a, C, NC, A> DatafeedGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
 /// Updates a datafeed of your Merchant Center account. This method supports patch semantics.
 ///
 /// A builder for the *patch* method supported by a *datafeed* resource.
-/// It is not used directly, but through a `DatafeedMethods`.
+/// It is not used directly, but through a `DatafeedMethods` instance.
 ///
 /// # Example
 ///
@@ -6043,7 +6256,7 @@ impl<'a, C, NC, A> DatafeedPatchCall<'a, C, NC, A> where NC: hyper::net::Network
         for &field in ["alt", "merchantId", "datafeedId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -6100,7 +6313,7 @@ impl<'a, C, NC, A> DatafeedPatchCall<'a, C, NC, A> where NC: hyper::net::Network
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -6116,7 +6329,6 @@ impl<'a, C, NC, A> DatafeedPatchCall<'a, C, NC, A> where NC: hyper::net::Network
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -6126,7 +6338,7 @@ impl<'a, C, NC, A> DatafeedPatchCall<'a, C, NC, A> where NC: hyper::net::Network
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -6137,7 +6349,7 @@ impl<'a, C, NC, A> DatafeedPatchCall<'a, C, NC, A> where NC: hyper::net::Network
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -6146,13 +6358,13 @@ impl<'a, C, NC, A> DatafeedPatchCall<'a, C, NC, A> where NC: hyper::net::Network
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -6242,7 +6454,7 @@ impl<'a, C, NC, A> DatafeedPatchCall<'a, C, NC, A> where NC: hyper::net::Network
 /// Deletes a datafeed from your Merchant Center account.
 ///
 /// A builder for the *delete* method supported by a *datafeed* resource.
-/// It is not used directly, but through a `DatafeedMethods`.
+/// It is not used directly, but through a `DatafeedMethods` instance.
 ///
 /// # Example
 ///
@@ -6302,7 +6514,7 @@ impl<'a, C, NC, A> DatafeedDeleteCall<'a, C, NC, A> where NC: hyper::net::Networ
         for &field in ["merchantId", "datafeedId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -6354,7 +6566,7 @@ impl<'a, C, NC, A> DatafeedDeleteCall<'a, C, NC, A> where NC: hyper::net::Networ
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -6366,7 +6578,6 @@ impl<'a, C, NC, A> DatafeedDeleteCall<'a, C, NC, A> where NC: hyper::net::Networ
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -6376,7 +6587,7 @@ impl<'a, C, NC, A> DatafeedDeleteCall<'a, C, NC, A> where NC: hyper::net::Networ
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -6387,12 +6598,12 @@ impl<'a, C, NC, A> DatafeedDeleteCall<'a, C, NC, A> where NC: hyper::net::Networ
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = res;
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -6473,7 +6684,7 @@ impl<'a, C, NC, A> DatafeedDeleteCall<'a, C, NC, A> where NC: hyper::net::Networ
 /// Registers a datafeed with your Merchant Center account.
 ///
 /// A builder for the *insert* method supported by a *datafeed* resource.
-/// It is not used directly, but through a `DatafeedMethods`.
+/// It is not used directly, but through a `DatafeedMethods` instance.
 ///
 /// # Example
 ///
@@ -6538,7 +6749,7 @@ impl<'a, C, NC, A> DatafeedInsertCall<'a, C, NC, A> where NC: hyper::net::Networ
         for &field in ["alt", "merchantId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -6595,7 +6806,7 @@ impl<'a, C, NC, A> DatafeedInsertCall<'a, C, NC, A> where NC: hyper::net::Networ
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -6611,7 +6822,6 @@ impl<'a, C, NC, A> DatafeedInsertCall<'a, C, NC, A> where NC: hyper::net::Networ
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -6621,7 +6831,7 @@ impl<'a, C, NC, A> DatafeedInsertCall<'a, C, NC, A> where NC: hyper::net::Networ
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -6632,7 +6842,7 @@ impl<'a, C, NC, A> DatafeedInsertCall<'a, C, NC, A> where NC: hyper::net::Networ
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -6641,13 +6851,13 @@ impl<'a, C, NC, A> DatafeedInsertCall<'a, C, NC, A> where NC: hyper::net::Networ
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -6728,7 +6938,7 @@ impl<'a, C, NC, A> DatafeedInsertCall<'a, C, NC, A> where NC: hyper::net::Networ
 /// Lists the datafeeds in your Merchant Center account.
 ///
 /// A builder for the *list* method supported by a *datafeed* resource.
-/// It is not used directly, but through a `DatafeedMethods`.
+/// It is not used directly, but through a `DatafeedMethods` instance.
 ///
 /// # Example
 ///
@@ -6796,7 +7006,7 @@ impl<'a, C, NC, A> DatafeedListCall<'a, C, NC, A> where NC: hyper::net::NetworkC
         for &field in ["alt", "merchantId", "pageToken", "maxResults"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -6849,7 +7059,7 @@ impl<'a, C, NC, A> DatafeedListCall<'a, C, NC, A> where NC: hyper::net::NetworkC
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -6861,7 +7071,6 @@ impl<'a, C, NC, A> DatafeedListCall<'a, C, NC, A> where NC: hyper::net::NetworkC
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -6871,7 +7080,7 @@ impl<'a, C, NC, A> DatafeedListCall<'a, C, NC, A> where NC: hyper::net::NetworkC
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -6882,7 +7091,7 @@ impl<'a, C, NC, A> DatafeedListCall<'a, C, NC, A> where NC: hyper::net::NetworkC
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -6891,13 +7100,13 @@ impl<'a, C, NC, A> DatafeedListCall<'a, C, NC, A> where NC: hyper::net::NetworkC
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -6909,7 +7118,7 @@ impl<'a, C, NC, A> DatafeedListCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The ID of the managing account.    
+    /// The ID of the managing account.
     pub fn merchant_id(mut self, new_value: &str) -> DatafeedListCall<'a, C, NC, A> {
         self._merchant_id = new_value.to_string();
         self
@@ -6917,7 +7126,7 @@ impl<'a, C, NC, A> DatafeedListCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// Sets the *page token* query property to the given value.
     ///
     /// 
-    /// The token returned by the previous request.    
+    /// The token returned by the previous request.
     pub fn page_token(mut self, new_value: &str) -> DatafeedListCall<'a, C, NC, A> {
         self._page_token = Some(new_value.to_string());
         self
@@ -6925,7 +7134,7 @@ impl<'a, C, NC, A> DatafeedListCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// Sets the *max results* query property to the given value.
     ///
     /// 
-    /// The maximum number of products to return in the response, used for paging.    
+    /// The maximum number of products to return in the response, used for paging.
     pub fn max_results(mut self, new_value: u32) -> DatafeedListCall<'a, C, NC, A> {
         self._max_results = Some(new_value);
         self
@@ -6986,7 +7195,7 @@ impl<'a, C, NC, A> DatafeedListCall<'a, C, NC, A> where NC: hyper::net::NetworkC
 /// Updates a datafeed of your Merchant Center account.
 ///
 /// A builder for the *update* method supported by a *datafeed* resource.
-/// It is not used directly, but through a `DatafeedMethods`.
+/// It is not used directly, but through a `DatafeedMethods` instance.
 ///
 /// # Example
 ///
@@ -7053,7 +7262,7 @@ impl<'a, C, NC, A> DatafeedUpdateCall<'a, C, NC, A> where NC: hyper::net::Networ
         for &field in ["alt", "merchantId", "datafeedId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -7110,7 +7319,7 @@ impl<'a, C, NC, A> DatafeedUpdateCall<'a, C, NC, A> where NC: hyper::net::Networ
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -7126,7 +7335,6 @@ impl<'a, C, NC, A> DatafeedUpdateCall<'a, C, NC, A> where NC: hyper::net::Networ
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -7136,7 +7344,7 @@ impl<'a, C, NC, A> DatafeedUpdateCall<'a, C, NC, A> where NC: hyper::net::Networ
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -7147,7 +7355,7 @@ impl<'a, C, NC, A> DatafeedUpdateCall<'a, C, NC, A> where NC: hyper::net::Networ
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -7156,13 +7364,13 @@ impl<'a, C, NC, A> DatafeedUpdateCall<'a, C, NC, A> where NC: hyper::net::Networ
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -7252,7 +7460,7 @@ impl<'a, C, NC, A> DatafeedUpdateCall<'a, C, NC, A> where NC: hyper::net::Networ
 /// Gets the status of a product from your Merchant Center account.
 ///
 /// A builder for the *get* method supported by a *productstatuse* resource.
-/// It is not used directly, but through a `ProductstatuseMethods`.
+/// It is not used directly, but through a `ProductstatuseMethods` instance.
 ///
 /// # Example
 ///
@@ -7312,7 +7520,7 @@ impl<'a, C, NC, A> ProductstatuseGetCall<'a, C, NC, A> where NC: hyper::net::Net
         for &field in ["alt", "merchantId", "productId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -7365,7 +7573,7 @@ impl<'a, C, NC, A> ProductstatuseGetCall<'a, C, NC, A> where NC: hyper::net::Net
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -7377,7 +7585,6 @@ impl<'a, C, NC, A> ProductstatuseGetCall<'a, C, NC, A> where NC: hyper::net::Net
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -7387,7 +7594,7 @@ impl<'a, C, NC, A> ProductstatuseGetCall<'a, C, NC, A> where NC: hyper::net::Net
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -7398,7 +7605,7 @@ impl<'a, C, NC, A> ProductstatuseGetCall<'a, C, NC, A> where NC: hyper::net::Net
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -7407,13 +7614,13 @@ impl<'a, C, NC, A> ProductstatuseGetCall<'a, C, NC, A> where NC: hyper::net::Net
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -7425,7 +7632,7 @@ impl<'a, C, NC, A> ProductstatuseGetCall<'a, C, NC, A> where NC: hyper::net::Net
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The ID of the managing account.    
+    /// The ID of the managing account.
     pub fn merchant_id(mut self, new_value: &str) -> ProductstatuseGetCall<'a, C, NC, A> {
         self._merchant_id = new_value.to_string();
         self
@@ -7435,7 +7642,7 @@ impl<'a, C, NC, A> ProductstatuseGetCall<'a, C, NC, A> where NC: hyper::net::Net
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The ID of the product.    
+    /// The ID of the product.
     pub fn product_id(mut self, new_value: &str) -> ProductstatuseGetCall<'a, C, NC, A> {
         self._product_id = new_value.to_string();
         self
@@ -7496,7 +7703,7 @@ impl<'a, C, NC, A> ProductstatuseGetCall<'a, C, NC, A> where NC: hyper::net::Net
 /// Lists the statuses of the products in your Merchant Center account.
 ///
 /// A builder for the *list* method supported by a *productstatuse* resource.
-/// It is not used directly, but through a `ProductstatuseMethods`.
+/// It is not used directly, but through a `ProductstatuseMethods` instance.
 ///
 /// # Example
 ///
@@ -7564,7 +7771,7 @@ impl<'a, C, NC, A> ProductstatuseListCall<'a, C, NC, A> where NC: hyper::net::Ne
         for &field in ["alt", "merchantId", "pageToken", "maxResults"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -7617,7 +7824,7 @@ impl<'a, C, NC, A> ProductstatuseListCall<'a, C, NC, A> where NC: hyper::net::Ne
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -7629,7 +7836,6 @@ impl<'a, C, NC, A> ProductstatuseListCall<'a, C, NC, A> where NC: hyper::net::Ne
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -7639,7 +7845,7 @@ impl<'a, C, NC, A> ProductstatuseListCall<'a, C, NC, A> where NC: hyper::net::Ne
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -7650,7 +7856,7 @@ impl<'a, C, NC, A> ProductstatuseListCall<'a, C, NC, A> where NC: hyper::net::Ne
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -7659,13 +7865,13 @@ impl<'a, C, NC, A> ProductstatuseListCall<'a, C, NC, A> where NC: hyper::net::Ne
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -7677,7 +7883,7 @@ impl<'a, C, NC, A> ProductstatuseListCall<'a, C, NC, A> where NC: hyper::net::Ne
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The ID of the managing account.    
+    /// The ID of the managing account.
     pub fn merchant_id(mut self, new_value: &str) -> ProductstatuseListCall<'a, C, NC, A> {
         self._merchant_id = new_value.to_string();
         self
@@ -7685,7 +7891,7 @@ impl<'a, C, NC, A> ProductstatuseListCall<'a, C, NC, A> where NC: hyper::net::Ne
     /// Sets the *page token* query property to the given value.
     ///
     /// 
-    /// The token returned by the previous request.    
+    /// The token returned by the previous request.
     pub fn page_token(mut self, new_value: &str) -> ProductstatuseListCall<'a, C, NC, A> {
         self._page_token = Some(new_value.to_string());
         self
@@ -7693,7 +7899,7 @@ impl<'a, C, NC, A> ProductstatuseListCall<'a, C, NC, A> where NC: hyper::net::Ne
     /// Sets the *max results* query property to the given value.
     ///
     /// 
-    /// The maximum number of product statuses to return in the response, used for paging.    
+    /// The maximum number of product statuses to return in the response, used for paging.
     pub fn max_results(mut self, new_value: u32) -> ProductstatuseListCall<'a, C, NC, A> {
         self._max_results = Some(new_value);
         self
@@ -7754,7 +7960,7 @@ impl<'a, C, NC, A> ProductstatuseListCall<'a, C, NC, A> where NC: hyper::net::Ne
 /// Gets the statuses of multiple products in a single request.
 ///
 /// A builder for the *custombatch* method supported by a *productstatuse* resource.
-/// It is not used directly, but through a `ProductstatuseMethods`.
+/// It is not used directly, but through a `ProductstatuseMethods` instance.
 ///
 /// # Example
 ///
@@ -7817,7 +8023,7 @@ impl<'a, C, NC, A> ProductstatuseCustombatchCall<'a, C, NC, A> where NC: hyper::
         for &field in ["alt"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -7850,7 +8056,7 @@ impl<'a, C, NC, A> ProductstatuseCustombatchCall<'a, C, NC, A> where NC: hyper::
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -7866,7 +8072,6 @@ impl<'a, C, NC, A> ProductstatuseCustombatchCall<'a, C, NC, A> where NC: hyper::
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -7876,7 +8081,7 @@ impl<'a, C, NC, A> ProductstatuseCustombatchCall<'a, C, NC, A> where NC: hyper::
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -7887,7 +8092,7 @@ impl<'a, C, NC, A> ProductstatuseCustombatchCall<'a, C, NC, A> where NC: hyper::
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -7896,13 +8101,13 @@ impl<'a, C, NC, A> ProductstatuseCustombatchCall<'a, C, NC, A> where NC: hyper::
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -7974,7 +8179,7 @@ impl<'a, C, NC, A> ProductstatuseCustombatchCall<'a, C, NC, A> where NC: hyper::
 /// Returns information about the authenticated user.
 ///
 /// A builder for the *authinfo* method supported by a *account* resource.
-/// It is not used directly, but through a `AccountMethods`.
+/// It is not used directly, but through a `AccountMethods` instance.
 ///
 /// # Example
 ///
@@ -8030,7 +8235,7 @@ impl<'a, C, NC, A> AccountAuthinfoCall<'a, C, NC, A> where NC: hyper::net::Netwo
         for &field in ["alt"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -8059,7 +8264,7 @@ impl<'a, C, NC, A> AccountAuthinfoCall<'a, C, NC, A> where NC: hyper::net::Netwo
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -8071,7 +8276,6 @@ impl<'a, C, NC, A> AccountAuthinfoCall<'a, C, NC, A> where NC: hyper::net::Netwo
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -8081,7 +8285,7 @@ impl<'a, C, NC, A> AccountAuthinfoCall<'a, C, NC, A> where NC: hyper::net::Netwo
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -8092,7 +8296,7 @@ impl<'a, C, NC, A> AccountAuthinfoCall<'a, C, NC, A> where NC: hyper::net::Netwo
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -8101,13 +8305,13 @@ impl<'a, C, NC, A> AccountAuthinfoCall<'a, C, NC, A> where NC: hyper::net::Netwo
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -8170,7 +8374,7 @@ impl<'a, C, NC, A> AccountAuthinfoCall<'a, C, NC, A> where NC: hyper::net::Netwo
 /// Updates a Merchant Center account. This method supports patch semantics.
 ///
 /// A builder for the *patch* method supported by a *account* resource.
-/// It is not used directly, but through a `AccountMethods`.
+/// It is not used directly, but through a `AccountMethods` instance.
 ///
 /// # Example
 ///
@@ -8237,7 +8441,7 @@ impl<'a, C, NC, A> AccountPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkC
         for &field in ["alt", "merchantId", "accountId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -8294,7 +8498,7 @@ impl<'a, C, NC, A> AccountPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkC
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -8310,7 +8514,6 @@ impl<'a, C, NC, A> AccountPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkC
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -8320,7 +8523,7 @@ impl<'a, C, NC, A> AccountPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkC
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -8331,7 +8534,7 @@ impl<'a, C, NC, A> AccountPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkC
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -8340,13 +8543,13 @@ impl<'a, C, NC, A> AccountPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkC
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -8367,7 +8570,7 @@ impl<'a, C, NC, A> AccountPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The ID of the managing account.    
+    /// The ID of the managing account.
     pub fn merchant_id(mut self, new_value: &str) -> AccountPatchCall<'a, C, NC, A> {
         self._merchant_id = new_value.to_string();
         self
@@ -8377,7 +8580,7 @@ impl<'a, C, NC, A> AccountPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The ID of the account.    
+    /// The ID of the account.
     pub fn account_id(mut self, new_value: &str) -> AccountPatchCall<'a, C, NC, A> {
         self._account_id = new_value.to_string();
         self
@@ -8438,7 +8641,7 @@ impl<'a, C, NC, A> AccountPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkC
 /// Retrieves a Merchant Center account.
 ///
 /// A builder for the *get* method supported by a *account* resource.
-/// It is not used directly, but through a `AccountMethods`.
+/// It is not used directly, but through a `AccountMethods` instance.
 ///
 /// # Example
 ///
@@ -8498,7 +8701,7 @@ impl<'a, C, NC, A> AccountGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
         for &field in ["alt", "merchantId", "accountId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -8551,7 +8754,7 @@ impl<'a, C, NC, A> AccountGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -8563,7 +8766,6 @@ impl<'a, C, NC, A> AccountGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -8573,7 +8775,7 @@ impl<'a, C, NC, A> AccountGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -8584,7 +8786,7 @@ impl<'a, C, NC, A> AccountGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -8593,13 +8795,13 @@ impl<'a, C, NC, A> AccountGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -8611,7 +8813,7 @@ impl<'a, C, NC, A> AccountGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The ID of the managing account.    
+    /// The ID of the managing account.
     pub fn merchant_id(mut self, new_value: &str) -> AccountGetCall<'a, C, NC, A> {
         self._merchant_id = new_value.to_string();
         self
@@ -8621,7 +8823,7 @@ impl<'a, C, NC, A> AccountGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The ID of the account.    
+    /// The ID of the account.
     pub fn account_id(mut self, new_value: &str) -> AccountGetCall<'a, C, NC, A> {
         self._account_id = new_value.to_string();
         self
@@ -8682,7 +8884,7 @@ impl<'a, C, NC, A> AccountGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
 /// Updates a Merchant Center account.
 ///
 /// A builder for the *update* method supported by a *account* resource.
-/// It is not used directly, but through a `AccountMethods`.
+/// It is not used directly, but through a `AccountMethods` instance.
 ///
 /// # Example
 ///
@@ -8749,7 +8951,7 @@ impl<'a, C, NC, A> AccountUpdateCall<'a, C, NC, A> where NC: hyper::net::Network
         for &field in ["alt", "merchantId", "accountId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -8806,7 +9008,7 @@ impl<'a, C, NC, A> AccountUpdateCall<'a, C, NC, A> where NC: hyper::net::Network
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -8822,7 +9024,6 @@ impl<'a, C, NC, A> AccountUpdateCall<'a, C, NC, A> where NC: hyper::net::Network
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -8832,7 +9033,7 @@ impl<'a, C, NC, A> AccountUpdateCall<'a, C, NC, A> where NC: hyper::net::Network
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -8843,7 +9044,7 @@ impl<'a, C, NC, A> AccountUpdateCall<'a, C, NC, A> where NC: hyper::net::Network
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -8852,13 +9053,13 @@ impl<'a, C, NC, A> AccountUpdateCall<'a, C, NC, A> where NC: hyper::net::Network
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -8879,7 +9080,7 @@ impl<'a, C, NC, A> AccountUpdateCall<'a, C, NC, A> where NC: hyper::net::Network
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The ID of the managing account.    
+    /// The ID of the managing account.
     pub fn merchant_id(mut self, new_value: &str) -> AccountUpdateCall<'a, C, NC, A> {
         self._merchant_id = new_value.to_string();
         self
@@ -8889,7 +9090,7 @@ impl<'a, C, NC, A> AccountUpdateCall<'a, C, NC, A> where NC: hyper::net::Network
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The ID of the account.    
+    /// The ID of the account.
     pub fn account_id(mut self, new_value: &str) -> AccountUpdateCall<'a, C, NC, A> {
         self._account_id = new_value.to_string();
         self
@@ -8950,7 +9151,7 @@ impl<'a, C, NC, A> AccountUpdateCall<'a, C, NC, A> where NC: hyper::net::Network
 /// Lists the sub-accounts in your Merchant Center account.
 ///
 /// A builder for the *list* method supported by a *account* resource.
-/// It is not used directly, but through a `AccountMethods`.
+/// It is not used directly, but through a `AccountMethods` instance.
 ///
 /// # Example
 ///
@@ -9018,7 +9219,7 @@ impl<'a, C, NC, A> AccountListCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
         for &field in ["alt", "merchantId", "pageToken", "maxResults"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -9071,7 +9272,7 @@ impl<'a, C, NC, A> AccountListCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -9083,7 +9284,6 @@ impl<'a, C, NC, A> AccountListCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -9093,7 +9293,7 @@ impl<'a, C, NC, A> AccountListCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -9104,7 +9304,7 @@ impl<'a, C, NC, A> AccountListCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -9113,13 +9313,13 @@ impl<'a, C, NC, A> AccountListCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -9131,7 +9331,7 @@ impl<'a, C, NC, A> AccountListCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The ID of the managing account.    
+    /// The ID of the managing account.
     pub fn merchant_id(mut self, new_value: &str) -> AccountListCall<'a, C, NC, A> {
         self._merchant_id = new_value.to_string();
         self
@@ -9139,7 +9339,7 @@ impl<'a, C, NC, A> AccountListCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// Sets the *page token* query property to the given value.
     ///
     /// 
-    /// The token returned by the previous request.    
+    /// The token returned by the previous request.
     pub fn page_token(mut self, new_value: &str) -> AccountListCall<'a, C, NC, A> {
         self._page_token = Some(new_value.to_string());
         self
@@ -9147,7 +9347,7 @@ impl<'a, C, NC, A> AccountListCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// Sets the *max results* query property to the given value.
     ///
     /// 
-    /// The maximum number of accounts to return in the response, used for paging.    
+    /// The maximum number of accounts to return in the response, used for paging.
     pub fn max_results(mut self, new_value: u32) -> AccountListCall<'a, C, NC, A> {
         self._max_results = Some(new_value);
         self
@@ -9208,7 +9408,7 @@ impl<'a, C, NC, A> AccountListCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
 /// Deletes a Merchant Center sub-account.
 ///
 /// A builder for the *delete* method supported by a *account* resource.
-/// It is not used directly, but through a `AccountMethods`.
+/// It is not used directly, but through a `AccountMethods` instance.
 ///
 /// # Example
 ///
@@ -9268,7 +9468,7 @@ impl<'a, C, NC, A> AccountDeleteCall<'a, C, NC, A> where NC: hyper::net::Network
         for &field in ["merchantId", "accountId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -9320,7 +9520,7 @@ impl<'a, C, NC, A> AccountDeleteCall<'a, C, NC, A> where NC: hyper::net::Network
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -9332,7 +9532,6 @@ impl<'a, C, NC, A> AccountDeleteCall<'a, C, NC, A> where NC: hyper::net::Network
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -9342,7 +9541,7 @@ impl<'a, C, NC, A> AccountDeleteCall<'a, C, NC, A> where NC: hyper::net::Network
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -9353,12 +9552,12 @@ impl<'a, C, NC, A> AccountDeleteCall<'a, C, NC, A> where NC: hyper::net::Network
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = res;
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -9370,7 +9569,7 @@ impl<'a, C, NC, A> AccountDeleteCall<'a, C, NC, A> where NC: hyper::net::Network
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The ID of the managing account.    
+    /// The ID of the managing account.
     pub fn merchant_id(mut self, new_value: &str) -> AccountDeleteCall<'a, C, NC, A> {
         self._merchant_id = new_value.to_string();
         self
@@ -9380,7 +9579,7 @@ impl<'a, C, NC, A> AccountDeleteCall<'a, C, NC, A> where NC: hyper::net::Network
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The ID of the account.    
+    /// The ID of the account.
     pub fn account_id(mut self, new_value: &str) -> AccountDeleteCall<'a, C, NC, A> {
         self._account_id = new_value.to_string();
         self
@@ -9441,7 +9640,7 @@ impl<'a, C, NC, A> AccountDeleteCall<'a, C, NC, A> where NC: hyper::net::Network
 /// Retrieves, inserts, updates, and deletes multiple Merchant Center (sub-)accounts in a single request.
 ///
 /// A builder for the *custombatch* method supported by a *account* resource.
-/// It is not used directly, but through a `AccountMethods`.
+/// It is not used directly, but through a `AccountMethods` instance.
 ///
 /// # Example
 ///
@@ -9504,7 +9703,7 @@ impl<'a, C, NC, A> AccountCustombatchCall<'a, C, NC, A> where NC: hyper::net::Ne
         for &field in ["alt"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -9537,7 +9736,7 @@ impl<'a, C, NC, A> AccountCustombatchCall<'a, C, NC, A> where NC: hyper::net::Ne
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -9553,7 +9752,6 @@ impl<'a, C, NC, A> AccountCustombatchCall<'a, C, NC, A> where NC: hyper::net::Ne
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -9563,7 +9761,7 @@ impl<'a, C, NC, A> AccountCustombatchCall<'a, C, NC, A> where NC: hyper::net::Ne
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -9574,7 +9772,7 @@ impl<'a, C, NC, A> AccountCustombatchCall<'a, C, NC, A> where NC: hyper::net::Ne
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -9583,13 +9781,13 @@ impl<'a, C, NC, A> AccountCustombatchCall<'a, C, NC, A> where NC: hyper::net::Ne
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -9661,7 +9859,7 @@ impl<'a, C, NC, A> AccountCustombatchCall<'a, C, NC, A> where NC: hyper::net::Ne
 /// Creates a Merchant Center sub-account.
 ///
 /// A builder for the *insert* method supported by a *account* resource.
-/// It is not used directly, but through a `AccountMethods`.
+/// It is not used directly, but through a `AccountMethods` instance.
 ///
 /// # Example
 ///
@@ -9726,7 +9924,7 @@ impl<'a, C, NC, A> AccountInsertCall<'a, C, NC, A> where NC: hyper::net::Network
         for &field in ["alt", "merchantId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -9783,7 +9981,7 @@ impl<'a, C, NC, A> AccountInsertCall<'a, C, NC, A> where NC: hyper::net::Network
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -9799,7 +9997,6 @@ impl<'a, C, NC, A> AccountInsertCall<'a, C, NC, A> where NC: hyper::net::Network
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -9809,7 +10006,7 @@ impl<'a, C, NC, A> AccountInsertCall<'a, C, NC, A> where NC: hyper::net::Network
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -9820,7 +10017,7 @@ impl<'a, C, NC, A> AccountInsertCall<'a, C, NC, A> where NC: hyper::net::Network
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -9829,13 +10026,13 @@ impl<'a, C, NC, A> AccountInsertCall<'a, C, NC, A> where NC: hyper::net::Network
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -9856,7 +10053,7 @@ impl<'a, C, NC, A> AccountInsertCall<'a, C, NC, A> where NC: hyper::net::Network
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The ID of the managing account.    
+    /// The ID of the managing account.
     pub fn merchant_id(mut self, new_value: &str) -> AccountInsertCall<'a, C, NC, A> {
         self._merchant_id = new_value.to_string();
         self
@@ -9917,7 +10114,7 @@ impl<'a, C, NC, A> AccountInsertCall<'a, C, NC, A> where NC: hyper::net::Network
 /// Updates price and availability of a product in your Merchant Center account.
 ///
 /// A builder for the *set* method supported by a *inventory* resource.
-/// It is not used directly, but through a `InventoryMethods`.
+/// It is not used directly, but through a `InventoryMethods` instance.
 ///
 /// # Example
 ///
@@ -9986,7 +10183,7 @@ impl<'a, C, NC, A> InventorySetCall<'a, C, NC, A> where NC: hyper::net::NetworkC
         for &field in ["alt", "merchantId", "storeCode", "productId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -10043,7 +10240,7 @@ impl<'a, C, NC, A> InventorySetCall<'a, C, NC, A> where NC: hyper::net::NetworkC
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -10059,7 +10256,6 @@ impl<'a, C, NC, A> InventorySetCall<'a, C, NC, A> where NC: hyper::net::NetworkC
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -10069,7 +10265,7 @@ impl<'a, C, NC, A> InventorySetCall<'a, C, NC, A> where NC: hyper::net::NetworkC
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -10080,7 +10276,7 @@ impl<'a, C, NC, A> InventorySetCall<'a, C, NC, A> where NC: hyper::net::NetworkC
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -10089,13 +10285,13 @@ impl<'a, C, NC, A> InventorySetCall<'a, C, NC, A> where NC: hyper::net::NetworkC
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -10116,7 +10312,7 @@ impl<'a, C, NC, A> InventorySetCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The ID of the managing account.    
+    /// The ID of the managing account.
     pub fn merchant_id(mut self, new_value: &str) -> InventorySetCall<'a, C, NC, A> {
         self._merchant_id = new_value.to_string();
         self
@@ -10126,7 +10322,7 @@ impl<'a, C, NC, A> InventorySetCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The code of the store for which to update price and availability. Use online to update price and availability of an online product.    
+    /// The code of the store for which to update price and availability. Use online to update price and availability of an online product.
     pub fn store_code(mut self, new_value: &str) -> InventorySetCall<'a, C, NC, A> {
         self._store_code = new_value.to_string();
         self
@@ -10136,7 +10332,7 @@ impl<'a, C, NC, A> InventorySetCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The ID of the product for which to update price and availability.    
+    /// The ID of the product for which to update price and availability.
     pub fn product_id(mut self, new_value: &str) -> InventorySetCall<'a, C, NC, A> {
         self._product_id = new_value.to_string();
         self
@@ -10197,7 +10393,7 @@ impl<'a, C, NC, A> InventorySetCall<'a, C, NC, A> where NC: hyper::net::NetworkC
 /// Updates price and availability for multiple products or stores in a single request.
 ///
 /// A builder for the *custombatch* method supported by a *inventory* resource.
-/// It is not used directly, but through a `InventoryMethods`.
+/// It is not used directly, but through a `InventoryMethods` instance.
 ///
 /// # Example
 ///
@@ -10260,7 +10456,7 @@ impl<'a, C, NC, A> InventoryCustombatchCall<'a, C, NC, A> where NC: hyper::net::
         for &field in ["alt"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -10293,7 +10489,7 @@ impl<'a, C, NC, A> InventoryCustombatchCall<'a, C, NC, A> where NC: hyper::net::
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -10309,7 +10505,6 @@ impl<'a, C, NC, A> InventoryCustombatchCall<'a, C, NC, A> where NC: hyper::net::
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -10319,7 +10514,7 @@ impl<'a, C, NC, A> InventoryCustombatchCall<'a, C, NC, A> where NC: hyper::net::
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -10330,7 +10525,7 @@ impl<'a, C, NC, A> InventoryCustombatchCall<'a, C, NC, A> where NC: hyper::net::
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -10339,13 +10534,13 @@ impl<'a, C, NC, A> InventoryCustombatchCall<'a, C, NC, A> where NC: hyper::net::
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -10417,7 +10612,7 @@ impl<'a, C, NC, A> InventoryCustombatchCall<'a, C, NC, A> where NC: hyper::net::
 /// Retrieves the status of a Merchant Center account.
 ///
 /// A builder for the *get* method supported by a *accountstatuse* resource.
-/// It is not used directly, but through a `AccountstatuseMethods`.
+/// It is not used directly, but through a `AccountstatuseMethods` instance.
 ///
 /// # Example
 ///
@@ -10477,7 +10672,7 @@ impl<'a, C, NC, A> AccountstatuseGetCall<'a, C, NC, A> where NC: hyper::net::Net
         for &field in ["alt", "merchantId", "accountId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -10530,7 +10725,7 @@ impl<'a, C, NC, A> AccountstatuseGetCall<'a, C, NC, A> where NC: hyper::net::Net
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -10542,7 +10737,6 @@ impl<'a, C, NC, A> AccountstatuseGetCall<'a, C, NC, A> where NC: hyper::net::Net
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -10552,7 +10746,7 @@ impl<'a, C, NC, A> AccountstatuseGetCall<'a, C, NC, A> where NC: hyper::net::Net
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -10563,7 +10757,7 @@ impl<'a, C, NC, A> AccountstatuseGetCall<'a, C, NC, A> where NC: hyper::net::Net
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -10572,13 +10766,13 @@ impl<'a, C, NC, A> AccountstatuseGetCall<'a, C, NC, A> where NC: hyper::net::Net
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -10590,7 +10784,7 @@ impl<'a, C, NC, A> AccountstatuseGetCall<'a, C, NC, A> where NC: hyper::net::Net
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The ID of the managing account.    
+    /// The ID of the managing account.
     pub fn merchant_id(mut self, new_value: &str) -> AccountstatuseGetCall<'a, C, NC, A> {
         self._merchant_id = new_value.to_string();
         self
@@ -10600,7 +10794,7 @@ impl<'a, C, NC, A> AccountstatuseGetCall<'a, C, NC, A> where NC: hyper::net::Net
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The ID of the account.    
+    /// The ID of the account.
     pub fn account_id(mut self, new_value: &str) -> AccountstatuseGetCall<'a, C, NC, A> {
         self._account_id = new_value.to_string();
         self
@@ -10661,7 +10855,7 @@ impl<'a, C, NC, A> AccountstatuseGetCall<'a, C, NC, A> where NC: hyper::net::Net
 /// Lists the statuses of the sub-accounts in your Merchant Center account.
 ///
 /// A builder for the *list* method supported by a *accountstatuse* resource.
-/// It is not used directly, but through a `AccountstatuseMethods`.
+/// It is not used directly, but through a `AccountstatuseMethods` instance.
 ///
 /// # Example
 ///
@@ -10729,7 +10923,7 @@ impl<'a, C, NC, A> AccountstatuseListCall<'a, C, NC, A> where NC: hyper::net::Ne
         for &field in ["alt", "merchantId", "pageToken", "maxResults"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -10782,7 +10976,7 @@ impl<'a, C, NC, A> AccountstatuseListCall<'a, C, NC, A> where NC: hyper::net::Ne
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -10794,7 +10988,6 @@ impl<'a, C, NC, A> AccountstatuseListCall<'a, C, NC, A> where NC: hyper::net::Ne
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -10804,7 +10997,7 @@ impl<'a, C, NC, A> AccountstatuseListCall<'a, C, NC, A> where NC: hyper::net::Ne
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -10815,7 +11008,7 @@ impl<'a, C, NC, A> AccountstatuseListCall<'a, C, NC, A> where NC: hyper::net::Ne
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -10824,13 +11017,13 @@ impl<'a, C, NC, A> AccountstatuseListCall<'a, C, NC, A> where NC: hyper::net::Ne
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -10842,7 +11035,7 @@ impl<'a, C, NC, A> AccountstatuseListCall<'a, C, NC, A> where NC: hyper::net::Ne
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The ID of the managing account.    
+    /// The ID of the managing account.
     pub fn merchant_id(mut self, new_value: &str) -> AccountstatuseListCall<'a, C, NC, A> {
         self._merchant_id = new_value.to_string();
         self
@@ -10850,7 +11043,7 @@ impl<'a, C, NC, A> AccountstatuseListCall<'a, C, NC, A> where NC: hyper::net::Ne
     /// Sets the *page token* query property to the given value.
     ///
     /// 
-    /// The token returned by the previous request.    
+    /// The token returned by the previous request.
     pub fn page_token(mut self, new_value: &str) -> AccountstatuseListCall<'a, C, NC, A> {
         self._page_token = Some(new_value.to_string());
         self
@@ -10858,7 +11051,7 @@ impl<'a, C, NC, A> AccountstatuseListCall<'a, C, NC, A> where NC: hyper::net::Ne
     /// Sets the *max results* query property to the given value.
     ///
     /// 
-    /// The maximum number of account statuses to return in the response, used for paging.    
+    /// The maximum number of account statuses to return in the response, used for paging.
     pub fn max_results(mut self, new_value: u32) -> AccountstatuseListCall<'a, C, NC, A> {
         self._max_results = Some(new_value);
         self
@@ -10917,7 +11110,7 @@ impl<'a, C, NC, A> AccountstatuseListCall<'a, C, NC, A> where NC: hyper::net::Ne
 
 
 /// A builder for the *custombatch* method supported by a *accountstatuse* resource.
-/// It is not used directly, but through a `AccountstatuseMethods`.
+/// It is not used directly, but through a `AccountstatuseMethods` instance.
 ///
 /// # Example
 ///
@@ -10980,7 +11173,7 @@ impl<'a, C, NC, A> AccountstatuseCustombatchCall<'a, C, NC, A> where NC: hyper::
         for &field in ["alt"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -11013,7 +11206,7 @@ impl<'a, C, NC, A> AccountstatuseCustombatchCall<'a, C, NC, A> where NC: hyper::
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -11029,7 +11222,6 @@ impl<'a, C, NC, A> AccountstatuseCustombatchCall<'a, C, NC, A> where NC: hyper::
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -11039,7 +11231,7 @@ impl<'a, C, NC, A> AccountstatuseCustombatchCall<'a, C, NC, A> where NC: hyper::
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -11050,7 +11242,7 @@ impl<'a, C, NC, A> AccountstatuseCustombatchCall<'a, C, NC, A> where NC: hyper::
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -11059,13 +11251,13 @@ impl<'a, C, NC, A> AccountstatuseCustombatchCall<'a, C, NC, A> where NC: hyper::
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -11137,7 +11329,7 @@ impl<'a, C, NC, A> AccountstatuseCustombatchCall<'a, C, NC, A> where NC: hyper::
 /// Lists the products in your Merchant Center account.
 ///
 /// A builder for the *list* method supported by a *product* resource.
-/// It is not used directly, but through a `ProductMethods`.
+/// It is not used directly, but through a `ProductMethods` instance.
 ///
 /// # Example
 ///
@@ -11205,7 +11397,7 @@ impl<'a, C, NC, A> ProductListCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
         for &field in ["alt", "merchantId", "pageToken", "maxResults"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -11258,7 +11450,7 @@ impl<'a, C, NC, A> ProductListCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -11270,7 +11462,6 @@ impl<'a, C, NC, A> ProductListCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -11280,7 +11471,7 @@ impl<'a, C, NC, A> ProductListCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -11291,7 +11482,7 @@ impl<'a, C, NC, A> ProductListCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -11300,13 +11491,13 @@ impl<'a, C, NC, A> ProductListCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -11318,7 +11509,7 @@ impl<'a, C, NC, A> ProductListCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The ID of the managing account.    
+    /// The ID of the managing account.
     pub fn merchant_id(mut self, new_value: &str) -> ProductListCall<'a, C, NC, A> {
         self._merchant_id = new_value.to_string();
         self
@@ -11326,7 +11517,7 @@ impl<'a, C, NC, A> ProductListCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// Sets the *page token* query property to the given value.
     ///
     /// 
-    /// The token returned by the previous request.    
+    /// The token returned by the previous request.
     pub fn page_token(mut self, new_value: &str) -> ProductListCall<'a, C, NC, A> {
         self._page_token = Some(new_value.to_string());
         self
@@ -11334,7 +11525,7 @@ impl<'a, C, NC, A> ProductListCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// Sets the *max results* query property to the given value.
     ///
     /// 
-    /// The maximum number of products to return in the response, used for paging.    
+    /// The maximum number of products to return in the response, used for paging.
     pub fn max_results(mut self, new_value: u32) -> ProductListCall<'a, C, NC, A> {
         self._max_results = Some(new_value);
         self
@@ -11395,7 +11586,7 @@ impl<'a, C, NC, A> ProductListCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
 /// Retrieves a product from your Merchant Center account.
 ///
 /// A builder for the *get* method supported by a *product* resource.
-/// It is not used directly, but through a `ProductMethods`.
+/// It is not used directly, but through a `ProductMethods` instance.
 ///
 /// # Example
 ///
@@ -11455,7 +11646,7 @@ impl<'a, C, NC, A> ProductGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
         for &field in ["alt", "merchantId", "productId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -11508,7 +11699,7 @@ impl<'a, C, NC, A> ProductGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -11520,7 +11711,6 @@ impl<'a, C, NC, A> ProductGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -11530,7 +11720,7 @@ impl<'a, C, NC, A> ProductGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -11541,7 +11731,7 @@ impl<'a, C, NC, A> ProductGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -11550,13 +11740,13 @@ impl<'a, C, NC, A> ProductGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -11568,7 +11758,7 @@ impl<'a, C, NC, A> ProductGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The ID of the managing account.    
+    /// The ID of the managing account.
     pub fn merchant_id(mut self, new_value: &str) -> ProductGetCall<'a, C, NC, A> {
         self._merchant_id = new_value.to_string();
         self
@@ -11578,7 +11768,7 @@ impl<'a, C, NC, A> ProductGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The ID of the product.    
+    /// The ID of the product.
     pub fn product_id(mut self, new_value: &str) -> ProductGetCall<'a, C, NC, A> {
         self._product_id = new_value.to_string();
         self
@@ -11639,7 +11829,7 @@ impl<'a, C, NC, A> ProductGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
 /// Deletes a product from your Merchant Center account.
 ///
 /// A builder for the *delete* method supported by a *product* resource.
-/// It is not used directly, but through a `ProductMethods`.
+/// It is not used directly, but through a `ProductMethods` instance.
 ///
 /// # Example
 ///
@@ -11704,7 +11894,7 @@ impl<'a, C, NC, A> ProductDeleteCall<'a, C, NC, A> where NC: hyper::net::Network
         for &field in ["merchantId", "productId", "dryRun"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -11756,7 +11946,7 @@ impl<'a, C, NC, A> ProductDeleteCall<'a, C, NC, A> where NC: hyper::net::Network
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -11768,7 +11958,6 @@ impl<'a, C, NC, A> ProductDeleteCall<'a, C, NC, A> where NC: hyper::net::Network
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -11778,7 +11967,7 @@ impl<'a, C, NC, A> ProductDeleteCall<'a, C, NC, A> where NC: hyper::net::Network
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -11789,12 +11978,12 @@ impl<'a, C, NC, A> ProductDeleteCall<'a, C, NC, A> where NC: hyper::net::Network
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = res;
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -11806,7 +11995,7 @@ impl<'a, C, NC, A> ProductDeleteCall<'a, C, NC, A> where NC: hyper::net::Network
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The ID of the managing account.    
+    /// The ID of the managing account.
     pub fn merchant_id(mut self, new_value: &str) -> ProductDeleteCall<'a, C, NC, A> {
         self._merchant_id = new_value.to_string();
         self
@@ -11816,7 +12005,7 @@ impl<'a, C, NC, A> ProductDeleteCall<'a, C, NC, A> where NC: hyper::net::Network
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The ID of the product.    
+    /// The ID of the product.
     pub fn product_id(mut self, new_value: &str) -> ProductDeleteCall<'a, C, NC, A> {
         self._product_id = new_value.to_string();
         self
@@ -11824,7 +12013,7 @@ impl<'a, C, NC, A> ProductDeleteCall<'a, C, NC, A> where NC: hyper::net::Network
     /// Sets the *dry run* query property to the given value.
     ///
     /// 
-    /// Flag to run the request in dry-run mode.    
+    /// Flag to run the request in dry-run mode.
     pub fn dry_run(mut self, new_value: bool) -> ProductDeleteCall<'a, C, NC, A> {
         self._dry_run = Some(new_value);
         self
@@ -11885,7 +12074,7 @@ impl<'a, C, NC, A> ProductDeleteCall<'a, C, NC, A> where NC: hyper::net::Network
 /// Retrieves, inserts, and deletes multiple products in a single request.
 ///
 /// A builder for the *custombatch* method supported by a *product* resource.
-/// It is not used directly, but through a `ProductMethods`.
+/// It is not used directly, but through a `ProductMethods` instance.
 ///
 /// # Example
 ///
@@ -11953,7 +12142,7 @@ impl<'a, C, NC, A> ProductCustombatchCall<'a, C, NC, A> where NC: hyper::net::Ne
         for &field in ["alt", "dryRun"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -11986,7 +12175,7 @@ impl<'a, C, NC, A> ProductCustombatchCall<'a, C, NC, A> where NC: hyper::net::Ne
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -12002,7 +12191,6 @@ impl<'a, C, NC, A> ProductCustombatchCall<'a, C, NC, A> where NC: hyper::net::Ne
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -12012,7 +12200,7 @@ impl<'a, C, NC, A> ProductCustombatchCall<'a, C, NC, A> where NC: hyper::net::Ne
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -12023,7 +12211,7 @@ impl<'a, C, NC, A> ProductCustombatchCall<'a, C, NC, A> where NC: hyper::net::Ne
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -12032,13 +12220,13 @@ impl<'a, C, NC, A> ProductCustombatchCall<'a, C, NC, A> where NC: hyper::net::Ne
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -12057,7 +12245,7 @@ impl<'a, C, NC, A> ProductCustombatchCall<'a, C, NC, A> where NC: hyper::net::Ne
     /// Sets the *dry run* query property to the given value.
     ///
     /// 
-    /// Flag to run the request in dry-run mode.    
+    /// Flag to run the request in dry-run mode.
     pub fn dry_run(mut self, new_value: bool) -> ProductCustombatchCall<'a, C, NC, A> {
         self._dry_run = Some(new_value);
         self
@@ -12118,7 +12306,7 @@ impl<'a, C, NC, A> ProductCustombatchCall<'a, C, NC, A> where NC: hyper::net::Ne
 /// Uploads a product to your Merchant Center account.
 ///
 /// A builder for the *insert* method supported by a *product* resource.
-/// It is not used directly, but through a `ProductMethods`.
+/// It is not used directly, but through a `ProductMethods` instance.
 ///
 /// # Example
 ///
@@ -12188,7 +12376,7 @@ impl<'a, C, NC, A> ProductInsertCall<'a, C, NC, A> where NC: hyper::net::Network
         for &field in ["alt", "merchantId", "dryRun"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -12245,7 +12433,7 @@ impl<'a, C, NC, A> ProductInsertCall<'a, C, NC, A> where NC: hyper::net::Network
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -12261,7 +12449,6 @@ impl<'a, C, NC, A> ProductInsertCall<'a, C, NC, A> where NC: hyper::net::Network
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -12271,7 +12458,7 @@ impl<'a, C, NC, A> ProductInsertCall<'a, C, NC, A> where NC: hyper::net::Network
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -12282,7 +12469,7 @@ impl<'a, C, NC, A> ProductInsertCall<'a, C, NC, A> where NC: hyper::net::Network
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -12291,13 +12478,13 @@ impl<'a, C, NC, A> ProductInsertCall<'a, C, NC, A> where NC: hyper::net::Network
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -12318,7 +12505,7 @@ impl<'a, C, NC, A> ProductInsertCall<'a, C, NC, A> where NC: hyper::net::Network
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The ID of the managing account.    
+    /// The ID of the managing account.
     pub fn merchant_id(mut self, new_value: &str) -> ProductInsertCall<'a, C, NC, A> {
         self._merchant_id = new_value.to_string();
         self
@@ -12326,7 +12513,7 @@ impl<'a, C, NC, A> ProductInsertCall<'a, C, NC, A> where NC: hyper::net::Network
     /// Sets the *dry run* query property to the given value.
     ///
     /// 
-    /// Flag to run the request in dry-run mode.    
+    /// Flag to run the request in dry-run mode.
     pub fn dry_run(mut self, new_value: bool) -> ProductInsertCall<'a, C, NC, A> {
         self._dry_run = Some(new_value);
         self
@@ -12387,7 +12574,7 @@ impl<'a, C, NC, A> ProductInsertCall<'a, C, NC, A> where NC: hyper::net::Network
 /// Lists the shipping settings of the sub-accounts in your Merchant Center account.
 ///
 /// A builder for the *list* method supported by a *accountshipping* resource.
-/// It is not used directly, but through a `AccountshippingMethods`.
+/// It is not used directly, but through a `AccountshippingMethods` instance.
 ///
 /// # Example
 ///
@@ -12455,7 +12642,7 @@ impl<'a, C, NC, A> AccountshippingListCall<'a, C, NC, A> where NC: hyper::net::N
         for &field in ["alt", "merchantId", "pageToken", "maxResults"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -12508,7 +12695,7 @@ impl<'a, C, NC, A> AccountshippingListCall<'a, C, NC, A> where NC: hyper::net::N
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -12520,7 +12707,6 @@ impl<'a, C, NC, A> AccountshippingListCall<'a, C, NC, A> where NC: hyper::net::N
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -12530,7 +12716,7 @@ impl<'a, C, NC, A> AccountshippingListCall<'a, C, NC, A> where NC: hyper::net::N
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -12541,7 +12727,7 @@ impl<'a, C, NC, A> AccountshippingListCall<'a, C, NC, A> where NC: hyper::net::N
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -12550,13 +12736,13 @@ impl<'a, C, NC, A> AccountshippingListCall<'a, C, NC, A> where NC: hyper::net::N
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -12568,7 +12754,7 @@ impl<'a, C, NC, A> AccountshippingListCall<'a, C, NC, A> where NC: hyper::net::N
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The ID of the managing account.    
+    /// The ID of the managing account.
     pub fn merchant_id(mut self, new_value: &str) -> AccountshippingListCall<'a, C, NC, A> {
         self._merchant_id = new_value.to_string();
         self
@@ -12576,7 +12762,7 @@ impl<'a, C, NC, A> AccountshippingListCall<'a, C, NC, A> where NC: hyper::net::N
     /// Sets the *page token* query property to the given value.
     ///
     /// 
-    /// The token returned by the previous request.    
+    /// The token returned by the previous request.
     pub fn page_token(mut self, new_value: &str) -> AccountshippingListCall<'a, C, NC, A> {
         self._page_token = Some(new_value.to_string());
         self
@@ -12584,7 +12770,7 @@ impl<'a, C, NC, A> AccountshippingListCall<'a, C, NC, A> where NC: hyper::net::N
     /// Sets the *max results* query property to the given value.
     ///
     /// 
-    /// The maximum number of shipping settings to return in the response, used for paging.    
+    /// The maximum number of shipping settings to return in the response, used for paging.
     pub fn max_results(mut self, new_value: u32) -> AccountshippingListCall<'a, C, NC, A> {
         self._max_results = Some(new_value);
         self
@@ -12645,7 +12831,7 @@ impl<'a, C, NC, A> AccountshippingListCall<'a, C, NC, A> where NC: hyper::net::N
 /// Updates the shipping settings of the account. This method supports patch semantics.
 ///
 /// A builder for the *patch* method supported by a *accountshipping* resource.
-/// It is not used directly, but through a `AccountshippingMethods`.
+/// It is not used directly, but through a `AccountshippingMethods` instance.
 ///
 /// # Example
 ///
@@ -12712,7 +12898,7 @@ impl<'a, C, NC, A> AccountshippingPatchCall<'a, C, NC, A> where NC: hyper::net::
         for &field in ["alt", "merchantId", "accountId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -12769,7 +12955,7 @@ impl<'a, C, NC, A> AccountshippingPatchCall<'a, C, NC, A> where NC: hyper::net::
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -12785,7 +12971,6 @@ impl<'a, C, NC, A> AccountshippingPatchCall<'a, C, NC, A> where NC: hyper::net::
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -12795,7 +12980,7 @@ impl<'a, C, NC, A> AccountshippingPatchCall<'a, C, NC, A> where NC: hyper::net::
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -12806,7 +12991,7 @@ impl<'a, C, NC, A> AccountshippingPatchCall<'a, C, NC, A> where NC: hyper::net::
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -12815,13 +13000,13 @@ impl<'a, C, NC, A> AccountshippingPatchCall<'a, C, NC, A> where NC: hyper::net::
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -12842,7 +13027,7 @@ impl<'a, C, NC, A> AccountshippingPatchCall<'a, C, NC, A> where NC: hyper::net::
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The ID of the managing account.    
+    /// The ID of the managing account.
     pub fn merchant_id(mut self, new_value: &str) -> AccountshippingPatchCall<'a, C, NC, A> {
         self._merchant_id = new_value.to_string();
         self
@@ -12852,7 +13037,7 @@ impl<'a, C, NC, A> AccountshippingPatchCall<'a, C, NC, A> where NC: hyper::net::
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The ID of the account for which to get/update account shipping settings.    
+    /// The ID of the account for which to get/update account shipping settings.
     pub fn account_id(mut self, new_value: &str) -> AccountshippingPatchCall<'a, C, NC, A> {
         self._account_id = new_value.to_string();
         self
@@ -12913,7 +13098,7 @@ impl<'a, C, NC, A> AccountshippingPatchCall<'a, C, NC, A> where NC: hyper::net::
 /// Updates the shipping settings of the account.
 ///
 /// A builder for the *update* method supported by a *accountshipping* resource.
-/// It is not used directly, but through a `AccountshippingMethods`.
+/// It is not used directly, but through a `AccountshippingMethods` instance.
 ///
 /// # Example
 ///
@@ -12980,7 +13165,7 @@ impl<'a, C, NC, A> AccountshippingUpdateCall<'a, C, NC, A> where NC: hyper::net:
         for &field in ["alt", "merchantId", "accountId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -13037,7 +13222,7 @@ impl<'a, C, NC, A> AccountshippingUpdateCall<'a, C, NC, A> where NC: hyper::net:
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -13053,7 +13238,6 @@ impl<'a, C, NC, A> AccountshippingUpdateCall<'a, C, NC, A> where NC: hyper::net:
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -13063,7 +13247,7 @@ impl<'a, C, NC, A> AccountshippingUpdateCall<'a, C, NC, A> where NC: hyper::net:
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -13074,7 +13258,7 @@ impl<'a, C, NC, A> AccountshippingUpdateCall<'a, C, NC, A> where NC: hyper::net:
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -13083,13 +13267,13 @@ impl<'a, C, NC, A> AccountshippingUpdateCall<'a, C, NC, A> where NC: hyper::net:
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -13110,7 +13294,7 @@ impl<'a, C, NC, A> AccountshippingUpdateCall<'a, C, NC, A> where NC: hyper::net:
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The ID of the managing account.    
+    /// The ID of the managing account.
     pub fn merchant_id(mut self, new_value: &str) -> AccountshippingUpdateCall<'a, C, NC, A> {
         self._merchant_id = new_value.to_string();
         self
@@ -13120,7 +13304,7 @@ impl<'a, C, NC, A> AccountshippingUpdateCall<'a, C, NC, A> where NC: hyper::net:
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The ID of the account for which to get/update account shipping settings.    
+    /// The ID of the account for which to get/update account shipping settings.
     pub fn account_id(mut self, new_value: &str) -> AccountshippingUpdateCall<'a, C, NC, A> {
         self._account_id = new_value.to_string();
         self
@@ -13181,7 +13365,7 @@ impl<'a, C, NC, A> AccountshippingUpdateCall<'a, C, NC, A> where NC: hyper::net:
 /// Retrieves and updates the shipping settings of multiple accounts in a single request.
 ///
 /// A builder for the *custombatch* method supported by a *accountshipping* resource.
-/// It is not used directly, but through a `AccountshippingMethods`.
+/// It is not used directly, but through a `AccountshippingMethods` instance.
 ///
 /// # Example
 ///
@@ -13244,7 +13428,7 @@ impl<'a, C, NC, A> AccountshippingCustombatchCall<'a, C, NC, A> where NC: hyper:
         for &field in ["alt"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -13277,7 +13461,7 @@ impl<'a, C, NC, A> AccountshippingCustombatchCall<'a, C, NC, A> where NC: hyper:
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -13293,7 +13477,6 @@ impl<'a, C, NC, A> AccountshippingCustombatchCall<'a, C, NC, A> where NC: hyper:
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -13303,7 +13486,7 @@ impl<'a, C, NC, A> AccountshippingCustombatchCall<'a, C, NC, A> where NC: hyper:
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -13314,7 +13497,7 @@ impl<'a, C, NC, A> AccountshippingCustombatchCall<'a, C, NC, A> where NC: hyper:
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -13323,13 +13506,13 @@ impl<'a, C, NC, A> AccountshippingCustombatchCall<'a, C, NC, A> where NC: hyper:
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -13401,7 +13584,7 @@ impl<'a, C, NC, A> AccountshippingCustombatchCall<'a, C, NC, A> where NC: hyper:
 /// Retrieves the shipping settings of the account.
 ///
 /// A builder for the *get* method supported by a *accountshipping* resource.
-/// It is not used directly, but through a `AccountshippingMethods`.
+/// It is not used directly, but through a `AccountshippingMethods` instance.
 ///
 /// # Example
 ///
@@ -13461,7 +13644,7 @@ impl<'a, C, NC, A> AccountshippingGetCall<'a, C, NC, A> where NC: hyper::net::Ne
         for &field in ["alt", "merchantId", "accountId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -13514,7 +13697,7 @@ impl<'a, C, NC, A> AccountshippingGetCall<'a, C, NC, A> where NC: hyper::net::Ne
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -13526,7 +13709,6 @@ impl<'a, C, NC, A> AccountshippingGetCall<'a, C, NC, A> where NC: hyper::net::Ne
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -13536,7 +13718,7 @@ impl<'a, C, NC, A> AccountshippingGetCall<'a, C, NC, A> where NC: hyper::net::Ne
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -13547,7 +13729,7 @@ impl<'a, C, NC, A> AccountshippingGetCall<'a, C, NC, A> where NC: hyper::net::Ne
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -13556,13 +13738,13 @@ impl<'a, C, NC, A> AccountshippingGetCall<'a, C, NC, A> where NC: hyper::net::Ne
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -13574,7 +13756,7 @@ impl<'a, C, NC, A> AccountshippingGetCall<'a, C, NC, A> where NC: hyper::net::Ne
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The ID of the managing account.    
+    /// The ID of the managing account.
     pub fn merchant_id(mut self, new_value: &str) -> AccountshippingGetCall<'a, C, NC, A> {
         self._merchant_id = new_value.to_string();
         self
@@ -13584,7 +13766,7 @@ impl<'a, C, NC, A> AccountshippingGetCall<'a, C, NC, A> where NC: hyper::net::Ne
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The ID of the account for which to get/update account shipping settings.    
+    /// The ID of the account for which to get/update account shipping settings.
     pub fn account_id(mut self, new_value: &str) -> AccountshippingGetCall<'a, C, NC, A> {
         self._account_id = new_value.to_string();
         self

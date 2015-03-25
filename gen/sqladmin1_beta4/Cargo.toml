@@ -4,7 +4,7 @@
 [package]
 
 name = "google-sqladmin1_beta4"
-version = "0.1.1+20150109"
+version = "0.1.2+20150109"
 authors = ["Sebastian Thiel <byronimo@gmail>"]
 description = "A complete library to interact with SQL Admin (protocol v1beta4)"
 repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/sqladmin1_beta4"
@@ -16,7 +16,7 @@ keywords = ["sqladmin", "google", "protocol", "web", "api"]
 [dependencies]
 hyper = "*"
 mime = "*"
+yup-oauth2 = "*"
 url = "*"
 serde = "*"
 serde_macros = "*"
-yup-oauth2 = "*"

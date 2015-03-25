@@ -1,8 +1,8 @@
 // DO NOT EDIT !
-// This file was generated automatically from 'src/mako/lib.rs.mako'
+// This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *AdSense Host* crate version *0.1.1+20150302*, where *20150302* is the exact revision of the *adsensehost:v4.1* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.1*.
+//! This documentation was generated from *AdSense Host* crate version *0.1.2+20150309*, where *20150309* is the exact revision of the *adsensehost:v4.1* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.2*.
 //! 
 //! Everything else about the *AdSense Host* *v4d1* API can be found at the
 //! [official documentation site](https://developers.google.com/adsense/host/).
@@ -35,6 +35,8 @@
 //! 
 //! * **[Hub](struct.AdSenseHost.html)**
 //!     * a central object to maintain state and allow accessing all *Activities*
+//!     * creates [*Method Builders*](trait.MethodsBuilder.html) which in turn
+//!       allow access to individual [*Call Builders*](trait.CallBuilder.html)
 //! * **[Resources](trait.Resource.html)**
 //!     * primary types that you can apply *Activities* to
 //!     * a collection of properties and *Parts*
@@ -43,6 +45,8 @@
 //!         * never directly used in *Activities*
 //! * **[Activities](trait.CallBuilder.html)**
 //!     * operations to apply to *Resources*
+//! 
+//! All *structures* are marked with applicable traits to further categorize them and ease browsing.
 //! 
 //! Generally speaking, you can invoke *Activities* like this:
 //! 
@@ -89,7 +93,7 @@
 //! extern crate hyper;
 //! extern crate "yup-oauth2" as oauth2;
 //! extern crate "google-adsensehost4d1" as adsensehost4d1;
-//! use adsensehost4d1::Result;
+//! use adsensehost4d1::{Result, Error};
 //! # #[test] fn egal() {
 //! use std::default::Default;
 //! use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -121,15 +125,17 @@
 //!              .doit();
 //! 
 //! match result {
-//!     Result::HttpError(err) => println!("HTTPERROR: {:?}", err),
-//!     Result::MissingAPIKey => println!("Auth: Missing API Key - used if there are no scopes"),
-//!     Result::MissingToken => println!("OAuth2: Missing Token"),
-//!     Result::Cancelled => println!("Operation cancelled by user"),
-//!     Result::UploadSizeLimitExceeded(size, max_size) => println!("Upload size too big: {} of {}", size, max_size),
-//!     Result::Failure(_) => println!("General Failure (hyper::client::Response doesn't print)"),
-//!     Result::FieldClash(clashed_field) => println!("You added custom parameter which is part of builder: {:?}", clashed_field),
-//!     Result::JsonDecodeError(err) => println!("Couldn't understand server reply - maybe API needs update: {:?}", err),
-//!     Result::Success(_) => println!("Success (value doesn't print)"),
+//!     Err(e) => match e {
+//!         Error::HttpError(err) => println!("HTTPERROR: {:?}", err),
+//!         Error::MissingAPIKey => println!("Auth: Missing API Key - used if there are no scopes"),
+//!         Error::MissingToken => println!("OAuth2: Missing Token"),
+//!         Error::Cancelled => println!("Operation canceled by user"),
+//!         Error::UploadSizeLimitExceeded(size, max_size) => println!("Upload size too big: {} of {}", size, max_size),
+//!         Error::Failure(_) => println!("General Failure (hyper::client::Response doesn't print)"),
+//!         Error::FieldClash(clashed_field) => println!("You added custom parameter which is part of builder: {:?}", clashed_field),
+//!         Error::JsonDecodeError(err) => println!("Couldn't understand server reply - maybe API needs update: {:?}", err),
+//!     },
+//!     Ok(_) => println!("Success (value doesn't print)"),
 //! }
 //! # }
 //! ```
@@ -142,7 +148,7 @@
 //! When delegates handle errors or intermediate values, they may have a chance to instruct the system to retry. This 
 //! makes the system potentially resilient to all kinds of errors.
 //! 
-//! ## Uploads and Downlods
+//! ## Uploads and Downloads
 //! If a method supports downloads, the response body, which is part of the [Result](enum.Result.html), should be
 //! read by you to obtain the media.
 //! If such a method also supports a [Response Result](trait.ResponseResult.html), it will return that by default.
@@ -165,8 +171,9 @@
 //! ## Optional Parts in Server-Requests
 //! 
 //! All structures provided by this library are made to be [enocodable](trait.RequestValue.html) and 
-//! [decodable](trait.ResponseResult.html) via json. Optionals are used to indicate that partial requests are responses are valid.
-//! Most optionals are are considered [Parts](trait.Part.html) which are identifyable by name, which will be sent to 
+//! [decodable](trait.ResponseResult.html) via *json*. Optionals are used to indicate that partial requests are responses 
+//! are valid.
+//! Most optionals are are considered [Parts](trait.Part.html) which are identifiable by name, which will be sent to 
 //! the server to indicate either the set parts of the request or the desired parts in the response.
 //! 
 //! ## Builder Arguments
@@ -215,7 +222,7 @@ use std::io;
 use std::fs;
 use std::thread::sleep;
 
-pub use cmn::{MultiPartReader, ToParts, MethodInfo, Result, CallBuilder, Hub, ReadSeek, Part, ResponseResult, RequestValue, NestedType, Delegate, DefaultDelegate, ResourceMethodsBuilder, Resource, JsonServerError};
+pub use cmn::{MultiPartReader, ToParts, MethodInfo, Result, Error, CallBuilder, Hub, ReadSeek, Part, ResponseResult, RequestValue, NestedType, Delegate, DefaultDelegate, MethodsBuilder, Resource, JsonServerError};
 
 
 // ##############
@@ -261,7 +268,7 @@ impl Default for Scope {
 /// extern crate hyper;
 /// extern crate "yup-oauth2" as oauth2;
 /// extern crate "google-adsensehost4d1" as adsensehost4d1;
-/// use adsensehost4d1::Result;
+/// use adsensehost4d1::{Result, Error};
 /// # #[test] fn egal() {
 /// use std::default::Default;
 /// use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -293,15 +300,17 @@ impl Default for Scope {
 ///              .doit();
 /// 
 /// match result {
-///     Result::HttpError(err) => println!("HTTPERROR: {:?}", err),
-///     Result::MissingAPIKey => println!("Auth: Missing API Key - used if there are no scopes"),
-///     Result::MissingToken => println!("OAuth2: Missing Token"),
-///     Result::Cancelled => println!("Operation cancelled by user"),
-///     Result::UploadSizeLimitExceeded(size, max_size) => println!("Upload size too big: {} of {}", size, max_size),
-///     Result::Failure(_) => println!("General Failure (hyper::client::Response doesn't print)"),
-///     Result::FieldClash(clashed_field) => println!("You added custom parameter which is part of builder: {:?}", clashed_field),
-///     Result::JsonDecodeError(err) => println!("Couldn't understand server reply - maybe API needs update: {:?}", err),
-///     Result::Success(_) => println!("Success (value doesn't print)"),
+///     Err(e) => match e {
+///         Error::HttpError(err) => println!("HTTPERROR: {:?}", err),
+///         Error::MissingAPIKey => println!("Auth: Missing API Key - used if there are no scopes"),
+///         Error::MissingToken => println!("OAuth2: Missing Token"),
+///         Error::Cancelled => println!("Operation canceled by user"),
+///         Error::UploadSizeLimitExceeded(size, max_size) => println!("Upload size too big: {} of {}", size, max_size),
+///         Error::Failure(_) => println!("General Failure (hyper::client::Response doesn't print)"),
+///         Error::FieldClash(clashed_field) => println!("You added custom parameter which is part of builder: {:?}", clashed_field),
+///         Error::JsonDecodeError(err) => println!("Couldn't understand server reply - maybe API needs update: {:?}", err),
+///     },
+///     Ok(_) => println!("Success (value doesn't print)"),
 /// }
 /// # }
 /// ```
@@ -322,7 +331,7 @@ impl<'a, C, NC, A> AdSenseHost<C, NC, A>
         AdSenseHost {
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/0.1.1".to_string(),
+            _user_agent: "google-api-rust-client/0.1.2".to_string(),
             _m: PhantomData
         }
     }
@@ -347,7 +356,7 @@ impl<'a, C, NC, A> AdSenseHost<C, NC, A>
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/0.1.1`.
+    /// It defaults to `google-api-rust-client/0.1.2`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -372,14 +381,14 @@ impl<'a, C, NC, A> AdSenseHost<C, NC, A>
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct UrlChannels {
-    /// Continuation token used to page through URL channels. To retrieve the next page of results, set the next request's "pageToken" value to this.    
+    /// Continuation token used to page through URL channels. To retrieve the next page of results, set the next request's "pageToken" value to this.
     #[serde(alias="nextPageToken")]
     pub next_page_token: String,
-    /// The URL channels returned in this list response.    
+    /// The URL channels returned in this list response.
     pub items: Vec<UrlChannel>,
-    /// Kind of list this is, in this case adsensehost#urlChannels.    
+    /// Kind of list this is, in this case adsensehost#urlChannels.
     pub kind: String,
-    /// ETag of this response for caching purposes.    
+    /// ETag of this response for caching purposes.
     pub etag: String,
 }
 
@@ -392,12 +401,12 @@ impl ResponseResult for UrlChannels {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct ReportHeaders {
-    /// The currency of this column. Only present if the header type is METRIC_CURRENCY.    
+    /// The currency of this column. Only present if the header type is METRIC_CURRENCY.
     pub currency: String,
-    /// The type of the header; one of DIMENSION, METRIC_TALLY, METRIC_RATIO, or METRIC_CURRENCY.    
+    /// The type of the header; one of DIMENSION, METRIC_TALLY, METRIC_RATIO, or METRIC_CURRENCY.
     #[serde(alias="type")]
     pub type_: String,
-    /// The name of the header.    
+    /// The name of the header.
     pub name: String,
 }
 
@@ -427,13 +436,13 @@ impl Part for ReportHeaders {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct Account {
-    /// Approval status of this account. One of: PENDING, APPROVED, DISABLED.    
+    /// Approval status of this account. One of: PENDING, APPROVED, DISABLED.
     pub status: String,
-    /// Kind of resource this is, in this case adsensehost#account.    
+    /// Kind of resource this is, in this case adsensehost#account.
     pub kind: String,
-    /// Unique identifier of this account.    
+    /// Unique identifier of this account.
     pub id: String,
-    /// Name of this account.    
+    /// Name of this account.
     pub name: String,
 }
 
@@ -452,14 +461,14 @@ impl ResponseResult for Account {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct AdUnits {
-    /// Continuation token used to page through ad units. To retrieve the next page of results, set the next request's "pageToken" value to this.    
+    /// Continuation token used to page through ad units. To retrieve the next page of results, set the next request's "pageToken" value to this.
     #[serde(alias="nextPageToken")]
     pub next_page_token: String,
-    /// The ad units returned in this list response.    
+    /// The ad units returned in this list response.
     pub items: Vec<AdUnit>,
-    /// Kind of list this is, in this case adsensehost#adUnits.    
+    /// Kind of list this is, in this case adsensehost#adUnits.
     pub kind: String,
-    /// ETag of this response for caching purposes.    
+    /// ETag of this response for caching purposes.
     pub etag: String,
 }
 
@@ -478,14 +487,14 @@ impl ResponseResult for AdUnits {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct AdClients {
-    /// Continuation token used to page through ad clients. To retrieve the next page of results, set the next request's "pageToken" value to this.    
+    /// Continuation token used to page through ad clients. To retrieve the next page of results, set the next request's "pageToken" value to this.
     #[serde(alias="nextPageToken")]
     pub next_page_token: String,
-    /// The ad clients returned in this list response.    
+    /// The ad clients returned in this list response.
     pub items: Vec<AdClient>,
-    /// Kind of list this is, in this case adsensehost#adClients.    
+    /// Kind of list this is, in this case adsensehost#adClients.
     pub kind: String,
-    /// ETag of this response for caching purposes.    
+    /// ETag of this response for caching purposes.
     pub etag: String,
 }
 
@@ -498,13 +507,13 @@ impl ResponseResult for AdClients {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct AdStyle {
-    /// The style of the corners in the ad. Possible values are SQUARE, SLIGHTLY_ROUNDED and VERY_ROUNDED.    
+    /// The style of the corners in the ad. Possible values are SQUARE, SLIGHTLY_ROUNDED and VERY_ROUNDED.
     pub corners: String,
-    /// The colors included in the style. These are represented as six hexadecimal characters, similar to HTML color codes, but without the leading hash.    
+    /// The colors included in the style. These are represented as six hexadecimal characters, similar to HTML color codes, but without the leading hash.
     pub colors: AdStyleColors,
-    /// The font which is included in the style.    
+    /// The font which is included in the style.
     pub font: AdStyleFont,
-    /// Kind this is, in this case adsensehost#adStyle.    
+    /// Kind this is, in this case adsensehost#adStyle.
     pub kind: String,
 }
 
@@ -517,15 +526,15 @@ impl Part for AdStyle {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct AdStyleColors {
-    /// The color of the ad url.    
+    /// The color of the ad url.
     pub url: String,
-    /// The color of the ad text.    
+    /// The color of the ad text.
     pub text: String,
-    /// The color of the ad border.    
+    /// The color of the ad border.
     pub border: String,
-    /// The color of the ad background.    
+    /// The color of the ad background.
     pub background: String,
-    /// The color of the ad title.    
+    /// The color of the ad title.
     pub title: String,
 }
 
@@ -539,16 +548,16 @@ impl Part for AdStyleColors {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct AdUnitMobileContentAdsSettings {
-    /// The scripting language to use for this ad unit.    
+    /// The scripting language to use for this ad unit.
     #[serde(alias="scriptingLanguage")]
     pub scripting_language: String,
-    /// The markup language to use for this ad unit.    
+    /// The markup language to use for this ad unit.
     #[serde(alias="markupLanguage")]
     pub markup_language: String,
-    /// Type of this ad unit.    
+    /// Type of this ad unit.
     #[serde(alias="type")]
     pub type_: String,
-    /// Size of this ad unit.    
+    /// Size of this ad unit.
     pub size: String,
 }
 
@@ -567,10 +576,10 @@ impl Part for AdUnitMobileContentAdsSettings {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct AdCode {
-    /// The ad code snippet.    
+    /// The ad code snippet.
     #[serde(alias="adCode")]
     pub ad_code: String,
-    /// Kind this is, in this case adsensehost#adCode.    
+    /// Kind this is, in this case adsensehost#adCode.
     pub kind: String,
 }
 
@@ -599,21 +608,21 @@ pub struct AdUnit {
     /// 
     /// INACTIVE: Indicates that there has been no activity on this ad unit in the last seven days.
     pub status: Option<String>,
-    /// Kind of resource this is, in this case adsensehost#adUnit.    
+    /// Kind of resource this is, in this case adsensehost#adUnit.
     pub kind: Option<String>,
-    /// Identity code of this ad unit, not necessarily unique across ad clients.    
+    /// Identity code of this ad unit, not necessarily unique across ad clients.
     pub code: Option<String>,
-    /// Name of this ad unit.    
+    /// Name of this ad unit.
     pub name: Option<String>,
-    /// Settings specific to content ads (AFC) and highend mobile content ads (AFMC).    
+    /// Settings specific to content ads (AFC) and highend mobile content ads (AFMC).
     #[serde(alias="contentAdsSettings")]
     pub content_ads_settings: Option<AdUnitContentAdsSettings>,
-    /// Unique identifier of this ad unit. This should be considered an opaque identifier; it is not safe to rely on it being in any particular format.    
+    /// Unique identifier of this ad unit. This should be considered an opaque identifier; it is not safe to rely on it being in any particular format.
     pub id: Option<String>,
-    /// Settings specific to WAP mobile content ads (AFMC).    
+    /// Settings specific to WAP mobile content ads (AFMC).
     #[serde(alias="mobileContentAdsSettings")]
     pub mobile_content_ads_settings: Option<AdUnitMobileContentAdsSettings>,
-    /// Custom style information specific to this ad unit.    
+    /// Custom style information specific to this ad unit.
     #[serde(alias="customStyle")]
     pub custom_style: Option<AdStyle>,
 }
@@ -634,11 +643,11 @@ impl ResponseResult for AdUnit {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct UrlChannel {
-    /// Kind of resource this is, in this case adsensehost#urlChannel.    
+    /// Kind of resource this is, in this case adsensehost#urlChannel.
     pub kind: Option<String>,
-    /// Unique identifier of this URL channel. This should be considered an opaque identifier; it is not safe to rely on it being in any particular format.    
+    /// Unique identifier of this URL channel. This should be considered an opaque identifier; it is not safe to rely on it being in any particular format.
     pub id: Option<String>,
-    /// URL Pattern of this URL channel. Does not include "http://" or "https://". Example: www.example.com/home    
+    /// URL Pattern of this URL channel. Does not include "http://" or "https://". Example: www.example.com/home
     #[serde(alias="urlPattern")]
     pub url_pattern: Option<String>,
 }
@@ -660,17 +669,17 @@ impl ResponseResult for UrlChannel {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct AdClient {
-    /// This ad client's product code, which corresponds to the PRODUCT_CODE report dimension.    
+    /// This ad client's product code, which corresponds to the PRODUCT_CODE report dimension.
     #[serde(alias="productCode")]
     pub product_code: String,
-    /// Kind of resource this is, in this case adsensehost#adClient.    
+    /// Kind of resource this is, in this case adsensehost#adClient.
     pub kind: String,
-    /// Unique identifier of this ad client.    
+    /// Unique identifier of this ad client.
     pub id: String,
-    /// Whether this ad client is opted in to ARC.    
+    /// Whether this ad client is opted in to ARC.
     #[serde(alias="arcOptIn")]
     pub arc_opt_in: bool,
-    /// Whether this ad client supports being reported on.    
+    /// Whether this ad client supports being reported on.
     #[serde(alias="supportsReporting")]
     pub supports_reporting: bool,
 }
@@ -685,11 +694,11 @@ impl ResponseResult for AdClient {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct AdUnitContentAdsSettingsBackupOption {
-    /// Color to use when type is set to COLOR. These are represented as six hexadecimal characters, similar to HTML color codes, but without the leading hash.    
+    /// Color to use when type is set to COLOR. These are represented as six hexadecimal characters, similar to HTML color codes, but without the leading hash.
     pub color: String,
-    /// URL to use when type is set to URL.    
+    /// URL to use when type is set to URL.
     pub url: String,
-    /// Type of the backup option. Possible values are BLANK, COLOR and URL.    
+    /// Type of the backup option. Possible values are BLANK, COLOR and URL.
     #[serde(alias="type")]
     pub type_: String,
 }
@@ -710,28 +719,28 @@ impl Part for AdUnitContentAdsSettingsBackupOption {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct AssociationSession {
-    /// Status of the completed association, available once the association callback token has been verified. One of ACCEPTED, REJECTED, or ERROR.    
+    /// Status of the completed association, available once the association callback token has been verified. One of ACCEPTED, REJECTED, or ERROR.
     pub status: String,
-    /// The products to associate with the user. Options: AFC, AFF, AFS, AFMC    
+    /// The products to associate with the user. Options: AFC, AFF, AFS, AFMC
     #[serde(alias="productCodes")]
     pub product_codes: Vec<String>,
-    /// Kind of resource this is, in this case adsensehost#associationSession.    
+    /// Kind of resource this is, in this case adsensehost#associationSession.
     pub kind: String,
-    /// The preferred locale of the user themselves when going through the AdSense association flow.    
+    /// The preferred locale of the user themselves when going through the AdSense association flow.
     #[serde(alias="userLocale")]
     pub user_locale: String,
-    /// The locale of the user's hosted website.    
+    /// The locale of the user's hosted website.
     #[serde(alias="websiteLocale")]
     pub website_locale: String,
-    /// Redirect URL of this association session. Used to redirect users into the AdSense association flow.    
+    /// Redirect URL of this association session. Used to redirect users into the AdSense association flow.
     #[serde(alias="redirectUrl")]
     pub redirect_url: String,
-    /// The URL of the user's hosted website.    
+    /// The URL of the user's hosted website.
     #[serde(alias="websiteUrl")]
     pub website_url: String,
-    /// Unique identifier of this association session.    
+    /// Unique identifier of this association session.
     pub id: String,
-    /// Hosted account id of the associated publisher after association. Present if status is ACCEPTED.    
+    /// Hosted account id of the associated publisher after association. Present if status is ACCEPTED.
     #[serde(alias="accountId")]
     pub account_id: String,
 }
@@ -751,11 +760,11 @@ impl ResponseResult for AssociationSession {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct Accounts {
-    /// The accounts returned in this list response.    
+    /// The accounts returned in this list response.
     pub items: Vec<Account>,
-    /// Kind of list this is, in this case adsensehost#accounts.    
+    /// Kind of list this is, in this case adsensehost#accounts.
     pub kind: String,
-    /// ETag of this response for caching purposes.    
+    /// ETag of this response for caching purposes.
     pub etag: String,
 }
 
@@ -768,13 +777,13 @@ impl ResponseResult for Accounts {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct AdUnitContentAdsSettings {
-    /// Type of this ad unit. Possible values are TEXT, TEXT_IMAGE, IMAGE and LINK.    
+    /// Type of this ad unit. Possible values are TEXT, TEXT_IMAGE, IMAGE and LINK.
     #[serde(alias="type")]
     pub type_: String,
-    /// The backup option to be used in instances where no ad is available.    
+    /// The backup option to be used in instances where no ad is available.
     #[serde(alias="backupOption")]
     pub backup_option: AdUnitContentAdsSettingsBackupOption,
-    /// Size of this ad unit. Size values are in the form SIZE_{width}_{height}.    
+    /// Size of this ad unit. Size values are in the form SIZE_{width}_{height}.
     pub size: String,
 }
 
@@ -788,9 +797,9 @@ impl Part for AdUnitContentAdsSettings {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct AdStyleFont {
-    /// The family of the font. Possible values are: ACCOUNT_DEFAULT_FAMILY, ADSENSE_DEFAULT_FAMILY, ARIAL, TIMES and VERDANA.    
+    /// The family of the font. Possible values are: ACCOUNT_DEFAULT_FAMILY, ADSENSE_DEFAULT_FAMILY, ARIAL, TIMES and VERDANA.
     pub family: String,
-    /// The size of the font. Possible values are: ACCOUNT_DEFAULT_SIZE, ADSENSE_DEFAULT_SIZE, SMALL, MEDIUM and LARGE.    
+    /// The size of the font. Possible values are: ACCOUNT_DEFAULT_SIZE, ADSENSE_DEFAULT_SIZE, SMALL, MEDIUM and LARGE.
     pub size: String,
 }
 
@@ -810,20 +819,20 @@ impl Part for AdStyleFont {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct Report {
-    /// The header information of the columns requested in the report. This is a list of headers; one for each dimension in the request, followed by one for each metric in the request.    
+    /// The header information of the columns requested in the report. This is a list of headers; one for each dimension in the request, followed by one for each metric in the request.
     pub headers: Vec<ReportHeaders>,
-    /// Kind this is, in this case adsensehost#report.    
+    /// Kind this is, in this case adsensehost#report.
     pub kind: String,
-    /// The output rows of the report. Each row is a list of cells; one for each dimension in the request, followed by one for each metric in the request. The dimension cells contain strings, and the metric cells contain numbers.    
+    /// The output rows of the report. Each row is a list of cells; one for each dimension in the request, followed by one for each metric in the request. The dimension cells contain strings, and the metric cells contain numbers.
     pub rows: Vec<Vec<String>>,
-    /// The total number of rows matched by the report request. Fewer rows may be returned in the response due to being limited by the row count requested or the report row limit.    
+    /// The total number of rows matched by the report request. Fewer rows may be returned in the response due to being limited by the row count requested or the report row limit.
     #[serde(alias="totalMatchedRows")]
     pub total_matched_rows: String,
-    /// Any warnings associated with generation of the report.    
+    /// Any warnings associated with generation of the report.
     pub warnings: Vec<String>,
-    /// The averages of the report. This is the same length as any other row in the report; cells corresponding to dimension columns are empty.    
+    /// The averages of the report. This is the same length as any other row in the report; cells corresponding to dimension columns are empty.
     pub averages: Vec<String>,
-    /// The totals of the report. This is the same length as any other row in the report; cells corresponding to dimension columns are empty.    
+    /// The totals of the report. This is the same length as any other row in the report; cells corresponding to dimension columns are empty.
     pub totals: Vec<String>,
 }
 
@@ -846,13 +855,13 @@ impl ResponseResult for Report {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct CustomChannel {
-    /// Kind of resource this is, in this case adsensehost#customChannel.    
+    /// Kind of resource this is, in this case adsensehost#customChannel.
     pub kind: Option<String>,
-    /// Code of this custom channel, not necessarily unique across ad clients.    
+    /// Code of this custom channel, not necessarily unique across ad clients.
     pub code: Option<String>,
-    /// Unique identifier of this custom channel. This should be considered an opaque identifier; it is not safe to rely on it being in any particular format.    
+    /// Unique identifier of this custom channel. This should be considered an opaque identifier; it is not safe to rely on it being in any particular format.
     pub id: Option<String>,
-    /// Name of this custom channel.    
+    /// Name of this custom channel.
     pub name: Option<String>,
 }
 
@@ -872,14 +881,14 @@ impl ResponseResult for CustomChannel {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct CustomChannels {
-    /// Continuation token used to page through custom channels. To retrieve the next page of results, set the next request's "pageToken" value to this.    
+    /// Continuation token used to page through custom channels. To retrieve the next page of results, set the next request's "pageToken" value to this.
     #[serde(alias="nextPageToken")]
     pub next_page_token: String,
-    /// The custom channels returned in this list response.    
+    /// The custom channels returned in this list response.
     pub items: Vec<CustomChannel>,
-    /// Kind of list this is, in this case adsensehost#customChannels.    
+    /// Kind of list this is, in this case adsensehost#customChannels.
     pub kind: String,
-    /// ETag of this response for caching purposes.    
+    /// ETag of this response for caching purposes.
     pub etag: String,
 }
 
@@ -925,13 +934,18 @@ pub struct UrlchannelMethods<'a, C, NC, A>
     hub: &'a AdSenseHost<C, NC, A>,
 }
 
-impl<'a, C, NC, A> ResourceMethodsBuilder for UrlchannelMethods<'a, C, NC, A> {}
+impl<'a, C, NC, A> MethodsBuilder for UrlchannelMethods<'a, C, NC, A> {}
 
 impl<'a, C, NC, A> UrlchannelMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Add a new URL channel to the host AdSense account.    
+    /// Add a new URL channel to the host AdSense account.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `adClientId` - Ad client to which the new URL channel will be added.
     pub fn insert(&self, request: &UrlChannel, ad_client_id: &str) -> UrlchannelInsertCall<'a, C, NC, A> {
         UrlchannelInsertCall {
             hub: self.hub,
@@ -945,7 +959,12 @@ impl<'a, C, NC, A> UrlchannelMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Delete a URL channel from the host AdSense account.    
+    /// Delete a URL channel from the host AdSense account.
+    /// 
+    /// # Arguments
+    ///
+    /// * `adClientId` - Ad client from which to delete the URL channel.
+    /// * `urlChannelId` - URL channel to delete.
     pub fn delete(&self, ad_client_id: &str, url_channel_id: &str) -> UrlchannelDeleteCall<'a, C, NC, A> {
         UrlchannelDeleteCall {
             hub: self.hub,
@@ -959,7 +978,11 @@ impl<'a, C, NC, A> UrlchannelMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// List all host URL channels in the host AdSense account.    
+    /// List all host URL channels in the host AdSense account.
+    /// 
+    /// # Arguments
+    ///
+    /// * `adClientId` - Ad client for which to list URL channels.
     pub fn list(&self, ad_client_id: &str) -> UrlchannelListCall<'a, C, NC, A> {
         UrlchannelListCall {
             hub: self.hub,
@@ -1009,13 +1032,13 @@ pub struct AdclientMethods<'a, C, NC, A>
     hub: &'a AdSenseHost<C, NC, A>,
 }
 
-impl<'a, C, NC, A> ResourceMethodsBuilder for AdclientMethods<'a, C, NC, A> {}
+impl<'a, C, NC, A> MethodsBuilder for AdclientMethods<'a, C, NC, A> {}
 
 impl<'a, C, NC, A> AdclientMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// List all host ad clients in this AdSense account.    
+    /// List all host ad clients in this AdSense account.
     pub fn list(&self) -> AdclientListCall<'a, C, NC, A> {
         AdclientListCall {
             hub: self.hub,
@@ -1029,7 +1052,11 @@ impl<'a, C, NC, A> AdclientMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Get information about one of the ad clients in the Host AdSense account.    
+    /// Get information about one of the ad clients in the Host AdSense account.
+    /// 
+    /// # Arguments
+    ///
+    /// * `adClientId` - Ad client to get.
     pub fn get(&self, ad_client_id: &str) -> AdclientGetCall<'a, C, NC, A> {
         AdclientGetCall {
             hub: self.hub,
@@ -1077,13 +1104,18 @@ pub struct AssociationsessionMethods<'a, C, NC, A>
     hub: &'a AdSenseHost<C, NC, A>,
 }
 
-impl<'a, C, NC, A> ResourceMethodsBuilder for AssociationsessionMethods<'a, C, NC, A> {}
+impl<'a, C, NC, A> MethodsBuilder for AssociationsessionMethods<'a, C, NC, A> {}
 
 impl<'a, C, NC, A> AssociationsessionMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Create an association session for initiating an association with an AdSense user.    
+    /// Create an association session for initiating an association with an AdSense user.
+    /// 
+    /// # Arguments
+    ///
+    /// * `productCode` - Products to associate with the user.
+    /// * `websiteUrl` - The URL of the user's hosted website.
     pub fn start(&self, product_code: &Vec<String>, website_url: &str) -> AssociationsessionStartCall<'a, C, NC, A> {
         AssociationsessionStartCall {
             hub: self.hub,
@@ -1099,7 +1131,11 @@ impl<'a, C, NC, A> AssociationsessionMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Verify an association session after the association callback returns from AdSense signup.    
+    /// Verify an association session after the association callback returns from AdSense signup.
+    /// 
+    /// # Arguments
+    ///
+    /// * `token` - The token returned to the association callback URL.
     pub fn verify(&self, token: &str) -> AssociationsessionVerifyCall<'a, C, NC, A> {
         AssociationsessionVerifyCall {
             hub: self.hub,
@@ -1147,13 +1183,18 @@ pub struct ReportMethods<'a, C, NC, A>
     hub: &'a AdSenseHost<C, NC, A>,
 }
 
-impl<'a, C, NC, A> ResourceMethodsBuilder for ReportMethods<'a, C, NC, A> {}
+impl<'a, C, NC, A> MethodsBuilder for ReportMethods<'a, C, NC, A> {}
 
 impl<'a, C, NC, A> ReportMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Generate an AdSense report based on the report request sent in the query parameters. Returns the result as JSON; to retrieve output in CSV format specify "alt=csv" as a query parameter.    
+    /// Generate an AdSense report based on the report request sent in the query parameters. Returns the result as JSON; to retrieve output in CSV format specify "alt=csv" as a query parameter.
+    /// 
+    /// # Arguments
+    ///
+    /// * `startDate` - Start of the date range to report on in "YYYY-MM-DD" format, inclusive.
+    /// * `endDate` - End of the date range to report on in "YYYY-MM-DD" format, inclusive.
     pub fn generate(&self, start_date: &str, end_date: &str) -> ReportGenerateCall<'a, C, NC, A> {
         ReportGenerateCall {
             hub: self.hub,
@@ -1209,13 +1250,18 @@ pub struct AccountMethods<'a, C, NC, A>
     hub: &'a AdSenseHost<C, NC, A>,
 }
 
-impl<'a, C, NC, A> ResourceMethodsBuilder for AccountMethods<'a, C, NC, A> {}
+impl<'a, C, NC, A> MethodsBuilder for AccountMethods<'a, C, NC, A> {}
 
 impl<'a, C, NC, A> AccountMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// List all ad units in the specified publisher's AdSense account.    
+    /// List all ad units in the specified publisher's AdSense account.
+    /// 
+    /// # Arguments
+    ///
+    /// * `accountId` - Account which contains the ad client.
+    /// * `adClientId` - Ad client for which to list ad units.
     pub fn adunits_list(&self, account_id: &str, ad_client_id: &str) -> AccountAdunitListCall<'a, C, NC, A> {
         AccountAdunitListCall {
             hub: self.hub,
@@ -1232,7 +1278,11 @@ impl<'a, C, NC, A> AccountMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// List hosted accounts associated with this AdSense account by ad client id.    
+    /// List hosted accounts associated with this AdSense account by ad client id.
+    /// 
+    /// # Arguments
+    ///
+    /// * `filterAdClientId` - Ad clients to list accounts for.
     pub fn list(&self, filter_ad_client_id: &Vec<String>) -> AccountListCall<'a, C, NC, A> {
         AccountListCall {
             hub: self.hub,
@@ -1245,7 +1295,13 @@ impl<'a, C, NC, A> AccountMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Get ad code for the specified ad unit, attaching the specified host custom channels.    
+    /// Get ad code for the specified ad unit, attaching the specified host custom channels.
+    /// 
+    /// # Arguments
+    ///
+    /// * `accountId` - Account which contains the ad client.
+    /// * `adClientId` - Ad client with contains the ad unit.
+    /// * `adUnitId` - Ad unit to get the code for.
     pub fn adunits_get_ad_code(&self, account_id: &str, ad_client_id: &str, ad_unit_id: &str) -> AccountAdunitGetAdCodeCall<'a, C, NC, A> {
         AccountAdunitGetAdCodeCall {
             hub: self.hub,
@@ -1261,7 +1317,13 @@ impl<'a, C, NC, A> AccountMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Generate an AdSense report based on the report request sent in the query parameters. Returns the result as JSON; to retrieve output in CSV format specify "alt=csv" as a query parameter.    
+    /// Generate an AdSense report based on the report request sent in the query parameters. Returns the result as JSON; to retrieve output in CSV format specify "alt=csv" as a query parameter.
+    /// 
+    /// # Arguments
+    ///
+    /// * `accountId` - Hosted account upon which to report.
+    /// * `startDate` - Start of the date range to report on in "YYYY-MM-DD" format, inclusive.
+    /// * `endDate` - End of the date range to report on in "YYYY-MM-DD" format, inclusive.
     pub fn reports_generate(&self, account_id: &str, start_date: &str, end_date: &str) -> AccountReportGenerateCall<'a, C, NC, A> {
         AccountReportGenerateCall {
             hub: self.hub,
@@ -1283,7 +1345,13 @@ impl<'a, C, NC, A> AccountMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Delete the specified ad unit from the specified publisher AdSense account.    
+    /// Delete the specified ad unit from the specified publisher AdSense account.
+    /// 
+    /// # Arguments
+    ///
+    /// * `accountId` - Account which contains the ad unit.
+    /// * `adClientId` - Ad client for which to get ad unit.
+    /// * `adUnitId` - Ad unit to delete.
     pub fn adunits_delete(&self, account_id: &str, ad_client_id: &str, ad_unit_id: &str) -> AccountAdunitDeleteCall<'a, C, NC, A> {
         AccountAdunitDeleteCall {
             hub: self.hub,
@@ -1298,7 +1366,11 @@ impl<'a, C, NC, A> AccountMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// List all hosted ad clients in the specified hosted account.    
+    /// List all hosted ad clients in the specified hosted account.
+    /// 
+    /// # Arguments
+    ///
+    /// * `accountId` - Account for which to list ad clients.
     pub fn adclients_list(&self, account_id: &str) -> AccountAdclientListCall<'a, C, NC, A> {
         AccountAdclientListCall {
             hub: self.hub,
@@ -1313,7 +1385,14 @@ impl<'a, C, NC, A> AccountMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Update the supplied ad unit in the specified publisher AdSense account. This method supports patch semantics.    
+    /// Update the supplied ad unit in the specified publisher AdSense account. This method supports patch semantics.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `accountId` - Account which contains the ad client.
+    /// * `adClientId` - Ad client which contains the ad unit.
+    /// * `adUnitId` - Ad unit to get.
     pub fn adunits_patch(&self, request: &AdUnit, account_id: &str, ad_client_id: &str, ad_unit_id: &str) -> AccountAdunitPatchCall<'a, C, NC, A> {
         AccountAdunitPatchCall {
             hub: self.hub,
@@ -1329,7 +1408,12 @@ impl<'a, C, NC, A> AccountMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Get information about one of the ad clients in the specified publisher's AdSense account.    
+    /// Get information about one of the ad clients in the specified publisher's AdSense account.
+    /// 
+    /// # Arguments
+    ///
+    /// * `accountId` - Account which contains the ad client.
+    /// * `adClientId` - Ad client to get.
     pub fn adclients_get(&self, account_id: &str, ad_client_id: &str) -> AccountAdclientGetCall<'a, C, NC, A> {
         AccountAdclientGetCall {
             hub: self.hub,
@@ -1343,7 +1427,11 @@ impl<'a, C, NC, A> AccountMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Get information about the selected associated AdSense account.    
+    /// Get information about the selected associated AdSense account.
+    /// 
+    /// # Arguments
+    ///
+    /// * `accountId` - Account to get information about.
     pub fn get(&self, account_id: &str) -> AccountGetCall<'a, C, NC, A> {
         AccountGetCall {
             hub: self.hub,
@@ -1356,7 +1444,13 @@ impl<'a, C, NC, A> AccountMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Insert the supplied ad unit into the specified publisher AdSense account.    
+    /// Insert the supplied ad unit into the specified publisher AdSense account.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `accountId` - Account which will contain the ad unit.
+    /// * `adClientId` - Ad client into which to insert the ad unit.
     pub fn adunits_insert(&self, request: &AdUnit, account_id: &str, ad_client_id: &str) -> AccountAdunitInsertCall<'a, C, NC, A> {
         AccountAdunitInsertCall {
             hub: self.hub,
@@ -1371,7 +1465,13 @@ impl<'a, C, NC, A> AccountMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Get the specified host ad unit in this AdSense account.    
+    /// Get the specified host ad unit in this AdSense account.
+    /// 
+    /// # Arguments
+    ///
+    /// * `accountId` - Account which contains the ad unit.
+    /// * `adClientId` - Ad client for which to get ad unit.
+    /// * `adUnitId` - Ad unit to get.
     pub fn adunits_get(&self, account_id: &str, ad_client_id: &str, ad_unit_id: &str) -> AccountAdunitGetCall<'a, C, NC, A> {
         AccountAdunitGetCall {
             hub: self.hub,
@@ -1386,7 +1486,13 @@ impl<'a, C, NC, A> AccountMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Update the supplied ad unit in the specified publisher AdSense account.    
+    /// Update the supplied ad unit in the specified publisher AdSense account.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `accountId` - Account which contains the ad client.
+    /// * `adClientId` - Ad client which contains the ad unit.
     pub fn adunits_update(&self, request: &AdUnit, account_id: &str, ad_client_id: &str) -> AccountAdunitUpdateCall<'a, C, NC, A> {
         AccountAdunitUpdateCall {
             hub: self.hub,
@@ -1436,13 +1542,18 @@ pub struct CustomchannelMethods<'a, C, NC, A>
     hub: &'a AdSenseHost<C, NC, A>,
 }
 
-impl<'a, C, NC, A> ResourceMethodsBuilder for CustomchannelMethods<'a, C, NC, A> {}
+impl<'a, C, NC, A> MethodsBuilder for CustomchannelMethods<'a, C, NC, A> {}
 
 impl<'a, C, NC, A> CustomchannelMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Get a specific custom channel from the host AdSense account.    
+    /// Get a specific custom channel from the host AdSense account.
+    /// 
+    /// # Arguments
+    ///
+    /// * `adClientId` - Ad client from which to get the custom channel.
+    /// * `customChannelId` - Custom channel to get.
     pub fn get(&self, ad_client_id: &str, custom_channel_id: &str) -> CustomchannelGetCall<'a, C, NC, A> {
         CustomchannelGetCall {
             hub: self.hub,
@@ -1456,7 +1567,12 @@ impl<'a, C, NC, A> CustomchannelMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Delete a specific custom channel from the host AdSense account.    
+    /// Delete a specific custom channel from the host AdSense account.
+    /// 
+    /// # Arguments
+    ///
+    /// * `adClientId` - Ad client from which to delete the custom channel.
+    /// * `customChannelId` - Custom channel to delete.
     pub fn delete(&self, ad_client_id: &str, custom_channel_id: &str) -> CustomchannelDeleteCall<'a, C, NC, A> {
         CustomchannelDeleteCall {
             hub: self.hub,
@@ -1470,7 +1586,12 @@ impl<'a, C, NC, A> CustomchannelMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Update a custom channel in the host AdSense account.    
+    /// Update a custom channel in the host AdSense account.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `adClientId` - Ad client in which the custom channel will be updated.
     pub fn update(&self, request: &CustomChannel, ad_client_id: &str) -> CustomchannelUpdateCall<'a, C, NC, A> {
         CustomchannelUpdateCall {
             hub: self.hub,
@@ -1484,7 +1605,11 @@ impl<'a, C, NC, A> CustomchannelMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// List all host custom channels in this AdSense account.    
+    /// List all host custom channels in this AdSense account.
+    /// 
+    /// # Arguments
+    ///
+    /// * `adClientId` - Ad client for which to list custom channels.
     pub fn list(&self, ad_client_id: &str) -> CustomchannelListCall<'a, C, NC, A> {
         CustomchannelListCall {
             hub: self.hub,
@@ -1499,7 +1624,13 @@ impl<'a, C, NC, A> CustomchannelMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Update a custom channel in the host AdSense account. This method supports patch semantics.    
+    /// Update a custom channel in the host AdSense account. This method supports patch semantics.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `adClientId` - Ad client in which the custom channel will be updated.
+    /// * `customChannelId` - Custom channel to get.
     pub fn patch(&self, request: &CustomChannel, ad_client_id: &str, custom_channel_id: &str) -> CustomchannelPatchCall<'a, C, NC, A> {
         CustomchannelPatchCall {
             hub: self.hub,
@@ -1514,7 +1645,12 @@ impl<'a, C, NC, A> CustomchannelMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Add a new custom channel to the host AdSense account.    
+    /// Add a new custom channel to the host AdSense account.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `adClientId` - Ad client to which the new custom channel will be added.
     pub fn insert(&self, request: &CustomChannel, ad_client_id: &str) -> CustomchannelInsertCall<'a, C, NC, A> {
         CustomchannelInsertCall {
             hub: self.hub,
@@ -1538,7 +1674,7 @@ impl<'a, C, NC, A> CustomchannelMethods<'a, C, NC, A> {
 /// Add a new URL channel to the host AdSense account.
 ///
 /// A builder for the *insert* method supported by a *urlchannel* resource.
-/// It is not used directly, but through a `UrlchannelMethods`.
+/// It is not used directly, but through a `UrlchannelMethods` instance.
 ///
 /// # Example
 ///
@@ -1603,7 +1739,7 @@ impl<'a, C, NC, A> UrlchannelInsertCall<'a, C, NC, A> where NC: hyper::net::Netw
         for &field in ["alt", "adClientId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -1660,7 +1796,7 @@ impl<'a, C, NC, A> UrlchannelInsertCall<'a, C, NC, A> where NC: hyper::net::Netw
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -1676,7 +1812,6 @@ impl<'a, C, NC, A> UrlchannelInsertCall<'a, C, NC, A> where NC: hyper::net::Netw
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -1686,7 +1821,7 @@ impl<'a, C, NC, A> UrlchannelInsertCall<'a, C, NC, A> where NC: hyper::net::Netw
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -1697,7 +1832,7 @@ impl<'a, C, NC, A> UrlchannelInsertCall<'a, C, NC, A> where NC: hyper::net::Netw
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -1706,13 +1841,13 @@ impl<'a, C, NC, A> UrlchannelInsertCall<'a, C, NC, A> where NC: hyper::net::Netw
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -1733,7 +1868,7 @@ impl<'a, C, NC, A> UrlchannelInsertCall<'a, C, NC, A> where NC: hyper::net::Netw
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Ad client to which the new URL channel will be added.    
+    /// Ad client to which the new URL channel will be added.
     pub fn ad_client_id(mut self, new_value: &str) -> UrlchannelInsertCall<'a, C, NC, A> {
         self._ad_client_id = new_value.to_string();
         self
@@ -1794,7 +1929,7 @@ impl<'a, C, NC, A> UrlchannelInsertCall<'a, C, NC, A> where NC: hyper::net::Netw
 /// Delete a URL channel from the host AdSense account.
 ///
 /// A builder for the *delete* method supported by a *urlchannel* resource.
-/// It is not used directly, but through a `UrlchannelMethods`.
+/// It is not used directly, but through a `UrlchannelMethods` instance.
 ///
 /// # Example
 ///
@@ -1854,7 +1989,7 @@ impl<'a, C, NC, A> UrlchannelDeleteCall<'a, C, NC, A> where NC: hyper::net::Netw
         for &field in ["alt", "adClientId", "urlChannelId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -1907,7 +2042,7 @@ impl<'a, C, NC, A> UrlchannelDeleteCall<'a, C, NC, A> where NC: hyper::net::Netw
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -1919,7 +2054,6 @@ impl<'a, C, NC, A> UrlchannelDeleteCall<'a, C, NC, A> where NC: hyper::net::Netw
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -1929,7 +2063,7 @@ impl<'a, C, NC, A> UrlchannelDeleteCall<'a, C, NC, A> where NC: hyper::net::Netw
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -1940,7 +2074,7 @@ impl<'a, C, NC, A> UrlchannelDeleteCall<'a, C, NC, A> where NC: hyper::net::Netw
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -1949,13 +2083,13 @@ impl<'a, C, NC, A> UrlchannelDeleteCall<'a, C, NC, A> where NC: hyper::net::Netw
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -1967,7 +2101,7 @@ impl<'a, C, NC, A> UrlchannelDeleteCall<'a, C, NC, A> where NC: hyper::net::Netw
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Ad client from which to delete the URL channel.    
+    /// Ad client from which to delete the URL channel.
     pub fn ad_client_id(mut self, new_value: &str) -> UrlchannelDeleteCall<'a, C, NC, A> {
         self._ad_client_id = new_value.to_string();
         self
@@ -1977,7 +2111,7 @@ impl<'a, C, NC, A> UrlchannelDeleteCall<'a, C, NC, A> where NC: hyper::net::Netw
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// URL channel to delete.    
+    /// URL channel to delete.
     pub fn url_channel_id(mut self, new_value: &str) -> UrlchannelDeleteCall<'a, C, NC, A> {
         self._url_channel_id = new_value.to_string();
         self
@@ -2038,7 +2172,7 @@ impl<'a, C, NC, A> UrlchannelDeleteCall<'a, C, NC, A> where NC: hyper::net::Netw
 /// List all host URL channels in the host AdSense account.
 ///
 /// A builder for the *list* method supported by a *urlchannel* resource.
-/// It is not used directly, but through a `UrlchannelMethods`.
+/// It is not used directly, but through a `UrlchannelMethods` instance.
 ///
 /// # Example
 ///
@@ -2106,7 +2240,7 @@ impl<'a, C, NC, A> UrlchannelListCall<'a, C, NC, A> where NC: hyper::net::Networ
         for &field in ["alt", "adClientId", "pageToken", "maxResults"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -2159,7 +2293,7 @@ impl<'a, C, NC, A> UrlchannelListCall<'a, C, NC, A> where NC: hyper::net::Networ
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -2171,7 +2305,6 @@ impl<'a, C, NC, A> UrlchannelListCall<'a, C, NC, A> where NC: hyper::net::Networ
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -2181,7 +2314,7 @@ impl<'a, C, NC, A> UrlchannelListCall<'a, C, NC, A> where NC: hyper::net::Networ
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -2192,7 +2325,7 @@ impl<'a, C, NC, A> UrlchannelListCall<'a, C, NC, A> where NC: hyper::net::Networ
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -2201,13 +2334,13 @@ impl<'a, C, NC, A> UrlchannelListCall<'a, C, NC, A> where NC: hyper::net::Networ
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -2219,7 +2352,7 @@ impl<'a, C, NC, A> UrlchannelListCall<'a, C, NC, A> where NC: hyper::net::Networ
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Ad client for which to list URL channels.    
+    /// Ad client for which to list URL channels.
     pub fn ad_client_id(mut self, new_value: &str) -> UrlchannelListCall<'a, C, NC, A> {
         self._ad_client_id = new_value.to_string();
         self
@@ -2227,7 +2360,7 @@ impl<'a, C, NC, A> UrlchannelListCall<'a, C, NC, A> where NC: hyper::net::Networ
     /// Sets the *page token* query property to the given value.
     ///
     /// 
-    /// A continuation token, used to page through URL channels. To retrieve the next page, set this parameter to the value of "nextPageToken" from the previous response.    
+    /// A continuation token, used to page through URL channels. To retrieve the next page, set this parameter to the value of "nextPageToken" from the previous response.
     pub fn page_token(mut self, new_value: &str) -> UrlchannelListCall<'a, C, NC, A> {
         self._page_token = Some(new_value.to_string());
         self
@@ -2235,7 +2368,7 @@ impl<'a, C, NC, A> UrlchannelListCall<'a, C, NC, A> where NC: hyper::net::Networ
     /// Sets the *max results* query property to the given value.
     ///
     /// 
-    /// The maximum number of URL channels to include in the response, used for paging.    
+    /// The maximum number of URL channels to include in the response, used for paging.
     pub fn max_results(mut self, new_value: u32) -> UrlchannelListCall<'a, C, NC, A> {
         self._max_results = Some(new_value);
         self
@@ -2296,7 +2429,7 @@ impl<'a, C, NC, A> UrlchannelListCall<'a, C, NC, A> where NC: hyper::net::Networ
 /// List all host ad clients in this AdSense account.
 ///
 /// A builder for the *list* method supported by a *adclient* resource.
-/// It is not used directly, but through a `AdclientMethods`.
+/// It is not used directly, but through a `AdclientMethods` instance.
 ///
 /// # Example
 ///
@@ -2362,7 +2495,7 @@ impl<'a, C, NC, A> AdclientListCall<'a, C, NC, A> where NC: hyper::net::NetworkC
         for &field in ["alt", "pageToken", "maxResults"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -2391,7 +2524,7 @@ impl<'a, C, NC, A> AdclientListCall<'a, C, NC, A> where NC: hyper::net::NetworkC
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -2403,7 +2536,6 @@ impl<'a, C, NC, A> AdclientListCall<'a, C, NC, A> where NC: hyper::net::NetworkC
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -2413,7 +2545,7 @@ impl<'a, C, NC, A> AdclientListCall<'a, C, NC, A> where NC: hyper::net::NetworkC
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -2424,7 +2556,7 @@ impl<'a, C, NC, A> AdclientListCall<'a, C, NC, A> where NC: hyper::net::NetworkC
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -2433,13 +2565,13 @@ impl<'a, C, NC, A> AdclientListCall<'a, C, NC, A> where NC: hyper::net::NetworkC
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -2449,7 +2581,7 @@ impl<'a, C, NC, A> AdclientListCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// Sets the *page token* query property to the given value.
     ///
     /// 
-    /// A continuation token, used to page through ad clients. To retrieve the next page, set this parameter to the value of "nextPageToken" from the previous response.    
+    /// A continuation token, used to page through ad clients. To retrieve the next page, set this parameter to the value of "nextPageToken" from the previous response.
     pub fn page_token(mut self, new_value: &str) -> AdclientListCall<'a, C, NC, A> {
         self._page_token = Some(new_value.to_string());
         self
@@ -2457,7 +2589,7 @@ impl<'a, C, NC, A> AdclientListCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// Sets the *max results* query property to the given value.
     ///
     /// 
-    /// The maximum number of ad clients to include in the response, used for paging.    
+    /// The maximum number of ad clients to include in the response, used for paging.
     pub fn max_results(mut self, new_value: u32) -> AdclientListCall<'a, C, NC, A> {
         self._max_results = Some(new_value);
         self
@@ -2518,7 +2650,7 @@ impl<'a, C, NC, A> AdclientListCall<'a, C, NC, A> where NC: hyper::net::NetworkC
 /// Get information about one of the ad clients in the Host AdSense account.
 ///
 /// A builder for the *get* method supported by a *adclient* resource.
-/// It is not used directly, but through a `AdclientMethods`.
+/// It is not used directly, but through a `AdclientMethods` instance.
 ///
 /// # Example
 ///
@@ -2576,7 +2708,7 @@ impl<'a, C, NC, A> AdclientGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
         for &field in ["alt", "adClientId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -2629,7 +2761,7 @@ impl<'a, C, NC, A> AdclientGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -2641,7 +2773,6 @@ impl<'a, C, NC, A> AdclientGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -2651,7 +2782,7 @@ impl<'a, C, NC, A> AdclientGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -2662,7 +2793,7 @@ impl<'a, C, NC, A> AdclientGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -2671,13 +2802,13 @@ impl<'a, C, NC, A> AdclientGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -2689,7 +2820,7 @@ impl<'a, C, NC, A> AdclientGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Ad client to get.    
+    /// Ad client to get.
     pub fn ad_client_id(mut self, new_value: &str) -> AdclientGetCall<'a, C, NC, A> {
         self._ad_client_id = new_value.to_string();
         self
@@ -2750,7 +2881,7 @@ impl<'a, C, NC, A> AdclientGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
 /// Create an association session for initiating an association with an AdSense user.
 ///
 /// A builder for the *start* method supported by a *associationsession* resource.
-/// It is not used directly, but through a `AssociationsessionMethods`.
+/// It is not used directly, but through a `AssociationsessionMethods` instance.
 ///
 /// # Example
 ///
@@ -2826,7 +2957,7 @@ impl<'a, C, NC, A> AssociationsessionStartCall<'a, C, NC, A> where NC: hyper::ne
         for &field in ["alt", "productCode", "websiteUrl", "websiteLocale", "userLocale"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -2855,7 +2986,7 @@ impl<'a, C, NC, A> AssociationsessionStartCall<'a, C, NC, A> where NC: hyper::ne
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -2867,7 +2998,6 @@ impl<'a, C, NC, A> AssociationsessionStartCall<'a, C, NC, A> where NC: hyper::ne
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -2877,7 +3007,7 @@ impl<'a, C, NC, A> AssociationsessionStartCall<'a, C, NC, A> where NC: hyper::ne
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -2888,7 +3018,7 @@ impl<'a, C, NC, A> AssociationsessionStartCall<'a, C, NC, A> where NC: hyper::ne
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -2897,13 +3027,13 @@ impl<'a, C, NC, A> AssociationsessionStartCall<'a, C, NC, A> where NC: hyper::ne
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -2916,7 +3046,7 @@ impl<'a, C, NC, A> AssociationsessionStartCall<'a, C, NC, A> where NC: hyper::ne
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Products to associate with the user.    
+    /// Products to associate with the user.
     pub fn add_product_code(mut self, new_value: &str) -> AssociationsessionStartCall<'a, C, NC, A> {
         self._product_code.push(new_value.to_string());
         self
@@ -2926,7 +3056,7 @@ impl<'a, C, NC, A> AssociationsessionStartCall<'a, C, NC, A> where NC: hyper::ne
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The URL of the user's hosted website.    
+    /// The URL of the user's hosted website.
     pub fn website_url(mut self, new_value: &str) -> AssociationsessionStartCall<'a, C, NC, A> {
         self._website_url = new_value.to_string();
         self
@@ -2934,7 +3064,7 @@ impl<'a, C, NC, A> AssociationsessionStartCall<'a, C, NC, A> where NC: hyper::ne
     /// Sets the *website locale* query property to the given value.
     ///
     /// 
-    /// The locale of the user's hosted website.    
+    /// The locale of the user's hosted website.
     pub fn website_locale(mut self, new_value: &str) -> AssociationsessionStartCall<'a, C, NC, A> {
         self._website_locale = Some(new_value.to_string());
         self
@@ -2942,7 +3072,7 @@ impl<'a, C, NC, A> AssociationsessionStartCall<'a, C, NC, A> where NC: hyper::ne
     /// Sets the *user locale* query property to the given value.
     ///
     /// 
-    /// The preferred locale of the user.    
+    /// The preferred locale of the user.
     pub fn user_locale(mut self, new_value: &str) -> AssociationsessionStartCall<'a, C, NC, A> {
         self._user_locale = Some(new_value.to_string());
         self
@@ -3003,7 +3133,7 @@ impl<'a, C, NC, A> AssociationsessionStartCall<'a, C, NC, A> where NC: hyper::ne
 /// Verify an association session after the association callback returns from AdSense signup.
 ///
 /// A builder for the *verify* method supported by a *associationsession* resource.
-/// It is not used directly, but through a `AssociationsessionMethods`.
+/// It is not used directly, but through a `AssociationsessionMethods` instance.
 ///
 /// # Example
 ///
@@ -3061,7 +3191,7 @@ impl<'a, C, NC, A> AssociationsessionVerifyCall<'a, C, NC, A> where NC: hyper::n
         for &field in ["alt", "token"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -3090,7 +3220,7 @@ impl<'a, C, NC, A> AssociationsessionVerifyCall<'a, C, NC, A> where NC: hyper::n
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -3102,7 +3232,6 @@ impl<'a, C, NC, A> AssociationsessionVerifyCall<'a, C, NC, A> where NC: hyper::n
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -3112,7 +3241,7 @@ impl<'a, C, NC, A> AssociationsessionVerifyCall<'a, C, NC, A> where NC: hyper::n
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -3123,7 +3252,7 @@ impl<'a, C, NC, A> AssociationsessionVerifyCall<'a, C, NC, A> where NC: hyper::n
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -3132,13 +3261,13 @@ impl<'a, C, NC, A> AssociationsessionVerifyCall<'a, C, NC, A> where NC: hyper::n
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -3150,7 +3279,7 @@ impl<'a, C, NC, A> AssociationsessionVerifyCall<'a, C, NC, A> where NC: hyper::n
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The token returned to the association callback URL.    
+    /// The token returned to the association callback URL.
     pub fn token(mut self, new_value: &str) -> AssociationsessionVerifyCall<'a, C, NC, A> {
         self._token = new_value.to_string();
         self
@@ -3211,7 +3340,7 @@ impl<'a, C, NC, A> AssociationsessionVerifyCall<'a, C, NC, A> where NC: hyper::n
 /// Generate an AdSense report based on the report request sent in the query parameters. Returns the result as JSON; to retrieve output in CSV format specify "alt=csv" as a query parameter.
 ///
 /// A builder for the *generate* method supported by a *report* resource.
-/// It is not used directly, but through a `ReportMethods`.
+/// It is not used directly, but through a `ReportMethods` instance.
 ///
 /// # Example
 ///
@@ -3322,7 +3451,7 @@ impl<'a, C, NC, A> ReportGenerateCall<'a, C, NC, A> where NC: hyper::net::Networ
         for &field in ["alt", "startDate", "endDate", "startIndex", "sort", "metric", "maxResults", "locale", "filter", "dimension"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -3351,7 +3480,7 @@ impl<'a, C, NC, A> ReportGenerateCall<'a, C, NC, A> where NC: hyper::net::Networ
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -3363,7 +3492,6 @@ impl<'a, C, NC, A> ReportGenerateCall<'a, C, NC, A> where NC: hyper::net::Networ
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -3373,7 +3501,7 @@ impl<'a, C, NC, A> ReportGenerateCall<'a, C, NC, A> where NC: hyper::net::Networ
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -3384,7 +3512,7 @@ impl<'a, C, NC, A> ReportGenerateCall<'a, C, NC, A> where NC: hyper::net::Networ
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -3393,13 +3521,13 @@ impl<'a, C, NC, A> ReportGenerateCall<'a, C, NC, A> where NC: hyper::net::Networ
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -3411,7 +3539,7 @@ impl<'a, C, NC, A> ReportGenerateCall<'a, C, NC, A> where NC: hyper::net::Networ
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Start of the date range to report on in "YYYY-MM-DD" format, inclusive.    
+    /// Start of the date range to report on in "YYYY-MM-DD" format, inclusive.
     pub fn start_date(mut self, new_value: &str) -> ReportGenerateCall<'a, C, NC, A> {
         self._start_date = new_value.to_string();
         self
@@ -3421,7 +3549,7 @@ impl<'a, C, NC, A> ReportGenerateCall<'a, C, NC, A> where NC: hyper::net::Networ
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// End of the date range to report on in "YYYY-MM-DD" format, inclusive.    
+    /// End of the date range to report on in "YYYY-MM-DD" format, inclusive.
     pub fn end_date(mut self, new_value: &str) -> ReportGenerateCall<'a, C, NC, A> {
         self._end_date = new_value.to_string();
         self
@@ -3429,7 +3557,7 @@ impl<'a, C, NC, A> ReportGenerateCall<'a, C, NC, A> where NC: hyper::net::Networ
     /// Sets the *start index* query property to the given value.
     ///
     /// 
-    /// Index of the first row of report data to return.    
+    /// Index of the first row of report data to return.
     pub fn start_index(mut self, new_value: u32) -> ReportGenerateCall<'a, C, NC, A> {
         self._start_index = Some(new_value);
         self
@@ -3438,7 +3566,7 @@ impl<'a, C, NC, A> ReportGenerateCall<'a, C, NC, A> where NC: hyper::net::Networ
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
     ///
     /// 
-    /// The name of a dimension or metric to sort the resulting report on, optionally prefixed with "+" to sort ascending or "-" to sort descending. If no prefix is specified, the column is sorted ascending.    
+    /// The name of a dimension or metric to sort the resulting report on, optionally prefixed with "+" to sort ascending or "-" to sort descending. If no prefix is specified, the column is sorted ascending.
     pub fn add_sort(mut self, new_value: &str) -> ReportGenerateCall<'a, C, NC, A> {
         self._sort.push(new_value.to_string());
         self
@@ -3447,7 +3575,7 @@ impl<'a, C, NC, A> ReportGenerateCall<'a, C, NC, A> where NC: hyper::net::Networ
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
     ///
     /// 
-    /// Numeric columns to include in the report.    
+    /// Numeric columns to include in the report.
     pub fn add_metric(mut self, new_value: &str) -> ReportGenerateCall<'a, C, NC, A> {
         self._metric.push(new_value.to_string());
         self
@@ -3455,7 +3583,7 @@ impl<'a, C, NC, A> ReportGenerateCall<'a, C, NC, A> where NC: hyper::net::Networ
     /// Sets the *max results* query property to the given value.
     ///
     /// 
-    /// The maximum number of rows of report data to return.    
+    /// The maximum number of rows of report data to return.
     pub fn max_results(mut self, new_value: u32) -> ReportGenerateCall<'a, C, NC, A> {
         self._max_results = Some(new_value);
         self
@@ -3463,7 +3591,7 @@ impl<'a, C, NC, A> ReportGenerateCall<'a, C, NC, A> where NC: hyper::net::Networ
     /// Sets the *locale* query property to the given value.
     ///
     /// 
-    /// Optional locale to use for translating report output to a local language. Defaults to "en_US" if not specified.    
+    /// Optional locale to use for translating report output to a local language. Defaults to "en_US" if not specified.
     pub fn locale(mut self, new_value: &str) -> ReportGenerateCall<'a, C, NC, A> {
         self._locale = Some(new_value.to_string());
         self
@@ -3472,7 +3600,7 @@ impl<'a, C, NC, A> ReportGenerateCall<'a, C, NC, A> where NC: hyper::net::Networ
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
     ///
     /// 
-    /// Filters to be run on the report.    
+    /// Filters to be run on the report.
     pub fn add_filter(mut self, new_value: &str) -> ReportGenerateCall<'a, C, NC, A> {
         self._filter.push(new_value.to_string());
         self
@@ -3481,7 +3609,7 @@ impl<'a, C, NC, A> ReportGenerateCall<'a, C, NC, A> where NC: hyper::net::Networ
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
     ///
     /// 
-    /// Dimensions to base the report on.    
+    /// Dimensions to base the report on.
     pub fn add_dimension(mut self, new_value: &str) -> ReportGenerateCall<'a, C, NC, A> {
         self._dimension.push(new_value.to_string());
         self
@@ -3542,7 +3670,7 @@ impl<'a, C, NC, A> ReportGenerateCall<'a, C, NC, A> where NC: hyper::net::Networ
 /// List all ad units in the specified publisher's AdSense account.
 ///
 /// A builder for the *adunits.list* method supported by a *account* resource.
-/// It is not used directly, but through a `AccountMethods`.
+/// It is not used directly, but through a `AccountMethods` instance.
 ///
 /// # Example
 ///
@@ -3617,7 +3745,7 @@ impl<'a, C, NC, A> AccountAdunitListCall<'a, C, NC, A> where NC: hyper::net::Net
         for &field in ["alt", "accountId", "adClientId", "pageToken", "maxResults", "includeInactive"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -3670,7 +3798,7 @@ impl<'a, C, NC, A> AccountAdunitListCall<'a, C, NC, A> where NC: hyper::net::Net
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -3682,7 +3810,6 @@ impl<'a, C, NC, A> AccountAdunitListCall<'a, C, NC, A> where NC: hyper::net::Net
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -3692,7 +3819,7 @@ impl<'a, C, NC, A> AccountAdunitListCall<'a, C, NC, A> where NC: hyper::net::Net
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -3703,7 +3830,7 @@ impl<'a, C, NC, A> AccountAdunitListCall<'a, C, NC, A> where NC: hyper::net::Net
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -3712,13 +3839,13 @@ impl<'a, C, NC, A> AccountAdunitListCall<'a, C, NC, A> where NC: hyper::net::Net
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -3730,7 +3857,7 @@ impl<'a, C, NC, A> AccountAdunitListCall<'a, C, NC, A> where NC: hyper::net::Net
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Account which contains the ad client.    
+    /// Account which contains the ad client.
     pub fn account_id(mut self, new_value: &str) -> AccountAdunitListCall<'a, C, NC, A> {
         self._account_id = new_value.to_string();
         self
@@ -3740,7 +3867,7 @@ impl<'a, C, NC, A> AccountAdunitListCall<'a, C, NC, A> where NC: hyper::net::Net
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Ad client for which to list ad units.    
+    /// Ad client for which to list ad units.
     pub fn ad_client_id(mut self, new_value: &str) -> AccountAdunitListCall<'a, C, NC, A> {
         self._ad_client_id = new_value.to_string();
         self
@@ -3748,7 +3875,7 @@ impl<'a, C, NC, A> AccountAdunitListCall<'a, C, NC, A> where NC: hyper::net::Net
     /// Sets the *page token* query property to the given value.
     ///
     /// 
-    /// A continuation token, used to page through ad units. To retrieve the next page, set this parameter to the value of "nextPageToken" from the previous response.    
+    /// A continuation token, used to page through ad units. To retrieve the next page, set this parameter to the value of "nextPageToken" from the previous response.
     pub fn page_token(mut self, new_value: &str) -> AccountAdunitListCall<'a, C, NC, A> {
         self._page_token = Some(new_value.to_string());
         self
@@ -3756,7 +3883,7 @@ impl<'a, C, NC, A> AccountAdunitListCall<'a, C, NC, A> where NC: hyper::net::Net
     /// Sets the *max results* query property to the given value.
     ///
     /// 
-    /// The maximum number of ad units to include in the response, used for paging.    
+    /// The maximum number of ad units to include in the response, used for paging.
     pub fn max_results(mut self, new_value: u32) -> AccountAdunitListCall<'a, C, NC, A> {
         self._max_results = Some(new_value);
         self
@@ -3764,7 +3891,7 @@ impl<'a, C, NC, A> AccountAdunitListCall<'a, C, NC, A> where NC: hyper::net::Net
     /// Sets the *include inactive* query property to the given value.
     ///
     /// 
-    /// Whether to include inactive ad units. Default: true.    
+    /// Whether to include inactive ad units. Default: true.
     pub fn include_inactive(mut self, new_value: bool) -> AccountAdunitListCall<'a, C, NC, A> {
         self._include_inactive = Some(new_value);
         self
@@ -3825,7 +3952,7 @@ impl<'a, C, NC, A> AccountAdunitListCall<'a, C, NC, A> where NC: hyper::net::Net
 /// List hosted accounts associated with this AdSense account by ad client id.
 ///
 /// A builder for the *list* method supported by a *account* resource.
-/// It is not used directly, but through a `AccountMethods`.
+/// It is not used directly, but through a `AccountMethods` instance.
 ///
 /// # Example
 ///
@@ -3889,7 +4016,7 @@ impl<'a, C, NC, A> AccountListCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
         for &field in ["alt", "filterAdClientId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -3918,7 +4045,7 @@ impl<'a, C, NC, A> AccountListCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -3930,7 +4057,6 @@ impl<'a, C, NC, A> AccountListCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -3940,7 +4066,7 @@ impl<'a, C, NC, A> AccountListCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -3951,7 +4077,7 @@ impl<'a, C, NC, A> AccountListCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -3960,13 +4086,13 @@ impl<'a, C, NC, A> AccountListCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -3979,7 +4105,7 @@ impl<'a, C, NC, A> AccountListCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Ad clients to list accounts for.    
+    /// Ad clients to list accounts for.
     pub fn add_filter_ad_client_id(mut self, new_value: &str) -> AccountListCall<'a, C, NC, A> {
         self._filter_ad_client_id.push(new_value.to_string());
         self
@@ -4040,7 +4166,7 @@ impl<'a, C, NC, A> AccountListCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
 /// Get ad code for the specified ad unit, attaching the specified host custom channels.
 ///
 /// A builder for the *adunits.getAdCode* method supported by a *account* resource.
-/// It is not used directly, but through a `AccountMethods`.
+/// It is not used directly, but through a `AccountMethods` instance.
 ///
 /// # Example
 ///
@@ -4111,7 +4237,7 @@ impl<'a, C, NC, A> AccountAdunitGetAdCodeCall<'a, C, NC, A> where NC: hyper::net
         for &field in ["alt", "accountId", "adClientId", "adUnitId", "hostCustomChannelId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -4164,7 +4290,7 @@ impl<'a, C, NC, A> AccountAdunitGetAdCodeCall<'a, C, NC, A> where NC: hyper::net
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -4176,7 +4302,6 @@ impl<'a, C, NC, A> AccountAdunitGetAdCodeCall<'a, C, NC, A> where NC: hyper::net
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -4186,7 +4311,7 @@ impl<'a, C, NC, A> AccountAdunitGetAdCodeCall<'a, C, NC, A> where NC: hyper::net
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -4197,7 +4322,7 @@ impl<'a, C, NC, A> AccountAdunitGetAdCodeCall<'a, C, NC, A> where NC: hyper::net
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -4206,13 +4331,13 @@ impl<'a, C, NC, A> AccountAdunitGetAdCodeCall<'a, C, NC, A> where NC: hyper::net
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -4224,7 +4349,7 @@ impl<'a, C, NC, A> AccountAdunitGetAdCodeCall<'a, C, NC, A> where NC: hyper::net
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Account which contains the ad client.    
+    /// Account which contains the ad client.
     pub fn account_id(mut self, new_value: &str) -> AccountAdunitGetAdCodeCall<'a, C, NC, A> {
         self._account_id = new_value.to_string();
         self
@@ -4234,7 +4359,7 @@ impl<'a, C, NC, A> AccountAdunitGetAdCodeCall<'a, C, NC, A> where NC: hyper::net
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Ad client with contains the ad unit.    
+    /// Ad client with contains the ad unit.
     pub fn ad_client_id(mut self, new_value: &str) -> AccountAdunitGetAdCodeCall<'a, C, NC, A> {
         self._ad_client_id = new_value.to_string();
         self
@@ -4244,7 +4369,7 @@ impl<'a, C, NC, A> AccountAdunitGetAdCodeCall<'a, C, NC, A> where NC: hyper::net
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Ad unit to get the code for.    
+    /// Ad unit to get the code for.
     pub fn ad_unit_id(mut self, new_value: &str) -> AccountAdunitGetAdCodeCall<'a, C, NC, A> {
         self._ad_unit_id = new_value.to_string();
         self
@@ -4253,7 +4378,7 @@ impl<'a, C, NC, A> AccountAdunitGetAdCodeCall<'a, C, NC, A> where NC: hyper::net
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
     ///
     /// 
-    /// Host custom channel to attach to the ad code.    
+    /// Host custom channel to attach to the ad code.
     pub fn add_host_custom_channel_id(mut self, new_value: &str) -> AccountAdunitGetAdCodeCall<'a, C, NC, A> {
         self._host_custom_channel_id.push(new_value.to_string());
         self
@@ -4314,7 +4439,7 @@ impl<'a, C, NC, A> AccountAdunitGetAdCodeCall<'a, C, NC, A> where NC: hyper::net
 /// Generate an AdSense report based on the report request sent in the query parameters. Returns the result as JSON; to retrieve output in CSV format specify "alt=csv" as a query parameter.
 ///
 /// A builder for the *reports.generate* method supported by a *account* resource.
-/// It is not used directly, but through a `AccountMethods`.
+/// It is not used directly, but through a `AccountMethods` instance.
 ///
 /// # Example
 ///
@@ -4427,7 +4552,7 @@ impl<'a, C, NC, A> AccountReportGenerateCall<'a, C, NC, A> where NC: hyper::net:
         for &field in ["alt", "accountId", "startDate", "endDate", "startIndex", "sort", "metric", "maxResults", "locale", "filter", "dimension"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -4480,7 +4605,7 @@ impl<'a, C, NC, A> AccountReportGenerateCall<'a, C, NC, A> where NC: hyper::net:
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -4492,7 +4617,6 @@ impl<'a, C, NC, A> AccountReportGenerateCall<'a, C, NC, A> where NC: hyper::net:
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -4502,7 +4626,7 @@ impl<'a, C, NC, A> AccountReportGenerateCall<'a, C, NC, A> where NC: hyper::net:
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -4513,7 +4637,7 @@ impl<'a, C, NC, A> AccountReportGenerateCall<'a, C, NC, A> where NC: hyper::net:
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -4522,13 +4646,13 @@ impl<'a, C, NC, A> AccountReportGenerateCall<'a, C, NC, A> where NC: hyper::net:
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -4540,7 +4664,7 @@ impl<'a, C, NC, A> AccountReportGenerateCall<'a, C, NC, A> where NC: hyper::net:
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Hosted account upon which to report.    
+    /// Hosted account upon which to report.
     pub fn account_id(mut self, new_value: &str) -> AccountReportGenerateCall<'a, C, NC, A> {
         self._account_id = new_value.to_string();
         self
@@ -4550,7 +4674,7 @@ impl<'a, C, NC, A> AccountReportGenerateCall<'a, C, NC, A> where NC: hyper::net:
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Start of the date range to report on in "YYYY-MM-DD" format, inclusive.    
+    /// Start of the date range to report on in "YYYY-MM-DD" format, inclusive.
     pub fn start_date(mut self, new_value: &str) -> AccountReportGenerateCall<'a, C, NC, A> {
         self._start_date = new_value.to_string();
         self
@@ -4560,7 +4684,7 @@ impl<'a, C, NC, A> AccountReportGenerateCall<'a, C, NC, A> where NC: hyper::net:
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// End of the date range to report on in "YYYY-MM-DD" format, inclusive.    
+    /// End of the date range to report on in "YYYY-MM-DD" format, inclusive.
     pub fn end_date(mut self, new_value: &str) -> AccountReportGenerateCall<'a, C, NC, A> {
         self._end_date = new_value.to_string();
         self
@@ -4568,7 +4692,7 @@ impl<'a, C, NC, A> AccountReportGenerateCall<'a, C, NC, A> where NC: hyper::net:
     /// Sets the *start index* query property to the given value.
     ///
     /// 
-    /// Index of the first row of report data to return.    
+    /// Index of the first row of report data to return.
     pub fn start_index(mut self, new_value: u32) -> AccountReportGenerateCall<'a, C, NC, A> {
         self._start_index = Some(new_value);
         self
@@ -4577,7 +4701,7 @@ impl<'a, C, NC, A> AccountReportGenerateCall<'a, C, NC, A> where NC: hyper::net:
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
     ///
     /// 
-    /// The name of a dimension or metric to sort the resulting report on, optionally prefixed with "+" to sort ascending or "-" to sort descending. If no prefix is specified, the column is sorted ascending.    
+    /// The name of a dimension or metric to sort the resulting report on, optionally prefixed with "+" to sort ascending or "-" to sort descending. If no prefix is specified, the column is sorted ascending.
     pub fn add_sort(mut self, new_value: &str) -> AccountReportGenerateCall<'a, C, NC, A> {
         self._sort.push(new_value.to_string());
         self
@@ -4586,7 +4710,7 @@ impl<'a, C, NC, A> AccountReportGenerateCall<'a, C, NC, A> where NC: hyper::net:
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
     ///
     /// 
-    /// Numeric columns to include in the report.    
+    /// Numeric columns to include in the report.
     pub fn add_metric(mut self, new_value: &str) -> AccountReportGenerateCall<'a, C, NC, A> {
         self._metric.push(new_value.to_string());
         self
@@ -4594,7 +4718,7 @@ impl<'a, C, NC, A> AccountReportGenerateCall<'a, C, NC, A> where NC: hyper::net:
     /// Sets the *max results* query property to the given value.
     ///
     /// 
-    /// The maximum number of rows of report data to return.    
+    /// The maximum number of rows of report data to return.
     pub fn max_results(mut self, new_value: u32) -> AccountReportGenerateCall<'a, C, NC, A> {
         self._max_results = Some(new_value);
         self
@@ -4602,7 +4726,7 @@ impl<'a, C, NC, A> AccountReportGenerateCall<'a, C, NC, A> where NC: hyper::net:
     /// Sets the *locale* query property to the given value.
     ///
     /// 
-    /// Optional locale to use for translating report output to a local language. Defaults to "en_US" if not specified.    
+    /// Optional locale to use for translating report output to a local language. Defaults to "en_US" if not specified.
     pub fn locale(mut self, new_value: &str) -> AccountReportGenerateCall<'a, C, NC, A> {
         self._locale = Some(new_value.to_string());
         self
@@ -4611,7 +4735,7 @@ impl<'a, C, NC, A> AccountReportGenerateCall<'a, C, NC, A> where NC: hyper::net:
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
     ///
     /// 
-    /// Filters to be run on the report.    
+    /// Filters to be run on the report.
     pub fn add_filter(mut self, new_value: &str) -> AccountReportGenerateCall<'a, C, NC, A> {
         self._filter.push(new_value.to_string());
         self
@@ -4620,7 +4744,7 @@ impl<'a, C, NC, A> AccountReportGenerateCall<'a, C, NC, A> where NC: hyper::net:
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
     ///
     /// 
-    /// Dimensions to base the report on.    
+    /// Dimensions to base the report on.
     pub fn add_dimension(mut self, new_value: &str) -> AccountReportGenerateCall<'a, C, NC, A> {
         self._dimension.push(new_value.to_string());
         self
@@ -4681,7 +4805,7 @@ impl<'a, C, NC, A> AccountReportGenerateCall<'a, C, NC, A> where NC: hyper::net:
 /// Delete the specified ad unit from the specified publisher AdSense account.
 ///
 /// A builder for the *adunits.delete* method supported by a *account* resource.
-/// It is not used directly, but through a `AccountMethods`.
+/// It is not used directly, but through a `AccountMethods` instance.
 ///
 /// # Example
 ///
@@ -4743,7 +4867,7 @@ impl<'a, C, NC, A> AccountAdunitDeleteCall<'a, C, NC, A> where NC: hyper::net::N
         for &field in ["alt", "accountId", "adClientId", "adUnitId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -4796,7 +4920,7 @@ impl<'a, C, NC, A> AccountAdunitDeleteCall<'a, C, NC, A> where NC: hyper::net::N
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -4808,7 +4932,6 @@ impl<'a, C, NC, A> AccountAdunitDeleteCall<'a, C, NC, A> where NC: hyper::net::N
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -4818,7 +4941,7 @@ impl<'a, C, NC, A> AccountAdunitDeleteCall<'a, C, NC, A> where NC: hyper::net::N
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -4829,7 +4952,7 @@ impl<'a, C, NC, A> AccountAdunitDeleteCall<'a, C, NC, A> where NC: hyper::net::N
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -4838,13 +4961,13 @@ impl<'a, C, NC, A> AccountAdunitDeleteCall<'a, C, NC, A> where NC: hyper::net::N
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -4856,7 +4979,7 @@ impl<'a, C, NC, A> AccountAdunitDeleteCall<'a, C, NC, A> where NC: hyper::net::N
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Account which contains the ad unit.    
+    /// Account which contains the ad unit.
     pub fn account_id(mut self, new_value: &str) -> AccountAdunitDeleteCall<'a, C, NC, A> {
         self._account_id = new_value.to_string();
         self
@@ -4866,7 +4989,7 @@ impl<'a, C, NC, A> AccountAdunitDeleteCall<'a, C, NC, A> where NC: hyper::net::N
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Ad client for which to get ad unit.    
+    /// Ad client for which to get ad unit.
     pub fn ad_client_id(mut self, new_value: &str) -> AccountAdunitDeleteCall<'a, C, NC, A> {
         self._ad_client_id = new_value.to_string();
         self
@@ -4876,7 +4999,7 @@ impl<'a, C, NC, A> AccountAdunitDeleteCall<'a, C, NC, A> where NC: hyper::net::N
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Ad unit to delete.    
+    /// Ad unit to delete.
     pub fn ad_unit_id(mut self, new_value: &str) -> AccountAdunitDeleteCall<'a, C, NC, A> {
         self._ad_unit_id = new_value.to_string();
         self
@@ -4937,7 +5060,7 @@ impl<'a, C, NC, A> AccountAdunitDeleteCall<'a, C, NC, A> where NC: hyper::net::N
 /// List all hosted ad clients in the specified hosted account.
 ///
 /// A builder for the *adclients.list* method supported by a *account* resource.
-/// It is not used directly, but through a `AccountMethods`.
+/// It is not used directly, but through a `AccountMethods` instance.
 ///
 /// # Example
 ///
@@ -5005,7 +5128,7 @@ impl<'a, C, NC, A> AccountAdclientListCall<'a, C, NC, A> where NC: hyper::net::N
         for &field in ["alt", "accountId", "pageToken", "maxResults"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -5058,7 +5181,7 @@ impl<'a, C, NC, A> AccountAdclientListCall<'a, C, NC, A> where NC: hyper::net::N
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -5070,7 +5193,6 @@ impl<'a, C, NC, A> AccountAdclientListCall<'a, C, NC, A> where NC: hyper::net::N
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -5080,7 +5202,7 @@ impl<'a, C, NC, A> AccountAdclientListCall<'a, C, NC, A> where NC: hyper::net::N
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -5091,7 +5213,7 @@ impl<'a, C, NC, A> AccountAdclientListCall<'a, C, NC, A> where NC: hyper::net::N
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -5100,13 +5222,13 @@ impl<'a, C, NC, A> AccountAdclientListCall<'a, C, NC, A> where NC: hyper::net::N
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -5118,7 +5240,7 @@ impl<'a, C, NC, A> AccountAdclientListCall<'a, C, NC, A> where NC: hyper::net::N
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Account for which to list ad clients.    
+    /// Account for which to list ad clients.
     pub fn account_id(mut self, new_value: &str) -> AccountAdclientListCall<'a, C, NC, A> {
         self._account_id = new_value.to_string();
         self
@@ -5126,7 +5248,7 @@ impl<'a, C, NC, A> AccountAdclientListCall<'a, C, NC, A> where NC: hyper::net::N
     /// Sets the *page token* query property to the given value.
     ///
     /// 
-    /// A continuation token, used to page through ad clients. To retrieve the next page, set this parameter to the value of "nextPageToken" from the previous response.    
+    /// A continuation token, used to page through ad clients. To retrieve the next page, set this parameter to the value of "nextPageToken" from the previous response.
     pub fn page_token(mut self, new_value: &str) -> AccountAdclientListCall<'a, C, NC, A> {
         self._page_token = Some(new_value.to_string());
         self
@@ -5134,7 +5256,7 @@ impl<'a, C, NC, A> AccountAdclientListCall<'a, C, NC, A> where NC: hyper::net::N
     /// Sets the *max results* query property to the given value.
     ///
     /// 
-    /// The maximum number of ad clients to include in the response, used for paging.    
+    /// The maximum number of ad clients to include in the response, used for paging.
     pub fn max_results(mut self, new_value: u32) -> AccountAdclientListCall<'a, C, NC, A> {
         self._max_results = Some(new_value);
         self
@@ -5195,7 +5317,7 @@ impl<'a, C, NC, A> AccountAdclientListCall<'a, C, NC, A> where NC: hyper::net::N
 /// Update the supplied ad unit in the specified publisher AdSense account. This method supports patch semantics.
 ///
 /// A builder for the *adunits.patch* method supported by a *account* resource.
-/// It is not used directly, but through a `AccountMethods`.
+/// It is not used directly, but through a `AccountMethods` instance.
 ///
 /// # Example
 ///
@@ -5264,7 +5386,7 @@ impl<'a, C, NC, A> AccountAdunitPatchCall<'a, C, NC, A> where NC: hyper::net::Ne
         for &field in ["alt", "accountId", "adClientId", "adUnitId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -5321,7 +5443,7 @@ impl<'a, C, NC, A> AccountAdunitPatchCall<'a, C, NC, A> where NC: hyper::net::Ne
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -5337,7 +5459,6 @@ impl<'a, C, NC, A> AccountAdunitPatchCall<'a, C, NC, A> where NC: hyper::net::Ne
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -5347,7 +5468,7 @@ impl<'a, C, NC, A> AccountAdunitPatchCall<'a, C, NC, A> where NC: hyper::net::Ne
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -5358,7 +5479,7 @@ impl<'a, C, NC, A> AccountAdunitPatchCall<'a, C, NC, A> where NC: hyper::net::Ne
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -5367,13 +5488,13 @@ impl<'a, C, NC, A> AccountAdunitPatchCall<'a, C, NC, A> where NC: hyper::net::Ne
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -5394,7 +5515,7 @@ impl<'a, C, NC, A> AccountAdunitPatchCall<'a, C, NC, A> where NC: hyper::net::Ne
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Account which contains the ad client.    
+    /// Account which contains the ad client.
     pub fn account_id(mut self, new_value: &str) -> AccountAdunitPatchCall<'a, C, NC, A> {
         self._account_id = new_value.to_string();
         self
@@ -5404,7 +5525,7 @@ impl<'a, C, NC, A> AccountAdunitPatchCall<'a, C, NC, A> where NC: hyper::net::Ne
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Ad client which contains the ad unit.    
+    /// Ad client which contains the ad unit.
     pub fn ad_client_id(mut self, new_value: &str) -> AccountAdunitPatchCall<'a, C, NC, A> {
         self._ad_client_id = new_value.to_string();
         self
@@ -5414,7 +5535,7 @@ impl<'a, C, NC, A> AccountAdunitPatchCall<'a, C, NC, A> where NC: hyper::net::Ne
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Ad unit to get.    
+    /// Ad unit to get.
     pub fn ad_unit_id(mut self, new_value: &str) -> AccountAdunitPatchCall<'a, C, NC, A> {
         self._ad_unit_id = new_value.to_string();
         self
@@ -5475,7 +5596,7 @@ impl<'a, C, NC, A> AccountAdunitPatchCall<'a, C, NC, A> where NC: hyper::net::Ne
 /// Get information about one of the ad clients in the specified publisher's AdSense account.
 ///
 /// A builder for the *adclients.get* method supported by a *account* resource.
-/// It is not used directly, but through a `AccountMethods`.
+/// It is not used directly, but through a `AccountMethods` instance.
 ///
 /// # Example
 ///
@@ -5535,7 +5656,7 @@ impl<'a, C, NC, A> AccountAdclientGetCall<'a, C, NC, A> where NC: hyper::net::Ne
         for &field in ["alt", "accountId", "adClientId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -5588,7 +5709,7 @@ impl<'a, C, NC, A> AccountAdclientGetCall<'a, C, NC, A> where NC: hyper::net::Ne
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -5600,7 +5721,6 @@ impl<'a, C, NC, A> AccountAdclientGetCall<'a, C, NC, A> where NC: hyper::net::Ne
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -5610,7 +5730,7 @@ impl<'a, C, NC, A> AccountAdclientGetCall<'a, C, NC, A> where NC: hyper::net::Ne
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -5621,7 +5741,7 @@ impl<'a, C, NC, A> AccountAdclientGetCall<'a, C, NC, A> where NC: hyper::net::Ne
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -5630,13 +5750,13 @@ impl<'a, C, NC, A> AccountAdclientGetCall<'a, C, NC, A> where NC: hyper::net::Ne
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -5648,7 +5768,7 @@ impl<'a, C, NC, A> AccountAdclientGetCall<'a, C, NC, A> where NC: hyper::net::Ne
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Account which contains the ad client.    
+    /// Account which contains the ad client.
     pub fn account_id(mut self, new_value: &str) -> AccountAdclientGetCall<'a, C, NC, A> {
         self._account_id = new_value.to_string();
         self
@@ -5658,7 +5778,7 @@ impl<'a, C, NC, A> AccountAdclientGetCall<'a, C, NC, A> where NC: hyper::net::Ne
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Ad client to get.    
+    /// Ad client to get.
     pub fn ad_client_id(mut self, new_value: &str) -> AccountAdclientGetCall<'a, C, NC, A> {
         self._ad_client_id = new_value.to_string();
         self
@@ -5719,7 +5839,7 @@ impl<'a, C, NC, A> AccountAdclientGetCall<'a, C, NC, A> where NC: hyper::net::Ne
 /// Get information about the selected associated AdSense account.
 ///
 /// A builder for the *get* method supported by a *account* resource.
-/// It is not used directly, but through a `AccountMethods`.
+/// It is not used directly, but through a `AccountMethods` instance.
 ///
 /// # Example
 ///
@@ -5777,7 +5897,7 @@ impl<'a, C, NC, A> AccountGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
         for &field in ["alt", "accountId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -5830,7 +5950,7 @@ impl<'a, C, NC, A> AccountGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -5842,7 +5962,6 @@ impl<'a, C, NC, A> AccountGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -5852,7 +5971,7 @@ impl<'a, C, NC, A> AccountGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -5863,7 +5982,7 @@ impl<'a, C, NC, A> AccountGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -5872,13 +5991,13 @@ impl<'a, C, NC, A> AccountGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -5890,7 +6009,7 @@ impl<'a, C, NC, A> AccountGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Account to get information about.    
+    /// Account to get information about.
     pub fn account_id(mut self, new_value: &str) -> AccountGetCall<'a, C, NC, A> {
         self._account_id = new_value.to_string();
         self
@@ -5951,7 +6070,7 @@ impl<'a, C, NC, A> AccountGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
 /// Insert the supplied ad unit into the specified publisher AdSense account.
 ///
 /// A builder for the *adunits.insert* method supported by a *account* resource.
-/// It is not used directly, but through a `AccountMethods`.
+/// It is not used directly, but through a `AccountMethods` instance.
 ///
 /// # Example
 ///
@@ -6018,7 +6137,7 @@ impl<'a, C, NC, A> AccountAdunitInsertCall<'a, C, NC, A> where NC: hyper::net::N
         for &field in ["alt", "accountId", "adClientId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -6075,7 +6194,7 @@ impl<'a, C, NC, A> AccountAdunitInsertCall<'a, C, NC, A> where NC: hyper::net::N
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -6091,7 +6210,6 @@ impl<'a, C, NC, A> AccountAdunitInsertCall<'a, C, NC, A> where NC: hyper::net::N
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -6101,7 +6219,7 @@ impl<'a, C, NC, A> AccountAdunitInsertCall<'a, C, NC, A> where NC: hyper::net::N
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -6112,7 +6230,7 @@ impl<'a, C, NC, A> AccountAdunitInsertCall<'a, C, NC, A> where NC: hyper::net::N
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -6121,13 +6239,13 @@ impl<'a, C, NC, A> AccountAdunitInsertCall<'a, C, NC, A> where NC: hyper::net::N
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -6148,7 +6266,7 @@ impl<'a, C, NC, A> AccountAdunitInsertCall<'a, C, NC, A> where NC: hyper::net::N
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Account which will contain the ad unit.    
+    /// Account which will contain the ad unit.
     pub fn account_id(mut self, new_value: &str) -> AccountAdunitInsertCall<'a, C, NC, A> {
         self._account_id = new_value.to_string();
         self
@@ -6158,7 +6276,7 @@ impl<'a, C, NC, A> AccountAdunitInsertCall<'a, C, NC, A> where NC: hyper::net::N
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Ad client into which to insert the ad unit.    
+    /// Ad client into which to insert the ad unit.
     pub fn ad_client_id(mut self, new_value: &str) -> AccountAdunitInsertCall<'a, C, NC, A> {
         self._ad_client_id = new_value.to_string();
         self
@@ -6219,7 +6337,7 @@ impl<'a, C, NC, A> AccountAdunitInsertCall<'a, C, NC, A> where NC: hyper::net::N
 /// Get the specified host ad unit in this AdSense account.
 ///
 /// A builder for the *adunits.get* method supported by a *account* resource.
-/// It is not used directly, but through a `AccountMethods`.
+/// It is not used directly, but through a `AccountMethods` instance.
 ///
 /// # Example
 ///
@@ -6281,7 +6399,7 @@ impl<'a, C, NC, A> AccountAdunitGetCall<'a, C, NC, A> where NC: hyper::net::Netw
         for &field in ["alt", "accountId", "adClientId", "adUnitId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -6334,7 +6452,7 @@ impl<'a, C, NC, A> AccountAdunitGetCall<'a, C, NC, A> where NC: hyper::net::Netw
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -6346,7 +6464,6 @@ impl<'a, C, NC, A> AccountAdunitGetCall<'a, C, NC, A> where NC: hyper::net::Netw
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -6356,7 +6473,7 @@ impl<'a, C, NC, A> AccountAdunitGetCall<'a, C, NC, A> where NC: hyper::net::Netw
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -6367,7 +6484,7 @@ impl<'a, C, NC, A> AccountAdunitGetCall<'a, C, NC, A> where NC: hyper::net::Netw
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -6376,13 +6493,13 @@ impl<'a, C, NC, A> AccountAdunitGetCall<'a, C, NC, A> where NC: hyper::net::Netw
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -6394,7 +6511,7 @@ impl<'a, C, NC, A> AccountAdunitGetCall<'a, C, NC, A> where NC: hyper::net::Netw
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Account which contains the ad unit.    
+    /// Account which contains the ad unit.
     pub fn account_id(mut self, new_value: &str) -> AccountAdunitGetCall<'a, C, NC, A> {
         self._account_id = new_value.to_string();
         self
@@ -6404,7 +6521,7 @@ impl<'a, C, NC, A> AccountAdunitGetCall<'a, C, NC, A> where NC: hyper::net::Netw
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Ad client for which to get ad unit.    
+    /// Ad client for which to get ad unit.
     pub fn ad_client_id(mut self, new_value: &str) -> AccountAdunitGetCall<'a, C, NC, A> {
         self._ad_client_id = new_value.to_string();
         self
@@ -6414,7 +6531,7 @@ impl<'a, C, NC, A> AccountAdunitGetCall<'a, C, NC, A> where NC: hyper::net::Netw
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Ad unit to get.    
+    /// Ad unit to get.
     pub fn ad_unit_id(mut self, new_value: &str) -> AccountAdunitGetCall<'a, C, NC, A> {
         self._ad_unit_id = new_value.to_string();
         self
@@ -6475,7 +6592,7 @@ impl<'a, C, NC, A> AccountAdunitGetCall<'a, C, NC, A> where NC: hyper::net::Netw
 /// Update the supplied ad unit in the specified publisher AdSense account.
 ///
 /// A builder for the *adunits.update* method supported by a *account* resource.
-/// It is not used directly, but through a `AccountMethods`.
+/// It is not used directly, but through a `AccountMethods` instance.
 ///
 /// # Example
 ///
@@ -6542,7 +6659,7 @@ impl<'a, C, NC, A> AccountAdunitUpdateCall<'a, C, NC, A> where NC: hyper::net::N
         for &field in ["alt", "accountId", "adClientId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -6599,7 +6716,7 @@ impl<'a, C, NC, A> AccountAdunitUpdateCall<'a, C, NC, A> where NC: hyper::net::N
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -6615,7 +6732,6 @@ impl<'a, C, NC, A> AccountAdunitUpdateCall<'a, C, NC, A> where NC: hyper::net::N
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -6625,7 +6741,7 @@ impl<'a, C, NC, A> AccountAdunitUpdateCall<'a, C, NC, A> where NC: hyper::net::N
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -6636,7 +6752,7 @@ impl<'a, C, NC, A> AccountAdunitUpdateCall<'a, C, NC, A> where NC: hyper::net::N
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -6645,13 +6761,13 @@ impl<'a, C, NC, A> AccountAdunitUpdateCall<'a, C, NC, A> where NC: hyper::net::N
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -6672,7 +6788,7 @@ impl<'a, C, NC, A> AccountAdunitUpdateCall<'a, C, NC, A> where NC: hyper::net::N
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Account which contains the ad client.    
+    /// Account which contains the ad client.
     pub fn account_id(mut self, new_value: &str) -> AccountAdunitUpdateCall<'a, C, NC, A> {
         self._account_id = new_value.to_string();
         self
@@ -6682,7 +6798,7 @@ impl<'a, C, NC, A> AccountAdunitUpdateCall<'a, C, NC, A> where NC: hyper::net::N
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Ad client which contains the ad unit.    
+    /// Ad client which contains the ad unit.
     pub fn ad_client_id(mut self, new_value: &str) -> AccountAdunitUpdateCall<'a, C, NC, A> {
         self._ad_client_id = new_value.to_string();
         self
@@ -6743,7 +6859,7 @@ impl<'a, C, NC, A> AccountAdunitUpdateCall<'a, C, NC, A> where NC: hyper::net::N
 /// Get a specific custom channel from the host AdSense account.
 ///
 /// A builder for the *get* method supported by a *customchannel* resource.
-/// It is not used directly, but through a `CustomchannelMethods`.
+/// It is not used directly, but through a `CustomchannelMethods` instance.
 ///
 /// # Example
 ///
@@ -6803,7 +6919,7 @@ impl<'a, C, NC, A> CustomchannelGetCall<'a, C, NC, A> where NC: hyper::net::Netw
         for &field in ["alt", "adClientId", "customChannelId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -6856,7 +6972,7 @@ impl<'a, C, NC, A> CustomchannelGetCall<'a, C, NC, A> where NC: hyper::net::Netw
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -6868,7 +6984,6 @@ impl<'a, C, NC, A> CustomchannelGetCall<'a, C, NC, A> where NC: hyper::net::Netw
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -6878,7 +6993,7 @@ impl<'a, C, NC, A> CustomchannelGetCall<'a, C, NC, A> where NC: hyper::net::Netw
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -6889,7 +7004,7 @@ impl<'a, C, NC, A> CustomchannelGetCall<'a, C, NC, A> where NC: hyper::net::Netw
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -6898,13 +7013,13 @@ impl<'a, C, NC, A> CustomchannelGetCall<'a, C, NC, A> where NC: hyper::net::Netw
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -6916,7 +7031,7 @@ impl<'a, C, NC, A> CustomchannelGetCall<'a, C, NC, A> where NC: hyper::net::Netw
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Ad client from which to get the custom channel.    
+    /// Ad client from which to get the custom channel.
     pub fn ad_client_id(mut self, new_value: &str) -> CustomchannelGetCall<'a, C, NC, A> {
         self._ad_client_id = new_value.to_string();
         self
@@ -6926,7 +7041,7 @@ impl<'a, C, NC, A> CustomchannelGetCall<'a, C, NC, A> where NC: hyper::net::Netw
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Custom channel to get.    
+    /// Custom channel to get.
     pub fn custom_channel_id(mut self, new_value: &str) -> CustomchannelGetCall<'a, C, NC, A> {
         self._custom_channel_id = new_value.to_string();
         self
@@ -6987,7 +7102,7 @@ impl<'a, C, NC, A> CustomchannelGetCall<'a, C, NC, A> where NC: hyper::net::Netw
 /// Delete a specific custom channel from the host AdSense account.
 ///
 /// A builder for the *delete* method supported by a *customchannel* resource.
-/// It is not used directly, but through a `CustomchannelMethods`.
+/// It is not used directly, but through a `CustomchannelMethods` instance.
 ///
 /// # Example
 ///
@@ -7047,7 +7162,7 @@ impl<'a, C, NC, A> CustomchannelDeleteCall<'a, C, NC, A> where NC: hyper::net::N
         for &field in ["alt", "adClientId", "customChannelId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -7100,7 +7215,7 @@ impl<'a, C, NC, A> CustomchannelDeleteCall<'a, C, NC, A> where NC: hyper::net::N
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -7112,7 +7227,6 @@ impl<'a, C, NC, A> CustomchannelDeleteCall<'a, C, NC, A> where NC: hyper::net::N
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -7122,7 +7236,7 @@ impl<'a, C, NC, A> CustomchannelDeleteCall<'a, C, NC, A> where NC: hyper::net::N
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -7133,7 +7247,7 @@ impl<'a, C, NC, A> CustomchannelDeleteCall<'a, C, NC, A> where NC: hyper::net::N
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -7142,13 +7256,13 @@ impl<'a, C, NC, A> CustomchannelDeleteCall<'a, C, NC, A> where NC: hyper::net::N
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -7160,7 +7274,7 @@ impl<'a, C, NC, A> CustomchannelDeleteCall<'a, C, NC, A> where NC: hyper::net::N
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Ad client from which to delete the custom channel.    
+    /// Ad client from which to delete the custom channel.
     pub fn ad_client_id(mut self, new_value: &str) -> CustomchannelDeleteCall<'a, C, NC, A> {
         self._ad_client_id = new_value.to_string();
         self
@@ -7170,7 +7284,7 @@ impl<'a, C, NC, A> CustomchannelDeleteCall<'a, C, NC, A> where NC: hyper::net::N
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Custom channel to delete.    
+    /// Custom channel to delete.
     pub fn custom_channel_id(mut self, new_value: &str) -> CustomchannelDeleteCall<'a, C, NC, A> {
         self._custom_channel_id = new_value.to_string();
         self
@@ -7231,7 +7345,7 @@ impl<'a, C, NC, A> CustomchannelDeleteCall<'a, C, NC, A> where NC: hyper::net::N
 /// Update a custom channel in the host AdSense account.
 ///
 /// A builder for the *update* method supported by a *customchannel* resource.
-/// It is not used directly, but through a `CustomchannelMethods`.
+/// It is not used directly, but through a `CustomchannelMethods` instance.
 ///
 /// # Example
 ///
@@ -7296,7 +7410,7 @@ impl<'a, C, NC, A> CustomchannelUpdateCall<'a, C, NC, A> where NC: hyper::net::N
         for &field in ["alt", "adClientId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -7353,7 +7467,7 @@ impl<'a, C, NC, A> CustomchannelUpdateCall<'a, C, NC, A> where NC: hyper::net::N
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -7369,7 +7483,6 @@ impl<'a, C, NC, A> CustomchannelUpdateCall<'a, C, NC, A> where NC: hyper::net::N
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -7379,7 +7492,7 @@ impl<'a, C, NC, A> CustomchannelUpdateCall<'a, C, NC, A> where NC: hyper::net::N
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -7390,7 +7503,7 @@ impl<'a, C, NC, A> CustomchannelUpdateCall<'a, C, NC, A> where NC: hyper::net::N
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -7399,13 +7512,13 @@ impl<'a, C, NC, A> CustomchannelUpdateCall<'a, C, NC, A> where NC: hyper::net::N
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -7426,7 +7539,7 @@ impl<'a, C, NC, A> CustomchannelUpdateCall<'a, C, NC, A> where NC: hyper::net::N
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Ad client in which the custom channel will be updated.    
+    /// Ad client in which the custom channel will be updated.
     pub fn ad_client_id(mut self, new_value: &str) -> CustomchannelUpdateCall<'a, C, NC, A> {
         self._ad_client_id = new_value.to_string();
         self
@@ -7487,7 +7600,7 @@ impl<'a, C, NC, A> CustomchannelUpdateCall<'a, C, NC, A> where NC: hyper::net::N
 /// List all host custom channels in this AdSense account.
 ///
 /// A builder for the *list* method supported by a *customchannel* resource.
-/// It is not used directly, but through a `CustomchannelMethods`.
+/// It is not used directly, but through a `CustomchannelMethods` instance.
 ///
 /// # Example
 ///
@@ -7555,7 +7668,7 @@ impl<'a, C, NC, A> CustomchannelListCall<'a, C, NC, A> where NC: hyper::net::Net
         for &field in ["alt", "adClientId", "pageToken", "maxResults"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -7608,7 +7721,7 @@ impl<'a, C, NC, A> CustomchannelListCall<'a, C, NC, A> where NC: hyper::net::Net
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -7620,7 +7733,6 @@ impl<'a, C, NC, A> CustomchannelListCall<'a, C, NC, A> where NC: hyper::net::Net
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -7630,7 +7742,7 @@ impl<'a, C, NC, A> CustomchannelListCall<'a, C, NC, A> where NC: hyper::net::Net
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -7641,7 +7753,7 @@ impl<'a, C, NC, A> CustomchannelListCall<'a, C, NC, A> where NC: hyper::net::Net
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -7650,13 +7762,13 @@ impl<'a, C, NC, A> CustomchannelListCall<'a, C, NC, A> where NC: hyper::net::Net
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -7668,7 +7780,7 @@ impl<'a, C, NC, A> CustomchannelListCall<'a, C, NC, A> where NC: hyper::net::Net
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Ad client for which to list custom channels.    
+    /// Ad client for which to list custom channels.
     pub fn ad_client_id(mut self, new_value: &str) -> CustomchannelListCall<'a, C, NC, A> {
         self._ad_client_id = new_value.to_string();
         self
@@ -7676,7 +7788,7 @@ impl<'a, C, NC, A> CustomchannelListCall<'a, C, NC, A> where NC: hyper::net::Net
     /// Sets the *page token* query property to the given value.
     ///
     /// 
-    /// A continuation token, used to page through custom channels. To retrieve the next page, set this parameter to the value of "nextPageToken" from the previous response.    
+    /// A continuation token, used to page through custom channels. To retrieve the next page, set this parameter to the value of "nextPageToken" from the previous response.
     pub fn page_token(mut self, new_value: &str) -> CustomchannelListCall<'a, C, NC, A> {
         self._page_token = Some(new_value.to_string());
         self
@@ -7684,7 +7796,7 @@ impl<'a, C, NC, A> CustomchannelListCall<'a, C, NC, A> where NC: hyper::net::Net
     /// Sets the *max results* query property to the given value.
     ///
     /// 
-    /// The maximum number of custom channels to include in the response, used for paging.    
+    /// The maximum number of custom channels to include in the response, used for paging.
     pub fn max_results(mut self, new_value: u32) -> CustomchannelListCall<'a, C, NC, A> {
         self._max_results = Some(new_value);
         self
@@ -7745,7 +7857,7 @@ impl<'a, C, NC, A> CustomchannelListCall<'a, C, NC, A> where NC: hyper::net::Net
 /// Update a custom channel in the host AdSense account. This method supports patch semantics.
 ///
 /// A builder for the *patch* method supported by a *customchannel* resource.
-/// It is not used directly, but through a `CustomchannelMethods`.
+/// It is not used directly, but through a `CustomchannelMethods` instance.
 ///
 /// # Example
 ///
@@ -7812,7 +7924,7 @@ impl<'a, C, NC, A> CustomchannelPatchCall<'a, C, NC, A> where NC: hyper::net::Ne
         for &field in ["alt", "adClientId", "customChannelId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -7869,7 +7981,7 @@ impl<'a, C, NC, A> CustomchannelPatchCall<'a, C, NC, A> where NC: hyper::net::Ne
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -7885,7 +7997,6 @@ impl<'a, C, NC, A> CustomchannelPatchCall<'a, C, NC, A> where NC: hyper::net::Ne
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -7895,7 +8006,7 @@ impl<'a, C, NC, A> CustomchannelPatchCall<'a, C, NC, A> where NC: hyper::net::Ne
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -7906,7 +8017,7 @@ impl<'a, C, NC, A> CustomchannelPatchCall<'a, C, NC, A> where NC: hyper::net::Ne
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -7915,13 +8026,13 @@ impl<'a, C, NC, A> CustomchannelPatchCall<'a, C, NC, A> where NC: hyper::net::Ne
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -7942,7 +8053,7 @@ impl<'a, C, NC, A> CustomchannelPatchCall<'a, C, NC, A> where NC: hyper::net::Ne
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Ad client in which the custom channel will be updated.    
+    /// Ad client in which the custom channel will be updated.
     pub fn ad_client_id(mut self, new_value: &str) -> CustomchannelPatchCall<'a, C, NC, A> {
         self._ad_client_id = new_value.to_string();
         self
@@ -7952,7 +8063,7 @@ impl<'a, C, NC, A> CustomchannelPatchCall<'a, C, NC, A> where NC: hyper::net::Ne
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Custom channel to get.    
+    /// Custom channel to get.
     pub fn custom_channel_id(mut self, new_value: &str) -> CustomchannelPatchCall<'a, C, NC, A> {
         self._custom_channel_id = new_value.to_string();
         self
@@ -8013,7 +8124,7 @@ impl<'a, C, NC, A> CustomchannelPatchCall<'a, C, NC, A> where NC: hyper::net::Ne
 /// Add a new custom channel to the host AdSense account.
 ///
 /// A builder for the *insert* method supported by a *customchannel* resource.
-/// It is not used directly, but through a `CustomchannelMethods`.
+/// It is not used directly, but through a `CustomchannelMethods` instance.
 ///
 /// # Example
 ///
@@ -8078,7 +8189,7 @@ impl<'a, C, NC, A> CustomchannelInsertCall<'a, C, NC, A> where NC: hyper::net::N
         for &field in ["alt", "adClientId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -8135,7 +8246,7 @@ impl<'a, C, NC, A> CustomchannelInsertCall<'a, C, NC, A> where NC: hyper::net::N
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -8151,7 +8262,6 @@ impl<'a, C, NC, A> CustomchannelInsertCall<'a, C, NC, A> where NC: hyper::net::N
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -8161,7 +8271,7 @@ impl<'a, C, NC, A> CustomchannelInsertCall<'a, C, NC, A> where NC: hyper::net::N
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -8172,7 +8282,7 @@ impl<'a, C, NC, A> CustomchannelInsertCall<'a, C, NC, A> where NC: hyper::net::N
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -8181,13 +8291,13 @@ impl<'a, C, NC, A> CustomchannelInsertCall<'a, C, NC, A> where NC: hyper::net::N
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -8208,7 +8318,7 @@ impl<'a, C, NC, A> CustomchannelInsertCall<'a, C, NC, A> where NC: hyper::net::N
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Ad client to which the new custom channel will be added.    
+    /// Ad client to which the new custom channel will be added.
     pub fn ad_client_id(mut self, new_value: &str) -> CustomchannelInsertCall<'a, C, NC, A> {
         self._ad_client_id = new_value.to_string();
         self

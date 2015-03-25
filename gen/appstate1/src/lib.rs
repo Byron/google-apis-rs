@@ -1,8 +1,8 @@
 // DO NOT EDIT !
-// This file was generated automatically from 'src/mako/lib.rs.mako'
+// This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *App State* crate version *0.1.1+20150309*, where *20150309* is the exact revision of the *appstate:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.1*.
+//! This documentation was generated from *App State* crate version *0.1.2+20150316*, where *20150316* is the exact revision of the *appstate:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.2*.
 //! 
 //! Everything else about the *App State* *v1* API can be found at the
 //! [official documentation site](https://developers.google.com/games/services/web/api/states).
@@ -25,6 +25,8 @@
 //! 
 //! * **[Hub](struct.AppState.html)**
 //!     * a central object to maintain state and allow accessing all *Activities*
+//!     * creates [*Method Builders*](trait.MethodsBuilder.html) which in turn
+//!       allow access to individual [*Call Builders*](trait.CallBuilder.html)
 //! * **[Resources](trait.Resource.html)**
 //!     * primary types that you can apply *Activities* to
 //!     * a collection of properties and *Parts*
@@ -33,6 +35,8 @@
 //!         * never directly used in *Activities*
 //! * **[Activities](trait.CallBuilder.html)**
 //!     * operations to apply to *Resources*
+//! 
+//! All *structures* are marked with applicable traits to further categorize them and ease browsing.
 //! 
 //! Generally speaking, you can invoke *Activities* like this:
 //! 
@@ -70,7 +74,7 @@
 //! extern crate "yup-oauth2" as oauth2;
 //! extern crate "google-appstate1" as appstate1;
 //! use appstate1::UpdateRequest;
-//! use appstate1::Result;
+//! use appstate1::{Result, Error};
 //! # #[test] fn egal() {
 //! use std::default::Default;
 //! use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -101,15 +105,17 @@
 //!              .doit();
 //! 
 //! match result {
-//!     Result::HttpError(err) => println!("HTTPERROR: {:?}", err),
-//!     Result::MissingAPIKey => println!("Auth: Missing API Key - used if there are no scopes"),
-//!     Result::MissingToken => println!("OAuth2: Missing Token"),
-//!     Result::Cancelled => println!("Operation cancelled by user"),
-//!     Result::UploadSizeLimitExceeded(size, max_size) => println!("Upload size too big: {} of {}", size, max_size),
-//!     Result::Failure(_) => println!("General Failure (hyper::client::Response doesn't print)"),
-//!     Result::FieldClash(clashed_field) => println!("You added custom parameter which is part of builder: {:?}", clashed_field),
-//!     Result::JsonDecodeError(err) => println!("Couldn't understand server reply - maybe API needs update: {:?}", err),
-//!     Result::Success(_) => println!("Success (value doesn't print)"),
+//!     Err(e) => match e {
+//!         Error::HttpError(err) => println!("HTTPERROR: {:?}", err),
+//!         Error::MissingAPIKey => println!("Auth: Missing API Key - used if there are no scopes"),
+//!         Error::MissingToken => println!("OAuth2: Missing Token"),
+//!         Error::Cancelled => println!("Operation canceled by user"),
+//!         Error::UploadSizeLimitExceeded(size, max_size) => println!("Upload size too big: {} of {}", size, max_size),
+//!         Error::Failure(_) => println!("General Failure (hyper::client::Response doesn't print)"),
+//!         Error::FieldClash(clashed_field) => println!("You added custom parameter which is part of builder: {:?}", clashed_field),
+//!         Error::JsonDecodeError(err) => println!("Couldn't understand server reply - maybe API needs update: {:?}", err),
+//!     },
+//!     Ok(_) => println!("Success (value doesn't print)"),
 //! }
 //! # }
 //! ```
@@ -122,7 +128,7 @@
 //! When delegates handle errors or intermediate values, they may have a chance to instruct the system to retry. This 
 //! makes the system potentially resilient to all kinds of errors.
 //! 
-//! ## Uploads and Downlods
+//! ## Uploads and Downloads
 //! If a method supports downloads, the response body, which is part of the [Result](enum.Result.html), should be
 //! read by you to obtain the media.
 //! If such a method also supports a [Response Result](trait.ResponseResult.html), it will return that by default.
@@ -145,8 +151,9 @@
 //! ## Optional Parts in Server-Requests
 //! 
 //! All structures provided by this library are made to be [enocodable](trait.RequestValue.html) and 
-//! [decodable](trait.ResponseResult.html) via json. Optionals are used to indicate that partial requests are responses are valid.
-//! Most optionals are are considered [Parts](trait.Part.html) which are identifyable by name, which will be sent to 
+//! [decodable](trait.ResponseResult.html) via *json*. Optionals are used to indicate that partial requests are responses 
+//! are valid.
+//! Most optionals are are considered [Parts](trait.Part.html) which are identifiable by name, which will be sent to 
 //! the server to indicate either the set parts of the request or the desired parts in the response.
 //! 
 //! ## Builder Arguments
@@ -195,7 +202,7 @@ use std::io;
 use std::fs;
 use std::thread::sleep;
 
-pub use cmn::{MultiPartReader, ToParts, MethodInfo, Result, CallBuilder, Hub, ReadSeek, Part, ResponseResult, RequestValue, NestedType, Delegate, DefaultDelegate, ResourceMethodsBuilder, Resource, JsonServerError};
+pub use cmn::{MultiPartReader, ToParts, MethodInfo, Result, Error, CallBuilder, Hub, ReadSeek, Part, ResponseResult, RequestValue, NestedType, Delegate, DefaultDelegate, MethodsBuilder, Resource, JsonServerError};
 
 
 // ##############
@@ -242,7 +249,7 @@ impl Default for Scope {
 /// extern crate "yup-oauth2" as oauth2;
 /// extern crate "google-appstate1" as appstate1;
 /// use appstate1::UpdateRequest;
-/// use appstate1::Result;
+/// use appstate1::{Result, Error};
 /// # #[test] fn egal() {
 /// use std::default::Default;
 /// use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -273,15 +280,17 @@ impl Default for Scope {
 ///              .doit();
 /// 
 /// match result {
-///     Result::HttpError(err) => println!("HTTPERROR: {:?}", err),
-///     Result::MissingAPIKey => println!("Auth: Missing API Key - used if there are no scopes"),
-///     Result::MissingToken => println!("OAuth2: Missing Token"),
-///     Result::Cancelled => println!("Operation cancelled by user"),
-///     Result::UploadSizeLimitExceeded(size, max_size) => println!("Upload size too big: {} of {}", size, max_size),
-///     Result::Failure(_) => println!("General Failure (hyper::client::Response doesn't print)"),
-///     Result::FieldClash(clashed_field) => println!("You added custom parameter which is part of builder: {:?}", clashed_field),
-///     Result::JsonDecodeError(err) => println!("Couldn't understand server reply - maybe API needs update: {:?}", err),
-///     Result::Success(_) => println!("Success (value doesn't print)"),
+///     Err(e) => match e {
+///         Error::HttpError(err) => println!("HTTPERROR: {:?}", err),
+///         Error::MissingAPIKey => println!("Auth: Missing API Key - used if there are no scopes"),
+///         Error::MissingToken => println!("OAuth2: Missing Token"),
+///         Error::Cancelled => println!("Operation canceled by user"),
+///         Error::UploadSizeLimitExceeded(size, max_size) => println!("Upload size too big: {} of {}", size, max_size),
+///         Error::Failure(_) => println!("General Failure (hyper::client::Response doesn't print)"),
+///         Error::FieldClash(clashed_field) => println!("You added custom parameter which is part of builder: {:?}", clashed_field),
+///         Error::JsonDecodeError(err) => println!("Couldn't understand server reply - maybe API needs update: {:?}", err),
+///     },
+///     Ok(_) => println!("Success (value doesn't print)"),
 /// }
 /// # }
 /// ```
@@ -302,7 +311,7 @@ impl<'a, C, NC, A> AppState<C, NC, A>
         AppState {
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/0.1.1".to_string(),
+            _user_agent: "google-api-rust-client/0.1.2".to_string(),
             _m: PhantomData
         }
     }
@@ -312,7 +321,7 @@ impl<'a, C, NC, A> AppState<C, NC, A>
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/0.1.1`.
+    /// It defaults to `google-api-rust-client/0.1.2`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -337,11 +346,11 @@ impl<'a, C, NC, A> AppState<C, NC, A>
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct ListResponse {
-    /// The app state data.    
+    /// The app state data.
     pub items: Vec<GetResponse>,
-    /// Uniquely identifies the type of this resource. Value is always the fixed string appstate#listResponse.    
+    /// Uniquely identifies the type of this resource. Value is always the fixed string appstate#listResponse.
     pub kind: String,
-    /// The maximum number of keys allowed for this user.    
+    /// The maximum number of keys allowed for this user.
     #[serde(alias="maximumKeyCount")]
     pub maximum_key_count: i32,
 }
@@ -360,14 +369,14 @@ impl ResponseResult for ListResponse {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct GetResponse {
-    /// The requested data.    
+    /// The requested data.
     pub data: String,
-    /// Uniquely identifies the type of this resource. Value is always the fixed string appstate#getResponse.    
+    /// Uniquely identifies the type of this resource. Value is always the fixed string appstate#getResponse.
     pub kind: String,
-    /// The key for the data.    
+    /// The key for the data.
     #[serde(alias="stateKey")]
     pub state_key: i32,
-    /// The current app state version.    
+    /// The current app state version.
     #[serde(alias="currentStateVersion")]
     pub current_state_version: String,
 }
@@ -386,9 +395,9 @@ impl ResponseResult for GetResponse {}
 /// 
 #[derive(Default, Clone, Debug, Serialize)]
 pub struct UpdateRequest {
-    /// Uniquely identifies the type of this resource. Value is always the fixed string appstate#updateRequest.    
+    /// Uniquely identifies the type of this resource. Value is always the fixed string appstate#updateRequest.
     pub kind: Option<String>,
-    /// The new app state data that your application is trying to update with.    
+    /// The new app state data that your application is trying to update with.
     pub data: Option<String>,
 }
 
@@ -407,12 +416,12 @@ impl RequestValue for UpdateRequest {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct WriteResult {
-    /// Uniquely identifies the type of this resource. Value is always the fixed string appstate#writeResult.    
+    /// Uniquely identifies the type of this resource. Value is always the fixed string appstate#writeResult.
     pub kind: String,
-    /// The written key.    
+    /// The written key.
     #[serde(alias="stateKey")]
     pub state_key: i32,
-    /// The version of the data for this key on the server.    
+    /// The version of the data for this key on the server.
     #[serde(alias="currentStateVersion")]
     pub current_state_version: String,
 }
@@ -459,13 +468,17 @@ pub struct StateMethods<'a, C, NC, A>
     hub: &'a AppState<C, NC, A>,
 }
 
-impl<'a, C, NC, A> ResourceMethodsBuilder for StateMethods<'a, C, NC, A> {}
+impl<'a, C, NC, A> MethodsBuilder for StateMethods<'a, C, NC, A> {}
 
 impl<'a, C, NC, A> StateMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Deletes a key and the data associated with it. The key is removed and no longer counts against the key quota. Note that since this method is not safe in the face of concurrent modifications, it should only be used for development and testing purposes. Invoking this method in shipping code can result in data loss and data corruption.    
+    /// Deletes a key and the data associated with it. The key is removed and no longer counts against the key quota. Note that since this method is not safe in the face of concurrent modifications, it should only be used for development and testing purposes. Invoking this method in shipping code can result in data loss and data corruption.
+    /// 
+    /// # Arguments
+    ///
+    /// * `stateKey` - The key for the data to be retrieved.
     pub fn delete(&self, state_key: i32) -> StateDeleteCall<'a, C, NC, A> {
         StateDeleteCall {
             hub: self.hub,
@@ -478,7 +491,11 @@ impl<'a, C, NC, A> StateMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Retrieves the data corresponding to the passed key. If the key does not exist on the server, an HTTP 404 will be returned.    
+    /// Retrieves the data corresponding to the passed key. If the key does not exist on the server, an HTTP 404 will be returned.
+    /// 
+    /// # Arguments
+    ///
+    /// * `stateKey` - The key for the data to be retrieved.
     pub fn get(&self, state_key: i32) -> StateGetCall<'a, C, NC, A> {
         StateGetCall {
             hub: self.hub,
@@ -491,7 +508,11 @@ impl<'a, C, NC, A> StateMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Clears (sets to empty) the data for the passed key if and only if the passed version matches the currently stored version. This method results in a conflict error on version mismatch.    
+    /// Clears (sets to empty) the data for the passed key if and only if the passed version matches the currently stored version. This method results in a conflict error on version mismatch.
+    /// 
+    /// # Arguments
+    ///
+    /// * `stateKey` - The key for the data to be retrieved.
     pub fn clear(&self, state_key: i32) -> StateClearCall<'a, C, NC, A> {
         StateClearCall {
             hub: self.hub,
@@ -505,7 +526,7 @@ impl<'a, C, NC, A> StateMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Lists all the states keys, and optionally the state data.    
+    /// Lists all the states keys, and optionally the state data.
     pub fn list(&self) -> StateListCall<'a, C, NC, A> {
         StateListCall {
             hub: self.hub,
@@ -518,7 +539,12 @@ impl<'a, C, NC, A> StateMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Update the data associated with the input key if and only if the passed version matches the currently stored version. This method is safe in the face of concurrent writes. Maximum per-key size is 128KB.    
+    /// Update the data associated with the input key if and only if the passed version matches the currently stored version. This method is safe in the face of concurrent writes. Maximum per-key size is 128KB.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `stateKey` - The key for the data to be retrieved.
     pub fn update(&self, request: &UpdateRequest, state_key: i32) -> StateUpdateCall<'a, C, NC, A> {
         StateUpdateCall {
             hub: self.hub,
@@ -543,7 +569,7 @@ impl<'a, C, NC, A> StateMethods<'a, C, NC, A> {
 /// Deletes a key and the data associated with it. The key is removed and no longer counts against the key quota. Note that since this method is not safe in the face of concurrent modifications, it should only be used for development and testing purposes. Invoking this method in shipping code can result in data loss and data corruption.
 ///
 /// A builder for the *delete* method supported by a *state* resource.
-/// It is not used directly, but through a `StateMethods`.
+/// It is not used directly, but through a `StateMethods` instance.
 ///
 /// # Example
 ///
@@ -601,7 +627,7 @@ impl<'a, C, NC, A> StateDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
         for &field in ["stateKey"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -653,7 +679,7 @@ impl<'a, C, NC, A> StateDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -665,7 +691,6 @@ impl<'a, C, NC, A> StateDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -675,7 +700,7 @@ impl<'a, C, NC, A> StateDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -686,12 +711,12 @@ impl<'a, C, NC, A> StateDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = res;
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -703,7 +728,7 @@ impl<'a, C, NC, A> StateDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The key for the data to be retrieved.    
+    /// The key for the data to be retrieved.
     pub fn state_key(mut self, new_value: i32) -> StateDeleteCall<'a, C, NC, A> {
         self._state_key = new_value;
         self
@@ -764,7 +789,7 @@ impl<'a, C, NC, A> StateDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
 /// Retrieves the data corresponding to the passed key. If the key does not exist on the server, an HTTP 404 will be returned.
 ///
 /// A builder for the *get* method supported by a *state* resource.
-/// It is not used directly, but through a `StateMethods`.
+/// It is not used directly, but through a `StateMethods` instance.
 ///
 /// # Example
 ///
@@ -822,7 +847,7 @@ impl<'a, C, NC, A> StateGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
         for &field in ["alt", "stateKey"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -875,7 +900,7 @@ impl<'a, C, NC, A> StateGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -887,7 +912,6 @@ impl<'a, C, NC, A> StateGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -897,7 +921,7 @@ impl<'a, C, NC, A> StateGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -908,7 +932,7 @@ impl<'a, C, NC, A> StateGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -917,13 +941,13 @@ impl<'a, C, NC, A> StateGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -935,7 +959,7 @@ impl<'a, C, NC, A> StateGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The key for the data to be retrieved.    
+    /// The key for the data to be retrieved.
     pub fn state_key(mut self, new_value: i32) -> StateGetCall<'a, C, NC, A> {
         self._state_key = new_value;
         self
@@ -996,7 +1020,7 @@ impl<'a, C, NC, A> StateGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
 /// Clears (sets to empty) the data for the passed key if and only if the passed version matches the currently stored version. This method results in a conflict error on version mismatch.
 ///
 /// A builder for the *clear* method supported by a *state* resource.
-/// It is not used directly, but through a `StateMethods`.
+/// It is not used directly, but through a `StateMethods` instance.
 ///
 /// # Example
 ///
@@ -1059,7 +1083,7 @@ impl<'a, C, NC, A> StateClearCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
         for &field in ["alt", "stateKey", "currentDataVersion"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -1112,7 +1136,7 @@ impl<'a, C, NC, A> StateClearCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -1124,7 +1148,6 @@ impl<'a, C, NC, A> StateClearCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -1134,7 +1157,7 @@ impl<'a, C, NC, A> StateClearCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -1145,7 +1168,7 @@ impl<'a, C, NC, A> StateClearCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -1154,13 +1177,13 @@ impl<'a, C, NC, A> StateClearCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -1172,7 +1195,7 @@ impl<'a, C, NC, A> StateClearCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The key for the data to be retrieved.    
+    /// The key for the data to be retrieved.
     pub fn state_key(mut self, new_value: i32) -> StateClearCall<'a, C, NC, A> {
         self._state_key = new_value;
         self
@@ -1180,7 +1203,7 @@ impl<'a, C, NC, A> StateClearCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// Sets the *current data version* query property to the given value.
     ///
     /// 
-    /// The version of the data to be cleared. Version strings are returned by the server.    
+    /// The version of the data to be cleared. Version strings are returned by the server.
     pub fn current_data_version(mut self, new_value: &str) -> StateClearCall<'a, C, NC, A> {
         self._current_data_version = Some(new_value.to_string());
         self
@@ -1241,7 +1264,7 @@ impl<'a, C, NC, A> StateClearCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
 /// Lists all the states keys, and optionally the state data.
 ///
 /// A builder for the *list* method supported by a *state* resource.
-/// It is not used directly, but through a `StateMethods`.
+/// It is not used directly, but through a `StateMethods` instance.
 ///
 /// # Example
 ///
@@ -1302,7 +1325,7 @@ impl<'a, C, NC, A> StateListCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
         for &field in ["alt", "includeData"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -1331,7 +1354,7 @@ impl<'a, C, NC, A> StateListCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -1343,7 +1366,6 @@ impl<'a, C, NC, A> StateListCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -1353,7 +1375,7 @@ impl<'a, C, NC, A> StateListCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -1364,7 +1386,7 @@ impl<'a, C, NC, A> StateListCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -1373,13 +1395,13 @@ impl<'a, C, NC, A> StateListCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -1389,7 +1411,7 @@ impl<'a, C, NC, A> StateListCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     /// Sets the *include data* query property to the given value.
     ///
     /// 
-    /// Whether to include the full data in addition to the version number    
+    /// Whether to include the full data in addition to the version number
     pub fn include_data(mut self, new_value: bool) -> StateListCall<'a, C, NC, A> {
         self._include_data = Some(new_value);
         self
@@ -1450,7 +1472,7 @@ impl<'a, C, NC, A> StateListCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
 /// Update the data associated with the input key if and only if the passed version matches the currently stored version. This method is safe in the face of concurrent writes. Maximum per-key size is 128KB.
 ///
 /// A builder for the *update* method supported by a *state* resource.
-/// It is not used directly, but through a `StateMethods`.
+/// It is not used directly, but through a `StateMethods` instance.
 ///
 /// # Example
 ///
@@ -1520,7 +1542,7 @@ impl<'a, C, NC, A> StateUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
         for &field in ["alt", "stateKey", "currentStateVersion"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -1577,7 +1599,7 @@ impl<'a, C, NC, A> StateUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -1593,7 +1615,6 @@ impl<'a, C, NC, A> StateUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -1603,7 +1624,7 @@ impl<'a, C, NC, A> StateUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -1614,7 +1635,7 @@ impl<'a, C, NC, A> StateUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -1623,13 +1644,13 @@ impl<'a, C, NC, A> StateUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -1650,7 +1671,7 @@ impl<'a, C, NC, A> StateUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The key for the data to be retrieved.    
+    /// The key for the data to be retrieved.
     pub fn state_key(mut self, new_value: i32) -> StateUpdateCall<'a, C, NC, A> {
         self._state_key = new_value;
         self
@@ -1658,7 +1679,7 @@ impl<'a, C, NC, A> StateUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// Sets the *current state version* query property to the given value.
     ///
     /// 
-    /// The version of the app state your application is attempting to update. If this does not match the current version, this method will return a conflict error. If there is no data stored on the server for this key, the update will succeed irrespective of the value of this parameter.    
+    /// The version of the app state your application is attempting to update. If this does not match the current version, this method will return a conflict error. If there is no data stored on the server for this key, the update will succeed irrespective of the value of this parameter.
     pub fn current_state_version(mut self, new_value: &str) -> StateUpdateCall<'a, C, NC, A> {
         self._current_state_version = Some(new_value.to_string());
         self

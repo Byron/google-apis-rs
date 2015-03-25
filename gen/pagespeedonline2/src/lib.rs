@@ -1,11 +1,11 @@
 // DO NOT EDIT !
-// This file was generated automatically from 'src/mako/lib.rs.mako'
+// This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *pagespeedonline* crate version *0.1.1+20150108*, where *20150108* is the exact revision of the *pagespeedonline:v2* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.1*.
+//! This documentation was generated from *pagespeedonline* crate version *0.1.2+20150317*, where *20150317* is the exact revision of the *pagespeedonline:v2* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.2*.
 //! 
 //! Everything else about the *pagespeedonline* *v2* API can be found at the
-//! [official documentation site](https://developers.google.com/speed/docs/insights/v1/getting_started).
+//! [official documentation site](https://developers.google.com/speed/docs/insights/v2/getting-started).
 //! The original source code is [on github](https://github.com/Byron/google-apis-rs/tree/master/gen/pagespeedonline2).
 //! # Features
 //! 
@@ -25,6 +25,8 @@
 //! 
 //! * **[Hub](struct.Pagespeedonline.html)**
 //!     * a central object to maintain state and allow accessing all *Activities*
+//!     * creates [*Method Builders*](trait.MethodsBuilder.html) which in turn
+//!       allow access to individual [*Call Builders*](trait.CallBuilder.html)
 //! * **[Resources](trait.Resource.html)**
 //!     * primary types that you can apply *Activities* to
 //!     * a collection of properties and *Parts*
@@ -33,6 +35,8 @@
 //!         * never directly used in *Activities*
 //! * **[Activities](trait.CallBuilder.html)**
 //!     * operations to apply to *Resources*
+//! 
+//! All *structures* are marked with applicable traits to further categorize them and ease browsing.
 //! 
 //! Generally speaking, you can invoke *Activities* like this:
 //! 
@@ -68,7 +72,7 @@
 //! extern crate hyper;
 //! extern crate "yup-oauth2" as oauth2;
 //! extern crate "google-pagespeedonline2" as pagespeedonline2;
-//! use pagespeedonline2::Result;
+//! use pagespeedonline2::{Result, Error};
 //! # #[test] fn egal() {
 //! use std::default::Default;
 //! use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -98,15 +102,17 @@
 //!              .doit();
 //! 
 //! match result {
-//!     Result::HttpError(err) => println!("HTTPERROR: {:?}", err),
-//!     Result::MissingAPIKey => println!("Auth: Missing API Key - used if there are no scopes"),
-//!     Result::MissingToken => println!("OAuth2: Missing Token"),
-//!     Result::Cancelled => println!("Operation cancelled by user"),
-//!     Result::UploadSizeLimitExceeded(size, max_size) => println!("Upload size too big: {} of {}", size, max_size),
-//!     Result::Failure(_) => println!("General Failure (hyper::client::Response doesn't print)"),
-//!     Result::FieldClash(clashed_field) => println!("You added custom parameter which is part of builder: {:?}", clashed_field),
-//!     Result::JsonDecodeError(err) => println!("Couldn't understand server reply - maybe API needs update: {:?}", err),
-//!     Result::Success(_) => println!("Success (value doesn't print)"),
+//!     Err(e) => match e {
+//!         Error::HttpError(err) => println!("HTTPERROR: {:?}", err),
+//!         Error::MissingAPIKey => println!("Auth: Missing API Key - used if there are no scopes"),
+//!         Error::MissingToken => println!("OAuth2: Missing Token"),
+//!         Error::Cancelled => println!("Operation canceled by user"),
+//!         Error::UploadSizeLimitExceeded(size, max_size) => println!("Upload size too big: {} of {}", size, max_size),
+//!         Error::Failure(_) => println!("General Failure (hyper::client::Response doesn't print)"),
+//!         Error::FieldClash(clashed_field) => println!("You added custom parameter which is part of builder: {:?}", clashed_field),
+//!         Error::JsonDecodeError(err) => println!("Couldn't understand server reply - maybe API needs update: {:?}", err),
+//!     },
+//!     Ok(_) => println!("Success (value doesn't print)"),
 //! }
 //! # }
 //! ```
@@ -119,7 +125,7 @@
 //! When delegates handle errors or intermediate values, they may have a chance to instruct the system to retry. This 
 //! makes the system potentially resilient to all kinds of errors.
 //! 
-//! ## Uploads and Downlods
+//! ## Uploads and Downloads
 //! If a method supports downloads, the response body, which is part of the [Result](enum.Result.html), should be
 //! read by you to obtain the media.
 //! If such a method also supports a [Response Result](trait.ResponseResult.html), it will return that by default.
@@ -142,8 +148,9 @@
 //! ## Optional Parts in Server-Requests
 //! 
 //! All structures provided by this library are made to be [enocodable](trait.RequestValue.html) and 
-//! [decodable](trait.ResponseResult.html) via json. Optionals are used to indicate that partial requests are responses are valid.
-//! Most optionals are are considered [Parts](trait.Part.html) which are identifyable by name, which will be sent to 
+//! [decodable](trait.ResponseResult.html) via *json*. Optionals are used to indicate that partial requests are responses 
+//! are valid.
+//! Most optionals are are considered [Parts](trait.Part.html) which are identifiable by name, which will be sent to 
 //! the server to indicate either the set parts of the request or the desired parts in the response.
 //! 
 //! ## Builder Arguments
@@ -192,7 +199,7 @@ use std::io;
 use std::fs;
 use std::thread::sleep;
 
-pub use cmn::{MultiPartReader, ToParts, MethodInfo, Result, CallBuilder, Hub, ReadSeek, Part, ResponseResult, RequestValue, NestedType, Delegate, DefaultDelegate, ResourceMethodsBuilder, Resource, JsonServerError};
+pub use cmn::{MultiPartReader, ToParts, MethodInfo, Result, Error, CallBuilder, Hub, ReadSeek, Part, ResponseResult, RequestValue, NestedType, Delegate, DefaultDelegate, MethodsBuilder, Resource, JsonServerError};
 
 
 // ##############
@@ -216,7 +223,7 @@ pub use cmn::{MultiPartReader, ToParts, MethodInfo, Result, CallBuilder, Hub, Re
 /// extern crate hyper;
 /// extern crate "yup-oauth2" as oauth2;
 /// extern crate "google-pagespeedonline2" as pagespeedonline2;
-/// use pagespeedonline2::Result;
+/// use pagespeedonline2::{Result, Error};
 /// # #[test] fn egal() {
 /// use std::default::Default;
 /// use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -246,15 +253,17 @@ pub use cmn::{MultiPartReader, ToParts, MethodInfo, Result, CallBuilder, Hub, Re
 ///              .doit();
 /// 
 /// match result {
-///     Result::HttpError(err) => println!("HTTPERROR: {:?}", err),
-///     Result::MissingAPIKey => println!("Auth: Missing API Key - used if there are no scopes"),
-///     Result::MissingToken => println!("OAuth2: Missing Token"),
-///     Result::Cancelled => println!("Operation cancelled by user"),
-///     Result::UploadSizeLimitExceeded(size, max_size) => println!("Upload size too big: {} of {}", size, max_size),
-///     Result::Failure(_) => println!("General Failure (hyper::client::Response doesn't print)"),
-///     Result::FieldClash(clashed_field) => println!("You added custom parameter which is part of builder: {:?}", clashed_field),
-///     Result::JsonDecodeError(err) => println!("Couldn't understand server reply - maybe API needs update: {:?}", err),
-///     Result::Success(_) => println!("Success (value doesn't print)"),
+///     Err(e) => match e {
+///         Error::HttpError(err) => println!("HTTPERROR: {:?}", err),
+///         Error::MissingAPIKey => println!("Auth: Missing API Key - used if there are no scopes"),
+///         Error::MissingToken => println!("OAuth2: Missing Token"),
+///         Error::Cancelled => println!("Operation canceled by user"),
+///         Error::UploadSizeLimitExceeded(size, max_size) => println!("Upload size too big: {} of {}", size, max_size),
+///         Error::Failure(_) => println!("General Failure (hyper::client::Response doesn't print)"),
+///         Error::FieldClash(clashed_field) => println!("You added custom parameter which is part of builder: {:?}", clashed_field),
+///         Error::JsonDecodeError(err) => println!("Couldn't understand server reply - maybe API needs update: {:?}", err),
+///     },
+///     Ok(_) => println!("Success (value doesn't print)"),
 /// }
 /// # }
 /// ```
@@ -275,7 +284,7 @@ impl<'a, C, NC, A> Pagespeedonline<C, NC, A>
         Pagespeedonline {
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/0.1.1".to_string(),
+            _user_agent: "google-api-rust-client/0.1.2".to_string(),
             _m: PhantomData
         }
     }
@@ -285,7 +294,7 @@ impl<'a, C, NC, A> Pagespeedonline<C, NC, A>
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/0.1.1`.
+    /// It defaults to `google-api-rust-client/0.1.2`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -305,13 +314,13 @@ impl<'a, C, NC, A> Pagespeedonline<C, NC, A>
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct PagespeedApiFormatStringV2ArgsSecondaryRects {
-    /// The width of the rect.    
+    /// The width of the rect.
     pub width: i32,
-    /// The top coordinate of the rect, in page coordinates.    
+    /// The top coordinate of the rect, in page coordinates.
     pub top: i32,
-    /// The height of the rect.    
+    /// The height of the rect.
     pub height: i32,
-    /// The left coordinate of the rect, in page coordinates.    
+    /// The left coordinate of the rect, in page coordinates.
     pub left: i32,
 }
 
@@ -325,13 +334,13 @@ impl Part for PagespeedApiFormatStringV2ArgsSecondaryRects {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct PagespeedApiFormatStringV2ArgsRects {
-    /// The width of the rect.    
+    /// The width of the rect.
     pub width: i32,
-    /// The top coordinate of the rect, in page coordinates.    
+    /// The top coordinate of the rect, in page coordinates.
     pub top: i32,
-    /// The height of the rect.    
+    /// The height of the rect.
     pub height: i32,
-    /// The left coordinate of the rect, in page coordinates.    
+    /// The left coordinate of the rect, in page coordinates.
     pub left: i32,
 }
 
@@ -345,9 +354,9 @@ impl Part for PagespeedApiFormatStringV2ArgsRects {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct PagespeedApiFormatStringV2 {
-    /// List of arguments for the format string.    
+    /// List of arguments for the format string.
     pub args: Vec<PagespeedApiFormatStringV2Args>,
-    /// A localized format string with {{FOO}} placeholders, where 'FOO' is the key of the argument whose value should be substituted. For HYPERLINK arguments, the format string will instead contain {{BEGIN_FOO}} and {{END_FOO}} for the argument with key 'FOO'.    
+    /// A localized format string with {{FOO}} placeholders, where 'FOO' is the key of the argument whose value should be substituted. For HYPERLINK arguments, the format string will instead contain {{BEGIN_FOO}} and {{END_FOO}} for the argument with key 'FOO'.
     pub format: String,
 }
 
@@ -360,9 +369,9 @@ impl Part for PagespeedApiFormatStringV2 {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct ResultFormattedResultsRuleResultsUrlBlocksUrls {
-    /// List of entries that provide additional details about a single URL. Optional.    
+    /// List of entries that provide additional details about a single URL. Optional.
     pub details: Vec<PagespeedApiFormatStringV2>,
-    /// A format string that gives information about the URL, and a list of arguments for that format string.    
+    /// A format string that gives information about the URL, and a list of arguments for that format string.
     pub result: PagespeedApiFormatStringV2,
 }
 
@@ -376,43 +385,43 @@ impl Part for ResultFormattedResultsRuleResultsUrlBlocksUrls {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct ResultPageStats {
-    /// Number of response bytes for flash resources on the page.    
+    /// Number of response bytes for flash resources on the page.
     #[serde(alias="flashResponseBytes")]
     pub flash_response_bytes: String,
-    /// Total size of all request bytes sent by the page.    
+    /// Total size of all request bytes sent by the page.
     #[serde(alias="totalRequestBytes")]
     pub total_request_bytes: String,
-    /// Number of CSS resources referenced by the page.    
+    /// Number of CSS resources referenced by the page.
     #[serde(alias="numberCssResources")]
     pub number_css_resources: i32,
-    /// Number of uncompressed response bytes for text resources not covered by other statistics (i.e non-HTML, non-script, non-CSS resources) on the page.    
+    /// Number of uncompressed response bytes for text resources not covered by other statistics (i.e non-HTML, non-script, non-CSS resources) on the page.
     #[serde(alias="textResponseBytes")]
     pub text_response_bytes: String,
-    /// Number of HTTP resources loaded by the page.    
+    /// Number of HTTP resources loaded by the page.
     #[serde(alias="numberResources")]
     pub number_resources: i32,
-    /// Number of response bytes for other resources on the page.    
+    /// Number of response bytes for other resources on the page.
     #[serde(alias="otherResponseBytes")]
     pub other_response_bytes: String,
-    /// Number of response bytes for image resources on the page.    
+    /// Number of response bytes for image resources on the page.
     #[serde(alias="imageResponseBytes")]
     pub image_response_bytes: String,
-    /// Number of unique hosts referenced by the page.    
+    /// Number of unique hosts referenced by the page.
     #[serde(alias="numberHosts")]
     pub number_hosts: i32,
-    /// Number of uncompressed response bytes for JS resources on the page.    
+    /// Number of uncompressed response bytes for JS resources on the page.
     #[serde(alias="javascriptResponseBytes")]
     pub javascript_response_bytes: String,
-    /// Number of uncompressed response bytes for the main HTML document and all iframes on the page.    
+    /// Number of uncompressed response bytes for the main HTML document and all iframes on the page.
     #[serde(alias="htmlResponseBytes")]
     pub html_response_bytes: String,
-    /// Number of uncompressed response bytes for CSS resources on the page.    
+    /// Number of uncompressed response bytes for CSS resources on the page.
     #[serde(alias="cssResponseBytes")]
     pub css_response_bytes: String,
-    /// Number of JavaScript resources referenced by the page.    
+    /// Number of JavaScript resources referenced by the page.
     #[serde(alias="numberJsResources")]
     pub number_js_resources: i32,
-    /// Number of static (i.e. cacheable) resources on the page.    
+    /// Number of static (i.e. cacheable) resources on the page.
     #[serde(alias="numberStaticResources")]
     pub number_static_resources: i32,
 }
@@ -427,18 +436,18 @@ impl Part for ResultPageStats {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct ResultFormattedResultsRuleResults {
-    /// Localized name of the rule, intended for presentation to a user.    
+    /// Localized name of the rule, intended for presentation to a user.
     #[serde(alias="localizedRuleName")]
     pub localized_rule_name: String,
-    /// List of blocks of URLs. Each block may contain a heading and a list of URLs. Each URL may optionally include additional details.    
+    /// List of blocks of URLs. Each block may contain a heading and a list of URLs. Each URL may optionally include additional details.
     #[serde(alias="urlBlocks")]
     pub url_blocks: Vec<ResultFormattedResultsRuleResultsUrlBlocks>,
-    /// List of rule groups that this rule belongs to. Each entry in the list is one of "SPEED" or "USABILITY".    
+    /// List of rule groups that this rule belongs to. Each entry in the list is one of "SPEED" or "USABILITY".
     pub groups: Vec<String>,
-    /// The impact (unbounded floating point value) that implementing the suggestions for this rule would have on making the page faster. Impact is comparable between rules to determine which rule's suggestions would have a higher or lower impact on making a page faster. For instance, if enabling compression would save 1MB, while optimizing images would save 500kB, the enable compression rule would have 2x the impact of the image optimization rule, all other things being equal.    
+    /// The impact (unbounded floating point value) that implementing the suggestions for this rule would have on making the page faster. Impact is comparable between rules to determine which rule's suggestions would have a higher or lower impact on making a page faster. For instance, if enabling compression would save 1MB, while optimizing images would save 500kB, the enable compression rule would have 2x the impact of the image optimization rule, all other things being equal.
     #[serde(alias="ruleImpact")]
     pub rule_impact: f64,
-    /// A brief summary description for the rule, indicating at a high level what should be done to follow the rule and what benefit can be gained by doing so.    
+    /// A brief summary description for the rule, indicating at a high level what should be done to follow the rule and what benefit can be gained by doing so.
     pub summary: PagespeedApiFormatStringV2,
 }
 
@@ -452,9 +461,9 @@ impl Part for ResultFormattedResultsRuleResults {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct ResultVersion {
-    /// The major version number of PageSpeed used to generate these results.    
+    /// The major version number of PageSpeed used to generate these results.
     pub major: i32,
-    /// The minor version number of PageSpeed used to generate these results.    
+    /// The minor version number of PageSpeed used to generate these results.
     pub minor: i32,
 }
 
@@ -468,16 +477,16 @@ impl Part for ResultVersion {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct PagespeedApiFormatStringV2Args {
-    /// The screen rectangles being referred to, with dimensions measured in CSS pixels. This is only ever used for SNAPSHOT_RECT arguments. If this is absent for a SNAPSHOT_RECT argument, it means that that argument refers to the entire snapshot.    
+    /// The screen rectangles being referred to, with dimensions measured in CSS pixels. This is only ever used for SNAPSHOT_RECT arguments. If this is absent for a SNAPSHOT_RECT argument, it means that that argument refers to the entire snapshot.
     pub rects: Vec<PagespeedApiFormatStringV2ArgsRects>,
-    /// The placeholder key for this arg, as a string.    
+    /// The placeholder key for this arg, as a string.
     pub key: String,
-    /// Type of argument. One of URL, STRING_LITERAL, INT_LITERAL, BYTES, DURATION, VERBATIM_STRING, PERCENTAGE, HYPERLINK, or SNAPSHOT_RECT.    
+    /// Type of argument. One of URL, STRING_LITERAL, INT_LITERAL, BYTES, DURATION, VERBATIM_STRING, PERCENTAGE, HYPERLINK, or SNAPSHOT_RECT.
     #[serde(alias="type")]
     pub type_: String,
-    /// Secondary screen rectangles being referred to, with dimensions measured in CSS pixels. This is only ever used for SNAPSHOT_RECT arguments.    
+    /// Secondary screen rectangles being referred to, with dimensions measured in CSS pixels. This is only ever used for SNAPSHOT_RECT arguments.
     pub secondary_rects: Vec<PagespeedApiFormatStringV2ArgsSecondaryRects>,
-    /// Argument value, as a localized string.    
+    /// Argument value, as a localized string.
     pub value: String,
 }
 
@@ -491,9 +500,9 @@ impl Part for PagespeedApiFormatStringV2Args {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct ResultFormattedResultsRuleResultsUrlBlocks {
-    /// Heading to be displayed with the list of URLs.    
+    /// Heading to be displayed with the list of URLs.
     pub header: PagespeedApiFormatStringV2,
-    /// List of entries that provide information about URLs in the url block. Optional.    
+    /// List of entries that provide information about URLs in the url block. Optional.
     pub urls: Vec<ResultFormattedResultsRuleResultsUrlBlocksUrls>,
 }
 
@@ -507,17 +516,17 @@ impl Part for ResultFormattedResultsRuleResultsUrlBlocks {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct PagespeedApiImageV2 {
-    /// Width of screenshot in pixels.    
+    /// Width of screenshot in pixels.
     pub width: i32,
-    /// Unique string key, if any, identifying this image.    
+    /// Unique string key, if any, identifying this image.
     pub key: String,
-    /// The region of the page that is captured by this image, with dimensions measured in CSS pixels.    
+    /// The region of the page that is captured by this image, with dimensions measured in CSS pixels.
     pub page_rect: PagespeedApiImageV2PageRect,
-    /// Image data base64 encoded.    
+    /// Image data base64 encoded.
     pub data: String,
-    /// Mime type of image data (e.g. "image/jpeg").    
+    /// Mime type of image data (e.g. "image/jpeg").
     pub mime_type: String,
-    /// Height of screenshot in pixels.    
+    /// Height of screenshot in pixels.
     pub height: i32,
 }
 
@@ -535,30 +544,30 @@ impl Part for PagespeedApiImageV2 {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct ResultType {
-    /// Kind of result.    
+    /// Kind of result.
     pub kind: String,
-    /// Response code for the document. 200 indicates a normal page load. 4xx/5xx indicates an error.    
+    /// Response code for the document. 200 indicates a normal page load. 4xx/5xx indicates an error.
     #[serde(alias="responseCode")]
     pub response_code: i32,
-    /// Base64-encoded screenshot of the page that was analyzed.    
+    /// Base64-encoded screenshot of the page that was analyzed.
     pub screenshot: PagespeedApiImageV2,
-    /// Title of the page, as displayed in the browser's title bar.    
+    /// Title of the page, as displayed in the browser's title bar.
     pub title: String,
-    /// A map with one entry for each rule group in these results.    
+    /// A map with one entry for each rule group in these results.
     #[serde(alias="ruleGroups")]
     pub rule_groups: HashMap<String, ResultRuleGroups>,
-    /// The version of PageSpeed used to generate these results.    
+    /// The version of PageSpeed used to generate these results.
     pub version: ResultVersion,
-    /// Localized PageSpeed results. Contains a ruleResults entry for each PageSpeed rule instantiated and run by the server.    
+    /// Localized PageSpeed results. Contains a ruleResults entry for each PageSpeed rule instantiated and run by the server.
     #[serde(alias="formattedResults")]
     pub formatted_results: ResultFormattedResults,
-    /// List of rules that were specified in the request, but which the server did not know how to instantiate.    
+    /// List of rules that were specified in the request, but which the server did not know how to instantiate.
     #[serde(alias="invalidRules")]
     pub invalid_rules: Vec<String>,
-    /// Summary statistics for the page, such as number of JavaScript bytes, number of HTML bytes, etc.    
+    /// Summary statistics for the page, such as number of JavaScript bytes, number of HTML bytes, etc.
     #[serde(alias="pageStats")]
     pub page_stats: ResultPageStats,
-    /// Canonicalized and final URL for the document, after following page redirects (if any).    
+    /// Canonicalized and final URL for the document, after following page redirects (if any).
     pub id: String,
 }
 
@@ -571,13 +580,13 @@ impl ResponseResult for ResultType {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct PagespeedApiImageV2PageRect {
-    /// The width of the rect.    
+    /// The width of the rect.
     pub width: i32,
-    /// The top coordinate of the rect, in page coordinates.    
+    /// The top coordinate of the rect, in page coordinates.
     pub top: i32,
-    /// The height of the rect.    
+    /// The height of the rect.
     pub height: i32,
-    /// The left coordinate of the rect, in page coordinates.    
+    /// The left coordinate of the rect, in page coordinates.
     pub left: i32,
 }
 
@@ -591,9 +600,9 @@ impl Part for PagespeedApiImageV2PageRect {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct ResultFormattedResults {
-    /// The locale of the formattedResults, e.g. "en_US".    
+    /// The locale of the formattedResults, e.g. "en_US".
     pub locale: String,
-    /// Dictionary of formatted rule results, with one entry for each PageSpeed rule instantiated and run by the server.    
+    /// Dictionary of formatted rule results, with one entry for each PageSpeed rule instantiated and run by the server.
     #[serde(alias="ruleResults")]
     pub rule_results: HashMap<String, ResultFormattedResultsRuleResults>,
 }
@@ -608,7 +617,7 @@ impl Part for ResultFormattedResults {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct ResultRuleGroups {
-    /// The score (0-100) for this rule group, which indicates how much better a page could be in that category (e.g. how much faster, or how much more usable). A high score indicates little room for improvement, while a lower score indicates more room for improvement.    
+    /// The score (0-100) for this rule group, which indicates how much better a page could be in that category (e.g. how much faster, or how much more usable). A high score indicates little room for improvement, while a lower score indicates more room for improvement.
     pub score: i32,
 }
 
@@ -655,13 +664,17 @@ pub struct PagespeedapiMethods<'a, C, NC, A>
     hub: &'a Pagespeedonline<C, NC, A>,
 }
 
-impl<'a, C, NC, A> ResourceMethodsBuilder for PagespeedapiMethods<'a, C, NC, A> {}
+impl<'a, C, NC, A> MethodsBuilder for PagespeedapiMethods<'a, C, NC, A> {}
 
 impl<'a, C, NC, A> PagespeedapiMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Runs PageSpeed analysis on the page at the specified URL, and returns PageSpeed scores, a list of suggestions to make that page faster, and other information.    
+    /// Runs PageSpeed analysis on the page at the specified URL, and returns PageSpeed scores, a list of suggestions to make that page faster, and other information.
+    /// 
+    /// # Arguments
+    ///
+    /// * `url` - The URL to fetch and analyze
     pub fn runpagespeed(&self, url: &str) -> PagespeedapiRunpagespeedCall<'a, C, NC, A> {
         PagespeedapiRunpagespeedCall {
             hub: self.hub,
@@ -688,7 +701,7 @@ impl<'a, C, NC, A> PagespeedapiMethods<'a, C, NC, A> {
 /// Runs PageSpeed analysis on the page at the specified URL, and returns PageSpeed scores, a list of suggestions to make that page faster, and other information.
 ///
 /// A builder for the *runpagespeed* method supported by a *pagespeedapi* resource.
-/// It is not used directly, but through a `PagespeedapiMethods`.
+/// It is not used directly, but through a `PagespeedapiMethods` instance.
 ///
 /// # Example
 ///
@@ -774,7 +787,7 @@ impl<'a, C, NC, A> PagespeedapiRunpagespeedCall<'a, C, NC, A> where NC: hyper::n
         for &field in ["alt", "url", "strategy", "screenshot", "rule", "locale", "filter_third_party_resources"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -793,7 +806,7 @@ impl<'a, C, NC, A> PagespeedapiRunpagespeedCall<'a, C, NC, A> where NC: hyper::n
             Some(value) => params.push(("key", value)),
             None => {
                 dlg.finished(false);
-                return Result::MissingAPIKey
+                return Err(Error::MissingAPIKey)
             }
         }
 
@@ -813,7 +826,6 @@ impl<'a, C, NC, A> PagespeedapiRunpagespeedCall<'a, C, NC, A> where NC: hyper::n
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -823,7 +835,7 @@ impl<'a, C, NC, A> PagespeedapiRunpagespeedCall<'a, C, NC, A> where NC: hyper::n
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -834,7 +846,7 @@ impl<'a, C, NC, A> PagespeedapiRunpagespeedCall<'a, C, NC, A> where NC: hyper::n
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -843,13 +855,13 @@ impl<'a, C, NC, A> PagespeedapiRunpagespeedCall<'a, C, NC, A> where NC: hyper::n
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -861,7 +873,7 @@ impl<'a, C, NC, A> PagespeedapiRunpagespeedCall<'a, C, NC, A> where NC: hyper::n
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The URL to fetch and analyze    
+    /// The URL to fetch and analyze
     pub fn url(mut self, new_value: &str) -> PagespeedapiRunpagespeedCall<'a, C, NC, A> {
         self._url = new_value.to_string();
         self
@@ -869,7 +881,7 @@ impl<'a, C, NC, A> PagespeedapiRunpagespeedCall<'a, C, NC, A> where NC: hyper::n
     /// Sets the *strategy* query property to the given value.
     ///
     /// 
-    /// The analysis strategy to use    
+    /// The analysis strategy to use
     pub fn strategy(mut self, new_value: &str) -> PagespeedapiRunpagespeedCall<'a, C, NC, A> {
         self._strategy = Some(new_value.to_string());
         self
@@ -877,7 +889,7 @@ impl<'a, C, NC, A> PagespeedapiRunpagespeedCall<'a, C, NC, A> where NC: hyper::n
     /// Sets the *screenshot* query property to the given value.
     ///
     /// 
-    /// Indicates if binary data containing a screenshot should be included    
+    /// Indicates if binary data containing a screenshot should be included
     pub fn screenshot(mut self, new_value: bool) -> PagespeedapiRunpagespeedCall<'a, C, NC, A> {
         self._screenshot = Some(new_value);
         self
@@ -886,7 +898,7 @@ impl<'a, C, NC, A> PagespeedapiRunpagespeedCall<'a, C, NC, A> where NC: hyper::n
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
     ///
     /// 
-    /// A PageSpeed rule to run; if none are given, all rules are run    
+    /// A PageSpeed rule to run; if none are given, all rules are run
     pub fn add_rule(mut self, new_value: &str) -> PagespeedapiRunpagespeedCall<'a, C, NC, A> {
         self._rule.push(new_value.to_string());
         self
@@ -894,7 +906,7 @@ impl<'a, C, NC, A> PagespeedapiRunpagespeedCall<'a, C, NC, A> where NC: hyper::n
     /// Sets the *locale* query property to the given value.
     ///
     /// 
-    /// The locale used to localize formatted results    
+    /// The locale used to localize formatted results
     pub fn locale(mut self, new_value: &str) -> PagespeedapiRunpagespeedCall<'a, C, NC, A> {
         self._locale = Some(new_value.to_string());
         self
@@ -902,7 +914,7 @@ impl<'a, C, NC, A> PagespeedapiRunpagespeedCall<'a, C, NC, A> where NC: hyper::n
     /// Sets the *filter_third_party_resources* query property to the given value.
     ///
     /// 
-    /// Indicates if third party resources should be filtered out before PageSpeed analysis.    
+    /// Indicates if third party resources should be filtered out before PageSpeed analysis.
     pub fn filter_third_party_resources(mut self, new_value: bool) -> PagespeedapiRunpagespeedCall<'a, C, NC, A> {
         self._filter_third_party_resources = Some(new_value);
         self

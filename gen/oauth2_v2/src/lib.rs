@@ -1,8 +1,8 @@
 // DO NOT EDIT !
-// This file was generated automatically from 'src/mako/lib.rs.mako'
+// This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *oauth2* crate version *0.1.1+20150227*, where *20150227* is the exact revision of the *oauth2:v2* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.1*.
+//! This documentation was generated from *oauth2* crate version *0.1.2+20150302*, where *20150302* is the exact revision of the *oauth2:v2* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.2*.
 //! 
 //! Everything else about the *oauth2* *v2* API can be found at the
 //! [official documentation site](https://developers.google.com/accounts/docs/OAuth2).
@@ -29,6 +29,8 @@
 //! 
 //! * **[Hub](struct.Oauth2.html)**
 //!     * a central object to maintain state and allow accessing all *Activities*
+//!     * creates [*Method Builders*](trait.MethodsBuilder.html) which in turn
+//!       allow access to individual [*Call Builders*](trait.CallBuilder.html)
 //! * **[Resources](trait.Resource.html)**
 //!     * primary types that you can apply *Activities* to
 //!     * a collection of properties and *Parts*
@@ -37,6 +39,8 @@
 //!         * never directly used in *Activities*
 //! * **[Activities](trait.CallBuilder.html)**
 //!     * operations to apply to *Resources*
+//! 
+//! All *structures* are marked with applicable traits to further categorize them and ease browsing.
 //! 
 //! Generally speaking, you can invoke *Activities* like this:
 //! 
@@ -73,7 +77,7 @@
 //! extern crate hyper;
 //! extern crate "yup-oauth2" as oauth2;
 //! extern crate "google-oauth2_v2" as oauth2_v2;
-//! use oauth2_v2::Result;
+//! use oauth2_v2::{Result, Error};
 //! # #[test] fn egal() {
 //! use std::default::Default;
 //! use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -98,15 +102,17 @@
 //!              .doit();
 //! 
 //! match result {
-//!     Result::HttpError(err) => println!("HTTPERROR: {:?}", err),
-//!     Result::MissingAPIKey => println!("Auth: Missing API Key - used if there are no scopes"),
-//!     Result::MissingToken => println!("OAuth2: Missing Token"),
-//!     Result::Cancelled => println!("Operation cancelled by user"),
-//!     Result::UploadSizeLimitExceeded(size, max_size) => println!("Upload size too big: {} of {}", size, max_size),
-//!     Result::Failure(_) => println!("General Failure (hyper::client::Response doesn't print)"),
-//!     Result::FieldClash(clashed_field) => println!("You added custom parameter which is part of builder: {:?}", clashed_field),
-//!     Result::JsonDecodeError(err) => println!("Couldn't understand server reply - maybe API needs update: {:?}", err),
-//!     Result::Success(_) => println!("Success (value doesn't print)"),
+//!     Err(e) => match e {
+//!         Error::HttpError(err) => println!("HTTPERROR: {:?}", err),
+//!         Error::MissingAPIKey => println!("Auth: Missing API Key - used if there are no scopes"),
+//!         Error::MissingToken => println!("OAuth2: Missing Token"),
+//!         Error::Cancelled => println!("Operation canceled by user"),
+//!         Error::UploadSizeLimitExceeded(size, max_size) => println!("Upload size too big: {} of {}", size, max_size),
+//!         Error::Failure(_) => println!("General Failure (hyper::client::Response doesn't print)"),
+//!         Error::FieldClash(clashed_field) => println!("You added custom parameter which is part of builder: {:?}", clashed_field),
+//!         Error::JsonDecodeError(err) => println!("Couldn't understand server reply - maybe API needs update: {:?}", err),
+//!     },
+//!     Ok(_) => println!("Success (value doesn't print)"),
 //! }
 //! # }
 //! ```
@@ -119,7 +125,7 @@
 //! When delegates handle errors or intermediate values, they may have a chance to instruct the system to retry. This 
 //! makes the system potentially resilient to all kinds of errors.
 //! 
-//! ## Uploads and Downlods
+//! ## Uploads and Downloads
 //! If a method supports downloads, the response body, which is part of the [Result](enum.Result.html), should be
 //! read by you to obtain the media.
 //! If such a method also supports a [Response Result](trait.ResponseResult.html), it will return that by default.
@@ -142,8 +148,9 @@
 //! ## Optional Parts in Server-Requests
 //! 
 //! All structures provided by this library are made to be [enocodable](trait.RequestValue.html) and 
-//! [decodable](trait.ResponseResult.html) via json. Optionals are used to indicate that partial requests are responses are valid.
-//! Most optionals are are considered [Parts](trait.Part.html) which are identifyable by name, which will be sent to 
+//! [decodable](trait.ResponseResult.html) via *json*. Optionals are used to indicate that partial requests are responses 
+//! are valid.
+//! Most optionals are are considered [Parts](trait.Part.html) which are identifiable by name, which will be sent to 
 //! the server to indicate either the set parts of the request or the desired parts in the response.
 //! 
 //! ## Builder Arguments
@@ -192,7 +199,7 @@ use std::io;
 use std::fs;
 use std::thread::sleep;
 
-pub use cmn::{MultiPartReader, ToParts, MethodInfo, Result, CallBuilder, Hub, ReadSeek, Part, ResponseResult, RequestValue, NestedType, Delegate, DefaultDelegate, ResourceMethodsBuilder, Resource, JsonServerError};
+pub use cmn::{MultiPartReader, ToParts, MethodInfo, Result, Error, CallBuilder, Hub, ReadSeek, Part, ResponseResult, RequestValue, NestedType, Delegate, DefaultDelegate, MethodsBuilder, Resource, JsonServerError};
 
 
 // ##############
@@ -250,7 +257,7 @@ impl Default for Scope {
 /// extern crate hyper;
 /// extern crate "yup-oauth2" as oauth2;
 /// extern crate "google-oauth2_v2" as oauth2_v2;
-/// use oauth2_v2::Result;
+/// use oauth2_v2::{Result, Error};
 /// # #[test] fn egal() {
 /// use std::default::Default;
 /// use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -275,15 +282,17 @@ impl Default for Scope {
 ///              .doit();
 /// 
 /// match result {
-///     Result::HttpError(err) => println!("HTTPERROR: {:?}", err),
-///     Result::MissingAPIKey => println!("Auth: Missing API Key - used if there are no scopes"),
-///     Result::MissingToken => println!("OAuth2: Missing Token"),
-///     Result::Cancelled => println!("Operation cancelled by user"),
-///     Result::UploadSizeLimitExceeded(size, max_size) => println!("Upload size too big: {} of {}", size, max_size),
-///     Result::Failure(_) => println!("General Failure (hyper::client::Response doesn't print)"),
-///     Result::FieldClash(clashed_field) => println!("You added custom parameter which is part of builder: {:?}", clashed_field),
-///     Result::JsonDecodeError(err) => println!("Couldn't understand server reply - maybe API needs update: {:?}", err),
-///     Result::Success(_) => println!("Success (value doesn't print)"),
+///     Err(e) => match e {
+///         Error::HttpError(err) => println!("HTTPERROR: {:?}", err),
+///         Error::MissingAPIKey => println!("Auth: Missing API Key - used if there are no scopes"),
+///         Error::MissingToken => println!("OAuth2: Missing Token"),
+///         Error::Cancelled => println!("Operation canceled by user"),
+///         Error::UploadSizeLimitExceeded(size, max_size) => println!("Upload size too big: {} of {}", size, max_size),
+///         Error::Failure(_) => println!("General Failure (hyper::client::Response doesn't print)"),
+///         Error::FieldClash(clashed_field) => println!("You added custom parameter which is part of builder: {:?}", clashed_field),
+///         Error::JsonDecodeError(err) => println!("Couldn't understand server reply - maybe API needs update: {:?}", err),
+///     },
+///     Ok(_) => println!("Success (value doesn't print)"),
 /// }
 /// # }
 /// ```
@@ -304,7 +313,7 @@ impl<'a, C, NC, A> Oauth2<C, NC, A>
         Oauth2 {
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/0.1.1".to_string(),
+            _user_agent: "google-api-rust-client/0.1.2".to_string(),
             _m: PhantomData
         }
     }
@@ -317,7 +326,7 @@ impl<'a, C, NC, A> Oauth2<C, NC, A>
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/0.1.1`.
+    /// It defaults to `google-api-rust-client/0.1.2`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -337,18 +346,18 @@ impl<'a, C, NC, A> Oauth2<C, NC, A>
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct JwkKeys {
-    /// no description provided    
+    /// no description provided
     #[serde(alias="use")]
     pub use_: String,
-    /// no description provided    
+    /// no description provided
     pub e: String,
-    /// no description provided    
+    /// no description provided
     pub kty: String,
-    /// no description provided    
+    /// no description provided
     pub alg: String,
-    /// no description provided    
+    /// no description provided
     pub kid: String,
-    /// no description provided    
+    /// no description provided
     pub n: String,
 }
 
@@ -367,7 +376,7 @@ impl Part for JwkKeys {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct Jwk {
-    /// no description provided    
+    /// no description provided
     pub keys: Vec<JwkKeys>,
 }
 
@@ -386,27 +395,27 @@ impl ResponseResult for Jwk {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct Userinfoplus {
-    /// The user's last name.    
+    /// The user's last name.
     pub family_name: String,
-    /// The user's full name.    
+    /// The user's full name.
     pub name: String,
-    /// URL of the user's picture image.    
+    /// URL of the user's picture image.
     pub picture: String,
-    /// The user's preferred locale.    
+    /// The user's preferred locale.
     pub locale: String,
-    /// The user's gender.    
+    /// The user's gender.
     pub gender: String,
-    /// The obfuscated ID of the user.    
+    /// The obfuscated ID of the user.
     pub id: String,
-    /// URL of the profile page.    
+    /// URL of the profile page.
     pub link: String,
-    /// The user's first name.    
+    /// The user's first name.
     pub given_name: String,
-    /// The user's email address.    
+    /// The user's email address.
     pub email: String,
-    /// The hosted domain e.g. example.com if the user is Google apps user.    
+    /// The hosted domain e.g. example.com if the user is Google apps user.
     pub hd: String,
-    /// Boolean flag which is true if the email address is verified. Always verified because we only return the user's primary email address.    
+    /// Boolean flag which is true if the email address is verified. Always verified because we only return the user's primary email address.
     pub verified_email: bool,
 }
 
@@ -424,21 +433,21 @@ impl ResponseResult for Userinfoplus {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct Tokeninfo {
-    /// To whom was the token issued to. In general the same as audience.    
+    /// To whom was the token issued to. In general the same as audience.
     pub issued_to: String,
-    /// The Gaia obfuscated user id.    
+    /// The obfuscated user id.
     pub user_id: String,
-    /// The expiry time of the token, as number of seconds left until expiry.    
+    /// The expiry time of the token, as number of seconds left until expiry.
     pub expires_in: i32,
-    /// The access type granted with this token. It can be offline or online.    
+    /// The access type granted with this token. It can be offline or online.
     pub access_type: String,
-    /// Who is the intended audience for this token. In general the same as issued_to.    
+    /// Who is the intended audience for this token. In general the same as issued_to.
     pub audience: String,
-    /// The space separated list of scopes granted to this token.    
+    /// The space separated list of scopes granted to this token.
     pub scope: String,
-    /// The email address of the user. Present only if the email scope is present in the request.    
+    /// The email address of the user. Present only if the email scope is present in the request.
     pub email: String,
-    /// Boolean flag which is true if the email address is verified. Present only if the email scope is present in the request.    
+    /// Boolean flag which is true if the email address is verified. Present only if the email scope is present in the request.
     pub verified_email: bool,
 }
 
@@ -484,7 +493,7 @@ pub struct UserinfoMethods<'a, C, NC, A>
     hub: &'a Oauth2<C, NC, A>,
 }
 
-impl<'a, C, NC, A> ResourceMethodsBuilder for UserinfoMethods<'a, C, NC, A> {}
+impl<'a, C, NC, A> MethodsBuilder for UserinfoMethods<'a, C, NC, A> {}
 
 impl<'a, C, NC, A> UserinfoMethods<'a, C, NC, A> {
     
@@ -543,7 +552,7 @@ pub struct MethodMethods<'a, C, NC, A>
     hub: &'a Oauth2<C, NC, A>,
 }
 
-impl<'a, C, NC, A> ResourceMethodsBuilder for MethodMethods<'a, C, NC, A> {}
+impl<'a, C, NC, A> MethodsBuilder for MethodMethods<'a, C, NC, A> {}
 
 impl<'a, C, NC, A> MethodMethods<'a, C, NC, A> {
     
@@ -577,7 +586,7 @@ impl<'a, C, NC, A> MethodMethods<'a, C, NC, A> {
 // #################
 
 /// A builder for the *v2.me.get* method supported by a *userinfo* resource.
-/// It is not used directly, but through a `UserinfoMethods`.
+/// It is not used directly, but through a `UserinfoMethods` instance.
 ///
 /// # Example
 ///
@@ -633,7 +642,7 @@ impl<'a, C, NC, A> UserinfoV2MeGetCall<'a, C, NC, A> where NC: hyper::net::Netwo
         for &field in ["alt"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -662,7 +671,7 @@ impl<'a, C, NC, A> UserinfoV2MeGetCall<'a, C, NC, A> where NC: hyper::net::Netwo
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -674,7 +683,6 @@ impl<'a, C, NC, A> UserinfoV2MeGetCall<'a, C, NC, A> where NC: hyper::net::Netwo
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -684,7 +692,7 @@ impl<'a, C, NC, A> UserinfoV2MeGetCall<'a, C, NC, A> where NC: hyper::net::Netwo
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -695,7 +703,7 @@ impl<'a, C, NC, A> UserinfoV2MeGetCall<'a, C, NC, A> where NC: hyper::net::Netwo
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -704,13 +712,13 @@ impl<'a, C, NC, A> UserinfoV2MeGetCall<'a, C, NC, A> where NC: hyper::net::Netwo
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -771,7 +779,7 @@ impl<'a, C, NC, A> UserinfoV2MeGetCall<'a, C, NC, A> where NC: hyper::net::Netwo
 
 
 /// A builder for the *get* method supported by a *userinfo* resource.
-/// It is not used directly, but through a `UserinfoMethods`.
+/// It is not used directly, but through a `UserinfoMethods` instance.
 ///
 /// # Example
 ///
@@ -827,7 +835,7 @@ impl<'a, C, NC, A> UserinfoGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
         for &field in ["alt"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -856,7 +864,7 @@ impl<'a, C, NC, A> UserinfoGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -868,7 +876,6 @@ impl<'a, C, NC, A> UserinfoGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -878,7 +885,7 @@ impl<'a, C, NC, A> UserinfoGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -889,7 +896,7 @@ impl<'a, C, NC, A> UserinfoGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -898,13 +905,13 @@ impl<'a, C, NC, A> UserinfoGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -965,7 +972,7 @@ impl<'a, C, NC, A> UserinfoGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
 
 
 /// A builder for the *tokeninfo* method.
-/// It is not used directly, but through a `MethodMethods`.
+/// It is not used directly, but through a `MethodMethods` instance.
 ///
 /// # Example
 ///
@@ -1031,7 +1038,7 @@ impl<'a, C, NC, A> MethodTokeninfoCall<'a, C, NC, A> where NC: hyper::net::Netwo
         for &field in ["alt", "id_token", "access_token"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -1060,7 +1067,7 @@ impl<'a, C, NC, A> MethodTokeninfoCall<'a, C, NC, A> where NC: hyper::net::Netwo
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -1072,7 +1079,6 @@ impl<'a, C, NC, A> MethodTokeninfoCall<'a, C, NC, A> where NC: hyper::net::Netwo
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -1082,7 +1088,7 @@ impl<'a, C, NC, A> MethodTokeninfoCall<'a, C, NC, A> where NC: hyper::net::Netwo
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -1093,7 +1099,7 @@ impl<'a, C, NC, A> MethodTokeninfoCall<'a, C, NC, A> where NC: hyper::net::Netwo
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -1102,13 +1108,13 @@ impl<'a, C, NC, A> MethodTokeninfoCall<'a, C, NC, A> where NC: hyper::net::Netwo
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -1183,7 +1189,7 @@ impl<'a, C, NC, A> MethodTokeninfoCall<'a, C, NC, A> where NC: hyper::net::Netwo
 
 
 /// A builder for the *getCertForOpenIdConnect* method.
-/// It is not used directly, but through a `MethodMethods`.
+/// It is not used directly, but through a `MethodMethods` instance.
 ///
 /// # Example
 ///
@@ -1239,7 +1245,7 @@ impl<'a, C, NC, A> MethodGetCertForOpenIdConnectCall<'a, C, NC, A> where NC: hyp
         for &field in ["alt"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -1268,7 +1274,7 @@ impl<'a, C, NC, A> MethodGetCertForOpenIdConnectCall<'a, C, NC, A> where NC: hyp
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -1280,7 +1286,6 @@ impl<'a, C, NC, A> MethodGetCertForOpenIdConnectCall<'a, C, NC, A> where NC: hyp
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -1290,7 +1295,7 @@ impl<'a, C, NC, A> MethodGetCertForOpenIdConnectCall<'a, C, NC, A> where NC: hyp
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -1301,7 +1306,7 @@ impl<'a, C, NC, A> MethodGetCertForOpenIdConnectCall<'a, C, NC, A> where NC: hyp
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -1310,13 +1315,13 @@ impl<'a, C, NC, A> MethodGetCertForOpenIdConnectCall<'a, C, NC, A> where NC: hyp
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }

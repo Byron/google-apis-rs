@@ -1,8 +1,8 @@
 // DO NOT EDIT !
-// This file was generated automatically from 'src/mako/lib.rs.mako'
+// This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *Tag Manager* crate version *0.1.1+20150121*, where *20150121* is the exact revision of the *tagmanager:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.1*.
+//! This documentation was generated from *Tag Manager* crate version *0.1.2+20150121*, where *20150121* is the exact revision of the *tagmanager:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.2*.
 //! 
 //! Everything else about the *Tag Manager* *v1* API can be found at the
 //! [official documentation site](https://developers.google.com/tag-manager/api/v1/).
@@ -25,6 +25,8 @@
 //! 
 //! * **[Hub](struct.TagManager.html)**
 //!     * a central object to maintain state and allow accessing all *Activities*
+//!     * creates [*Method Builders*](trait.MethodsBuilder.html) which in turn
+//!       allow access to individual [*Call Builders*](trait.CallBuilder.html)
 //! * **[Resources](trait.Resource.html)**
 //!     * primary types that you can apply *Activities* to
 //!     * a collection of properties and *Parts*
@@ -33,6 +35,8 @@
 //!         * never directly used in *Activities*
 //! * **[Activities](trait.CallBuilder.html)**
 //!     * operations to apply to *Resources*
+//! 
+//! All *structures* are marked with applicable traits to further categorize them and ease browsing.
 //! 
 //! Generally speaking, you can invoke *Activities* like this:
 //! 
@@ -114,7 +118,7 @@
 //! extern crate "yup-oauth2" as oauth2;
 //! extern crate "google-tagmanager1" as tagmanager1;
 //! use tagmanager1::Trigger;
-//! use tagmanager1::Result;
+//! use tagmanager1::{Result, Error};
 //! # #[test] fn egal() {
 //! use std::default::Default;
 //! use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -145,15 +149,17 @@
 //!              .doit();
 //! 
 //! match result {
-//!     Result::HttpError(err) => println!("HTTPERROR: {:?}", err),
-//!     Result::MissingAPIKey => println!("Auth: Missing API Key - used if there are no scopes"),
-//!     Result::MissingToken => println!("OAuth2: Missing Token"),
-//!     Result::Cancelled => println!("Operation cancelled by user"),
-//!     Result::UploadSizeLimitExceeded(size, max_size) => println!("Upload size too big: {} of {}", size, max_size),
-//!     Result::Failure(_) => println!("General Failure (hyper::client::Response doesn't print)"),
-//!     Result::FieldClash(clashed_field) => println!("You added custom parameter which is part of builder: {:?}", clashed_field),
-//!     Result::JsonDecodeError(err) => println!("Couldn't understand server reply - maybe API needs update: {:?}", err),
-//!     Result::Success(_) => println!("Success (value doesn't print)"),
+//!     Err(e) => match e {
+//!         Error::HttpError(err) => println!("HTTPERROR: {:?}", err),
+//!         Error::MissingAPIKey => println!("Auth: Missing API Key - used if there are no scopes"),
+//!         Error::MissingToken => println!("OAuth2: Missing Token"),
+//!         Error::Cancelled => println!("Operation canceled by user"),
+//!         Error::UploadSizeLimitExceeded(size, max_size) => println!("Upload size too big: {} of {}", size, max_size),
+//!         Error::Failure(_) => println!("General Failure (hyper::client::Response doesn't print)"),
+//!         Error::FieldClash(clashed_field) => println!("You added custom parameter which is part of builder: {:?}", clashed_field),
+//!         Error::JsonDecodeError(err) => println!("Couldn't understand server reply - maybe API needs update: {:?}", err),
+//!     },
+//!     Ok(_) => println!("Success (value doesn't print)"),
 //! }
 //! # }
 //! ```
@@ -166,7 +172,7 @@
 //! When delegates handle errors or intermediate values, they may have a chance to instruct the system to retry. This 
 //! makes the system potentially resilient to all kinds of errors.
 //! 
-//! ## Uploads and Downlods
+//! ## Uploads and Downloads
 //! If a method supports downloads, the response body, which is part of the [Result](enum.Result.html), should be
 //! read by you to obtain the media.
 //! If such a method also supports a [Response Result](trait.ResponseResult.html), it will return that by default.
@@ -189,8 +195,9 @@
 //! ## Optional Parts in Server-Requests
 //! 
 //! All structures provided by this library are made to be [enocodable](trait.RequestValue.html) and 
-//! [decodable](trait.ResponseResult.html) via json. Optionals are used to indicate that partial requests are responses are valid.
-//! Most optionals are are considered [Parts](trait.Part.html) which are identifyable by name, which will be sent to 
+//! [decodable](trait.ResponseResult.html) via *json*. Optionals are used to indicate that partial requests are responses 
+//! are valid.
+//! Most optionals are are considered [Parts](trait.Part.html) which are identifiable by name, which will be sent to 
 //! the server to indicate either the set parts of the request or the desired parts in the response.
 //! 
 //! ## Builder Arguments
@@ -239,7 +246,7 @@ use std::io;
 use std::fs;
 use std::thread::sleep;
 
-pub use cmn::{MultiPartReader, ToParts, MethodInfo, Result, CallBuilder, Hub, ReadSeek, Part, ResponseResult, RequestValue, NestedType, Delegate, DefaultDelegate, ResourceMethodsBuilder, Resource, JsonServerError};
+pub use cmn::{MultiPartReader, ToParts, MethodInfo, Result, Error, CallBuilder, Hub, ReadSeek, Part, ResponseResult, RequestValue, NestedType, Delegate, DefaultDelegate, MethodsBuilder, Resource, JsonServerError};
 
 
 // ##############
@@ -310,7 +317,7 @@ impl Default for Scope {
 /// extern crate "yup-oauth2" as oauth2;
 /// extern crate "google-tagmanager1" as tagmanager1;
 /// use tagmanager1::Trigger;
-/// use tagmanager1::Result;
+/// use tagmanager1::{Result, Error};
 /// # #[test] fn egal() {
 /// use std::default::Default;
 /// use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -341,15 +348,17 @@ impl Default for Scope {
 ///              .doit();
 /// 
 /// match result {
-///     Result::HttpError(err) => println!("HTTPERROR: {:?}", err),
-///     Result::MissingAPIKey => println!("Auth: Missing API Key - used if there are no scopes"),
-///     Result::MissingToken => println!("OAuth2: Missing Token"),
-///     Result::Cancelled => println!("Operation cancelled by user"),
-///     Result::UploadSizeLimitExceeded(size, max_size) => println!("Upload size too big: {} of {}", size, max_size),
-///     Result::Failure(_) => println!("General Failure (hyper::client::Response doesn't print)"),
-///     Result::FieldClash(clashed_field) => println!("You added custom parameter which is part of builder: {:?}", clashed_field),
-///     Result::JsonDecodeError(err) => println!("Couldn't understand server reply - maybe API needs update: {:?}", err),
-///     Result::Success(_) => println!("Success (value doesn't print)"),
+///     Err(e) => match e {
+///         Error::HttpError(err) => println!("HTTPERROR: {:?}", err),
+///         Error::MissingAPIKey => println!("Auth: Missing API Key - used if there are no scopes"),
+///         Error::MissingToken => println!("OAuth2: Missing Token"),
+///         Error::Cancelled => println!("Operation canceled by user"),
+///         Error::UploadSizeLimitExceeded(size, max_size) => println!("Upload size too big: {} of {}", size, max_size),
+///         Error::Failure(_) => println!("General Failure (hyper::client::Response doesn't print)"),
+///         Error::FieldClash(clashed_field) => println!("You added custom parameter which is part of builder: {:?}", clashed_field),
+///         Error::JsonDecodeError(err) => println!("Couldn't understand server reply - maybe API needs update: {:?}", err),
+///     },
+///     Ok(_) => println!("Success (value doesn't print)"),
 /// }
 /// # }
 /// ```
@@ -370,7 +379,7 @@ impl<'a, C, NC, A> TagManager<C, NC, A>
         TagManager {
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/0.1.1".to_string(),
+            _user_agent: "google-api-rust-client/0.1.2".to_string(),
             _m: PhantomData
         }
     }
@@ -380,7 +389,7 @@ impl<'a, C, NC, A> TagManager<C, NC, A>
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/0.1.1`.
+    /// It defaults to `google-api-rust-client/0.1.2`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -405,7 +414,7 @@ impl<'a, C, NC, A> TagManager<C, NC, A>
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct ListMacrosResponse {
-    /// All GTM Macros of a GTM Container.    
+    /// All GTM Macros of a GTM Container.
     pub macros: Vec<Macro>,
 }
 
@@ -418,7 +427,7 @@ impl ResponseResult for ListMacrosResponse {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct AccountAccess {
-    /// List of Account permissions. Valid account permissions are read and manage.    
+    /// List of Account permissions. Valid account permissions are read and manage.
     pub permission: Vec<String>,
 }
 
@@ -438,47 +447,47 @@ impl Part for AccountAccess {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Tag {
-    /// The start timestamp in milliseconds to schedule a tag.    
+    /// The start timestamp in milliseconds to schedule a tag.
     #[serde(alias="scheduleStartMs")]
     pub schedule_start_ms: Option<String>,
-    /// The end timestamp in milliseconds to schedule a tag.    
+    /// The end timestamp in milliseconds to schedule a tag.
     #[serde(alias="scheduleEndMs")]
     pub schedule_end_ms: Option<String>,
-    /// GTM Container ID.    
+    /// GTM Container ID.
     #[serde(alias="containerId")]
     pub container_id: Option<String>,
-    /// The Tag ID uniquely identifies the GTM Tag.    
+    /// The Tag ID uniquely identifies the GTM Tag.
     #[serde(alias="tagId")]
     pub tag_id: Option<String>,
-    /// Blocking rule IDs. If any of the listed rules evaluate to true, the tag will not fire.    
+    /// Blocking rule IDs. If any of the listed rules evaluate to true, the tag will not fire.
     #[serde(alias="blockingRuleId")]
     pub blocking_rule_id: Option<Vec<String>>,
-    /// The fingerprint of the GTM Tag as computed at storage time. This value is recomputed whenever the tag is modified.    
+    /// The fingerprint of the GTM Tag as computed at storage time. This value is recomputed whenever the tag is modified.
     pub fingerprint: Option<String>,
-    /// Firing rule IDs. A tag will fire when any of the listed rules are true and all of its blockingRuleIds (if any specified) are false.    
+    /// Firing rule IDs. A tag will fire when any of the listed rules are true and all of its blockingRuleIds (if any specified) are false.
     #[serde(alias="firingRuleId")]
     pub firing_rule_id: Option<Vec<String>>,
-    /// Firing trigger IDs. A tag will fire when any of the listed triggers are true and all of its blockingTriggerIds (if any specified) are false.    
+    /// Firing trigger IDs. A tag will fire when any of the listed triggers are true and all of its blockingTriggerIds (if any specified) are false.
     #[serde(alias="firingTriggerId")]
     pub firing_trigger_id: Option<Vec<String>>,
-    /// GTM Account ID.    
+    /// GTM Account ID.
     #[serde(alias="accountId")]
     pub account_id: Option<String>,
-    /// Tag display name.    
+    /// Tag display name.
     pub name: Option<String>,
-    /// The tag's parameters.    
+    /// The tag's parameters.
     pub parameter: Option<Vec<Parameter>>,
-    /// User notes on how to apply this tag in the container.    
+    /// User notes on how to apply this tag in the container.
     pub notes: Option<String>,
-    /// User defined numeric priority of the tag. Tags are fired asynchronously in order of priority. Tags with higher numeric value fire first. A tag's priority can be a positive or negative value. The default value is 0.    
+    /// User defined numeric priority of the tag. Tags are fired asynchronously in order of priority. Tags with higher numeric value fire first. A tag's priority can be a positive or negative value. The default value is 0.
     pub priority: Option<Parameter>,
-    /// If set to true, this tag will only fire in the live environment (e.g. not in preview or debug mode).    
+    /// If set to true, this tag will only fire in the live environment (e.g. not in preview or debug mode).
     #[serde(alias="liveOnly")]
     pub live_only: Option<bool>,
-    /// GTM Tag Type.    
+    /// GTM Tag Type.
     #[serde(alias="type")]
     pub type_: Option<String>,
-    /// Blocking trigger IDs. If any of the listed triggers evaluate to true, the tag will not fire.    
+    /// Blocking trigger IDs. If any of the listed triggers evaluate to true, the tag will not fire.
     #[serde(alias="blockingTriggerId")]
     pub blocking_trigger_id: Option<Vec<String>>,
 }
@@ -500,34 +509,34 @@ impl ResponseResult for Tag {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Container {
-    /// Container Time Zone ID.    
+    /// Container Time Zone ID.
     #[serde(alias="timeZoneId")]
     pub time_zone_id: Option<String>,
-    /// List of enabled built-in variables. Valid values include: pageUrl, pageHostname, pagePath, referrer, event, clickElement, clickClasses, clickId, clickTarget, clickUrl, clickText, formElement, formClasses, formId, formTarget, formUrl, formText, errorMessage, errorUrl, errorLine, newHistoryFragment, oldHistoryFragment, newHistoryState, oldHistoryState, historySource, containerVersion, debugMode, randomNumber, containerId.    
+    /// List of enabled built-in variables. Valid values include: pageUrl, pageHostname, pagePath, referrer, event, clickElement, clickClasses, clickId, clickTarget, clickUrl, clickText, formElement, formClasses, formId, formTarget, formUrl, formText, errorMessage, errorUrl, errorLine, newHistoryFragment, oldHistoryFragment, newHistoryState, oldHistoryState, historySource, containerVersion, debugMode, randomNumber, containerId.
     #[serde(alias="enabledBuiltInVariable")]
     pub enabled_built_in_variable: Option<Vec<String>>,
-    /// Container Country ID.    
+    /// Container Country ID.
     #[serde(alias="timeZoneCountryId")]
     pub time_zone_country_id: Option<i64>,
-    /// Container Public ID.    
+    /// Container Public ID.
     #[serde(alias="publicId")]
     pub public_id: Option<String>,
-    /// The Container ID uniquely identifies the GTM Container.    
+    /// The Container ID uniquely identifies the GTM Container.
     #[serde(alias="containerId")]
     pub container_id: Option<String>,
-    /// Optional list of domain names associated with the Container.    
+    /// Optional list of domain names associated with the Container.
     #[serde(alias="domainName")]
     pub domain_name: Option<Vec<String>>,
-    /// Container Notes.    
+    /// Container Notes.
     pub notes: Option<String>,
-    /// Container display name.    
+    /// Container display name.
     pub name: Option<String>,
-    /// List of Usage Contexts for the Container. Valid values include: web, android, ios.    
+    /// List of Usage Contexts for the Container. Valid values include: web, android, ios.
     #[serde(alias="usageContext")]
     pub usage_context: Option<Vec<String>>,
-    /// The fingerprint of the GTM Container as computed at storage time. This value is recomputed whenever the account is modified.    
+    /// The fingerprint of the GTM Container as computed at storage time. This value is recomputed whenever the account is modified.
     pub fingerprint: Option<String>,
-    /// GTM Account ID.    
+    /// GTM Account ID.
     #[serde(alias="accountId")]
     pub account_id: Option<String>,
 }
@@ -547,7 +556,7 @@ impl ResponseResult for Container {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct ListContainersResponse {
-    /// All Containers of a GTM Account.    
+    /// All Containers of a GTM Account.
     pub containers: Vec<Container>,
 }
 
@@ -567,37 +576,37 @@ impl ResponseResult for ListContainersResponse {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Macro {
-    /// The start timestamp in milliseconds to schedule a macro.    
+    /// The start timestamp in milliseconds to schedule a macro.
     #[serde(alias="scheduleStartMs")]
     pub schedule_start_ms: Option<String>,
-    /// The end timestamp in milliseconds to schedule a macro.    
+    /// The end timestamp in milliseconds to schedule a macro.
     #[serde(alias="scheduleEndMs")]
     pub schedule_end_ms: Option<String>,
-    /// The Macro ID uniquely identifies the GTM Macro.    
+    /// The Macro ID uniquely identifies the GTM Macro.
     #[serde(alias="macroId")]
     pub macro_id: Option<String>,
-    /// GTM Container ID.    
+    /// GTM Container ID.
     #[serde(alias="containerId")]
     pub container_id: Option<String>,
-    /// The macro's parameters.    
+    /// The macro's parameters.
     pub parameter: Option<Vec<Parameter>>,
-    /// User notes on how to apply this macro in the container.    
+    /// User notes on how to apply this macro in the container.
     pub notes: Option<String>,
-    /// The fingerprint of the GTM Macro as computed at storage time. This value is recomputed whenever the macro is modified.    
+    /// The fingerprint of the GTM Macro as computed at storage time. This value is recomputed whenever the macro is modified.
     pub fingerprint: Option<String>,
-    /// For mobile containers only: A list of rule IDs for disabling conditional macros; the macro is enabled if one of the enabling rules is true while all the disabling rules are false. Treated as an unordered set.    
+    /// For mobile containers only: A list of rule IDs for disabling conditional macros; the macro is enabled if one of the enabling rules is true while all the disabling rules are false. Treated as an unordered set.
     #[serde(alias="disablingRuleId")]
     pub disabling_rule_id: Option<Vec<String>>,
-    /// For mobile containers only: A list of rule IDs for enabling conditional macros; the macro is enabled if one of the enabling rules is true while all the disabling rules are false. Treated as an unordered set.    
+    /// For mobile containers only: A list of rule IDs for enabling conditional macros; the macro is enabled if one of the enabling rules is true while all the disabling rules are false. Treated as an unordered set.
     #[serde(alias="enablingRuleId")]
     pub enabling_rule_id: Option<Vec<String>>,
-    /// GTM Account ID.    
+    /// GTM Account ID.
     #[serde(alias="accountId")]
     pub account_id: Option<String>,
-    /// GTM Macro Type.    
+    /// GTM Macro Type.
     #[serde(alias="type")]
     pub type_: Option<String>,
-    /// Macro display name.    
+    /// Macro display name.
     pub name: Option<String>,
 }
 
@@ -616,7 +625,7 @@ impl ResponseResult for Macro {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct ListVariablesResponse {
-    /// All GTM Variables of a GTM Container.    
+    /// All GTM Variables of a GTM Container.
     pub variables: Vec<Variable>,
 }
 
@@ -679,15 +688,15 @@ impl ResponseResult for ListVariablesResponse {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Account {
-    /// Whether the account shares data anonymously with Google and others.    
+    /// Whether the account shares data anonymously with Google and others.
     #[serde(alias="shareData")]
     pub share_data: Option<bool>,
-    /// The Account ID uniquely identifies the GTM Account.    
+    /// The Account ID uniquely identifies the GTM Account.
     #[serde(alias="accountId")]
     pub account_id: Option<String>,
-    /// Account display name.    
+    /// Account display name.
     pub name: Option<String>,
-    /// The fingerprint of the GTM Account as computed at storage time. This value is recomputed whenever the account is modified.    
+    /// The fingerprint of the GTM Account as computed at storage time. This value is recomputed whenever the account is modified.
     pub fingerprint: Option<String>,
 }
 
@@ -709,21 +718,21 @@ impl ResponseResult for Account {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Rule {
-    /// GTM Container ID.    
+    /// GTM Container ID.
     #[serde(alias="containerId")]
     pub container_id: Option<String>,
-    /// Rule display name.    
+    /// Rule display name.
     pub name: Option<String>,
-    /// The Rule ID uniquely identifies the GTM Rule.    
+    /// The Rule ID uniquely identifies the GTM Rule.
     #[serde(alias="ruleId")]
     pub rule_id: Option<String>,
-    /// User notes on how to apply this rule in the container.    
+    /// User notes on how to apply this rule in the container.
     pub notes: Option<String>,
-    /// The fingerprint of the GTM Rule as computed at storage time. This value is recomputed whenever the rule is modified.    
+    /// The fingerprint of the GTM Rule as computed at storage time. This value is recomputed whenever the rule is modified.
     pub fingerprint: Option<String>,
-    /// The list of conditions that make up this rule (implicit AND between them).    
+    /// The list of conditions that make up this rule (implicit AND between them).
     pub condition: Option<Vec<Condition>>,
-    /// GTM Account ID.    
+    /// GTM Account ID.
     #[serde(alias="accountId")]
     pub account_id: Option<String>,
 }
@@ -743,7 +752,7 @@ impl ResponseResult for Rule {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct ListAccountsResponse {
-    /// List of GTM Accounts that a user has access to.    
+    /// List of GTM Accounts that a user has access to.
     pub accounts: Vec<Account>,
 }
 
@@ -761,10 +770,10 @@ impl ResponseResult for ListAccountsResponse {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct PublishContainerVersionResponse {
-    /// The container version created.    
+    /// The container version created.
     #[serde(alias="containerVersion")]
     pub container_version: ContainerVersion,
-    /// Compiler errors or not.    
+    /// Compiler errors or not.
     #[serde(alias="compilerError")]
     pub compiler_error: bool,
 }
@@ -785,53 +794,53 @@ impl ResponseResult for PublishContainerVersionResponse {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Trigger {
-    /// GTM Container ID.    
+    /// GTM Container ID.
     #[serde(alias="containerId")]
     pub container_id: Option<String>,
-    /// Globally unique id of the trigger that auto-generates this (a Form Submit, Link Click or Timer listener) if any. Used to make incompatible auto-events work together with trigger filtering based on trigger ids. This value is populated during output generation since the tags implied by triggers don't exist until then. Only valid for Form Submit, Link Click and Timer triggers.    
+    /// Globally unique id of the trigger that auto-generates this (a Form Submit, Link Click or Timer listener) if any. Used to make incompatible auto-events work together with trigger filtering based on trigger ids. This value is populated during output generation since the tags implied by triggers don't exist until then. Only valid for Form Submit, Link Click and Timer triggers.
     #[serde(alias="uniqueTriggerId")]
     pub unique_trigger_id: Option<Parameter>,
-    /// The Trigger ID uniquely identifies the GTM Trigger.    
+    /// The Trigger ID uniquely identifies the GTM Trigger.
     #[serde(alias="triggerId")]
     pub trigger_id: Option<String>,
-    /// The fingerprint of the GTM Trigger as computed at storage time. This value is recomputed whenever the trigger is modified.    
+    /// The fingerprint of the GTM Trigger as computed at storage time. This value is recomputed whenever the trigger is modified.
     pub fingerprint: Option<String>,
-    /// Reloads the videos in the page that don't already have the YT API enabled. If false, only capture events from videos that already have the API enabled. Only valid for YouTube triggers.    
+    /// Reloads the videos in the page that don't already have the YT API enabled. If false, only capture events from videos that already have the API enabled. Only valid for YouTube triggers.
     #[serde(alias="enableAllVideos")]
     pub enable_all_videos: Option<Parameter>,
-    /// GTM Account ID.    
+    /// GTM Account ID.
     #[serde(alias="accountId")]
     pub account_id: Option<String>,
-    /// Name of the GTM event that is fired. Only valid for Timer triggers.    
+    /// Name of the GTM event that is fired. Only valid for Timer triggers.
     #[serde(alias="eventName")]
     pub event_name: Option<Parameter>,
-    /// List of integer percentage values. The trigger will fire as each percentage is reached in any instrumented videos. Only valid for YouTube triggers.    
+    /// List of integer percentage values. The trigger will fire as each percentage is reached in any instrumented videos. Only valid for YouTube triggers.
     #[serde(alias="videoPercentageList")]
     pub video_percentage_list: Option<Parameter>,
-    /// Whether or not we should delay the form submissions or link opening until all of the tags have fired (by preventing the default action and later simulating the default action). Only valid for Form Submission and Link Click triggers.    
+    /// Whether or not we should delay the form submissions or link opening until all of the tags have fired (by preventing the default action and later simulating the default action). Only valid for Form Submission and Link Click triggers.
     #[serde(alias="waitForTags")]
     pub wait_for_tags: Option<Parameter>,
-    /// Trigger display name.    
+    /// Trigger display name.
     pub name: Option<String>,
-    /// Time between triggering recurring Timer Events (in milliseconds). Only valid for Timer triggers.    
+    /// Time between triggering recurring Timer Events (in milliseconds). Only valid for Timer triggers.
     pub interval: Option<Parameter>,
-    /// Used in the case of auto event tracking.    
+    /// Used in the case of auto event tracking.
     #[serde(alias="autoEventFilter")]
     pub auto_event_filter: Option<Vec<Condition>>,
-    /// The trigger will only fire iff all Conditions are true.    
+    /// The trigger will only fire iff all Conditions are true.
     pub filter: Option<Vec<Condition>>,
-    /// How long to wait (in milliseconds) for tags to fire when 'waits_for_tags' above evaluates to true. Only valid for Form Submission and Link Click triggers.    
+    /// How long to wait (in milliseconds) for tags to fire when 'waits_for_tags' above evaluates to true. Only valid for Form Submission and Link Click triggers.
     #[serde(alias="waitForTagsTimeout")]
     pub wait_for_tags_timeout: Option<Parameter>,
-    /// Limit of the number of GTM events this Timer Trigger will fire. If no limit is set, we will continue to fire GTM events until the user leaves the page. Only valid for Timer triggers.    
+    /// Limit of the number of GTM events this Timer Trigger will fire. If no limit is set, we will continue to fire GTM events until the user leaves the page. Only valid for Timer triggers.
     pub limit: Option<Parameter>,
-    /// Whether or not we should only fire tags if the form submit or link click event is not cancelled by some other event handler (e.g. because of validation). Only valid for Form Submission and Link Click triggers.    
+    /// Whether or not we should only fire tags if the form submit or link click event is not cancelled by some other event handler (e.g. because of validation). Only valid for Form Submission and Link Click triggers.
     #[serde(alias="checkValidation")]
     pub check_validation: Option<Parameter>,
-    /// Used in the case of custom event, which is fired iff all Conditions are true.    
+    /// Used in the case of custom event, which is fired iff all Conditions are true.
     #[serde(alias="customEventFilter")]
     pub custom_event_filter: Option<Vec<Condition>>,
-    /// Defines the data layer event that causes this trigger.    
+    /// Defines the data layer event that causes this trigger.
     #[serde(alias="type")]
     pub type_: Option<String>,
 }
@@ -851,10 +860,10 @@ impl ResponseResult for Trigger {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct CreateContainerVersionResponse {
-    /// The container version created.    
+    /// The container version created.
     #[serde(alias="containerVersion")]
     pub container_version: ContainerVersion,
-    /// Compiler errors or not.    
+    /// Compiler errors or not.
     #[serde(alias="compilerError")]
     pub compiler_error: bool,
 }
@@ -873,7 +882,7 @@ impl ResponseResult for CreateContainerVersionResponse {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct ListRulesResponse {
-    /// All GTM Rules of a GTM Container.    
+    /// All GTM Rules of a GTM Container.
     pub rules: Vec<Rule>,
 }
 
@@ -886,10 +895,10 @@ impl ResponseResult for ListRulesResponse {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ContainerAccess {
-    /// GTM Container ID.    
+    /// GTM Container ID.
     #[serde(alias="containerId")]
     pub container_id: String,
-    /// List of Container permissions. Valid container permissions are: read, edit, delete, publish.    
+    /// List of Container permissions. Valid container permissions are: read, edit, delete, publish.
     pub permission: Vec<String>,
 }
 
@@ -909,19 +918,19 @@ impl Part for ContainerAccess {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct UserAccess {
-    /// GTM Container access permissions.    
+    /// GTM Container access permissions.
     #[serde(alias="containerAccess")]
     pub container_access: Option<Vec<ContainerAccess>>,
-    /// GTM Account access permissions.    
+    /// GTM Account access permissions.
     #[serde(alias="accountAccess")]
     pub account_access: Option<AccountAccess>,
-    /// User's email address.    
+    /// User's email address.
     #[serde(alias="emailAddress")]
     pub email_address: Option<String>,
-    /// Account Permission ID.    
+    /// Account Permission ID.
     #[serde(alias="permissionId")]
     pub permission_id: Option<String>,
-    /// GTM Account ID.    
+    /// GTM Account ID.
     #[serde(alias="accountId")]
     pub account_id: Option<String>,
 }
@@ -936,13 +945,13 @@ impl ResponseResult for UserAccess {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Parameter {
-    /// This map parameter's parameters (must have keys; keys must be unique).    
+    /// This map parameter's parameters (must have keys; keys must be unique).
     pub map: Vec<Parameter>,
-    /// This list parameter's parameters (keys will be ignored).    
+    /// This list parameter's parameters (keys will be ignored).
     pub list: Vec<Parameter>,
-    /// The named key that uniquely identifies a parameter. Required for top-level parameters, as well as map values. Ignored for list values.    
+    /// The named key that uniquely identifies a parameter. Required for top-level parameters, as well as map values. Ignored for list values.
     pub key: String,
-    /// A parameter's value (may contain macro references such as "{{myMacro}}") as appropriate to the specified type.    
+    /// A parameter's value (may contain macro references such as "{{myMacro}}") as appropriate to the specified type.
     pub value: String,
     /// The parameter type. Valid values are: 
     /// - boolean: The value represents a boolean, represented as 'true' or 'false' 
@@ -968,7 +977,7 @@ impl Part for Parameter {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct ListTagsResponse {
-    /// All GTM Tags of a GTM Container.    
+    /// All GTM Tags of a GTM Container.
     pub tags: Vec<Tag>,
 }
 
@@ -986,7 +995,7 @@ impl ResponseResult for ListTagsResponse {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct ListAccountUsersResponse {
-    /// All GTM AccountUsers of a GTM Account.    
+    /// All GTM AccountUsers of a GTM Account.
     #[serde(alias="userAccess")]
     pub user_access: Vec<UserAccess>,
 }
@@ -1005,11 +1014,11 @@ impl ResponseResult for ListAccountUsersResponse {}
 /// 
 #[derive(Default, Clone, Debug, Serialize)]
 pub struct CreateContainerVersionRequestVersionOptions {
-    /// The notes of the container version to be created.    
+    /// The notes of the container version to be created.
     pub notes: Option<String>,
-    /// The name of the container version to be created.    
+    /// The name of the container version to be created.
     pub name: Option<String>,
-    /// The creation of this version may be for quick preview and shouldn't be saved.    
+    /// The creation of this version may be for quick preview and shouldn't be saved.
     #[serde(alias="quickPreview")]
     pub quick_preview: Option<bool>,
 }
@@ -1028,7 +1037,7 @@ impl RequestValue for CreateContainerVersionRequestVersionOptions {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct ListTriggersResponse {
-    /// All GTM Triggers of a GTM Container.    
+    /// All GTM Triggers of a GTM Container.
     pub triggers: Vec<Trigger>,
 }
 
@@ -1041,32 +1050,32 @@ impl ResponseResult for ListTriggersResponse {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct ContainerVersionHeader {
-    /// Container version display name.    
+    /// Container version display name.
     pub name: String,
-    /// A value of true indicates this container version has been deleted.    
+    /// A value of true indicates this container version has been deleted.
     pub deleted: bool,
-    /// Number of macros in the container version.    
+    /// Number of macros in the container version.
     #[serde(alias="numMacros")]
     pub num_macros: String,
-    /// GTM Container ID.    
+    /// GTM Container ID.
     #[serde(alias="containerId")]
     pub container_id: String,
-    /// Number of tags in the container version.    
+    /// Number of tags in the container version.
     #[serde(alias="numTags")]
     pub num_tags: String,
-    /// Number of rules in the container version.    
+    /// Number of rules in the container version.
     #[serde(alias="numRules")]
     pub num_rules: String,
-    /// The Container Version ID uniquely identifies the GTM Container Version.    
+    /// The Container Version ID uniquely identifies the GTM Container Version.
     #[serde(alias="containerVersionId")]
     pub container_version_id: String,
-    /// Number of triggers in the container version.    
+    /// Number of triggers in the container version.
     #[serde(alias="numTriggers")]
     pub num_triggers: String,
-    /// GTM Account ID.    
+    /// GTM Account ID.
     #[serde(alias="accountId")]
     pub account_id: String,
-    /// Number of variables in the container version.    
+    /// Number of variables in the container version.
     #[serde(alias="numVariables")]
     pub num_variables: String,
 }
@@ -1088,35 +1097,35 @@ impl Part for ContainerVersionHeader {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ContainerVersion {
-    /// The container that this version was taken from.    
+    /// The container that this version was taken from.
     pub container: Option<Container>,
-    /// GTM Container ID.    
+    /// GTM Container ID.
     #[serde(alias="containerId")]
     pub container_id: Option<String>,
-    /// The triggers in the container that this version was taken from.    
+    /// The triggers in the container that this version was taken from.
     pub trigger: Option<Vec<Trigger>>,
-    /// A value of true indicates this container version has been deleted.    
+    /// A value of true indicates this container version has been deleted.
     pub deleted: Option<bool>,
-    /// The macros in the container that this version was taken from.    
+    /// The macros in the container that this version was taken from.
     #[serde(alias="macro")]
     pub macro_: Option<Vec<Macro>>,
-    /// User notes on how to apply this container version in the container.    
+    /// User notes on how to apply this container version in the container.
     pub notes: Option<String>,
-    /// The rules in the container that this version was taken from.    
+    /// The rules in the container that this version was taken from.
     pub rule: Option<Vec<Rule>>,
-    /// The tags in the container that this version was taken from.    
+    /// The tags in the container that this version was taken from.
     pub tag: Option<Vec<Tag>>,
-    /// The Container Version ID uniquely identifies the GTM Container Version.    
+    /// The Container Version ID uniquely identifies the GTM Container Version.
     #[serde(alias="containerVersionId")]
     pub container_version_id: Option<String>,
-    /// The fingerprint of the GTM Container Version as computed at storage time. This value is recomputed whenever the container version is modified.    
+    /// The fingerprint of the GTM Container Version as computed at storage time. This value is recomputed whenever the container version is modified.
     pub fingerprint: Option<String>,
-    /// The variables in the container that this version was taken from.    
+    /// The variables in the container that this version was taken from.
     pub variable: Option<Vec<Variable>>,
-    /// GTM Account ID.    
+    /// GTM Account ID.
     #[serde(alias="accountId")]
     pub account_id: Option<String>,
-    /// Container version display name.    
+    /// Container version display name.
     pub name: Option<String>,
 }
 
@@ -1135,10 +1144,10 @@ impl ResponseResult for ContainerVersion {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct ListContainerVersionsResponse {
-    /// All container version headers of a GTM Container.    
+    /// All container version headers of a GTM Container.
     #[serde(alias="containerVersionHeader")]
     pub container_version_header: Vec<ContainerVersionHeader>,
-    /// All versions of a GTM Container.    
+    /// All versions of a GTM Container.
     #[serde(alias="containerVersion")]
     pub container_version: Vec<ContainerVersion>,
 }
@@ -1159,36 +1168,36 @@ impl ResponseResult for ListContainerVersionsResponse {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Variable {
-    /// The start timestamp in milliseconds to schedule a variable.    
+    /// The start timestamp in milliseconds to schedule a variable.
     #[serde(alias="scheduleStartMs")]
     pub schedule_start_ms: Option<String>,
-    /// The end timestamp in milliseconds to schedule a variable.    
+    /// The end timestamp in milliseconds to schedule a variable.
     #[serde(alias="scheduleEndMs")]
     pub schedule_end_ms: Option<String>,
-    /// Variable display name.    
+    /// Variable display name.
     pub name: Option<String>,
-    /// The variable's parameters.    
+    /// The variable's parameters.
     pub parameter: Option<Vec<Parameter>>,
-    /// User notes on how to apply this variable in the container.    
+    /// User notes on how to apply this variable in the container.
     pub notes: Option<String>,
-    /// GTM Container ID.    
+    /// GTM Container ID.
     #[serde(alias="containerId")]
     pub container_id: Option<String>,
-    /// For mobile containers only: A list of trigger IDs for enabling conditional variables; the variable is enabled if one of the enabling triggers is true while all the disabling triggers are false. Treated as an unordered set.    
+    /// For mobile containers only: A list of trigger IDs for enabling conditional variables; the variable is enabled if one of the enabling triggers is true while all the disabling triggers are false. Treated as an unordered set.
     #[serde(alias="enablingTriggerId")]
     pub enabling_trigger_id: Option<Vec<String>>,
-    /// The fingerprint of the GTM Variable as computed at storage time. This value is recomputed whenever the variable is modified.    
+    /// The fingerprint of the GTM Variable as computed at storage time. This value is recomputed whenever the variable is modified.
     pub fingerprint: Option<String>,
-    /// GTM Account ID.    
+    /// GTM Account ID.
     #[serde(alias="accountId")]
     pub account_id: Option<String>,
-    /// GTM Variable Type.    
+    /// GTM Variable Type.
     #[serde(alias="type")]
     pub type_: Option<String>,
-    /// For mobile containers only: A list of trigger IDs for disabling conditional variables; the variable is enabled if one of the enabling trigger is true while all the disabling trigger are false. Treated as an unordered set.    
+    /// For mobile containers only: A list of trigger IDs for disabling conditional variables; the variable is enabled if one of the enabling trigger is true while all the disabling trigger are false. Treated as an unordered set.
     #[serde(alias="disablingTriggerId")]
     pub disabling_trigger_id: Option<Vec<String>>,
-    /// The Variable ID uniquely identifies the GTM Variable.    
+    /// The Variable ID uniquely identifies the GTM Variable.
     #[serde(alias="variableId")]
     pub variable_id: Option<String>,
 }
@@ -1209,7 +1218,7 @@ pub struct Condition {
     /// - For case-insensitive Regex matching, include a boolean parameter named ignore_case that is set to true. If not specified or set to any other value, the matching will be case sensitive. 
     /// - To negate an operator, include a boolean parameter named negate boolean parameter that is set to true.
     pub parameter: Vec<Parameter>,
-    /// The type of operator for this condition.    
+    /// The type of operator for this condition.
     #[serde(alias="type")]
     pub type_: String,
 }
@@ -1256,13 +1265,17 @@ pub struct AccountMethods<'a, C, NC, A>
     hub: &'a TagManager<C, NC, A>,
 }
 
-impl<'a, C, NC, A> ResourceMethodsBuilder for AccountMethods<'a, C, NC, A> {}
+impl<'a, C, NC, A> MethodsBuilder for AccountMethods<'a, C, NC, A> {}
 
 impl<'a, C, NC, A> AccountMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Lists all Containers that belongs to a GTM Account.    
+    /// Lists all Containers that belongs to a GTM Account.
+    /// 
+    /// # Arguments
+    ///
+    /// * `accountId` - The GTM Account ID.
     pub fn containers_list(&self, account_id: &str) -> AccountContainerListCall<'a, C, NC, A> {
         AccountContainerListCall {
             hub: self.hub,
@@ -1275,7 +1288,11 @@ impl<'a, C, NC, A> AccountMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// List all users that have access to the account along with Account and Container Permissions granted to each of them.    
+    /// List all users that have access to the account along with Account and Container Permissions granted to each of them.
+    /// 
+    /// # Arguments
+    ///
+    /// * `accountId` - The GTM Account ID. @required tagmanager.accounts.permissions.list
     pub fn permissions_list(&self, account_id: &str) -> AccountPermissionListCall<'a, C, NC, A> {
         AccountPermissionListCall {
             hub: self.hub,
@@ -1288,7 +1305,13 @@ impl<'a, C, NC, A> AccountMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Undeletes a Container Version.    
+    /// Undeletes a Container Version.
+    /// 
+    /// # Arguments
+    ///
+    /// * `accountId` - The GTM Account ID.
+    /// * `containerId` - The GTM Container ID.
+    /// * `containerVersionId` - The GTM Container Version ID.
     pub fn containers_versions_undelete(&self, account_id: &str, container_id: &str, container_version_id: &str) -> AccountContainerVersionUndeleteCall<'a, C, NC, A> {
         AccountContainerVersionUndeleteCall {
             hub: self.hub,
@@ -1303,7 +1326,12 @@ impl<'a, C, NC, A> AccountMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Creates a user's Account & Container Permissions.    
+    /// Creates a user's Account & Container Permissions.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `accountId` - The GTM Account ID.
     pub fn permissions_create(&self, request: &UserAccess, account_id: &str) -> AccountPermissionCreateCall<'a, C, NC, A> {
         AccountPermissionCreateCall {
             hub: self.hub,
@@ -1317,7 +1345,12 @@ impl<'a, C, NC, A> AccountMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Removes a user from the account, revoking access to it and all of its containers.    
+    /// Removes a user from the account, revoking access to it and all of its containers.
+    /// 
+    /// # Arguments
+    ///
+    /// * `accountId` - The GTM Account ID.
+    /// * `permissionId` - The GTM User ID.
     pub fn permissions_delete(&self, account_id: &str, permission_id: &str) -> AccountPermissionDeleteCall<'a, C, NC, A> {
         AccountPermissionDeleteCall {
             hub: self.hub,
@@ -1331,7 +1364,12 @@ impl<'a, C, NC, A> AccountMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Gets a Container.    
+    /// Gets a Container.
+    /// 
+    /// # Arguments
+    ///
+    /// * `accountId` - The GTM Account ID.
+    /// * `containerId` - The GTM Container ID.
     pub fn containers_get(&self, account_id: &str, container_id: &str) -> AccountContainerGetCall<'a, C, NC, A> {
         AccountContainerGetCall {
             hub: self.hub,
@@ -1345,7 +1383,12 @@ impl<'a, C, NC, A> AccountMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Lists all Container Versions of a GTM Container.    
+    /// Lists all Container Versions of a GTM Container.
+    /// 
+    /// # Arguments
+    ///
+    /// * `accountId` - The GTM Account ID.
+    /// * `containerId` - The GTM Container ID.
     pub fn containers_versions_list(&self, account_id: &str, container_id: &str) -> AccountContainerVersionListCall<'a, C, NC, A> {
         AccountContainerVersionListCall {
             hub: self.hub,
@@ -1360,7 +1403,14 @@ impl<'a, C, NC, A> AccountMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Updates a GTM Trigger.    
+    /// Updates a GTM Trigger.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `accountId` - The GTM Account ID.
+    /// * `containerId` - The GTM Container ID.
+    /// * `triggerId` - The GTM Trigger ID.
     pub fn containers_triggers_update(&self, request: &Trigger, account_id: &str, container_id: &str, trigger_id: &str) -> AccountContainerTriggerUpdateCall<'a, C, NC, A> {
         AccountContainerTriggerUpdateCall {
             hub: self.hub,
@@ -1377,7 +1427,13 @@ impl<'a, C, NC, A> AccountMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Gets a GTM Trigger.    
+    /// Gets a GTM Trigger.
+    /// 
+    /// # Arguments
+    ///
+    /// * `accountId` - The GTM Account ID.
+    /// * `containerId` - The GTM Container ID.
+    /// * `triggerId` - The GTM Trigger ID.
     pub fn containers_triggers_get(&self, account_id: &str, container_id: &str, trigger_id: &str) -> AccountContainerTriggerGetCall<'a, C, NC, A> {
         AccountContainerTriggerGetCall {
             hub: self.hub,
@@ -1392,7 +1448,12 @@ impl<'a, C, NC, A> AccountMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Deletes a Container.    
+    /// Deletes a Container.
+    /// 
+    /// # Arguments
+    ///
+    /// * `accountId` - The GTM Account ID.
+    /// * `containerId` - The GTM Container ID.
     pub fn containers_delete(&self, account_id: &str, container_id: &str) -> AccountContainerDeleteCall<'a, C, NC, A> {
         AccountContainerDeleteCall {
             hub: self.hub,
@@ -1406,7 +1467,12 @@ impl<'a, C, NC, A> AccountMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Creates a Container.    
+    /// Creates a Container.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `accountId` - The GTM Account ID.
     pub fn containers_create(&self, request: &Container, account_id: &str) -> AccountContainerCreateCall<'a, C, NC, A> {
         AccountContainerCreateCall {
             hub: self.hub,
@@ -1420,7 +1486,13 @@ impl<'a, C, NC, A> AccountMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Deletes a GTM Tag.    
+    /// Deletes a GTM Tag.
+    /// 
+    /// # Arguments
+    ///
+    /// * `accountId` - The GTM Account ID.
+    /// * `containerId` - The GTM Container ID.
+    /// * `tagId` - The GTM Tag ID.
     pub fn containers_tags_delete(&self, account_id: &str, container_id: &str, tag_id: &str) -> AccountContainerTagDeleteCall<'a, C, NC, A> {
         AccountContainerTagDeleteCall {
             hub: self.hub,
@@ -1435,7 +1507,14 @@ impl<'a, C, NC, A> AccountMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Updates a GTM Rule.    
+    /// Updates a GTM Rule.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `accountId` - The GTM Account ID.
+    /// * `containerId` - The GTM Container ID.
+    /// * `ruleId` - The GTM Rule ID.
     pub fn containers_rules_update(&self, request: &Rule, account_id: &str, container_id: &str, rule_id: &str) -> AccountContainerRuleUpdateCall<'a, C, NC, A> {
         AccountContainerRuleUpdateCall {
             hub: self.hub,
@@ -1452,7 +1531,13 @@ impl<'a, C, NC, A> AccountMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Deletes a GTM Rule.    
+    /// Deletes a GTM Rule.
+    /// 
+    /// # Arguments
+    ///
+    /// * `accountId` - The GTM Account ID.
+    /// * `containerId` - The GTM Container ID.
+    /// * `ruleId` - The GTM Rule ID.
     pub fn containers_rules_delete(&self, account_id: &str, container_id: &str, rule_id: &str) -> AccountContainerRuleDeleteCall<'a, C, NC, A> {
         AccountContainerRuleDeleteCall {
             hub: self.hub,
@@ -1467,7 +1552,12 @@ impl<'a, C, NC, A> AccountMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Lists all GTM Tags of a Container.    
+    /// Lists all GTM Tags of a Container.
+    /// 
+    /// # Arguments
+    ///
+    /// * `accountId` - The GTM Account ID.
+    /// * `containerId` - The GTM Container ID.
     pub fn containers_tags_list(&self, account_id: &str, container_id: &str) -> AccountContainerTagListCall<'a, C, NC, A> {
         AccountContainerTagListCall {
             hub: self.hub,
@@ -1481,7 +1571,13 @@ impl<'a, C, NC, A> AccountMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Publishes a Container Version.    
+    /// Publishes a Container Version.
+    /// 
+    /// # Arguments
+    ///
+    /// * `accountId` - The GTM Account ID.
+    /// * `containerId` - The GTM Container ID.
+    /// * `containerVersionId` - The GTM Container Version ID.
     pub fn containers_versions_publish(&self, account_id: &str, container_id: &str, container_version_id: &str) -> AccountContainerVersionPublishCall<'a, C, NC, A> {
         AccountContainerVersionPublishCall {
             hub: self.hub,
@@ -1497,7 +1593,13 @@ impl<'a, C, NC, A> AccountMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Creates a GTM Tag.    
+    /// Creates a GTM Tag.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `accountId` - The GTM Account ID.
+    /// * `containerId` - The GTM Container ID.
     pub fn containers_tags_create(&self, request: &Tag, account_id: &str, container_id: &str) -> AccountContainerTagCreateCall<'a, C, NC, A> {
         AccountContainerTagCreateCall {
             hub: self.hub,
@@ -1512,7 +1614,12 @@ impl<'a, C, NC, A> AccountMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Lists all GTM Triggers of a Container.    
+    /// Lists all GTM Triggers of a Container.
+    /// 
+    /// # Arguments
+    ///
+    /// * `accountId` - The GTM Account ID.
+    /// * `containerId` - The GTM Container ID.
     pub fn containers_triggers_list(&self, account_id: &str, container_id: &str) -> AccountContainerTriggerListCall<'a, C, NC, A> {
         AccountContainerTriggerListCall {
             hub: self.hub,
@@ -1526,7 +1633,13 @@ impl<'a, C, NC, A> AccountMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Deletes a Container Version.    
+    /// Deletes a Container Version.
+    /// 
+    /// # Arguments
+    ///
+    /// * `accountId` - The GTM Account ID.
+    /// * `containerId` - The GTM Container ID.
+    /// * `containerVersionId` - The GTM Container Version ID.
     pub fn containers_versions_delete(&self, account_id: &str, container_id: &str, container_version_id: &str) -> AccountContainerVersionDeleteCall<'a, C, NC, A> {
         AccountContainerVersionDeleteCall {
             hub: self.hub,
@@ -1541,7 +1654,12 @@ impl<'a, C, NC, A> AccountMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Updates a GTM Account.    
+    /// Updates a GTM Account.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `accountId` - The GTM Account ID.
     pub fn update(&self, request: &Account, account_id: &str) -> AccountUpdateCall<'a, C, NC, A> {
         AccountUpdateCall {
             hub: self.hub,
@@ -1556,7 +1674,13 @@ impl<'a, C, NC, A> AccountMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Deletes a GTM Macro.    
+    /// Deletes a GTM Macro.
+    /// 
+    /// # Arguments
+    ///
+    /// * `accountId` - The GTM Account ID.
+    /// * `containerId` - The GTM Container ID.
+    /// * `macroId` - The GTM Macro ID.
     pub fn containers_macros_delete(&self, account_id: &str, container_id: &str, macro_id: &str) -> AccountContainerMacroDeleteCall<'a, C, NC, A> {
         AccountContainerMacroDeleteCall {
             hub: self.hub,
@@ -1571,7 +1695,13 @@ impl<'a, C, NC, A> AccountMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Creates a Container Version.    
+    /// Creates a Container Version.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `accountId` - The GTM Account ID.
+    /// * `containerId` - The GTM Container ID.
     pub fn containers_versions_create(&self, request: &CreateContainerVersionRequestVersionOptions, account_id: &str, container_id: &str) -> AccountContainerVersionCreateCall<'a, C, NC, A> {
         AccountContainerVersionCreateCall {
             hub: self.hub,
@@ -1586,7 +1716,12 @@ impl<'a, C, NC, A> AccountMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Gets a user's Account & Container Permissions.    
+    /// Gets a user's Account & Container Permissions.
+    /// 
+    /// # Arguments
+    ///
+    /// * `accountId` - The GTM Account ID.
+    /// * `permissionId` - The GTM User ID.
     pub fn permissions_get(&self, account_id: &str, permission_id: &str) -> AccountPermissionGetCall<'a, C, NC, A> {
         AccountPermissionGetCall {
             hub: self.hub,
@@ -1600,7 +1735,13 @@ impl<'a, C, NC, A> AccountMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Creates a GTM Rule.    
+    /// Creates a GTM Rule.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `accountId` - The GTM Account ID.
+    /// * `containerId` - The GTM Container ID.
     pub fn containers_rules_create(&self, request: &Rule, account_id: &str, container_id: &str) -> AccountContainerRuleCreateCall<'a, C, NC, A> {
         AccountContainerRuleCreateCall {
             hub: self.hub,
@@ -1615,7 +1756,13 @@ impl<'a, C, NC, A> AccountMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Restores a Container Version. This will overwrite the container's current configuration (including its macros, rules and tags). The operation will not have any effect on the version that is being served (i.e. the published version).    
+    /// Restores a Container Version. This will overwrite the container's current configuration (including its macros, rules and tags). The operation will not have any effect on the version that is being served (i.e. the published version).
+    /// 
+    /// # Arguments
+    ///
+    /// * `accountId` - The GTM Account ID.
+    /// * `containerId` - The GTM Container ID.
+    /// * `containerVersionId` - The GTM Container Version ID.
     pub fn containers_versions_restore(&self, account_id: &str, container_id: &str, container_version_id: &str) -> AccountContainerVersionRestoreCall<'a, C, NC, A> {
         AccountContainerVersionRestoreCall {
             hub: self.hub,
@@ -1630,7 +1777,13 @@ impl<'a, C, NC, A> AccountMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Gets a GTM Rule.    
+    /// Gets a GTM Rule.
+    /// 
+    /// # Arguments
+    ///
+    /// * `accountId` - The GTM Account ID.
+    /// * `containerId` - The GTM Container ID.
+    /// * `ruleId` - The GTM Rule ID.
     pub fn containers_rules_get(&self, account_id: &str, container_id: &str, rule_id: &str) -> AccountContainerRuleGetCall<'a, C, NC, A> {
         AccountContainerRuleGetCall {
             hub: self.hub,
@@ -1645,7 +1798,13 @@ impl<'a, C, NC, A> AccountMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Creates a GTM Variable.    
+    /// Creates a GTM Variable.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `accountId` - The GTM Account ID.
+    /// * `containerId` - The GTM Container ID.
     pub fn containers_variables_create(&self, request: &Variable, account_id: &str, container_id: &str) -> AccountContainerVariableCreateCall<'a, C, NC, A> {
         AccountContainerVariableCreateCall {
             hub: self.hub,
@@ -1660,7 +1819,12 @@ impl<'a, C, NC, A> AccountMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Lists all GTM Variables of a Container.    
+    /// Lists all GTM Variables of a Container.
+    /// 
+    /// # Arguments
+    ///
+    /// * `accountId` - The GTM Account ID.
+    /// * `containerId` - The GTM Container ID.
     pub fn containers_variables_list(&self, account_id: &str, container_id: &str) -> AccountContainerVariableListCall<'a, C, NC, A> {
         AccountContainerVariableListCall {
             hub: self.hub,
@@ -1674,7 +1838,13 @@ impl<'a, C, NC, A> AccountMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Creates a GTM Macro.    
+    /// Creates a GTM Macro.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `accountId` - The GTM Account ID.
+    /// * `containerId` - The GTM Container ID.
     pub fn containers_macros_create(&self, request: &Macro, account_id: &str, container_id: &str) -> AccountContainerMacroCreateCall<'a, C, NC, A> {
         AccountContainerMacroCreateCall {
             hub: self.hub,
@@ -1689,7 +1859,13 @@ impl<'a, C, NC, A> AccountMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Gets a GTM Tag.    
+    /// Gets a GTM Tag.
+    /// 
+    /// # Arguments
+    ///
+    /// * `accountId` - The GTM Account ID.
+    /// * `containerId` - The GTM Container ID.
+    /// * `tagId` - The GTM Tag ID.
     pub fn containers_tags_get(&self, account_id: &str, container_id: &str, tag_id: &str) -> AccountContainerTagGetCall<'a, C, NC, A> {
         AccountContainerTagGetCall {
             hub: self.hub,
@@ -1704,7 +1880,13 @@ impl<'a, C, NC, A> AccountMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Gets a GTM Variable.    
+    /// Gets a GTM Variable.
+    /// 
+    /// # Arguments
+    ///
+    /// * `accountId` - The GTM Account ID.
+    /// * `containerId` - The GTM Container ID.
+    /// * `variableId` - The GTM Variable ID.
     pub fn containers_variables_get(&self, account_id: &str, container_id: &str, variable_id: &str) -> AccountContainerVariableGetCall<'a, C, NC, A> {
         AccountContainerVariableGetCall {
             hub: self.hub,
@@ -1719,7 +1901,13 @@ impl<'a, C, NC, A> AccountMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Deletes a GTM Trigger.    
+    /// Deletes a GTM Trigger.
+    /// 
+    /// # Arguments
+    ///
+    /// * `accountId` - The GTM Account ID.
+    /// * `containerId` - The GTM Container ID.
+    /// * `triggerId` - The GTM Trigger ID.
     pub fn containers_triggers_delete(&self, account_id: &str, container_id: &str, trigger_id: &str) -> AccountContainerTriggerDeleteCall<'a, C, NC, A> {
         AccountContainerTriggerDeleteCall {
             hub: self.hub,
@@ -1734,7 +1922,12 @@ impl<'a, C, NC, A> AccountMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Lists all GTM Macros of a Container.    
+    /// Lists all GTM Macros of a Container.
+    /// 
+    /// # Arguments
+    ///
+    /// * `accountId` - The GTM Account ID.
+    /// * `containerId` - The GTM Container ID.
     pub fn containers_macros_list(&self, account_id: &str, container_id: &str) -> AccountContainerMacroListCall<'a, C, NC, A> {
         AccountContainerMacroListCall {
             hub: self.hub,
@@ -1748,7 +1941,13 @@ impl<'a, C, NC, A> AccountMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Creates a GTM Trigger.    
+    /// Creates a GTM Trigger.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `accountId` - The GTM Account ID.
+    /// * `containerId` - The GTM Container ID.
     pub fn containers_triggers_create(&self, request: &Trigger, account_id: &str, container_id: &str) -> AccountContainerTriggerCreateCall<'a, C, NC, A> {
         AccountContainerTriggerCreateCall {
             hub: self.hub,
@@ -1763,7 +1962,14 @@ impl<'a, C, NC, A> AccountMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Updates a GTM Macro.    
+    /// Updates a GTM Macro.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `accountId` - The GTM Account ID.
+    /// * `containerId` - The GTM Container ID.
+    /// * `macroId` - The GTM Macro ID.
     pub fn containers_macros_update(&self, request: &Macro, account_id: &str, container_id: &str, macro_id: &str) -> AccountContainerMacroUpdateCall<'a, C, NC, A> {
         AccountContainerMacroUpdateCall {
             hub: self.hub,
@@ -1780,7 +1986,7 @@ impl<'a, C, NC, A> AccountMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Lists all GTM Accounts that a user has access to.    
+    /// Lists all GTM Accounts that a user has access to.
     pub fn list(&self) -> AccountListCall<'a, C, NC, A> {
         AccountListCall {
             hub: self.hub,
@@ -1792,7 +1998,13 @@ impl<'a, C, NC, A> AccountMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Updates a user's Account & Container Permissions.    
+    /// Updates a user's Account & Container Permissions.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `accountId` - The GTM Account ID.
+    /// * `permissionId` - The GTM User ID.
     pub fn permissions_update(&self, request: &UserAccess, account_id: &str, permission_id: &str) -> AccountPermissionUpdateCall<'a, C, NC, A> {
         AccountPermissionUpdateCall {
             hub: self.hub,
@@ -1807,7 +2019,13 @@ impl<'a, C, NC, A> AccountMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Deletes a GTM Variable.    
+    /// Deletes a GTM Variable.
+    /// 
+    /// # Arguments
+    ///
+    /// * `accountId` - The GTM Account ID.
+    /// * `containerId` - The GTM Container ID.
+    /// * `variableId` - The GTM Variable ID.
     pub fn containers_variables_delete(&self, account_id: &str, container_id: &str, variable_id: &str) -> AccountContainerVariableDeleteCall<'a, C, NC, A> {
         AccountContainerVariableDeleteCall {
             hub: self.hub,
@@ -1822,7 +2040,11 @@ impl<'a, C, NC, A> AccountMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Gets a GTM Account.    
+    /// Gets a GTM Account.
+    /// 
+    /// # Arguments
+    ///
+    /// * `accountId` - The GTM Account ID.
     pub fn get(&self, account_id: &str) -> AccountGetCall<'a, C, NC, A> {
         AccountGetCall {
             hub: self.hub,
@@ -1835,7 +2057,13 @@ impl<'a, C, NC, A> AccountMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Updates a Container.    
+    /// Updates a Container.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `accountId` - The GTM Account ID.
+    /// * `containerId` - The GTM Container ID.
     pub fn containers_update(&self, request: &Container, account_id: &str, container_id: &str) -> AccountContainerUpdateCall<'a, C, NC, A> {
         AccountContainerUpdateCall {
             hub: self.hub,
@@ -1851,7 +2079,12 @@ impl<'a, C, NC, A> AccountMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Lists all GTM Rules of a Container.    
+    /// Lists all GTM Rules of a Container.
+    /// 
+    /// # Arguments
+    ///
+    /// * `accountId` - The GTM Account ID.
+    /// * `containerId` - The GTM Container ID.
     pub fn containers_rules_list(&self, account_id: &str, container_id: &str) -> AccountContainerRuleListCall<'a, C, NC, A> {
         AccountContainerRuleListCall {
             hub: self.hub,
@@ -1865,7 +2098,14 @@ impl<'a, C, NC, A> AccountMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Updates a GTM Tag.    
+    /// Updates a GTM Tag.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `accountId` - The GTM Account ID.
+    /// * `containerId` - The GTM Container ID.
+    /// * `tagId` - The GTM Tag ID.
     pub fn containers_tags_update(&self, request: &Tag, account_id: &str, container_id: &str, tag_id: &str) -> AccountContainerTagUpdateCall<'a, C, NC, A> {
         AccountContainerTagUpdateCall {
             hub: self.hub,
@@ -1882,7 +2122,13 @@ impl<'a, C, NC, A> AccountMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Gets a GTM Macro.    
+    /// Gets a GTM Macro.
+    /// 
+    /// # Arguments
+    ///
+    /// * `accountId` - The GTM Account ID.
+    /// * `containerId` - The GTM Container ID.
+    /// * `macroId` - The GTM Macro ID.
     pub fn containers_macros_get(&self, account_id: &str, container_id: &str, macro_id: &str) -> AccountContainerMacroGetCall<'a, C, NC, A> {
         AccountContainerMacroGetCall {
             hub: self.hub,
@@ -1897,7 +2143,14 @@ impl<'a, C, NC, A> AccountMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Updates a Container Version.    
+    /// Updates a Container Version.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `accountId` - The GTM Account ID.
+    /// * `containerId` - The GTM Container ID.
+    /// * `containerVersionId` - The GTM Container Version ID.
     pub fn containers_versions_update(&self, request: &ContainerVersion, account_id: &str, container_id: &str, container_version_id: &str) -> AccountContainerVersionUpdateCall<'a, C, NC, A> {
         AccountContainerVersionUpdateCall {
             hub: self.hub,
@@ -1914,7 +2167,14 @@ impl<'a, C, NC, A> AccountMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Updates a GTM Variable.    
+    /// Updates a GTM Variable.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `accountId` - The GTM Account ID.
+    /// * `containerId` - The GTM Container ID.
+    /// * `variableId` - The GTM Variable ID.
     pub fn containers_variables_update(&self, request: &Variable, account_id: &str, container_id: &str, variable_id: &str) -> AccountContainerVariableUpdateCall<'a, C, NC, A> {
         AccountContainerVariableUpdateCall {
             hub: self.hub,
@@ -1931,7 +2191,13 @@ impl<'a, C, NC, A> AccountMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Gets a Container Version.    
+    /// Gets a Container Version.
+    /// 
+    /// # Arguments
+    ///
+    /// * `accountId` - The GTM Account ID.
+    /// * `containerId` - The GTM Container ID.
+    /// * `containerVersionId` - The GTM Container Version ID. Specify published to retrieve the currently published version.
     pub fn containers_versions_get(&self, account_id: &str, container_id: &str, container_version_id: &str) -> AccountContainerVersionGetCall<'a, C, NC, A> {
         AccountContainerVersionGetCall {
             hub: self.hub,
@@ -1956,7 +2222,7 @@ impl<'a, C, NC, A> AccountMethods<'a, C, NC, A> {
 /// Lists all Containers that belongs to a GTM Account.
 ///
 /// A builder for the *containers.list* method supported by a *account* resource.
-/// It is not used directly, but through a `AccountMethods`.
+/// It is not used directly, but through a `AccountMethods` instance.
 ///
 /// # Example
 ///
@@ -2014,7 +2280,7 @@ impl<'a, C, NC, A> AccountContainerListCall<'a, C, NC, A> where NC: hyper::net::
         for &field in ["alt", "accountId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -2067,7 +2333,7 @@ impl<'a, C, NC, A> AccountContainerListCall<'a, C, NC, A> where NC: hyper::net::
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -2079,7 +2345,6 @@ impl<'a, C, NC, A> AccountContainerListCall<'a, C, NC, A> where NC: hyper::net::
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -2089,7 +2354,7 @@ impl<'a, C, NC, A> AccountContainerListCall<'a, C, NC, A> where NC: hyper::net::
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -2100,7 +2365,7 @@ impl<'a, C, NC, A> AccountContainerListCall<'a, C, NC, A> where NC: hyper::net::
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -2109,13 +2374,13 @@ impl<'a, C, NC, A> AccountContainerListCall<'a, C, NC, A> where NC: hyper::net::
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -2127,7 +2392,7 @@ impl<'a, C, NC, A> AccountContainerListCall<'a, C, NC, A> where NC: hyper::net::
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The GTM Account ID.    
+    /// The GTM Account ID.
     pub fn account_id(mut self, new_value: &str) -> AccountContainerListCall<'a, C, NC, A> {
         self._account_id = new_value.to_string();
         self
@@ -2188,7 +2453,7 @@ impl<'a, C, NC, A> AccountContainerListCall<'a, C, NC, A> where NC: hyper::net::
 /// List all users that have access to the account along with Account and Container Permissions granted to each of them.
 ///
 /// A builder for the *permissions.list* method supported by a *account* resource.
-/// It is not used directly, but through a `AccountMethods`.
+/// It is not used directly, but through a `AccountMethods` instance.
 ///
 /// # Example
 ///
@@ -2246,7 +2511,7 @@ impl<'a, C, NC, A> AccountPermissionListCall<'a, C, NC, A> where NC: hyper::net:
         for &field in ["alt", "accountId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -2299,7 +2564,7 @@ impl<'a, C, NC, A> AccountPermissionListCall<'a, C, NC, A> where NC: hyper::net:
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -2311,7 +2576,6 @@ impl<'a, C, NC, A> AccountPermissionListCall<'a, C, NC, A> where NC: hyper::net:
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -2321,7 +2585,7 @@ impl<'a, C, NC, A> AccountPermissionListCall<'a, C, NC, A> where NC: hyper::net:
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -2332,7 +2596,7 @@ impl<'a, C, NC, A> AccountPermissionListCall<'a, C, NC, A> where NC: hyper::net:
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -2341,13 +2605,13 @@ impl<'a, C, NC, A> AccountPermissionListCall<'a, C, NC, A> where NC: hyper::net:
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -2359,7 +2623,7 @@ impl<'a, C, NC, A> AccountPermissionListCall<'a, C, NC, A> where NC: hyper::net:
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The GTM Account ID. @required tagmanager.accounts.permissions.list    
+    /// The GTM Account ID. @required tagmanager.accounts.permissions.list
     pub fn account_id(mut self, new_value: &str) -> AccountPermissionListCall<'a, C, NC, A> {
         self._account_id = new_value.to_string();
         self
@@ -2420,7 +2684,7 @@ impl<'a, C, NC, A> AccountPermissionListCall<'a, C, NC, A> where NC: hyper::net:
 /// Undeletes a Container Version.
 ///
 /// A builder for the *containers.versions.undelete* method supported by a *account* resource.
-/// It is not used directly, but through a `AccountMethods`.
+/// It is not used directly, but through a `AccountMethods` instance.
 ///
 /// # Example
 ///
@@ -2482,7 +2746,7 @@ impl<'a, C, NC, A> AccountContainerVersionUndeleteCall<'a, C, NC, A> where NC: h
         for &field in ["alt", "accountId", "containerId", "containerVersionId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -2535,7 +2799,7 @@ impl<'a, C, NC, A> AccountContainerVersionUndeleteCall<'a, C, NC, A> where NC: h
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -2547,7 +2811,6 @@ impl<'a, C, NC, A> AccountContainerVersionUndeleteCall<'a, C, NC, A> where NC: h
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -2557,7 +2820,7 @@ impl<'a, C, NC, A> AccountContainerVersionUndeleteCall<'a, C, NC, A> where NC: h
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -2568,7 +2831,7 @@ impl<'a, C, NC, A> AccountContainerVersionUndeleteCall<'a, C, NC, A> where NC: h
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -2577,13 +2840,13 @@ impl<'a, C, NC, A> AccountContainerVersionUndeleteCall<'a, C, NC, A> where NC: h
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -2595,7 +2858,7 @@ impl<'a, C, NC, A> AccountContainerVersionUndeleteCall<'a, C, NC, A> where NC: h
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The GTM Account ID.    
+    /// The GTM Account ID.
     pub fn account_id(mut self, new_value: &str) -> AccountContainerVersionUndeleteCall<'a, C, NC, A> {
         self._account_id = new_value.to_string();
         self
@@ -2605,7 +2868,7 @@ impl<'a, C, NC, A> AccountContainerVersionUndeleteCall<'a, C, NC, A> where NC: h
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The GTM Container ID.    
+    /// The GTM Container ID.
     pub fn container_id(mut self, new_value: &str) -> AccountContainerVersionUndeleteCall<'a, C, NC, A> {
         self._container_id = new_value.to_string();
         self
@@ -2615,7 +2878,7 @@ impl<'a, C, NC, A> AccountContainerVersionUndeleteCall<'a, C, NC, A> where NC: h
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The GTM Container Version ID.    
+    /// The GTM Container Version ID.
     pub fn container_version_id(mut self, new_value: &str) -> AccountContainerVersionUndeleteCall<'a, C, NC, A> {
         self._container_version_id = new_value.to_string();
         self
@@ -2676,7 +2939,7 @@ impl<'a, C, NC, A> AccountContainerVersionUndeleteCall<'a, C, NC, A> where NC: h
 /// Creates a user's Account & Container Permissions.
 ///
 /// A builder for the *permissions.create* method supported by a *account* resource.
-/// It is not used directly, but through a `AccountMethods`.
+/// It is not used directly, but through a `AccountMethods` instance.
 ///
 /// # Example
 ///
@@ -2741,7 +3004,7 @@ impl<'a, C, NC, A> AccountPermissionCreateCall<'a, C, NC, A> where NC: hyper::ne
         for &field in ["alt", "accountId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -2798,7 +3061,7 @@ impl<'a, C, NC, A> AccountPermissionCreateCall<'a, C, NC, A> where NC: hyper::ne
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -2814,7 +3077,6 @@ impl<'a, C, NC, A> AccountPermissionCreateCall<'a, C, NC, A> where NC: hyper::ne
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -2824,7 +3086,7 @@ impl<'a, C, NC, A> AccountPermissionCreateCall<'a, C, NC, A> where NC: hyper::ne
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -2835,7 +3097,7 @@ impl<'a, C, NC, A> AccountPermissionCreateCall<'a, C, NC, A> where NC: hyper::ne
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -2844,13 +3106,13 @@ impl<'a, C, NC, A> AccountPermissionCreateCall<'a, C, NC, A> where NC: hyper::ne
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -2871,7 +3133,7 @@ impl<'a, C, NC, A> AccountPermissionCreateCall<'a, C, NC, A> where NC: hyper::ne
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The GTM Account ID.    
+    /// The GTM Account ID.
     pub fn account_id(mut self, new_value: &str) -> AccountPermissionCreateCall<'a, C, NC, A> {
         self._account_id = new_value.to_string();
         self
@@ -2932,7 +3194,7 @@ impl<'a, C, NC, A> AccountPermissionCreateCall<'a, C, NC, A> where NC: hyper::ne
 /// Removes a user from the account, revoking access to it and all of its containers.
 ///
 /// A builder for the *permissions.delete* method supported by a *account* resource.
-/// It is not used directly, but through a `AccountMethods`.
+/// It is not used directly, but through a `AccountMethods` instance.
 ///
 /// # Example
 ///
@@ -2992,7 +3254,7 @@ impl<'a, C, NC, A> AccountPermissionDeleteCall<'a, C, NC, A> where NC: hyper::ne
         for &field in ["accountId", "permissionId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -3044,7 +3306,7 @@ impl<'a, C, NC, A> AccountPermissionDeleteCall<'a, C, NC, A> where NC: hyper::ne
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -3056,7 +3318,6 @@ impl<'a, C, NC, A> AccountPermissionDeleteCall<'a, C, NC, A> where NC: hyper::ne
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -3066,7 +3327,7 @@ impl<'a, C, NC, A> AccountPermissionDeleteCall<'a, C, NC, A> where NC: hyper::ne
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -3077,12 +3338,12 @@ impl<'a, C, NC, A> AccountPermissionDeleteCall<'a, C, NC, A> where NC: hyper::ne
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = res;
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -3094,7 +3355,7 @@ impl<'a, C, NC, A> AccountPermissionDeleteCall<'a, C, NC, A> where NC: hyper::ne
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The GTM Account ID.    
+    /// The GTM Account ID.
     pub fn account_id(mut self, new_value: &str) -> AccountPermissionDeleteCall<'a, C, NC, A> {
         self._account_id = new_value.to_string();
         self
@@ -3104,7 +3365,7 @@ impl<'a, C, NC, A> AccountPermissionDeleteCall<'a, C, NC, A> where NC: hyper::ne
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The GTM User ID.    
+    /// The GTM User ID.
     pub fn permission_id(mut self, new_value: &str) -> AccountPermissionDeleteCall<'a, C, NC, A> {
         self._permission_id = new_value.to_string();
         self
@@ -3165,7 +3426,7 @@ impl<'a, C, NC, A> AccountPermissionDeleteCall<'a, C, NC, A> where NC: hyper::ne
 /// Gets a Container.
 ///
 /// A builder for the *containers.get* method supported by a *account* resource.
-/// It is not used directly, but through a `AccountMethods`.
+/// It is not used directly, but through a `AccountMethods` instance.
 ///
 /// # Example
 ///
@@ -3225,7 +3486,7 @@ impl<'a, C, NC, A> AccountContainerGetCall<'a, C, NC, A> where NC: hyper::net::N
         for &field in ["alt", "accountId", "containerId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -3278,7 +3539,7 @@ impl<'a, C, NC, A> AccountContainerGetCall<'a, C, NC, A> where NC: hyper::net::N
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -3290,7 +3551,6 @@ impl<'a, C, NC, A> AccountContainerGetCall<'a, C, NC, A> where NC: hyper::net::N
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -3300,7 +3560,7 @@ impl<'a, C, NC, A> AccountContainerGetCall<'a, C, NC, A> where NC: hyper::net::N
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -3311,7 +3571,7 @@ impl<'a, C, NC, A> AccountContainerGetCall<'a, C, NC, A> where NC: hyper::net::N
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -3320,13 +3580,13 @@ impl<'a, C, NC, A> AccountContainerGetCall<'a, C, NC, A> where NC: hyper::net::N
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -3338,7 +3598,7 @@ impl<'a, C, NC, A> AccountContainerGetCall<'a, C, NC, A> where NC: hyper::net::N
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The GTM Account ID.    
+    /// The GTM Account ID.
     pub fn account_id(mut self, new_value: &str) -> AccountContainerGetCall<'a, C, NC, A> {
         self._account_id = new_value.to_string();
         self
@@ -3348,7 +3608,7 @@ impl<'a, C, NC, A> AccountContainerGetCall<'a, C, NC, A> where NC: hyper::net::N
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The GTM Container ID.    
+    /// The GTM Container ID.
     pub fn container_id(mut self, new_value: &str) -> AccountContainerGetCall<'a, C, NC, A> {
         self._container_id = new_value.to_string();
         self
@@ -3409,7 +3669,7 @@ impl<'a, C, NC, A> AccountContainerGetCall<'a, C, NC, A> where NC: hyper::net::N
 /// Lists all Container Versions of a GTM Container.
 ///
 /// A builder for the *containers.versions.list* method supported by a *account* resource.
-/// It is not used directly, but through a `AccountMethods`.
+/// It is not used directly, but through a `AccountMethods` instance.
 ///
 /// # Example
 ///
@@ -3474,7 +3734,7 @@ impl<'a, C, NC, A> AccountContainerVersionListCall<'a, C, NC, A> where NC: hyper
         for &field in ["alt", "accountId", "containerId", "headers"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -3527,7 +3787,7 @@ impl<'a, C, NC, A> AccountContainerVersionListCall<'a, C, NC, A> where NC: hyper
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -3539,7 +3799,6 @@ impl<'a, C, NC, A> AccountContainerVersionListCall<'a, C, NC, A> where NC: hyper
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -3549,7 +3808,7 @@ impl<'a, C, NC, A> AccountContainerVersionListCall<'a, C, NC, A> where NC: hyper
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -3560,7 +3819,7 @@ impl<'a, C, NC, A> AccountContainerVersionListCall<'a, C, NC, A> where NC: hyper
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -3569,13 +3828,13 @@ impl<'a, C, NC, A> AccountContainerVersionListCall<'a, C, NC, A> where NC: hyper
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -3587,7 +3846,7 @@ impl<'a, C, NC, A> AccountContainerVersionListCall<'a, C, NC, A> where NC: hyper
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The GTM Account ID.    
+    /// The GTM Account ID.
     pub fn account_id(mut self, new_value: &str) -> AccountContainerVersionListCall<'a, C, NC, A> {
         self._account_id = new_value.to_string();
         self
@@ -3597,7 +3856,7 @@ impl<'a, C, NC, A> AccountContainerVersionListCall<'a, C, NC, A> where NC: hyper
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The GTM Container ID.    
+    /// The GTM Container ID.
     pub fn container_id(mut self, new_value: &str) -> AccountContainerVersionListCall<'a, C, NC, A> {
         self._container_id = new_value.to_string();
         self
@@ -3605,7 +3864,7 @@ impl<'a, C, NC, A> AccountContainerVersionListCall<'a, C, NC, A> where NC: hyper
     /// Sets the *headers* query property to the given value.
     ///
     /// 
-    /// Retrieve headers only when true.    
+    /// Retrieve headers only when true.
     pub fn headers(mut self, new_value: bool) -> AccountContainerVersionListCall<'a, C, NC, A> {
         self._headers = Some(new_value);
         self
@@ -3666,7 +3925,7 @@ impl<'a, C, NC, A> AccountContainerVersionListCall<'a, C, NC, A> where NC: hyper
 /// Updates a GTM Trigger.
 ///
 /// A builder for the *containers.triggers.update* method supported by a *account* resource.
-/// It is not used directly, but through a `AccountMethods`.
+/// It is not used directly, but through a `AccountMethods` instance.
 ///
 /// # Example
 ///
@@ -3740,7 +3999,7 @@ impl<'a, C, NC, A> AccountContainerTriggerUpdateCall<'a, C, NC, A> where NC: hyp
         for &field in ["alt", "accountId", "containerId", "triggerId", "fingerprint"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -3797,7 +4056,7 @@ impl<'a, C, NC, A> AccountContainerTriggerUpdateCall<'a, C, NC, A> where NC: hyp
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -3813,7 +4072,6 @@ impl<'a, C, NC, A> AccountContainerTriggerUpdateCall<'a, C, NC, A> where NC: hyp
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -3823,7 +4081,7 @@ impl<'a, C, NC, A> AccountContainerTriggerUpdateCall<'a, C, NC, A> where NC: hyp
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -3834,7 +4092,7 @@ impl<'a, C, NC, A> AccountContainerTriggerUpdateCall<'a, C, NC, A> where NC: hyp
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -3843,13 +4101,13 @@ impl<'a, C, NC, A> AccountContainerTriggerUpdateCall<'a, C, NC, A> where NC: hyp
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -3870,7 +4128,7 @@ impl<'a, C, NC, A> AccountContainerTriggerUpdateCall<'a, C, NC, A> where NC: hyp
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The GTM Account ID.    
+    /// The GTM Account ID.
     pub fn account_id(mut self, new_value: &str) -> AccountContainerTriggerUpdateCall<'a, C, NC, A> {
         self._account_id = new_value.to_string();
         self
@@ -3880,7 +4138,7 @@ impl<'a, C, NC, A> AccountContainerTriggerUpdateCall<'a, C, NC, A> where NC: hyp
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The GTM Container ID.    
+    /// The GTM Container ID.
     pub fn container_id(mut self, new_value: &str) -> AccountContainerTriggerUpdateCall<'a, C, NC, A> {
         self._container_id = new_value.to_string();
         self
@@ -3890,7 +4148,7 @@ impl<'a, C, NC, A> AccountContainerTriggerUpdateCall<'a, C, NC, A> where NC: hyp
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The GTM Trigger ID.    
+    /// The GTM Trigger ID.
     pub fn trigger_id(mut self, new_value: &str) -> AccountContainerTriggerUpdateCall<'a, C, NC, A> {
         self._trigger_id = new_value.to_string();
         self
@@ -3898,7 +4156,7 @@ impl<'a, C, NC, A> AccountContainerTriggerUpdateCall<'a, C, NC, A> where NC: hyp
     /// Sets the *fingerprint* query property to the given value.
     ///
     /// 
-    /// When provided, this fingerprint must match the fingerprint of the trigger in storage.    
+    /// When provided, this fingerprint must match the fingerprint of the trigger in storage.
     pub fn fingerprint(mut self, new_value: &str) -> AccountContainerTriggerUpdateCall<'a, C, NC, A> {
         self._fingerprint = Some(new_value.to_string());
         self
@@ -3959,7 +4217,7 @@ impl<'a, C, NC, A> AccountContainerTriggerUpdateCall<'a, C, NC, A> where NC: hyp
 /// Gets a GTM Trigger.
 ///
 /// A builder for the *containers.triggers.get* method supported by a *account* resource.
-/// It is not used directly, but through a `AccountMethods`.
+/// It is not used directly, but through a `AccountMethods` instance.
 ///
 /// # Example
 ///
@@ -4021,7 +4279,7 @@ impl<'a, C, NC, A> AccountContainerTriggerGetCall<'a, C, NC, A> where NC: hyper:
         for &field in ["alt", "accountId", "containerId", "triggerId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -4074,7 +4332,7 @@ impl<'a, C, NC, A> AccountContainerTriggerGetCall<'a, C, NC, A> where NC: hyper:
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -4086,7 +4344,6 @@ impl<'a, C, NC, A> AccountContainerTriggerGetCall<'a, C, NC, A> where NC: hyper:
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -4096,7 +4353,7 @@ impl<'a, C, NC, A> AccountContainerTriggerGetCall<'a, C, NC, A> where NC: hyper:
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -4107,7 +4364,7 @@ impl<'a, C, NC, A> AccountContainerTriggerGetCall<'a, C, NC, A> where NC: hyper:
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -4116,13 +4373,13 @@ impl<'a, C, NC, A> AccountContainerTriggerGetCall<'a, C, NC, A> where NC: hyper:
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -4134,7 +4391,7 @@ impl<'a, C, NC, A> AccountContainerTriggerGetCall<'a, C, NC, A> where NC: hyper:
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The GTM Account ID.    
+    /// The GTM Account ID.
     pub fn account_id(mut self, new_value: &str) -> AccountContainerTriggerGetCall<'a, C, NC, A> {
         self._account_id = new_value.to_string();
         self
@@ -4144,7 +4401,7 @@ impl<'a, C, NC, A> AccountContainerTriggerGetCall<'a, C, NC, A> where NC: hyper:
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The GTM Container ID.    
+    /// The GTM Container ID.
     pub fn container_id(mut self, new_value: &str) -> AccountContainerTriggerGetCall<'a, C, NC, A> {
         self._container_id = new_value.to_string();
         self
@@ -4154,7 +4411,7 @@ impl<'a, C, NC, A> AccountContainerTriggerGetCall<'a, C, NC, A> where NC: hyper:
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The GTM Trigger ID.    
+    /// The GTM Trigger ID.
     pub fn trigger_id(mut self, new_value: &str) -> AccountContainerTriggerGetCall<'a, C, NC, A> {
         self._trigger_id = new_value.to_string();
         self
@@ -4215,7 +4472,7 @@ impl<'a, C, NC, A> AccountContainerTriggerGetCall<'a, C, NC, A> where NC: hyper:
 /// Deletes a Container.
 ///
 /// A builder for the *containers.delete* method supported by a *account* resource.
-/// It is not used directly, but through a `AccountMethods`.
+/// It is not used directly, but through a `AccountMethods` instance.
 ///
 /// # Example
 ///
@@ -4275,7 +4532,7 @@ impl<'a, C, NC, A> AccountContainerDeleteCall<'a, C, NC, A> where NC: hyper::net
         for &field in ["accountId", "containerId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -4327,7 +4584,7 @@ impl<'a, C, NC, A> AccountContainerDeleteCall<'a, C, NC, A> where NC: hyper::net
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -4339,7 +4596,6 @@ impl<'a, C, NC, A> AccountContainerDeleteCall<'a, C, NC, A> where NC: hyper::net
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -4349,7 +4605,7 @@ impl<'a, C, NC, A> AccountContainerDeleteCall<'a, C, NC, A> where NC: hyper::net
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -4360,12 +4616,12 @@ impl<'a, C, NC, A> AccountContainerDeleteCall<'a, C, NC, A> where NC: hyper::net
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = res;
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -4377,7 +4633,7 @@ impl<'a, C, NC, A> AccountContainerDeleteCall<'a, C, NC, A> where NC: hyper::net
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The GTM Account ID.    
+    /// The GTM Account ID.
     pub fn account_id(mut self, new_value: &str) -> AccountContainerDeleteCall<'a, C, NC, A> {
         self._account_id = new_value.to_string();
         self
@@ -4387,7 +4643,7 @@ impl<'a, C, NC, A> AccountContainerDeleteCall<'a, C, NC, A> where NC: hyper::net
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The GTM Container ID.    
+    /// The GTM Container ID.
     pub fn container_id(mut self, new_value: &str) -> AccountContainerDeleteCall<'a, C, NC, A> {
         self._container_id = new_value.to_string();
         self
@@ -4448,7 +4704,7 @@ impl<'a, C, NC, A> AccountContainerDeleteCall<'a, C, NC, A> where NC: hyper::net
 /// Creates a Container.
 ///
 /// A builder for the *containers.create* method supported by a *account* resource.
-/// It is not used directly, but through a `AccountMethods`.
+/// It is not used directly, but through a `AccountMethods` instance.
 ///
 /// # Example
 ///
@@ -4513,7 +4769,7 @@ impl<'a, C, NC, A> AccountContainerCreateCall<'a, C, NC, A> where NC: hyper::net
         for &field in ["alt", "accountId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -4570,7 +4826,7 @@ impl<'a, C, NC, A> AccountContainerCreateCall<'a, C, NC, A> where NC: hyper::net
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -4586,7 +4842,6 @@ impl<'a, C, NC, A> AccountContainerCreateCall<'a, C, NC, A> where NC: hyper::net
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -4596,7 +4851,7 @@ impl<'a, C, NC, A> AccountContainerCreateCall<'a, C, NC, A> where NC: hyper::net
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -4607,7 +4862,7 @@ impl<'a, C, NC, A> AccountContainerCreateCall<'a, C, NC, A> where NC: hyper::net
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -4616,13 +4871,13 @@ impl<'a, C, NC, A> AccountContainerCreateCall<'a, C, NC, A> where NC: hyper::net
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -4643,7 +4898,7 @@ impl<'a, C, NC, A> AccountContainerCreateCall<'a, C, NC, A> where NC: hyper::net
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The GTM Account ID.    
+    /// The GTM Account ID.
     pub fn account_id(mut self, new_value: &str) -> AccountContainerCreateCall<'a, C, NC, A> {
         self._account_id = new_value.to_string();
         self
@@ -4704,7 +4959,7 @@ impl<'a, C, NC, A> AccountContainerCreateCall<'a, C, NC, A> where NC: hyper::net
 /// Deletes a GTM Tag.
 ///
 /// A builder for the *containers.tags.delete* method supported by a *account* resource.
-/// It is not used directly, but through a `AccountMethods`.
+/// It is not used directly, but through a `AccountMethods` instance.
 ///
 /// # Example
 ///
@@ -4766,7 +5021,7 @@ impl<'a, C, NC, A> AccountContainerTagDeleteCall<'a, C, NC, A> where NC: hyper::
         for &field in ["accountId", "containerId", "tagId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -4818,7 +5073,7 @@ impl<'a, C, NC, A> AccountContainerTagDeleteCall<'a, C, NC, A> where NC: hyper::
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -4830,7 +5085,6 @@ impl<'a, C, NC, A> AccountContainerTagDeleteCall<'a, C, NC, A> where NC: hyper::
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -4840,7 +5094,7 @@ impl<'a, C, NC, A> AccountContainerTagDeleteCall<'a, C, NC, A> where NC: hyper::
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -4851,12 +5105,12 @@ impl<'a, C, NC, A> AccountContainerTagDeleteCall<'a, C, NC, A> where NC: hyper::
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = res;
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -4868,7 +5122,7 @@ impl<'a, C, NC, A> AccountContainerTagDeleteCall<'a, C, NC, A> where NC: hyper::
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The GTM Account ID.    
+    /// The GTM Account ID.
     pub fn account_id(mut self, new_value: &str) -> AccountContainerTagDeleteCall<'a, C, NC, A> {
         self._account_id = new_value.to_string();
         self
@@ -4878,7 +5132,7 @@ impl<'a, C, NC, A> AccountContainerTagDeleteCall<'a, C, NC, A> where NC: hyper::
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The GTM Container ID.    
+    /// The GTM Container ID.
     pub fn container_id(mut self, new_value: &str) -> AccountContainerTagDeleteCall<'a, C, NC, A> {
         self._container_id = new_value.to_string();
         self
@@ -4888,7 +5142,7 @@ impl<'a, C, NC, A> AccountContainerTagDeleteCall<'a, C, NC, A> where NC: hyper::
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The GTM Tag ID.    
+    /// The GTM Tag ID.
     pub fn tag_id(mut self, new_value: &str) -> AccountContainerTagDeleteCall<'a, C, NC, A> {
         self._tag_id = new_value.to_string();
         self
@@ -4949,7 +5203,7 @@ impl<'a, C, NC, A> AccountContainerTagDeleteCall<'a, C, NC, A> where NC: hyper::
 /// Updates a GTM Rule.
 ///
 /// A builder for the *containers.rules.update* method supported by a *account* resource.
-/// It is not used directly, but through a `AccountMethods`.
+/// It is not used directly, but through a `AccountMethods` instance.
 ///
 /// # Example
 ///
@@ -5023,7 +5277,7 @@ impl<'a, C, NC, A> AccountContainerRuleUpdateCall<'a, C, NC, A> where NC: hyper:
         for &field in ["alt", "accountId", "containerId", "ruleId", "fingerprint"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -5080,7 +5334,7 @@ impl<'a, C, NC, A> AccountContainerRuleUpdateCall<'a, C, NC, A> where NC: hyper:
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -5096,7 +5350,6 @@ impl<'a, C, NC, A> AccountContainerRuleUpdateCall<'a, C, NC, A> where NC: hyper:
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -5106,7 +5359,7 @@ impl<'a, C, NC, A> AccountContainerRuleUpdateCall<'a, C, NC, A> where NC: hyper:
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -5117,7 +5370,7 @@ impl<'a, C, NC, A> AccountContainerRuleUpdateCall<'a, C, NC, A> where NC: hyper:
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -5126,13 +5379,13 @@ impl<'a, C, NC, A> AccountContainerRuleUpdateCall<'a, C, NC, A> where NC: hyper:
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -5153,7 +5406,7 @@ impl<'a, C, NC, A> AccountContainerRuleUpdateCall<'a, C, NC, A> where NC: hyper:
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The GTM Account ID.    
+    /// The GTM Account ID.
     pub fn account_id(mut self, new_value: &str) -> AccountContainerRuleUpdateCall<'a, C, NC, A> {
         self._account_id = new_value.to_string();
         self
@@ -5163,7 +5416,7 @@ impl<'a, C, NC, A> AccountContainerRuleUpdateCall<'a, C, NC, A> where NC: hyper:
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The GTM Container ID.    
+    /// The GTM Container ID.
     pub fn container_id(mut self, new_value: &str) -> AccountContainerRuleUpdateCall<'a, C, NC, A> {
         self._container_id = new_value.to_string();
         self
@@ -5173,7 +5426,7 @@ impl<'a, C, NC, A> AccountContainerRuleUpdateCall<'a, C, NC, A> where NC: hyper:
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The GTM Rule ID.    
+    /// The GTM Rule ID.
     pub fn rule_id(mut self, new_value: &str) -> AccountContainerRuleUpdateCall<'a, C, NC, A> {
         self._rule_id = new_value.to_string();
         self
@@ -5181,7 +5434,7 @@ impl<'a, C, NC, A> AccountContainerRuleUpdateCall<'a, C, NC, A> where NC: hyper:
     /// Sets the *fingerprint* query property to the given value.
     ///
     /// 
-    /// When provided, this fingerprint must match the fingerprint of the rule in storage.    
+    /// When provided, this fingerprint must match the fingerprint of the rule in storage.
     pub fn fingerprint(mut self, new_value: &str) -> AccountContainerRuleUpdateCall<'a, C, NC, A> {
         self._fingerprint = Some(new_value.to_string());
         self
@@ -5242,7 +5495,7 @@ impl<'a, C, NC, A> AccountContainerRuleUpdateCall<'a, C, NC, A> where NC: hyper:
 /// Deletes a GTM Rule.
 ///
 /// A builder for the *containers.rules.delete* method supported by a *account* resource.
-/// It is not used directly, but through a `AccountMethods`.
+/// It is not used directly, but through a `AccountMethods` instance.
 ///
 /// # Example
 ///
@@ -5304,7 +5557,7 @@ impl<'a, C, NC, A> AccountContainerRuleDeleteCall<'a, C, NC, A> where NC: hyper:
         for &field in ["accountId", "containerId", "ruleId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -5356,7 +5609,7 @@ impl<'a, C, NC, A> AccountContainerRuleDeleteCall<'a, C, NC, A> where NC: hyper:
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -5368,7 +5621,6 @@ impl<'a, C, NC, A> AccountContainerRuleDeleteCall<'a, C, NC, A> where NC: hyper:
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -5378,7 +5630,7 @@ impl<'a, C, NC, A> AccountContainerRuleDeleteCall<'a, C, NC, A> where NC: hyper:
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -5389,12 +5641,12 @@ impl<'a, C, NC, A> AccountContainerRuleDeleteCall<'a, C, NC, A> where NC: hyper:
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = res;
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -5406,7 +5658,7 @@ impl<'a, C, NC, A> AccountContainerRuleDeleteCall<'a, C, NC, A> where NC: hyper:
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The GTM Account ID.    
+    /// The GTM Account ID.
     pub fn account_id(mut self, new_value: &str) -> AccountContainerRuleDeleteCall<'a, C, NC, A> {
         self._account_id = new_value.to_string();
         self
@@ -5416,7 +5668,7 @@ impl<'a, C, NC, A> AccountContainerRuleDeleteCall<'a, C, NC, A> where NC: hyper:
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The GTM Container ID.    
+    /// The GTM Container ID.
     pub fn container_id(mut self, new_value: &str) -> AccountContainerRuleDeleteCall<'a, C, NC, A> {
         self._container_id = new_value.to_string();
         self
@@ -5426,7 +5678,7 @@ impl<'a, C, NC, A> AccountContainerRuleDeleteCall<'a, C, NC, A> where NC: hyper:
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The GTM Rule ID.    
+    /// The GTM Rule ID.
     pub fn rule_id(mut self, new_value: &str) -> AccountContainerRuleDeleteCall<'a, C, NC, A> {
         self._rule_id = new_value.to_string();
         self
@@ -5487,7 +5739,7 @@ impl<'a, C, NC, A> AccountContainerRuleDeleteCall<'a, C, NC, A> where NC: hyper:
 /// Lists all GTM Tags of a Container.
 ///
 /// A builder for the *containers.tags.list* method supported by a *account* resource.
-/// It is not used directly, but through a `AccountMethods`.
+/// It is not used directly, but through a `AccountMethods` instance.
 ///
 /// # Example
 ///
@@ -5547,7 +5799,7 @@ impl<'a, C, NC, A> AccountContainerTagListCall<'a, C, NC, A> where NC: hyper::ne
         for &field in ["alt", "accountId", "containerId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -5600,7 +5852,7 @@ impl<'a, C, NC, A> AccountContainerTagListCall<'a, C, NC, A> where NC: hyper::ne
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -5612,7 +5864,6 @@ impl<'a, C, NC, A> AccountContainerTagListCall<'a, C, NC, A> where NC: hyper::ne
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -5622,7 +5873,7 @@ impl<'a, C, NC, A> AccountContainerTagListCall<'a, C, NC, A> where NC: hyper::ne
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -5633,7 +5884,7 @@ impl<'a, C, NC, A> AccountContainerTagListCall<'a, C, NC, A> where NC: hyper::ne
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -5642,13 +5893,13 @@ impl<'a, C, NC, A> AccountContainerTagListCall<'a, C, NC, A> where NC: hyper::ne
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -5660,7 +5911,7 @@ impl<'a, C, NC, A> AccountContainerTagListCall<'a, C, NC, A> where NC: hyper::ne
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The GTM Account ID.    
+    /// The GTM Account ID.
     pub fn account_id(mut self, new_value: &str) -> AccountContainerTagListCall<'a, C, NC, A> {
         self._account_id = new_value.to_string();
         self
@@ -5670,7 +5921,7 @@ impl<'a, C, NC, A> AccountContainerTagListCall<'a, C, NC, A> where NC: hyper::ne
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The GTM Container ID.    
+    /// The GTM Container ID.
     pub fn container_id(mut self, new_value: &str) -> AccountContainerTagListCall<'a, C, NC, A> {
         self._container_id = new_value.to_string();
         self
@@ -5731,7 +5982,7 @@ impl<'a, C, NC, A> AccountContainerTagListCall<'a, C, NC, A> where NC: hyper::ne
 /// Publishes a Container Version.
 ///
 /// A builder for the *containers.versions.publish* method supported by a *account* resource.
-/// It is not used directly, but through a `AccountMethods`.
+/// It is not used directly, but through a `AccountMethods` instance.
 ///
 /// # Example
 ///
@@ -5798,7 +6049,7 @@ impl<'a, C, NC, A> AccountContainerVersionPublishCall<'a, C, NC, A> where NC: hy
         for &field in ["alt", "accountId", "containerId", "containerVersionId", "fingerprint"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -5851,7 +6102,7 @@ impl<'a, C, NC, A> AccountContainerVersionPublishCall<'a, C, NC, A> where NC: hy
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -5863,7 +6114,6 @@ impl<'a, C, NC, A> AccountContainerVersionPublishCall<'a, C, NC, A> where NC: hy
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -5873,7 +6123,7 @@ impl<'a, C, NC, A> AccountContainerVersionPublishCall<'a, C, NC, A> where NC: hy
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -5884,7 +6134,7 @@ impl<'a, C, NC, A> AccountContainerVersionPublishCall<'a, C, NC, A> where NC: hy
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -5893,13 +6143,13 @@ impl<'a, C, NC, A> AccountContainerVersionPublishCall<'a, C, NC, A> where NC: hy
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -5911,7 +6161,7 @@ impl<'a, C, NC, A> AccountContainerVersionPublishCall<'a, C, NC, A> where NC: hy
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The GTM Account ID.    
+    /// The GTM Account ID.
     pub fn account_id(mut self, new_value: &str) -> AccountContainerVersionPublishCall<'a, C, NC, A> {
         self._account_id = new_value.to_string();
         self
@@ -5921,7 +6171,7 @@ impl<'a, C, NC, A> AccountContainerVersionPublishCall<'a, C, NC, A> where NC: hy
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The GTM Container ID.    
+    /// The GTM Container ID.
     pub fn container_id(mut self, new_value: &str) -> AccountContainerVersionPublishCall<'a, C, NC, A> {
         self._container_id = new_value.to_string();
         self
@@ -5931,7 +6181,7 @@ impl<'a, C, NC, A> AccountContainerVersionPublishCall<'a, C, NC, A> where NC: hy
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The GTM Container Version ID.    
+    /// The GTM Container Version ID.
     pub fn container_version_id(mut self, new_value: &str) -> AccountContainerVersionPublishCall<'a, C, NC, A> {
         self._container_version_id = new_value.to_string();
         self
@@ -5939,7 +6189,7 @@ impl<'a, C, NC, A> AccountContainerVersionPublishCall<'a, C, NC, A> where NC: hy
     /// Sets the *fingerprint* query property to the given value.
     ///
     /// 
-    /// When provided, this fingerprint must match the fingerprint of the container version in storage.    
+    /// When provided, this fingerprint must match the fingerprint of the container version in storage.
     pub fn fingerprint(mut self, new_value: &str) -> AccountContainerVersionPublishCall<'a, C, NC, A> {
         self._fingerprint = Some(new_value.to_string());
         self
@@ -6000,7 +6250,7 @@ impl<'a, C, NC, A> AccountContainerVersionPublishCall<'a, C, NC, A> where NC: hy
 /// Creates a GTM Tag.
 ///
 /// A builder for the *containers.tags.create* method supported by a *account* resource.
-/// It is not used directly, but through a `AccountMethods`.
+/// It is not used directly, but through a `AccountMethods` instance.
 ///
 /// # Example
 ///
@@ -6067,7 +6317,7 @@ impl<'a, C, NC, A> AccountContainerTagCreateCall<'a, C, NC, A> where NC: hyper::
         for &field in ["alt", "accountId", "containerId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -6124,7 +6374,7 @@ impl<'a, C, NC, A> AccountContainerTagCreateCall<'a, C, NC, A> where NC: hyper::
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -6140,7 +6390,6 @@ impl<'a, C, NC, A> AccountContainerTagCreateCall<'a, C, NC, A> where NC: hyper::
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -6150,7 +6399,7 @@ impl<'a, C, NC, A> AccountContainerTagCreateCall<'a, C, NC, A> where NC: hyper::
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -6161,7 +6410,7 @@ impl<'a, C, NC, A> AccountContainerTagCreateCall<'a, C, NC, A> where NC: hyper::
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -6170,13 +6419,13 @@ impl<'a, C, NC, A> AccountContainerTagCreateCall<'a, C, NC, A> where NC: hyper::
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -6197,7 +6446,7 @@ impl<'a, C, NC, A> AccountContainerTagCreateCall<'a, C, NC, A> where NC: hyper::
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The GTM Account ID.    
+    /// The GTM Account ID.
     pub fn account_id(mut self, new_value: &str) -> AccountContainerTagCreateCall<'a, C, NC, A> {
         self._account_id = new_value.to_string();
         self
@@ -6207,7 +6456,7 @@ impl<'a, C, NC, A> AccountContainerTagCreateCall<'a, C, NC, A> where NC: hyper::
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The GTM Container ID.    
+    /// The GTM Container ID.
     pub fn container_id(mut self, new_value: &str) -> AccountContainerTagCreateCall<'a, C, NC, A> {
         self._container_id = new_value.to_string();
         self
@@ -6268,7 +6517,7 @@ impl<'a, C, NC, A> AccountContainerTagCreateCall<'a, C, NC, A> where NC: hyper::
 /// Lists all GTM Triggers of a Container.
 ///
 /// A builder for the *containers.triggers.list* method supported by a *account* resource.
-/// It is not used directly, but through a `AccountMethods`.
+/// It is not used directly, but through a `AccountMethods` instance.
 ///
 /// # Example
 ///
@@ -6328,7 +6577,7 @@ impl<'a, C, NC, A> AccountContainerTriggerListCall<'a, C, NC, A> where NC: hyper
         for &field in ["alt", "accountId", "containerId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -6381,7 +6630,7 @@ impl<'a, C, NC, A> AccountContainerTriggerListCall<'a, C, NC, A> where NC: hyper
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -6393,7 +6642,6 @@ impl<'a, C, NC, A> AccountContainerTriggerListCall<'a, C, NC, A> where NC: hyper
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -6403,7 +6651,7 @@ impl<'a, C, NC, A> AccountContainerTriggerListCall<'a, C, NC, A> where NC: hyper
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -6414,7 +6662,7 @@ impl<'a, C, NC, A> AccountContainerTriggerListCall<'a, C, NC, A> where NC: hyper
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -6423,13 +6671,13 @@ impl<'a, C, NC, A> AccountContainerTriggerListCall<'a, C, NC, A> where NC: hyper
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -6441,7 +6689,7 @@ impl<'a, C, NC, A> AccountContainerTriggerListCall<'a, C, NC, A> where NC: hyper
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The GTM Account ID.    
+    /// The GTM Account ID.
     pub fn account_id(mut self, new_value: &str) -> AccountContainerTriggerListCall<'a, C, NC, A> {
         self._account_id = new_value.to_string();
         self
@@ -6451,7 +6699,7 @@ impl<'a, C, NC, A> AccountContainerTriggerListCall<'a, C, NC, A> where NC: hyper
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The GTM Container ID.    
+    /// The GTM Container ID.
     pub fn container_id(mut self, new_value: &str) -> AccountContainerTriggerListCall<'a, C, NC, A> {
         self._container_id = new_value.to_string();
         self
@@ -6512,7 +6760,7 @@ impl<'a, C, NC, A> AccountContainerTriggerListCall<'a, C, NC, A> where NC: hyper
 /// Deletes a Container Version.
 ///
 /// A builder for the *containers.versions.delete* method supported by a *account* resource.
-/// It is not used directly, but through a `AccountMethods`.
+/// It is not used directly, but through a `AccountMethods` instance.
 ///
 /// # Example
 ///
@@ -6574,7 +6822,7 @@ impl<'a, C, NC, A> AccountContainerVersionDeleteCall<'a, C, NC, A> where NC: hyp
         for &field in ["accountId", "containerId", "containerVersionId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -6626,7 +6874,7 @@ impl<'a, C, NC, A> AccountContainerVersionDeleteCall<'a, C, NC, A> where NC: hyp
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -6638,7 +6886,6 @@ impl<'a, C, NC, A> AccountContainerVersionDeleteCall<'a, C, NC, A> where NC: hyp
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -6648,7 +6895,7 @@ impl<'a, C, NC, A> AccountContainerVersionDeleteCall<'a, C, NC, A> where NC: hyp
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -6659,12 +6906,12 @@ impl<'a, C, NC, A> AccountContainerVersionDeleteCall<'a, C, NC, A> where NC: hyp
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = res;
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -6676,7 +6923,7 @@ impl<'a, C, NC, A> AccountContainerVersionDeleteCall<'a, C, NC, A> where NC: hyp
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The GTM Account ID.    
+    /// The GTM Account ID.
     pub fn account_id(mut self, new_value: &str) -> AccountContainerVersionDeleteCall<'a, C, NC, A> {
         self._account_id = new_value.to_string();
         self
@@ -6686,7 +6933,7 @@ impl<'a, C, NC, A> AccountContainerVersionDeleteCall<'a, C, NC, A> where NC: hyp
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The GTM Container ID.    
+    /// The GTM Container ID.
     pub fn container_id(mut self, new_value: &str) -> AccountContainerVersionDeleteCall<'a, C, NC, A> {
         self._container_id = new_value.to_string();
         self
@@ -6696,7 +6943,7 @@ impl<'a, C, NC, A> AccountContainerVersionDeleteCall<'a, C, NC, A> where NC: hyp
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The GTM Container Version ID.    
+    /// The GTM Container Version ID.
     pub fn container_version_id(mut self, new_value: &str) -> AccountContainerVersionDeleteCall<'a, C, NC, A> {
         self._container_version_id = new_value.to_string();
         self
@@ -6757,7 +7004,7 @@ impl<'a, C, NC, A> AccountContainerVersionDeleteCall<'a, C, NC, A> where NC: hyp
 /// Updates a GTM Account.
 ///
 /// A builder for the *update* method supported by a *account* resource.
-/// It is not used directly, but through a `AccountMethods`.
+/// It is not used directly, but through a `AccountMethods` instance.
 ///
 /// # Example
 ///
@@ -6827,7 +7074,7 @@ impl<'a, C, NC, A> AccountUpdateCall<'a, C, NC, A> where NC: hyper::net::Network
         for &field in ["alt", "accountId", "fingerprint"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -6884,7 +7131,7 @@ impl<'a, C, NC, A> AccountUpdateCall<'a, C, NC, A> where NC: hyper::net::Network
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -6900,7 +7147,6 @@ impl<'a, C, NC, A> AccountUpdateCall<'a, C, NC, A> where NC: hyper::net::Network
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -6910,7 +7156,7 @@ impl<'a, C, NC, A> AccountUpdateCall<'a, C, NC, A> where NC: hyper::net::Network
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -6921,7 +7167,7 @@ impl<'a, C, NC, A> AccountUpdateCall<'a, C, NC, A> where NC: hyper::net::Network
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -6930,13 +7176,13 @@ impl<'a, C, NC, A> AccountUpdateCall<'a, C, NC, A> where NC: hyper::net::Network
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -6957,7 +7203,7 @@ impl<'a, C, NC, A> AccountUpdateCall<'a, C, NC, A> where NC: hyper::net::Network
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The GTM Account ID.    
+    /// The GTM Account ID.
     pub fn account_id(mut self, new_value: &str) -> AccountUpdateCall<'a, C, NC, A> {
         self._account_id = new_value.to_string();
         self
@@ -6965,7 +7211,7 @@ impl<'a, C, NC, A> AccountUpdateCall<'a, C, NC, A> where NC: hyper::net::Network
     /// Sets the *fingerprint* query property to the given value.
     ///
     /// 
-    /// When provided, this fingerprint must match the fingerprint of the account in storage.    
+    /// When provided, this fingerprint must match the fingerprint of the account in storage.
     pub fn fingerprint(mut self, new_value: &str) -> AccountUpdateCall<'a, C, NC, A> {
         self._fingerprint = Some(new_value.to_string());
         self
@@ -7026,7 +7272,7 @@ impl<'a, C, NC, A> AccountUpdateCall<'a, C, NC, A> where NC: hyper::net::Network
 /// Deletes a GTM Macro.
 ///
 /// A builder for the *containers.macros.delete* method supported by a *account* resource.
-/// It is not used directly, but through a `AccountMethods`.
+/// It is not used directly, but through a `AccountMethods` instance.
 ///
 /// # Example
 ///
@@ -7088,7 +7334,7 @@ impl<'a, C, NC, A> AccountContainerMacroDeleteCall<'a, C, NC, A> where NC: hyper
         for &field in ["accountId", "containerId", "macroId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -7140,7 +7386,7 @@ impl<'a, C, NC, A> AccountContainerMacroDeleteCall<'a, C, NC, A> where NC: hyper
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -7152,7 +7398,6 @@ impl<'a, C, NC, A> AccountContainerMacroDeleteCall<'a, C, NC, A> where NC: hyper
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -7162,7 +7407,7 @@ impl<'a, C, NC, A> AccountContainerMacroDeleteCall<'a, C, NC, A> where NC: hyper
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -7173,12 +7418,12 @@ impl<'a, C, NC, A> AccountContainerMacroDeleteCall<'a, C, NC, A> where NC: hyper
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = res;
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -7190,7 +7435,7 @@ impl<'a, C, NC, A> AccountContainerMacroDeleteCall<'a, C, NC, A> where NC: hyper
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The GTM Account ID.    
+    /// The GTM Account ID.
     pub fn account_id(mut self, new_value: &str) -> AccountContainerMacroDeleteCall<'a, C, NC, A> {
         self._account_id = new_value.to_string();
         self
@@ -7200,7 +7445,7 @@ impl<'a, C, NC, A> AccountContainerMacroDeleteCall<'a, C, NC, A> where NC: hyper
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The GTM Container ID.    
+    /// The GTM Container ID.
     pub fn container_id(mut self, new_value: &str) -> AccountContainerMacroDeleteCall<'a, C, NC, A> {
         self._container_id = new_value.to_string();
         self
@@ -7210,7 +7455,7 @@ impl<'a, C, NC, A> AccountContainerMacroDeleteCall<'a, C, NC, A> where NC: hyper
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The GTM Macro ID.    
+    /// The GTM Macro ID.
     pub fn macro_id(mut self, new_value: &str) -> AccountContainerMacroDeleteCall<'a, C, NC, A> {
         self._macro_id = new_value.to_string();
         self
@@ -7271,7 +7516,7 @@ impl<'a, C, NC, A> AccountContainerMacroDeleteCall<'a, C, NC, A> where NC: hyper
 /// Creates a Container Version.
 ///
 /// A builder for the *containers.versions.create* method supported by a *account* resource.
-/// It is not used directly, but through a `AccountMethods`.
+/// It is not used directly, but through a `AccountMethods` instance.
 ///
 /// # Example
 ///
@@ -7338,7 +7583,7 @@ impl<'a, C, NC, A> AccountContainerVersionCreateCall<'a, C, NC, A> where NC: hyp
         for &field in ["alt", "accountId", "containerId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -7395,7 +7640,7 @@ impl<'a, C, NC, A> AccountContainerVersionCreateCall<'a, C, NC, A> where NC: hyp
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -7411,7 +7656,6 @@ impl<'a, C, NC, A> AccountContainerVersionCreateCall<'a, C, NC, A> where NC: hyp
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -7421,7 +7665,7 @@ impl<'a, C, NC, A> AccountContainerVersionCreateCall<'a, C, NC, A> where NC: hyp
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -7432,7 +7676,7 @@ impl<'a, C, NC, A> AccountContainerVersionCreateCall<'a, C, NC, A> where NC: hyp
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -7441,13 +7685,13 @@ impl<'a, C, NC, A> AccountContainerVersionCreateCall<'a, C, NC, A> where NC: hyp
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -7468,7 +7712,7 @@ impl<'a, C, NC, A> AccountContainerVersionCreateCall<'a, C, NC, A> where NC: hyp
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The GTM Account ID.    
+    /// The GTM Account ID.
     pub fn account_id(mut self, new_value: &str) -> AccountContainerVersionCreateCall<'a, C, NC, A> {
         self._account_id = new_value.to_string();
         self
@@ -7478,7 +7722,7 @@ impl<'a, C, NC, A> AccountContainerVersionCreateCall<'a, C, NC, A> where NC: hyp
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The GTM Container ID.    
+    /// The GTM Container ID.
     pub fn container_id(mut self, new_value: &str) -> AccountContainerVersionCreateCall<'a, C, NC, A> {
         self._container_id = new_value.to_string();
         self
@@ -7539,7 +7783,7 @@ impl<'a, C, NC, A> AccountContainerVersionCreateCall<'a, C, NC, A> where NC: hyp
 /// Gets a user's Account & Container Permissions.
 ///
 /// A builder for the *permissions.get* method supported by a *account* resource.
-/// It is not used directly, but through a `AccountMethods`.
+/// It is not used directly, but through a `AccountMethods` instance.
 ///
 /// # Example
 ///
@@ -7599,7 +7843,7 @@ impl<'a, C, NC, A> AccountPermissionGetCall<'a, C, NC, A> where NC: hyper::net::
         for &field in ["alt", "accountId", "permissionId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -7652,7 +7896,7 @@ impl<'a, C, NC, A> AccountPermissionGetCall<'a, C, NC, A> where NC: hyper::net::
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -7664,7 +7908,6 @@ impl<'a, C, NC, A> AccountPermissionGetCall<'a, C, NC, A> where NC: hyper::net::
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -7674,7 +7917,7 @@ impl<'a, C, NC, A> AccountPermissionGetCall<'a, C, NC, A> where NC: hyper::net::
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -7685,7 +7928,7 @@ impl<'a, C, NC, A> AccountPermissionGetCall<'a, C, NC, A> where NC: hyper::net::
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -7694,13 +7937,13 @@ impl<'a, C, NC, A> AccountPermissionGetCall<'a, C, NC, A> where NC: hyper::net::
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -7712,7 +7955,7 @@ impl<'a, C, NC, A> AccountPermissionGetCall<'a, C, NC, A> where NC: hyper::net::
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The GTM Account ID.    
+    /// The GTM Account ID.
     pub fn account_id(mut self, new_value: &str) -> AccountPermissionGetCall<'a, C, NC, A> {
         self._account_id = new_value.to_string();
         self
@@ -7722,7 +7965,7 @@ impl<'a, C, NC, A> AccountPermissionGetCall<'a, C, NC, A> where NC: hyper::net::
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The GTM User ID.    
+    /// The GTM User ID.
     pub fn permission_id(mut self, new_value: &str) -> AccountPermissionGetCall<'a, C, NC, A> {
         self._permission_id = new_value.to_string();
         self
@@ -7783,7 +8026,7 @@ impl<'a, C, NC, A> AccountPermissionGetCall<'a, C, NC, A> where NC: hyper::net::
 /// Creates a GTM Rule.
 ///
 /// A builder for the *containers.rules.create* method supported by a *account* resource.
-/// It is not used directly, but through a `AccountMethods`.
+/// It is not used directly, but through a `AccountMethods` instance.
 ///
 /// # Example
 ///
@@ -7850,7 +8093,7 @@ impl<'a, C, NC, A> AccountContainerRuleCreateCall<'a, C, NC, A> where NC: hyper:
         for &field in ["alt", "accountId", "containerId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -7907,7 +8150,7 @@ impl<'a, C, NC, A> AccountContainerRuleCreateCall<'a, C, NC, A> where NC: hyper:
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -7923,7 +8166,6 @@ impl<'a, C, NC, A> AccountContainerRuleCreateCall<'a, C, NC, A> where NC: hyper:
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -7933,7 +8175,7 @@ impl<'a, C, NC, A> AccountContainerRuleCreateCall<'a, C, NC, A> where NC: hyper:
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -7944,7 +8186,7 @@ impl<'a, C, NC, A> AccountContainerRuleCreateCall<'a, C, NC, A> where NC: hyper:
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -7953,13 +8195,13 @@ impl<'a, C, NC, A> AccountContainerRuleCreateCall<'a, C, NC, A> where NC: hyper:
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -7980,7 +8222,7 @@ impl<'a, C, NC, A> AccountContainerRuleCreateCall<'a, C, NC, A> where NC: hyper:
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The GTM Account ID.    
+    /// The GTM Account ID.
     pub fn account_id(mut self, new_value: &str) -> AccountContainerRuleCreateCall<'a, C, NC, A> {
         self._account_id = new_value.to_string();
         self
@@ -7990,7 +8232,7 @@ impl<'a, C, NC, A> AccountContainerRuleCreateCall<'a, C, NC, A> where NC: hyper:
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The GTM Container ID.    
+    /// The GTM Container ID.
     pub fn container_id(mut self, new_value: &str) -> AccountContainerRuleCreateCall<'a, C, NC, A> {
         self._container_id = new_value.to_string();
         self
@@ -8051,7 +8293,7 @@ impl<'a, C, NC, A> AccountContainerRuleCreateCall<'a, C, NC, A> where NC: hyper:
 /// Restores a Container Version. This will overwrite the container's current configuration (including its macros, rules and tags). The operation will not have any effect on the version that is being served (i.e. the published version).
 ///
 /// A builder for the *containers.versions.restore* method supported by a *account* resource.
-/// It is not used directly, but through a `AccountMethods`.
+/// It is not used directly, but through a `AccountMethods` instance.
 ///
 /// # Example
 ///
@@ -8113,7 +8355,7 @@ impl<'a, C, NC, A> AccountContainerVersionRestoreCall<'a, C, NC, A> where NC: hy
         for &field in ["alt", "accountId", "containerId", "containerVersionId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -8166,7 +8408,7 @@ impl<'a, C, NC, A> AccountContainerVersionRestoreCall<'a, C, NC, A> where NC: hy
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -8178,7 +8420,6 @@ impl<'a, C, NC, A> AccountContainerVersionRestoreCall<'a, C, NC, A> where NC: hy
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -8188,7 +8429,7 @@ impl<'a, C, NC, A> AccountContainerVersionRestoreCall<'a, C, NC, A> where NC: hy
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -8199,7 +8440,7 @@ impl<'a, C, NC, A> AccountContainerVersionRestoreCall<'a, C, NC, A> where NC: hy
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -8208,13 +8449,13 @@ impl<'a, C, NC, A> AccountContainerVersionRestoreCall<'a, C, NC, A> where NC: hy
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -8226,7 +8467,7 @@ impl<'a, C, NC, A> AccountContainerVersionRestoreCall<'a, C, NC, A> where NC: hy
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The GTM Account ID.    
+    /// The GTM Account ID.
     pub fn account_id(mut self, new_value: &str) -> AccountContainerVersionRestoreCall<'a, C, NC, A> {
         self._account_id = new_value.to_string();
         self
@@ -8236,7 +8477,7 @@ impl<'a, C, NC, A> AccountContainerVersionRestoreCall<'a, C, NC, A> where NC: hy
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The GTM Container ID.    
+    /// The GTM Container ID.
     pub fn container_id(mut self, new_value: &str) -> AccountContainerVersionRestoreCall<'a, C, NC, A> {
         self._container_id = new_value.to_string();
         self
@@ -8246,7 +8487,7 @@ impl<'a, C, NC, A> AccountContainerVersionRestoreCall<'a, C, NC, A> where NC: hy
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The GTM Container Version ID.    
+    /// The GTM Container Version ID.
     pub fn container_version_id(mut self, new_value: &str) -> AccountContainerVersionRestoreCall<'a, C, NC, A> {
         self._container_version_id = new_value.to_string();
         self
@@ -8307,7 +8548,7 @@ impl<'a, C, NC, A> AccountContainerVersionRestoreCall<'a, C, NC, A> where NC: hy
 /// Gets a GTM Rule.
 ///
 /// A builder for the *containers.rules.get* method supported by a *account* resource.
-/// It is not used directly, but through a `AccountMethods`.
+/// It is not used directly, but through a `AccountMethods` instance.
 ///
 /// # Example
 ///
@@ -8369,7 +8610,7 @@ impl<'a, C, NC, A> AccountContainerRuleGetCall<'a, C, NC, A> where NC: hyper::ne
         for &field in ["alt", "accountId", "containerId", "ruleId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -8422,7 +8663,7 @@ impl<'a, C, NC, A> AccountContainerRuleGetCall<'a, C, NC, A> where NC: hyper::ne
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -8434,7 +8675,6 @@ impl<'a, C, NC, A> AccountContainerRuleGetCall<'a, C, NC, A> where NC: hyper::ne
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -8444,7 +8684,7 @@ impl<'a, C, NC, A> AccountContainerRuleGetCall<'a, C, NC, A> where NC: hyper::ne
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -8455,7 +8695,7 @@ impl<'a, C, NC, A> AccountContainerRuleGetCall<'a, C, NC, A> where NC: hyper::ne
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -8464,13 +8704,13 @@ impl<'a, C, NC, A> AccountContainerRuleGetCall<'a, C, NC, A> where NC: hyper::ne
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -8482,7 +8722,7 @@ impl<'a, C, NC, A> AccountContainerRuleGetCall<'a, C, NC, A> where NC: hyper::ne
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The GTM Account ID.    
+    /// The GTM Account ID.
     pub fn account_id(mut self, new_value: &str) -> AccountContainerRuleGetCall<'a, C, NC, A> {
         self._account_id = new_value.to_string();
         self
@@ -8492,7 +8732,7 @@ impl<'a, C, NC, A> AccountContainerRuleGetCall<'a, C, NC, A> where NC: hyper::ne
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The GTM Container ID.    
+    /// The GTM Container ID.
     pub fn container_id(mut self, new_value: &str) -> AccountContainerRuleGetCall<'a, C, NC, A> {
         self._container_id = new_value.to_string();
         self
@@ -8502,7 +8742,7 @@ impl<'a, C, NC, A> AccountContainerRuleGetCall<'a, C, NC, A> where NC: hyper::ne
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The GTM Rule ID.    
+    /// The GTM Rule ID.
     pub fn rule_id(mut self, new_value: &str) -> AccountContainerRuleGetCall<'a, C, NC, A> {
         self._rule_id = new_value.to_string();
         self
@@ -8563,7 +8803,7 @@ impl<'a, C, NC, A> AccountContainerRuleGetCall<'a, C, NC, A> where NC: hyper::ne
 /// Creates a GTM Variable.
 ///
 /// A builder for the *containers.variables.create* method supported by a *account* resource.
-/// It is not used directly, but through a `AccountMethods`.
+/// It is not used directly, but through a `AccountMethods` instance.
 ///
 /// # Example
 ///
@@ -8630,7 +8870,7 @@ impl<'a, C, NC, A> AccountContainerVariableCreateCall<'a, C, NC, A> where NC: hy
         for &field in ["alt", "accountId", "containerId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -8687,7 +8927,7 @@ impl<'a, C, NC, A> AccountContainerVariableCreateCall<'a, C, NC, A> where NC: hy
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -8703,7 +8943,6 @@ impl<'a, C, NC, A> AccountContainerVariableCreateCall<'a, C, NC, A> where NC: hy
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -8713,7 +8952,7 @@ impl<'a, C, NC, A> AccountContainerVariableCreateCall<'a, C, NC, A> where NC: hy
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -8724,7 +8963,7 @@ impl<'a, C, NC, A> AccountContainerVariableCreateCall<'a, C, NC, A> where NC: hy
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -8733,13 +8972,13 @@ impl<'a, C, NC, A> AccountContainerVariableCreateCall<'a, C, NC, A> where NC: hy
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -8760,7 +8999,7 @@ impl<'a, C, NC, A> AccountContainerVariableCreateCall<'a, C, NC, A> where NC: hy
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The GTM Account ID.    
+    /// The GTM Account ID.
     pub fn account_id(mut self, new_value: &str) -> AccountContainerVariableCreateCall<'a, C, NC, A> {
         self._account_id = new_value.to_string();
         self
@@ -8770,7 +9009,7 @@ impl<'a, C, NC, A> AccountContainerVariableCreateCall<'a, C, NC, A> where NC: hy
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The GTM Container ID.    
+    /// The GTM Container ID.
     pub fn container_id(mut self, new_value: &str) -> AccountContainerVariableCreateCall<'a, C, NC, A> {
         self._container_id = new_value.to_string();
         self
@@ -8831,7 +9070,7 @@ impl<'a, C, NC, A> AccountContainerVariableCreateCall<'a, C, NC, A> where NC: hy
 /// Lists all GTM Variables of a Container.
 ///
 /// A builder for the *containers.variables.list* method supported by a *account* resource.
-/// It is not used directly, but through a `AccountMethods`.
+/// It is not used directly, but through a `AccountMethods` instance.
 ///
 /// # Example
 ///
@@ -8891,7 +9130,7 @@ impl<'a, C, NC, A> AccountContainerVariableListCall<'a, C, NC, A> where NC: hype
         for &field in ["alt", "accountId", "containerId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -8944,7 +9183,7 @@ impl<'a, C, NC, A> AccountContainerVariableListCall<'a, C, NC, A> where NC: hype
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -8956,7 +9195,6 @@ impl<'a, C, NC, A> AccountContainerVariableListCall<'a, C, NC, A> where NC: hype
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -8966,7 +9204,7 @@ impl<'a, C, NC, A> AccountContainerVariableListCall<'a, C, NC, A> where NC: hype
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -8977,7 +9215,7 @@ impl<'a, C, NC, A> AccountContainerVariableListCall<'a, C, NC, A> where NC: hype
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -8986,13 +9224,13 @@ impl<'a, C, NC, A> AccountContainerVariableListCall<'a, C, NC, A> where NC: hype
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -9004,7 +9242,7 @@ impl<'a, C, NC, A> AccountContainerVariableListCall<'a, C, NC, A> where NC: hype
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The GTM Account ID.    
+    /// The GTM Account ID.
     pub fn account_id(mut self, new_value: &str) -> AccountContainerVariableListCall<'a, C, NC, A> {
         self._account_id = new_value.to_string();
         self
@@ -9014,7 +9252,7 @@ impl<'a, C, NC, A> AccountContainerVariableListCall<'a, C, NC, A> where NC: hype
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The GTM Container ID.    
+    /// The GTM Container ID.
     pub fn container_id(mut self, new_value: &str) -> AccountContainerVariableListCall<'a, C, NC, A> {
         self._container_id = new_value.to_string();
         self
@@ -9075,7 +9313,7 @@ impl<'a, C, NC, A> AccountContainerVariableListCall<'a, C, NC, A> where NC: hype
 /// Creates a GTM Macro.
 ///
 /// A builder for the *containers.macros.create* method supported by a *account* resource.
-/// It is not used directly, but through a `AccountMethods`.
+/// It is not used directly, but through a `AccountMethods` instance.
 ///
 /// # Example
 ///
@@ -9142,7 +9380,7 @@ impl<'a, C, NC, A> AccountContainerMacroCreateCall<'a, C, NC, A> where NC: hyper
         for &field in ["alt", "accountId", "containerId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -9199,7 +9437,7 @@ impl<'a, C, NC, A> AccountContainerMacroCreateCall<'a, C, NC, A> where NC: hyper
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -9215,7 +9453,6 @@ impl<'a, C, NC, A> AccountContainerMacroCreateCall<'a, C, NC, A> where NC: hyper
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -9225,7 +9462,7 @@ impl<'a, C, NC, A> AccountContainerMacroCreateCall<'a, C, NC, A> where NC: hyper
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -9236,7 +9473,7 @@ impl<'a, C, NC, A> AccountContainerMacroCreateCall<'a, C, NC, A> where NC: hyper
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -9245,13 +9482,13 @@ impl<'a, C, NC, A> AccountContainerMacroCreateCall<'a, C, NC, A> where NC: hyper
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -9272,7 +9509,7 @@ impl<'a, C, NC, A> AccountContainerMacroCreateCall<'a, C, NC, A> where NC: hyper
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The GTM Account ID.    
+    /// The GTM Account ID.
     pub fn account_id(mut self, new_value: &str) -> AccountContainerMacroCreateCall<'a, C, NC, A> {
         self._account_id = new_value.to_string();
         self
@@ -9282,7 +9519,7 @@ impl<'a, C, NC, A> AccountContainerMacroCreateCall<'a, C, NC, A> where NC: hyper
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The GTM Container ID.    
+    /// The GTM Container ID.
     pub fn container_id(mut self, new_value: &str) -> AccountContainerMacroCreateCall<'a, C, NC, A> {
         self._container_id = new_value.to_string();
         self
@@ -9343,7 +9580,7 @@ impl<'a, C, NC, A> AccountContainerMacroCreateCall<'a, C, NC, A> where NC: hyper
 /// Gets a GTM Tag.
 ///
 /// A builder for the *containers.tags.get* method supported by a *account* resource.
-/// It is not used directly, but through a `AccountMethods`.
+/// It is not used directly, but through a `AccountMethods` instance.
 ///
 /// # Example
 ///
@@ -9405,7 +9642,7 @@ impl<'a, C, NC, A> AccountContainerTagGetCall<'a, C, NC, A> where NC: hyper::net
         for &field in ["alt", "accountId", "containerId", "tagId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -9458,7 +9695,7 @@ impl<'a, C, NC, A> AccountContainerTagGetCall<'a, C, NC, A> where NC: hyper::net
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -9470,7 +9707,6 @@ impl<'a, C, NC, A> AccountContainerTagGetCall<'a, C, NC, A> where NC: hyper::net
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -9480,7 +9716,7 @@ impl<'a, C, NC, A> AccountContainerTagGetCall<'a, C, NC, A> where NC: hyper::net
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -9491,7 +9727,7 @@ impl<'a, C, NC, A> AccountContainerTagGetCall<'a, C, NC, A> where NC: hyper::net
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -9500,13 +9736,13 @@ impl<'a, C, NC, A> AccountContainerTagGetCall<'a, C, NC, A> where NC: hyper::net
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -9518,7 +9754,7 @@ impl<'a, C, NC, A> AccountContainerTagGetCall<'a, C, NC, A> where NC: hyper::net
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The GTM Account ID.    
+    /// The GTM Account ID.
     pub fn account_id(mut self, new_value: &str) -> AccountContainerTagGetCall<'a, C, NC, A> {
         self._account_id = new_value.to_string();
         self
@@ -9528,7 +9764,7 @@ impl<'a, C, NC, A> AccountContainerTagGetCall<'a, C, NC, A> where NC: hyper::net
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The GTM Container ID.    
+    /// The GTM Container ID.
     pub fn container_id(mut self, new_value: &str) -> AccountContainerTagGetCall<'a, C, NC, A> {
         self._container_id = new_value.to_string();
         self
@@ -9538,7 +9774,7 @@ impl<'a, C, NC, A> AccountContainerTagGetCall<'a, C, NC, A> where NC: hyper::net
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The GTM Tag ID.    
+    /// The GTM Tag ID.
     pub fn tag_id(mut self, new_value: &str) -> AccountContainerTagGetCall<'a, C, NC, A> {
         self._tag_id = new_value.to_string();
         self
@@ -9599,7 +9835,7 @@ impl<'a, C, NC, A> AccountContainerTagGetCall<'a, C, NC, A> where NC: hyper::net
 /// Gets a GTM Variable.
 ///
 /// A builder for the *containers.variables.get* method supported by a *account* resource.
-/// It is not used directly, but through a `AccountMethods`.
+/// It is not used directly, but through a `AccountMethods` instance.
 ///
 /// # Example
 ///
@@ -9661,7 +9897,7 @@ impl<'a, C, NC, A> AccountContainerVariableGetCall<'a, C, NC, A> where NC: hyper
         for &field in ["alt", "accountId", "containerId", "variableId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -9714,7 +9950,7 @@ impl<'a, C, NC, A> AccountContainerVariableGetCall<'a, C, NC, A> where NC: hyper
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -9726,7 +9962,6 @@ impl<'a, C, NC, A> AccountContainerVariableGetCall<'a, C, NC, A> where NC: hyper
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -9736,7 +9971,7 @@ impl<'a, C, NC, A> AccountContainerVariableGetCall<'a, C, NC, A> where NC: hyper
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -9747,7 +9982,7 @@ impl<'a, C, NC, A> AccountContainerVariableGetCall<'a, C, NC, A> where NC: hyper
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -9756,13 +9991,13 @@ impl<'a, C, NC, A> AccountContainerVariableGetCall<'a, C, NC, A> where NC: hyper
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -9774,7 +10009,7 @@ impl<'a, C, NC, A> AccountContainerVariableGetCall<'a, C, NC, A> where NC: hyper
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The GTM Account ID.    
+    /// The GTM Account ID.
     pub fn account_id(mut self, new_value: &str) -> AccountContainerVariableGetCall<'a, C, NC, A> {
         self._account_id = new_value.to_string();
         self
@@ -9784,7 +10019,7 @@ impl<'a, C, NC, A> AccountContainerVariableGetCall<'a, C, NC, A> where NC: hyper
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The GTM Container ID.    
+    /// The GTM Container ID.
     pub fn container_id(mut self, new_value: &str) -> AccountContainerVariableGetCall<'a, C, NC, A> {
         self._container_id = new_value.to_string();
         self
@@ -9794,7 +10029,7 @@ impl<'a, C, NC, A> AccountContainerVariableGetCall<'a, C, NC, A> where NC: hyper
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The GTM Variable ID.    
+    /// The GTM Variable ID.
     pub fn variable_id(mut self, new_value: &str) -> AccountContainerVariableGetCall<'a, C, NC, A> {
         self._variable_id = new_value.to_string();
         self
@@ -9855,7 +10090,7 @@ impl<'a, C, NC, A> AccountContainerVariableGetCall<'a, C, NC, A> where NC: hyper
 /// Deletes a GTM Trigger.
 ///
 /// A builder for the *containers.triggers.delete* method supported by a *account* resource.
-/// It is not used directly, but through a `AccountMethods`.
+/// It is not used directly, but through a `AccountMethods` instance.
 ///
 /// # Example
 ///
@@ -9917,7 +10152,7 @@ impl<'a, C, NC, A> AccountContainerTriggerDeleteCall<'a, C, NC, A> where NC: hyp
         for &field in ["accountId", "containerId", "triggerId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -9969,7 +10204,7 @@ impl<'a, C, NC, A> AccountContainerTriggerDeleteCall<'a, C, NC, A> where NC: hyp
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -9981,7 +10216,6 @@ impl<'a, C, NC, A> AccountContainerTriggerDeleteCall<'a, C, NC, A> where NC: hyp
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -9991,7 +10225,7 @@ impl<'a, C, NC, A> AccountContainerTriggerDeleteCall<'a, C, NC, A> where NC: hyp
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -10002,12 +10236,12 @@ impl<'a, C, NC, A> AccountContainerTriggerDeleteCall<'a, C, NC, A> where NC: hyp
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = res;
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -10019,7 +10253,7 @@ impl<'a, C, NC, A> AccountContainerTriggerDeleteCall<'a, C, NC, A> where NC: hyp
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The GTM Account ID.    
+    /// The GTM Account ID.
     pub fn account_id(mut self, new_value: &str) -> AccountContainerTriggerDeleteCall<'a, C, NC, A> {
         self._account_id = new_value.to_string();
         self
@@ -10029,7 +10263,7 @@ impl<'a, C, NC, A> AccountContainerTriggerDeleteCall<'a, C, NC, A> where NC: hyp
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The GTM Container ID.    
+    /// The GTM Container ID.
     pub fn container_id(mut self, new_value: &str) -> AccountContainerTriggerDeleteCall<'a, C, NC, A> {
         self._container_id = new_value.to_string();
         self
@@ -10039,7 +10273,7 @@ impl<'a, C, NC, A> AccountContainerTriggerDeleteCall<'a, C, NC, A> where NC: hyp
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The GTM Trigger ID.    
+    /// The GTM Trigger ID.
     pub fn trigger_id(mut self, new_value: &str) -> AccountContainerTriggerDeleteCall<'a, C, NC, A> {
         self._trigger_id = new_value.to_string();
         self
@@ -10100,7 +10334,7 @@ impl<'a, C, NC, A> AccountContainerTriggerDeleteCall<'a, C, NC, A> where NC: hyp
 /// Lists all GTM Macros of a Container.
 ///
 /// A builder for the *containers.macros.list* method supported by a *account* resource.
-/// It is not used directly, but through a `AccountMethods`.
+/// It is not used directly, but through a `AccountMethods` instance.
 ///
 /// # Example
 ///
@@ -10160,7 +10394,7 @@ impl<'a, C, NC, A> AccountContainerMacroListCall<'a, C, NC, A> where NC: hyper::
         for &field in ["alt", "accountId", "containerId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -10213,7 +10447,7 @@ impl<'a, C, NC, A> AccountContainerMacroListCall<'a, C, NC, A> where NC: hyper::
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -10225,7 +10459,6 @@ impl<'a, C, NC, A> AccountContainerMacroListCall<'a, C, NC, A> where NC: hyper::
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -10235,7 +10468,7 @@ impl<'a, C, NC, A> AccountContainerMacroListCall<'a, C, NC, A> where NC: hyper::
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -10246,7 +10479,7 @@ impl<'a, C, NC, A> AccountContainerMacroListCall<'a, C, NC, A> where NC: hyper::
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -10255,13 +10488,13 @@ impl<'a, C, NC, A> AccountContainerMacroListCall<'a, C, NC, A> where NC: hyper::
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -10273,7 +10506,7 @@ impl<'a, C, NC, A> AccountContainerMacroListCall<'a, C, NC, A> where NC: hyper::
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The GTM Account ID.    
+    /// The GTM Account ID.
     pub fn account_id(mut self, new_value: &str) -> AccountContainerMacroListCall<'a, C, NC, A> {
         self._account_id = new_value.to_string();
         self
@@ -10283,7 +10516,7 @@ impl<'a, C, NC, A> AccountContainerMacroListCall<'a, C, NC, A> where NC: hyper::
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The GTM Container ID.    
+    /// The GTM Container ID.
     pub fn container_id(mut self, new_value: &str) -> AccountContainerMacroListCall<'a, C, NC, A> {
         self._container_id = new_value.to_string();
         self
@@ -10344,7 +10577,7 @@ impl<'a, C, NC, A> AccountContainerMacroListCall<'a, C, NC, A> where NC: hyper::
 /// Creates a GTM Trigger.
 ///
 /// A builder for the *containers.triggers.create* method supported by a *account* resource.
-/// It is not used directly, but through a `AccountMethods`.
+/// It is not used directly, but through a `AccountMethods` instance.
 ///
 /// # Example
 ///
@@ -10411,7 +10644,7 @@ impl<'a, C, NC, A> AccountContainerTriggerCreateCall<'a, C, NC, A> where NC: hyp
         for &field in ["alt", "accountId", "containerId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -10468,7 +10701,7 @@ impl<'a, C, NC, A> AccountContainerTriggerCreateCall<'a, C, NC, A> where NC: hyp
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -10484,7 +10717,6 @@ impl<'a, C, NC, A> AccountContainerTriggerCreateCall<'a, C, NC, A> where NC: hyp
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -10494,7 +10726,7 @@ impl<'a, C, NC, A> AccountContainerTriggerCreateCall<'a, C, NC, A> where NC: hyp
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -10505,7 +10737,7 @@ impl<'a, C, NC, A> AccountContainerTriggerCreateCall<'a, C, NC, A> where NC: hyp
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -10514,13 +10746,13 @@ impl<'a, C, NC, A> AccountContainerTriggerCreateCall<'a, C, NC, A> where NC: hyp
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -10541,7 +10773,7 @@ impl<'a, C, NC, A> AccountContainerTriggerCreateCall<'a, C, NC, A> where NC: hyp
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The GTM Account ID.    
+    /// The GTM Account ID.
     pub fn account_id(mut self, new_value: &str) -> AccountContainerTriggerCreateCall<'a, C, NC, A> {
         self._account_id = new_value.to_string();
         self
@@ -10551,7 +10783,7 @@ impl<'a, C, NC, A> AccountContainerTriggerCreateCall<'a, C, NC, A> where NC: hyp
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The GTM Container ID.    
+    /// The GTM Container ID.
     pub fn container_id(mut self, new_value: &str) -> AccountContainerTriggerCreateCall<'a, C, NC, A> {
         self._container_id = new_value.to_string();
         self
@@ -10612,7 +10844,7 @@ impl<'a, C, NC, A> AccountContainerTriggerCreateCall<'a, C, NC, A> where NC: hyp
 /// Updates a GTM Macro.
 ///
 /// A builder for the *containers.macros.update* method supported by a *account* resource.
-/// It is not used directly, but through a `AccountMethods`.
+/// It is not used directly, but through a `AccountMethods` instance.
 ///
 /// # Example
 ///
@@ -10686,7 +10918,7 @@ impl<'a, C, NC, A> AccountContainerMacroUpdateCall<'a, C, NC, A> where NC: hyper
         for &field in ["alt", "accountId", "containerId", "macroId", "fingerprint"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -10743,7 +10975,7 @@ impl<'a, C, NC, A> AccountContainerMacroUpdateCall<'a, C, NC, A> where NC: hyper
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -10759,7 +10991,6 @@ impl<'a, C, NC, A> AccountContainerMacroUpdateCall<'a, C, NC, A> where NC: hyper
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -10769,7 +11000,7 @@ impl<'a, C, NC, A> AccountContainerMacroUpdateCall<'a, C, NC, A> where NC: hyper
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -10780,7 +11011,7 @@ impl<'a, C, NC, A> AccountContainerMacroUpdateCall<'a, C, NC, A> where NC: hyper
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -10789,13 +11020,13 @@ impl<'a, C, NC, A> AccountContainerMacroUpdateCall<'a, C, NC, A> where NC: hyper
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -10816,7 +11047,7 @@ impl<'a, C, NC, A> AccountContainerMacroUpdateCall<'a, C, NC, A> where NC: hyper
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The GTM Account ID.    
+    /// The GTM Account ID.
     pub fn account_id(mut self, new_value: &str) -> AccountContainerMacroUpdateCall<'a, C, NC, A> {
         self._account_id = new_value.to_string();
         self
@@ -10826,7 +11057,7 @@ impl<'a, C, NC, A> AccountContainerMacroUpdateCall<'a, C, NC, A> where NC: hyper
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The GTM Container ID.    
+    /// The GTM Container ID.
     pub fn container_id(mut self, new_value: &str) -> AccountContainerMacroUpdateCall<'a, C, NC, A> {
         self._container_id = new_value.to_string();
         self
@@ -10836,7 +11067,7 @@ impl<'a, C, NC, A> AccountContainerMacroUpdateCall<'a, C, NC, A> where NC: hyper
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The GTM Macro ID.    
+    /// The GTM Macro ID.
     pub fn macro_id(mut self, new_value: &str) -> AccountContainerMacroUpdateCall<'a, C, NC, A> {
         self._macro_id = new_value.to_string();
         self
@@ -10844,7 +11075,7 @@ impl<'a, C, NC, A> AccountContainerMacroUpdateCall<'a, C, NC, A> where NC: hyper
     /// Sets the *fingerprint* query property to the given value.
     ///
     /// 
-    /// When provided, this fingerprint must match the fingerprint of the macro in storage.    
+    /// When provided, this fingerprint must match the fingerprint of the macro in storage.
     pub fn fingerprint(mut self, new_value: &str) -> AccountContainerMacroUpdateCall<'a, C, NC, A> {
         self._fingerprint = Some(new_value.to_string());
         self
@@ -10905,7 +11136,7 @@ impl<'a, C, NC, A> AccountContainerMacroUpdateCall<'a, C, NC, A> where NC: hyper
 /// Lists all GTM Accounts that a user has access to.
 ///
 /// A builder for the *list* method supported by a *account* resource.
-/// It is not used directly, but through a `AccountMethods`.
+/// It is not used directly, but through a `AccountMethods` instance.
 ///
 /// # Example
 ///
@@ -10961,7 +11192,7 @@ impl<'a, C, NC, A> AccountListCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
         for &field in ["alt"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -10990,7 +11221,7 @@ impl<'a, C, NC, A> AccountListCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -11002,7 +11233,6 @@ impl<'a, C, NC, A> AccountListCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -11012,7 +11242,7 @@ impl<'a, C, NC, A> AccountListCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -11023,7 +11253,7 @@ impl<'a, C, NC, A> AccountListCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -11032,13 +11262,13 @@ impl<'a, C, NC, A> AccountListCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -11101,7 +11331,7 @@ impl<'a, C, NC, A> AccountListCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
 /// Updates a user's Account & Container Permissions.
 ///
 /// A builder for the *permissions.update* method supported by a *account* resource.
-/// It is not used directly, but through a `AccountMethods`.
+/// It is not used directly, but through a `AccountMethods` instance.
 ///
 /// # Example
 ///
@@ -11168,7 +11398,7 @@ impl<'a, C, NC, A> AccountPermissionUpdateCall<'a, C, NC, A> where NC: hyper::ne
         for &field in ["alt", "accountId", "permissionId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -11225,7 +11455,7 @@ impl<'a, C, NC, A> AccountPermissionUpdateCall<'a, C, NC, A> where NC: hyper::ne
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -11241,7 +11471,6 @@ impl<'a, C, NC, A> AccountPermissionUpdateCall<'a, C, NC, A> where NC: hyper::ne
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -11251,7 +11480,7 @@ impl<'a, C, NC, A> AccountPermissionUpdateCall<'a, C, NC, A> where NC: hyper::ne
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -11262,7 +11491,7 @@ impl<'a, C, NC, A> AccountPermissionUpdateCall<'a, C, NC, A> where NC: hyper::ne
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -11271,13 +11500,13 @@ impl<'a, C, NC, A> AccountPermissionUpdateCall<'a, C, NC, A> where NC: hyper::ne
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -11298,7 +11527,7 @@ impl<'a, C, NC, A> AccountPermissionUpdateCall<'a, C, NC, A> where NC: hyper::ne
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The GTM Account ID.    
+    /// The GTM Account ID.
     pub fn account_id(mut self, new_value: &str) -> AccountPermissionUpdateCall<'a, C, NC, A> {
         self._account_id = new_value.to_string();
         self
@@ -11308,7 +11537,7 @@ impl<'a, C, NC, A> AccountPermissionUpdateCall<'a, C, NC, A> where NC: hyper::ne
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The GTM User ID.    
+    /// The GTM User ID.
     pub fn permission_id(mut self, new_value: &str) -> AccountPermissionUpdateCall<'a, C, NC, A> {
         self._permission_id = new_value.to_string();
         self
@@ -11369,7 +11598,7 @@ impl<'a, C, NC, A> AccountPermissionUpdateCall<'a, C, NC, A> where NC: hyper::ne
 /// Deletes a GTM Variable.
 ///
 /// A builder for the *containers.variables.delete* method supported by a *account* resource.
-/// It is not used directly, but through a `AccountMethods`.
+/// It is not used directly, but through a `AccountMethods` instance.
 ///
 /// # Example
 ///
@@ -11431,7 +11660,7 @@ impl<'a, C, NC, A> AccountContainerVariableDeleteCall<'a, C, NC, A> where NC: hy
         for &field in ["accountId", "containerId", "variableId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -11483,7 +11712,7 @@ impl<'a, C, NC, A> AccountContainerVariableDeleteCall<'a, C, NC, A> where NC: hy
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -11495,7 +11724,6 @@ impl<'a, C, NC, A> AccountContainerVariableDeleteCall<'a, C, NC, A> where NC: hy
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -11505,7 +11733,7 @@ impl<'a, C, NC, A> AccountContainerVariableDeleteCall<'a, C, NC, A> where NC: hy
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -11516,12 +11744,12 @@ impl<'a, C, NC, A> AccountContainerVariableDeleteCall<'a, C, NC, A> where NC: hy
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = res;
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -11533,7 +11761,7 @@ impl<'a, C, NC, A> AccountContainerVariableDeleteCall<'a, C, NC, A> where NC: hy
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The GTM Account ID.    
+    /// The GTM Account ID.
     pub fn account_id(mut self, new_value: &str) -> AccountContainerVariableDeleteCall<'a, C, NC, A> {
         self._account_id = new_value.to_string();
         self
@@ -11543,7 +11771,7 @@ impl<'a, C, NC, A> AccountContainerVariableDeleteCall<'a, C, NC, A> where NC: hy
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The GTM Container ID.    
+    /// The GTM Container ID.
     pub fn container_id(mut self, new_value: &str) -> AccountContainerVariableDeleteCall<'a, C, NC, A> {
         self._container_id = new_value.to_string();
         self
@@ -11553,7 +11781,7 @@ impl<'a, C, NC, A> AccountContainerVariableDeleteCall<'a, C, NC, A> where NC: hy
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The GTM Variable ID.    
+    /// The GTM Variable ID.
     pub fn variable_id(mut self, new_value: &str) -> AccountContainerVariableDeleteCall<'a, C, NC, A> {
         self._variable_id = new_value.to_string();
         self
@@ -11614,7 +11842,7 @@ impl<'a, C, NC, A> AccountContainerVariableDeleteCall<'a, C, NC, A> where NC: hy
 /// Gets a GTM Account.
 ///
 /// A builder for the *get* method supported by a *account* resource.
-/// It is not used directly, but through a `AccountMethods`.
+/// It is not used directly, but through a `AccountMethods` instance.
 ///
 /// # Example
 ///
@@ -11672,7 +11900,7 @@ impl<'a, C, NC, A> AccountGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
         for &field in ["alt", "accountId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -11725,7 +11953,7 @@ impl<'a, C, NC, A> AccountGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -11737,7 +11965,6 @@ impl<'a, C, NC, A> AccountGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -11747,7 +11974,7 @@ impl<'a, C, NC, A> AccountGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -11758,7 +11985,7 @@ impl<'a, C, NC, A> AccountGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -11767,13 +11994,13 @@ impl<'a, C, NC, A> AccountGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -11785,7 +12012,7 @@ impl<'a, C, NC, A> AccountGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The GTM Account ID.    
+    /// The GTM Account ID.
     pub fn account_id(mut self, new_value: &str) -> AccountGetCall<'a, C, NC, A> {
         self._account_id = new_value.to_string();
         self
@@ -11846,7 +12073,7 @@ impl<'a, C, NC, A> AccountGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
 /// Updates a Container.
 ///
 /// A builder for the *containers.update* method supported by a *account* resource.
-/// It is not used directly, but through a `AccountMethods`.
+/// It is not used directly, but through a `AccountMethods` instance.
 ///
 /// # Example
 ///
@@ -11918,7 +12145,7 @@ impl<'a, C, NC, A> AccountContainerUpdateCall<'a, C, NC, A> where NC: hyper::net
         for &field in ["alt", "accountId", "containerId", "fingerprint"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -11975,7 +12202,7 @@ impl<'a, C, NC, A> AccountContainerUpdateCall<'a, C, NC, A> where NC: hyper::net
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -11991,7 +12218,6 @@ impl<'a, C, NC, A> AccountContainerUpdateCall<'a, C, NC, A> where NC: hyper::net
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -12001,7 +12227,7 @@ impl<'a, C, NC, A> AccountContainerUpdateCall<'a, C, NC, A> where NC: hyper::net
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -12012,7 +12238,7 @@ impl<'a, C, NC, A> AccountContainerUpdateCall<'a, C, NC, A> where NC: hyper::net
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -12021,13 +12247,13 @@ impl<'a, C, NC, A> AccountContainerUpdateCall<'a, C, NC, A> where NC: hyper::net
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -12048,7 +12274,7 @@ impl<'a, C, NC, A> AccountContainerUpdateCall<'a, C, NC, A> where NC: hyper::net
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The GTM Account ID.    
+    /// The GTM Account ID.
     pub fn account_id(mut self, new_value: &str) -> AccountContainerUpdateCall<'a, C, NC, A> {
         self._account_id = new_value.to_string();
         self
@@ -12058,7 +12284,7 @@ impl<'a, C, NC, A> AccountContainerUpdateCall<'a, C, NC, A> where NC: hyper::net
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The GTM Container ID.    
+    /// The GTM Container ID.
     pub fn container_id(mut self, new_value: &str) -> AccountContainerUpdateCall<'a, C, NC, A> {
         self._container_id = new_value.to_string();
         self
@@ -12066,7 +12292,7 @@ impl<'a, C, NC, A> AccountContainerUpdateCall<'a, C, NC, A> where NC: hyper::net
     /// Sets the *fingerprint* query property to the given value.
     ///
     /// 
-    /// When provided, this fingerprint must match the fingerprint of the container in storage.    
+    /// When provided, this fingerprint must match the fingerprint of the container in storage.
     pub fn fingerprint(mut self, new_value: &str) -> AccountContainerUpdateCall<'a, C, NC, A> {
         self._fingerprint = Some(new_value.to_string());
         self
@@ -12127,7 +12353,7 @@ impl<'a, C, NC, A> AccountContainerUpdateCall<'a, C, NC, A> where NC: hyper::net
 /// Lists all GTM Rules of a Container.
 ///
 /// A builder for the *containers.rules.list* method supported by a *account* resource.
-/// It is not used directly, but through a `AccountMethods`.
+/// It is not used directly, but through a `AccountMethods` instance.
 ///
 /// # Example
 ///
@@ -12187,7 +12413,7 @@ impl<'a, C, NC, A> AccountContainerRuleListCall<'a, C, NC, A> where NC: hyper::n
         for &field in ["alt", "accountId", "containerId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -12240,7 +12466,7 @@ impl<'a, C, NC, A> AccountContainerRuleListCall<'a, C, NC, A> where NC: hyper::n
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -12252,7 +12478,6 @@ impl<'a, C, NC, A> AccountContainerRuleListCall<'a, C, NC, A> where NC: hyper::n
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -12262,7 +12487,7 @@ impl<'a, C, NC, A> AccountContainerRuleListCall<'a, C, NC, A> where NC: hyper::n
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -12273,7 +12498,7 @@ impl<'a, C, NC, A> AccountContainerRuleListCall<'a, C, NC, A> where NC: hyper::n
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -12282,13 +12507,13 @@ impl<'a, C, NC, A> AccountContainerRuleListCall<'a, C, NC, A> where NC: hyper::n
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -12300,7 +12525,7 @@ impl<'a, C, NC, A> AccountContainerRuleListCall<'a, C, NC, A> where NC: hyper::n
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The GTM Account ID.    
+    /// The GTM Account ID.
     pub fn account_id(mut self, new_value: &str) -> AccountContainerRuleListCall<'a, C, NC, A> {
         self._account_id = new_value.to_string();
         self
@@ -12310,7 +12535,7 @@ impl<'a, C, NC, A> AccountContainerRuleListCall<'a, C, NC, A> where NC: hyper::n
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The GTM Container ID.    
+    /// The GTM Container ID.
     pub fn container_id(mut self, new_value: &str) -> AccountContainerRuleListCall<'a, C, NC, A> {
         self._container_id = new_value.to_string();
         self
@@ -12371,7 +12596,7 @@ impl<'a, C, NC, A> AccountContainerRuleListCall<'a, C, NC, A> where NC: hyper::n
 /// Updates a GTM Tag.
 ///
 /// A builder for the *containers.tags.update* method supported by a *account* resource.
-/// It is not used directly, but through a `AccountMethods`.
+/// It is not used directly, but through a `AccountMethods` instance.
 ///
 /// # Example
 ///
@@ -12445,7 +12670,7 @@ impl<'a, C, NC, A> AccountContainerTagUpdateCall<'a, C, NC, A> where NC: hyper::
         for &field in ["alt", "accountId", "containerId", "tagId", "fingerprint"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -12502,7 +12727,7 @@ impl<'a, C, NC, A> AccountContainerTagUpdateCall<'a, C, NC, A> where NC: hyper::
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -12518,7 +12743,6 @@ impl<'a, C, NC, A> AccountContainerTagUpdateCall<'a, C, NC, A> where NC: hyper::
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -12528,7 +12752,7 @@ impl<'a, C, NC, A> AccountContainerTagUpdateCall<'a, C, NC, A> where NC: hyper::
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -12539,7 +12763,7 @@ impl<'a, C, NC, A> AccountContainerTagUpdateCall<'a, C, NC, A> where NC: hyper::
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -12548,13 +12772,13 @@ impl<'a, C, NC, A> AccountContainerTagUpdateCall<'a, C, NC, A> where NC: hyper::
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -12575,7 +12799,7 @@ impl<'a, C, NC, A> AccountContainerTagUpdateCall<'a, C, NC, A> where NC: hyper::
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The GTM Account ID.    
+    /// The GTM Account ID.
     pub fn account_id(mut self, new_value: &str) -> AccountContainerTagUpdateCall<'a, C, NC, A> {
         self._account_id = new_value.to_string();
         self
@@ -12585,7 +12809,7 @@ impl<'a, C, NC, A> AccountContainerTagUpdateCall<'a, C, NC, A> where NC: hyper::
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The GTM Container ID.    
+    /// The GTM Container ID.
     pub fn container_id(mut self, new_value: &str) -> AccountContainerTagUpdateCall<'a, C, NC, A> {
         self._container_id = new_value.to_string();
         self
@@ -12595,7 +12819,7 @@ impl<'a, C, NC, A> AccountContainerTagUpdateCall<'a, C, NC, A> where NC: hyper::
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The GTM Tag ID.    
+    /// The GTM Tag ID.
     pub fn tag_id(mut self, new_value: &str) -> AccountContainerTagUpdateCall<'a, C, NC, A> {
         self._tag_id = new_value.to_string();
         self
@@ -12603,7 +12827,7 @@ impl<'a, C, NC, A> AccountContainerTagUpdateCall<'a, C, NC, A> where NC: hyper::
     /// Sets the *fingerprint* query property to the given value.
     ///
     /// 
-    /// When provided, this fingerprint must match the fingerprint of the tag in storage.    
+    /// When provided, this fingerprint must match the fingerprint of the tag in storage.
     pub fn fingerprint(mut self, new_value: &str) -> AccountContainerTagUpdateCall<'a, C, NC, A> {
         self._fingerprint = Some(new_value.to_string());
         self
@@ -12664,7 +12888,7 @@ impl<'a, C, NC, A> AccountContainerTagUpdateCall<'a, C, NC, A> where NC: hyper::
 /// Gets a GTM Macro.
 ///
 /// A builder for the *containers.macros.get* method supported by a *account* resource.
-/// It is not used directly, but through a `AccountMethods`.
+/// It is not used directly, but through a `AccountMethods` instance.
 ///
 /// # Example
 ///
@@ -12726,7 +12950,7 @@ impl<'a, C, NC, A> AccountContainerMacroGetCall<'a, C, NC, A> where NC: hyper::n
         for &field in ["alt", "accountId", "containerId", "macroId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -12779,7 +13003,7 @@ impl<'a, C, NC, A> AccountContainerMacroGetCall<'a, C, NC, A> where NC: hyper::n
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -12791,7 +13015,6 @@ impl<'a, C, NC, A> AccountContainerMacroGetCall<'a, C, NC, A> where NC: hyper::n
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -12801,7 +13024,7 @@ impl<'a, C, NC, A> AccountContainerMacroGetCall<'a, C, NC, A> where NC: hyper::n
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -12812,7 +13035,7 @@ impl<'a, C, NC, A> AccountContainerMacroGetCall<'a, C, NC, A> where NC: hyper::n
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -12821,13 +13044,13 @@ impl<'a, C, NC, A> AccountContainerMacroGetCall<'a, C, NC, A> where NC: hyper::n
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -12839,7 +13062,7 @@ impl<'a, C, NC, A> AccountContainerMacroGetCall<'a, C, NC, A> where NC: hyper::n
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The GTM Account ID.    
+    /// The GTM Account ID.
     pub fn account_id(mut self, new_value: &str) -> AccountContainerMacroGetCall<'a, C, NC, A> {
         self._account_id = new_value.to_string();
         self
@@ -12849,7 +13072,7 @@ impl<'a, C, NC, A> AccountContainerMacroGetCall<'a, C, NC, A> where NC: hyper::n
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The GTM Container ID.    
+    /// The GTM Container ID.
     pub fn container_id(mut self, new_value: &str) -> AccountContainerMacroGetCall<'a, C, NC, A> {
         self._container_id = new_value.to_string();
         self
@@ -12859,7 +13082,7 @@ impl<'a, C, NC, A> AccountContainerMacroGetCall<'a, C, NC, A> where NC: hyper::n
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The GTM Macro ID.    
+    /// The GTM Macro ID.
     pub fn macro_id(mut self, new_value: &str) -> AccountContainerMacroGetCall<'a, C, NC, A> {
         self._macro_id = new_value.to_string();
         self
@@ -12920,7 +13143,7 @@ impl<'a, C, NC, A> AccountContainerMacroGetCall<'a, C, NC, A> where NC: hyper::n
 /// Updates a Container Version.
 ///
 /// A builder for the *containers.versions.update* method supported by a *account* resource.
-/// It is not used directly, but through a `AccountMethods`.
+/// It is not used directly, but through a `AccountMethods` instance.
 ///
 /// # Example
 ///
@@ -12994,7 +13217,7 @@ impl<'a, C, NC, A> AccountContainerVersionUpdateCall<'a, C, NC, A> where NC: hyp
         for &field in ["alt", "accountId", "containerId", "containerVersionId", "fingerprint"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -13051,7 +13274,7 @@ impl<'a, C, NC, A> AccountContainerVersionUpdateCall<'a, C, NC, A> where NC: hyp
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -13067,7 +13290,6 @@ impl<'a, C, NC, A> AccountContainerVersionUpdateCall<'a, C, NC, A> where NC: hyp
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -13077,7 +13299,7 @@ impl<'a, C, NC, A> AccountContainerVersionUpdateCall<'a, C, NC, A> where NC: hyp
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -13088,7 +13310,7 @@ impl<'a, C, NC, A> AccountContainerVersionUpdateCall<'a, C, NC, A> where NC: hyp
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -13097,13 +13319,13 @@ impl<'a, C, NC, A> AccountContainerVersionUpdateCall<'a, C, NC, A> where NC: hyp
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -13124,7 +13346,7 @@ impl<'a, C, NC, A> AccountContainerVersionUpdateCall<'a, C, NC, A> where NC: hyp
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The GTM Account ID.    
+    /// The GTM Account ID.
     pub fn account_id(mut self, new_value: &str) -> AccountContainerVersionUpdateCall<'a, C, NC, A> {
         self._account_id = new_value.to_string();
         self
@@ -13134,7 +13356,7 @@ impl<'a, C, NC, A> AccountContainerVersionUpdateCall<'a, C, NC, A> where NC: hyp
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The GTM Container ID.    
+    /// The GTM Container ID.
     pub fn container_id(mut self, new_value: &str) -> AccountContainerVersionUpdateCall<'a, C, NC, A> {
         self._container_id = new_value.to_string();
         self
@@ -13144,7 +13366,7 @@ impl<'a, C, NC, A> AccountContainerVersionUpdateCall<'a, C, NC, A> where NC: hyp
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The GTM Container Version ID.    
+    /// The GTM Container Version ID.
     pub fn container_version_id(mut self, new_value: &str) -> AccountContainerVersionUpdateCall<'a, C, NC, A> {
         self._container_version_id = new_value.to_string();
         self
@@ -13152,7 +13374,7 @@ impl<'a, C, NC, A> AccountContainerVersionUpdateCall<'a, C, NC, A> where NC: hyp
     /// Sets the *fingerprint* query property to the given value.
     ///
     /// 
-    /// When provided, this fingerprint must match the fingerprint of the container version in storage.    
+    /// When provided, this fingerprint must match the fingerprint of the container version in storage.
     pub fn fingerprint(mut self, new_value: &str) -> AccountContainerVersionUpdateCall<'a, C, NC, A> {
         self._fingerprint = Some(new_value.to_string());
         self
@@ -13213,7 +13435,7 @@ impl<'a, C, NC, A> AccountContainerVersionUpdateCall<'a, C, NC, A> where NC: hyp
 /// Updates a GTM Variable.
 ///
 /// A builder for the *containers.variables.update* method supported by a *account* resource.
-/// It is not used directly, but through a `AccountMethods`.
+/// It is not used directly, but through a `AccountMethods` instance.
 ///
 /// # Example
 ///
@@ -13287,7 +13509,7 @@ impl<'a, C, NC, A> AccountContainerVariableUpdateCall<'a, C, NC, A> where NC: hy
         for &field in ["alt", "accountId", "containerId", "variableId", "fingerprint"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -13344,7 +13566,7 @@ impl<'a, C, NC, A> AccountContainerVariableUpdateCall<'a, C, NC, A> where NC: hy
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -13360,7 +13582,6 @@ impl<'a, C, NC, A> AccountContainerVariableUpdateCall<'a, C, NC, A> where NC: hy
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -13370,7 +13591,7 @@ impl<'a, C, NC, A> AccountContainerVariableUpdateCall<'a, C, NC, A> where NC: hy
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -13381,7 +13602,7 @@ impl<'a, C, NC, A> AccountContainerVariableUpdateCall<'a, C, NC, A> where NC: hy
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -13390,13 +13611,13 @@ impl<'a, C, NC, A> AccountContainerVariableUpdateCall<'a, C, NC, A> where NC: hy
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -13417,7 +13638,7 @@ impl<'a, C, NC, A> AccountContainerVariableUpdateCall<'a, C, NC, A> where NC: hy
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The GTM Account ID.    
+    /// The GTM Account ID.
     pub fn account_id(mut self, new_value: &str) -> AccountContainerVariableUpdateCall<'a, C, NC, A> {
         self._account_id = new_value.to_string();
         self
@@ -13427,7 +13648,7 @@ impl<'a, C, NC, A> AccountContainerVariableUpdateCall<'a, C, NC, A> where NC: hy
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The GTM Container ID.    
+    /// The GTM Container ID.
     pub fn container_id(mut self, new_value: &str) -> AccountContainerVariableUpdateCall<'a, C, NC, A> {
         self._container_id = new_value.to_string();
         self
@@ -13437,7 +13658,7 @@ impl<'a, C, NC, A> AccountContainerVariableUpdateCall<'a, C, NC, A> where NC: hy
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The GTM Variable ID.    
+    /// The GTM Variable ID.
     pub fn variable_id(mut self, new_value: &str) -> AccountContainerVariableUpdateCall<'a, C, NC, A> {
         self._variable_id = new_value.to_string();
         self
@@ -13445,7 +13666,7 @@ impl<'a, C, NC, A> AccountContainerVariableUpdateCall<'a, C, NC, A> where NC: hy
     /// Sets the *fingerprint* query property to the given value.
     ///
     /// 
-    /// When provided, this fingerprint must match the fingerprint of the variable in storage.    
+    /// When provided, this fingerprint must match the fingerprint of the variable in storage.
     pub fn fingerprint(mut self, new_value: &str) -> AccountContainerVariableUpdateCall<'a, C, NC, A> {
         self._fingerprint = Some(new_value.to_string());
         self
@@ -13506,7 +13727,7 @@ impl<'a, C, NC, A> AccountContainerVariableUpdateCall<'a, C, NC, A> where NC: hy
 /// Gets a Container Version.
 ///
 /// A builder for the *containers.versions.get* method supported by a *account* resource.
-/// It is not used directly, but through a `AccountMethods`.
+/// It is not used directly, but through a `AccountMethods` instance.
 ///
 /// # Example
 ///
@@ -13568,7 +13789,7 @@ impl<'a, C, NC, A> AccountContainerVersionGetCall<'a, C, NC, A> where NC: hyper:
         for &field in ["alt", "accountId", "containerId", "containerVersionId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -13621,7 +13842,7 @@ impl<'a, C, NC, A> AccountContainerVersionGetCall<'a, C, NC, A> where NC: hyper:
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -13633,7 +13854,6 @@ impl<'a, C, NC, A> AccountContainerVersionGetCall<'a, C, NC, A> where NC: hyper:
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -13643,7 +13863,7 @@ impl<'a, C, NC, A> AccountContainerVersionGetCall<'a, C, NC, A> where NC: hyper:
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -13654,7 +13874,7 @@ impl<'a, C, NC, A> AccountContainerVersionGetCall<'a, C, NC, A> where NC: hyper:
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -13663,13 +13883,13 @@ impl<'a, C, NC, A> AccountContainerVersionGetCall<'a, C, NC, A> where NC: hyper:
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -13681,7 +13901,7 @@ impl<'a, C, NC, A> AccountContainerVersionGetCall<'a, C, NC, A> where NC: hyper:
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The GTM Account ID.    
+    /// The GTM Account ID.
     pub fn account_id(mut self, new_value: &str) -> AccountContainerVersionGetCall<'a, C, NC, A> {
         self._account_id = new_value.to_string();
         self
@@ -13691,7 +13911,7 @@ impl<'a, C, NC, A> AccountContainerVersionGetCall<'a, C, NC, A> where NC: hyper:
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The GTM Container ID.    
+    /// The GTM Container ID.
     pub fn container_id(mut self, new_value: &str) -> AccountContainerVersionGetCall<'a, C, NC, A> {
         self._container_id = new_value.to_string();
         self
@@ -13701,7 +13921,7 @@ impl<'a, C, NC, A> AccountContainerVersionGetCall<'a, C, NC, A> where NC: hyper:
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The GTM Container Version ID. Specify published to retrieve the currently published version.    
+    /// The GTM Container Version ID. Specify published to retrieve the currently published version.
     pub fn container_version_id(mut self, new_value: &str) -> AccountContainerVersionGetCall<'a, C, NC, A> {
         self._container_version_id = new_value.to_string();
         self

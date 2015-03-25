@@ -1,8 +1,8 @@
 // DO NOT EDIT !
-// This file was generated automatically from 'src/mako/lib.rs.mako'
+// This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *calendar* crate version *0.1.1+20141123*, where *20141123* is the exact revision of the *calendar:v3* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.1*.
+//! This documentation was generated from *calendar* crate version *0.1.2+20150303*, where *20150303* is the exact revision of the *calendar:v3* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.2*.
 //! 
 //! Everything else about the *calendar* *v3* API can be found at the
 //! [official documentation site](https://developers.google.com/google-apps/calendar/firstapp).
@@ -51,6 +51,8 @@
 //! 
 //! * **[Hub](struct.CalendarHub.html)**
 //!     * a central object to maintain state and allow accessing all *Activities*
+//!     * creates [*Method Builders*](trait.MethodsBuilder.html) which in turn
+//!       allow access to individual [*Call Builders*](trait.CallBuilder.html)
 //! * **[Resources](trait.Resource.html)**
 //!     * primary types that you can apply *Activities* to
 //!     * a collection of properties and *Parts*
@@ -59,6 +61,8 @@
 //!         * never directly used in *Activities*
 //! * **[Activities](trait.CallBuilder.html)**
 //!     * operations to apply to *Resources*
+//! 
+//! All *structures* are marked with applicable traits to further categorize them and ease browsing.
 //! 
 //! Generally speaking, you can invoke *Activities* like this:
 //! 
@@ -105,7 +109,7 @@
 //! extern crate "yup-oauth2" as oauth2;
 //! extern crate "google-calendar3" as calendar3;
 //! use calendar3::Channel;
-//! use calendar3::Result;
+//! use calendar3::{Result, Error};
 //! # #[test] fn egal() {
 //! use std::default::Default;
 //! use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -152,15 +156,17 @@
 //!              .doit();
 //! 
 //! match result {
-//!     Result::HttpError(err) => println!("HTTPERROR: {:?}", err),
-//!     Result::MissingAPIKey => println!("Auth: Missing API Key - used if there are no scopes"),
-//!     Result::MissingToken => println!("OAuth2: Missing Token"),
-//!     Result::Cancelled => println!("Operation cancelled by user"),
-//!     Result::UploadSizeLimitExceeded(size, max_size) => println!("Upload size too big: {} of {}", size, max_size),
-//!     Result::Failure(_) => println!("General Failure (hyper::client::Response doesn't print)"),
-//!     Result::FieldClash(clashed_field) => println!("You added custom parameter which is part of builder: {:?}", clashed_field),
-//!     Result::JsonDecodeError(err) => println!("Couldn't understand server reply - maybe API needs update: {:?}", err),
-//!     Result::Success(_) => println!("Success (value doesn't print)"),
+//!     Err(e) => match e {
+//!         Error::HttpError(err) => println!("HTTPERROR: {:?}", err),
+//!         Error::MissingAPIKey => println!("Auth: Missing API Key - used if there are no scopes"),
+//!         Error::MissingToken => println!("OAuth2: Missing Token"),
+//!         Error::Cancelled => println!("Operation canceled by user"),
+//!         Error::UploadSizeLimitExceeded(size, max_size) => println!("Upload size too big: {} of {}", size, max_size),
+//!         Error::Failure(_) => println!("General Failure (hyper::client::Response doesn't print)"),
+//!         Error::FieldClash(clashed_field) => println!("You added custom parameter which is part of builder: {:?}", clashed_field),
+//!         Error::JsonDecodeError(err) => println!("Couldn't understand server reply - maybe API needs update: {:?}", err),
+//!     },
+//!     Ok(_) => println!("Success (value doesn't print)"),
 //! }
 //! # }
 //! ```
@@ -173,7 +179,7 @@
 //! When delegates handle errors or intermediate values, they may have a chance to instruct the system to retry. This 
 //! makes the system potentially resilient to all kinds of errors.
 //! 
-//! ## Uploads and Downlods
+//! ## Uploads and Downloads
 //! If a method supports downloads, the response body, which is part of the [Result](enum.Result.html), should be
 //! read by you to obtain the media.
 //! If such a method also supports a [Response Result](trait.ResponseResult.html), it will return that by default.
@@ -196,8 +202,9 @@
 //! ## Optional Parts in Server-Requests
 //! 
 //! All structures provided by this library are made to be [enocodable](trait.RequestValue.html) and 
-//! [decodable](trait.ResponseResult.html) via json. Optionals are used to indicate that partial requests are responses are valid.
-//! Most optionals are are considered [Parts](trait.Part.html) which are identifyable by name, which will be sent to 
+//! [decodable](trait.ResponseResult.html) via *json*. Optionals are used to indicate that partial requests are responses 
+//! are valid.
+//! Most optionals are are considered [Parts](trait.Part.html) which are identifiable by name, which will be sent to 
 //! the server to indicate either the set parts of the request or the desired parts in the response.
 //! 
 //! ## Builder Arguments
@@ -246,7 +253,7 @@ use std::io;
 use std::fs;
 use std::thread::sleep;
 
-pub use cmn::{MultiPartReader, ToParts, MethodInfo, Result, CallBuilder, Hub, ReadSeek, Part, ResponseResult, RequestValue, NestedType, Delegate, DefaultDelegate, ResourceMethodsBuilder, Resource, JsonServerError};
+pub use cmn::{MultiPartReader, ToParts, MethodInfo, Result, Error, CallBuilder, Hub, ReadSeek, Part, ResponseResult, RequestValue, NestedType, Delegate, DefaultDelegate, MethodsBuilder, Resource, JsonServerError};
 
 
 // ##############
@@ -297,7 +304,7 @@ impl Default for Scope {
 /// extern crate "yup-oauth2" as oauth2;
 /// extern crate "google-calendar3" as calendar3;
 /// use calendar3::Channel;
-/// use calendar3::Result;
+/// use calendar3::{Result, Error};
 /// # #[test] fn egal() {
 /// use std::default::Default;
 /// use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -344,15 +351,17 @@ impl Default for Scope {
 ///              .doit();
 /// 
 /// match result {
-///     Result::HttpError(err) => println!("HTTPERROR: {:?}", err),
-///     Result::MissingAPIKey => println!("Auth: Missing API Key - used if there are no scopes"),
-///     Result::MissingToken => println!("OAuth2: Missing Token"),
-///     Result::Cancelled => println!("Operation cancelled by user"),
-///     Result::UploadSizeLimitExceeded(size, max_size) => println!("Upload size too big: {} of {}", size, max_size),
-///     Result::Failure(_) => println!("General Failure (hyper::client::Response doesn't print)"),
-///     Result::FieldClash(clashed_field) => println!("You added custom parameter which is part of builder: {:?}", clashed_field),
-///     Result::JsonDecodeError(err) => println!("Couldn't understand server reply - maybe API needs update: {:?}", err),
-///     Result::Success(_) => println!("Success (value doesn't print)"),
+///     Err(e) => match e {
+///         Error::HttpError(err) => println!("HTTPERROR: {:?}", err),
+///         Error::MissingAPIKey => println!("Auth: Missing API Key - used if there are no scopes"),
+///         Error::MissingToken => println!("OAuth2: Missing Token"),
+///         Error::Cancelled => println!("Operation canceled by user"),
+///         Error::UploadSizeLimitExceeded(size, max_size) => println!("Upload size too big: {} of {}", size, max_size),
+///         Error::Failure(_) => println!("General Failure (hyper::client::Response doesn't print)"),
+///         Error::FieldClash(clashed_field) => println!("You added custom parameter which is part of builder: {:?}", clashed_field),
+///         Error::JsonDecodeError(err) => println!("Couldn't understand server reply - maybe API needs update: {:?}", err),
+///     },
+///     Ok(_) => println!("Success (value doesn't print)"),
 /// }
 /// # }
 /// ```
@@ -373,7 +382,7 @@ impl<'a, C, NC, A> CalendarHub<C, NC, A>
         CalendarHub {
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/0.1.1".to_string(),
+            _user_agent: "google-api-rust-client/0.1.2".to_string(),
             _m: PhantomData
         }
     }
@@ -404,7 +413,7 @@ impl<'a, C, NC, A> CalendarHub<C, NC, A>
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/0.1.1`.
+    /// It defaults to `google-api-rust-client/0.1.2`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -424,24 +433,24 @@ impl<'a, C, NC, A> CalendarHub<C, NC, A>
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct EventGadget {
-    /// Preferences.    
+    /// Preferences.
     pub preferences: HashMap<String, String>,
-    /// The gadget's title.    
+    /// The gadget's title.
     pub title: String,
-    /// The gadget's height in pixels. Optional.    
+    /// The gadget's height in pixels. Optional.
     pub height: i32,
-    /// The gadget's width in pixels. Optional.    
+    /// The gadget's width in pixels. Optional.
     pub width: i32,
-    /// The gadget's URL.    
+    /// The gadget's URL.
     pub link: String,
-    /// The gadget's type.    
+    /// The gadget's type.
     #[serde(alias="type")]
     pub type_: String,
     /// The gadget's display mode. Optional. Possible values are:  
     /// - "icon" - The gadget displays next to the event's title in the calendar view. 
     /// - "chip" - The gadget displays when the event is clicked.
     pub display: String,
-    /// The gadget's icon URL.    
+    /// The gadget's icon URL.
     #[serde(alias="iconLink")]
     pub icon_link: String,
 }
@@ -456,10 +465,10 @@ impl Part for EventGadget {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct FreeBusyCalendar {
-    /// List of time ranges during which this calendar should be regarded as busy.    
+    /// List of time ranges during which this calendar should be regarded as busy.
     pub busy: Vec<TimePeriod>,
-    /// Optional error(s) (if computation for the calendar failed).    
-    pub errors: Vec<Error>,
+    /// Optional error(s) (if computation for the calendar failed).
+    pub errors: Vec<ErrorType>,
 }
 
 impl Part for FreeBusyCalendar {}
@@ -478,7 +487,7 @@ pub struct AclRuleScope {
     /// - "domain" - Limits the scope to a domain.  Note: The permissions granted to the "default", or public, scope apply to any user, authenticated or not.
     #[serde(alias="type")]
     pub type_: String,
-    /// The email address of a user or group, or the name of a domain, depending on the scope type. Omitted for type "default".    
+    /// The email address of a user or group, or the name of a domain, depending on the scope type. Omitted for type "default".
     pub value: String,
 }
 
@@ -497,16 +506,16 @@ impl Part for AclRuleScope {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct Settings {
-    /// Token used to access the next page of this result. Omitted if no further results are available, in which case nextSyncToken is provided.    
+    /// Token used to access the next page of this result. Omitted if no further results are available, in which case nextSyncToken is provided.
     #[serde(alias="nextPageToken")]
     pub next_page_token: String,
-    /// List of user settings.    
+    /// List of user settings.
     pub items: Vec<Setting>,
-    /// Type of the collection ("calendar#settings").    
+    /// Type of the collection ("calendar#settings").
     pub kind: String,
-    /// Etag of the collection.    
+    /// Etag of the collection.
     pub etag: String,
-    /// Token used at a later point in time to retrieve only the entries that have changed since this result was returned. Omitted if further results are available, in which case nextPageToken is provided.    
+    /// Token used at a later point in time to retrieve only the entries that have changed since this result was returned. Omitted if further results are available, in which case nextPageToken is provided.
     #[serde(alias="nextSyncToken")]
     pub next_sync_token: String,
 }
@@ -530,20 +539,20 @@ impl ResponseResult for Settings {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Calendar {
-    /// Type of the resource ("calendar#calendar").    
+    /// Type of the resource ("calendar#calendar").
     pub kind: Option<String>,
-    /// ETag of the resource.    
+    /// ETag of the resource.
     pub etag: Option<String>,
-    /// Description of the calendar. Optional.    
+    /// Description of the calendar. Optional.
     pub description: Option<String>,
-    /// Identifier of the calendar.    
+    /// Identifier of the calendar.
     pub id: Option<String>,
-    /// The time zone of the calendar. (Formatted as an IANA Time Zone Database name, e.g. "Europe/Zurich".) Optional.    
+    /// The time zone of the calendar. (Formatted as an IANA Time Zone Database name, e.g. "Europe/Zurich".) Optional.
     #[serde(alias="timeZone")]
     pub time_zone: Option<String>,
-    /// Geographic location of the calendar as free-form text. Optional.    
+    /// Geographic location of the calendar as free-form text. Optional.
     pub location: Option<String>,
-    /// Title of the calendar.    
+    /// Title of the calendar.
     pub summary: Option<String>,
 }
 
@@ -566,14 +575,14 @@ impl ResponseResult for Calendar {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct CalendarListEntry {
-    /// The notifications that the authenticated user is receiving for this calendar.    
+    /// The notifications that the authenticated user is receiving for this calendar.
     #[serde(alias="notificationSettings")]
     pub notification_settings: Option<CalendarListEntryNotificationSettings>,
-    /// Description of the calendar. Optional. Read-only.    
+    /// Description of the calendar. Optional. Read-only.
     pub description: Option<String>,
-    /// Whether this calendar list entry has been deleted from the calendar list. Read-only. Optional. The default is False.    
+    /// Whether this calendar list entry has been deleted from the calendar list. Read-only. Optional. The default is False.
     pub deleted: Option<bool>,
-    /// Whether the calendar is the primary calendar of the authenticated user. Read-only. Optional. The default is False.    
+    /// Whether the calendar is the primary calendar of the authenticated user. Read-only. Optional. The default is False.
     pub primary: Option<bool>,
     /// The effective access role that the authenticated user has on the calendar. Read-only. Possible values are:  
     /// - "freeBusyReader" - Provides read access to free/busy information. 
@@ -582,37 +591,37 @@ pub struct CalendarListEntry {
     /// - "owner" - Provides ownership of the calendar. This role has all of the permissions of the writer role with the additional ability to see and manipulate ACLs.
     #[serde(alias="accessRole")]
     pub access_role: Option<String>,
-    /// Identifier of the calendar.    
+    /// Identifier of the calendar.
     pub id: Option<String>,
-    /// Type of the resource ("calendar#calendarListEntry").    
+    /// Type of the resource ("calendar#calendarListEntry").
     pub kind: Option<String>,
-    /// The foreground color of the calendar in the hexadecimal format "#ffffff". This property supersedes the index-based colorId property. Optional.    
+    /// The foreground color of the calendar in the hexadecimal format "#ffffff". This property supersedes the index-based colorId property. Optional.
     #[serde(alias="foregroundColor")]
     pub foreground_color: Option<String>,
-    /// The default reminders that the authenticated user has for this calendar.    
+    /// The default reminders that the authenticated user has for this calendar.
     #[serde(alias="defaultReminders")]
     pub default_reminders: Option<Vec<EventReminder>>,
-    /// The color of the calendar. This is an ID referring to an entry in the calendar section of the colors definition (see the colors endpoint). Optional.    
+    /// The color of the calendar. This is an ID referring to an entry in the calendar section of the colors definition (see the colors endpoint). Optional.
     #[serde(alias="colorId")]
     pub color_id: Option<String>,
-    /// Whether the calendar content shows up in the calendar UI. Optional. The default is False.    
+    /// Whether the calendar content shows up in the calendar UI. Optional. The default is False.
     pub selected: Option<bool>,
-    /// Title of the calendar. Read-only.    
+    /// Title of the calendar. Read-only.
     pub summary: Option<String>,
-    /// ETag of the resource.    
+    /// ETag of the resource.
     pub etag: Option<String>,
-    /// Geographic location of the calendar as free-form text. Optional. Read-only.    
+    /// Geographic location of the calendar as free-form text. Optional. Read-only.
     pub location: Option<String>,
-    /// The main color of the calendar in the hexadecimal format "#0088aa". This property supersedes the index-based colorId property. Optional.    
+    /// The main color of the calendar in the hexadecimal format "#0088aa". This property supersedes the index-based colorId property. Optional.
     #[serde(alias="backgroundColor")]
     pub background_color: Option<String>,
-    /// The summary that the authenticated user has set for this calendar. Optional.    
+    /// The summary that the authenticated user has set for this calendar. Optional.
     #[serde(alias="summaryOverride")]
     pub summary_override: Option<String>,
-    /// The time zone of the calendar. Optional. Read-only.    
+    /// The time zone of the calendar. Optional. Read-only.
     #[serde(alias="timeZone")]
     pub time_zone: Option<String>,
-    /// Whether the calendar has been hidden from the list. Optional. The default is False.    
+    /// Whether the calendar has been hidden from the list. Optional. The default is False.
     pub hidden: Option<bool>,
 }
 
@@ -626,7 +635,7 @@ impl ResponseResult for CalendarListEntry {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct CalendarListEntryNotificationSettings {
-    /// The list of notifications set for this calendar.    
+    /// The list of notifications set for this calendar.
     pub notifications: Vec<CalendarNotification>,
 }
 
@@ -640,9 +649,9 @@ impl Part for CalendarListEntryNotificationSettings {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct ColorDefinition {
-    /// The foreground color that can be used to write on top of a background with 'background' color.    
+    /// The foreground color that can be used to write on top of a background with 'background' color.
     pub foreground: String,
-    /// The background color associated with this color definition.    
+    /// The background color associated with this color definition.
     pub background: String,
 }
 
@@ -655,12 +664,12 @@ impl Part for ColorDefinition {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct EventDateTime {
-    /// The date, in the format "yyyy-mm-dd", if this is an all-day event.    
+    /// The date, in the format "yyyy-mm-dd", if this is an all-day event.
     pub date: String,
-    /// The time zone in which the time is specified. (Formatted as an IANA Time Zone Database name, e.g. "Europe/Zurich".) For recurring events this field is required and specifies the time zone in which the recurrence is expanded. For single events this field is optional and indicates a custom time zone for the event start/end.    
+    /// The time zone in which the time is specified. (Formatted as an IANA Time Zone Database name, e.g. "Europe/Zurich".) For recurring events this field is required and specifies the time zone in which the recurrence is expanded. For single events this field is optional and indicates a custom time zone for the event start/end.
     #[serde(alias="timeZone")]
     pub time_zone: String,
-    /// The time, as a combined date-time value (formatted according to RFC 3339). A time zone offset is required unless a time zone is explicitly specified in timeZone.    
+    /// The time, as a combined date-time value (formatted according to RFC 3339). A time zone offset is required unless a time zone is explicitly specified in timeZone.
     #[serde(alias="dateTime")]
     pub date_time: String,
 }
@@ -681,13 +690,13 @@ impl Part for EventDateTime {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct Setting {
-    /// Type of the resource ("calendar#setting").    
+    /// Type of the resource ("calendar#setting").
     pub kind: String,
-    /// ETag of the resource.    
+    /// ETag of the resource.
     pub etag: String,
-    /// The id of the user setting.    
+    /// The id of the user setting.
     pub id: String,
-    /// Value of the user setting. The format of the value depends on the ID of the setting. It must always be a UTF-8 string of length up to 1024 characters.    
+    /// Value of the user setting. The format of the value depends on the ID of the setting. It must always be a UTF-8 string of length up to 1024 characters.
     pub value: String,
 }
 
@@ -701,15 +710,15 @@ impl ResponseResult for Setting {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct EventCreator {
-    /// Whether the creator corresponds to the calendar on which this copy of the event appears. Read-only. The default is False.    
+    /// Whether the creator corresponds to the calendar on which this copy of the event appears. Read-only. The default is False.
     #[serde(alias="self")]
     pub self_: bool,
-    /// The creator's name, if available.    
+    /// The creator's name, if available.
     #[serde(alias="displayName")]
     pub display_name: String,
-    /// The creator's email address, if available.    
+    /// The creator's email address, if available.
     pub email: String,
-    /// The creator's Profile ID, if available.    
+    /// The creator's Profile ID, if available.
     pub id: String,
 }
 
@@ -722,8 +731,8 @@ impl Part for EventCreator {}
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
-pub struct Error {
-    /// Domain, or broad category, of the error.    
+pub struct ErrorType {
+    /// Domain, or broad category, of the error.
     pub domain: String,
     /// Specific reason for the error. Some of the possible values are:  
     /// - "groupTooBig" - The group of users requested is too large for a single query. 
@@ -733,7 +742,7 @@ pub struct Error {
     pub reason: String,
 }
 
-impl Part for Error {}
+impl Part for ErrorType {}
 
 
 /// There is no detailed description.
@@ -750,11 +759,11 @@ impl Part for Error {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct AclRule {
-    /// The scope of the rule.    
+    /// The scope of the rule.
     pub scope: Option<AclRuleScope>,
-    /// Type of the resource ("calendar#aclRule").    
+    /// Type of the resource ("calendar#aclRule").
     pub kind: Option<String>,
-    /// ETag of the resource.    
+    /// ETag of the resource.
     pub etag: Option<String>,
     /// The role assigned to the scope. Possible values are:  
     /// - "none" - Provides no access. 
@@ -763,7 +772,7 @@ pub struct AclRule {
     /// - "writer" - Provides read and write access to the calendar. Private events will appear to users with writer access, and event details will be visible. 
     /// - "owner" - Provides ownership of the calendar. This role has all of the permissions of the writer role with the additional ability to see and manipulate ACLs.
     pub role: Option<String>,
-    /// Identifier of the ACL rule.    
+    /// Identifier of the ACL rule.
     pub id: Option<String>,
 }
 
@@ -782,16 +791,16 @@ impl ResponseResult for AclRule {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct Acl {
-    /// Token used to access the next page of this result. Omitted if no further results are available, in which case nextSyncToken is provided.    
+    /// Token used to access the next page of this result. Omitted if no further results are available, in which case nextSyncToken is provided.
     #[serde(alias="nextPageToken")]
     pub next_page_token: String,
-    /// List of rules on the access control list.    
+    /// List of rules on the access control list.
     pub items: Vec<AclRule>,
-    /// Type of the collection ("calendar#acl").    
+    /// Type of the collection ("calendar#acl").
     pub kind: String,
-    /// ETag of the collection.    
+    /// ETag of the collection.
     pub etag: String,
-    /// Token used at a later point in time to retrieve only the entries that have changed since this result was returned. Omitted if further results are available, in which case nextPageToken is provided.    
+    /// Token used at a later point in time to retrieve only the entries that have changed since this result was returned. Omitted if further results are available, in which case nextPageToken is provided.
     #[serde(alias="nextSyncToken")]
     pub next_sync_token: String,
 }
@@ -811,28 +820,28 @@ impl ResponseResult for Acl {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct Events {
-    /// Token used to access the next page of this result. Omitted if no further results are available, in which case nextSyncToken is provided.    
+    /// Token used to access the next page of this result. Omitted if no further results are available, in which case nextSyncToken is provided.
     #[serde(alias="nextPageToken")]
     pub next_page_token: String,
-    /// Type of the collection ("calendar#events").    
+    /// Type of the collection ("calendar#events").
     pub kind: String,
-    /// The default reminders on the calendar for the authenticated user. These reminders apply to all events on this calendar that do not explicitly override them (i.e. do not have reminders.useDefault set to True).    
+    /// The default reminders on the calendar for the authenticated user. These reminders apply to all events on this calendar that do not explicitly override them (i.e. do not have reminders.useDefault set to True).
     #[serde(alias="defaultReminders")]
     pub default_reminders: Vec<EventReminder>,
-    /// Description of the calendar. Read-only.    
+    /// Description of the calendar. Read-only.
     pub description: String,
-    /// List of events on the calendar.    
+    /// List of events on the calendar.
     pub items: Vec<Event>,
-    /// Last modification time of the calendar (as a RFC 3339 timestamp). Read-only.    
+    /// Last modification time of the calendar (as a RFC 3339 timestamp). Read-only.
     pub updated: String,
-    /// Title of the calendar. Read-only.    
+    /// Title of the calendar. Read-only.
     pub summary: String,
-    /// ETag of the collection.    
+    /// ETag of the collection.
     pub etag: String,
-    /// Token used at a later point in time to retrieve only the entries that have changed since this result was returned. Omitted if further results are available, in which case nextPageToken is provided.    
+    /// Token used at a later point in time to retrieve only the entries that have changed since this result was returned. Omitted if further results are available, in which case nextPageToken is provided.
     #[serde(alias="nextSyncToken")]
     pub next_sync_token: String,
-    /// The time zone of the calendar. Read-only.    
+    /// The time zone of the calendar. Read-only.
     #[serde(alias="timeZone")]
     pub time_zone: String,
     /// The user's access role for this calendar. Read-only. Possible values are:  
@@ -863,28 +872,28 @@ impl ResponseResult for Events {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Channel {
-    /// A version-specific identifier for the watched resource.    
+    /// A version-specific identifier for the watched resource.
     #[serde(alias="resourceUri")]
     pub resource_uri: Option<String>,
-    /// Identifies this as a notification channel used to watch for changes to a resource. Value: the fixed string "api#channel".    
+    /// Identifies this as a notification channel used to watch for changes to a resource. Value: the fixed string "api#channel".
     pub kind: Option<String>,
-    /// An opaque ID that identifies the resource being watched on this channel. Stable across different API versions.    
+    /// An opaque ID that identifies the resource being watched on this channel. Stable across different API versions.
     #[serde(alias="resourceId")]
     pub resource_id: Option<String>,
-    /// A UUID or similar unique string that identifies this channel.    
+    /// A UUID or similar unique string that identifies this channel.
     pub id: Option<String>,
-    /// An arbitrary string delivered to the target address with each notification delivered over this channel. Optional.    
+    /// An arbitrary string delivered to the target address with each notification delivered over this channel. Optional.
     pub token: Option<String>,
-    /// Additional parameters controlling delivery channel behavior. Optional.    
+    /// Additional parameters controlling delivery channel behavior. Optional.
     pub params: Option<HashMap<String, String>>,
-    /// Date and time of notification channel expiration, expressed as a Unix timestamp, in milliseconds. Optional.    
+    /// Date and time of notification channel expiration, expressed as a Unix timestamp, in milliseconds. Optional.
     pub expiration: Option<String>,
-    /// The address where notifications are delivered for this channel.    
+    /// The address where notifications are delivered for this channel.
     pub address: Option<String>,
-    /// The type of delivery mechanism used for this channel.    
+    /// The type of delivery mechanism used for this channel.
     #[serde(alias="type")]
     pub type_: Option<String>,
-    /// A Boolean value to indicate whether payload is wanted. Optional.    
+    /// A Boolean value to indicate whether payload is wanted. Optional.
     pub payload: Option<bool>,
 }
 
@@ -899,26 +908,26 @@ impl ResponseResult for Channel {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct EventAttendee {
-    /// The attendee's response comment. Optional.    
+    /// The attendee's response comment. Optional.
     pub comment: String,
-    /// The attendee's name, if available. Optional.    
+    /// The attendee's name, if available. Optional.
     #[serde(alias="displayName")]
     pub display_name: String,
-    /// Whether this entry represents the calendar on which this copy of the event appears. Read-only. The default is False.    
+    /// Whether this entry represents the calendar on which this copy of the event appears. Read-only. The default is False.
     #[serde(alias="self")]
     pub self_: bool,
-    /// The attendee's email address, if available. This field must be present when adding an attendee.    
+    /// The attendee's email address, if available. This field must be present when adding an attendee.
     pub email: String,
-    /// The attendee's Profile ID, if available.    
+    /// The attendee's Profile ID, if available.
     pub id: String,
-    /// Number of additional guests. Optional. The default is 0.    
+    /// Number of additional guests. Optional. The default is 0.
     #[serde(alias="additionalGuests")]
     pub additional_guests: i32,
-    /// Whether the attendee is a resource. Read-only. The default is False.    
+    /// Whether the attendee is a resource. Read-only. The default is False.
     pub resource: bool,
-    /// Whether the attendee is the organizer of the event. Read-only. The default is False.    
+    /// Whether the attendee is the organizer of the event. Read-only. The default is False.
     pub organizer: bool,
-    /// Whether this is an optional attendee. Optional. The default is False.    
+    /// Whether this is an optional attendee. Optional. The default is False.
     pub optional: bool,
     /// The attendee's response status. Possible values are:  
     /// - "needsAction" - The attendee has not responded to the invitation. 
@@ -938,9 +947,9 @@ impl Part for EventAttendee {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct FreeBusyGroup {
-    /// Optional error(s) (if computation for the group failed).    
-    pub errors: Vec<Error>,
-    /// List of calendars' identifiers within a group.    
+    /// Optional error(s) (if computation for the group failed).
+    pub errors: Vec<ErrorType>,
+    /// List of calendars' identifiers within a group.
     pub calendars: Vec<String>,
 }
 
@@ -953,9 +962,9 @@ impl Part for FreeBusyGroup {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct EventReminders {
-    /// If the event doesn't use the default reminders, this lists the reminders specific to the event, or, if not set, indicates that no reminders are set for this event.    
+    /// If the event doesn't use the default reminders, this lists the reminders specific to the event, or, if not set, indicates that no reminders are set for this event.
     pub overrides: Vec<EventReminder>,
-    /// Whether the default reminders of the calendar apply to the event.    
+    /// Whether the default reminders of the calendar apply to the event.
     #[serde(alias="useDefault")]
     pub use_default: bool,
 }
@@ -975,16 +984,16 @@ impl Part for EventReminders {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct CalendarList {
-    /// Token used to access the next page of this result. Omitted if no further results are available, in which case nextSyncToken is provided.    
+    /// Token used to access the next page of this result. Omitted if no further results are available, in which case nextSyncToken is provided.
     #[serde(alias="nextPageToken")]
     pub next_page_token: String,
-    /// Calendars that are present on the user's calendar list.    
+    /// Calendars that are present on the user's calendar list.
     pub items: Vec<CalendarListEntry>,
-    /// Type of the collection ("calendar#calendarList").    
+    /// Type of the collection ("calendar#calendarList").
     pub kind: String,
-    /// ETag of the collection.    
+    /// ETag of the collection.
     pub etag: String,
-    /// Token used at a later point in time to retrieve only the entries that have changed since this result was returned. Omitted if further results are available, in which case nextPageToken is provided.    
+    /// Token used at a later point in time to retrieve only the entries that have changed since this result was returned. Omitted if further results are available, in which case nextPageToken is provided.
     #[serde(alias="nextSyncToken")]
     pub next_sync_token: String,
 }
@@ -998,9 +1007,9 @@ impl ResponseResult for CalendarList {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct EventExtendedProperties {
-    /// Properties that are shared between copies of the event on other attendees' calendars.    
+    /// Properties that are shared between copies of the event on other attendees' calendars.
     pub shared: HashMap<String, String>,
-    /// Properties that are private to the copy of the event that appears on this calendar.    
+    /// Properties that are private to the copy of the event that appears on this calendar.
     pub private: HashMap<String, String>,
 }
 
@@ -1014,7 +1023,7 @@ impl Part for EventExtendedProperties {}
 /// 
 #[derive(Default, Clone, Debug, Serialize)]
 pub struct FreeBusyRequestItem {
-    /// The identifier of a calendar or a group.    
+    /// The identifier of a calendar or a group.
     pub id: String,
 }
 
@@ -1032,16 +1041,16 @@ impl Part for FreeBusyRequestItem {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct FreeBusyResponse {
-    /// The end of the interval.    
+    /// The end of the interval.
     #[serde(alias="timeMax")]
     pub time_max: String,
-    /// Type of the resource ("calendar#freeBusy").    
+    /// Type of the resource ("calendar#freeBusy").
     pub kind: String,
-    /// List of free/busy information for calendars.    
+    /// List of free/busy information for calendars.
     pub calendars: HashMap<String, FreeBusyCalendar>,
-    /// Expansion of groups.    
+    /// Expansion of groups.
     pub groups: HashMap<String, FreeBusyGroup>,
-    /// The start of the interval.    
+    /// The start of the interval.
     #[serde(alias="timeMin")]
     pub time_min: String,
 }
@@ -1060,13 +1069,13 @@ impl ResponseResult for FreeBusyResponse {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct Colors {
-    /// Palette of calendar colors, mapping from the color ID to its definition. A calendarListEntry resource refers to one of these color IDs in its color field. Read-only.    
+    /// Palette of calendar colors, mapping from the color ID to its definition. A calendarListEntry resource refers to one of these color IDs in its color field. Read-only.
     pub calendar: HashMap<String, ColorDefinition>,
-    /// Last modification time of the color palette (as a RFC 3339 timestamp). Read-only.    
+    /// Last modification time of the color palette (as a RFC 3339 timestamp). Read-only.
     pub updated: String,
-    /// Type of the resource ("calendar#colors").    
+    /// Type of the resource ("calendar#colors").
     pub kind: String,
-    /// Palette of event colors, mapping from the color ID to its definition. An event resource may refer to one of these color IDs in its color field. Read-only.    
+    /// Palette of event colors, mapping from the color ID to its definition. An event resource may refer to one of these color IDs in its color field. Read-only.
     pub event: HashMap<String, ColorDefinition>,
 }
 
@@ -1084,21 +1093,21 @@ impl ResponseResult for Colors {}
 /// 
 #[derive(Default, Clone, Debug, Serialize)]
 pub struct FreeBusyRequest {
-    /// Maximal number of calendars for which FreeBusy information is to be provided. Optional.    
+    /// Maximal number of calendars for which FreeBusy information is to be provided. Optional.
     #[serde(alias="calendarExpansionMax")]
     pub calendar_expansion_max: Option<i32>,
-    /// The start of the interval for the query.    
+    /// The start of the interval for the query.
     #[serde(alias="timeMin")]
     pub time_min: Option<String>,
-    /// Maximal number of calendar identifiers to be provided for a single group. Optional. An error will be returned for a group with more members than this value.    
+    /// Maximal number of calendar identifiers to be provided for a single group. Optional. An error will be returned for a group with more members than this value.
     #[serde(alias="groupExpansionMax")]
     pub group_expansion_max: Option<i32>,
-    /// The end of the interval for the query.    
+    /// The end of the interval for the query.
     #[serde(alias="timeMax")]
     pub time_max: Option<String>,
-    /// List of calendars and/or groups to query.    
+    /// List of calendars and/or groups to query.
     pub items: Option<Vec<FreeBusyRequestItem>>,
-    /// Time zone used in the response. Optional. The default is UTC.    
+    /// Time zone used in the response. Optional. The default is UTC.
     #[serde(alias="timeZone")]
     pub time_zone: Option<String>,
 }
@@ -1112,9 +1121,9 @@ impl RequestValue for FreeBusyRequest {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct EventSource {
-    /// URL of the source pointing to a resource. URL's protocol must be HTTP or HTTPS.    
+    /// URL of the source pointing to a resource. URL's protocol must be HTTP or HTTPS.
     pub url: String,
-    /// Title of the source; for example a title of a web page or an email subject.    
+    /// Title of the source; for example a title of a web page or an email subject.
     pub title: String,
 }
 
@@ -1128,15 +1137,15 @@ impl Part for EventSource {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct EventOrganizer {
-    /// Whether the organizer corresponds to the calendar on which this copy of the event appears. Read-only. The default is False.    
+    /// Whether the organizer corresponds to the calendar on which this copy of the event appears. Read-only. The default is False.
     #[serde(alias="self")]
     pub self_: bool,
-    /// The organizer's name, if available.    
+    /// The organizer's name, if available.
     #[serde(alias="displayName")]
     pub display_name: String,
-    /// The organizer's email address, if available.    
+    /// The organizer's email address, if available.
     pub email: String,
-    /// The organizer's Profile ID, if available.    
+    /// The organizer's Profile ID, if available.
     pub id: String,
 }
 
@@ -1150,7 +1159,7 @@ impl Part for EventOrganizer {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct EventReminder {
-    /// Number of minutes before the start of the event when the reminder should trigger.    
+    /// Number of minutes before the start of the event when the reminder should trigger.
     pub minutes: i32,
     /// The method used by this reminder. Possible values are:  
     /// - "email" - Reminders are sent via email. 
@@ -1168,9 +1177,9 @@ impl Part for EventReminder {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct TimePeriod {
-    /// The (inclusive) start of the time period.    
+    /// The (inclusive) start of the time period.
     pub start: String,
-    /// The (exclusive) end of the time period.    
+    /// The (exclusive) end of the time period.
     pub end: String,
 }
 
@@ -1221,40 +1230,40 @@ impl Part for CalendarNotification {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Event {
-    /// The creator of the event. Read-only.    
+    /// The creator of the event. Read-only.
     pub creator: Option<EventCreator>,
-    /// The organizer of the event. If the organizer is also an attendee, this is indicated with a separate entry in attendees with the organizer field set to True. To change the organizer, use the move operation. Read-only, except when importing an event.    
+    /// The organizer of the event. If the organizer is also an attendee, this is indicated with a separate entry in attendees with the organizer field set to True. To change the organizer, use the move operation. Read-only, except when importing an event.
     pub organizer: Option<EventOrganizer>,
     /// Identifier of the event. When creating new single or recurring events, you can specify their IDs. Provided IDs must follow these rules:  
     /// - characters allowed in the ID are those used in base32hex encoding, i.e. lowercase letters a-v and digits 0-9, see section 3.1.2 in RFC2938 
     /// - the length of the ID must be between 5 and 1024 characters 
     /// - the ID must be unique per calendar  Due to the globally distributed nature of the system, we cannot guarantee that ID collisions will be detected at event creation time. To minimize the risk of collisions we recommend using an established UUID algorithm such as one described in RFC4122.
     pub id: Option<String>,
-    /// An absolute link to the Google+ hangout associated with this event. Read-only.    
+    /// An absolute link to the Google+ hangout associated with this event. Read-only.
     #[serde(alias="hangoutLink")]
     pub hangout_link: Option<String>,
-    /// Whether attendees other than the organizer can invite others to the event. Optional. The default is True.    
+    /// Whether attendees other than the organizer can invite others to the event. Optional. The default is True.
     #[serde(alias="guestsCanInviteOthers")]
     pub guests_can_invite_others: Option<bool>,
-    /// The attendees of the event.    
+    /// The attendees of the event.
     pub attendees: Option<Vec<EventAttendee>>,
-    /// The (inclusive) start time of the event. For a recurring event, this is the start time of the first instance.    
+    /// The (inclusive) start time of the event. For a recurring event, this is the start time of the first instance.
     pub start: Option<EventDateTime>,
-    /// An absolute link to this event in the Google Calendar Web UI. Read-only.    
+    /// An absolute link to this event in the Google Calendar Web UI. Read-only.
     #[serde(alias="htmlLink")]
     pub html_link: Option<String>,
-    /// List of RRULE, EXRULE, RDATE and EXDATE lines for a recurring event. This field is omitted for single events or instances of recurring events.    
+    /// List of RRULE, EXRULE, RDATE and EXDATE lines for a recurring event. This field is omitted for single events or instances of recurring events.
     pub recurrence: Option<Vec<String>>,
-    /// Source of an event from which it was created; for example a web page, an email message or any document identifiable by an URL using HTTP/HTTPS protocol. Accessible only by the creator of the event.    
+    /// Source of an event from which it was created; for example a web page, an email message or any document identifiable by an URL using HTTP/HTTPS protocol. Accessible only by the creator of the event.
     pub source: Option<EventSource>,
-    /// ETag of the resource.    
+    /// ETag of the resource.
     pub etag: Option<String>,
-    /// Geographic location of the event as free-form text. Optional.    
+    /// Geographic location of the event as free-form text. Optional.
     pub location: Option<String>,
-    /// For an instance of a recurring event, this is the event ID of the recurring event itself. Immutable.    
+    /// For an instance of a recurring event, this is the event ID of the recurring event itself. Immutable.
     #[serde(alias="recurringEventId")]
     pub recurring_event_id: Option<String>,
-    /// For an instance of a recurring event, this is the time at which this event would start according to the recurrence data in the recurring event identified by recurringEventId. Immutable.    
+    /// For an instance of a recurring event, this is the time at which this event would start according to the recurrence data in the recurring event identified by recurringEventId. Immutable.
     #[serde(alias="originalStartTime")]
     pub original_start_time: Option<EventDateTime>,
     /// Status of the event. Optional. Possible values are:  
@@ -1262,19 +1271,19 @@ pub struct Event {
     /// - "tentative" - The event is tentatively confirmed. 
     /// - "cancelled" - The event is cancelled.
     pub status: Option<String>,
-    /// Last modification time of the event (as a RFC 3339 timestamp). Read-only.    
+    /// Last modification time of the event (as a RFC 3339 timestamp). Read-only.
     pub updated: Option<String>,
-    /// Description of the event. Optional.    
+    /// Description of the event. Optional.
     pub description: Option<String>,
-    /// Event ID in the iCalendar format.    
+    /// Event ID in the iCalendar format.
     #[serde(alias="iCalUID")]
     pub i_cal_uid: Option<String>,
-    /// A gadget that extends this event.    
+    /// A gadget that extends this event.
     pub gadget: Option<EventGadget>,
-    /// Whether the end time is actually unspecified. An end time is still provided for compatibility reasons, even if this attribute is set to True. The default is False.    
+    /// Whether the end time is actually unspecified. An end time is still provided for compatibility reasons, even if this attribute is set to True. The default is False.
     #[serde(alias="endTimeUnspecified")]
     pub end_time_unspecified: Option<bool>,
-    /// Sequence number as per iCalendar.    
+    /// Sequence number as per iCalendar.
     pub sequence: Option<i32>,
     /// Visibility of the event. Optional. Possible values are:  
     /// - "default" - Uses the default visibility for events on the calendar. This is the default value. 
@@ -1282,41 +1291,41 @@ pub struct Event {
     /// - "private" - The event is private and only event attendees may view event details. 
     /// - "confidential" - The event is private. This value is provided for compatibility reasons.
     pub visibility: Option<String>,
-    /// Whether attendees other than the organizer can modify the event. Optional. The default is False.    
+    /// Whether attendees other than the organizer can modify the event. Optional. The default is False.
     #[serde(alias="guestsCanModify")]
     pub guests_can_modify: Option<bool>,
-    /// The (exclusive) end time of the event. For a recurring event, this is the end time of the first instance.    
+    /// The (exclusive) end time of the event. For a recurring event, this is the end time of the first instance.
     pub end: Option<EventDateTime>,
-    /// Whether attendees may have been omitted from the event's representation. When retrieving an event, this may be due to a restriction specified by the maxAttendee query parameter. When updating an event, this can be used to only update the participant's response. Optional. The default is False.    
+    /// Whether attendees may have been omitted from the event's representation. When retrieving an event, this may be due to a restriction specified by the maxAttendee query parameter. When updating an event, this can be used to only update the participant's response. Optional. The default is False.
     #[serde(alias="attendeesOmitted")]
     pub attendees_omitted: Option<bool>,
-    /// Type of the resource ("calendar#event").    
+    /// Type of the resource ("calendar#event").
     pub kind: Option<String>,
-    /// Whether this is a locked event copy where no changes can be made to the main event fields "summary", "description", "location", "start", "end" or "recurrence". The default is False. Read-Only.    
+    /// Whether this is a locked event copy where no changes can be made to the main event fields "summary", "description", "location", "start", "end" or "recurrence". The default is False. Read-Only.
     pub locked: Option<bool>,
-    /// Creation time of the event (as a RFC 3339 timestamp). Read-only.    
+    /// Creation time of the event (as a RFC 3339 timestamp). Read-only.
     pub created: Option<String>,
-    /// The color of the event. This is an ID referring to an entry in the event section of the colors definition (see the  colors endpoint). Optional.    
+    /// The color of the event. This is an ID referring to an entry in the event section of the colors definition (see the  colors endpoint). Optional.
     #[serde(alias="colorId")]
     pub color_id: Option<String>,
-    /// Whether anyone can invite themselves to the event. Optional. The default is False.    
+    /// Whether anyone can invite themselves to the event. Optional. The default is False.
     #[serde(alias="anyoneCanAddSelf")]
     pub anyone_can_add_self: Option<bool>,
-    /// Information about the event's reminders for the authenticated user.    
+    /// Information about the event's reminders for the authenticated user.
     pub reminders: Option<EventReminders>,
-    /// Whether attendees other than the organizer can see who the event's attendees are. Optional. The default is True.    
+    /// Whether attendees other than the organizer can see who the event's attendees are. Optional. The default is True.
     #[serde(alias="guestsCanSeeOtherGuests")]
     pub guests_can_see_other_guests: Option<bool>,
-    /// Title of the event.    
+    /// Title of the event.
     pub summary: Option<String>,
-    /// Extended properties of the event.    
+    /// Extended properties of the event.
     #[serde(alias="extendedProperties")]
     pub extended_properties: Option<EventExtendedProperties>,
     /// Whether the event blocks time on the calendar. Optional. Possible values are:  
     /// - "opaque" - The event blocks time on the calendar. This is the default value. 
     /// - "transparent" - The event does not block time on the calendar.
     pub transparency: Option<String>,
-    /// Whether this is a private event copy where changes are not shared with other copies on other calendars. Optional. Immutable. The default is False.    
+    /// Whether this is a private event copy where changes are not shared with other copies on other calendars. Optional. Immutable. The default is False.
     #[serde(alias="privateCopy")]
     pub private_copy: Option<bool>,
 }
@@ -1365,13 +1374,17 @@ pub struct FreebusyMethods<'a, C, NC, A>
     hub: &'a CalendarHub<C, NC, A>,
 }
 
-impl<'a, C, NC, A> ResourceMethodsBuilder for FreebusyMethods<'a, C, NC, A> {}
+impl<'a, C, NC, A> MethodsBuilder for FreebusyMethods<'a, C, NC, A> {}
 
 impl<'a, C, NC, A> FreebusyMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Returns free/busy information for a set of calendars.    
+    /// Returns free/busy information for a set of calendars.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
     pub fn query(&self, request: &FreeBusyRequest) -> FreebusyQueryCall<'a, C, NC, A> {
         FreebusyQueryCall {
             hub: self.hub,
@@ -1419,13 +1432,13 @@ pub struct SettingMethods<'a, C, NC, A>
     hub: &'a CalendarHub<C, NC, A>,
 }
 
-impl<'a, C, NC, A> ResourceMethodsBuilder for SettingMethods<'a, C, NC, A> {}
+impl<'a, C, NC, A> MethodsBuilder for SettingMethods<'a, C, NC, A> {}
 
 impl<'a, C, NC, A> SettingMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Returns all user settings for the authenticated user.    
+    /// Returns all user settings for the authenticated user.
     pub fn list(&self) -> SettingListCall<'a, C, NC, A> {
         SettingListCall {
             hub: self.hub,
@@ -1440,7 +1453,11 @@ impl<'a, C, NC, A> SettingMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Watch for changes to Settings resources.    
+    /// Watch for changes to Settings resources.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
     pub fn watch(&self, request: &Channel) -> SettingWatchCall<'a, C, NC, A> {
         SettingWatchCall {
             hub: self.hub,
@@ -1456,7 +1473,11 @@ impl<'a, C, NC, A> SettingMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Returns a single user setting.    
+    /// Returns a single user setting.
+    /// 
+    /// # Arguments
+    ///
+    /// * `setting` - The id of the user setting.
     pub fn get(&self, setting: &str) -> SettingGetCall<'a, C, NC, A> {
         SettingGetCall {
             hub: self.hub,
@@ -1504,13 +1525,18 @@ pub struct CalendarListMethods<'a, C, NC, A>
     hub: &'a CalendarHub<C, NC, A>,
 }
 
-impl<'a, C, NC, A> ResourceMethodsBuilder for CalendarListMethods<'a, C, NC, A> {}
+impl<'a, C, NC, A> MethodsBuilder for CalendarListMethods<'a, C, NC, A> {}
 
 impl<'a, C, NC, A> CalendarListMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Updates an entry on the user's calendar list.    
+    /// Updates an entry on the user's calendar list.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `calendarId` - Calendar identifier.
     pub fn update(&self, request: &CalendarListEntry, calendar_id: &str) -> CalendarListUpdateCall<'a, C, NC, A> {
         CalendarListUpdateCall {
             hub: self.hub,
@@ -1525,7 +1551,11 @@ impl<'a, C, NC, A> CalendarListMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Deletes an entry on the user's calendar list.    
+    /// Deletes an entry on the user's calendar list.
+    /// 
+    /// # Arguments
+    ///
+    /// * `calendarId` - Calendar identifier.
     pub fn delete(&self, calendar_id: &str) -> CalendarListDeleteCall<'a, C, NC, A> {
         CalendarListDeleteCall {
             hub: self.hub,
@@ -1538,7 +1568,11 @@ impl<'a, C, NC, A> CalendarListMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Returns an entry on the user's calendar list.    
+    /// Returns an entry on the user's calendar list.
+    /// 
+    /// # Arguments
+    ///
+    /// * `calendarId` - Calendar identifier.
     pub fn get(&self, calendar_id: &str) -> CalendarListGetCall<'a, C, NC, A> {
         CalendarListGetCall {
             hub: self.hub,
@@ -1551,7 +1585,7 @@ impl<'a, C, NC, A> CalendarListMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Returns entries on the user's calendar list.    
+    /// Returns entries on the user's calendar list.
     pub fn list(&self) -> CalendarListListCall<'a, C, NC, A> {
         CalendarListListCall {
             hub: self.hub,
@@ -1569,7 +1603,11 @@ impl<'a, C, NC, A> CalendarListMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Adds an entry to the user's calendar list.    
+    /// Adds an entry to the user's calendar list.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
     pub fn insert(&self, request: &CalendarListEntry) -> CalendarListInsertCall<'a, C, NC, A> {
         CalendarListInsertCall {
             hub: self.hub,
@@ -1583,7 +1621,12 @@ impl<'a, C, NC, A> CalendarListMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Updates an entry on the user's calendar list. This method supports patch semantics.    
+    /// Updates an entry on the user's calendar list. This method supports patch semantics.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `calendarId` - Calendar identifier.
     pub fn patch(&self, request: &CalendarListEntry, calendar_id: &str) -> CalendarListPatchCall<'a, C, NC, A> {
         CalendarListPatchCall {
             hub: self.hub,
@@ -1598,7 +1641,11 @@ impl<'a, C, NC, A> CalendarListMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Watch for changes to CalendarList resources.    
+    /// Watch for changes to CalendarList resources.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
     pub fn watch(&self, request: &Channel) -> CalendarListWatchCall<'a, C, NC, A> {
         CalendarListWatchCall {
             hub: self.hub,
@@ -1652,13 +1699,18 @@ pub struct CalendarMethods<'a, C, NC, A>
     hub: &'a CalendarHub<C, NC, A>,
 }
 
-impl<'a, C, NC, A> ResourceMethodsBuilder for CalendarMethods<'a, C, NC, A> {}
+impl<'a, C, NC, A> MethodsBuilder for CalendarMethods<'a, C, NC, A> {}
 
 impl<'a, C, NC, A> CalendarMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Updates metadata for a calendar. This method supports patch semantics.    
+    /// Updates metadata for a calendar. This method supports patch semantics.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `calendarId` - Calendar identifier.
     pub fn patch(&self, request: &Calendar, calendar_id: &str) -> CalendarPatchCall<'a, C, NC, A> {
         CalendarPatchCall {
             hub: self.hub,
@@ -1672,7 +1724,11 @@ impl<'a, C, NC, A> CalendarMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Deletes a secondary calendar. Use calendars.clear for clearing all events on primary calendars.    
+    /// Deletes a secondary calendar. Use calendars.clear for clearing all events on primary calendars.
+    /// 
+    /// # Arguments
+    ///
+    /// * `calendarId` - Calendar identifier.
     pub fn delete(&self, calendar_id: &str) -> CalendarDeleteCall<'a, C, NC, A> {
         CalendarDeleteCall {
             hub: self.hub,
@@ -1685,7 +1741,11 @@ impl<'a, C, NC, A> CalendarMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Returns metadata for a calendar.    
+    /// Returns metadata for a calendar.
+    /// 
+    /// # Arguments
+    ///
+    /// * `calendarId` - Calendar identifier.
     pub fn get(&self, calendar_id: &str) -> CalendarGetCall<'a, C, NC, A> {
         CalendarGetCall {
             hub: self.hub,
@@ -1698,7 +1758,11 @@ impl<'a, C, NC, A> CalendarMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Clears a primary calendar. This operation deletes all events associated with the primary calendar of an account.    
+    /// Clears a primary calendar. This operation deletes all events associated with the primary calendar of an account.
+    /// 
+    /// # Arguments
+    ///
+    /// * `calendarId` - Calendar identifier.
     pub fn clear(&self, calendar_id: &str) -> CalendarClearCall<'a, C, NC, A> {
         CalendarClearCall {
             hub: self.hub,
@@ -1711,7 +1775,11 @@ impl<'a, C, NC, A> CalendarMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Creates a secondary calendar.    
+    /// Creates a secondary calendar.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
     pub fn insert(&self, request: &Calendar) -> CalendarInsertCall<'a, C, NC, A> {
         CalendarInsertCall {
             hub: self.hub,
@@ -1724,7 +1792,12 @@ impl<'a, C, NC, A> CalendarMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Updates metadata for a calendar.    
+    /// Updates metadata for a calendar.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `calendarId` - Calendar identifier.
     pub fn update(&self, request: &Calendar, calendar_id: &str) -> CalendarUpdateCall<'a, C, NC, A> {
         CalendarUpdateCall {
             hub: self.hub,
@@ -1773,13 +1846,18 @@ pub struct AclMethods<'a, C, NC, A>
     hub: &'a CalendarHub<C, NC, A>,
 }
 
-impl<'a, C, NC, A> ResourceMethodsBuilder for AclMethods<'a, C, NC, A> {}
+impl<'a, C, NC, A> MethodsBuilder for AclMethods<'a, C, NC, A> {}
 
 impl<'a, C, NC, A> AclMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Watch for changes to ACL resources.    
+    /// Watch for changes to ACL resources.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `calendarId` - Calendar identifier.
     pub fn watch(&self, request: &Channel, calendar_id: &str) -> AclWatchCall<'a, C, NC, A> {
         AclWatchCall {
             hub: self.hub,
@@ -1797,7 +1875,12 @@ impl<'a, C, NC, A> AclMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Creates an access control rule.    
+    /// Creates an access control rule.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `calendarId` - Calendar identifier.
     pub fn insert(&self, request: &AclRule, calendar_id: &str) -> AclInsertCall<'a, C, NC, A> {
         AclInsertCall {
             hub: self.hub,
@@ -1811,7 +1894,13 @@ impl<'a, C, NC, A> AclMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Updates an access control rule.    
+    /// Updates an access control rule.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `calendarId` - Calendar identifier.
+    /// * `ruleId` - ACL rule identifier.
     pub fn update(&self, request: &AclRule, calendar_id: &str, rule_id: &str) -> AclUpdateCall<'a, C, NC, A> {
         AclUpdateCall {
             hub: self.hub,
@@ -1826,7 +1915,13 @@ impl<'a, C, NC, A> AclMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Updates an access control rule. This method supports patch semantics.    
+    /// Updates an access control rule. This method supports patch semantics.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `calendarId` - Calendar identifier.
+    /// * `ruleId` - ACL rule identifier.
     pub fn patch(&self, request: &AclRule, calendar_id: &str, rule_id: &str) -> AclPatchCall<'a, C, NC, A> {
         AclPatchCall {
             hub: self.hub,
@@ -1841,7 +1936,11 @@ impl<'a, C, NC, A> AclMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Returns the rules in the access control list for the calendar.    
+    /// Returns the rules in the access control list for the calendar.
+    /// 
+    /// # Arguments
+    ///
+    /// * `calendarId` - Calendar identifier.
     pub fn list(&self, calendar_id: &str) -> AclListCall<'a, C, NC, A> {
         AclListCall {
             hub: self.hub,
@@ -1858,7 +1957,12 @@ impl<'a, C, NC, A> AclMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Deletes an access control rule.    
+    /// Deletes an access control rule.
+    /// 
+    /// # Arguments
+    ///
+    /// * `calendarId` - Calendar identifier.
+    /// * `ruleId` - ACL rule identifier.
     pub fn delete(&self, calendar_id: &str, rule_id: &str) -> AclDeleteCall<'a, C, NC, A> {
         AclDeleteCall {
             hub: self.hub,
@@ -1872,7 +1976,12 @@ impl<'a, C, NC, A> AclMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Returns an access control rule.    
+    /// Returns an access control rule.
+    /// 
+    /// # Arguments
+    ///
+    /// * `calendarId` - Calendar identifier.
+    /// * `ruleId` - ACL rule identifier.
     pub fn get(&self, calendar_id: &str, rule_id: &str) -> AclGetCall<'a, C, NC, A> {
         AclGetCall {
             hub: self.hub,
@@ -1921,13 +2030,17 @@ pub struct ChannelMethods<'a, C, NC, A>
     hub: &'a CalendarHub<C, NC, A>,
 }
 
-impl<'a, C, NC, A> ResourceMethodsBuilder for ChannelMethods<'a, C, NC, A> {}
+impl<'a, C, NC, A> MethodsBuilder for ChannelMethods<'a, C, NC, A> {}
 
 impl<'a, C, NC, A> ChannelMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Stop watching resources through this channel    
+    /// Stop watching resources through this channel
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
     pub fn stop(&self, request: &Channel) -> ChannelStopCall<'a, C, NC, A> {
         ChannelStopCall {
             hub: self.hub,
@@ -1975,13 +2088,13 @@ pub struct ColorMethods<'a, C, NC, A>
     hub: &'a CalendarHub<C, NC, A>,
 }
 
-impl<'a, C, NC, A> ResourceMethodsBuilder for ColorMethods<'a, C, NC, A> {}
+impl<'a, C, NC, A> MethodsBuilder for ColorMethods<'a, C, NC, A> {}
 
 impl<'a, C, NC, A> ColorMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Returns the color definitions for calendars and events.    
+    /// Returns the color definitions for calendars and events.
     pub fn get(&self) -> ColorGetCall<'a, C, NC, A> {
         ColorGetCall {
             hub: self.hub,
@@ -2028,13 +2141,18 @@ pub struct EventMethods<'a, C, NC, A>
     hub: &'a CalendarHub<C, NC, A>,
 }
 
-impl<'a, C, NC, A> ResourceMethodsBuilder for EventMethods<'a, C, NC, A> {}
+impl<'a, C, NC, A> MethodsBuilder for EventMethods<'a, C, NC, A> {}
 
 impl<'a, C, NC, A> EventMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Deletes an event.    
+    /// Deletes an event.
+    /// 
+    /// # Arguments
+    ///
+    /// * `calendarId` - Calendar identifier.
+    /// * `eventId` - Event identifier.
     pub fn delete(&self, calendar_id: &str, event_id: &str) -> EventDeleteCall<'a, C, NC, A> {
         EventDeleteCall {
             hub: self.hub,
@@ -2049,7 +2167,12 @@ impl<'a, C, NC, A> EventMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Creates an event.    
+    /// Creates an event.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `calendarId` - Calendar identifier.
     pub fn insert(&self, request: &Event, calendar_id: &str) -> EventInsertCall<'a, C, NC, A> {
         EventInsertCall {
             hub: self.hub,
@@ -2065,7 +2188,12 @@ impl<'a, C, NC, A> EventMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Imports an event. This operation is used to add a private copy of an existing event to a calendar.    
+    /// Imports an event. This operation is used to add a private copy of an existing event to a calendar.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `calendarId` - Calendar identifier.
     pub fn import(&self, request: &Event, calendar_id: &str) -> EventImportCall<'a, C, NC, A> {
         EventImportCall {
             hub: self.hub,
@@ -2079,7 +2207,12 @@ impl<'a, C, NC, A> EventMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Returns instances of the specified recurring event.    
+    /// Returns instances of the specified recurring event.
+    /// 
+    /// # Arguments
+    ///
+    /// * `calendarId` - Calendar identifier.
+    /// * `eventId` - Recurring event identifier.
     pub fn instances(&self, calendar_id: &str, event_id: &str) -> EventInstanceCall<'a, C, NC, A> {
         EventInstanceCall {
             hub: self.hub,
@@ -2102,7 +2235,12 @@ impl<'a, C, NC, A> EventMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Returns an event.    
+    /// Returns an event.
+    /// 
+    /// # Arguments
+    ///
+    /// * `calendarId` - Calendar identifier.
+    /// * `eventId` - Event identifier.
     pub fn get(&self, calendar_id: &str, event_id: &str) -> EventGetCall<'a, C, NC, A> {
         EventGetCall {
             hub: self.hub,
@@ -2119,7 +2257,11 @@ impl<'a, C, NC, A> EventMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Returns events on the specified calendar.    
+    /// Returns events on the specified calendar.
+    /// 
+    /// # Arguments
+    ///
+    /// * `calendarId` - Calendar identifier.
     pub fn list(&self, calendar_id: &str) -> EventListCall<'a, C, NC, A> {
         EventListCall {
             hub: self.hub,
@@ -2149,7 +2291,13 @@ impl<'a, C, NC, A> EventMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Updates an event. This method supports patch semantics.    
+    /// Updates an event. This method supports patch semantics.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `calendarId` - Calendar identifier.
+    /// * `eventId` - Event identifier.
     pub fn patch(&self, request: &Event, calendar_id: &str, event_id: &str) -> EventPatchCall<'a, C, NC, A> {
         EventPatchCall {
             hub: self.hub,
@@ -2167,7 +2315,13 @@ impl<'a, C, NC, A> EventMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Moves an event to another calendar, i.e. changes an event's organizer.    
+    /// Moves an event to another calendar, i.e. changes an event's organizer.
+    /// 
+    /// # Arguments
+    ///
+    /// * `calendarId` - Calendar identifier of the source calendar where the event currently is on.
+    /// * `eventId` - Event identifier.
+    /// * `destination` - Calendar identifier of the target calendar where the event is to be moved to.
     pub fn move_(&self, calendar_id: &str, event_id: &str, destination: &str) -> EventMoveCall<'a, C, NC, A> {
         EventMoveCall {
             hub: self.hub,
@@ -2183,7 +2337,13 @@ impl<'a, C, NC, A> EventMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Updates an event.    
+    /// Updates an event.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `calendarId` - Calendar identifier.
+    /// * `eventId` - Event identifier.
     pub fn update(&self, request: &Event, calendar_id: &str, event_id: &str) -> EventUpdateCall<'a, C, NC, A> {
         EventUpdateCall {
             hub: self.hub,
@@ -2201,7 +2361,12 @@ impl<'a, C, NC, A> EventMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Watch for changes to Events resources.    
+    /// Watch for changes to Events resources.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `calendarId` - Calendar identifier.
     pub fn watch(&self, request: &Channel, calendar_id: &str) -> EventWatchCall<'a, C, NC, A> {
         EventWatchCall {
             hub: self.hub,
@@ -2232,7 +2397,12 @@ impl<'a, C, NC, A> EventMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Creates an event based on a simple text string.    
+    /// Creates an event based on a simple text string.
+    /// 
+    /// # Arguments
+    ///
+    /// * `calendarId` - Calendar identifier.
+    /// * `text` - The text describing the event to be created.
     pub fn quick_add(&self, calendar_id: &str, text: &str) -> EventQuickAddCall<'a, C, NC, A> {
         EventQuickAddCall {
             hub: self.hub,
@@ -2257,7 +2427,7 @@ impl<'a, C, NC, A> EventMethods<'a, C, NC, A> {
 /// Returns free/busy information for a set of calendars.
 ///
 /// A builder for the *query* method supported by a *freebusy* resource.
-/// It is not used directly, but through a `FreebusyMethods`.
+/// It is not used directly, but through a `FreebusyMethods` instance.
 ///
 /// # Example
 ///
@@ -2320,7 +2490,7 @@ impl<'a, C, NC, A> FreebusyQueryCall<'a, C, NC, A> where NC: hyper::net::Network
         for &field in ["alt"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -2353,7 +2523,7 @@ impl<'a, C, NC, A> FreebusyQueryCall<'a, C, NC, A> where NC: hyper::net::Network
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -2369,7 +2539,6 @@ impl<'a, C, NC, A> FreebusyQueryCall<'a, C, NC, A> where NC: hyper::net::Network
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -2379,7 +2548,7 @@ impl<'a, C, NC, A> FreebusyQueryCall<'a, C, NC, A> where NC: hyper::net::Network
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -2390,7 +2559,7 @@ impl<'a, C, NC, A> FreebusyQueryCall<'a, C, NC, A> where NC: hyper::net::Network
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -2399,13 +2568,13 @@ impl<'a, C, NC, A> FreebusyQueryCall<'a, C, NC, A> where NC: hyper::net::Network
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -2477,7 +2646,7 @@ impl<'a, C, NC, A> FreebusyQueryCall<'a, C, NC, A> where NC: hyper::net::Network
 /// Returns all user settings for the authenticated user.
 ///
 /// A builder for the *list* method supported by a *setting* resource.
-/// It is not used directly, but through a `SettingMethods`.
+/// It is not used directly, but through a `SettingMethods` instance.
 ///
 /// # Example
 ///
@@ -2548,7 +2717,7 @@ impl<'a, C, NC, A> SettingListCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
         for &field in ["alt", "syncToken", "pageToken", "maxResults"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -2577,7 +2746,7 @@ impl<'a, C, NC, A> SettingListCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -2589,7 +2758,6 @@ impl<'a, C, NC, A> SettingListCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -2599,7 +2767,7 @@ impl<'a, C, NC, A> SettingListCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -2610,7 +2778,7 @@ impl<'a, C, NC, A> SettingListCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -2619,13 +2787,13 @@ impl<'a, C, NC, A> SettingListCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -2646,7 +2814,7 @@ impl<'a, C, NC, A> SettingListCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// Sets the *page token* query property to the given value.
     ///
     /// 
-    /// Token specifying which result page to return. Optional.    
+    /// Token specifying which result page to return. Optional.
     pub fn page_token(mut self, new_value: &str) -> SettingListCall<'a, C, NC, A> {
         self._page_token = Some(new_value.to_string());
         self
@@ -2654,7 +2822,7 @@ impl<'a, C, NC, A> SettingListCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// Sets the *max results* query property to the given value.
     ///
     /// 
-    /// Maximum number of entries returned on one result page. By default the value is 100 entries. The page size can never be larger than 250 entries. Optional.    
+    /// Maximum number of entries returned on one result page. By default the value is 100 entries. The page size can never be larger than 250 entries. Optional.
     pub fn max_results(mut self, new_value: i32) -> SettingListCall<'a, C, NC, A> {
         self._max_results = Some(new_value);
         self
@@ -2715,7 +2883,7 @@ impl<'a, C, NC, A> SettingListCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
 /// Watch for changes to Settings resources.
 ///
 /// A builder for the *watch* method supported by a *setting* resource.
-/// It is not used directly, but through a `SettingMethods`.
+/// It is not used directly, but through a `SettingMethods` instance.
 ///
 /// # Example
 ///
@@ -2793,7 +2961,7 @@ impl<'a, C, NC, A> SettingWatchCall<'a, C, NC, A> where NC: hyper::net::NetworkC
         for &field in ["alt", "syncToken", "pageToken", "maxResults"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -2826,7 +2994,7 @@ impl<'a, C, NC, A> SettingWatchCall<'a, C, NC, A> where NC: hyper::net::NetworkC
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -2842,7 +3010,6 @@ impl<'a, C, NC, A> SettingWatchCall<'a, C, NC, A> where NC: hyper::net::NetworkC
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -2852,7 +3019,7 @@ impl<'a, C, NC, A> SettingWatchCall<'a, C, NC, A> where NC: hyper::net::NetworkC
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -2863,7 +3030,7 @@ impl<'a, C, NC, A> SettingWatchCall<'a, C, NC, A> where NC: hyper::net::NetworkC
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -2872,13 +3039,13 @@ impl<'a, C, NC, A> SettingWatchCall<'a, C, NC, A> where NC: hyper::net::NetworkC
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -2908,7 +3075,7 @@ impl<'a, C, NC, A> SettingWatchCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// Sets the *page token* query property to the given value.
     ///
     /// 
-    /// Token specifying which result page to return. Optional.    
+    /// Token specifying which result page to return. Optional.
     pub fn page_token(mut self, new_value: &str) -> SettingWatchCall<'a, C, NC, A> {
         self._page_token = Some(new_value.to_string());
         self
@@ -2916,7 +3083,7 @@ impl<'a, C, NC, A> SettingWatchCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// Sets the *max results* query property to the given value.
     ///
     /// 
-    /// Maximum number of entries returned on one result page. By default the value is 100 entries. The page size can never be larger than 250 entries. Optional.    
+    /// Maximum number of entries returned on one result page. By default the value is 100 entries. The page size can never be larger than 250 entries. Optional.
     pub fn max_results(mut self, new_value: i32) -> SettingWatchCall<'a, C, NC, A> {
         self._max_results = Some(new_value);
         self
@@ -2977,7 +3144,7 @@ impl<'a, C, NC, A> SettingWatchCall<'a, C, NC, A> where NC: hyper::net::NetworkC
 /// Returns a single user setting.
 ///
 /// A builder for the *get* method supported by a *setting* resource.
-/// It is not used directly, but through a `SettingMethods`.
+/// It is not used directly, but through a `SettingMethods` instance.
 ///
 /// # Example
 ///
@@ -3035,7 +3202,7 @@ impl<'a, C, NC, A> SettingGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
         for &field in ["alt", "setting"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -3088,7 +3255,7 @@ impl<'a, C, NC, A> SettingGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -3100,7 +3267,6 @@ impl<'a, C, NC, A> SettingGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -3110,7 +3276,7 @@ impl<'a, C, NC, A> SettingGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -3121,7 +3287,7 @@ impl<'a, C, NC, A> SettingGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -3130,13 +3296,13 @@ impl<'a, C, NC, A> SettingGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -3148,7 +3314,7 @@ impl<'a, C, NC, A> SettingGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The id of the user setting.    
+    /// The id of the user setting.
     pub fn setting(mut self, new_value: &str) -> SettingGetCall<'a, C, NC, A> {
         self._setting = new_value.to_string();
         self
@@ -3209,7 +3375,7 @@ impl<'a, C, NC, A> SettingGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
 /// Updates an entry on the user's calendar list.
 ///
 /// A builder for the *update* method supported by a *calendarList* resource.
-/// It is not used directly, but through a `CalendarListMethods`.
+/// It is not used directly, but through a `CalendarListMethods` instance.
 ///
 /// # Example
 ///
@@ -3279,7 +3445,7 @@ impl<'a, C, NC, A> CalendarListUpdateCall<'a, C, NC, A> where NC: hyper::net::Ne
         for &field in ["alt", "calendarId", "colorRgbFormat"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -3336,7 +3502,7 @@ impl<'a, C, NC, A> CalendarListUpdateCall<'a, C, NC, A> where NC: hyper::net::Ne
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -3352,7 +3518,6 @@ impl<'a, C, NC, A> CalendarListUpdateCall<'a, C, NC, A> where NC: hyper::net::Ne
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -3362,7 +3527,7 @@ impl<'a, C, NC, A> CalendarListUpdateCall<'a, C, NC, A> where NC: hyper::net::Ne
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -3373,7 +3538,7 @@ impl<'a, C, NC, A> CalendarListUpdateCall<'a, C, NC, A> where NC: hyper::net::Ne
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -3382,13 +3547,13 @@ impl<'a, C, NC, A> CalendarListUpdateCall<'a, C, NC, A> where NC: hyper::net::Ne
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -3409,7 +3574,7 @@ impl<'a, C, NC, A> CalendarListUpdateCall<'a, C, NC, A> where NC: hyper::net::Ne
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Calendar identifier.    
+    /// Calendar identifier.
     pub fn calendar_id(mut self, new_value: &str) -> CalendarListUpdateCall<'a, C, NC, A> {
         self._calendar_id = new_value.to_string();
         self
@@ -3417,7 +3582,7 @@ impl<'a, C, NC, A> CalendarListUpdateCall<'a, C, NC, A> where NC: hyper::net::Ne
     /// Sets the *color rgb format* query property to the given value.
     ///
     /// 
-    /// Whether to use the foregroundColor and backgroundColor fields to write the calendar colors (RGB). If this feature is used, the index-based colorId field will be set to the best matching option automatically. Optional. The default is False.    
+    /// Whether to use the foregroundColor and backgroundColor fields to write the calendar colors (RGB). If this feature is used, the index-based colorId field will be set to the best matching option automatically. Optional. The default is False.
     pub fn color_rgb_format(mut self, new_value: bool) -> CalendarListUpdateCall<'a, C, NC, A> {
         self._color_rgb_format = Some(new_value);
         self
@@ -3478,7 +3643,7 @@ impl<'a, C, NC, A> CalendarListUpdateCall<'a, C, NC, A> where NC: hyper::net::Ne
 /// Deletes an entry on the user's calendar list.
 ///
 /// A builder for the *delete* method supported by a *calendarList* resource.
-/// It is not used directly, but through a `CalendarListMethods`.
+/// It is not used directly, but through a `CalendarListMethods` instance.
 ///
 /// # Example
 ///
@@ -3536,7 +3701,7 @@ impl<'a, C, NC, A> CalendarListDeleteCall<'a, C, NC, A> where NC: hyper::net::Ne
         for &field in ["calendarId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -3588,7 +3753,7 @@ impl<'a, C, NC, A> CalendarListDeleteCall<'a, C, NC, A> where NC: hyper::net::Ne
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -3600,7 +3765,6 @@ impl<'a, C, NC, A> CalendarListDeleteCall<'a, C, NC, A> where NC: hyper::net::Ne
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -3610,7 +3774,7 @@ impl<'a, C, NC, A> CalendarListDeleteCall<'a, C, NC, A> where NC: hyper::net::Ne
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -3621,12 +3785,12 @@ impl<'a, C, NC, A> CalendarListDeleteCall<'a, C, NC, A> where NC: hyper::net::Ne
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = res;
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -3638,7 +3802,7 @@ impl<'a, C, NC, A> CalendarListDeleteCall<'a, C, NC, A> where NC: hyper::net::Ne
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Calendar identifier.    
+    /// Calendar identifier.
     pub fn calendar_id(mut self, new_value: &str) -> CalendarListDeleteCall<'a, C, NC, A> {
         self._calendar_id = new_value.to_string();
         self
@@ -3699,7 +3863,7 @@ impl<'a, C, NC, A> CalendarListDeleteCall<'a, C, NC, A> where NC: hyper::net::Ne
 /// Returns an entry on the user's calendar list.
 ///
 /// A builder for the *get* method supported by a *calendarList* resource.
-/// It is not used directly, but through a `CalendarListMethods`.
+/// It is not used directly, but through a `CalendarListMethods` instance.
 ///
 /// # Example
 ///
@@ -3757,7 +3921,7 @@ impl<'a, C, NC, A> CalendarListGetCall<'a, C, NC, A> where NC: hyper::net::Netwo
         for &field in ["alt", "calendarId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -3810,7 +3974,7 @@ impl<'a, C, NC, A> CalendarListGetCall<'a, C, NC, A> where NC: hyper::net::Netwo
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -3822,7 +3986,6 @@ impl<'a, C, NC, A> CalendarListGetCall<'a, C, NC, A> where NC: hyper::net::Netwo
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -3832,7 +3995,7 @@ impl<'a, C, NC, A> CalendarListGetCall<'a, C, NC, A> where NC: hyper::net::Netwo
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -3843,7 +4006,7 @@ impl<'a, C, NC, A> CalendarListGetCall<'a, C, NC, A> where NC: hyper::net::Netwo
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -3852,13 +4015,13 @@ impl<'a, C, NC, A> CalendarListGetCall<'a, C, NC, A> where NC: hyper::net::Netwo
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -3870,7 +4033,7 @@ impl<'a, C, NC, A> CalendarListGetCall<'a, C, NC, A> where NC: hyper::net::Netwo
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Calendar identifier.    
+    /// Calendar identifier.
     pub fn calendar_id(mut self, new_value: &str) -> CalendarListGetCall<'a, C, NC, A> {
         self._calendar_id = new_value.to_string();
         self
@@ -3931,7 +4094,7 @@ impl<'a, C, NC, A> CalendarListGetCall<'a, C, NC, A> where NC: hyper::net::Netwo
 /// Returns entries on the user's calendar list.
 ///
 /// A builder for the *list* method supported by a *calendarList* resource.
-/// It is not used directly, but through a `CalendarListMethods`.
+/// It is not used directly, but through a `CalendarListMethods` instance.
 ///
 /// # Example
 ///
@@ -4017,7 +4180,7 @@ impl<'a, C, NC, A> CalendarListListCall<'a, C, NC, A> where NC: hyper::net::Netw
         for &field in ["alt", "syncToken", "showHidden", "showDeleted", "pageToken", "minAccessRole", "maxResults"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -4046,7 +4209,7 @@ impl<'a, C, NC, A> CalendarListListCall<'a, C, NC, A> where NC: hyper::net::Netw
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -4058,7 +4221,6 @@ impl<'a, C, NC, A> CalendarListListCall<'a, C, NC, A> where NC: hyper::net::Netw
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -4068,7 +4230,7 @@ impl<'a, C, NC, A> CalendarListListCall<'a, C, NC, A> where NC: hyper::net::Netw
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -4079,7 +4241,7 @@ impl<'a, C, NC, A> CalendarListListCall<'a, C, NC, A> where NC: hyper::net::Netw
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -4088,13 +4250,13 @@ impl<'a, C, NC, A> CalendarListListCall<'a, C, NC, A> where NC: hyper::net::Netw
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -4116,7 +4278,7 @@ impl<'a, C, NC, A> CalendarListListCall<'a, C, NC, A> where NC: hyper::net::Netw
     /// Sets the *show hidden* query property to the given value.
     ///
     /// 
-    /// Whether to show hidden entries. Optional. The default is False.    
+    /// Whether to show hidden entries. Optional. The default is False.
     pub fn show_hidden(mut self, new_value: bool) -> CalendarListListCall<'a, C, NC, A> {
         self._show_hidden = Some(new_value);
         self
@@ -4124,7 +4286,7 @@ impl<'a, C, NC, A> CalendarListListCall<'a, C, NC, A> where NC: hyper::net::Netw
     /// Sets the *show deleted* query property to the given value.
     ///
     /// 
-    /// Whether to include deleted calendar list entries in the result. Optional. The default is False.    
+    /// Whether to include deleted calendar list entries in the result. Optional. The default is False.
     pub fn show_deleted(mut self, new_value: bool) -> CalendarListListCall<'a, C, NC, A> {
         self._show_deleted = Some(new_value);
         self
@@ -4132,7 +4294,7 @@ impl<'a, C, NC, A> CalendarListListCall<'a, C, NC, A> where NC: hyper::net::Netw
     /// Sets the *page token* query property to the given value.
     ///
     /// 
-    /// Token specifying which result page to return. Optional.    
+    /// Token specifying which result page to return. Optional.
     pub fn page_token(mut self, new_value: &str) -> CalendarListListCall<'a, C, NC, A> {
         self._page_token = Some(new_value.to_string());
         self
@@ -4140,7 +4302,7 @@ impl<'a, C, NC, A> CalendarListListCall<'a, C, NC, A> where NC: hyper::net::Netw
     /// Sets the *min access role* query property to the given value.
     ///
     /// 
-    /// The minimum access role for the user in the returned entires. Optional. The default is no restriction.    
+    /// The minimum access role for the user in the returned entires. Optional. The default is no restriction.
     pub fn min_access_role(mut self, new_value: &str) -> CalendarListListCall<'a, C, NC, A> {
         self._min_access_role = Some(new_value.to_string());
         self
@@ -4148,7 +4310,7 @@ impl<'a, C, NC, A> CalendarListListCall<'a, C, NC, A> where NC: hyper::net::Netw
     /// Sets the *max results* query property to the given value.
     ///
     /// 
-    /// Maximum number of entries returned on one result page. By default the value is 100 entries. The page size can never be larger than 250 entries. Optional.    
+    /// Maximum number of entries returned on one result page. By default the value is 100 entries. The page size can never be larger than 250 entries. Optional.
     pub fn max_results(mut self, new_value: i32) -> CalendarListListCall<'a, C, NC, A> {
         self._max_results = Some(new_value);
         self
@@ -4209,7 +4371,7 @@ impl<'a, C, NC, A> CalendarListListCall<'a, C, NC, A> where NC: hyper::net::Netw
 /// Adds an entry to the user's calendar list.
 ///
 /// A builder for the *insert* method supported by a *calendarList* resource.
-/// It is not used directly, but through a `CalendarListMethods`.
+/// It is not used directly, but through a `CalendarListMethods` instance.
 ///
 /// # Example
 ///
@@ -4277,7 +4439,7 @@ impl<'a, C, NC, A> CalendarListInsertCall<'a, C, NC, A> where NC: hyper::net::Ne
         for &field in ["alt", "colorRgbFormat"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -4310,7 +4472,7 @@ impl<'a, C, NC, A> CalendarListInsertCall<'a, C, NC, A> where NC: hyper::net::Ne
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -4326,7 +4488,6 @@ impl<'a, C, NC, A> CalendarListInsertCall<'a, C, NC, A> where NC: hyper::net::Ne
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -4336,7 +4497,7 @@ impl<'a, C, NC, A> CalendarListInsertCall<'a, C, NC, A> where NC: hyper::net::Ne
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -4347,7 +4508,7 @@ impl<'a, C, NC, A> CalendarListInsertCall<'a, C, NC, A> where NC: hyper::net::Ne
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -4356,13 +4517,13 @@ impl<'a, C, NC, A> CalendarListInsertCall<'a, C, NC, A> where NC: hyper::net::Ne
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -4381,7 +4542,7 @@ impl<'a, C, NC, A> CalendarListInsertCall<'a, C, NC, A> where NC: hyper::net::Ne
     /// Sets the *color rgb format* query property to the given value.
     ///
     /// 
-    /// Whether to use the foregroundColor and backgroundColor fields to write the calendar colors (RGB). If this feature is used, the index-based colorId field will be set to the best matching option automatically. Optional. The default is False.    
+    /// Whether to use the foregroundColor and backgroundColor fields to write the calendar colors (RGB). If this feature is used, the index-based colorId field will be set to the best matching option automatically. Optional. The default is False.
     pub fn color_rgb_format(mut self, new_value: bool) -> CalendarListInsertCall<'a, C, NC, A> {
         self._color_rgb_format = Some(new_value);
         self
@@ -4442,7 +4603,7 @@ impl<'a, C, NC, A> CalendarListInsertCall<'a, C, NC, A> where NC: hyper::net::Ne
 /// Updates an entry on the user's calendar list. This method supports patch semantics.
 ///
 /// A builder for the *patch* method supported by a *calendarList* resource.
-/// It is not used directly, but through a `CalendarListMethods`.
+/// It is not used directly, but through a `CalendarListMethods` instance.
 ///
 /// # Example
 ///
@@ -4512,7 +4673,7 @@ impl<'a, C, NC, A> CalendarListPatchCall<'a, C, NC, A> where NC: hyper::net::Net
         for &field in ["alt", "calendarId", "colorRgbFormat"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -4569,7 +4730,7 @@ impl<'a, C, NC, A> CalendarListPatchCall<'a, C, NC, A> where NC: hyper::net::Net
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -4585,7 +4746,6 @@ impl<'a, C, NC, A> CalendarListPatchCall<'a, C, NC, A> where NC: hyper::net::Net
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -4595,7 +4755,7 @@ impl<'a, C, NC, A> CalendarListPatchCall<'a, C, NC, A> where NC: hyper::net::Net
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -4606,7 +4766,7 @@ impl<'a, C, NC, A> CalendarListPatchCall<'a, C, NC, A> where NC: hyper::net::Net
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -4615,13 +4775,13 @@ impl<'a, C, NC, A> CalendarListPatchCall<'a, C, NC, A> where NC: hyper::net::Net
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -4642,7 +4802,7 @@ impl<'a, C, NC, A> CalendarListPatchCall<'a, C, NC, A> where NC: hyper::net::Net
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Calendar identifier.    
+    /// Calendar identifier.
     pub fn calendar_id(mut self, new_value: &str) -> CalendarListPatchCall<'a, C, NC, A> {
         self._calendar_id = new_value.to_string();
         self
@@ -4650,7 +4810,7 @@ impl<'a, C, NC, A> CalendarListPatchCall<'a, C, NC, A> where NC: hyper::net::Net
     /// Sets the *color rgb format* query property to the given value.
     ///
     /// 
-    /// Whether to use the foregroundColor and backgroundColor fields to write the calendar colors (RGB). If this feature is used, the index-based colorId field will be set to the best matching option automatically. Optional. The default is False.    
+    /// Whether to use the foregroundColor and backgroundColor fields to write the calendar colors (RGB). If this feature is used, the index-based colorId field will be set to the best matching option automatically. Optional. The default is False.
     pub fn color_rgb_format(mut self, new_value: bool) -> CalendarListPatchCall<'a, C, NC, A> {
         self._color_rgb_format = Some(new_value);
         self
@@ -4711,7 +4871,7 @@ impl<'a, C, NC, A> CalendarListPatchCall<'a, C, NC, A> where NC: hyper::net::Net
 /// Watch for changes to CalendarList resources.
 ///
 /// A builder for the *watch* method supported by a *calendarList* resource.
-/// It is not used directly, but through a `CalendarListMethods`.
+/// It is not used directly, but through a `CalendarListMethods` instance.
 ///
 /// # Example
 ///
@@ -4804,7 +4964,7 @@ impl<'a, C, NC, A> CalendarListWatchCall<'a, C, NC, A> where NC: hyper::net::Net
         for &field in ["alt", "syncToken", "showHidden", "showDeleted", "pageToken", "minAccessRole", "maxResults"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -4837,7 +4997,7 @@ impl<'a, C, NC, A> CalendarListWatchCall<'a, C, NC, A> where NC: hyper::net::Net
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -4853,7 +5013,6 @@ impl<'a, C, NC, A> CalendarListWatchCall<'a, C, NC, A> where NC: hyper::net::Net
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -4863,7 +5022,7 @@ impl<'a, C, NC, A> CalendarListWatchCall<'a, C, NC, A> where NC: hyper::net::Net
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -4874,7 +5033,7 @@ impl<'a, C, NC, A> CalendarListWatchCall<'a, C, NC, A> where NC: hyper::net::Net
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -4883,13 +5042,13 @@ impl<'a, C, NC, A> CalendarListWatchCall<'a, C, NC, A> where NC: hyper::net::Net
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -4920,7 +5079,7 @@ impl<'a, C, NC, A> CalendarListWatchCall<'a, C, NC, A> where NC: hyper::net::Net
     /// Sets the *show hidden* query property to the given value.
     ///
     /// 
-    /// Whether to show hidden entries. Optional. The default is False.    
+    /// Whether to show hidden entries. Optional. The default is False.
     pub fn show_hidden(mut self, new_value: bool) -> CalendarListWatchCall<'a, C, NC, A> {
         self._show_hidden = Some(new_value);
         self
@@ -4928,7 +5087,7 @@ impl<'a, C, NC, A> CalendarListWatchCall<'a, C, NC, A> where NC: hyper::net::Net
     /// Sets the *show deleted* query property to the given value.
     ///
     /// 
-    /// Whether to include deleted calendar list entries in the result. Optional. The default is False.    
+    /// Whether to include deleted calendar list entries in the result. Optional. The default is False.
     pub fn show_deleted(mut self, new_value: bool) -> CalendarListWatchCall<'a, C, NC, A> {
         self._show_deleted = Some(new_value);
         self
@@ -4936,7 +5095,7 @@ impl<'a, C, NC, A> CalendarListWatchCall<'a, C, NC, A> where NC: hyper::net::Net
     /// Sets the *page token* query property to the given value.
     ///
     /// 
-    /// Token specifying which result page to return. Optional.    
+    /// Token specifying which result page to return. Optional.
     pub fn page_token(mut self, new_value: &str) -> CalendarListWatchCall<'a, C, NC, A> {
         self._page_token = Some(new_value.to_string());
         self
@@ -4944,7 +5103,7 @@ impl<'a, C, NC, A> CalendarListWatchCall<'a, C, NC, A> where NC: hyper::net::Net
     /// Sets the *min access role* query property to the given value.
     ///
     /// 
-    /// The minimum access role for the user in the returned entires. Optional. The default is no restriction.    
+    /// The minimum access role for the user in the returned entires. Optional. The default is no restriction.
     pub fn min_access_role(mut self, new_value: &str) -> CalendarListWatchCall<'a, C, NC, A> {
         self._min_access_role = Some(new_value.to_string());
         self
@@ -4952,7 +5111,7 @@ impl<'a, C, NC, A> CalendarListWatchCall<'a, C, NC, A> where NC: hyper::net::Net
     /// Sets the *max results* query property to the given value.
     ///
     /// 
-    /// Maximum number of entries returned on one result page. By default the value is 100 entries. The page size can never be larger than 250 entries. Optional.    
+    /// Maximum number of entries returned on one result page. By default the value is 100 entries. The page size can never be larger than 250 entries. Optional.
     pub fn max_results(mut self, new_value: i32) -> CalendarListWatchCall<'a, C, NC, A> {
         self._max_results = Some(new_value);
         self
@@ -5013,7 +5172,7 @@ impl<'a, C, NC, A> CalendarListWatchCall<'a, C, NC, A> where NC: hyper::net::Net
 /// Updates metadata for a calendar. This method supports patch semantics.
 ///
 /// A builder for the *patch* method supported by a *calendar* resource.
-/// It is not used directly, but through a `CalendarMethods`.
+/// It is not used directly, but through a `CalendarMethods` instance.
 ///
 /// # Example
 ///
@@ -5078,7 +5237,7 @@ impl<'a, C, NC, A> CalendarPatchCall<'a, C, NC, A> where NC: hyper::net::Network
         for &field in ["alt", "calendarId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -5135,7 +5294,7 @@ impl<'a, C, NC, A> CalendarPatchCall<'a, C, NC, A> where NC: hyper::net::Network
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -5151,7 +5310,6 @@ impl<'a, C, NC, A> CalendarPatchCall<'a, C, NC, A> where NC: hyper::net::Network
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -5161,7 +5319,7 @@ impl<'a, C, NC, A> CalendarPatchCall<'a, C, NC, A> where NC: hyper::net::Network
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -5172,7 +5330,7 @@ impl<'a, C, NC, A> CalendarPatchCall<'a, C, NC, A> where NC: hyper::net::Network
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -5181,13 +5339,13 @@ impl<'a, C, NC, A> CalendarPatchCall<'a, C, NC, A> where NC: hyper::net::Network
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -5208,7 +5366,7 @@ impl<'a, C, NC, A> CalendarPatchCall<'a, C, NC, A> where NC: hyper::net::Network
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Calendar identifier.    
+    /// Calendar identifier.
     pub fn calendar_id(mut self, new_value: &str) -> CalendarPatchCall<'a, C, NC, A> {
         self._calendar_id = new_value.to_string();
         self
@@ -5269,7 +5427,7 @@ impl<'a, C, NC, A> CalendarPatchCall<'a, C, NC, A> where NC: hyper::net::Network
 /// Deletes a secondary calendar. Use calendars.clear for clearing all events on primary calendars.
 ///
 /// A builder for the *delete* method supported by a *calendar* resource.
-/// It is not used directly, but through a `CalendarMethods`.
+/// It is not used directly, but through a `CalendarMethods` instance.
 ///
 /// # Example
 ///
@@ -5327,7 +5485,7 @@ impl<'a, C, NC, A> CalendarDeleteCall<'a, C, NC, A> where NC: hyper::net::Networ
         for &field in ["calendarId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -5379,7 +5537,7 @@ impl<'a, C, NC, A> CalendarDeleteCall<'a, C, NC, A> where NC: hyper::net::Networ
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -5391,7 +5549,6 @@ impl<'a, C, NC, A> CalendarDeleteCall<'a, C, NC, A> where NC: hyper::net::Networ
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -5401,7 +5558,7 @@ impl<'a, C, NC, A> CalendarDeleteCall<'a, C, NC, A> where NC: hyper::net::Networ
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -5412,12 +5569,12 @@ impl<'a, C, NC, A> CalendarDeleteCall<'a, C, NC, A> where NC: hyper::net::Networ
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = res;
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -5429,7 +5586,7 @@ impl<'a, C, NC, A> CalendarDeleteCall<'a, C, NC, A> where NC: hyper::net::Networ
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Calendar identifier.    
+    /// Calendar identifier.
     pub fn calendar_id(mut self, new_value: &str) -> CalendarDeleteCall<'a, C, NC, A> {
         self._calendar_id = new_value.to_string();
         self
@@ -5490,7 +5647,7 @@ impl<'a, C, NC, A> CalendarDeleteCall<'a, C, NC, A> where NC: hyper::net::Networ
 /// Returns metadata for a calendar.
 ///
 /// A builder for the *get* method supported by a *calendar* resource.
-/// It is not used directly, but through a `CalendarMethods`.
+/// It is not used directly, but through a `CalendarMethods` instance.
 ///
 /// # Example
 ///
@@ -5548,7 +5705,7 @@ impl<'a, C, NC, A> CalendarGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
         for &field in ["alt", "calendarId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -5601,7 +5758,7 @@ impl<'a, C, NC, A> CalendarGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -5613,7 +5770,6 @@ impl<'a, C, NC, A> CalendarGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -5623,7 +5779,7 @@ impl<'a, C, NC, A> CalendarGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -5634,7 +5790,7 @@ impl<'a, C, NC, A> CalendarGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -5643,13 +5799,13 @@ impl<'a, C, NC, A> CalendarGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -5661,7 +5817,7 @@ impl<'a, C, NC, A> CalendarGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Calendar identifier.    
+    /// Calendar identifier.
     pub fn calendar_id(mut self, new_value: &str) -> CalendarGetCall<'a, C, NC, A> {
         self._calendar_id = new_value.to_string();
         self
@@ -5722,7 +5878,7 @@ impl<'a, C, NC, A> CalendarGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
 /// Clears a primary calendar. This operation deletes all events associated with the primary calendar of an account.
 ///
 /// A builder for the *clear* method supported by a *calendar* resource.
-/// It is not used directly, but through a `CalendarMethods`.
+/// It is not used directly, but through a `CalendarMethods` instance.
 ///
 /// # Example
 ///
@@ -5780,7 +5936,7 @@ impl<'a, C, NC, A> CalendarClearCall<'a, C, NC, A> where NC: hyper::net::Network
         for &field in ["calendarId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -5832,7 +5988,7 @@ impl<'a, C, NC, A> CalendarClearCall<'a, C, NC, A> where NC: hyper::net::Network
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -5844,7 +6000,6 @@ impl<'a, C, NC, A> CalendarClearCall<'a, C, NC, A> where NC: hyper::net::Network
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -5854,7 +6009,7 @@ impl<'a, C, NC, A> CalendarClearCall<'a, C, NC, A> where NC: hyper::net::Network
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -5865,12 +6020,12 @@ impl<'a, C, NC, A> CalendarClearCall<'a, C, NC, A> where NC: hyper::net::Network
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = res;
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -5882,7 +6037,7 @@ impl<'a, C, NC, A> CalendarClearCall<'a, C, NC, A> where NC: hyper::net::Network
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Calendar identifier.    
+    /// Calendar identifier.
     pub fn calendar_id(mut self, new_value: &str) -> CalendarClearCall<'a, C, NC, A> {
         self._calendar_id = new_value.to_string();
         self
@@ -5943,7 +6098,7 @@ impl<'a, C, NC, A> CalendarClearCall<'a, C, NC, A> where NC: hyper::net::Network
 /// Creates a secondary calendar.
 ///
 /// A builder for the *insert* method supported by a *calendar* resource.
-/// It is not used directly, but through a `CalendarMethods`.
+/// It is not used directly, but through a `CalendarMethods` instance.
 ///
 /// # Example
 ///
@@ -6006,7 +6161,7 @@ impl<'a, C, NC, A> CalendarInsertCall<'a, C, NC, A> where NC: hyper::net::Networ
         for &field in ["alt"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -6039,7 +6194,7 @@ impl<'a, C, NC, A> CalendarInsertCall<'a, C, NC, A> where NC: hyper::net::Networ
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -6055,7 +6210,6 @@ impl<'a, C, NC, A> CalendarInsertCall<'a, C, NC, A> where NC: hyper::net::Networ
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -6065,7 +6219,7 @@ impl<'a, C, NC, A> CalendarInsertCall<'a, C, NC, A> where NC: hyper::net::Networ
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -6076,7 +6230,7 @@ impl<'a, C, NC, A> CalendarInsertCall<'a, C, NC, A> where NC: hyper::net::Networ
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -6085,13 +6239,13 @@ impl<'a, C, NC, A> CalendarInsertCall<'a, C, NC, A> where NC: hyper::net::Networ
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -6163,7 +6317,7 @@ impl<'a, C, NC, A> CalendarInsertCall<'a, C, NC, A> where NC: hyper::net::Networ
 /// Updates metadata for a calendar.
 ///
 /// A builder for the *update* method supported by a *calendar* resource.
-/// It is not used directly, but through a `CalendarMethods`.
+/// It is not used directly, but through a `CalendarMethods` instance.
 ///
 /// # Example
 ///
@@ -6228,7 +6382,7 @@ impl<'a, C, NC, A> CalendarUpdateCall<'a, C, NC, A> where NC: hyper::net::Networ
         for &field in ["alt", "calendarId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -6285,7 +6439,7 @@ impl<'a, C, NC, A> CalendarUpdateCall<'a, C, NC, A> where NC: hyper::net::Networ
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -6301,7 +6455,6 @@ impl<'a, C, NC, A> CalendarUpdateCall<'a, C, NC, A> where NC: hyper::net::Networ
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -6311,7 +6464,7 @@ impl<'a, C, NC, A> CalendarUpdateCall<'a, C, NC, A> where NC: hyper::net::Networ
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -6322,7 +6475,7 @@ impl<'a, C, NC, A> CalendarUpdateCall<'a, C, NC, A> where NC: hyper::net::Networ
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -6331,13 +6484,13 @@ impl<'a, C, NC, A> CalendarUpdateCall<'a, C, NC, A> where NC: hyper::net::Networ
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -6358,7 +6511,7 @@ impl<'a, C, NC, A> CalendarUpdateCall<'a, C, NC, A> where NC: hyper::net::Networ
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Calendar identifier.    
+    /// Calendar identifier.
     pub fn calendar_id(mut self, new_value: &str) -> CalendarUpdateCall<'a, C, NC, A> {
         self._calendar_id = new_value.to_string();
         self
@@ -6419,7 +6572,7 @@ impl<'a, C, NC, A> CalendarUpdateCall<'a, C, NC, A> where NC: hyper::net::Networ
 /// Watch for changes to ACL resources.
 ///
 /// A builder for the *watch* method supported by a *acl* resource.
-/// It is not used directly, but through a `AclMethods`.
+/// It is not used directly, but through a `AclMethods` instance.
 ///
 /// # Example
 ///
@@ -6504,7 +6657,7 @@ impl<'a, C, NC, A> AclWatchCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
         for &field in ["alt", "calendarId", "syncToken", "showDeleted", "pageToken", "maxResults"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -6561,7 +6714,7 @@ impl<'a, C, NC, A> AclWatchCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -6577,7 +6730,6 @@ impl<'a, C, NC, A> AclWatchCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -6587,7 +6739,7 @@ impl<'a, C, NC, A> AclWatchCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -6598,7 +6750,7 @@ impl<'a, C, NC, A> AclWatchCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -6607,13 +6759,13 @@ impl<'a, C, NC, A> AclWatchCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -6634,7 +6786,7 @@ impl<'a, C, NC, A> AclWatchCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Calendar identifier.    
+    /// Calendar identifier.
     pub fn calendar_id(mut self, new_value: &str) -> AclWatchCall<'a, C, NC, A> {
         self._calendar_id = new_value.to_string();
         self
@@ -6653,7 +6805,7 @@ impl<'a, C, NC, A> AclWatchCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
     /// Sets the *show deleted* query property to the given value.
     ///
     /// 
-    /// Whether to include deleted ACLs in the result. Deleted ACLs are represented by role equal to "none". Deleted ACLs will always be included if syncToken is provided. Optional. The default is False.    
+    /// Whether to include deleted ACLs in the result. Deleted ACLs are represented by role equal to "none". Deleted ACLs will always be included if syncToken is provided. Optional. The default is False.
     pub fn show_deleted(mut self, new_value: bool) -> AclWatchCall<'a, C, NC, A> {
         self._show_deleted = Some(new_value);
         self
@@ -6661,7 +6813,7 @@ impl<'a, C, NC, A> AclWatchCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
     /// Sets the *page token* query property to the given value.
     ///
     /// 
-    /// Token specifying which result page to return. Optional.    
+    /// Token specifying which result page to return. Optional.
     pub fn page_token(mut self, new_value: &str) -> AclWatchCall<'a, C, NC, A> {
         self._page_token = Some(new_value.to_string());
         self
@@ -6669,7 +6821,7 @@ impl<'a, C, NC, A> AclWatchCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
     /// Sets the *max results* query property to the given value.
     ///
     /// 
-    /// Maximum number of entries returned on one result page. By default the value is 100 entries. The page size can never be larger than 250 entries. Optional.    
+    /// Maximum number of entries returned on one result page. By default the value is 100 entries. The page size can never be larger than 250 entries. Optional.
     pub fn max_results(mut self, new_value: i32) -> AclWatchCall<'a, C, NC, A> {
         self._max_results = Some(new_value);
         self
@@ -6730,7 +6882,7 @@ impl<'a, C, NC, A> AclWatchCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
 /// Creates an access control rule.
 ///
 /// A builder for the *insert* method supported by a *acl* resource.
-/// It is not used directly, but through a `AclMethods`.
+/// It is not used directly, but through a `AclMethods` instance.
 ///
 /// # Example
 ///
@@ -6795,7 +6947,7 @@ impl<'a, C, NC, A> AclInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
         for &field in ["alt", "calendarId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -6852,7 +7004,7 @@ impl<'a, C, NC, A> AclInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -6868,7 +7020,6 @@ impl<'a, C, NC, A> AclInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -6878,7 +7029,7 @@ impl<'a, C, NC, A> AclInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -6889,7 +7040,7 @@ impl<'a, C, NC, A> AclInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -6898,13 +7049,13 @@ impl<'a, C, NC, A> AclInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -6925,7 +7076,7 @@ impl<'a, C, NC, A> AclInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Calendar identifier.    
+    /// Calendar identifier.
     pub fn calendar_id(mut self, new_value: &str) -> AclInsertCall<'a, C, NC, A> {
         self._calendar_id = new_value.to_string();
         self
@@ -6986,7 +7137,7 @@ impl<'a, C, NC, A> AclInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
 /// Updates an access control rule.
 ///
 /// A builder for the *update* method supported by a *acl* resource.
-/// It is not used directly, but through a `AclMethods`.
+/// It is not used directly, but through a `AclMethods` instance.
 ///
 /// # Example
 ///
@@ -7053,7 +7204,7 @@ impl<'a, C, NC, A> AclUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
         for &field in ["alt", "calendarId", "ruleId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -7110,7 +7261,7 @@ impl<'a, C, NC, A> AclUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -7126,7 +7277,6 @@ impl<'a, C, NC, A> AclUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -7136,7 +7286,7 @@ impl<'a, C, NC, A> AclUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -7147,7 +7297,7 @@ impl<'a, C, NC, A> AclUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -7156,13 +7306,13 @@ impl<'a, C, NC, A> AclUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -7183,7 +7333,7 @@ impl<'a, C, NC, A> AclUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Calendar identifier.    
+    /// Calendar identifier.
     pub fn calendar_id(mut self, new_value: &str) -> AclUpdateCall<'a, C, NC, A> {
         self._calendar_id = new_value.to_string();
         self
@@ -7193,7 +7343,7 @@ impl<'a, C, NC, A> AclUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// ACL rule identifier.    
+    /// ACL rule identifier.
     pub fn rule_id(mut self, new_value: &str) -> AclUpdateCall<'a, C, NC, A> {
         self._rule_id = new_value.to_string();
         self
@@ -7254,7 +7404,7 @@ impl<'a, C, NC, A> AclUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
 /// Updates an access control rule. This method supports patch semantics.
 ///
 /// A builder for the *patch* method supported by a *acl* resource.
-/// It is not used directly, but through a `AclMethods`.
+/// It is not used directly, but through a `AclMethods` instance.
 ///
 /// # Example
 ///
@@ -7321,7 +7471,7 @@ impl<'a, C, NC, A> AclPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
         for &field in ["alt", "calendarId", "ruleId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -7378,7 +7528,7 @@ impl<'a, C, NC, A> AclPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -7394,7 +7544,6 @@ impl<'a, C, NC, A> AclPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -7404,7 +7553,7 @@ impl<'a, C, NC, A> AclPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -7415,7 +7564,7 @@ impl<'a, C, NC, A> AclPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -7424,13 +7573,13 @@ impl<'a, C, NC, A> AclPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -7451,7 +7600,7 @@ impl<'a, C, NC, A> AclPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Calendar identifier.    
+    /// Calendar identifier.
     pub fn calendar_id(mut self, new_value: &str) -> AclPatchCall<'a, C, NC, A> {
         self._calendar_id = new_value.to_string();
         self
@@ -7461,7 +7610,7 @@ impl<'a, C, NC, A> AclPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// ACL rule identifier.    
+    /// ACL rule identifier.
     pub fn rule_id(mut self, new_value: &str) -> AclPatchCall<'a, C, NC, A> {
         self._rule_id = new_value.to_string();
         self
@@ -7522,7 +7671,7 @@ impl<'a, C, NC, A> AclPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
 /// Returns the rules in the access control list for the calendar.
 ///
 /// A builder for the *list* method supported by a *acl* resource.
-/// It is not used directly, but through a `AclMethods`.
+/// It is not used directly, but through a `AclMethods` instance.
 ///
 /// # Example
 ///
@@ -7600,7 +7749,7 @@ impl<'a, C, NC, A> AclListCall<'a, C, NC, A> where NC: hyper::net::NetworkConnec
         for &field in ["alt", "calendarId", "syncToken", "showDeleted", "pageToken", "maxResults"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -7653,7 +7802,7 @@ impl<'a, C, NC, A> AclListCall<'a, C, NC, A> where NC: hyper::net::NetworkConnec
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -7665,7 +7814,6 @@ impl<'a, C, NC, A> AclListCall<'a, C, NC, A> where NC: hyper::net::NetworkConnec
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -7675,7 +7823,7 @@ impl<'a, C, NC, A> AclListCall<'a, C, NC, A> where NC: hyper::net::NetworkConnec
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -7686,7 +7834,7 @@ impl<'a, C, NC, A> AclListCall<'a, C, NC, A> where NC: hyper::net::NetworkConnec
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -7695,13 +7843,13 @@ impl<'a, C, NC, A> AclListCall<'a, C, NC, A> where NC: hyper::net::NetworkConnec
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -7713,7 +7861,7 @@ impl<'a, C, NC, A> AclListCall<'a, C, NC, A> where NC: hyper::net::NetworkConnec
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Calendar identifier.    
+    /// Calendar identifier.
     pub fn calendar_id(mut self, new_value: &str) -> AclListCall<'a, C, NC, A> {
         self._calendar_id = new_value.to_string();
         self
@@ -7732,7 +7880,7 @@ impl<'a, C, NC, A> AclListCall<'a, C, NC, A> where NC: hyper::net::NetworkConnec
     /// Sets the *show deleted* query property to the given value.
     ///
     /// 
-    /// Whether to include deleted ACLs in the result. Deleted ACLs are represented by role equal to "none". Deleted ACLs will always be included if syncToken is provided. Optional. The default is False.    
+    /// Whether to include deleted ACLs in the result. Deleted ACLs are represented by role equal to "none". Deleted ACLs will always be included if syncToken is provided. Optional. The default is False.
     pub fn show_deleted(mut self, new_value: bool) -> AclListCall<'a, C, NC, A> {
         self._show_deleted = Some(new_value);
         self
@@ -7740,7 +7888,7 @@ impl<'a, C, NC, A> AclListCall<'a, C, NC, A> where NC: hyper::net::NetworkConnec
     /// Sets the *page token* query property to the given value.
     ///
     /// 
-    /// Token specifying which result page to return. Optional.    
+    /// Token specifying which result page to return. Optional.
     pub fn page_token(mut self, new_value: &str) -> AclListCall<'a, C, NC, A> {
         self._page_token = Some(new_value.to_string());
         self
@@ -7748,7 +7896,7 @@ impl<'a, C, NC, A> AclListCall<'a, C, NC, A> where NC: hyper::net::NetworkConnec
     /// Sets the *max results* query property to the given value.
     ///
     /// 
-    /// Maximum number of entries returned on one result page. By default the value is 100 entries. The page size can never be larger than 250 entries. Optional.    
+    /// Maximum number of entries returned on one result page. By default the value is 100 entries. The page size can never be larger than 250 entries. Optional.
     pub fn max_results(mut self, new_value: i32) -> AclListCall<'a, C, NC, A> {
         self._max_results = Some(new_value);
         self
@@ -7809,7 +7957,7 @@ impl<'a, C, NC, A> AclListCall<'a, C, NC, A> where NC: hyper::net::NetworkConnec
 /// Deletes an access control rule.
 ///
 /// A builder for the *delete* method supported by a *acl* resource.
-/// It is not used directly, but through a `AclMethods`.
+/// It is not used directly, but through a `AclMethods` instance.
 ///
 /// # Example
 ///
@@ -7869,7 +8017,7 @@ impl<'a, C, NC, A> AclDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
         for &field in ["calendarId", "ruleId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -7921,7 +8069,7 @@ impl<'a, C, NC, A> AclDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -7933,7 +8081,6 @@ impl<'a, C, NC, A> AclDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -7943,7 +8090,7 @@ impl<'a, C, NC, A> AclDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -7954,12 +8101,12 @@ impl<'a, C, NC, A> AclDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = res;
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -7971,7 +8118,7 @@ impl<'a, C, NC, A> AclDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Calendar identifier.    
+    /// Calendar identifier.
     pub fn calendar_id(mut self, new_value: &str) -> AclDeleteCall<'a, C, NC, A> {
         self._calendar_id = new_value.to_string();
         self
@@ -7981,7 +8128,7 @@ impl<'a, C, NC, A> AclDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// ACL rule identifier.    
+    /// ACL rule identifier.
     pub fn rule_id(mut self, new_value: &str) -> AclDeleteCall<'a, C, NC, A> {
         self._rule_id = new_value.to_string();
         self
@@ -8042,7 +8189,7 @@ impl<'a, C, NC, A> AclDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
 /// Returns an access control rule.
 ///
 /// A builder for the *get* method supported by a *acl* resource.
-/// It is not used directly, but through a `AclMethods`.
+/// It is not used directly, but through a `AclMethods` instance.
 ///
 /// # Example
 ///
@@ -8102,7 +8249,7 @@ impl<'a, C, NC, A> AclGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnect
         for &field in ["alt", "calendarId", "ruleId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -8155,7 +8302,7 @@ impl<'a, C, NC, A> AclGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnect
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -8167,7 +8314,6 @@ impl<'a, C, NC, A> AclGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnect
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -8177,7 +8323,7 @@ impl<'a, C, NC, A> AclGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnect
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -8188,7 +8334,7 @@ impl<'a, C, NC, A> AclGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnect
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -8197,13 +8343,13 @@ impl<'a, C, NC, A> AclGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnect
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -8215,7 +8361,7 @@ impl<'a, C, NC, A> AclGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnect
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Calendar identifier.    
+    /// Calendar identifier.
     pub fn calendar_id(mut self, new_value: &str) -> AclGetCall<'a, C, NC, A> {
         self._calendar_id = new_value.to_string();
         self
@@ -8225,7 +8371,7 @@ impl<'a, C, NC, A> AclGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnect
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// ACL rule identifier.    
+    /// ACL rule identifier.
     pub fn rule_id(mut self, new_value: &str) -> AclGetCall<'a, C, NC, A> {
         self._rule_id = new_value.to_string();
         self
@@ -8286,7 +8432,7 @@ impl<'a, C, NC, A> AclGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnect
 /// Stop watching resources through this channel
 ///
 /// A builder for the *stop* method supported by a *channel* resource.
-/// It is not used directly, but through a `ChannelMethods`.
+/// It is not used directly, but through a `ChannelMethods` instance.
 ///
 /// # Example
 ///
@@ -8349,7 +8495,7 @@ impl<'a, C, NC, A> ChannelStopCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
         for &field in [].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -8381,7 +8527,7 @@ impl<'a, C, NC, A> ChannelStopCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -8397,7 +8543,6 @@ impl<'a, C, NC, A> ChannelStopCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -8407,7 +8552,7 @@ impl<'a, C, NC, A> ChannelStopCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -8418,12 +8563,12 @@ impl<'a, C, NC, A> ChannelStopCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = res;
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -8495,7 +8640,7 @@ impl<'a, C, NC, A> ChannelStopCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
 /// Returns the color definitions for calendars and events.
 ///
 /// A builder for the *get* method supported by a *color* resource.
-/// It is not used directly, but through a `ColorMethods`.
+/// It is not used directly, but through a `ColorMethods` instance.
 ///
 /// # Example
 ///
@@ -8551,7 +8696,7 @@ impl<'a, C, NC, A> ColorGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
         for &field in ["alt"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -8580,7 +8725,7 @@ impl<'a, C, NC, A> ColorGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -8592,7 +8737,6 @@ impl<'a, C, NC, A> ColorGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -8602,7 +8746,7 @@ impl<'a, C, NC, A> ColorGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -8613,7 +8757,7 @@ impl<'a, C, NC, A> ColorGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -8622,13 +8766,13 @@ impl<'a, C, NC, A> ColorGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -8691,7 +8835,7 @@ impl<'a, C, NC, A> ColorGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
 /// Deletes an event.
 ///
 /// A builder for the *delete* method supported by a *event* resource.
-/// It is not used directly, but through a `EventMethods`.
+/// It is not used directly, but through a `EventMethods` instance.
 ///
 /// # Example
 ///
@@ -8756,7 +8900,7 @@ impl<'a, C, NC, A> EventDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
         for &field in ["calendarId", "eventId", "sendNotifications"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -8808,7 +8952,7 @@ impl<'a, C, NC, A> EventDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -8820,7 +8964,6 @@ impl<'a, C, NC, A> EventDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -8830,7 +8973,7 @@ impl<'a, C, NC, A> EventDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -8841,12 +8984,12 @@ impl<'a, C, NC, A> EventDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = res;
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -8858,7 +9001,7 @@ impl<'a, C, NC, A> EventDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Calendar identifier.    
+    /// Calendar identifier.
     pub fn calendar_id(mut self, new_value: &str) -> EventDeleteCall<'a, C, NC, A> {
         self._calendar_id = new_value.to_string();
         self
@@ -8868,7 +9011,7 @@ impl<'a, C, NC, A> EventDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Event identifier.    
+    /// Event identifier.
     pub fn event_id(mut self, new_value: &str) -> EventDeleteCall<'a, C, NC, A> {
         self._event_id = new_value.to_string();
         self
@@ -8876,7 +9019,7 @@ impl<'a, C, NC, A> EventDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// Sets the *send notifications* query property to the given value.
     ///
     /// 
-    /// Whether to send notifications about the deletion of the event. Optional. The default is False.    
+    /// Whether to send notifications about the deletion of the event. Optional. The default is False.
     pub fn send_notifications(mut self, new_value: bool) -> EventDeleteCall<'a, C, NC, A> {
         self._send_notifications = Some(new_value);
         self
@@ -8937,7 +9080,7 @@ impl<'a, C, NC, A> EventDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
 /// Creates an event.
 ///
 /// A builder for the *insert* method supported by a *event* resource.
-/// It is not used directly, but through a `EventMethods`.
+/// It is not used directly, but through a `EventMethods` instance.
 ///
 /// # Example
 ///
@@ -9012,7 +9155,7 @@ impl<'a, C, NC, A> EventInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
         for &field in ["alt", "calendarId", "sendNotifications", "maxAttendees"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -9069,7 +9212,7 @@ impl<'a, C, NC, A> EventInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -9085,7 +9228,6 @@ impl<'a, C, NC, A> EventInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -9095,7 +9237,7 @@ impl<'a, C, NC, A> EventInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -9106,7 +9248,7 @@ impl<'a, C, NC, A> EventInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -9115,13 +9257,13 @@ impl<'a, C, NC, A> EventInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -9142,7 +9284,7 @@ impl<'a, C, NC, A> EventInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Calendar identifier.    
+    /// Calendar identifier.
     pub fn calendar_id(mut self, new_value: &str) -> EventInsertCall<'a, C, NC, A> {
         self._calendar_id = new_value.to_string();
         self
@@ -9150,7 +9292,7 @@ impl<'a, C, NC, A> EventInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// Sets the *send notifications* query property to the given value.
     ///
     /// 
-    /// Whether to send notifications about the creation of the new event. Optional. The default is False.    
+    /// Whether to send notifications about the creation of the new event. Optional. The default is False.
     pub fn send_notifications(mut self, new_value: bool) -> EventInsertCall<'a, C, NC, A> {
         self._send_notifications = Some(new_value);
         self
@@ -9158,7 +9300,7 @@ impl<'a, C, NC, A> EventInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// Sets the *max attendees* query property to the given value.
     ///
     /// 
-    /// The maximum number of attendees to include in the response. If there are more than the specified number of attendees, only the participant is returned. Optional.    
+    /// The maximum number of attendees to include in the response. If there are more than the specified number of attendees, only the participant is returned. Optional.
     pub fn max_attendees(mut self, new_value: i32) -> EventInsertCall<'a, C, NC, A> {
         self._max_attendees = Some(new_value);
         self
@@ -9219,7 +9361,7 @@ impl<'a, C, NC, A> EventInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
 /// Imports an event. This operation is used to add a private copy of an existing event to a calendar.
 ///
 /// A builder for the *import* method supported by a *event* resource.
-/// It is not used directly, but through a `EventMethods`.
+/// It is not used directly, but through a `EventMethods` instance.
 ///
 /// # Example
 ///
@@ -9284,7 +9426,7 @@ impl<'a, C, NC, A> EventImportCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
         for &field in ["alt", "calendarId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -9341,7 +9483,7 @@ impl<'a, C, NC, A> EventImportCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -9357,7 +9499,6 @@ impl<'a, C, NC, A> EventImportCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -9367,7 +9508,7 @@ impl<'a, C, NC, A> EventImportCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -9378,7 +9519,7 @@ impl<'a, C, NC, A> EventImportCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -9387,13 +9528,13 @@ impl<'a, C, NC, A> EventImportCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -9414,7 +9555,7 @@ impl<'a, C, NC, A> EventImportCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Calendar identifier.    
+    /// Calendar identifier.
     pub fn calendar_id(mut self, new_value: &str) -> EventImportCall<'a, C, NC, A> {
         self._calendar_id = new_value.to_string();
         self
@@ -9475,7 +9616,7 @@ impl<'a, C, NC, A> EventImportCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
 /// Returns instances of the specified recurring event.
 ///
 /// A builder for the *instances* method supported by a *event* resource.
-/// It is not used directly, but through a `EventMethods`.
+/// It is not used directly, but through a `EventMethods` instance.
 ///
 /// # Example
 ///
@@ -9580,7 +9721,7 @@ impl<'a, C, NC, A> EventInstanceCall<'a, C, NC, A> where NC: hyper::net::Network
         for &field in ["alt", "calendarId", "eventId", "timeZone", "timeMin", "timeMax", "showDeleted", "pageToken", "originalStart", "maxResults", "maxAttendees", "alwaysIncludeEmail"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -9633,7 +9774,7 @@ impl<'a, C, NC, A> EventInstanceCall<'a, C, NC, A> where NC: hyper::net::Network
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -9645,7 +9786,6 @@ impl<'a, C, NC, A> EventInstanceCall<'a, C, NC, A> where NC: hyper::net::Network
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -9655,7 +9795,7 @@ impl<'a, C, NC, A> EventInstanceCall<'a, C, NC, A> where NC: hyper::net::Network
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -9666,7 +9806,7 @@ impl<'a, C, NC, A> EventInstanceCall<'a, C, NC, A> where NC: hyper::net::Network
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -9675,13 +9815,13 @@ impl<'a, C, NC, A> EventInstanceCall<'a, C, NC, A> where NC: hyper::net::Network
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -9693,7 +9833,7 @@ impl<'a, C, NC, A> EventInstanceCall<'a, C, NC, A> where NC: hyper::net::Network
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Calendar identifier.    
+    /// Calendar identifier.
     pub fn calendar_id(mut self, new_value: &str) -> EventInstanceCall<'a, C, NC, A> {
         self._calendar_id = new_value.to_string();
         self
@@ -9703,7 +9843,7 @@ impl<'a, C, NC, A> EventInstanceCall<'a, C, NC, A> where NC: hyper::net::Network
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Recurring event identifier.    
+    /// Recurring event identifier.
     pub fn event_id(mut self, new_value: &str) -> EventInstanceCall<'a, C, NC, A> {
         self._event_id = new_value.to_string();
         self
@@ -9711,7 +9851,7 @@ impl<'a, C, NC, A> EventInstanceCall<'a, C, NC, A> where NC: hyper::net::Network
     /// Sets the *time zone* query property to the given value.
     ///
     /// 
-    /// Time zone used in the response. Optional. The default is the time zone of the calendar.    
+    /// Time zone used in the response. Optional. The default is the time zone of the calendar.
     pub fn time_zone(mut self, new_value: &str) -> EventInstanceCall<'a, C, NC, A> {
         self._time_zone = Some(new_value.to_string());
         self
@@ -9719,7 +9859,7 @@ impl<'a, C, NC, A> EventInstanceCall<'a, C, NC, A> where NC: hyper::net::Network
     /// Sets the *time min* query property to the given value.
     ///
     /// 
-    /// Lower bound (inclusive) for an event's end time to filter by. Optional. The default is not to filter by end time.    
+    /// Lower bound (inclusive) for an event's end time to filter by. Optional. The default is not to filter by end time.
     pub fn time_min(mut self, new_value: &str) -> EventInstanceCall<'a, C, NC, A> {
         self._time_min = Some(new_value.to_string());
         self
@@ -9727,7 +9867,7 @@ impl<'a, C, NC, A> EventInstanceCall<'a, C, NC, A> where NC: hyper::net::Network
     /// Sets the *time max* query property to the given value.
     ///
     /// 
-    /// Upper bound (exclusive) for an event's start time to filter by. Optional. The default is not to filter by start time.    
+    /// Upper bound (exclusive) for an event's start time to filter by. Optional. The default is not to filter by start time.
     pub fn time_max(mut self, new_value: &str) -> EventInstanceCall<'a, C, NC, A> {
         self._time_max = Some(new_value.to_string());
         self
@@ -9735,7 +9875,7 @@ impl<'a, C, NC, A> EventInstanceCall<'a, C, NC, A> where NC: hyper::net::Network
     /// Sets the *show deleted* query property to the given value.
     ///
     /// 
-    /// Whether to include deleted events (with status equals "cancelled") in the result. Cancelled instances of recurring events will still be included if singleEvents is False. Optional. The default is False.    
+    /// Whether to include deleted events (with status equals "cancelled") in the result. Cancelled instances of recurring events will still be included if singleEvents is False. Optional. The default is False.
     pub fn show_deleted(mut self, new_value: bool) -> EventInstanceCall<'a, C, NC, A> {
         self._show_deleted = Some(new_value);
         self
@@ -9743,7 +9883,7 @@ impl<'a, C, NC, A> EventInstanceCall<'a, C, NC, A> where NC: hyper::net::Network
     /// Sets the *page token* query property to the given value.
     ///
     /// 
-    /// Token specifying which result page to return. Optional.    
+    /// Token specifying which result page to return. Optional.
     pub fn page_token(mut self, new_value: &str) -> EventInstanceCall<'a, C, NC, A> {
         self._page_token = Some(new_value.to_string());
         self
@@ -9751,7 +9891,7 @@ impl<'a, C, NC, A> EventInstanceCall<'a, C, NC, A> where NC: hyper::net::Network
     /// Sets the *original start* query property to the given value.
     ///
     /// 
-    /// The original start time of the instance in the result. Optional.    
+    /// The original start time of the instance in the result. Optional.
     pub fn original_start(mut self, new_value: &str) -> EventInstanceCall<'a, C, NC, A> {
         self._original_start = Some(new_value.to_string());
         self
@@ -9759,7 +9899,7 @@ impl<'a, C, NC, A> EventInstanceCall<'a, C, NC, A> where NC: hyper::net::Network
     /// Sets the *max results* query property to the given value.
     ///
     /// 
-    /// Maximum number of events returned on one result page. By default the value is 250 events. The page size can never be larger than 2500 events. Optional.    
+    /// Maximum number of events returned on one result page. By default the value is 250 events. The page size can never be larger than 2500 events. Optional.
     pub fn max_results(mut self, new_value: i32) -> EventInstanceCall<'a, C, NC, A> {
         self._max_results = Some(new_value);
         self
@@ -9767,7 +9907,7 @@ impl<'a, C, NC, A> EventInstanceCall<'a, C, NC, A> where NC: hyper::net::Network
     /// Sets the *max attendees* query property to the given value.
     ///
     /// 
-    /// The maximum number of attendees to include in the response. If there are more than the specified number of attendees, only the participant is returned. Optional.    
+    /// The maximum number of attendees to include in the response. If there are more than the specified number of attendees, only the participant is returned. Optional.
     pub fn max_attendees(mut self, new_value: i32) -> EventInstanceCall<'a, C, NC, A> {
         self._max_attendees = Some(new_value);
         self
@@ -9775,7 +9915,7 @@ impl<'a, C, NC, A> EventInstanceCall<'a, C, NC, A> where NC: hyper::net::Network
     /// Sets the *always include email* query property to the given value.
     ///
     /// 
-    /// Whether to always include a value in the email field for the organizer, creator and attendees, even if no real email is available (i.e. a generated, non-working value will be provided). The use of this option is discouraged and should only be used by clients which cannot handle the absence of an email address value in the mentioned places. Optional. The default is False.    
+    /// Whether to always include a value in the email field for the organizer, creator and attendees, even if no real email is available (i.e. a generated, non-working value will be provided). The use of this option is discouraged and should only be used by clients which cannot handle the absence of an email address value in the mentioned places. Optional. The default is False.
     pub fn always_include_email(mut self, new_value: bool) -> EventInstanceCall<'a, C, NC, A> {
         self._always_include_email = Some(new_value);
         self
@@ -9836,7 +9976,7 @@ impl<'a, C, NC, A> EventInstanceCall<'a, C, NC, A> where NC: hyper::net::Network
 /// Returns an event.
 ///
 /// A builder for the *get* method supported by a *event* resource.
-/// It is not used directly, but through a `EventMethods`.
+/// It is not used directly, but through a `EventMethods` instance.
 ///
 /// # Example
 ///
@@ -9911,7 +10051,7 @@ impl<'a, C, NC, A> EventGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
         for &field in ["alt", "calendarId", "eventId", "timeZone", "maxAttendees", "alwaysIncludeEmail"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -9964,7 +10104,7 @@ impl<'a, C, NC, A> EventGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -9976,7 +10116,6 @@ impl<'a, C, NC, A> EventGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -9986,7 +10125,7 @@ impl<'a, C, NC, A> EventGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -9997,7 +10136,7 @@ impl<'a, C, NC, A> EventGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -10006,13 +10145,13 @@ impl<'a, C, NC, A> EventGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -10024,7 +10163,7 @@ impl<'a, C, NC, A> EventGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Calendar identifier.    
+    /// Calendar identifier.
     pub fn calendar_id(mut self, new_value: &str) -> EventGetCall<'a, C, NC, A> {
         self._calendar_id = new_value.to_string();
         self
@@ -10034,7 +10173,7 @@ impl<'a, C, NC, A> EventGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Event identifier.    
+    /// Event identifier.
     pub fn event_id(mut self, new_value: &str) -> EventGetCall<'a, C, NC, A> {
         self._event_id = new_value.to_string();
         self
@@ -10042,7 +10181,7 @@ impl<'a, C, NC, A> EventGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
     /// Sets the *time zone* query property to the given value.
     ///
     /// 
-    /// Time zone used in the response. Optional. The default is the time zone of the calendar.    
+    /// Time zone used in the response. Optional. The default is the time zone of the calendar.
     pub fn time_zone(mut self, new_value: &str) -> EventGetCall<'a, C, NC, A> {
         self._time_zone = Some(new_value.to_string());
         self
@@ -10050,7 +10189,7 @@ impl<'a, C, NC, A> EventGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
     /// Sets the *max attendees* query property to the given value.
     ///
     /// 
-    /// The maximum number of attendees to include in the response. If there are more than the specified number of attendees, only the participant is returned. Optional.    
+    /// The maximum number of attendees to include in the response. If there are more than the specified number of attendees, only the participant is returned. Optional.
     pub fn max_attendees(mut self, new_value: i32) -> EventGetCall<'a, C, NC, A> {
         self._max_attendees = Some(new_value);
         self
@@ -10058,7 +10197,7 @@ impl<'a, C, NC, A> EventGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
     /// Sets the *always include email* query property to the given value.
     ///
     /// 
-    /// Whether to always include a value in the email field for the organizer, creator and attendees, even if no real email is available (i.e. a generated, non-working value will be provided). The use of this option is discouraged and should only be used by clients which cannot handle the absence of an email address value in the mentioned places. Optional. The default is False.    
+    /// Whether to always include a value in the email field for the organizer, creator and attendees, even if no real email is available (i.e. a generated, non-working value will be provided). The use of this option is discouraged and should only be used by clients which cannot handle the absence of an email address value in the mentioned places. Optional. The default is False.
     pub fn always_include_email(mut self, new_value: bool) -> EventGetCall<'a, C, NC, A> {
         self._always_include_email = Some(new_value);
         self
@@ -10119,7 +10258,7 @@ impl<'a, C, NC, A> EventGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
 /// Returns events on the specified calendar.
 ///
 /// A builder for the *list* method supported by a *event* resource.
-/// It is not used directly, but through a `EventMethods`.
+/// It is not used directly, but through a `EventMethods` instance.
 ///
 /// # Example
 ///
@@ -10270,7 +10409,7 @@ impl<'a, C, NC, A> EventListCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
         for &field in ["alt", "calendarId", "updatedMin", "timeZone", "timeMin", "timeMax", "syncToken", "singleEvents", "showHiddenInvitations", "showDeleted", "sharedExtendedProperty", "q", "privateExtendedProperty", "pageToken", "orderBy", "maxResults", "maxAttendees", "iCalUID", "alwaysIncludeEmail"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -10323,7 +10462,7 @@ impl<'a, C, NC, A> EventListCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -10335,7 +10474,6 @@ impl<'a, C, NC, A> EventListCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -10345,7 +10483,7 @@ impl<'a, C, NC, A> EventListCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -10356,7 +10494,7 @@ impl<'a, C, NC, A> EventListCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -10365,13 +10503,13 @@ impl<'a, C, NC, A> EventListCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -10383,7 +10521,7 @@ impl<'a, C, NC, A> EventListCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Calendar identifier.    
+    /// Calendar identifier.
     pub fn calendar_id(mut self, new_value: &str) -> EventListCall<'a, C, NC, A> {
         self._calendar_id = new_value.to_string();
         self
@@ -10391,7 +10529,7 @@ impl<'a, C, NC, A> EventListCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     /// Sets the *updated min* query property to the given value.
     ///
     /// 
-    /// Lower bound for an event's last modification time (as a RFC 3339 timestamp) to filter by. When specified, entries deleted since this time will always be included regardless of showDeleted. Optional. The default is not to filter by last modification time.    
+    /// Lower bound for an event's last modification time (as a RFC 3339 timestamp) to filter by. When specified, entries deleted since this time will always be included regardless of showDeleted. Optional. The default is not to filter by last modification time.
     pub fn updated_min(mut self, new_value: &str) -> EventListCall<'a, C, NC, A> {
         self._updated_min = Some(new_value.to_string());
         self
@@ -10399,7 +10537,7 @@ impl<'a, C, NC, A> EventListCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     /// Sets the *time zone* query property to the given value.
     ///
     /// 
-    /// Time zone used in the response. Optional. The default is the time zone of the calendar.    
+    /// Time zone used in the response. Optional. The default is the time zone of the calendar.
     pub fn time_zone(mut self, new_value: &str) -> EventListCall<'a, C, NC, A> {
         self._time_zone = Some(new_value.to_string());
         self
@@ -10407,7 +10545,7 @@ impl<'a, C, NC, A> EventListCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     /// Sets the *time min* query property to the given value.
     ///
     /// 
-    /// Lower bound (inclusive) for an event's end time to filter by. Optional. The default is not to filter by end time.    
+    /// Lower bound (inclusive) for an event's end time to filter by. Optional. The default is not to filter by end time.
     pub fn time_min(mut self, new_value: &str) -> EventListCall<'a, C, NC, A> {
         self._time_min = Some(new_value.to_string());
         self
@@ -10415,7 +10553,7 @@ impl<'a, C, NC, A> EventListCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     /// Sets the *time max* query property to the given value.
     ///
     /// 
-    /// Upper bound (exclusive) for an event's start time to filter by. Optional. The default is not to filter by start time.    
+    /// Upper bound (exclusive) for an event's start time to filter by. Optional. The default is not to filter by start time.
     pub fn time_max(mut self, new_value: &str) -> EventListCall<'a, C, NC, A> {
         self._time_max = Some(new_value.to_string());
         self
@@ -10444,7 +10582,7 @@ impl<'a, C, NC, A> EventListCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     /// Sets the *single events* query property to the given value.
     ///
     /// 
-    /// Whether to expand recurring events into instances and only return single one-off events and instances of recurring events, but not the underlying recurring events themselves. Optional. The default is False.    
+    /// Whether to expand recurring events into instances and only return single one-off events and instances of recurring events, but not the underlying recurring events themselves. Optional. The default is False.
     pub fn single_events(mut self, new_value: bool) -> EventListCall<'a, C, NC, A> {
         self._single_events = Some(new_value);
         self
@@ -10452,7 +10590,7 @@ impl<'a, C, NC, A> EventListCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     /// Sets the *show hidden invitations* query property to the given value.
     ///
     /// 
-    /// Whether to include hidden invitations in the result. Optional. The default is False.    
+    /// Whether to include hidden invitations in the result. Optional. The default is False.
     pub fn show_hidden_invitations(mut self, new_value: bool) -> EventListCall<'a, C, NC, A> {
         self._show_hidden_invitations = Some(new_value);
         self
@@ -10460,7 +10598,7 @@ impl<'a, C, NC, A> EventListCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     /// Sets the *show deleted* query property to the given value.
     ///
     /// 
-    /// Whether to include deleted events (with status equals "cancelled") in the result. Cancelled instances of recurring events (but not the underlying recurring event) will still be included if showDeleted and singleEvents are both False. If showDeleted and singleEvents are both True, only single instances of deleted events (but not the underlying recurring events) are returned. Optional. The default is False.    
+    /// Whether to include deleted events (with status equals "cancelled") in the result. Cancelled instances of recurring events (but not the underlying recurring event) will still be included if showDeleted and singleEvents are both False. If showDeleted and singleEvents are both True, only single instances of deleted events (but not the underlying recurring events) are returned. Optional. The default is False.
     pub fn show_deleted(mut self, new_value: bool) -> EventListCall<'a, C, NC, A> {
         self._show_deleted = Some(new_value);
         self
@@ -10469,7 +10607,7 @@ impl<'a, C, NC, A> EventListCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
     ///
     /// 
-    /// Extended properties constraint specified as propertyName=value. Matches only shared properties. This parameter might be repeated multiple times to return events that match all given constraints.    
+    /// Extended properties constraint specified as propertyName=value. Matches only shared properties. This parameter might be repeated multiple times to return events that match all given constraints.
     pub fn add_shared_extended_property(mut self, new_value: &str) -> EventListCall<'a, C, NC, A> {
         self._shared_extended_property.push(new_value.to_string());
         self
@@ -10477,7 +10615,7 @@ impl<'a, C, NC, A> EventListCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     /// Sets the *q* query property to the given value.
     ///
     /// 
-    /// Free text search terms to find events that match these terms in any field, except for extended properties. Optional.    
+    /// Free text search terms to find events that match these terms in any field, except for extended properties. Optional.
     pub fn q(mut self, new_value: &str) -> EventListCall<'a, C, NC, A> {
         self._q = Some(new_value.to_string());
         self
@@ -10486,7 +10624,7 @@ impl<'a, C, NC, A> EventListCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
     ///
     /// 
-    /// Extended properties constraint specified as propertyName=value. Matches only private properties. This parameter might be repeated multiple times to return events that match all given constraints.    
+    /// Extended properties constraint specified as propertyName=value. Matches only private properties. This parameter might be repeated multiple times to return events that match all given constraints.
     pub fn add_private_extended_property(mut self, new_value: &str) -> EventListCall<'a, C, NC, A> {
         self._private_extended_property.push(new_value.to_string());
         self
@@ -10494,7 +10632,7 @@ impl<'a, C, NC, A> EventListCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     /// Sets the *page token* query property to the given value.
     ///
     /// 
-    /// Token specifying which result page to return. Optional.    
+    /// Token specifying which result page to return. Optional.
     pub fn page_token(mut self, new_value: &str) -> EventListCall<'a, C, NC, A> {
         self._page_token = Some(new_value.to_string());
         self
@@ -10502,7 +10640,7 @@ impl<'a, C, NC, A> EventListCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     /// Sets the *order by* query property to the given value.
     ///
     /// 
-    /// The order of the events returned in the result. Optional. The default is an unspecified, stable order.    
+    /// The order of the events returned in the result. Optional. The default is an unspecified, stable order.
     pub fn order_by(mut self, new_value: &str) -> EventListCall<'a, C, NC, A> {
         self._order_by = Some(new_value.to_string());
         self
@@ -10510,7 +10648,7 @@ impl<'a, C, NC, A> EventListCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     /// Sets the *max results* query property to the given value.
     ///
     /// 
-    /// Maximum number of events returned on one result page. By default the value is 250 events. The page size can never be larger than 2500 events. Optional.    
+    /// Maximum number of events returned on one result page. By default the value is 250 events. The page size can never be larger than 2500 events. Optional.
     pub fn max_results(mut self, new_value: i32) -> EventListCall<'a, C, NC, A> {
         self._max_results = Some(new_value);
         self
@@ -10518,7 +10656,7 @@ impl<'a, C, NC, A> EventListCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     /// Sets the *max attendees* query property to the given value.
     ///
     /// 
-    /// The maximum number of attendees to include in the response. If there are more than the specified number of attendees, only the participant is returned. Optional.    
+    /// The maximum number of attendees to include in the response. If there are more than the specified number of attendees, only the participant is returned. Optional.
     pub fn max_attendees(mut self, new_value: i32) -> EventListCall<'a, C, NC, A> {
         self._max_attendees = Some(new_value);
         self
@@ -10526,7 +10664,7 @@ impl<'a, C, NC, A> EventListCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     /// Sets the *i cal uid* query property to the given value.
     ///
     /// 
-    /// Specifies event ID in the iCalendar format to be included in the response. Optional.    
+    /// Specifies event ID in the iCalendar format to be included in the response. Optional.
     pub fn i_cal_uid(mut self, new_value: &str) -> EventListCall<'a, C, NC, A> {
         self._i_cal_uid = Some(new_value.to_string());
         self
@@ -10534,7 +10672,7 @@ impl<'a, C, NC, A> EventListCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     /// Sets the *always include email* query property to the given value.
     ///
     /// 
-    /// Whether to always include a value in the email field for the organizer, creator and attendees, even if no real email is available (i.e. a generated, non-working value will be provided). The use of this option is discouraged and should only be used by clients which cannot handle the absence of an email address value in the mentioned places. Optional. The default is False.    
+    /// Whether to always include a value in the email field for the organizer, creator and attendees, even if no real email is available (i.e. a generated, non-working value will be provided). The use of this option is discouraged and should only be used by clients which cannot handle the absence of an email address value in the mentioned places. Optional. The default is False.
     pub fn always_include_email(mut self, new_value: bool) -> EventListCall<'a, C, NC, A> {
         self._always_include_email = Some(new_value);
         self
@@ -10595,7 +10733,7 @@ impl<'a, C, NC, A> EventListCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
 /// Updates an event. This method supports patch semantics.
 ///
 /// A builder for the *patch* method supported by a *event* resource.
-/// It is not used directly, but through a `EventMethods`.
+/// It is not used directly, but through a `EventMethods` instance.
 ///
 /// # Example
 ///
@@ -10677,7 +10815,7 @@ impl<'a, C, NC, A> EventPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
         for &field in ["alt", "calendarId", "eventId", "sendNotifications", "maxAttendees", "alwaysIncludeEmail"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -10734,7 +10872,7 @@ impl<'a, C, NC, A> EventPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -10750,7 +10888,6 @@ impl<'a, C, NC, A> EventPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -10760,7 +10897,7 @@ impl<'a, C, NC, A> EventPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -10771,7 +10908,7 @@ impl<'a, C, NC, A> EventPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -10780,13 +10917,13 @@ impl<'a, C, NC, A> EventPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -10807,7 +10944,7 @@ impl<'a, C, NC, A> EventPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Calendar identifier.    
+    /// Calendar identifier.
     pub fn calendar_id(mut self, new_value: &str) -> EventPatchCall<'a, C, NC, A> {
         self._calendar_id = new_value.to_string();
         self
@@ -10817,7 +10954,7 @@ impl<'a, C, NC, A> EventPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Event identifier.    
+    /// Event identifier.
     pub fn event_id(mut self, new_value: &str) -> EventPatchCall<'a, C, NC, A> {
         self._event_id = new_value.to_string();
         self
@@ -10825,7 +10962,7 @@ impl<'a, C, NC, A> EventPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// Sets the *send notifications* query property to the given value.
     ///
     /// 
-    /// Whether to send notifications about the event update (e.g. attendee's responses, title changes, etc.). Optional. The default is False.    
+    /// Whether to send notifications about the event update (e.g. attendee's responses, title changes, etc.). Optional. The default is False.
     pub fn send_notifications(mut self, new_value: bool) -> EventPatchCall<'a, C, NC, A> {
         self._send_notifications = Some(new_value);
         self
@@ -10833,7 +10970,7 @@ impl<'a, C, NC, A> EventPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// Sets the *max attendees* query property to the given value.
     ///
     /// 
-    /// The maximum number of attendees to include in the response. If there are more than the specified number of attendees, only the participant is returned. Optional.    
+    /// The maximum number of attendees to include in the response. If there are more than the specified number of attendees, only the participant is returned. Optional.
     pub fn max_attendees(mut self, new_value: i32) -> EventPatchCall<'a, C, NC, A> {
         self._max_attendees = Some(new_value);
         self
@@ -10841,7 +10978,7 @@ impl<'a, C, NC, A> EventPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// Sets the *always include email* query property to the given value.
     ///
     /// 
-    /// Whether to always include a value in the email field for the organizer, creator and attendees, even if no real email is available (i.e. a generated, non-working value will be provided). The use of this option is discouraged and should only be used by clients which cannot handle the absence of an email address value in the mentioned places. Optional. The default is False.    
+    /// Whether to always include a value in the email field for the organizer, creator and attendees, even if no real email is available (i.e. a generated, non-working value will be provided). The use of this option is discouraged and should only be used by clients which cannot handle the absence of an email address value in the mentioned places. Optional. The default is False.
     pub fn always_include_email(mut self, new_value: bool) -> EventPatchCall<'a, C, NC, A> {
         self._always_include_email = Some(new_value);
         self
@@ -10902,7 +11039,7 @@ impl<'a, C, NC, A> EventPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
 /// Moves an event to another calendar, i.e. changes an event's organizer.
 ///
 /// A builder for the *move* method supported by a *event* resource.
-/// It is not used directly, but through a `EventMethods`.
+/// It is not used directly, but through a `EventMethods` instance.
 ///
 /// # Example
 ///
@@ -10969,7 +11106,7 @@ impl<'a, C, NC, A> EventMoveCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
         for &field in ["alt", "calendarId", "eventId", "destination", "sendNotifications"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -11022,7 +11159,7 @@ impl<'a, C, NC, A> EventMoveCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -11034,7 +11171,6 @@ impl<'a, C, NC, A> EventMoveCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -11044,7 +11180,7 @@ impl<'a, C, NC, A> EventMoveCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -11055,7 +11191,7 @@ impl<'a, C, NC, A> EventMoveCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -11064,13 +11200,13 @@ impl<'a, C, NC, A> EventMoveCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -11082,7 +11218,7 @@ impl<'a, C, NC, A> EventMoveCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Calendar identifier of the source calendar where the event currently is on.    
+    /// Calendar identifier of the source calendar where the event currently is on.
     pub fn calendar_id(mut self, new_value: &str) -> EventMoveCall<'a, C, NC, A> {
         self._calendar_id = new_value.to_string();
         self
@@ -11092,7 +11228,7 @@ impl<'a, C, NC, A> EventMoveCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Event identifier.    
+    /// Event identifier.
     pub fn event_id(mut self, new_value: &str) -> EventMoveCall<'a, C, NC, A> {
         self._event_id = new_value.to_string();
         self
@@ -11102,7 +11238,7 @@ impl<'a, C, NC, A> EventMoveCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Calendar identifier of the target calendar where the event is to be moved to.    
+    /// Calendar identifier of the target calendar where the event is to be moved to.
     pub fn destination(mut self, new_value: &str) -> EventMoveCall<'a, C, NC, A> {
         self._destination = new_value.to_string();
         self
@@ -11110,7 +11246,7 @@ impl<'a, C, NC, A> EventMoveCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     /// Sets the *send notifications* query property to the given value.
     ///
     /// 
-    /// Whether to send notifications about the change of the event's organizer. Optional. The default is False.    
+    /// Whether to send notifications about the change of the event's organizer. Optional. The default is False.
     pub fn send_notifications(mut self, new_value: bool) -> EventMoveCall<'a, C, NC, A> {
         self._send_notifications = Some(new_value);
         self
@@ -11171,7 +11307,7 @@ impl<'a, C, NC, A> EventMoveCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
 /// Updates an event.
 ///
 /// A builder for the *update* method supported by a *event* resource.
-/// It is not used directly, but through a `EventMethods`.
+/// It is not used directly, but through a `EventMethods` instance.
 ///
 /// # Example
 ///
@@ -11253,7 +11389,7 @@ impl<'a, C, NC, A> EventUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
         for &field in ["alt", "calendarId", "eventId", "sendNotifications", "maxAttendees", "alwaysIncludeEmail"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -11310,7 +11446,7 @@ impl<'a, C, NC, A> EventUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -11326,7 +11462,6 @@ impl<'a, C, NC, A> EventUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -11336,7 +11471,7 @@ impl<'a, C, NC, A> EventUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -11347,7 +11482,7 @@ impl<'a, C, NC, A> EventUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -11356,13 +11491,13 @@ impl<'a, C, NC, A> EventUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -11383,7 +11518,7 @@ impl<'a, C, NC, A> EventUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Calendar identifier.    
+    /// Calendar identifier.
     pub fn calendar_id(mut self, new_value: &str) -> EventUpdateCall<'a, C, NC, A> {
         self._calendar_id = new_value.to_string();
         self
@@ -11393,7 +11528,7 @@ impl<'a, C, NC, A> EventUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Event identifier.    
+    /// Event identifier.
     pub fn event_id(mut self, new_value: &str) -> EventUpdateCall<'a, C, NC, A> {
         self._event_id = new_value.to_string();
         self
@@ -11401,7 +11536,7 @@ impl<'a, C, NC, A> EventUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// Sets the *send notifications* query property to the given value.
     ///
     /// 
-    /// Whether to send notifications about the event update (e.g. attendee's responses, title changes, etc.). Optional. The default is False.    
+    /// Whether to send notifications about the event update (e.g. attendee's responses, title changes, etc.). Optional. The default is False.
     pub fn send_notifications(mut self, new_value: bool) -> EventUpdateCall<'a, C, NC, A> {
         self._send_notifications = Some(new_value);
         self
@@ -11409,7 +11544,7 @@ impl<'a, C, NC, A> EventUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// Sets the *max attendees* query property to the given value.
     ///
     /// 
-    /// The maximum number of attendees to include in the response. If there are more than the specified number of attendees, only the participant is returned. Optional.    
+    /// The maximum number of attendees to include in the response. If there are more than the specified number of attendees, only the participant is returned. Optional.
     pub fn max_attendees(mut self, new_value: i32) -> EventUpdateCall<'a, C, NC, A> {
         self._max_attendees = Some(new_value);
         self
@@ -11417,7 +11552,7 @@ impl<'a, C, NC, A> EventUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// Sets the *always include email* query property to the given value.
     ///
     /// 
-    /// Whether to always include a value in the email field for the organizer, creator and attendees, even if no real email is available (i.e. a generated, non-working value will be provided). The use of this option is discouraged and should only be used by clients which cannot handle the absence of an email address value in the mentioned places. Optional. The default is False.    
+    /// Whether to always include a value in the email field for the organizer, creator and attendees, even if no real email is available (i.e. a generated, non-working value will be provided). The use of this option is discouraged and should only be used by clients which cannot handle the absence of an email address value in the mentioned places. Optional. The default is False.
     pub fn always_include_email(mut self, new_value: bool) -> EventUpdateCall<'a, C, NC, A> {
         self._always_include_email = Some(new_value);
         self
@@ -11478,7 +11613,7 @@ impl<'a, C, NC, A> EventUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
 /// Watch for changes to Events resources.
 ///
 /// A builder for the *watch* method supported by a *event* resource.
-/// It is not used directly, but through a `EventMethods`.
+/// It is not used directly, but through a `EventMethods` instance.
 ///
 /// # Example
 ///
@@ -11636,7 +11771,7 @@ impl<'a, C, NC, A> EventWatchCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
         for &field in ["alt", "calendarId", "updatedMin", "timeZone", "timeMin", "timeMax", "syncToken", "singleEvents", "showHiddenInvitations", "showDeleted", "sharedExtendedProperty", "q", "privateExtendedProperty", "pageToken", "orderBy", "maxResults", "maxAttendees", "iCalUID", "alwaysIncludeEmail"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -11693,7 +11828,7 @@ impl<'a, C, NC, A> EventWatchCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -11709,7 +11844,6 @@ impl<'a, C, NC, A> EventWatchCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -11719,7 +11853,7 @@ impl<'a, C, NC, A> EventWatchCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -11730,7 +11864,7 @@ impl<'a, C, NC, A> EventWatchCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -11739,13 +11873,13 @@ impl<'a, C, NC, A> EventWatchCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -11766,7 +11900,7 @@ impl<'a, C, NC, A> EventWatchCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Calendar identifier.    
+    /// Calendar identifier.
     pub fn calendar_id(mut self, new_value: &str) -> EventWatchCall<'a, C, NC, A> {
         self._calendar_id = new_value.to_string();
         self
@@ -11774,7 +11908,7 @@ impl<'a, C, NC, A> EventWatchCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// Sets the *updated min* query property to the given value.
     ///
     /// 
-    /// Lower bound for an event's last modification time (as a RFC 3339 timestamp) to filter by. When specified, entries deleted since this time will always be included regardless of showDeleted. Optional. The default is not to filter by last modification time.    
+    /// Lower bound for an event's last modification time (as a RFC 3339 timestamp) to filter by. When specified, entries deleted since this time will always be included regardless of showDeleted. Optional. The default is not to filter by last modification time.
     pub fn updated_min(mut self, new_value: &str) -> EventWatchCall<'a, C, NC, A> {
         self._updated_min = Some(new_value.to_string());
         self
@@ -11782,7 +11916,7 @@ impl<'a, C, NC, A> EventWatchCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// Sets the *time zone* query property to the given value.
     ///
     /// 
-    /// Time zone used in the response. Optional. The default is the time zone of the calendar.    
+    /// Time zone used in the response. Optional. The default is the time zone of the calendar.
     pub fn time_zone(mut self, new_value: &str) -> EventWatchCall<'a, C, NC, A> {
         self._time_zone = Some(new_value.to_string());
         self
@@ -11790,7 +11924,7 @@ impl<'a, C, NC, A> EventWatchCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// Sets the *time min* query property to the given value.
     ///
     /// 
-    /// Lower bound (inclusive) for an event's end time to filter by. Optional. The default is not to filter by end time.    
+    /// Lower bound (inclusive) for an event's end time to filter by. Optional. The default is not to filter by end time.
     pub fn time_min(mut self, new_value: &str) -> EventWatchCall<'a, C, NC, A> {
         self._time_min = Some(new_value.to_string());
         self
@@ -11798,7 +11932,7 @@ impl<'a, C, NC, A> EventWatchCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// Sets the *time max* query property to the given value.
     ///
     /// 
-    /// Upper bound (exclusive) for an event's start time to filter by. Optional. The default is not to filter by start time.    
+    /// Upper bound (exclusive) for an event's start time to filter by. Optional. The default is not to filter by start time.
     pub fn time_max(mut self, new_value: &str) -> EventWatchCall<'a, C, NC, A> {
         self._time_max = Some(new_value.to_string());
         self
@@ -11827,7 +11961,7 @@ impl<'a, C, NC, A> EventWatchCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// Sets the *single events* query property to the given value.
     ///
     /// 
-    /// Whether to expand recurring events into instances and only return single one-off events and instances of recurring events, but not the underlying recurring events themselves. Optional. The default is False.    
+    /// Whether to expand recurring events into instances and only return single one-off events and instances of recurring events, but not the underlying recurring events themselves. Optional. The default is False.
     pub fn single_events(mut self, new_value: bool) -> EventWatchCall<'a, C, NC, A> {
         self._single_events = Some(new_value);
         self
@@ -11835,7 +11969,7 @@ impl<'a, C, NC, A> EventWatchCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// Sets the *show hidden invitations* query property to the given value.
     ///
     /// 
-    /// Whether to include hidden invitations in the result. Optional. The default is False.    
+    /// Whether to include hidden invitations in the result. Optional. The default is False.
     pub fn show_hidden_invitations(mut self, new_value: bool) -> EventWatchCall<'a, C, NC, A> {
         self._show_hidden_invitations = Some(new_value);
         self
@@ -11843,7 +11977,7 @@ impl<'a, C, NC, A> EventWatchCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// Sets the *show deleted* query property to the given value.
     ///
     /// 
-    /// Whether to include deleted events (with status equals "cancelled") in the result. Cancelled instances of recurring events (but not the underlying recurring event) will still be included if showDeleted and singleEvents are both False. If showDeleted and singleEvents are both True, only single instances of deleted events (but not the underlying recurring events) are returned. Optional. The default is False.    
+    /// Whether to include deleted events (with status equals "cancelled") in the result. Cancelled instances of recurring events (but not the underlying recurring event) will still be included if showDeleted and singleEvents are both False. If showDeleted and singleEvents are both True, only single instances of deleted events (but not the underlying recurring events) are returned. Optional. The default is False.
     pub fn show_deleted(mut self, new_value: bool) -> EventWatchCall<'a, C, NC, A> {
         self._show_deleted = Some(new_value);
         self
@@ -11852,7 +11986,7 @@ impl<'a, C, NC, A> EventWatchCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
     ///
     /// 
-    /// Extended properties constraint specified as propertyName=value. Matches only shared properties. This parameter might be repeated multiple times to return events that match all given constraints.    
+    /// Extended properties constraint specified as propertyName=value. Matches only shared properties. This parameter might be repeated multiple times to return events that match all given constraints.
     pub fn add_shared_extended_property(mut self, new_value: &str) -> EventWatchCall<'a, C, NC, A> {
         self._shared_extended_property.push(new_value.to_string());
         self
@@ -11860,7 +11994,7 @@ impl<'a, C, NC, A> EventWatchCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// Sets the *q* query property to the given value.
     ///
     /// 
-    /// Free text search terms to find events that match these terms in any field, except for extended properties. Optional.    
+    /// Free text search terms to find events that match these terms in any field, except for extended properties. Optional.
     pub fn q(mut self, new_value: &str) -> EventWatchCall<'a, C, NC, A> {
         self._q = Some(new_value.to_string());
         self
@@ -11869,7 +12003,7 @@ impl<'a, C, NC, A> EventWatchCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
     ///
     /// 
-    /// Extended properties constraint specified as propertyName=value. Matches only private properties. This parameter might be repeated multiple times to return events that match all given constraints.    
+    /// Extended properties constraint specified as propertyName=value. Matches only private properties. This parameter might be repeated multiple times to return events that match all given constraints.
     pub fn add_private_extended_property(mut self, new_value: &str) -> EventWatchCall<'a, C, NC, A> {
         self._private_extended_property.push(new_value.to_string());
         self
@@ -11877,7 +12011,7 @@ impl<'a, C, NC, A> EventWatchCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// Sets the *page token* query property to the given value.
     ///
     /// 
-    /// Token specifying which result page to return. Optional.    
+    /// Token specifying which result page to return. Optional.
     pub fn page_token(mut self, new_value: &str) -> EventWatchCall<'a, C, NC, A> {
         self._page_token = Some(new_value.to_string());
         self
@@ -11885,7 +12019,7 @@ impl<'a, C, NC, A> EventWatchCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// Sets the *order by* query property to the given value.
     ///
     /// 
-    /// The order of the events returned in the result. Optional. The default is an unspecified, stable order.    
+    /// The order of the events returned in the result. Optional. The default is an unspecified, stable order.
     pub fn order_by(mut self, new_value: &str) -> EventWatchCall<'a, C, NC, A> {
         self._order_by = Some(new_value.to_string());
         self
@@ -11893,7 +12027,7 @@ impl<'a, C, NC, A> EventWatchCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// Sets the *max results* query property to the given value.
     ///
     /// 
-    /// Maximum number of events returned on one result page. By default the value is 250 events. The page size can never be larger than 2500 events. Optional.    
+    /// Maximum number of events returned on one result page. By default the value is 250 events. The page size can never be larger than 2500 events. Optional.
     pub fn max_results(mut self, new_value: i32) -> EventWatchCall<'a, C, NC, A> {
         self._max_results = Some(new_value);
         self
@@ -11901,7 +12035,7 @@ impl<'a, C, NC, A> EventWatchCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// Sets the *max attendees* query property to the given value.
     ///
     /// 
-    /// The maximum number of attendees to include in the response. If there are more than the specified number of attendees, only the participant is returned. Optional.    
+    /// The maximum number of attendees to include in the response. If there are more than the specified number of attendees, only the participant is returned. Optional.
     pub fn max_attendees(mut self, new_value: i32) -> EventWatchCall<'a, C, NC, A> {
         self._max_attendees = Some(new_value);
         self
@@ -11909,7 +12043,7 @@ impl<'a, C, NC, A> EventWatchCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// Sets the *i cal uid* query property to the given value.
     ///
     /// 
-    /// Specifies event ID in the iCalendar format to be included in the response. Optional.    
+    /// Specifies event ID in the iCalendar format to be included in the response. Optional.
     pub fn i_cal_uid(mut self, new_value: &str) -> EventWatchCall<'a, C, NC, A> {
         self._i_cal_uid = Some(new_value.to_string());
         self
@@ -11917,7 +12051,7 @@ impl<'a, C, NC, A> EventWatchCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// Sets the *always include email* query property to the given value.
     ///
     /// 
-    /// Whether to always include a value in the email field for the organizer, creator and attendees, even if no real email is available (i.e. a generated, non-working value will be provided). The use of this option is discouraged and should only be used by clients which cannot handle the absence of an email address value in the mentioned places. Optional. The default is False.    
+    /// Whether to always include a value in the email field for the organizer, creator and attendees, even if no real email is available (i.e. a generated, non-working value will be provided). The use of this option is discouraged and should only be used by clients which cannot handle the absence of an email address value in the mentioned places. Optional. The default is False.
     pub fn always_include_email(mut self, new_value: bool) -> EventWatchCall<'a, C, NC, A> {
         self._always_include_email = Some(new_value);
         self
@@ -11978,7 +12112,7 @@ impl<'a, C, NC, A> EventWatchCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
 /// Creates an event based on a simple text string.
 ///
 /// A builder for the *quickAdd* method supported by a *event* resource.
-/// It is not used directly, but through a `EventMethods`.
+/// It is not used directly, but through a `EventMethods` instance.
 ///
 /// # Example
 ///
@@ -12043,7 +12177,7 @@ impl<'a, C, NC, A> EventQuickAddCall<'a, C, NC, A> where NC: hyper::net::Network
         for &field in ["alt", "calendarId", "text", "sendNotifications"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -12096,7 +12230,7 @@ impl<'a, C, NC, A> EventQuickAddCall<'a, C, NC, A> where NC: hyper::net::Network
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -12108,7 +12242,6 @@ impl<'a, C, NC, A> EventQuickAddCall<'a, C, NC, A> where NC: hyper::net::Network
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -12118,7 +12251,7 @@ impl<'a, C, NC, A> EventQuickAddCall<'a, C, NC, A> where NC: hyper::net::Network
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -12129,7 +12262,7 @@ impl<'a, C, NC, A> EventQuickAddCall<'a, C, NC, A> where NC: hyper::net::Network
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -12138,13 +12271,13 @@ impl<'a, C, NC, A> EventQuickAddCall<'a, C, NC, A> where NC: hyper::net::Network
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -12156,7 +12289,7 @@ impl<'a, C, NC, A> EventQuickAddCall<'a, C, NC, A> where NC: hyper::net::Network
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Calendar identifier.    
+    /// Calendar identifier.
     pub fn calendar_id(mut self, new_value: &str) -> EventQuickAddCall<'a, C, NC, A> {
         self._calendar_id = new_value.to_string();
         self
@@ -12166,7 +12299,7 @@ impl<'a, C, NC, A> EventQuickAddCall<'a, C, NC, A> where NC: hyper::net::Network
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The text describing the event to be created.    
+    /// The text describing the event to be created.
     pub fn text(mut self, new_value: &str) -> EventQuickAddCall<'a, C, NC, A> {
         self._text = new_value.to_string();
         self
@@ -12174,7 +12307,7 @@ impl<'a, C, NC, A> EventQuickAddCall<'a, C, NC, A> where NC: hyper::net::Network
     /// Sets the *send notifications* query property to the given value.
     ///
     /// 
-    /// Whether to send notifications about the creation of the event. Optional. The default is False.    
+    /// Whether to send notifications about the creation of the event. Optional. The default is False.
     pub fn send_notifications(mut self, new_value: bool) -> EventQuickAddCall<'a, C, NC, A> {
         self._send_notifications = Some(new_value);
         self

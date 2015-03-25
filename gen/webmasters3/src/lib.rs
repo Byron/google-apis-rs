@@ -1,8 +1,8 @@
 // DO NOT EDIT !
-// This file was generated automatically from 'src/mako/lib.rs.mako'
+// This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *webmasters* crate version *0.1.1+20140908*, where *20140908* is the exact revision of the *webmasters:v3* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.1*.
+//! This documentation was generated from *webmasters* crate version *0.1.2+20140908*, where *20140908* is the exact revision of the *webmasters:v3* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.2*.
 //! 
 //! Everything else about the *webmasters* *v3* API can be found at the
 //! [official documentation site](https://developers.google.com/webmaster-tools/v3/welcome).
@@ -31,6 +31,8 @@
 //! 
 //! * **[Hub](struct.Webmasters.html)**
 //!     * a central object to maintain state and allow accessing all *Activities*
+//!     * creates [*Method Builders*](trait.MethodsBuilder.html) which in turn
+//!       allow access to individual [*Call Builders*](trait.CallBuilder.html)
 //! * **[Resources](trait.Resource.html)**
 //!     * primary types that you can apply *Activities* to
 //!     * a collection of properties and *Parts*
@@ -39,6 +41,8 @@
 //!         * never directly used in *Activities*
 //! * **[Activities](trait.CallBuilder.html)**
 //!     * operations to apply to *Resources*
+//! 
+//! All *structures* are marked with applicable traits to further categorize them and ease browsing.
 //! 
 //! Generally speaking, you can invoke *Activities* like this:
 //! 
@@ -74,7 +78,7 @@
 //! extern crate hyper;
 //! extern crate "yup-oauth2" as oauth2;
 //! extern crate "google-webmasters3" as webmasters3;
-//! use webmasters3::Result;
+//! use webmasters3::{Result, Error};
 //! # #[test] fn egal() {
 //! use std::default::Default;
 //! use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -99,15 +103,17 @@
 //!              .doit();
 //! 
 //! match result {
-//!     Result::HttpError(err) => println!("HTTPERROR: {:?}", err),
-//!     Result::MissingAPIKey => println!("Auth: Missing API Key - used if there are no scopes"),
-//!     Result::MissingToken => println!("OAuth2: Missing Token"),
-//!     Result::Cancelled => println!("Operation cancelled by user"),
-//!     Result::UploadSizeLimitExceeded(size, max_size) => println!("Upload size too big: {} of {}", size, max_size),
-//!     Result::Failure(_) => println!("General Failure (hyper::client::Response doesn't print)"),
-//!     Result::FieldClash(clashed_field) => println!("You added custom parameter which is part of builder: {:?}", clashed_field),
-//!     Result::JsonDecodeError(err) => println!("Couldn't understand server reply - maybe API needs update: {:?}", err),
-//!     Result::Success(_) => println!("Success (value doesn't print)"),
+//!     Err(e) => match e {
+//!         Error::HttpError(err) => println!("HTTPERROR: {:?}", err),
+//!         Error::MissingAPIKey => println!("Auth: Missing API Key - used if there are no scopes"),
+//!         Error::MissingToken => println!("OAuth2: Missing Token"),
+//!         Error::Cancelled => println!("Operation canceled by user"),
+//!         Error::UploadSizeLimitExceeded(size, max_size) => println!("Upload size too big: {} of {}", size, max_size),
+//!         Error::Failure(_) => println!("General Failure (hyper::client::Response doesn't print)"),
+//!         Error::FieldClash(clashed_field) => println!("You added custom parameter which is part of builder: {:?}", clashed_field),
+//!         Error::JsonDecodeError(err) => println!("Couldn't understand server reply - maybe API needs update: {:?}", err),
+//!     },
+//!     Ok(_) => println!("Success (value doesn't print)"),
 //! }
 //! # }
 //! ```
@@ -120,7 +126,7 @@
 //! When delegates handle errors or intermediate values, they may have a chance to instruct the system to retry. This 
 //! makes the system potentially resilient to all kinds of errors.
 //! 
-//! ## Uploads and Downlods
+//! ## Uploads and Downloads
 //! If a method supports downloads, the response body, which is part of the [Result](enum.Result.html), should be
 //! read by you to obtain the media.
 //! If such a method also supports a [Response Result](trait.ResponseResult.html), it will return that by default.
@@ -143,8 +149,9 @@
 //! ## Optional Parts in Server-Requests
 //! 
 //! All structures provided by this library are made to be [enocodable](trait.RequestValue.html) and 
-//! [decodable](trait.ResponseResult.html) via json. Optionals are used to indicate that partial requests are responses are valid.
-//! Most optionals are are considered [Parts](trait.Part.html) which are identifyable by name, which will be sent to 
+//! [decodable](trait.ResponseResult.html) via *json*. Optionals are used to indicate that partial requests are responses 
+//! are valid.
+//! Most optionals are are considered [Parts](trait.Part.html) which are identifiable by name, which will be sent to 
 //! the server to indicate either the set parts of the request or the desired parts in the response.
 //! 
 //! ## Builder Arguments
@@ -193,7 +200,7 @@ use std::io;
 use std::fs;
 use std::thread::sleep;
 
-pub use cmn::{MultiPartReader, ToParts, MethodInfo, Result, CallBuilder, Hub, ReadSeek, Part, ResponseResult, RequestValue, NestedType, Delegate, DefaultDelegate, ResourceMethodsBuilder, Resource, JsonServerError};
+pub use cmn::{MultiPartReader, ToParts, MethodInfo, Result, Error, CallBuilder, Hub, ReadSeek, Part, ResponseResult, RequestValue, NestedType, Delegate, DefaultDelegate, MethodsBuilder, Resource, JsonServerError};
 
 
 // ##############
@@ -243,7 +250,7 @@ impl Default for Scope {
 /// extern crate hyper;
 /// extern crate "yup-oauth2" as oauth2;
 /// extern crate "google-webmasters3" as webmasters3;
-/// use webmasters3::Result;
+/// use webmasters3::{Result, Error};
 /// # #[test] fn egal() {
 /// use std::default::Default;
 /// use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -268,15 +275,17 @@ impl Default for Scope {
 ///              .doit();
 /// 
 /// match result {
-///     Result::HttpError(err) => println!("HTTPERROR: {:?}", err),
-///     Result::MissingAPIKey => println!("Auth: Missing API Key - used if there are no scopes"),
-///     Result::MissingToken => println!("OAuth2: Missing Token"),
-///     Result::Cancelled => println!("Operation cancelled by user"),
-///     Result::UploadSizeLimitExceeded(size, max_size) => println!("Upload size too big: {} of {}", size, max_size),
-///     Result::Failure(_) => println!("General Failure (hyper::client::Response doesn't print)"),
-///     Result::FieldClash(clashed_field) => println!("You added custom parameter which is part of builder: {:?}", clashed_field),
-///     Result::JsonDecodeError(err) => println!("Couldn't understand server reply - maybe API needs update: {:?}", err),
-///     Result::Success(_) => println!("Success (value doesn't print)"),
+///     Err(e) => match e {
+///         Error::HttpError(err) => println!("HTTPERROR: {:?}", err),
+///         Error::MissingAPIKey => println!("Auth: Missing API Key - used if there are no scopes"),
+///         Error::MissingToken => println!("OAuth2: Missing Token"),
+///         Error::Cancelled => println!("Operation canceled by user"),
+///         Error::UploadSizeLimitExceeded(size, max_size) => println!("Upload size too big: {} of {}", size, max_size),
+///         Error::Failure(_) => println!("General Failure (hyper::client::Response doesn't print)"),
+///         Error::FieldClash(clashed_field) => println!("You added custom parameter which is part of builder: {:?}", clashed_field),
+///         Error::JsonDecodeError(err) => println!("Couldn't understand server reply - maybe API needs update: {:?}", err),
+///     },
+///     Ok(_) => println!("Success (value doesn't print)"),
 /// }
 /// # }
 /// ```
@@ -297,7 +306,7 @@ impl<'a, C, NC, A> Webmasters<C, NC, A>
         Webmasters {
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/0.1.1".to_string(),
+            _user_agent: "google-api-rust-client/0.1.2".to_string(),
             _m: PhantomData
         }
     }
@@ -316,7 +325,7 @@ impl<'a, C, NC, A> Webmasters<C, NC, A>
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/0.1.1`.
+    /// It defaults to `google-api-rust-client/0.1.2`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -341,7 +350,7 @@ impl<'a, C, NC, A> Webmasters<C, NC, A>
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct SitemapsListResponse {
-    /// Information about a sitemap entry.    
+    /// Information about a sitemap entry.
     pub sitemap: Vec<WmxSitemap>,
 }
 
@@ -354,12 +363,12 @@ impl ResponseResult for SitemapsListResponse {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct WmxSitemapContent {
-    /// The number of URLs from the sitemap that were indexed (of the content type).    
+    /// The number of URLs from the sitemap that were indexed (of the content type).
     pub indexed: String,
-    /// The specific type of content in this sitemap (for example "web", "images").    
+    /// The specific type of content in this sitemap (for example "web", "images").
     #[serde(alias="type")]
     pub type_: String,
-    /// The number of URLs in the sitemap (of the content type).    
+    /// The number of URLs in the sitemap (of the content type).
     pub submitted: String,
 }
 
@@ -372,11 +381,11 @@ impl Part for WmxSitemapContent {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct UrlCrawlErrorCountsPerType {
-    /// The crawl error type.    
+    /// The crawl error type.
     pub category: String,
-    /// Corresponding to the user agent that made the request.    
+    /// Corresponding to the user agent that made the request.
     pub platform: String,
-    /// The error count entries time series.    
+    /// The error count entries time series.
     pub entries: Vec<UrlCrawlErrorCount>,
 }
 
@@ -394,10 +403,10 @@ impl Part for UrlCrawlErrorCountsPerType {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct WmxSite {
-    /// The user's permission level for the site.    
+    /// The user's permission level for the site.
     #[serde(alias="permissionLevel")]
     pub permission_level: String,
-    /// The URL of the site.    
+    /// The URL of the site.
     #[serde(alias="siteUrl")]
     pub site_url: String,
 }
@@ -416,7 +425,7 @@ impl ResponseResult for WmxSite {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct UrlCrawlErrorsCountsQueryResponse {
-    /// The time series of the number of URL crawl errors for per error category and platform.    
+    /// The time series of the number of URL crawl errors for per error category and platform.
     #[serde(alias="countPerTypes")]
     pub count_per_types: Vec<UrlCrawlErrorCountsPerType>,
 }
@@ -430,9 +439,9 @@ impl ResponseResult for UrlCrawlErrorsCountsQueryResponse {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct UrlCrawlErrorCount {
-    /// The error count at the given timestamp.    
+    /// The error count at the given timestamp.
     pub count: String,
-    /// The time (well, date) when errors were detected, in RFC 3339 format.    
+    /// The time (well, date) when errors were detected, in RFC 3339 format.
     pub timestamp: String,
 }
 
@@ -450,28 +459,28 @@ impl Part for UrlCrawlErrorCount {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct WmxSitemap {
-    /// Number of errors in the sitemap - issues with the sitemap itself, that needs to be fixed before it can be processed correctly.    
+    /// Number of errors in the sitemap - issues with the sitemap itself, that needs to be fixed before it can be processed correctly.
     pub errors: String,
-    /// Number of warnings for the sitemap - issues with URLs in the sitemaps.    
+    /// Number of warnings for the sitemap - issues with URLs in the sitemaps.
     pub warnings: String,
-    /// If true, the sitemap has not been processed.    
+    /// If true, the sitemap has not been processed.
     #[serde(alias="isPending")]
     pub is_pending: bool,
-    /// Date & time in which this sitemap was submitted. Date format is in RFC 3339 format (yyyy-mm-dd).    
+    /// Date & time in which this sitemap was submitted. Date format is in RFC 3339 format (yyyy-mm-dd).
     #[serde(alias="lastSubmitted")]
     pub last_submitted: String,
-    /// If true, the sitemap is a collection of sitemaps.    
+    /// If true, the sitemap is a collection of sitemaps.
     #[serde(alias="isSitemapsIndex")]
     pub is_sitemaps_index: bool,
-    /// Date & time in which this sitemap was last downloaded. Date format is in RFC 3339 format (yyyy-mm-dd).    
+    /// Date & time in which this sitemap was last downloaded. Date format is in RFC 3339 format (yyyy-mm-dd).
     #[serde(alias="lastDownloaded")]
     pub last_downloaded: String,
-    /// The url of the sitemap.    
+    /// The url of the sitemap.
     pub path: String,
-    /// The type of the sitemap (for example "sitemap").    
+    /// The type of the sitemap (for example "sitemap").
     #[serde(alias="type")]
     pub type_: String,
-    /// The various content types in the sitemap.    
+    /// The various content types in the sitemap.
     pub contents: Vec<WmxSitemapContent>,
 }
 
@@ -489,7 +498,7 @@ impl ResponseResult for WmxSitemap {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct SitesListResponse {
-    /// Access level information for a Webmaster Tools site.    
+    /// Access level information for a Webmaster Tools site.
     #[serde(alias="siteEntry")]
     pub site_entry: Vec<WmxSite>,
 }
@@ -508,18 +517,18 @@ impl ResponseResult for SitesListResponse {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct UrlCrawlErrorsSample {
-    /// Additional details about the URL, set only when calling get().    
+    /// Additional details about the URL, set only when calling get().
     #[serde(alias="urlDetails")]
     pub url_details: UrlSampleDetails,
-    /// The URL of an error, relative to the site.    
+    /// The URL of an error, relative to the site.
     #[serde(alias="pageUrl")]
     pub page_url: String,
-    /// The time when the URL was last crawled, in RFC 3339 format.    
+    /// The time when the URL was last crawled, in RFC 3339 format.
     pub last_crawled: String,
-    /// The HTTP response code, if any.    
+    /// The HTTP response code, if any.
     #[serde(alias="responseCode")]
     pub response_code: i32,
-    /// The time the error was first detected, in RFC 3339 format.    
+    /// The time the error was first detected, in RFC 3339 format.
     pub first_detected: String,
 }
 
@@ -533,10 +542,10 @@ impl ResponseResult for UrlCrawlErrorsSample {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct UrlSampleDetails {
-    /// List of sitemaps pointing at this URL.    
+    /// List of sitemaps pointing at this URL.
     #[serde(alias="containingSitemaps")]
     pub containing_sitemaps: Vec<String>,
-    /// A sample set of URLs linking to this URL.    
+    /// A sample set of URLs linking to this URL.
     #[serde(alias="linkedFromUrls")]
     pub linked_from_urls: Vec<String>,
 }
@@ -555,7 +564,7 @@ impl Part for UrlSampleDetails {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct UrlCrawlErrorsSamplesListResponse {
-    /// Information about the sample URL and its crawl error.    
+    /// Information about the sample URL and its crawl error.
     #[serde(alias="urlCrawlErrorSample")]
     pub url_crawl_error_sample: Vec<UrlCrawlErrorsSample>,
 }
@@ -602,13 +611,18 @@ pub struct SitemapMethods<'a, C, NC, A>
     hub: &'a Webmasters<C, NC, A>,
 }
 
-impl<'a, C, NC, A> ResourceMethodsBuilder for SitemapMethods<'a, C, NC, A> {}
+impl<'a, C, NC, A> MethodsBuilder for SitemapMethods<'a, C, NC, A> {}
 
 impl<'a, C, NC, A> SitemapMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Deletes a sitemap from this site.    
+    /// Deletes a sitemap from this site.
+    /// 
+    /// # Arguments
+    ///
+    /// * `siteUrl` - The site's URL, including protocol, for example 'http://www.example.com/'
+    /// * `feedpath` - The URL of the actual sitemap (for example http://www.example.com/sitemap.xml).
     pub fn delete(&self, site_url: &str, feedpath: &str) -> SitemapDeleteCall<'a, C, NC, A> {
         SitemapDeleteCall {
             hub: self.hub,
@@ -622,7 +636,12 @@ impl<'a, C, NC, A> SitemapMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Submits a sitemap for a site.    
+    /// Submits a sitemap for a site.
+    /// 
+    /// # Arguments
+    ///
+    /// * `siteUrl` - The site's URL, including protocol, for example 'http://www.example.com/'
+    /// * `feedpath` - The URL of the sitemap to add.
     pub fn submit(&self, site_url: &str, feedpath: &str) -> SitemapSubmitCall<'a, C, NC, A> {
         SitemapSubmitCall {
             hub: self.hub,
@@ -636,7 +655,12 @@ impl<'a, C, NC, A> SitemapMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Retrieves information about a specific sitemap.    
+    /// Retrieves information about a specific sitemap.
+    /// 
+    /// # Arguments
+    ///
+    /// * `siteUrl` - The site's URL, including protocol, for example 'http://www.example.com/'
+    /// * `feedpath` - The URL of the actual sitemap (for example http://www.example.com/sitemap.xml).
     pub fn get(&self, site_url: &str, feedpath: &str) -> SitemapGetCall<'a, C, NC, A> {
         SitemapGetCall {
             hub: self.hub,
@@ -650,7 +674,11 @@ impl<'a, C, NC, A> SitemapMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Lists sitemaps uploaded to the site.    
+    /// Lists sitemaps uploaded to the site.
+    /// 
+    /// # Arguments
+    ///
+    /// * `siteUrl` - The site's URL, including protocol, for example 'http://www.example.com/'
     pub fn list(&self, site_url: &str) -> SitemapListCall<'a, C, NC, A> {
         SitemapListCall {
             hub: self.hub,
@@ -699,13 +727,17 @@ pub struct SiteMethods<'a, C, NC, A>
     hub: &'a Webmasters<C, NC, A>,
 }
 
-impl<'a, C, NC, A> ResourceMethodsBuilder for SiteMethods<'a, C, NC, A> {}
+impl<'a, C, NC, A> MethodsBuilder for SiteMethods<'a, C, NC, A> {}
 
 impl<'a, C, NC, A> SiteMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Retrieves information about specific site.    
+    /// Retrieves information about specific site.
+    /// 
+    /// # Arguments
+    ///
+    /// * `siteUrl` - The site's URL, including protocol, for example 'http://www.example.com/'
     pub fn get(&self, site_url: &str) -> SiteGetCall<'a, C, NC, A> {
         SiteGetCall {
             hub: self.hub,
@@ -718,7 +750,11 @@ impl<'a, C, NC, A> SiteMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Adds a site to the set of the user's sites in Webmaster Tools.    
+    /// Adds a site to the set of the user's sites in Webmaster Tools.
+    /// 
+    /// # Arguments
+    ///
+    /// * `siteUrl` - The URL of the site to add.
     pub fn add(&self, site_url: &str) -> SiteAddCall<'a, C, NC, A> {
         SiteAddCall {
             hub: self.hub,
@@ -731,7 +767,7 @@ impl<'a, C, NC, A> SiteMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Lists your Webmaster Tools sites.    
+    /// Lists your Webmaster Tools sites.
     pub fn list(&self) -> SiteListCall<'a, C, NC, A> {
         SiteListCall {
             hub: self.hub,
@@ -743,7 +779,11 @@ impl<'a, C, NC, A> SiteMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Removes a site from the set of the user's Webmaster Tools sites.    
+    /// Removes a site from the set of the user's Webmaster Tools sites.
+    /// 
+    /// # Arguments
+    ///
+    /// * `siteUrl` - The site's URL, including protocol, for example 'http://www.example.com/'
     pub fn delete(&self, site_url: &str) -> SiteDeleteCall<'a, C, NC, A> {
         SiteDeleteCall {
             hub: self.hub,
@@ -791,13 +831,17 @@ pub struct UrlcrawlerrorscountMethods<'a, C, NC, A>
     hub: &'a Webmasters<C, NC, A>,
 }
 
-impl<'a, C, NC, A> ResourceMethodsBuilder for UrlcrawlerrorscountMethods<'a, C, NC, A> {}
+impl<'a, C, NC, A> MethodsBuilder for UrlcrawlerrorscountMethods<'a, C, NC, A> {}
 
 impl<'a, C, NC, A> UrlcrawlerrorscountMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Retrieves a time series of the number of URL crawl errors per error category and platform.    
+    /// Retrieves a time series of the number of URL crawl errors per error category and platform.
+    /// 
+    /// # Arguments
+    ///
+    /// * `siteUrl` - The site's URL, including protocol, for example 'http://www.example.com/'
     pub fn query(&self, site_url: &str) -> UrlcrawlerrorscountQueryCall<'a, C, NC, A> {
         UrlcrawlerrorscountQueryCall {
             hub: self.hub,
@@ -848,13 +892,20 @@ pub struct UrlcrawlerrorssampleMethods<'a, C, NC, A>
     hub: &'a Webmasters<C, NC, A>,
 }
 
-impl<'a, C, NC, A> ResourceMethodsBuilder for UrlcrawlerrorssampleMethods<'a, C, NC, A> {}
+impl<'a, C, NC, A> MethodsBuilder for UrlcrawlerrorssampleMethods<'a, C, NC, A> {}
 
 impl<'a, C, NC, A> UrlcrawlerrorssampleMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Retrieves details about crawl errors for a site's sample URL.    
+    /// Retrieves details about crawl errors for a site's sample URL.
+    /// 
+    /// # Arguments
+    ///
+    /// * `siteUrl` - The site's URL, including protocol, for example 'http://www.example.com/'
+    /// * `url` - The relative path (without the site) of the sample URL; must be one of the URLs returned by list
+    /// * `category` - The crawl error category, for example 'authPermissions'
+    /// * `platform` - The user agent type (platform) that made the request, for example 'web'
     pub fn get(&self, site_url: &str, url: &str, category: &str, platform: &str) -> UrlcrawlerrorssampleGetCall<'a, C, NC, A> {
         UrlcrawlerrorssampleGetCall {
             hub: self.hub,
@@ -870,7 +921,13 @@ impl<'a, C, NC, A> UrlcrawlerrorssampleMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Lists a site's sample URLs for the specified crawl error category and platform.    
+    /// Lists a site's sample URLs for the specified crawl error category and platform.
+    /// 
+    /// # Arguments
+    ///
+    /// * `siteUrl` - The site's URL, including protocol, for example 'http://www.example.com/'
+    /// * `category` - The crawl error category, for example 'authPermissions'
+    /// * `platform` - The user agent type (platform) that made the request, for example 'web'
     pub fn list(&self, site_url: &str, category: &str, platform: &str) -> UrlcrawlerrorssampleListCall<'a, C, NC, A> {
         UrlcrawlerrorssampleListCall {
             hub: self.hub,
@@ -885,7 +942,14 @@ impl<'a, C, NC, A> UrlcrawlerrorssampleMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Marks the provided site's sample URL as fixed, and removes it from the samples list.    
+    /// Marks the provided site's sample URL as fixed, and removes it from the samples list.
+    /// 
+    /// # Arguments
+    ///
+    /// * `siteUrl` - The site's URL, including protocol, for example 'http://www.example.com/'
+    /// * `url` - The relative path (without the site) of the sample URL; must be one of the URLs returned by list
+    /// * `category` - The crawl error category, for example 'authPermissions'
+    /// * `platform` - The user agent type (platform) that made the request, for example 'web'
     pub fn mark_as_fixed(&self, site_url: &str, url: &str, category: &str, platform: &str) -> UrlcrawlerrorssampleMarkAsFixedCall<'a, C, NC, A> {
         UrlcrawlerrorssampleMarkAsFixedCall {
             hub: self.hub,
@@ -911,7 +975,7 @@ impl<'a, C, NC, A> UrlcrawlerrorssampleMethods<'a, C, NC, A> {
 /// Deletes a sitemap from this site.
 ///
 /// A builder for the *delete* method supported by a *sitemap* resource.
-/// It is not used directly, but through a `SitemapMethods`.
+/// It is not used directly, but through a `SitemapMethods` instance.
 ///
 /// # Example
 ///
@@ -971,7 +1035,7 @@ impl<'a, C, NC, A> SitemapDeleteCall<'a, C, NC, A> where NC: hyper::net::Network
         for &field in ["siteUrl", "feedpath"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -1023,7 +1087,7 @@ impl<'a, C, NC, A> SitemapDeleteCall<'a, C, NC, A> where NC: hyper::net::Network
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -1035,7 +1099,6 @@ impl<'a, C, NC, A> SitemapDeleteCall<'a, C, NC, A> where NC: hyper::net::Network
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -1045,7 +1108,7 @@ impl<'a, C, NC, A> SitemapDeleteCall<'a, C, NC, A> where NC: hyper::net::Network
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -1056,12 +1119,12 @@ impl<'a, C, NC, A> SitemapDeleteCall<'a, C, NC, A> where NC: hyper::net::Network
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = res;
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -1073,7 +1136,7 @@ impl<'a, C, NC, A> SitemapDeleteCall<'a, C, NC, A> where NC: hyper::net::Network
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The site's URL, including protocol, for example 'http://www.example.com/'    
+    /// The site's URL, including protocol, for example 'http://www.example.com/'
     pub fn site_url(mut self, new_value: &str) -> SitemapDeleteCall<'a, C, NC, A> {
         self._site_url = new_value.to_string();
         self
@@ -1083,7 +1146,7 @@ impl<'a, C, NC, A> SitemapDeleteCall<'a, C, NC, A> where NC: hyper::net::Network
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The URL of the actual sitemap (for example http://www.example.com/sitemap.xml).    
+    /// The URL of the actual sitemap (for example http://www.example.com/sitemap.xml).
     pub fn feedpath(mut self, new_value: &str) -> SitemapDeleteCall<'a, C, NC, A> {
         self._feedpath = new_value.to_string();
         self
@@ -1144,7 +1207,7 @@ impl<'a, C, NC, A> SitemapDeleteCall<'a, C, NC, A> where NC: hyper::net::Network
 /// Submits a sitemap for a site.
 ///
 /// A builder for the *submit* method supported by a *sitemap* resource.
-/// It is not used directly, but through a `SitemapMethods`.
+/// It is not used directly, but through a `SitemapMethods` instance.
 ///
 /// # Example
 ///
@@ -1204,7 +1267,7 @@ impl<'a, C, NC, A> SitemapSubmitCall<'a, C, NC, A> where NC: hyper::net::Network
         for &field in ["siteUrl", "feedpath"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -1256,7 +1319,7 @@ impl<'a, C, NC, A> SitemapSubmitCall<'a, C, NC, A> where NC: hyper::net::Network
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -1268,7 +1331,6 @@ impl<'a, C, NC, A> SitemapSubmitCall<'a, C, NC, A> where NC: hyper::net::Network
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -1278,7 +1340,7 @@ impl<'a, C, NC, A> SitemapSubmitCall<'a, C, NC, A> where NC: hyper::net::Network
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -1289,12 +1351,12 @@ impl<'a, C, NC, A> SitemapSubmitCall<'a, C, NC, A> where NC: hyper::net::Network
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = res;
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -1306,7 +1368,7 @@ impl<'a, C, NC, A> SitemapSubmitCall<'a, C, NC, A> where NC: hyper::net::Network
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The site's URL, including protocol, for example 'http://www.example.com/'    
+    /// The site's URL, including protocol, for example 'http://www.example.com/'
     pub fn site_url(mut self, new_value: &str) -> SitemapSubmitCall<'a, C, NC, A> {
         self._site_url = new_value.to_string();
         self
@@ -1316,7 +1378,7 @@ impl<'a, C, NC, A> SitemapSubmitCall<'a, C, NC, A> where NC: hyper::net::Network
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The URL of the sitemap to add.    
+    /// The URL of the sitemap to add.
     pub fn feedpath(mut self, new_value: &str) -> SitemapSubmitCall<'a, C, NC, A> {
         self._feedpath = new_value.to_string();
         self
@@ -1377,7 +1439,7 @@ impl<'a, C, NC, A> SitemapSubmitCall<'a, C, NC, A> where NC: hyper::net::Network
 /// Retrieves information about a specific sitemap.
 ///
 /// A builder for the *get* method supported by a *sitemap* resource.
-/// It is not used directly, but through a `SitemapMethods`.
+/// It is not used directly, but through a `SitemapMethods` instance.
 ///
 /// # Example
 ///
@@ -1437,7 +1499,7 @@ impl<'a, C, NC, A> SitemapGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
         for &field in ["alt", "siteUrl", "feedpath"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -1490,7 +1552,7 @@ impl<'a, C, NC, A> SitemapGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -1502,7 +1564,6 @@ impl<'a, C, NC, A> SitemapGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -1512,7 +1573,7 @@ impl<'a, C, NC, A> SitemapGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -1523,7 +1584,7 @@ impl<'a, C, NC, A> SitemapGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -1532,13 +1593,13 @@ impl<'a, C, NC, A> SitemapGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -1550,7 +1611,7 @@ impl<'a, C, NC, A> SitemapGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The site's URL, including protocol, for example 'http://www.example.com/'    
+    /// The site's URL, including protocol, for example 'http://www.example.com/'
     pub fn site_url(mut self, new_value: &str) -> SitemapGetCall<'a, C, NC, A> {
         self._site_url = new_value.to_string();
         self
@@ -1560,7 +1621,7 @@ impl<'a, C, NC, A> SitemapGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The URL of the actual sitemap (for example http://www.example.com/sitemap.xml).    
+    /// The URL of the actual sitemap (for example http://www.example.com/sitemap.xml).
     pub fn feedpath(mut self, new_value: &str) -> SitemapGetCall<'a, C, NC, A> {
         self._feedpath = new_value.to_string();
         self
@@ -1621,7 +1682,7 @@ impl<'a, C, NC, A> SitemapGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
 /// Lists sitemaps uploaded to the site.
 ///
 /// A builder for the *list* method supported by a *sitemap* resource.
-/// It is not used directly, but through a `SitemapMethods`.
+/// It is not used directly, but through a `SitemapMethods` instance.
 ///
 /// # Example
 ///
@@ -1684,7 +1745,7 @@ impl<'a, C, NC, A> SitemapListCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
         for &field in ["alt", "siteUrl", "sitemapIndex"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -1737,7 +1798,7 @@ impl<'a, C, NC, A> SitemapListCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -1749,7 +1810,6 @@ impl<'a, C, NC, A> SitemapListCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -1759,7 +1819,7 @@ impl<'a, C, NC, A> SitemapListCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -1770,7 +1830,7 @@ impl<'a, C, NC, A> SitemapListCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -1779,13 +1839,13 @@ impl<'a, C, NC, A> SitemapListCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -1797,7 +1857,7 @@ impl<'a, C, NC, A> SitemapListCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The site's URL, including protocol, for example 'http://www.example.com/'    
+    /// The site's URL, including protocol, for example 'http://www.example.com/'
     pub fn site_url(mut self, new_value: &str) -> SitemapListCall<'a, C, NC, A> {
         self._site_url = new_value.to_string();
         self
@@ -1805,7 +1865,7 @@ impl<'a, C, NC, A> SitemapListCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// Sets the *sitemap index* query property to the given value.
     ///
     /// 
-    /// A URL of a site's sitemap index.    
+    /// A URL of a site's sitemap index.
     pub fn sitemap_index(mut self, new_value: &str) -> SitemapListCall<'a, C, NC, A> {
         self._sitemap_index = Some(new_value.to_string());
         self
@@ -1866,7 +1926,7 @@ impl<'a, C, NC, A> SitemapListCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
 /// Retrieves information about specific site.
 ///
 /// A builder for the *get* method supported by a *site* resource.
-/// It is not used directly, but through a `SiteMethods`.
+/// It is not used directly, but through a `SiteMethods` instance.
 ///
 /// # Example
 ///
@@ -1924,7 +1984,7 @@ impl<'a, C, NC, A> SiteGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnec
         for &field in ["alt", "siteUrl"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -1977,7 +2037,7 @@ impl<'a, C, NC, A> SiteGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnec
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -1989,7 +2049,6 @@ impl<'a, C, NC, A> SiteGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnec
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -1999,7 +2058,7 @@ impl<'a, C, NC, A> SiteGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnec
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -2010,7 +2069,7 @@ impl<'a, C, NC, A> SiteGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnec
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -2019,13 +2078,13 @@ impl<'a, C, NC, A> SiteGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnec
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -2037,7 +2096,7 @@ impl<'a, C, NC, A> SiteGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnec
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The site's URL, including protocol, for example 'http://www.example.com/'    
+    /// The site's URL, including protocol, for example 'http://www.example.com/'
     pub fn site_url(mut self, new_value: &str) -> SiteGetCall<'a, C, NC, A> {
         self._site_url = new_value.to_string();
         self
@@ -2098,7 +2157,7 @@ impl<'a, C, NC, A> SiteGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnec
 /// Adds a site to the set of the user's sites in Webmaster Tools.
 ///
 /// A builder for the *add* method supported by a *site* resource.
-/// It is not used directly, but through a `SiteMethods`.
+/// It is not used directly, but through a `SiteMethods` instance.
 ///
 /// # Example
 ///
@@ -2156,7 +2215,7 @@ impl<'a, C, NC, A> SiteAddCall<'a, C, NC, A> where NC: hyper::net::NetworkConnec
         for &field in ["siteUrl"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -2208,7 +2267,7 @@ impl<'a, C, NC, A> SiteAddCall<'a, C, NC, A> where NC: hyper::net::NetworkConnec
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -2220,7 +2279,6 @@ impl<'a, C, NC, A> SiteAddCall<'a, C, NC, A> where NC: hyper::net::NetworkConnec
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -2230,7 +2288,7 @@ impl<'a, C, NC, A> SiteAddCall<'a, C, NC, A> where NC: hyper::net::NetworkConnec
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -2241,12 +2299,12 @@ impl<'a, C, NC, A> SiteAddCall<'a, C, NC, A> where NC: hyper::net::NetworkConnec
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = res;
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -2258,7 +2316,7 @@ impl<'a, C, NC, A> SiteAddCall<'a, C, NC, A> where NC: hyper::net::NetworkConnec
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The URL of the site to add.    
+    /// The URL of the site to add.
     pub fn site_url(mut self, new_value: &str) -> SiteAddCall<'a, C, NC, A> {
         self._site_url = new_value.to_string();
         self
@@ -2319,7 +2377,7 @@ impl<'a, C, NC, A> SiteAddCall<'a, C, NC, A> where NC: hyper::net::NetworkConnec
 /// Lists your Webmaster Tools sites.
 ///
 /// A builder for the *list* method supported by a *site* resource.
-/// It is not used directly, but through a `SiteMethods`.
+/// It is not used directly, but through a `SiteMethods` instance.
 ///
 /// # Example
 ///
@@ -2375,7 +2433,7 @@ impl<'a, C, NC, A> SiteListCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
         for &field in ["alt"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -2404,7 +2462,7 @@ impl<'a, C, NC, A> SiteListCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -2416,7 +2474,6 @@ impl<'a, C, NC, A> SiteListCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -2426,7 +2483,7 @@ impl<'a, C, NC, A> SiteListCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -2437,7 +2494,7 @@ impl<'a, C, NC, A> SiteListCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -2446,13 +2503,13 @@ impl<'a, C, NC, A> SiteListCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -2515,7 +2572,7 @@ impl<'a, C, NC, A> SiteListCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
 /// Removes a site from the set of the user's Webmaster Tools sites.
 ///
 /// A builder for the *delete* method supported by a *site* resource.
-/// It is not used directly, but through a `SiteMethods`.
+/// It is not used directly, but through a `SiteMethods` instance.
 ///
 /// # Example
 ///
@@ -2573,7 +2630,7 @@ impl<'a, C, NC, A> SiteDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
         for &field in ["siteUrl"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -2625,7 +2682,7 @@ impl<'a, C, NC, A> SiteDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -2637,7 +2694,6 @@ impl<'a, C, NC, A> SiteDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -2647,7 +2703,7 @@ impl<'a, C, NC, A> SiteDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -2658,12 +2714,12 @@ impl<'a, C, NC, A> SiteDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = res;
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -2675,7 +2731,7 @@ impl<'a, C, NC, A> SiteDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The site's URL, including protocol, for example 'http://www.example.com/'    
+    /// The site's URL, including protocol, for example 'http://www.example.com/'
     pub fn site_url(mut self, new_value: &str) -> SiteDeleteCall<'a, C, NC, A> {
         self._site_url = new_value.to_string();
         self
@@ -2736,7 +2792,7 @@ impl<'a, C, NC, A> SiteDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
 /// Retrieves a time series of the number of URL crawl errors per error category and platform.
 ///
 /// A builder for the *query* method supported by a *urlcrawlerrorscount* resource.
-/// It is not used directly, but through a `UrlcrawlerrorscountMethods`.
+/// It is not used directly, but through a `UrlcrawlerrorscountMethods` instance.
 ///
 /// # Example
 ///
@@ -2809,7 +2865,7 @@ impl<'a, C, NC, A> UrlcrawlerrorscountQueryCall<'a, C, NC, A> where NC: hyper::n
         for &field in ["alt", "siteUrl", "platform", "latestCountsOnly", "category"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -2862,7 +2918,7 @@ impl<'a, C, NC, A> UrlcrawlerrorscountQueryCall<'a, C, NC, A> where NC: hyper::n
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -2874,7 +2930,6 @@ impl<'a, C, NC, A> UrlcrawlerrorscountQueryCall<'a, C, NC, A> where NC: hyper::n
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -2884,7 +2939,7 @@ impl<'a, C, NC, A> UrlcrawlerrorscountQueryCall<'a, C, NC, A> where NC: hyper::n
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -2895,7 +2950,7 @@ impl<'a, C, NC, A> UrlcrawlerrorscountQueryCall<'a, C, NC, A> where NC: hyper::n
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -2904,13 +2959,13 @@ impl<'a, C, NC, A> UrlcrawlerrorscountQueryCall<'a, C, NC, A> where NC: hyper::n
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -2922,7 +2977,7 @@ impl<'a, C, NC, A> UrlcrawlerrorscountQueryCall<'a, C, NC, A> where NC: hyper::n
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The site's URL, including protocol, for example 'http://www.example.com/'    
+    /// The site's URL, including protocol, for example 'http://www.example.com/'
     pub fn site_url(mut self, new_value: &str) -> UrlcrawlerrorscountQueryCall<'a, C, NC, A> {
         self._site_url = new_value.to_string();
         self
@@ -2930,7 +2985,7 @@ impl<'a, C, NC, A> UrlcrawlerrorscountQueryCall<'a, C, NC, A> where NC: hyper::n
     /// Sets the *platform* query property to the given value.
     ///
     /// 
-    /// The user agent type (platform) that made the request, for example 'web'. If not specified, we return results for all platforms.    
+    /// The user agent type (platform) that made the request, for example 'web'. If not specified, we return results for all platforms.
     pub fn platform(mut self, new_value: &str) -> UrlcrawlerrorscountQueryCall<'a, C, NC, A> {
         self._platform = Some(new_value.to_string());
         self
@@ -2938,7 +2993,7 @@ impl<'a, C, NC, A> UrlcrawlerrorscountQueryCall<'a, C, NC, A> where NC: hyper::n
     /// Sets the *latest counts only* query property to the given value.
     ///
     /// 
-    /// If true, returns only the latest crawl error counts.    
+    /// If true, returns only the latest crawl error counts.
     pub fn latest_counts_only(mut self, new_value: bool) -> UrlcrawlerrorscountQueryCall<'a, C, NC, A> {
         self._latest_counts_only = Some(new_value);
         self
@@ -2946,7 +3001,7 @@ impl<'a, C, NC, A> UrlcrawlerrorscountQueryCall<'a, C, NC, A> where NC: hyper::n
     /// Sets the *category* query property to the given value.
     ///
     /// 
-    /// The crawl error category, for example 'serverError'. If not specified, we return results for all categories.    
+    /// The crawl error category, for example 'serverError'. If not specified, we return results for all categories.
     pub fn category(mut self, new_value: &str) -> UrlcrawlerrorscountQueryCall<'a, C, NC, A> {
         self._category = Some(new_value.to_string());
         self
@@ -3007,7 +3062,7 @@ impl<'a, C, NC, A> UrlcrawlerrorscountQueryCall<'a, C, NC, A> where NC: hyper::n
 /// Retrieves details about crawl errors for a site's sample URL.
 ///
 /// A builder for the *get* method supported by a *urlcrawlerrorssample* resource.
-/// It is not used directly, but through a `UrlcrawlerrorssampleMethods`.
+/// It is not used directly, but through a `UrlcrawlerrorssampleMethods` instance.
 ///
 /// # Example
 ///
@@ -3071,7 +3126,7 @@ impl<'a, C, NC, A> UrlcrawlerrorssampleGetCall<'a, C, NC, A> where NC: hyper::ne
         for &field in ["alt", "siteUrl", "url", "category", "platform"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -3124,7 +3179,7 @@ impl<'a, C, NC, A> UrlcrawlerrorssampleGetCall<'a, C, NC, A> where NC: hyper::ne
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -3136,7 +3191,6 @@ impl<'a, C, NC, A> UrlcrawlerrorssampleGetCall<'a, C, NC, A> where NC: hyper::ne
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -3146,7 +3200,7 @@ impl<'a, C, NC, A> UrlcrawlerrorssampleGetCall<'a, C, NC, A> where NC: hyper::ne
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -3157,7 +3211,7 @@ impl<'a, C, NC, A> UrlcrawlerrorssampleGetCall<'a, C, NC, A> where NC: hyper::ne
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -3166,13 +3220,13 @@ impl<'a, C, NC, A> UrlcrawlerrorssampleGetCall<'a, C, NC, A> where NC: hyper::ne
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -3184,7 +3238,7 @@ impl<'a, C, NC, A> UrlcrawlerrorssampleGetCall<'a, C, NC, A> where NC: hyper::ne
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The site's URL, including protocol, for example 'http://www.example.com/'    
+    /// The site's URL, including protocol, for example 'http://www.example.com/'
     pub fn site_url(mut self, new_value: &str) -> UrlcrawlerrorssampleGetCall<'a, C, NC, A> {
         self._site_url = new_value.to_string();
         self
@@ -3194,7 +3248,7 @@ impl<'a, C, NC, A> UrlcrawlerrorssampleGetCall<'a, C, NC, A> where NC: hyper::ne
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The relative path (without the site) of the sample URL; must be one of the URLs returned by list    
+    /// The relative path (without the site) of the sample URL; must be one of the URLs returned by list
     pub fn url(mut self, new_value: &str) -> UrlcrawlerrorssampleGetCall<'a, C, NC, A> {
         self._url = new_value.to_string();
         self
@@ -3204,7 +3258,7 @@ impl<'a, C, NC, A> UrlcrawlerrorssampleGetCall<'a, C, NC, A> where NC: hyper::ne
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The crawl error category, for example 'authPermissions'    
+    /// The crawl error category, for example 'authPermissions'
     pub fn category(mut self, new_value: &str) -> UrlcrawlerrorssampleGetCall<'a, C, NC, A> {
         self._category = new_value.to_string();
         self
@@ -3214,7 +3268,7 @@ impl<'a, C, NC, A> UrlcrawlerrorssampleGetCall<'a, C, NC, A> where NC: hyper::ne
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The user agent type (platform) that made the request, for example 'web'    
+    /// The user agent type (platform) that made the request, for example 'web'
     pub fn platform(mut self, new_value: &str) -> UrlcrawlerrorssampleGetCall<'a, C, NC, A> {
         self._platform = new_value.to_string();
         self
@@ -3275,7 +3329,7 @@ impl<'a, C, NC, A> UrlcrawlerrorssampleGetCall<'a, C, NC, A> where NC: hyper::ne
 /// Lists a site's sample URLs for the specified crawl error category and platform.
 ///
 /// A builder for the *list* method supported by a *urlcrawlerrorssample* resource.
-/// It is not used directly, but through a `UrlcrawlerrorssampleMethods`.
+/// It is not used directly, but through a `UrlcrawlerrorssampleMethods` instance.
 ///
 /// # Example
 ///
@@ -3337,7 +3391,7 @@ impl<'a, C, NC, A> UrlcrawlerrorssampleListCall<'a, C, NC, A> where NC: hyper::n
         for &field in ["alt", "siteUrl", "category", "platform"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -3390,7 +3444,7 @@ impl<'a, C, NC, A> UrlcrawlerrorssampleListCall<'a, C, NC, A> where NC: hyper::n
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -3402,7 +3456,6 @@ impl<'a, C, NC, A> UrlcrawlerrorssampleListCall<'a, C, NC, A> where NC: hyper::n
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -3412,7 +3465,7 @@ impl<'a, C, NC, A> UrlcrawlerrorssampleListCall<'a, C, NC, A> where NC: hyper::n
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -3423,7 +3476,7 @@ impl<'a, C, NC, A> UrlcrawlerrorssampleListCall<'a, C, NC, A> where NC: hyper::n
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -3432,13 +3485,13 @@ impl<'a, C, NC, A> UrlcrawlerrorssampleListCall<'a, C, NC, A> where NC: hyper::n
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -3450,7 +3503,7 @@ impl<'a, C, NC, A> UrlcrawlerrorssampleListCall<'a, C, NC, A> where NC: hyper::n
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The site's URL, including protocol, for example 'http://www.example.com/'    
+    /// The site's URL, including protocol, for example 'http://www.example.com/'
     pub fn site_url(mut self, new_value: &str) -> UrlcrawlerrorssampleListCall<'a, C, NC, A> {
         self._site_url = new_value.to_string();
         self
@@ -3460,7 +3513,7 @@ impl<'a, C, NC, A> UrlcrawlerrorssampleListCall<'a, C, NC, A> where NC: hyper::n
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The crawl error category, for example 'authPermissions'    
+    /// The crawl error category, for example 'authPermissions'
     pub fn category(mut self, new_value: &str) -> UrlcrawlerrorssampleListCall<'a, C, NC, A> {
         self._category = new_value.to_string();
         self
@@ -3470,7 +3523,7 @@ impl<'a, C, NC, A> UrlcrawlerrorssampleListCall<'a, C, NC, A> where NC: hyper::n
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The user agent type (platform) that made the request, for example 'web'    
+    /// The user agent type (platform) that made the request, for example 'web'
     pub fn platform(mut self, new_value: &str) -> UrlcrawlerrorssampleListCall<'a, C, NC, A> {
         self._platform = new_value.to_string();
         self
@@ -3531,7 +3584,7 @@ impl<'a, C, NC, A> UrlcrawlerrorssampleListCall<'a, C, NC, A> where NC: hyper::n
 /// Marks the provided site's sample URL as fixed, and removes it from the samples list.
 ///
 /// A builder for the *markAsFixed* method supported by a *urlcrawlerrorssample* resource.
-/// It is not used directly, but through a `UrlcrawlerrorssampleMethods`.
+/// It is not used directly, but through a `UrlcrawlerrorssampleMethods` instance.
 ///
 /// # Example
 ///
@@ -3595,7 +3648,7 @@ impl<'a, C, NC, A> UrlcrawlerrorssampleMarkAsFixedCall<'a, C, NC, A> where NC: h
         for &field in ["siteUrl", "url", "category", "platform"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -3647,7 +3700,7 @@ impl<'a, C, NC, A> UrlcrawlerrorssampleMarkAsFixedCall<'a, C, NC, A> where NC: h
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -3659,7 +3712,6 @@ impl<'a, C, NC, A> UrlcrawlerrorssampleMarkAsFixedCall<'a, C, NC, A> where NC: h
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -3669,7 +3721,7 @@ impl<'a, C, NC, A> UrlcrawlerrorssampleMarkAsFixedCall<'a, C, NC, A> where NC: h
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -3680,12 +3732,12 @@ impl<'a, C, NC, A> UrlcrawlerrorssampleMarkAsFixedCall<'a, C, NC, A> where NC: h
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = res;
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -3697,7 +3749,7 @@ impl<'a, C, NC, A> UrlcrawlerrorssampleMarkAsFixedCall<'a, C, NC, A> where NC: h
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The site's URL, including protocol, for example 'http://www.example.com/'    
+    /// The site's URL, including protocol, for example 'http://www.example.com/'
     pub fn site_url(mut self, new_value: &str) -> UrlcrawlerrorssampleMarkAsFixedCall<'a, C, NC, A> {
         self._site_url = new_value.to_string();
         self
@@ -3707,7 +3759,7 @@ impl<'a, C, NC, A> UrlcrawlerrorssampleMarkAsFixedCall<'a, C, NC, A> where NC: h
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The relative path (without the site) of the sample URL; must be one of the URLs returned by list    
+    /// The relative path (without the site) of the sample URL; must be one of the URLs returned by list
     pub fn url(mut self, new_value: &str) -> UrlcrawlerrorssampleMarkAsFixedCall<'a, C, NC, A> {
         self._url = new_value.to_string();
         self
@@ -3717,7 +3769,7 @@ impl<'a, C, NC, A> UrlcrawlerrorssampleMarkAsFixedCall<'a, C, NC, A> where NC: h
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The crawl error category, for example 'authPermissions'    
+    /// The crawl error category, for example 'authPermissions'
     pub fn category(mut self, new_value: &str) -> UrlcrawlerrorssampleMarkAsFixedCall<'a, C, NC, A> {
         self._category = new_value.to_string();
         self
@@ -3727,7 +3779,7 @@ impl<'a, C, NC, A> UrlcrawlerrorssampleMarkAsFixedCall<'a, C, NC, A> where NC: h
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The user agent type (platform) that made the request, for example 'web'    
+    /// The user agent type (platform) that made the request, for example 'web'
     pub fn platform(mut self, new_value: &str) -> UrlcrawlerrorssampleMarkAsFixedCall<'a, C, NC, A> {
         self._platform = new_value.to_string();
         self

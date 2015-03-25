@@ -1,8 +1,8 @@
 // DO NOT EDIT !
-// This file was generated automatically from 'src/mako/lib.rs.mako'
+// This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *YouTube Analytics* crate version *0.1.1+20150304*, where *20150304* is the exact revision of the *youtubeAnalytics:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.1*.
+//! This documentation was generated from *YouTube Analytics* crate version *0.1.2+20150304*, where *20150304* is the exact revision of the *youtubeAnalytics:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.2*.
 //! 
 //! Everything else about the *YouTube Analytics* *v1* API can be found at the
 //! [official documentation site](http://developers.google.com/youtube/analytics/).
@@ -33,6 +33,8 @@
 //! 
 //! * **[Hub](struct.YouTubeAnalytics.html)**
 //!     * a central object to maintain state and allow accessing all *Activities*
+//!     * creates [*Method Builders*](trait.MethodsBuilder.html) which in turn
+//!       allow access to individual [*Call Builders*](trait.CallBuilder.html)
 //! * **[Resources](trait.Resource.html)**
 //!     * primary types that you can apply *Activities* to
 //!     * a collection of properties and *Parts*
@@ -41,6 +43,8 @@
 //!         * never directly used in *Activities*
 //! * **[Activities](trait.CallBuilder.html)**
 //!     * operations to apply to *Resources*
+//! 
+//! All *structures* are marked with applicable traits to further categorize them and ease browsing.
 //! 
 //! Generally speaking, you can invoke *Activities* like this:
 //! 
@@ -79,7 +83,7 @@
 //! extern crate hyper;
 //! extern crate "yup-oauth2" as oauth2;
 //! extern crate "google-youtubeanalytics1" as youtubeanalytics1;
-//! use youtubeanalytics1::Result;
+//! use youtubeanalytics1::{Result, Error};
 //! # #[test] fn egal() {
 //! use std::default::Default;
 //! use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -107,15 +111,17 @@
 //!              .doit();
 //! 
 //! match result {
-//!     Result::HttpError(err) => println!("HTTPERROR: {:?}", err),
-//!     Result::MissingAPIKey => println!("Auth: Missing API Key - used if there are no scopes"),
-//!     Result::MissingToken => println!("OAuth2: Missing Token"),
-//!     Result::Cancelled => println!("Operation cancelled by user"),
-//!     Result::UploadSizeLimitExceeded(size, max_size) => println!("Upload size too big: {} of {}", size, max_size),
-//!     Result::Failure(_) => println!("General Failure (hyper::client::Response doesn't print)"),
-//!     Result::FieldClash(clashed_field) => println!("You added custom parameter which is part of builder: {:?}", clashed_field),
-//!     Result::JsonDecodeError(err) => println!("Couldn't understand server reply - maybe API needs update: {:?}", err),
-//!     Result::Success(_) => println!("Success (value doesn't print)"),
+//!     Err(e) => match e {
+//!         Error::HttpError(err) => println!("HTTPERROR: {:?}", err),
+//!         Error::MissingAPIKey => println!("Auth: Missing API Key - used if there are no scopes"),
+//!         Error::MissingToken => println!("OAuth2: Missing Token"),
+//!         Error::Cancelled => println!("Operation canceled by user"),
+//!         Error::UploadSizeLimitExceeded(size, max_size) => println!("Upload size too big: {} of {}", size, max_size),
+//!         Error::Failure(_) => println!("General Failure (hyper::client::Response doesn't print)"),
+//!         Error::FieldClash(clashed_field) => println!("You added custom parameter which is part of builder: {:?}", clashed_field),
+//!         Error::JsonDecodeError(err) => println!("Couldn't understand server reply - maybe API needs update: {:?}", err),
+//!     },
+//!     Ok(_) => println!("Success (value doesn't print)"),
 //! }
 //! # }
 //! ```
@@ -128,7 +134,7 @@
 //! When delegates handle errors or intermediate values, they may have a chance to instruct the system to retry. This 
 //! makes the system potentially resilient to all kinds of errors.
 //! 
-//! ## Uploads and Downlods
+//! ## Uploads and Downloads
 //! If a method supports downloads, the response body, which is part of the [Result](enum.Result.html), should be
 //! read by you to obtain the media.
 //! If such a method also supports a [Response Result](trait.ResponseResult.html), it will return that by default.
@@ -151,8 +157,9 @@
 //! ## Optional Parts in Server-Requests
 //! 
 //! All structures provided by this library are made to be [enocodable](trait.RequestValue.html) and 
-//! [decodable](trait.ResponseResult.html) via json. Optionals are used to indicate that partial requests are responses are valid.
-//! Most optionals are are considered [Parts](trait.Part.html) which are identifyable by name, which will be sent to 
+//! [decodable](trait.ResponseResult.html) via *json*. Optionals are used to indicate that partial requests are responses 
+//! are valid.
+//! Most optionals are are considered [Parts](trait.Part.html) which are identifiable by name, which will be sent to 
 //! the server to indicate either the set parts of the request or the desired parts in the response.
 //! 
 //! ## Builder Arguments
@@ -201,7 +208,7 @@ use std::io;
 use std::fs;
 use std::thread::sleep;
 
-pub use cmn::{MultiPartReader, ToParts, MethodInfo, Result, CallBuilder, Hub, ReadSeek, Part, ResponseResult, RequestValue, NestedType, Delegate, DefaultDelegate, ResourceMethodsBuilder, Resource, JsonServerError};
+pub use cmn::{MultiPartReader, ToParts, MethodInfo, Result, Error, CallBuilder, Hub, ReadSeek, Part, ResponseResult, RequestValue, NestedType, Delegate, DefaultDelegate, MethodsBuilder, Resource, JsonServerError};
 
 
 // ##############
@@ -263,7 +270,7 @@ impl Default for Scope {
 /// extern crate hyper;
 /// extern crate "yup-oauth2" as oauth2;
 /// extern crate "google-youtubeanalytics1" as youtubeanalytics1;
-/// use youtubeanalytics1::Result;
+/// use youtubeanalytics1::{Result, Error};
 /// # #[test] fn egal() {
 /// use std::default::Default;
 /// use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -291,15 +298,17 @@ impl Default for Scope {
 ///              .doit();
 /// 
 /// match result {
-///     Result::HttpError(err) => println!("HTTPERROR: {:?}", err),
-///     Result::MissingAPIKey => println!("Auth: Missing API Key - used if there are no scopes"),
-///     Result::MissingToken => println!("OAuth2: Missing Token"),
-///     Result::Cancelled => println!("Operation cancelled by user"),
-///     Result::UploadSizeLimitExceeded(size, max_size) => println!("Upload size too big: {} of {}", size, max_size),
-///     Result::Failure(_) => println!("General Failure (hyper::client::Response doesn't print)"),
-///     Result::FieldClash(clashed_field) => println!("You added custom parameter which is part of builder: {:?}", clashed_field),
-///     Result::JsonDecodeError(err) => println!("Couldn't understand server reply - maybe API needs update: {:?}", err),
-///     Result::Success(_) => println!("Success (value doesn't print)"),
+///     Err(e) => match e {
+///         Error::HttpError(err) => println!("HTTPERROR: {:?}", err),
+///         Error::MissingAPIKey => println!("Auth: Missing API Key - used if there are no scopes"),
+///         Error::MissingToken => println!("OAuth2: Missing Token"),
+///         Error::Cancelled => println!("Operation canceled by user"),
+///         Error::UploadSizeLimitExceeded(size, max_size) => println!("Upload size too big: {} of {}", size, max_size),
+///         Error::Failure(_) => println!("General Failure (hyper::client::Response doesn't print)"),
+///         Error::FieldClash(clashed_field) => println!("You added custom parameter which is part of builder: {:?}", clashed_field),
+///         Error::JsonDecodeError(err) => println!("Couldn't understand server reply - maybe API needs update: {:?}", err),
+///     },
+///     Ok(_) => println!("Success (value doesn't print)"),
 /// }
 /// # }
 /// ```
@@ -320,7 +329,7 @@ impl<'a, C, NC, A> YouTubeAnalytics<C, NC, A>
         YouTubeAnalytics {
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/0.1.1".to_string(),
+            _user_agent: "google-api-rust-client/0.1.2".to_string(),
             _m: PhantomData
         }
     }
@@ -342,7 +351,7 @@ impl<'a, C, NC, A> YouTubeAnalytics<C, NC, A>
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/0.1.1`.
+    /// It defaults to `google-api-rust-client/0.1.2`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -367,9 +376,9 @@ impl<'a, C, NC, A> YouTubeAnalytics<C, NC, A>
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct BatchReportDefinitionList {
-    /// A list of batchReportDefinition resources that match the request criteria.    
+    /// A list of batchReportDefinition resources that match the request criteria.
     pub items: Vec<BatchReportDefinition>,
-    /// This value specifies the type of data included in the API response. For the list method, the kind property value is youtubeAnalytics#batchReportDefinitionList.    
+    /// This value specifies the type of data included in the API response. For the list method, the kind property value is youtubeAnalytics#batchReportDefinitionList.
     pub kind: String,
 }
 
@@ -390,16 +399,16 @@ impl ResponseResult for BatchReportDefinitionList {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Group {
-    /// no description provided    
+    /// no description provided
     pub snippet: Option<GroupSnippet>,
-    /// no description provided    
+    /// no description provided
     #[serde(alias="contentDetails")]
     pub content_details: Option<GroupContentDetails>,
-    /// no description provided    
+    /// no description provided
     pub kind: Option<String>,
-    /// no description provided    
+    /// no description provided
     pub etag: Option<String>,
-    /// no description provided    
+    /// no description provided
     pub id: Option<String>,
 }
 
@@ -414,10 +423,10 @@ impl ResponseResult for Group {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GroupContentDetails {
-    /// no description provided    
+    /// no description provided
     #[serde(alias="itemCount")]
     pub item_count: i64,
-    /// no description provided    
+    /// no description provided
     #[serde(alias="itemType")]
     pub item_type: String,
 }
@@ -437,11 +446,11 @@ impl Part for GroupContentDetails {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct GroupListResponse {
-    /// no description provided    
+    /// no description provided
     pub items: Vec<Group>,
-    /// no description provided    
+    /// no description provided
     pub kind: String,
-    /// no description provided    
+    /// no description provided
     pub etag: String,
 }
 
@@ -454,13 +463,13 @@ impl ResponseResult for GroupListResponse {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct ResultTableColumnHeaders {
-    /// The type of the data in the column (STRING, INTEGER, FLOAT, etc.).    
+    /// The type of the data in the column (STRING, INTEGER, FLOAT, etc.).
     #[serde(alias="dataType")]
     pub data_type: String,
-    /// The type of the column (DIMENSION or METRIC).    
+    /// The type of the column (DIMENSION or METRIC).
     #[serde(alias="columnType")]
     pub column_type: String,
-    /// The name of the dimension or metric.    
+    /// The name of the dimension or metric.
     pub name: String,
 }
 
@@ -479,11 +488,11 @@ impl Part for ResultTableColumnHeaders {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct GroupItemListResponse {
-    /// no description provided    
+    /// no description provided
     pub items: Vec<GroupItem>,
-    /// no description provided    
+    /// no description provided
     pub kind: String,
-    /// no description provided    
+    /// no description provided
     pub etag: String,
 }
 
@@ -496,13 +505,13 @@ impl ResponseResult for GroupItemListResponse {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct BatchReportOutputs {
-    /// Cloud storage URL to download this report. This URL is valid for 30 minutes.    
+    /// Cloud storage URL to download this report. This URL is valid for 30 minutes.
     #[serde(alias="downloadUrl")]
     pub download_url: String,
-    /// Type of the output.    
+    /// Type of the output.
     #[serde(alias="type")]
     pub type_: String,
-    /// Format of the output.    
+    /// Format of the output.
     pub format: String,
 }
 
@@ -516,10 +525,10 @@ impl Part for BatchReportOutputs {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GroupSnippet {
-    /// no description provided    
+    /// no description provided
     #[serde(alias="publishedAt")]
     pub published_at: String,
-    /// no description provided    
+    /// no description provided
     pub title: String,
 }
 
@@ -540,16 +549,16 @@ impl Part for GroupSnippet {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GroupItem {
-    /// no description provided    
+    /// no description provided
     pub kind: Option<String>,
-    /// no description provided    
+    /// no description provided
     pub etag: Option<String>,
-    /// no description provided    
+    /// no description provided
     pub resource: Option<GroupItemResource>,
-    /// no description provided    
+    /// no description provided
     #[serde(alias="groupId")]
     pub group_id: Option<String>,
-    /// no description provided    
+    /// no description provided
     pub id: Option<String>,
 }
 
@@ -564,9 +573,9 @@ impl ResponseResult for GroupItem {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GroupItemResource {
-    /// no description provided    
+    /// no description provided
     pub kind: String,
-    /// no description provided    
+    /// no description provided
     pub id: String,
 }
 
@@ -585,16 +594,16 @@ impl Part for GroupItemResource {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct BatchReportDefinition {
-    /// Status of the report definition.    
+    /// Status of the report definition.
     pub status: Option<String>,
-    /// This value specifies the type of data of this item. For batch report definition the kind property value is youtubeAnalytics#batchReportDefinition.    
+    /// This value specifies the type of data of this item. For batch report definition the kind property value is youtubeAnalytics#batchReportDefinition.
     pub kind: Option<String>,
-    /// Type of the report definition.    
+    /// Type of the report definition.
     #[serde(alias="type")]
     pub type_: Option<String>,
-    /// The ID that YouTube assigns and uses to uniquely identify the report definition.    
+    /// The ID that YouTube assigns and uses to uniquely identify the report definition.
     pub id: Option<String>,
-    /// Name of the report definition.    
+    /// Name of the report definition.
     pub name: Option<String>,
 }
 
@@ -612,11 +621,11 @@ impl Resource for BatchReportDefinition {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct ResultTable {
-    /// This value specifies the type of data included in the API response. For the query method, the kind property value will be youtubeAnalytics#resultTable.    
+    /// This value specifies the type of data included in the API response. For the query method, the kind property value will be youtubeAnalytics#resultTable.
     pub kind: String,
-    /// The list contains all rows of the result table. Each item in the list is an array that contains comma-delimited data corresponding to a single row of data. The order of the comma-delimited data fields will match the order of the columns listed in the columnHeaders field. If no data is available for the given query, the rows element will be omitted from the response. The response for a query with the day dimension will not contain rows for the most recent days.    
+    /// The list contains all rows of the result table. Each item in the list is an array that contains comma-delimited data corresponding to a single row of data. The order of the comma-delimited data fields will match the order of the columns listed in the columnHeaders field. If no data is available for the given query, the rows element will be omitted from the response. The response for a query with the day dimension will not contain rows for the most recent days.
     pub rows: Vec<Vec<String>>,
-    /// This value specifies information about the data returned in the rows fields. Each item in the columnHeaders list identifies a field returned in the rows value, which contains a list of comma-delimited data. The columnHeaders list will begin with the dimensions specified in the API request, which will be followed by the metrics specified in the API request. The order of both dimensions and metrics will match the ordering in the API request. For example, if the API request contains the parameters dimensions=ageGroup,gender&metrics=viewerPercentage, the API response will return columns in this order: ageGroup,gender,viewerPercentage.    
+    /// This value specifies information about the data returned in the rows fields. Each item in the columnHeaders list identifies a field returned in the rows value, which contains a list of comma-delimited data. The columnHeaders list will begin with the dimensions specified in the API request, which will be followed by the metrics specified in the API request. The order of both dimensions and metrics will match the ordering in the API request. For example, if the API request contains the parameters dimensions=ageGroup,gender&metrics=viewerPercentage, the API response will return columns in this order: ageGroup,gender,viewerPercentage.
     #[serde(alias="columnHeaders")]
     pub column_headers: Vec<ResultTableColumnHeaders>,
 }
@@ -635,20 +644,20 @@ impl ResponseResult for ResultTable {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct BatchReport {
-    /// This value specifies the type of data of this item. For batch report the kind property value is youtubeAnalytics#batchReport.    
+    /// This value specifies the type of data of this item. For batch report the kind property value is youtubeAnalytics#batchReport.
     pub kind: Option<String>,
-    /// The ID of the the report definition.    
+    /// The ID of the the report definition.
     #[serde(alias="reportId")]
     pub report_id: Option<String>,
-    /// Period included in the report. For reports containing all entities endTime is not set. Both startTime and endTime are inclusive.    
+    /// Period included in the report. For reports containing all entities endTime is not set. Both startTime and endTime are inclusive.
     #[serde(alias="timeSpan")]
     pub time_span: Option<BatchReportTimeSpan>,
-    /// Report outputs.    
+    /// Report outputs.
     pub outputs: Option<Vec<BatchReportOutputs>>,
-    /// The time when the report was updated.    
+    /// The time when the report was updated.
     #[serde(alias="timeUpdated")]
     pub time_updated: Option<String>,
-    /// The ID that YouTube assigns and uses to uniquely identify the report.    
+    /// The ID that YouTube assigns and uses to uniquely identify the report.
     pub id: Option<String>,
 }
 
@@ -661,10 +670,10 @@ impl Resource for BatchReport {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct BatchReportTimeSpan {
-    /// End of the period included in the report. Inclusive. For reports containing all entities endTime is not set.    
+    /// End of the period included in the report. Inclusive. For reports containing all entities endTime is not set.
     #[serde(alias="endTime")]
     pub end_time: String,
-    /// Start of the period included in the report. Inclusive.    
+    /// Start of the period included in the report. Inclusive.
     #[serde(alias="startTime")]
     pub start_time: String,
 }
@@ -684,9 +693,9 @@ impl Part for BatchReportTimeSpan {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct BatchReportList {
-    /// A list of batchReport resources that match the request criteria.    
+    /// A list of batchReport resources that match the request criteria.
     pub items: Vec<BatchReport>,
-    /// This value specifies the type of data included in the API response. For the list method, the kind property value is youtubeAnalytics#batchReportList.    
+    /// This value specifies the type of data included in the API response. For the list method, the kind property value is youtubeAnalytics#batchReportList.
     pub kind: String,
 }
 
@@ -732,13 +741,22 @@ pub struct ReportMethods<'a, C, NC, A>
     hub: &'a YouTubeAnalytics<C, NC, A>,
 }
 
-impl<'a, C, NC, A> ResourceMethodsBuilder for ReportMethods<'a, C, NC, A> {}
+impl<'a, C, NC, A> MethodsBuilder for ReportMethods<'a, C, NC, A> {}
 
 impl<'a, C, NC, A> ReportMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Retrieve your YouTube Analytics reports.    
+    /// Retrieve your YouTube Analytics reports.
+    /// 
+    /// # Arguments
+    ///
+    /// * `ids` - Identifies the YouTube channel or content owner for which you are retrieving YouTube Analytics data.
+    ///           - To request data for a YouTube user, set the ids parameter value to channel==CHANNEL_ID, where CHANNEL_ID specifies the unique YouTube channel ID.
+    ///           - To request data for a YouTube CMS content owner, set the ids parameter value to contentOwner==OWNER_NAME, where OWNER_NAME is the CMS name of the content owner.
+    /// * `start-date` - The start date for fetching YouTube Analytics data. The value should be in YYYY-MM-DD format.
+    /// * `end-date` - The end date for fetching YouTube Analytics data. The value should be in YYYY-MM-DD format.
+    /// * `metrics` - A comma-separated list of YouTube Analytics metrics, such as views or likes,dislikes. See the Available Reports document for a list of the reports that you can retrieve and the metrics available in each report, and see the Metrics document for definitions of those metrics.
     pub fn query(&self, ids: &str, start_date: &str, end_date: &str, metrics: &str) -> ReportQueryCall<'a, C, NC, A> {
         ReportQueryCall {
             hub: self.hub,
@@ -795,13 +813,17 @@ pub struct BatchReportDefinitionMethods<'a, C, NC, A>
     hub: &'a YouTubeAnalytics<C, NC, A>,
 }
 
-impl<'a, C, NC, A> ResourceMethodsBuilder for BatchReportDefinitionMethods<'a, C, NC, A> {}
+impl<'a, C, NC, A> MethodsBuilder for BatchReportDefinitionMethods<'a, C, NC, A> {}
 
 impl<'a, C, NC, A> BatchReportDefinitionMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Retrieves a list of available batch report definitions.    
+    /// Retrieves a list of available batch report definitions.
+    /// 
+    /// # Arguments
+    ///
+    /// * `onBehalfOfContentOwner` - The onBehalfOfContentOwner parameter identifies the content owner that the user is acting on behalf of.
     pub fn list(&self, on_behalf_of_content_owner: &str) -> BatchReportDefinitionListCall<'a, C, NC, A> {
         BatchReportDefinitionListCall {
             hub: self.hub,
@@ -849,13 +871,17 @@ pub struct GroupItemMethods<'a, C, NC, A>
     hub: &'a YouTubeAnalytics<C, NC, A>,
 }
 
-impl<'a, C, NC, A> ResourceMethodsBuilder for GroupItemMethods<'a, C, NC, A> {}
+impl<'a, C, NC, A> MethodsBuilder for GroupItemMethods<'a, C, NC, A> {}
 
 impl<'a, C, NC, A> GroupItemMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Creates a group item.    
+    /// Creates a group item.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
     pub fn insert(&self, request: &GroupItem) -> GroupItemInsertCall<'a, C, NC, A> {
         GroupItemInsertCall {
             hub: self.hub,
@@ -869,7 +895,11 @@ impl<'a, C, NC, A> GroupItemMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Returns a collection of group items that match the API request parameters.    
+    /// Returns a collection of group items that match the API request parameters.
+    /// 
+    /// # Arguments
+    ///
+    /// * `groupId` - The id parameter specifies the unique ID of the group for which you want to retrieve group items.
     pub fn list(&self, group_id: &str) -> GroupItemListCall<'a, C, NC, A> {
         GroupItemListCall {
             hub: self.hub,
@@ -883,7 +913,11 @@ impl<'a, C, NC, A> GroupItemMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Removes an item from a group.    
+    /// Removes an item from a group.
+    /// 
+    /// # Arguments
+    ///
+    /// * `id` - The id parameter specifies the YouTube group item ID for the group that is being deleted.
     pub fn delete(&self, id: &str) -> GroupItemDeleteCall<'a, C, NC, A> {
         GroupItemDeleteCall {
             hub: self.hub,
@@ -932,13 +966,17 @@ pub struct GroupMethods<'a, C, NC, A>
     hub: &'a YouTubeAnalytics<C, NC, A>,
 }
 
-impl<'a, C, NC, A> ResourceMethodsBuilder for GroupMethods<'a, C, NC, A> {}
+impl<'a, C, NC, A> MethodsBuilder for GroupMethods<'a, C, NC, A> {}
 
 impl<'a, C, NC, A> GroupMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Deletes a group.    
+    /// Deletes a group.
+    /// 
+    /// # Arguments
+    ///
+    /// * `id` - The id parameter specifies the YouTube group ID for the group that is being deleted.
     pub fn delete(&self, id: &str) -> GroupDeleteCall<'a, C, NC, A> {
         GroupDeleteCall {
             hub: self.hub,
@@ -952,7 +990,11 @@ impl<'a, C, NC, A> GroupMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Creates a group.    
+    /// Creates a group.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
     pub fn insert(&self, request: &Group) -> GroupInsertCall<'a, C, NC, A> {
         GroupInsertCall {
             hub: self.hub,
@@ -966,7 +1008,7 @@ impl<'a, C, NC, A> GroupMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Returns a collection of groups that match the API request parameters. For example, you can retrieve all groups that the authenticated user owns, or you can retrieve one or more groups by their unique IDs.    
+    /// Returns a collection of groups that match the API request parameters. For example, you can retrieve all groups that the authenticated user owns, or you can retrieve one or more groups by their unique IDs.
     pub fn list(&self) -> GroupListCall<'a, C, NC, A> {
         GroupListCall {
             hub: self.hub,
@@ -981,7 +1023,11 @@ impl<'a, C, NC, A> GroupMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Modifies a group. For example, you could change a group's title.    
+    /// Modifies a group. For example, you could change a group's title.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
     pub fn update(&self, request: &Group) -> GroupUpdateCall<'a, C, NC, A> {
         GroupUpdateCall {
             hub: self.hub,
@@ -1030,13 +1076,18 @@ pub struct BatchReportMethods<'a, C, NC, A>
     hub: &'a YouTubeAnalytics<C, NC, A>,
 }
 
-impl<'a, C, NC, A> ResourceMethodsBuilder for BatchReportMethods<'a, C, NC, A> {}
+impl<'a, C, NC, A> MethodsBuilder for BatchReportMethods<'a, C, NC, A> {}
 
 impl<'a, C, NC, A> BatchReportMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Retrieves a list of processed batch reports.    
+    /// Retrieves a list of processed batch reports.
+    /// 
+    /// # Arguments
+    ///
+    /// * `batchReportDefinitionId` - The batchReportDefinitionId parameter specifies the ID of the batch reportort definition for which you are retrieving reports.
+    /// * `onBehalfOfContentOwner` - The onBehalfOfContentOwner parameter identifies the content owner that the user is acting on behalf of.
     pub fn list(&self, batch_report_definition_id: &str, on_behalf_of_content_owner: &str) -> BatchReportListCall<'a, C, NC, A> {
         BatchReportListCall {
             hub: self.hub,
@@ -1060,7 +1111,7 @@ impl<'a, C, NC, A> BatchReportMethods<'a, C, NC, A> {
 /// Retrieve your YouTube Analytics reports.
 ///
 /// A builder for the *query* method supported by a *report* resource.
-/// It is not used directly, but through a `ReportMethods`.
+/// It is not used directly, but through a `ReportMethods` instance.
 ///
 /// # Example
 ///
@@ -1154,7 +1205,7 @@ impl<'a, C, NC, A> ReportQueryCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
         for &field in ["alt", "ids", "start-date", "end-date", "metrics", "start-index", "sort", "max-results", "filters", "dimensions", "currency"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -1183,7 +1234,7 @@ impl<'a, C, NC, A> ReportQueryCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -1195,7 +1246,6 @@ impl<'a, C, NC, A> ReportQueryCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -1205,7 +1255,7 @@ impl<'a, C, NC, A> ReportQueryCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -1216,7 +1266,7 @@ impl<'a, C, NC, A> ReportQueryCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -1225,13 +1275,13 @@ impl<'a, C, NC, A> ReportQueryCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -1255,7 +1305,7 @@ impl<'a, C, NC, A> ReportQueryCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The start date for fetching YouTube Analytics data. The value should be in YYYY-MM-DD format.    
+    /// The start date for fetching YouTube Analytics data. The value should be in YYYY-MM-DD format.
     pub fn start_date(mut self, new_value: &str) -> ReportQueryCall<'a, C, NC, A> {
         self._start_date = new_value.to_string();
         self
@@ -1265,7 +1315,7 @@ impl<'a, C, NC, A> ReportQueryCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The end date for fetching YouTube Analytics data. The value should be in YYYY-MM-DD format.    
+    /// The end date for fetching YouTube Analytics data. The value should be in YYYY-MM-DD format.
     pub fn end_date(mut self, new_value: &str) -> ReportQueryCall<'a, C, NC, A> {
         self._end_date = new_value.to_string();
         self
@@ -1275,7 +1325,7 @@ impl<'a, C, NC, A> ReportQueryCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// A comma-separated list of YouTube Analytics metrics, such as views or likes,dislikes. See the Available Reports document for a list of the reports that you can retrieve and the metrics available in each report, and see the Metrics document for definitions of those metrics.    
+    /// A comma-separated list of YouTube Analytics metrics, such as views or likes,dislikes. See the Available Reports document for a list of the reports that you can retrieve and the metrics available in each report, and see the Metrics document for definitions of those metrics.
     pub fn metrics(mut self, new_value: &str) -> ReportQueryCall<'a, C, NC, A> {
         self._metrics = new_value.to_string();
         self
@@ -1283,7 +1333,7 @@ impl<'a, C, NC, A> ReportQueryCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// Sets the *start-index* query property to the given value.
     ///
     /// 
-    /// An index of the first entity to retrieve. Use this parameter as a pagination mechanism along with the max-results parameter (one-based, inclusive).    
+    /// An index of the first entity to retrieve. Use this parameter as a pagination mechanism along with the max-results parameter (one-based, inclusive).
     pub fn start_index(mut self, new_value: i32) -> ReportQueryCall<'a, C, NC, A> {
         self._start_index = Some(new_value);
         self
@@ -1291,7 +1341,7 @@ impl<'a, C, NC, A> ReportQueryCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// Sets the *sort* query property to the given value.
     ///
     /// 
-    /// A comma-separated list of dimensions or metrics that determine the sort order for YouTube Analytics data. By default the sort order is ascending. The '-' prefix causes descending sort order.    
+    /// A comma-separated list of dimensions or metrics that determine the sort order for YouTube Analytics data. By default the sort order is ascending. The '-' prefix causes descending sort order.
     pub fn sort(mut self, new_value: &str) -> ReportQueryCall<'a, C, NC, A> {
         self._sort = Some(new_value.to_string());
         self
@@ -1299,7 +1349,7 @@ impl<'a, C, NC, A> ReportQueryCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// Sets the *max-results* query property to the given value.
     ///
     /// 
-    /// The maximum number of rows to include in the response.    
+    /// The maximum number of rows to include in the response.
     pub fn max_results(mut self, new_value: i32) -> ReportQueryCall<'a, C, NC, A> {
         self._max_results = Some(new_value);
         self
@@ -1307,7 +1357,7 @@ impl<'a, C, NC, A> ReportQueryCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// Sets the *filters* query property to the given value.
     ///
     /// 
-    /// A list of filters that should be applied when retrieving YouTube Analytics data. The Available Reports document identifies the dimensions that can be used to filter each report, and the Dimensions document defines those dimensions. If a request uses multiple filters, join them together with a semicolon (;), and the returned result table will satisfy both filters. For example, a filters parameter value of video==dMH0bHeiRNg;country==IT restricts the result set to include data for the given video in Italy.    
+    /// A list of filters that should be applied when retrieving YouTube Analytics data. The Available Reports document identifies the dimensions that can be used to filter each report, and the Dimensions document defines those dimensions. If a request uses multiple filters, join them together with a semicolon (;), and the returned result table will satisfy both filters. For example, a filters parameter value of video==dMH0bHeiRNg;country==IT restricts the result set to include data for the given video in Italy.
     pub fn filters(mut self, new_value: &str) -> ReportQueryCall<'a, C, NC, A> {
         self._filters = Some(new_value.to_string());
         self
@@ -1315,7 +1365,7 @@ impl<'a, C, NC, A> ReportQueryCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// Sets the *dimensions* query property to the given value.
     ///
     /// 
-    /// A comma-separated list of YouTube Analytics dimensions, such as views or ageGroup,gender. See the Available Reports document for a list of the reports that you can retrieve and the dimensions used for those reports. Also see the Dimensions document for definitions of those dimensions.    
+    /// A comma-separated list of YouTube Analytics dimensions, such as views or ageGroup,gender. See the Available Reports document for a list of the reports that you can retrieve and the dimensions used for those reports. Also see the Dimensions document for definitions of those dimensions.
     pub fn dimensions(mut self, new_value: &str) -> ReportQueryCall<'a, C, NC, A> {
         self._dimensions = Some(new_value.to_string());
         self
@@ -1323,7 +1373,7 @@ impl<'a, C, NC, A> ReportQueryCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// Sets the *currency* query property to the given value.
     ///
     /// 
-    /// The currency to which financial metrics should be converted. The default is US Dollar (USD). If the result contains no financial metrics, this flag will be ignored. Responds with an error if the specified currency is not recognized.    
+    /// The currency to which financial metrics should be converted. The default is US Dollar (USD). If the result contains no financial metrics, this flag will be ignored. Responds with an error if the specified currency is not recognized.
     pub fn currency(mut self, new_value: &str) -> ReportQueryCall<'a, C, NC, A> {
         self._currency = Some(new_value.to_string());
         self
@@ -1384,7 +1434,7 @@ impl<'a, C, NC, A> ReportQueryCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
 /// Retrieves a list of available batch report definitions.
 ///
 /// A builder for the *list* method supported by a *batchReportDefinition* resource.
-/// It is not used directly, but through a `BatchReportDefinitionMethods`.
+/// It is not used directly, but through a `BatchReportDefinitionMethods` instance.
 ///
 /// # Example
 ///
@@ -1442,7 +1492,7 @@ impl<'a, C, NC, A> BatchReportDefinitionListCall<'a, C, NC, A> where NC: hyper::
         for &field in ["alt", "onBehalfOfContentOwner"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -1471,7 +1521,7 @@ impl<'a, C, NC, A> BatchReportDefinitionListCall<'a, C, NC, A> where NC: hyper::
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -1483,7 +1533,6 @@ impl<'a, C, NC, A> BatchReportDefinitionListCall<'a, C, NC, A> where NC: hyper::
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -1493,7 +1542,7 @@ impl<'a, C, NC, A> BatchReportDefinitionListCall<'a, C, NC, A> where NC: hyper::
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -1504,7 +1553,7 @@ impl<'a, C, NC, A> BatchReportDefinitionListCall<'a, C, NC, A> where NC: hyper::
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -1513,13 +1562,13 @@ impl<'a, C, NC, A> BatchReportDefinitionListCall<'a, C, NC, A> where NC: hyper::
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -1531,7 +1580,7 @@ impl<'a, C, NC, A> BatchReportDefinitionListCall<'a, C, NC, A> where NC: hyper::
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The onBehalfOfContentOwner parameter identifies the content owner that the user is acting on behalf of.    
+    /// The onBehalfOfContentOwner parameter identifies the content owner that the user is acting on behalf of.
     pub fn on_behalf_of_content_owner(mut self, new_value: &str) -> BatchReportDefinitionListCall<'a, C, NC, A> {
         self._on_behalf_of_content_owner = new_value.to_string();
         self
@@ -1592,7 +1641,7 @@ impl<'a, C, NC, A> BatchReportDefinitionListCall<'a, C, NC, A> where NC: hyper::
 /// Creates a group item.
 ///
 /// A builder for the *insert* method supported by a *groupItem* resource.
-/// It is not used directly, but through a `GroupItemMethods`.
+/// It is not used directly, but through a `GroupItemMethods` instance.
 ///
 /// # Example
 ///
@@ -1660,7 +1709,7 @@ impl<'a, C, NC, A> GroupItemInsertCall<'a, C, NC, A> where NC: hyper::net::Netwo
         for &field in ["alt", "onBehalfOfContentOwner"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -1693,7 +1742,7 @@ impl<'a, C, NC, A> GroupItemInsertCall<'a, C, NC, A> where NC: hyper::net::Netwo
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -1709,7 +1758,6 @@ impl<'a, C, NC, A> GroupItemInsertCall<'a, C, NC, A> where NC: hyper::net::Netwo
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -1719,7 +1767,7 @@ impl<'a, C, NC, A> GroupItemInsertCall<'a, C, NC, A> where NC: hyper::net::Netwo
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -1730,7 +1778,7 @@ impl<'a, C, NC, A> GroupItemInsertCall<'a, C, NC, A> where NC: hyper::net::Netwo
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -1739,13 +1787,13 @@ impl<'a, C, NC, A> GroupItemInsertCall<'a, C, NC, A> where NC: hyper::net::Netwo
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -1827,7 +1875,7 @@ impl<'a, C, NC, A> GroupItemInsertCall<'a, C, NC, A> where NC: hyper::net::Netwo
 /// Returns a collection of group items that match the API request parameters.
 ///
 /// A builder for the *list* method supported by a *groupItem* resource.
-/// It is not used directly, but through a `GroupItemMethods`.
+/// It is not used directly, but through a `GroupItemMethods` instance.
 ///
 /// # Example
 ///
@@ -1890,7 +1938,7 @@ impl<'a, C, NC, A> GroupItemListCall<'a, C, NC, A> where NC: hyper::net::Network
         for &field in ["alt", "groupId", "onBehalfOfContentOwner"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -1919,7 +1967,7 @@ impl<'a, C, NC, A> GroupItemListCall<'a, C, NC, A> where NC: hyper::net::Network
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -1931,7 +1979,6 @@ impl<'a, C, NC, A> GroupItemListCall<'a, C, NC, A> where NC: hyper::net::Network
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -1941,7 +1988,7 @@ impl<'a, C, NC, A> GroupItemListCall<'a, C, NC, A> where NC: hyper::net::Network
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -1952,7 +1999,7 @@ impl<'a, C, NC, A> GroupItemListCall<'a, C, NC, A> where NC: hyper::net::Network
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -1961,13 +2008,13 @@ impl<'a, C, NC, A> GroupItemListCall<'a, C, NC, A> where NC: hyper::net::Network
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -1979,7 +2026,7 @@ impl<'a, C, NC, A> GroupItemListCall<'a, C, NC, A> where NC: hyper::net::Network
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The id parameter specifies the unique ID of the group for which you want to retrieve group items.    
+    /// The id parameter specifies the unique ID of the group for which you want to retrieve group items.
     pub fn group_id(mut self, new_value: &str) -> GroupItemListCall<'a, C, NC, A> {
         self._group_id = new_value.to_string();
         self
@@ -2050,7 +2097,7 @@ impl<'a, C, NC, A> GroupItemListCall<'a, C, NC, A> where NC: hyper::net::Network
 /// Removes an item from a group.
 ///
 /// A builder for the *delete* method supported by a *groupItem* resource.
-/// It is not used directly, but through a `GroupItemMethods`.
+/// It is not used directly, but through a `GroupItemMethods` instance.
 ///
 /// # Example
 ///
@@ -2113,7 +2160,7 @@ impl<'a, C, NC, A> GroupItemDeleteCall<'a, C, NC, A> where NC: hyper::net::Netwo
         for &field in ["id", "onBehalfOfContentOwner"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -2141,7 +2188,7 @@ impl<'a, C, NC, A> GroupItemDeleteCall<'a, C, NC, A> where NC: hyper::net::Netwo
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -2153,7 +2200,6 @@ impl<'a, C, NC, A> GroupItemDeleteCall<'a, C, NC, A> where NC: hyper::net::Netwo
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -2163,7 +2209,7 @@ impl<'a, C, NC, A> GroupItemDeleteCall<'a, C, NC, A> where NC: hyper::net::Netwo
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -2174,12 +2220,12 @@ impl<'a, C, NC, A> GroupItemDeleteCall<'a, C, NC, A> where NC: hyper::net::Netwo
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = res;
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -2191,7 +2237,7 @@ impl<'a, C, NC, A> GroupItemDeleteCall<'a, C, NC, A> where NC: hyper::net::Netwo
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The id parameter specifies the YouTube group item ID for the group that is being deleted.    
+    /// The id parameter specifies the YouTube group item ID for the group that is being deleted.
     pub fn id(mut self, new_value: &str) -> GroupItemDeleteCall<'a, C, NC, A> {
         self._id = new_value.to_string();
         self
@@ -2262,7 +2308,7 @@ impl<'a, C, NC, A> GroupItemDeleteCall<'a, C, NC, A> where NC: hyper::net::Netwo
 /// Deletes a group.
 ///
 /// A builder for the *delete* method supported by a *group* resource.
-/// It is not used directly, but through a `GroupMethods`.
+/// It is not used directly, but through a `GroupMethods` instance.
 ///
 /// # Example
 ///
@@ -2325,7 +2371,7 @@ impl<'a, C, NC, A> GroupDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
         for &field in ["id", "onBehalfOfContentOwner"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -2353,7 +2399,7 @@ impl<'a, C, NC, A> GroupDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -2365,7 +2411,6 @@ impl<'a, C, NC, A> GroupDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -2375,7 +2420,7 @@ impl<'a, C, NC, A> GroupDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -2386,12 +2431,12 @@ impl<'a, C, NC, A> GroupDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = res;
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -2403,7 +2448,7 @@ impl<'a, C, NC, A> GroupDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The id parameter specifies the YouTube group ID for the group that is being deleted.    
+    /// The id parameter specifies the YouTube group ID for the group that is being deleted.
     pub fn id(mut self, new_value: &str) -> GroupDeleteCall<'a, C, NC, A> {
         self._id = new_value.to_string();
         self
@@ -2474,7 +2519,7 @@ impl<'a, C, NC, A> GroupDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
 /// Creates a group.
 ///
 /// A builder for the *insert* method supported by a *group* resource.
-/// It is not used directly, but through a `GroupMethods`.
+/// It is not used directly, but through a `GroupMethods` instance.
 ///
 /// # Example
 ///
@@ -2542,7 +2587,7 @@ impl<'a, C, NC, A> GroupInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
         for &field in ["alt", "onBehalfOfContentOwner"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -2575,7 +2620,7 @@ impl<'a, C, NC, A> GroupInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -2591,7 +2636,6 @@ impl<'a, C, NC, A> GroupInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -2601,7 +2645,7 @@ impl<'a, C, NC, A> GroupInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -2612,7 +2656,7 @@ impl<'a, C, NC, A> GroupInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -2621,13 +2665,13 @@ impl<'a, C, NC, A> GroupInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -2709,7 +2753,7 @@ impl<'a, C, NC, A> GroupInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
 /// Returns a collection of groups that match the API request parameters. For example, you can retrieve all groups that the authenticated user owns, or you can retrieve one or more groups by their unique IDs.
 ///
 /// A builder for the *list* method supported by a *group* resource.
-/// It is not used directly, but through a `GroupMethods`.
+/// It is not used directly, but through a `GroupMethods` instance.
 ///
 /// # Example
 ///
@@ -2780,7 +2824,7 @@ impl<'a, C, NC, A> GroupListCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
         for &field in ["alt", "onBehalfOfContentOwner", "mine", "id"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -2809,7 +2853,7 @@ impl<'a, C, NC, A> GroupListCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -2821,7 +2865,6 @@ impl<'a, C, NC, A> GroupListCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -2831,7 +2874,7 @@ impl<'a, C, NC, A> GroupListCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -2842,7 +2885,7 @@ impl<'a, C, NC, A> GroupListCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -2851,13 +2894,13 @@ impl<'a, C, NC, A> GroupListCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -2877,7 +2920,7 @@ impl<'a, C, NC, A> GroupListCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     /// Sets the *mine* query property to the given value.
     ///
     /// 
-    /// Set this parameter's value to true to instruct the API to only return groups owned by the authenticated user.    
+    /// Set this parameter's value to true to instruct the API to only return groups owned by the authenticated user.
     pub fn mine(mut self, new_value: bool) -> GroupListCall<'a, C, NC, A> {
         self._mine = Some(new_value);
         self
@@ -2885,7 +2928,7 @@ impl<'a, C, NC, A> GroupListCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     /// Sets the *id* query property to the given value.
     ///
     /// 
-    /// The id parameter specifies a comma-separated list of the YouTube group ID(s) for the resource(s) that are being retrieved. In a group resource, the id property specifies the group's YouTube group ID.    
+    /// The id parameter specifies a comma-separated list of the YouTube group ID(s) for the resource(s) that are being retrieved. In a group resource, the id property specifies the group's YouTube group ID.
     pub fn id(mut self, new_value: &str) -> GroupListCall<'a, C, NC, A> {
         self._id = Some(new_value.to_string());
         self
@@ -2946,7 +2989,7 @@ impl<'a, C, NC, A> GroupListCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
 /// Modifies a group. For example, you could change a group's title.
 ///
 /// A builder for the *update* method supported by a *group* resource.
-/// It is not used directly, but through a `GroupMethods`.
+/// It is not used directly, but through a `GroupMethods` instance.
 ///
 /// # Example
 ///
@@ -3014,7 +3057,7 @@ impl<'a, C, NC, A> GroupUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
         for &field in ["alt", "onBehalfOfContentOwner"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -3047,7 +3090,7 @@ impl<'a, C, NC, A> GroupUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -3063,7 +3106,6 @@ impl<'a, C, NC, A> GroupUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -3073,7 +3115,7 @@ impl<'a, C, NC, A> GroupUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -3084,7 +3126,7 @@ impl<'a, C, NC, A> GroupUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -3093,13 +3135,13 @@ impl<'a, C, NC, A> GroupUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -3181,7 +3223,7 @@ impl<'a, C, NC, A> GroupUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
 /// Retrieves a list of processed batch reports.
 ///
 /// A builder for the *list* method supported by a *batchReport* resource.
-/// It is not used directly, but through a `BatchReportMethods`.
+/// It is not used directly, but through a `BatchReportMethods` instance.
 ///
 /// # Example
 ///
@@ -3241,7 +3283,7 @@ impl<'a, C, NC, A> BatchReportListCall<'a, C, NC, A> where NC: hyper::net::Netwo
         for &field in ["alt", "batchReportDefinitionId", "onBehalfOfContentOwner"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -3270,7 +3312,7 @@ impl<'a, C, NC, A> BatchReportListCall<'a, C, NC, A> where NC: hyper::net::Netwo
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -3282,7 +3324,6 @@ impl<'a, C, NC, A> BatchReportListCall<'a, C, NC, A> where NC: hyper::net::Netwo
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -3292,7 +3333,7 @@ impl<'a, C, NC, A> BatchReportListCall<'a, C, NC, A> where NC: hyper::net::Netwo
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -3303,7 +3344,7 @@ impl<'a, C, NC, A> BatchReportListCall<'a, C, NC, A> where NC: hyper::net::Netwo
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -3312,13 +3353,13 @@ impl<'a, C, NC, A> BatchReportListCall<'a, C, NC, A> where NC: hyper::net::Netwo
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -3330,7 +3371,7 @@ impl<'a, C, NC, A> BatchReportListCall<'a, C, NC, A> where NC: hyper::net::Netwo
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The batchReportDefinitionId parameter specifies the ID of the batch reportort definition for which you are retrieving reports.    
+    /// The batchReportDefinitionId parameter specifies the ID of the batch reportort definition for which you are retrieving reports.
     pub fn batch_report_definition_id(mut self, new_value: &str) -> BatchReportListCall<'a, C, NC, A> {
         self._batch_report_definition_id = new_value.to_string();
         self
@@ -3340,7 +3381,7 @@ impl<'a, C, NC, A> BatchReportListCall<'a, C, NC, A> where NC: hyper::net::Netwo
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The onBehalfOfContentOwner parameter identifies the content owner that the user is acting on behalf of.    
+    /// The onBehalfOfContentOwner parameter identifies the content owner that the user is acting on behalf of.
     pub fn on_behalf_of_content_owner(mut self, new_value: &str) -> BatchReportListCall<'a, C, NC, A> {
         self._on_behalf_of_content_owner = new_value.to_string();
         self

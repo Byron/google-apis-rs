@@ -1,8 +1,8 @@
 // DO NOT EDIT !
-// This file was generated automatically from 'src/mako/lib.rs.mako'
+// This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *SQL Admin* crate version *0.1.1+20150109*, where *20150109* is the exact revision of the *sqladmin:v1beta4* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.1*.
+//! This documentation was generated from *SQL Admin* crate version *0.1.2+20150109*, where *20150109* is the exact revision of the *sqladmin:v1beta4* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.2*.
 //! 
 //! Everything else about the *SQL Admin* *v1_beta4* API can be found at the
 //! [official documentation site](https://developers.google.com/cloud-sql/docs/admin-api/).
@@ -39,6 +39,8 @@
 //! 
 //! * **[Hub](struct.SQLAdmin.html)**
 //!     * a central object to maintain state and allow accessing all *Activities*
+//!     * creates [*Method Builders*](trait.MethodsBuilder.html) which in turn
+//!       allow access to individual [*Call Builders*](trait.CallBuilder.html)
 //! * **[Resources](trait.Resource.html)**
 //!     * primary types that you can apply *Activities* to
 //!     * a collection of properties and *Parts*
@@ -47,6 +49,8 @@
 //!         * never directly used in *Activities*
 //! * **[Activities](trait.CallBuilder.html)**
 //!     * operations to apply to *Resources*
+//! 
+//! All *structures* are marked with applicable traits to further categorize them and ease browsing.
 //! 
 //! Generally speaking, you can invoke *Activities* like this:
 //! 
@@ -105,7 +109,7 @@
 //! extern crate "yup-oauth2" as oauth2;
 //! extern crate "google-sqladmin1_beta4" as sqladmin1_beta4;
 //! use sqladmin1_beta4::User;
-//! use sqladmin1_beta4::Result;
+//! use sqladmin1_beta4::{Result, Error};
 //! # #[test] fn egal() {
 //! use std::default::Default;
 //! use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -135,15 +139,17 @@
 //!              .doit();
 //! 
 //! match result {
-//!     Result::HttpError(err) => println!("HTTPERROR: {:?}", err),
-//!     Result::MissingAPIKey => println!("Auth: Missing API Key - used if there are no scopes"),
-//!     Result::MissingToken => println!("OAuth2: Missing Token"),
-//!     Result::Cancelled => println!("Operation cancelled by user"),
-//!     Result::UploadSizeLimitExceeded(size, max_size) => println!("Upload size too big: {} of {}", size, max_size),
-//!     Result::Failure(_) => println!("General Failure (hyper::client::Response doesn't print)"),
-//!     Result::FieldClash(clashed_field) => println!("You added custom parameter which is part of builder: {:?}", clashed_field),
-//!     Result::JsonDecodeError(err) => println!("Couldn't understand server reply - maybe API needs update: {:?}", err),
-//!     Result::Success(_) => println!("Success (value doesn't print)"),
+//!     Err(e) => match e {
+//!         Error::HttpError(err) => println!("HTTPERROR: {:?}", err),
+//!         Error::MissingAPIKey => println!("Auth: Missing API Key - used if there are no scopes"),
+//!         Error::MissingToken => println!("OAuth2: Missing Token"),
+//!         Error::Cancelled => println!("Operation canceled by user"),
+//!         Error::UploadSizeLimitExceeded(size, max_size) => println!("Upload size too big: {} of {}", size, max_size),
+//!         Error::Failure(_) => println!("General Failure (hyper::client::Response doesn't print)"),
+//!         Error::FieldClash(clashed_field) => println!("You added custom parameter which is part of builder: {:?}", clashed_field),
+//!         Error::JsonDecodeError(err) => println!("Couldn't understand server reply - maybe API needs update: {:?}", err),
+//!     },
+//!     Ok(_) => println!("Success (value doesn't print)"),
 //! }
 //! # }
 //! ```
@@ -156,7 +162,7 @@
 //! When delegates handle errors or intermediate values, they may have a chance to instruct the system to retry. This 
 //! makes the system potentially resilient to all kinds of errors.
 //! 
-//! ## Uploads and Downlods
+//! ## Uploads and Downloads
 //! If a method supports downloads, the response body, which is part of the [Result](enum.Result.html), should be
 //! read by you to obtain the media.
 //! If such a method also supports a [Response Result](trait.ResponseResult.html), it will return that by default.
@@ -179,8 +185,9 @@
 //! ## Optional Parts in Server-Requests
 //! 
 //! All structures provided by this library are made to be [enocodable](trait.RequestValue.html) and 
-//! [decodable](trait.ResponseResult.html) via json. Optionals are used to indicate that partial requests are responses are valid.
-//! Most optionals are are considered [Parts](trait.Part.html) which are identifyable by name, which will be sent to 
+//! [decodable](trait.ResponseResult.html) via *json*. Optionals are used to indicate that partial requests are responses 
+//! are valid.
+//! Most optionals are are considered [Parts](trait.Part.html) which are identifiable by name, which will be sent to 
 //! the server to indicate either the set parts of the request or the desired parts in the response.
 //! 
 //! ## Builder Arguments
@@ -229,7 +236,7 @@ use std::io;
 use std::fs;
 use std::thread::sleep;
 
-pub use cmn::{MultiPartReader, ToParts, MethodInfo, Result, CallBuilder, Hub, ReadSeek, Part, ResponseResult, RequestValue, NestedType, Delegate, DefaultDelegate, ResourceMethodsBuilder, Resource, JsonServerError};
+pub use cmn::{MultiPartReader, ToParts, MethodInfo, Result, Error, CallBuilder, Hub, ReadSeek, Part, ResponseResult, RequestValue, NestedType, Delegate, DefaultDelegate, MethodsBuilder, Resource, JsonServerError};
 
 
 // ##############
@@ -280,7 +287,7 @@ impl Default for Scope {
 /// extern crate "yup-oauth2" as oauth2;
 /// extern crate "google-sqladmin1_beta4" as sqladmin1_beta4;
 /// use sqladmin1_beta4::User;
-/// use sqladmin1_beta4::Result;
+/// use sqladmin1_beta4::{Result, Error};
 /// # #[test] fn egal() {
 /// use std::default::Default;
 /// use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -310,15 +317,17 @@ impl Default for Scope {
 ///              .doit();
 /// 
 /// match result {
-///     Result::HttpError(err) => println!("HTTPERROR: {:?}", err),
-///     Result::MissingAPIKey => println!("Auth: Missing API Key - used if there are no scopes"),
-///     Result::MissingToken => println!("OAuth2: Missing Token"),
-///     Result::Cancelled => println!("Operation cancelled by user"),
-///     Result::UploadSizeLimitExceeded(size, max_size) => println!("Upload size too big: {} of {}", size, max_size),
-///     Result::Failure(_) => println!("General Failure (hyper::client::Response doesn't print)"),
-///     Result::FieldClash(clashed_field) => println!("You added custom parameter which is part of builder: {:?}", clashed_field),
-///     Result::JsonDecodeError(err) => println!("Couldn't understand server reply - maybe API needs update: {:?}", err),
-///     Result::Success(_) => println!("Success (value doesn't print)"),
+///     Err(e) => match e {
+///         Error::HttpError(err) => println!("HTTPERROR: {:?}", err),
+///         Error::MissingAPIKey => println!("Auth: Missing API Key - used if there are no scopes"),
+///         Error::MissingToken => println!("OAuth2: Missing Token"),
+///         Error::Cancelled => println!("Operation canceled by user"),
+///         Error::UploadSizeLimitExceeded(size, max_size) => println!("Upload size too big: {} of {}", size, max_size),
+///         Error::Failure(_) => println!("General Failure (hyper::client::Response doesn't print)"),
+///         Error::FieldClash(clashed_field) => println!("You added custom parameter which is part of builder: {:?}", clashed_field),
+///         Error::JsonDecodeError(err) => println!("Couldn't understand server reply - maybe API needs update: {:?}", err),
+///     },
+///     Ok(_) => println!("Success (value doesn't print)"),
 /// }
 /// # }
 /// ```
@@ -339,7 +348,7 @@ impl<'a, C, NC, A> SQLAdmin<C, NC, A>
         SQLAdmin {
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/0.1.1".to_string(),
+            _user_agent: "google-api-rust-client/0.1.2".to_string(),
             _m: PhantomData
         }
     }
@@ -370,7 +379,7 @@ impl<'a, C, NC, A> SQLAdmin<C, NC, A>
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/0.1.1`.
+    /// It defaults to `google-api-rust-client/0.1.2`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -396,29 +405,29 @@ impl<'a, C, NC, A> SQLAdmin<C, NC, A>
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct BackupRun {
-    /// The status of this run.    
+    /// The status of this run.
     pub status: String,
-    /// This is always sql#backupRun.    
+    /// This is always sql#backupRun.
     pub kind: String,
-    /// The start time of the backup window during which this the backup was attempted in RFC 3339 format, for example 2012-11-15T16:19:00.094Z.    
+    /// The start time of the backup window during which this the backup was attempted in RFC 3339 format, for example 2012-11-15T16:19:00.094Z.
     #[serde(alias="windowStartTime")]
     pub window_start_time: String,
-    /// A unique identifier for this backup run. Note that this is unique only within the scope of a particular Cloud SQL instance.    
+    /// A unique identifier for this backup run. Note that this is unique only within the scope of a particular Cloud SQL instance.
     pub id: String,
-    /// Name of the database instance.    
+    /// Name of the database instance.
     pub instance: String,
-    /// The time the backup operation actually started in UTC timezone in RFC 3339 format, for example 2012-11-15T16:19:00.094Z.    
+    /// The time the backup operation actually started in UTC timezone in RFC 3339 format, for example 2012-11-15T16:19:00.094Z.
     #[serde(alias="startTime")]
     pub start_time: String,
-    /// Information about why the backup operation failed. This is only present if the run has the FAILED status.    
+    /// Information about why the backup operation failed. This is only present if the run has the FAILED status.
     pub error: OperationError,
-    /// The time the backup operation completed in UTC timezone in RFC 3339 format, for example 2012-11-15T16:19:00.094Z.    
+    /// The time the backup operation completed in UTC timezone in RFC 3339 format, for example 2012-11-15T16:19:00.094Z.
     #[serde(alias="endTime")]
     pub end_time: String,
-    /// The time the run was enqueued in UTC timezone in RFC 3339 format, for example 2012-11-15T16:19:00.094Z.    
+    /// The time the run was enqueued in UTC timezone in RFC 3339 format, for example 2012-11-15T16:19:00.094Z.
     #[serde(alias="enqueuedTime")]
     pub enqueued_time: String,
-    /// The URI of this resource.    
+    /// The URI of this resource.
     #[serde(alias="selfLink")]
     pub self_link: String,
 }
@@ -433,10 +442,10 @@ impl ResponseResult for BackupRun {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct SslCertDetail {
-    /// The public information about the cert.    
+    /// The public information about the cert.
     #[serde(alias="certInfo")]
     pub cert_info: SslCert,
-    /// The private key for the client cert, in pem format. Keep private in order to protect your security.    
+    /// The private key for the client cert, in pem format. Keep private in order to protect your security.
     #[serde(alias="certPrivateKey")]
     pub cert_private_key: String,
 }
@@ -458,28 +467,28 @@ impl Part for SslCertDetail {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct SslCert {
-    /// Serial number, as extracted from the certificate.    
+    /// Serial number, as extracted from the certificate.
     #[serde(alias="certSerialNumber")]
     pub cert_serial_number: String,
-    /// This is always sql#sslCert.    
+    /// This is always sql#sslCert.
     pub kind: String,
-    /// Sha1 Fingerprint.    
+    /// Sha1 Fingerprint.
     #[serde(alias="sha1Fingerprint")]
     pub sha1_fingerprint: String,
-    /// User supplied name. Constrained to [a-zA-Z.-_ ]+.    
+    /// User supplied name. Constrained to [a-zA-Z.-_ ]+.
     #[serde(alias="commonName")]
     pub common_name: String,
-    /// Name of the database instance.    
+    /// Name of the database instance.
     pub instance: String,
-    /// PEM representation.    
+    /// PEM representation.
     pub cert: String,
-    /// The time when the certificate expires in RFC 3339 format, for example 2012-11-15T16:19:00.094Z.    
+    /// The time when the certificate expires in RFC 3339 format, for example 2012-11-15T16:19:00.094Z.
     #[serde(alias="expirationTime")]
     pub expiration_time: String,
-    /// The time when the certificate was created in RFC 3339 format, for example 2012-11-15T16:19:00.094Z    
+    /// The time when the certificate was created in RFC 3339 format, for example 2012-11-15T16:19:00.094Z
     #[serde(alias="createTime")]
     pub create_time: String,
-    /// no description provided    
+    /// no description provided
     #[serde(alias="selfLink")]
     pub self_link: String,
 }
@@ -494,9 +503,9 @@ impl ResponseResult for SslCert {}
 /// 
 #[derive(Default, Clone, Debug, Serialize)]
 pub struct RestoreBackupContext {
-    /// This is always sql#restoreBackupContext.    
+    /// This is always sql#restoreBackupContext.
     pub kind: String,
-    /// The ID of the backup run to restore from.    
+    /// The ID of the backup run to restore from.
     #[serde(alias="backupRunId")]
     pub backup_run_id: String,
 }
@@ -510,7 +519,7 @@ impl Part for RestoreBackupContext {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ExportContextCsvExportOptions {
-    /// The select query used to extract the data.    
+    /// The select query used to extract the data.
     #[serde(alias="selectQuery")]
     pub select_query: String,
 }
@@ -525,14 +534,14 @@ impl Part for ExportContextCsvExportOptions {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct BackupConfiguration {
-    /// This is always sql#backupConfiguration.    
+    /// This is always sql#backupConfiguration.
     pub kind: String,
-    /// Whether this configuration is enabled.    
+    /// Whether this configuration is enabled.
     pub enabled: bool,
-    /// Whether binary log is enabled. If backup configuration is disabled, binary log must be disabled as well.    
+    /// Whether binary log is enabled. If backup configuration is disabled, binary log must be disabled as well.
     #[serde(alias="binaryLogEnabled")]
     pub binary_log_enabled: bool,
-    /// Start time for the daily backup configuration in UTC timezone in the 24 hour format - HH:MM.    
+    /// Start time for the daily backup configuration in UTC timezone in the 24 hour format - HH:MM.
     #[serde(alias="startTime")]
     pub start_time: String,
 }
@@ -551,7 +560,7 @@ impl Part for BackupConfiguration {}
 /// 
 #[derive(Default, Clone, Debug, Serialize)]
 pub struct InstancesCloneRequest {
-    /// Contains details about the clone operation.    
+    /// Contains details about the clone operation.
     #[serde(alias="cloneContext")]
     pub clone_context: Option<CloneContext>,
 }
@@ -570,12 +579,12 @@ impl RequestValue for InstancesCloneRequest {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct SslCertsInsertResponse {
-    /// This is always sql#sslCertsInsert.    
+    /// This is always sql#sslCertsInsert.
     pub kind: String,
-    /// The new client certificate and private key. The new certificate will not work until the instance is restarted.    
+    /// The new client certificate and private key. The new certificate will not work until the instance is restarted.
     #[serde(alias="clientCert")]
     pub client_cert: SslCertDetail,
-    /// The server Certificate Authority's certificate. If this is missing you can force a new one to be generated by calling resetSslConfig method on instances resource.    
+    /// The server Certificate Authority's certificate. If this is missing you can force a new one to be generated by calling resetSslConfig method on instances resource.
     #[serde(alias="serverCaCert")]
     pub server_ca_cert: SslCert,
 }
@@ -594,12 +603,12 @@ impl ResponseResult for SslCertsInsertResponse {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct OperationsListResponse {
-    /// The continuation token, used to page through large result sets. Provide this value in a subsequent request to return the next page of results.    
+    /// The continuation token, used to page through large result sets. Provide this value in a subsequent request to return the next page of results.
     #[serde(alias="nextPageToken")]
     pub next_page_token: String,
-    /// List of operation resources.    
+    /// List of operation resources.
     pub items: Vec<Operation>,
-    /// This is always sql#operationsList.    
+    /// This is always sql#operationsList.
     pub kind: String,
 }
 
@@ -617,9 +626,9 @@ impl ResponseResult for OperationsListResponse {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct TiersListResponse {
-    /// List of tiers.    
+    /// List of tiers.
     pub items: Vec<Tier>,
-    /// This is always sql#tiersList.    
+    /// This is always sql#tiersList.
     pub kind: String,
 }
 
@@ -637,14 +646,14 @@ pub struct ImportContext {
     /// CSV: The file contains CSV data.
     #[serde(alias="fileType")]
     pub file_type: String,
-    /// Options for importing data as CSV.    
+    /// Options for importing data as CSV.
     #[serde(alias="csvImportOptions")]
     pub csv_import_options: ImportContextCsvImportOptions,
-    /// A path to the file in Google Cloud Storage from which the import is made. The URI is in the form gs://bucketName/fileName. Compressed gzip files (.gz) are supported when fileType is SQL.    
+    /// A path to the file in Google Cloud Storage from which the import is made. The URI is in the form gs://bucketName/fileName. Compressed gzip files (.gz) are supported when fileType is SQL.
     pub uri: String,
-    /// This is always sql#importContext.    
+    /// This is always sql#importContext.
     pub kind: String,
-    /// The database (for example, guestbook) to which the import is made. If fileType is SQL and no database is specified, it is assumed that the database is specified in the file to be imported. If fileType is CSV, it must be specified.    
+    /// The database (for example, guestbook) to which the import is made. If fileType is SQL and no database is specified, it is assumed that the database is specified in the file to be imported. If fileType is CSV, it must be specified.
     pub database: String,
 }
 
@@ -657,10 +666,10 @@ impl Part for ImportContext {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct IpMapping {
-    /// The due time for this IP to be retired in RFC 3339 format, for example 2012-11-15T16:19:00.094Z. This field is only available when the IP is scheduled to be retired.    
+    /// The due time for this IP to be retired in RFC 3339 format, for example 2012-11-15T16:19:00.094Z. This field is only available when the IP is scheduled to be retired.
     #[serde(alias="timeToRetire")]
     pub time_to_retire: String,
-    /// The IP address assigned.    
+    /// The IP address assigned.
     #[serde(alias="ipAddress")]
     pub ip_address: String,
 }
@@ -674,22 +683,22 @@ impl Part for IpMapping {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ExportContext {
-    /// Options for exporting data as CSV.    
+    /// Options for exporting data as CSV.
     #[serde(alias="csvExportOptions")]
     pub csv_export_options: ExportContextCsvExportOptions,
-    /// This is always sql#exportContext.    
+    /// This is always sql#exportContext.
     pub kind: String,
-    /// Databases (for example, guestbook) from which the export is made. If fileType is SQL and no database is specified, all databases are exported. If fileType is CSV, you can optionally specify at most one database to export. If csvExportOptions.selectQuery also specifies the database, this field will be ignored.    
+    /// Databases (for example, guestbook) from which the export is made. If fileType is SQL and no database is specified, all databases are exported. If fileType is CSV, you can optionally specify at most one database to export. If csvExportOptions.selectQuery also specifies the database, this field will be ignored.
     pub databases: Vec<String>,
     /// The file type for the specified uri.
     /// SQL: The file contains SQL statements.
     /// CSV: The file contains CSV data.
     #[serde(alias="fileType")]
     pub file_type: String,
-    /// Options for exporting data as SQL statements.    
+    /// Options for exporting data as SQL statements.
     #[serde(alias="sqlExportOptions")]
     pub sql_export_options: ExportContextSqlExportOptions,
-    /// The path to the file in Google Cloud Storage where the export will be stored. The URI is in the form gs://bucketName/fileName. If the file already exists, the operation fails. If fileType is SQL and the filename ends with .gz, the contents are compressed.    
+    /// The path to the file in Google Cloud Storage where the export will be stored. The URI is in the form gs://bucketName/fileName. If the file already exists, the operation fails. If fileType is SQL and the filename ends with .gz, the contents are compressed.
     pub uri: String,
 }
 
@@ -707,12 +716,12 @@ impl Part for ExportContext {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct BackupRunsListResponse {
-    /// The continuation token, used to page through large result sets. Provide this value in a subsequent request to return the next page of results.    
+    /// The continuation token, used to page through large result sets. Provide this value in a subsequent request to return the next page of results.
     #[serde(alias="nextPageToken")]
     pub next_page_token: String,
-    /// A list of backup runs in reverse chronological order of the enqueued time.    
+    /// A list of backup runs in reverse chronological order of the enqueued time.
     pub items: Vec<BackupRun>,
-    /// This is always sql#backupRunsList.    
+    /// This is always sql#backupRunsList.
     pub kind: String,
 }
 
@@ -735,21 +744,21 @@ impl ResponseResult for BackupRunsListResponse {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Database {
-    /// This is always sql#database.    
+    /// This is always sql#database.
     pub kind: Option<String>,
-    /// The name of the database in the Cloud SQL instance. This does not include the project ID or instance name.    
+    /// The name of the database in the Cloud SQL instance. This does not include the project ID or instance name.
     pub name: Option<String>,
-    /// The MySQL charset value.    
+    /// The MySQL charset value.
     pub charset: Option<String>,
-    /// The project ID of the project containing the Cloud SQL database. The Google apps domain is prefixed if applicable.    
+    /// The project ID of the project containing the Cloud SQL database. The Google apps domain is prefixed if applicable.
     pub project: Option<String>,
-    /// The name of the Cloud SQL instance. This does not include the project ID.    
+    /// The name of the Cloud SQL instance. This does not include the project ID.
     pub instance: Option<String>,
-    /// HTTP 1.1 Entity tag for the resource.    
+    /// HTTP 1.1 Entity tag for the resource.
     pub etag: Option<String>,
-    /// The MySQL collation value.    
+    /// The MySQL collation value.
     pub collation: Option<String>,
-    /// The URI of this resource.    
+    /// The URI of this resource.
     #[serde(alias="selfLink")]
     pub self_link: Option<String>,
 }
@@ -765,9 +774,9 @@ impl ResponseResult for Database {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ImportContextCsvImportOptions {
-    /// The table to which CSV data is imported.    
+    /// The table to which CSV data is imported.
     pub table: String,
-    /// The columns to which CSV data is imported. If not specified, all columns of the database table are loaded with CSV data.    
+    /// The columns to which CSV data is imported. If not specified, all columns of the database table are loaded with CSV data.
     pub columns: Vec<String>,
 }
 
@@ -781,13 +790,13 @@ impl Part for ImportContextCsvImportOptions {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct IpConfiguration {
-    /// Whether the mysqld should default to 'REQUIRE X509' for users connecting over IP.    
+    /// Whether the mysqld should default to 'REQUIRE X509' for users connecting over IP.
     #[serde(alias="requireSsl")]
     pub require_ssl: bool,
-    /// Whether the instance should be assigned an IP address or not.    
+    /// Whether the instance should be assigned an IP address or not.
     #[serde(alias="ipv4Enabled")]
     pub ipv4_enabled: bool,
-    /// The list of external networks that are allowed to connect to the instance using the IP. In CIDR notation, also known as 'slash' notation (e.g. 192.168.100.0/24).    
+    /// The list of external networks that are allowed to connect to the instance using the IP. In CIDR notation, also known as 'slash' notation (e.g. 192.168.100.0/24).
     #[serde(alias="authorizedNetworks")]
     pub authorized_networks: Vec<AclEntry>,
 }
@@ -801,11 +810,11 @@ impl Part for IpConfiguration {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct OperationError {
-    /// This is always sql#operationError.    
+    /// This is always sql#operationError.
     pub kind: String,
-    /// Identifies the specific error that occurred.    
+    /// Identifies the specific error that occurred.
     pub code: String,
-    /// Additional information about the error encountered.    
+    /// Additional information about the error encountered.
     pub message: String,
 }
 
@@ -823,23 +832,23 @@ impl Part for OperationError {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct Flag {
-    /// This is always sql#flag.    
+    /// This is always sql#flag.
     pub kind: Option<String>,
-    /// This is the name of the flag. Flag names always use underscores, not hyphens, e.g. max_allowed_packet    
+    /// This is the name of the flag. Flag names always use underscores, not hyphens, e.g. max_allowed_packet
     pub name: Option<String>,
-    /// For STRING flags, a list of strings that the value can be set to.    
+    /// For STRING flags, a list of strings that the value can be set to.
     #[serde(alias="allowedStringValues")]
     pub allowed_string_values: Option<Vec<String>>,
-    /// The database version this flag applies to. Currently this can only be [MYSQL_5_5].    
+    /// The database version this flag applies to. Currently this can only be [MYSQL_5_5].
     #[serde(alias="appliesTo")]
     pub applies_to: Option<Vec<String>>,
-    /// The type of the flag. Flags are typed to being BOOLEAN, STRING, INTEGER or NONE. NONE is used for flags which do not take a value, such as skip_grant_tables.    
+    /// The type of the flag. Flags are typed to being BOOLEAN, STRING, INTEGER or NONE. NONE is used for flags which do not take a value, such as skip_grant_tables.
     #[serde(alias="type")]
     pub type_: Option<String>,
-    /// For INTEGER flags, the maximum allowed value.    
+    /// For INTEGER flags, the maximum allowed value.
     #[serde(alias="maxValue")]
     pub max_value: Option<String>,
-    /// For INTEGER flags, the minimum allowed value.    
+    /// For INTEGER flags, the minimum allowed value.
     #[serde(alias="minValue")]
     pub min_value: Option<String>,
 }
@@ -861,19 +870,19 @@ impl Resource for Flag {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct User {
-    /// The project ID of the project containing the Cloud SQL database. The Google apps domain is prefixed if applicable. Can be omitted for update since it is already specified on the URL.    
+    /// The project ID of the project containing the Cloud SQL database. The Google apps domain is prefixed if applicable. Can be omitted for update since it is already specified on the URL.
     pub project: Option<String>,
-    /// The name of the Cloud SQL instance. This does not include the project ID. Can be omitted for update since it is already specified on the URL.    
+    /// The name of the Cloud SQL instance. This does not include the project ID. Can be omitted for update since it is already specified on the URL.
     pub instance: Option<String>,
-    /// This is always sql#user.    
+    /// This is always sql#user.
     pub kind: Option<String>,
-    /// HTTP 1.1 Entity tag for the resource.    
+    /// HTTP 1.1 Entity tag for the resource.
     pub etag: Option<String>,
-    /// The name of the user in the Cloud SQL instance. Can be omitted for update since it is already specified on the URL.    
+    /// The name of the user in the Cloud SQL instance. Can be omitted for update since it is already specified on the URL.
     pub name: Option<String>,
-    /// The password for the user.    
+    /// The password for the user.
     pub password: Option<String>,
-    /// The host name from which the user can connect. For insert operations, host is set to '%'. For update operations, host is specified as part of the request URL. The host name is not mutable with this API.    
+    /// The host name from which the user can connect. For insert operations, host is set to '%'. For update operations, host is specified as part of the request URL. The host name is not mutable with this API.
     pub host: Option<String>,
 }
 
@@ -892,17 +901,17 @@ impl Resource for User {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct Tier {
-    /// The maximum disk size of this tier in bytes.    
+    /// The maximum disk size of this tier in bytes.
     #[serde(alias="DiskQuota")]
     pub disk_quota: Option<String>,
-    /// An identifier for the service tier, for example D1, D2 etc. For related information, see Pricing.    
+    /// An identifier for the service tier, for example D1, D2 etc. For related information, see Pricing.
     pub tier: Option<String>,
-    /// This is always sql#tier.    
+    /// This is always sql#tier.
     pub kind: Option<String>,
-    /// The maximum RAM usage of this tier in bytes.    
+    /// The maximum RAM usage of this tier in bytes.
     #[serde(alias="RAM")]
     pub ram: Option<String>,
-    /// The applicable regions for this tier. Can be us-east1, europe-west1 or asia-east1.    
+    /// The applicable regions for this tier. Can be us-east1, europe-west1 or asia-east1.
     pub region: Option<Vec<String>>,
 }
 
@@ -915,12 +924,12 @@ impl Resource for Tier {}
 /// 
 #[derive(Default, Clone, Debug, Serialize)]
 pub struct CloneContext {
-    /// Binary log coordinates, if specified, indentify the the position up to which the source instance should be cloned. If not specified, the source instance is cloned up to the most recent binary log coordintes.    
+    /// Binary log coordinates, if specified, indentify the the position up to which the source instance should be cloned. If not specified, the source instance is cloned up to the most recent binary log coordintes.
     #[serde(alias="binLogCoordinates")]
     pub bin_log_coordinates: BinLogCoordinates,
-    /// This is always sql#cloneContext.    
+    /// This is always sql#cloneContext.
     pub kind: String,
-    /// Name of the Cloud SQL instance to be created as a clone.    
+    /// Name of the Cloud SQL instance to be created as a clone.
     #[serde(alias="destinationInstanceName")]
     pub destination_instance_name: String,
 }
@@ -939,7 +948,7 @@ impl Part for CloneContext {}
 /// 
 #[derive(Default, Clone, Debug, Serialize)]
 pub struct InstancesRestoreBackupRequest {
-    /// Parameters required to perform the restore backup operation.    
+    /// Parameters required to perform the restore backup operation.
     #[serde(alias="restoreBackupContext")]
     pub restore_backup_context: Option<RestoreBackupContext>,
 }
@@ -953,9 +962,9 @@ impl RequestValue for InstancesRestoreBackupRequest {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct DatabaseFlags {
-    /// The name of the flag. These flags are passed at instance startup, so include both MySQL server options and MySQL system variables. Flags should be specified with underscores, not hyphens. Refer to the official MySQL documentation on server options and system variables for descriptions of what these flags do. Acceptable values are:  character_set_server utf8 or utf8mb4 event_scheduler on or off (Note: The event scheduler will only work reliably if the instance activationPolicy is set to ALWAYS) general_log on or off group_concat_max_len 4..17179869184 innodb_flush_log_at_trx_commit 0..2 innodb_lock_wait_timeout 1..1073741824 log_bin_trust_function_creators on or off log_output Can be either TABLE or NONE, FILE is not supported log_queries_not_using_indexes on or off long_query_time 0..30000000 lower_case_table_names 0..2 max_allowed_packet 16384..1073741824 read_only on or off skip_show_database on or off slow_query_log on or off. If set to on, you must also set the log_output flag to TABLE to receive logs. wait_timeout 1..31536000    
+    /// The name of the flag. These flags are passed at instance startup, so include both MySQL server options and MySQL system variables. Flags should be specified with underscores, not hyphens. Refer to the official MySQL documentation on server options and system variables for descriptions of what these flags do. Acceptable values are:  character_set_server utf8 or utf8mb4 event_scheduler on or off (Note: The event scheduler will only work reliably if the instance activationPolicy is set to ALWAYS) general_log on or off group_concat_max_len 4..17179869184 innodb_flush_log_at_trx_commit 0..2 innodb_lock_wait_timeout 1..1073741824 log_bin_trust_function_creators on or off log_output Can be either TABLE or NONE, FILE is not supported log_queries_not_using_indexes on or off long_query_time 0..30000000 lower_case_table_names 0..2 max_allowed_packet 16384..1073741824 read_only on or off skip_show_database on or off slow_query_log on or off. If set to on, you must also set the log_output flag to TABLE to receive logs. wait_timeout 1..31536000
     pub name: String,
-    /// The value of the flag. Booleans should be set using 1 for true, and 0 for false. This field must be omitted if the flag doesn't take a value.    
+    /// The value of the flag. Booleans should be set using 1 for true, and 0 for false. This field must be omitted if the flag doesn't take a value.
     pub value: String,
 }
 
@@ -973,9 +982,9 @@ impl Part for DatabaseFlags {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct FlagsListResponse {
-    /// List of flags.    
+    /// List of flags.
     pub items: Vec<Flag>,
-    /// This is always sql#flagsList.    
+    /// This is always sql#flagsList.
     pub kind: String,
 }
 
@@ -988,12 +997,12 @@ impl ResponseResult for FlagsListResponse {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Settings {
-    /// The database flags passed to the instance at startup.    
+    /// The database flags passed to the instance at startup.
     #[serde(alias="databaseFlags")]
     pub database_flags: Vec<DatabaseFlags>,
-    /// This is always sql#settings.    
+    /// This is always sql#settings.
     pub kind: String,
-    /// The App Engine app IDs that can access this instance.    
+    /// The App Engine app IDs that can access this instance.
     #[serde(alias="authorizedGaeApplications")]
     pub authorized_gae_applications: Vec<String>,
     /// The activation policy for this instance. This specifies when the instance should be activated and is applicable only when the instance state is RUNNABLE. This can be one of the following.
@@ -1002,27 +1011,27 @@ pub struct Settings {
     /// ON_DEMAND: The instance is activated upon receiving requests.
     #[serde(alias="activationPolicy")]
     pub activation_policy: String,
-    /// The daily backup configuration for the instance.    
+    /// The daily backup configuration for the instance.
     #[serde(alias="backupConfiguration")]
     pub backup_configuration: BackupConfiguration,
-    /// The settings for IP Management. This allows to enable or disable the instance IP and manage which external networks can connect to the instance.    
+    /// The settings for IP Management. This allows to enable or disable the instance IP and manage which external networks can connect to the instance.
     #[serde(alias="ipConfiguration")]
     pub ip_configuration: IpConfiguration,
-    /// Configuration specific to read replica instances. Indicates whether replication is enabled or not.    
+    /// Configuration specific to read replica instances. Indicates whether replication is enabled or not.
     #[serde(alias="databaseReplicationEnabled")]
     pub database_replication_enabled: bool,
-    /// The type of replication this instance uses. This can be either ASYNCHRONOUS or SYNCHRONOUS.    
+    /// The type of replication this instance uses. This can be either ASYNCHRONOUS or SYNCHRONOUS.
     #[serde(alias="replicationType")]
     pub replication_type: String,
-    /// The tier of service for this instance, for example D1, D2. For more information, see pricing.    
+    /// The tier of service for this instance, for example D1, D2. For more information, see pricing.
     pub tier: String,
-    /// The pricing plan for this instance. This can be either PER_USE or PACKAGE.    
+    /// The pricing plan for this instance. This can be either PER_USE or PACKAGE.
     #[serde(alias="pricingPlan")]
     pub pricing_plan: String,
-    /// The version of instance settings. This is a required field for update method to make sure concurrent updates are handled properly. During update, use the most recent settingsVersion value for this instance and do not try to update this value.    
+    /// The version of instance settings. This is a required field for update method to make sure concurrent updates are handled properly. During update, use the most recent settingsVersion value for this instance and do not try to update this value.
     #[serde(alias="settingsVersion")]
     pub settings_version: String,
-    /// The location preference settings. This allows the instance to be located as near as possible to either an App Engine app or GCE zone for better performance.    
+    /// The location preference settings. This allows the instance to be located as near as possible to either an App Engine app or GCE zone for better performance.
     #[serde(alias="locationPreference")]
     pub location_preference: LocationPreference,
 }
@@ -1041,7 +1050,7 @@ impl Part for Settings {}
 /// 
 #[derive(Default, Clone, Debug, Serialize)]
 pub struct SslCertsInsertRequest {
-    /// User supplied name. Must be a distinct name from the other certificates for this instance. New certificates will not be usable until the instance is restarted.    
+    /// User supplied name. Must be a distinct name from the other certificates for this instance. New certificates will not be usable until the instance is restarted.
     #[serde(alias="commonName")]
     pub common_name: Option<String>,
 }
@@ -1060,9 +1069,9 @@ impl RequestValue for SslCertsInsertRequest {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct SslCertsListResponse {
-    /// List of client certificates for the instance.    
+    /// List of client certificates for the instance.
     pub items: Vec<SslCert>,
-    /// This is always sql#sslCertsList.    
+    /// This is always sql#sslCertsList.
     pub kind: String,
 }
 
@@ -1075,14 +1084,14 @@ impl ResponseResult for SslCertsListResponse {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct AclEntry {
-    /// The time when this access control entry expires in RFC 3339 format, for example 2012-11-15T16:19:00.094Z.    
+    /// The time when this access control entry expires in RFC 3339 format, for example 2012-11-15T16:19:00.094Z.
     #[serde(alias="expirationTime")]
     pub expiration_time: String,
-    /// This is always sql#aclEntry.    
+    /// This is always sql#aclEntry.
     pub kind: String,
-    /// The whitelisted value for the access control list.    
+    /// The whitelisted value for the access control list.
     pub value: String,
-    /// An optional label to identify this entry.    
+    /// An optional label to identify this entry.
     pub name: String,
 }
 
@@ -1100,12 +1109,12 @@ impl Part for AclEntry {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct InstancesListResponse {
-    /// The continuation token, used to page through large result sets. Provide this value in a subsequent request to return the next page of results.    
+    /// The continuation token, used to page through large result sets. Provide this value in a subsequent request to return the next page of results.
     #[serde(alias="nextPageToken")]
     pub next_page_token: String,
-    /// List of database instance resources.    
+    /// List of database instance resources.
     pub items: Vec<DatabaseInstance>,
-    /// This is always sql#instancesList.    
+    /// This is always sql#instancesList.
     pub kind: String,
 }
 
@@ -1118,7 +1127,7 @@ impl ResponseResult for InstancesListResponse {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct OperationErrorNested {
-    /// The list of errors encountered while processing this operation.    
+    /// The list of errors encountered while processing this operation.
     pub errors: Vec<OperationError>,
 }
 
@@ -1137,7 +1146,7 @@ impl Part for OperationErrorNested {}
 /// 
 #[derive(Default, Clone, Debug, Serialize)]
 pub struct InstancesExportRequest {
-    /// Contains details about the export operation.    
+    /// Contains details about the export operation.
     #[serde(alias="exportContext")]
     pub export_context: Option<ExportContext>,
 }
@@ -1156,12 +1165,12 @@ impl RequestValue for InstancesExportRequest {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct UsersListResponse {
-    /// An identifier that uniquely identifies the operation. You can use this identifier to retrieve the Operations resource that has information about the operation.    
+    /// An identifier that uniquely identifies the operation. You can use this identifier to retrieve the Operations resource that has information about the operation.
     #[serde(alias="nextPageToken")]
     pub next_page_token: String,
-    /// List of user resources in the instance.    
+    /// List of user resources in the instance.
     pub items: Vec<User>,
-    /// This is always sql#usersList.    
+    /// This is always sql#usersList.
     pub kind: String,
 }
 
@@ -1182,22 +1191,22 @@ impl ResponseResult for UsersListResponse {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct DatabaseInstance {
-    /// The maximum disk size of the instance in bytes.    
+    /// The maximum disk size of the instance in bytes.
     #[serde(alias="maxDiskSize")]
     pub max_disk_size: Option<String>,
-    /// The replicas of the instance.    
+    /// The replicas of the instance.
     #[serde(alias="replicaNames")]
     pub replica_names: Option<Vec<String>>,
-    /// The current disk usage of the instance in bytes.    
+    /// The current disk usage of the instance in bytes.
     #[serde(alias="currentDiskSize")]
     pub current_disk_size: Option<String>,
-    /// The service account email address assigned to the instance.    
+    /// The service account email address assigned to the instance.
     #[serde(alias="serviceAccountEmailAddress")]
     pub service_account_email_address: Option<String>,
-    /// The assigned IP addresses for the instance.    
+    /// The assigned IP addresses for the instance.
     #[serde(alias="ipAddresses")]
     pub ip_addresses: Option<Vec<IpMapping>>,
-    /// The database engine type and version. Can be MYSQL_5_5 or MYSQL_5_6. Defaults to MYSQL_5_5. The databaseVersion can not be changed after instance creation.    
+    /// The database engine type and version. Can be MYSQL_5_5 or MYSQL_5_6. Defaults to MYSQL_5_5. The databaseVersion can not be changed after instance creation.
     #[serde(alias="databaseVersion")]
     pub database_version: Option<String>,
     /// The instance type. This can be one of the following.
@@ -1205,24 +1214,24 @@ pub struct DatabaseInstance {
     /// READ_REPLICA_INSTANCE: A Cloud SQL instance configured as a read-replica.
     #[serde(alias="instanceType")]
     pub instance_type: Option<String>,
-    /// This is always sql#instance.    
+    /// This is always sql#instance.
     pub kind: Option<String>,
-    /// Name of the Cloud SQL instance. This does not include the project ID.    
+    /// Name of the Cloud SQL instance. This does not include the project ID.
     pub name: Option<String>,
-    /// The IPv6 address assigned to the instance.    
+    /// The IPv6 address assigned to the instance.
     #[serde(alias="ipv6Address")]
     pub ipv6_address: Option<String>,
-    /// SSL configuration.    
+    /// SSL configuration.
     #[serde(alias="serverCaCert")]
     pub server_ca_cert: Option<SslCert>,
-    /// The geographical region. Can be us-central, asia-east1 or europe-west1. Defaults to us-central. The region can not be changed after instance creation.    
+    /// The geographical region. Can be us-central, asia-east1 or europe-west1. Defaults to us-central. The region can not be changed after instance creation.
     pub region: Option<String>,
-    /// The user settings.    
+    /// The user settings.
     pub settings: Option<Settings>,
-    /// The name of the instance which will act as master in the replication setup.    
+    /// The name of the instance which will act as master in the replication setup.
     #[serde(alias="masterInstanceName")]
     pub master_instance_name: Option<String>,
-    /// The project ID of the project containing the Cloud SQL instance. The Google apps domain is prefixed if applicable.    
+    /// The project ID of the project containing the Cloud SQL instance. The Google apps domain is prefixed if applicable.
     pub project: Option<String>,
     /// The current serving state of the Cloud SQL instance. This can be one of the following.
     /// RUNNABLE: The instance is running, or is ready to run when accessed.
@@ -1231,9 +1240,9 @@ pub struct DatabaseInstance {
     /// MAINTENANCE: The instance is down for maintenance.
     /// UNKNOWN_STATE: The state of the instance is unknown.
     pub state: Option<String>,
-    /// HTTP 1.1 Entity tag for the resource.    
+    /// HTTP 1.1 Entity tag for the resource.
     pub etag: Option<String>,
-    /// The URI of this resource.    
+    /// The URI of this resource.
     #[serde(alias="selfLink")]
     pub self_link: Option<String>,
 }
@@ -1253,7 +1262,7 @@ impl ResponseResult for DatabaseInstance {}
 /// 
 #[derive(Default, Clone, Debug, Serialize)]
 pub struct InstancesImportRequest {
-    /// Contains details about the import operation.    
+    /// Contains details about the import operation.
     #[serde(alias="importContext")]
     pub import_context: Option<ImportContext>,
 }
@@ -1272,9 +1281,9 @@ impl RequestValue for InstancesImportRequest {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct DatabasesListResponse {
-    /// List of database resources in the instance.    
+    /// List of database resources in the instance.
     pub items: Vec<Database>,
-    /// This is always sql#databasesList.    
+    /// This is always sql#databasesList.
     pub kind: String,
 }
 
@@ -1287,12 +1296,12 @@ impl ResponseResult for DatabasesListResponse {}
 /// 
 #[derive(Default, Clone, Debug, Serialize)]
 pub struct BinLogCoordinates {
-    /// Position (offset) within the binary log file.    
+    /// Position (offset) within the binary log file.
     #[serde(alias="binLogPosition")]
     pub bin_log_position: String,
-    /// This is always sql#binLogCoordinates.    
+    /// This is always sql#binLogCoordinates.
     pub kind: String,
-    /// Name of the binary log file for a Cloud SQL instance.    
+    /// Name of the binary log file for a Cloud SQL instance.
     #[serde(alias="binLogFileName")]
     pub bin_log_file_name: String,
 }
@@ -1333,45 +1342,45 @@ impl Part for BinLogCoordinates {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct Operation {
-    /// The status of an operation. Valid values are PENDING, RUNNING, DONE, UNKNOWN.    
+    /// The status of an operation. Valid values are PENDING, RUNNING, DONE, UNKNOWN.
     pub status: String,
-    /// The context for import operation, if applicable.    
+    /// The context for import operation, if applicable.
     #[serde(alias="importContext")]
     pub import_context: ImportContext,
-    /// This is always sql#instanceOperation.    
+    /// This is always sql#instanceOperation.
     pub kind: String,
-    /// An identifier that uniquely identifies the operation. You can use this identifier to retrieve the Operations resource that has information about the operation.    
+    /// An identifier that uniquely identifies the operation. You can use this identifier to retrieve the Operations resource that has information about the operation.
     pub name: String,
-    /// The context for export operation, if applicable.    
+    /// The context for export operation, if applicable.
     #[serde(alias="exportContext")]
     pub export_context: ExportContext,
-    /// The project ID of the target instance related to this operation.    
+    /// The project ID of the target instance related to this operation.
     #[serde(alias="targetProject")]
     pub target_project: String,
-    /// Name of the database instance related to this operation.    
+    /// Name of the database instance related to this operation.
     #[serde(alias="targetId")]
     pub target_id: String,
-    /// TODO(b/18431310): update this list to reflect current values. The type of the operation. Valid values are CREATE, DELETE, UPDATE, RESTART, IMPORT, EXPORT, BACKUP_VOLUME, RESTORE_VOLUME.    
+    /// TODO(b/18431310): update this list to reflect current values. The type of the operation. Valid values are CREATE, DELETE, UPDATE, RESTART, IMPORT, EXPORT, BACKUP_VOLUME, RESTORE_VOLUME.
     #[serde(alias="operationType")]
     pub operation_type: String,
-    /// The time this operation was enqueued in UTC timezone in RFC 3339 format, for example 2012-11-15T16:19:00.094Z.    
+    /// The time this operation was enqueued in UTC timezone in RFC 3339 format, for example 2012-11-15T16:19:00.094Z.
     #[serde(alias="insertTime")]
     pub insert_time: String,
-    /// The URI of the instance related to the operation.    
+    /// The URI of the instance related to the operation.
     #[serde(alias="targetLink")]
     pub target_link: String,
-    /// The time this operation actually started in UTC timezone in RFC 3339 format, for example 2012-11-15T16:19:00.094Z.    
+    /// The time this operation actually started in UTC timezone in RFC 3339 format, for example 2012-11-15T16:19:00.094Z.
     #[serde(alias="startTime")]
     pub start_time: String,
-    /// If errors occurred during processing of this operation, this field will be populated.    
+    /// If errors occurred during processing of this operation, this field will be populated.
     pub error: OperationErrorNested,
-    /// The time this operation finished in UTC timezone in RFC 3339 format, for example 2012-11-15T16:19:00.094Z.    
+    /// The time this operation finished in UTC timezone in RFC 3339 format, for example 2012-11-15T16:19:00.094Z.
     #[serde(alias="endTime")]
     pub end_time: String,
-    /// The URI of this resource.    
+    /// The URI of this resource.
     #[serde(alias="selfLink")]
     pub self_link: String,
-    /// The email address of the user who initiated this operation.    
+    /// The email address of the user who initiated this operation.
     pub user: String,
 }
 
@@ -1385,12 +1394,12 @@ impl ResponseResult for Operation {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct LocationPreference {
-    /// This is always sql#locationPreference.    
+    /// This is always sql#locationPreference.
     pub kind: String,
-    /// The AppEngine application to follow, it must be in the same region as the Cloud SQL instance.    
+    /// The AppEngine application to follow, it must be in the same region as the Cloud SQL instance.
     #[serde(alias="followGaeApplication")]
     pub follow_gae_application: String,
-    /// The preferred Compute Engine zone (e.g. us-centra1-a, us-central1-b, etc.).    
+    /// The preferred Compute Engine zone (e.g. us-centra1-a, us-central1-b, etc.).
     pub zone: String,
 }
 
@@ -1403,7 +1412,7 @@ impl Part for LocationPreference {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ExportContextSqlExportOptions {
-    /// Tables to export, or that were exported, from the specified database. If you specify tables, specify one and only one database.    
+    /// Tables to export, or that were exported, from the specified database. If you specify tables, specify one and only one database.
     pub tables: Vec<String>,
 }
 
@@ -1450,13 +1459,18 @@ pub struct OperationMethods<'a, C, NC, A>
     hub: &'a SQLAdmin<C, NC, A>,
 }
 
-impl<'a, C, NC, A> ResourceMethodsBuilder for OperationMethods<'a, C, NC, A> {}
+impl<'a, C, NC, A> MethodsBuilder for OperationMethods<'a, C, NC, A> {}
 
 impl<'a, C, NC, A> OperationMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Lists all instance operations that have been performed on the given Cloud SQL instance in the reverse chronological order of the start time.    
+    /// Lists all instance operations that have been performed on the given Cloud SQL instance in the reverse chronological order of the start time.
+    /// 
+    /// # Arguments
+    ///
+    /// * `project` - Project ID of the project that contains the instance.
+    /// * `instance` - Cloud SQL instance ID. This does not include the project ID.
     pub fn list(&self, project: &str, instance: &str) -> OperationListCall<'a, C, NC, A> {
         OperationListCall {
             hub: self.hub,
@@ -1472,7 +1486,12 @@ impl<'a, C, NC, A> OperationMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Retrieves an instance operation that has been performed on an instance.    
+    /// Retrieves an instance operation that has been performed on an instance.
+    /// 
+    /// # Arguments
+    ///
+    /// * `project` - Project ID of the project that contains the instance.
+    /// * `operation` - Instance operation ID.
     pub fn get(&self, project: &str, operation: &str) -> OperationGetCall<'a, C, NC, A> {
         OperationGetCall {
             hub: self.hub,
@@ -1521,13 +1540,17 @@ pub struct TierMethods<'a, C, NC, A>
     hub: &'a SQLAdmin<C, NC, A>,
 }
 
-impl<'a, C, NC, A> ResourceMethodsBuilder for TierMethods<'a, C, NC, A> {}
+impl<'a, C, NC, A> MethodsBuilder for TierMethods<'a, C, NC, A> {}
 
 impl<'a, C, NC, A> TierMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Lists all available service tiers for Google Cloud SQL, for example D1, D2. For related information, see Pricing.    
+    /// Lists all available service tiers for Google Cloud SQL, for example D1, D2. For related information, see Pricing.
+    /// 
+    /// # Arguments
+    ///
+    /// * `project` - Project ID of the project for which to list tiers.
     pub fn list(&self, project: &str) -> TierListCall<'a, C, NC, A> {
         TierListCall {
             hub: self.hub,
@@ -1575,13 +1598,18 @@ pub struct UserMethods<'a, C, NC, A>
     hub: &'a SQLAdmin<C, NC, A>,
 }
 
-impl<'a, C, NC, A> ResourceMethodsBuilder for UserMethods<'a, C, NC, A> {}
+impl<'a, C, NC, A> MethodsBuilder for UserMethods<'a, C, NC, A> {}
 
 impl<'a, C, NC, A> UserMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Lists users in the specified Cloud SQL instance.    
+    /// Lists users in the specified Cloud SQL instance.
+    /// 
+    /// # Arguments
+    ///
+    /// * `project` - Project ID of the project that contains the instance.
+    /// * `instance` - Database instance ID. This does not include the project ID.
     pub fn list(&self, project: &str, instance: &str) -> UserListCall<'a, C, NC, A> {
         UserListCall {
             hub: self.hub,
@@ -1595,7 +1623,14 @@ impl<'a, C, NC, A> UserMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Deletes a user from a Cloud SQL instance.    
+    /// Deletes a user from a Cloud SQL instance.
+    /// 
+    /// # Arguments
+    ///
+    /// * `project` - Project ID of the project that contains the instance.
+    /// * `instance` - Database instance ID. This does not include the project ID.
+    /// * `host` - Host of the user in the instance.
+    /// * `name` - Name of the user in the instance.
     pub fn delete(&self, project: &str, instance: &str, host: &str, name: &str) -> UserDeleteCall<'a, C, NC, A> {
         UserDeleteCall {
             hub: self.hub,
@@ -1611,7 +1646,15 @@ impl<'a, C, NC, A> UserMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Updates an existing user in a Cloud SQL instance.    
+    /// Updates an existing user in a Cloud SQL instance.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `project` - Project ID of the project that contains the instance.
+    /// * `instance` - Database instance ID. This does not include the project ID.
+    /// * `host` - Host of the user in the instance.
+    /// * `name` - Name of the user in the instance.
     pub fn update(&self, request: &User, project: &str, instance: &str, host: &str, name: &str) -> UserUpdateCall<'a, C, NC, A> {
         UserUpdateCall {
             hub: self.hub,
@@ -1628,7 +1671,13 @@ impl<'a, C, NC, A> UserMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Creates a new user in a Cloud SQL instance.    
+    /// Creates a new user in a Cloud SQL instance.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `project` - Project ID of the project that contains the instance.
+    /// * `instance` - Database instance ID. This does not include the project ID.
     pub fn insert(&self, request: &User, project: &str, instance: &str) -> UserInsertCall<'a, C, NC, A> {
         UserInsertCall {
             hub: self.hub,
@@ -1678,13 +1727,18 @@ pub struct InstanceMethods<'a, C, NC, A>
     hub: &'a SQLAdmin<C, NC, A>,
 }
 
-impl<'a, C, NC, A> ResourceMethodsBuilder for InstanceMethods<'a, C, NC, A> {}
+impl<'a, C, NC, A> MethodsBuilder for InstanceMethods<'a, C, NC, A> {}
 
 impl<'a, C, NC, A> InstanceMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Deletes all client certificates and generates a new server SSL certificate for the instance. The changes will not take effect until the instance is restarted. Existing instances without a server certificate will need to call this once to set a server certificate.    
+    /// Deletes all client certificates and generates a new server SSL certificate for the instance. The changes will not take effect until the instance is restarted. Existing instances without a server certificate will need to call this once to set a server certificate.
+    /// 
+    /// # Arguments
+    ///
+    /// * `project` - Project ID of the project that contains the instance.
+    /// * `instance` - Cloud SQL instance ID. This does not include the project ID.
     pub fn reset_ssl_config(&self, project: &str, instance: &str) -> InstanceResetSslConfigCall<'a, C, NC, A> {
         InstanceResetSslConfigCall {
             hub: self.hub,
@@ -1698,7 +1752,12 @@ impl<'a, C, NC, A> InstanceMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Promotes the read replica instance to be a stand-alone Cloud SQL instance.    
+    /// Promotes the read replica instance to be a stand-alone Cloud SQL instance.
+    /// 
+    /// # Arguments
+    ///
+    /// * `project` - ID of the project that contains the read replica.
+    /// * `instance` - Cloud SQL read replica instance name.
     pub fn promote_replica(&self, project: &str, instance: &str) -> InstancePromoteReplicaCall<'a, C, NC, A> {
         InstancePromoteReplicaCall {
             hub: self.hub,
@@ -1712,7 +1771,12 @@ impl<'a, C, NC, A> InstanceMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Retrieves a resource containing information about a Cloud SQL instance.    
+    /// Retrieves a resource containing information about a Cloud SQL instance.
+    /// 
+    /// # Arguments
+    ///
+    /// * `project` - Project ID of the project that contains the instance.
+    /// * `instance` - Database instance ID. This does not include the project ID.
     pub fn get(&self, project: &str, instance: &str) -> InstanceGetCall<'a, C, NC, A> {
         InstanceGetCall {
             hub: self.hub,
@@ -1726,7 +1790,13 @@ impl<'a, C, NC, A> InstanceMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Updates settings of a Cloud SQL instance. Caution: This is not a partial update, so you must include values for all the settings that you want to retain. For partial updates, use patch.. This method supports patch semantics.    
+    /// Updates settings of a Cloud SQL instance. Caution: This is not a partial update, so you must include values for all the settings that you want to retain. For partial updates, use patch.. This method supports patch semantics.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `project` - Project ID of the project that contains the instance.
+    /// * `instance` - Cloud SQL instance ID. This does not include the project ID.
     pub fn patch(&self, request: &DatabaseInstance, project: &str, instance: &str) -> InstancePatchCall<'a, C, NC, A> {
         InstancePatchCall {
             hub: self.hub,
@@ -1741,7 +1811,12 @@ impl<'a, C, NC, A> InstanceMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Restarts a Cloud SQL instance.    
+    /// Restarts a Cloud SQL instance.
+    /// 
+    /// # Arguments
+    ///
+    /// * `project` - Project ID of the project that contains the instance to be restarted.
+    /// * `instance` - Cloud SQL instance ID. This does not include the project ID.
     pub fn restart(&self, project: &str, instance: &str) -> InstanceRestartCall<'a, C, NC, A> {
         InstanceRestartCall {
             hub: self.hub,
@@ -1755,7 +1830,12 @@ impl<'a, C, NC, A> InstanceMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Deletes a Cloud SQL instance.    
+    /// Deletes a Cloud SQL instance.
+    /// 
+    /// # Arguments
+    ///
+    /// * `project` - Project ID of the project that contains the instance to be deleted.
+    /// * `instance` - Cloud SQL instance ID. This does not include the project ID.
     pub fn delete(&self, project: &str, instance: &str) -> InstanceDeleteCall<'a, C, NC, A> {
         InstanceDeleteCall {
             hub: self.hub,
@@ -1769,7 +1849,12 @@ impl<'a, C, NC, A> InstanceMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Stops the replication in the read replica instance.    
+    /// Stops the replication in the read replica instance.
+    /// 
+    /// # Arguments
+    ///
+    /// * `project` - ID of the project that contains the read replica.
+    /// * `instance` - Cloud SQL read replica instance name.
     pub fn stop_replica(&self, project: &str, instance: &str) -> InstanceStopReplicaCall<'a, C, NC, A> {
         InstanceStopReplicaCall {
             hub: self.hub,
@@ -1783,7 +1868,12 @@ impl<'a, C, NC, A> InstanceMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Starts the replication in the read replica instance.    
+    /// Starts the replication in the read replica instance.
+    /// 
+    /// # Arguments
+    ///
+    /// * `project` - ID of the project that contains the read replica.
+    /// * `instance` - Cloud SQL read replica instance name.
     pub fn start_replica(&self, project: &str, instance: &str) -> InstanceStartReplicaCall<'a, C, NC, A> {
         InstanceStartReplicaCall {
             hub: self.hub,
@@ -1797,7 +1887,12 @@ impl<'a, C, NC, A> InstanceMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Creates a new Cloud SQL instance.    
+    /// Creates a new Cloud SQL instance.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `project` - Project ID of the project to which the newly created Cloud SQL instances should belong.
     pub fn insert(&self, request: &DatabaseInstance, project: &str) -> InstanceInsertCall<'a, C, NC, A> {
         InstanceInsertCall {
             hub: self.hub,
@@ -1811,7 +1906,11 @@ impl<'a, C, NC, A> InstanceMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Lists instances under a given project in the alphabetical order of the instance name.    
+    /// Lists instances under a given project in the alphabetical order of the instance name.
+    /// 
+    /// # Arguments
+    ///
+    /// * `project` - Project ID of the project for which to list Cloud SQL instances.
     pub fn list(&self, project: &str) -> InstanceListCall<'a, C, NC, A> {
         InstanceListCall {
             hub: self.hub,
@@ -1826,7 +1925,13 @@ impl<'a, C, NC, A> InstanceMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Imports data into a Cloud SQL instance from a MySQL dump file in Google Cloud Storage.    
+    /// Imports data into a Cloud SQL instance from a MySQL dump file in Google Cloud Storage.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `project` - Project ID of the project that contains the instance.
+    /// * `instance` - Cloud SQL instance ID. This does not include the project ID.
     pub fn import(&self, request: &InstancesImportRequest, project: &str, instance: &str) -> InstanceImportCall<'a, C, NC, A> {
         InstanceImportCall {
             hub: self.hub,
@@ -1841,7 +1946,13 @@ impl<'a, C, NC, A> InstanceMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Updates settings of a Cloud SQL instance. Caution: This is not a partial update, so you must include values for all the settings that you want to retain. For partial updates, use patch.    
+    /// Updates settings of a Cloud SQL instance. Caution: This is not a partial update, so you must include values for all the settings that you want to retain. For partial updates, use patch.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `project` - Project ID of the project that contains the instance.
+    /// * `instance` - Cloud SQL instance ID. This does not include the project ID.
     pub fn update(&self, request: &DatabaseInstance, project: &str, instance: &str) -> InstanceUpdateCall<'a, C, NC, A> {
         InstanceUpdateCall {
             hub: self.hub,
@@ -1856,7 +1967,13 @@ impl<'a, C, NC, A> InstanceMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Creates a Cloud SQL instance as a clone of the source instance.    
+    /// Creates a Cloud SQL instance as a clone of the source instance.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `project` - Project ID of the source as well as the clone Cloud SQL instance.
+    /// * `instance` - The ID of the Cloud SQL instance to be cloned (source). This does not include the project ID.
     pub fn clone(&self, request: &InstancesCloneRequest, project: &str, instance: &str) -> InstanceCloneCall<'a, C, NC, A> {
         InstanceCloneCall {
             hub: self.hub,
@@ -1871,7 +1988,13 @@ impl<'a, C, NC, A> InstanceMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Exports data from a Cloud SQL instance to a Google Cloud Storage bucket as a MySQL dump file.    
+    /// Exports data from a Cloud SQL instance to a Google Cloud Storage bucket as a MySQL dump file.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `project` - Project ID of the project that contains the instance to be exported.
+    /// * `instance` - Cloud SQL instance ID. This does not include the project ID.
     pub fn export(&self, request: &InstancesExportRequest, project: &str, instance: &str) -> InstanceExportCall<'a, C, NC, A> {
         InstanceExportCall {
             hub: self.hub,
@@ -1886,7 +2009,13 @@ impl<'a, C, NC, A> InstanceMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Restores a backup of a Cloud SQL instance.    
+    /// Restores a backup of a Cloud SQL instance.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `project` - Project ID of the project that contains the instance.
+    /// * `instance` - Cloud SQL instance ID. This does not include the project ID.
     pub fn restore_backup(&self, request: &InstancesRestoreBackupRequest, project: &str, instance: &str) -> InstanceRestoreBackupCall<'a, C, NC, A> {
         InstanceRestoreBackupCall {
             hub: self.hub,
@@ -1936,13 +2065,13 @@ pub struct FlagMethods<'a, C, NC, A>
     hub: &'a SQLAdmin<C, NC, A>,
 }
 
-impl<'a, C, NC, A> ResourceMethodsBuilder for FlagMethods<'a, C, NC, A> {}
+impl<'a, C, NC, A> MethodsBuilder for FlagMethods<'a, C, NC, A> {}
 
 impl<'a, C, NC, A> FlagMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// List all available database flags for Google Cloud SQL instances.    
+    /// List all available database flags for Google Cloud SQL instances.
     pub fn list(&self) -> FlagListCall<'a, C, NC, A> {
         FlagListCall {
             hub: self.hub,
@@ -1989,13 +2118,19 @@ pub struct DatabaseMethods<'a, C, NC, A>
     hub: &'a SQLAdmin<C, NC, A>,
 }
 
-impl<'a, C, NC, A> ResourceMethodsBuilder for DatabaseMethods<'a, C, NC, A> {}
+impl<'a, C, NC, A> MethodsBuilder for DatabaseMethods<'a, C, NC, A> {}
 
 impl<'a, C, NC, A> DatabaseMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Deletes a resource containing information about a database inside a Cloud SQL instance.    
+    /// Deletes a resource containing information about a database inside a Cloud SQL instance.
+    /// 
+    /// # Arguments
+    ///
+    /// * `project` - Project ID of the project that contains the instance.
+    /// * `instance` - Database instance ID. This does not include the project ID.
+    /// * `database` - Name of the database to be deleted in the instance.
     pub fn delete(&self, project: &str, instance: &str, database: &str) -> DatabaseDeleteCall<'a, C, NC, A> {
         DatabaseDeleteCall {
             hub: self.hub,
@@ -2010,7 +2145,14 @@ impl<'a, C, NC, A> DatabaseMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Updates a resource containing information about a database inside a Cloud SQL instance. This method supports patch semantics.    
+    /// Updates a resource containing information about a database inside a Cloud SQL instance. This method supports patch semantics.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `project` - Project ID of the project that contains the instance.
+    /// * `instance` - Database instance ID. This does not include the project ID.
+    /// * `database` - Name of the database to be updated in the instance.
     pub fn patch(&self, request: &Database, project: &str, instance: &str, database: &str) -> DatabasePatchCall<'a, C, NC, A> {
         DatabasePatchCall {
             hub: self.hub,
@@ -2026,7 +2168,12 @@ impl<'a, C, NC, A> DatabaseMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Lists databases in the specified Cloud SQL instance.    
+    /// Lists databases in the specified Cloud SQL instance.
+    /// 
+    /// # Arguments
+    ///
+    /// * `project` - Project ID of the project for which to list Cloud SQL instances.
+    /// * `instance` - Cloud SQL instance ID. This does not include the project ID.
     pub fn list(&self, project: &str, instance: &str) -> DatabaseListCall<'a, C, NC, A> {
         DatabaseListCall {
             hub: self.hub,
@@ -2040,7 +2187,13 @@ impl<'a, C, NC, A> DatabaseMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Inserts a resource containing information about a database inside a Cloud SQL instance.    
+    /// Inserts a resource containing information about a database inside a Cloud SQL instance.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `project` - Project ID of the project that contains the instance.
+    /// * `instance` - Database instance ID. This does not include the project ID.
     pub fn insert(&self, request: &Database, project: &str, instance: &str) -> DatabaseInsertCall<'a, C, NC, A> {
         DatabaseInsertCall {
             hub: self.hub,
@@ -2055,7 +2208,13 @@ impl<'a, C, NC, A> DatabaseMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Retrieves a resource containing information about a database inside a Cloud SQL instance.    
+    /// Retrieves a resource containing information about a database inside a Cloud SQL instance.
+    /// 
+    /// # Arguments
+    ///
+    /// * `project` - Project ID of the project that contains the instance.
+    /// * `instance` - Database instance ID. This does not include the project ID.
+    /// * `database` - Name of the database in the instance.
     pub fn get(&self, project: &str, instance: &str, database: &str) -> DatabaseGetCall<'a, C, NC, A> {
         DatabaseGetCall {
             hub: self.hub,
@@ -2070,7 +2229,14 @@ impl<'a, C, NC, A> DatabaseMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Updates a resource containing information about a database inside a Cloud SQL instance.    
+    /// Updates a resource containing information about a database inside a Cloud SQL instance.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `project` - Project ID of the project that contains the instance.
+    /// * `instance` - Database instance ID. This does not include the project ID.
+    /// * `database` - Name of the database to be updated in the instance.
     pub fn update(&self, request: &Database, project: &str, instance: &str, database: &str) -> DatabaseUpdateCall<'a, C, NC, A> {
         DatabaseUpdateCall {
             hub: self.hub,
@@ -2121,13 +2287,19 @@ pub struct SslCertMethods<'a, C, NC, A>
     hub: &'a SQLAdmin<C, NC, A>,
 }
 
-impl<'a, C, NC, A> ResourceMethodsBuilder for SslCertMethods<'a, C, NC, A> {}
+impl<'a, C, NC, A> MethodsBuilder for SslCertMethods<'a, C, NC, A> {}
 
 impl<'a, C, NC, A> SslCertMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Creates an SSL certificate and returns it along with the private key and server certificate authority. The new certificate will not be usable until the instance is restarted.    
+    /// Creates an SSL certificate and returns it along with the private key and server certificate authority. The new certificate will not be usable until the instance is restarted.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `project` - Project ID of the project to which the newly created Cloud SQL instances should belong.
+    /// * `instance` - Cloud SQL instance ID. This does not include the project ID.
     pub fn insert(&self, request: &SslCertsInsertRequest, project: &str, instance: &str) -> SslCertInsertCall<'a, C, NC, A> {
         SslCertInsertCall {
             hub: self.hub,
@@ -2142,7 +2314,13 @@ impl<'a, C, NC, A> SslCertMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Deletes the SSL certificate. The change will not take effect until the instance is restarted.    
+    /// Deletes the SSL certificate. The change will not take effect until the instance is restarted.
+    /// 
+    /// # Arguments
+    ///
+    /// * `project` - Project ID of the project that contains the instance to be deleted.
+    /// * `instance` - Cloud SQL instance ID. This does not include the project ID.
+    /// * `sha1Fingerprint` - Sha1 FingerPrint.
     pub fn delete(&self, project: &str, instance: &str, sha1_fingerprint: &str) -> SslCertDeleteCall<'a, C, NC, A> {
         SslCertDeleteCall {
             hub: self.hub,
@@ -2157,7 +2335,13 @@ impl<'a, C, NC, A> SslCertMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Retrieves a particular SSL certificate. Does not include the private key (required for usage). The private key must be saved from the response to initial creation.    
+    /// Retrieves a particular SSL certificate. Does not include the private key (required for usage). The private key must be saved from the response to initial creation.
+    /// 
+    /// # Arguments
+    ///
+    /// * `project` - Project ID of the project that contains the instance.
+    /// * `instance` - Cloud SQL instance ID. This does not include the project ID.
+    /// * `sha1Fingerprint` - Sha1 FingerPrint.
     pub fn get(&self, project: &str, instance: &str, sha1_fingerprint: &str) -> SslCertGetCall<'a, C, NC, A> {
         SslCertGetCall {
             hub: self.hub,
@@ -2172,7 +2356,12 @@ impl<'a, C, NC, A> SslCertMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Lists all of the current SSL certificates for the instance.    
+    /// Lists all of the current SSL certificates for the instance.
+    /// 
+    /// # Arguments
+    ///
+    /// * `project` - Project ID of the project for which to list Cloud SQL instances.
+    /// * `instance` - Cloud SQL instance ID. This does not include the project ID.
     pub fn list(&self, project: &str, instance: &str) -> SslCertListCall<'a, C, NC, A> {
         SslCertListCall {
             hub: self.hub,
@@ -2221,13 +2410,18 @@ pub struct BackupRunMethods<'a, C, NC, A>
     hub: &'a SQLAdmin<C, NC, A>,
 }
 
-impl<'a, C, NC, A> ResourceMethodsBuilder for BackupRunMethods<'a, C, NC, A> {}
+impl<'a, C, NC, A> MethodsBuilder for BackupRunMethods<'a, C, NC, A> {}
 
 impl<'a, C, NC, A> BackupRunMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Lists all backup runs associated with a given instance and configuration in the reverse chronological order of the enqueued time.    
+    /// Lists all backup runs associated with a given instance and configuration in the reverse chronological order of the enqueued time.
+    /// 
+    /// # Arguments
+    ///
+    /// * `project` - Project ID of the project that contains the instance.
+    /// * `instance` - Cloud SQL instance ID. This does not include the project ID.
     pub fn list(&self, project: &str, instance: &str) -> BackupRunListCall<'a, C, NC, A> {
         BackupRunListCall {
             hub: self.hub,
@@ -2243,7 +2437,13 @@ impl<'a, C, NC, A> BackupRunMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Retrieves a resource containing information about a backup run.    
+    /// Retrieves a resource containing information about a backup run.
+    /// 
+    /// # Arguments
+    ///
+    /// * `project` - Project ID of the project that contains the instance.
+    /// * `instance` - Cloud SQL instance ID. This does not include the project ID.
+    /// * `id` - The ID of this Backup Run.
     pub fn get(&self, project: &str, instance: &str, id: &str) -> BackupRunGetCall<'a, C, NC, A> {
         BackupRunGetCall {
             hub: self.hub,
@@ -2268,7 +2468,7 @@ impl<'a, C, NC, A> BackupRunMethods<'a, C, NC, A> {
 /// Lists all instance operations that have been performed on the given Cloud SQL instance in the reverse chronological order of the start time.
 ///
 /// A builder for the *list* method supported by a *operation* resource.
-/// It is not used directly, but through a `OperationMethods`.
+/// It is not used directly, but through a `OperationMethods` instance.
 ///
 /// # Example
 ///
@@ -2338,7 +2538,7 @@ impl<'a, C, NC, A> OperationListCall<'a, C, NC, A> where NC: hyper::net::Network
         for &field in ["alt", "project", "instance", "pageToken", "maxResults"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -2391,7 +2591,7 @@ impl<'a, C, NC, A> OperationListCall<'a, C, NC, A> where NC: hyper::net::Network
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -2403,7 +2603,6 @@ impl<'a, C, NC, A> OperationListCall<'a, C, NC, A> where NC: hyper::net::Network
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -2413,7 +2612,7 @@ impl<'a, C, NC, A> OperationListCall<'a, C, NC, A> where NC: hyper::net::Network
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -2424,7 +2623,7 @@ impl<'a, C, NC, A> OperationListCall<'a, C, NC, A> where NC: hyper::net::Network
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -2433,13 +2632,13 @@ impl<'a, C, NC, A> OperationListCall<'a, C, NC, A> where NC: hyper::net::Network
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -2451,7 +2650,7 @@ impl<'a, C, NC, A> OperationListCall<'a, C, NC, A> where NC: hyper::net::Network
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Project ID of the project that contains the instance.    
+    /// Project ID of the project that contains the instance.
     pub fn project(mut self, new_value: &str) -> OperationListCall<'a, C, NC, A> {
         self._project = new_value.to_string();
         self
@@ -2461,7 +2660,7 @@ impl<'a, C, NC, A> OperationListCall<'a, C, NC, A> where NC: hyper::net::Network
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Cloud SQL instance ID. This does not include the project ID.    
+    /// Cloud SQL instance ID. This does not include the project ID.
     pub fn instance(mut self, new_value: &str) -> OperationListCall<'a, C, NC, A> {
         self._instance = new_value.to_string();
         self
@@ -2469,7 +2668,7 @@ impl<'a, C, NC, A> OperationListCall<'a, C, NC, A> where NC: hyper::net::Network
     /// Sets the *page token* query property to the given value.
     ///
     /// 
-    /// A previously-returned page token representing part of the larger set of results to view.    
+    /// A previously-returned page token representing part of the larger set of results to view.
     pub fn page_token(mut self, new_value: &str) -> OperationListCall<'a, C, NC, A> {
         self._page_token = Some(new_value.to_string());
         self
@@ -2477,7 +2676,7 @@ impl<'a, C, NC, A> OperationListCall<'a, C, NC, A> where NC: hyper::net::Network
     /// Sets the *max results* query property to the given value.
     ///
     /// 
-    /// Maximum number of operations per response.    
+    /// Maximum number of operations per response.
     pub fn max_results(mut self, new_value: u32) -> OperationListCall<'a, C, NC, A> {
         self._max_results = Some(new_value);
         self
@@ -2538,7 +2737,7 @@ impl<'a, C, NC, A> OperationListCall<'a, C, NC, A> where NC: hyper::net::Network
 /// Retrieves an instance operation that has been performed on an instance.
 ///
 /// A builder for the *get* method supported by a *operation* resource.
-/// It is not used directly, but through a `OperationMethods`.
+/// It is not used directly, but through a `OperationMethods` instance.
 ///
 /// # Example
 ///
@@ -2598,7 +2797,7 @@ impl<'a, C, NC, A> OperationGetCall<'a, C, NC, A> where NC: hyper::net::NetworkC
         for &field in ["alt", "project", "operation"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -2651,7 +2850,7 @@ impl<'a, C, NC, A> OperationGetCall<'a, C, NC, A> where NC: hyper::net::NetworkC
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -2663,7 +2862,6 @@ impl<'a, C, NC, A> OperationGetCall<'a, C, NC, A> where NC: hyper::net::NetworkC
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -2673,7 +2871,7 @@ impl<'a, C, NC, A> OperationGetCall<'a, C, NC, A> where NC: hyper::net::NetworkC
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -2684,7 +2882,7 @@ impl<'a, C, NC, A> OperationGetCall<'a, C, NC, A> where NC: hyper::net::NetworkC
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -2693,13 +2891,13 @@ impl<'a, C, NC, A> OperationGetCall<'a, C, NC, A> where NC: hyper::net::NetworkC
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -2711,7 +2909,7 @@ impl<'a, C, NC, A> OperationGetCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Project ID of the project that contains the instance.    
+    /// Project ID of the project that contains the instance.
     pub fn project(mut self, new_value: &str) -> OperationGetCall<'a, C, NC, A> {
         self._project = new_value.to_string();
         self
@@ -2721,7 +2919,7 @@ impl<'a, C, NC, A> OperationGetCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Instance operation ID.    
+    /// Instance operation ID.
     pub fn operation(mut self, new_value: &str) -> OperationGetCall<'a, C, NC, A> {
         self._operation = new_value.to_string();
         self
@@ -2782,7 +2980,7 @@ impl<'a, C, NC, A> OperationGetCall<'a, C, NC, A> where NC: hyper::net::NetworkC
 /// Lists all available service tiers for Google Cloud SQL, for example D1, D2. For related information, see Pricing.
 ///
 /// A builder for the *list* method supported by a *tier* resource.
-/// It is not used directly, but through a `TierMethods`.
+/// It is not used directly, but through a `TierMethods` instance.
 ///
 /// # Example
 ///
@@ -2840,7 +3038,7 @@ impl<'a, C, NC, A> TierListCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
         for &field in ["alt", "project"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -2893,7 +3091,7 @@ impl<'a, C, NC, A> TierListCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -2905,7 +3103,6 @@ impl<'a, C, NC, A> TierListCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -2915,7 +3112,7 @@ impl<'a, C, NC, A> TierListCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -2926,7 +3123,7 @@ impl<'a, C, NC, A> TierListCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -2935,13 +3132,13 @@ impl<'a, C, NC, A> TierListCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -2953,7 +3150,7 @@ impl<'a, C, NC, A> TierListCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Project ID of the project for which to list tiers.    
+    /// Project ID of the project for which to list tiers.
     pub fn project(mut self, new_value: &str) -> TierListCall<'a, C, NC, A> {
         self._project = new_value.to_string();
         self
@@ -3014,7 +3211,7 @@ impl<'a, C, NC, A> TierListCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
 /// Lists users in the specified Cloud SQL instance.
 ///
 /// A builder for the *list* method supported by a *user* resource.
-/// It is not used directly, but through a `UserMethods`.
+/// It is not used directly, but through a `UserMethods` instance.
 ///
 /// # Example
 ///
@@ -3074,7 +3271,7 @@ impl<'a, C, NC, A> UserListCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
         for &field in ["alt", "project", "instance"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -3127,7 +3324,7 @@ impl<'a, C, NC, A> UserListCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -3139,7 +3336,6 @@ impl<'a, C, NC, A> UserListCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -3149,7 +3345,7 @@ impl<'a, C, NC, A> UserListCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -3160,7 +3356,7 @@ impl<'a, C, NC, A> UserListCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -3169,13 +3365,13 @@ impl<'a, C, NC, A> UserListCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -3187,7 +3383,7 @@ impl<'a, C, NC, A> UserListCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Project ID of the project that contains the instance.    
+    /// Project ID of the project that contains the instance.
     pub fn project(mut self, new_value: &str) -> UserListCall<'a, C, NC, A> {
         self._project = new_value.to_string();
         self
@@ -3197,7 +3393,7 @@ impl<'a, C, NC, A> UserListCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Database instance ID. This does not include the project ID.    
+    /// Database instance ID. This does not include the project ID.
     pub fn instance(mut self, new_value: &str) -> UserListCall<'a, C, NC, A> {
         self._instance = new_value.to_string();
         self
@@ -3258,7 +3454,7 @@ impl<'a, C, NC, A> UserListCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
 /// Deletes a user from a Cloud SQL instance.
 ///
 /// A builder for the *delete* method supported by a *user* resource.
-/// It is not used directly, but through a `UserMethods`.
+/// It is not used directly, but through a `UserMethods` instance.
 ///
 /// # Example
 ///
@@ -3322,7 +3518,7 @@ impl<'a, C, NC, A> UserDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
         for &field in ["alt", "project", "instance", "host", "name"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -3375,7 +3571,7 @@ impl<'a, C, NC, A> UserDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -3387,7 +3583,6 @@ impl<'a, C, NC, A> UserDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -3397,7 +3592,7 @@ impl<'a, C, NC, A> UserDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -3408,7 +3603,7 @@ impl<'a, C, NC, A> UserDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -3417,13 +3612,13 @@ impl<'a, C, NC, A> UserDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -3435,7 +3630,7 @@ impl<'a, C, NC, A> UserDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Project ID of the project that contains the instance.    
+    /// Project ID of the project that contains the instance.
     pub fn project(mut self, new_value: &str) -> UserDeleteCall<'a, C, NC, A> {
         self._project = new_value.to_string();
         self
@@ -3445,7 +3640,7 @@ impl<'a, C, NC, A> UserDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Database instance ID. This does not include the project ID.    
+    /// Database instance ID. This does not include the project ID.
     pub fn instance(mut self, new_value: &str) -> UserDeleteCall<'a, C, NC, A> {
         self._instance = new_value.to_string();
         self
@@ -3455,7 +3650,7 @@ impl<'a, C, NC, A> UserDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Host of the user in the instance.    
+    /// Host of the user in the instance.
     pub fn host(mut self, new_value: &str) -> UserDeleteCall<'a, C, NC, A> {
         self._host = new_value.to_string();
         self
@@ -3465,7 +3660,7 @@ impl<'a, C, NC, A> UserDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Name of the user in the instance.    
+    /// Name of the user in the instance.
     pub fn name(mut self, new_value: &str) -> UserDeleteCall<'a, C, NC, A> {
         self._name = new_value.to_string();
         self
@@ -3526,7 +3721,7 @@ impl<'a, C, NC, A> UserDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
 /// Updates an existing user in a Cloud SQL instance.
 ///
 /// A builder for the *update* method supported by a *user* resource.
-/// It is not used directly, but through a `UserMethods`.
+/// It is not used directly, but through a `UserMethods` instance.
 ///
 /// # Example
 ///
@@ -3597,7 +3792,7 @@ impl<'a, C, NC, A> UserUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
         for &field in ["alt", "project", "instance", "host", "name"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -3654,7 +3849,7 @@ impl<'a, C, NC, A> UserUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -3670,7 +3865,6 @@ impl<'a, C, NC, A> UserUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -3680,7 +3874,7 @@ impl<'a, C, NC, A> UserUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -3691,7 +3885,7 @@ impl<'a, C, NC, A> UserUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -3700,13 +3894,13 @@ impl<'a, C, NC, A> UserUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -3727,7 +3921,7 @@ impl<'a, C, NC, A> UserUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Project ID of the project that contains the instance.    
+    /// Project ID of the project that contains the instance.
     pub fn project(mut self, new_value: &str) -> UserUpdateCall<'a, C, NC, A> {
         self._project = new_value.to_string();
         self
@@ -3737,7 +3931,7 @@ impl<'a, C, NC, A> UserUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Database instance ID. This does not include the project ID.    
+    /// Database instance ID. This does not include the project ID.
     pub fn instance(mut self, new_value: &str) -> UserUpdateCall<'a, C, NC, A> {
         self._instance = new_value.to_string();
         self
@@ -3747,7 +3941,7 @@ impl<'a, C, NC, A> UserUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Host of the user in the instance.    
+    /// Host of the user in the instance.
     pub fn host(mut self, new_value: &str) -> UserUpdateCall<'a, C, NC, A> {
         self._host = new_value.to_string();
         self
@@ -3757,7 +3951,7 @@ impl<'a, C, NC, A> UserUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Name of the user in the instance.    
+    /// Name of the user in the instance.
     pub fn name(mut self, new_value: &str) -> UserUpdateCall<'a, C, NC, A> {
         self._name = new_value.to_string();
         self
@@ -3818,7 +4012,7 @@ impl<'a, C, NC, A> UserUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
 /// Creates a new user in a Cloud SQL instance.
 ///
 /// A builder for the *insert* method supported by a *user* resource.
-/// It is not used directly, but through a `UserMethods`.
+/// It is not used directly, but through a `UserMethods` instance.
 ///
 /// # Example
 ///
@@ -3885,7 +4079,7 @@ impl<'a, C, NC, A> UserInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
         for &field in ["alt", "project", "instance"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -3942,7 +4136,7 @@ impl<'a, C, NC, A> UserInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -3958,7 +4152,6 @@ impl<'a, C, NC, A> UserInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -3968,7 +4161,7 @@ impl<'a, C, NC, A> UserInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -3979,7 +4172,7 @@ impl<'a, C, NC, A> UserInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -3988,13 +4181,13 @@ impl<'a, C, NC, A> UserInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -4015,7 +4208,7 @@ impl<'a, C, NC, A> UserInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Project ID of the project that contains the instance.    
+    /// Project ID of the project that contains the instance.
     pub fn project(mut self, new_value: &str) -> UserInsertCall<'a, C, NC, A> {
         self._project = new_value.to_string();
         self
@@ -4025,7 +4218,7 @@ impl<'a, C, NC, A> UserInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Database instance ID. This does not include the project ID.    
+    /// Database instance ID. This does not include the project ID.
     pub fn instance(mut self, new_value: &str) -> UserInsertCall<'a, C, NC, A> {
         self._instance = new_value.to_string();
         self
@@ -4086,7 +4279,7 @@ impl<'a, C, NC, A> UserInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
 /// Deletes all client certificates and generates a new server SSL certificate for the instance. The changes will not take effect until the instance is restarted. Existing instances without a server certificate will need to call this once to set a server certificate.
 ///
 /// A builder for the *resetSslConfig* method supported by a *instance* resource.
-/// It is not used directly, but through a `InstanceMethods`.
+/// It is not used directly, but through a `InstanceMethods` instance.
 ///
 /// # Example
 ///
@@ -4146,7 +4339,7 @@ impl<'a, C, NC, A> InstanceResetSslConfigCall<'a, C, NC, A> where NC: hyper::net
         for &field in ["alt", "project", "instance"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -4199,7 +4392,7 @@ impl<'a, C, NC, A> InstanceResetSslConfigCall<'a, C, NC, A> where NC: hyper::net
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -4211,7 +4404,6 @@ impl<'a, C, NC, A> InstanceResetSslConfigCall<'a, C, NC, A> where NC: hyper::net
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -4221,7 +4413,7 @@ impl<'a, C, NC, A> InstanceResetSslConfigCall<'a, C, NC, A> where NC: hyper::net
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -4232,7 +4424,7 @@ impl<'a, C, NC, A> InstanceResetSslConfigCall<'a, C, NC, A> where NC: hyper::net
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -4241,13 +4433,13 @@ impl<'a, C, NC, A> InstanceResetSslConfigCall<'a, C, NC, A> where NC: hyper::net
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -4259,7 +4451,7 @@ impl<'a, C, NC, A> InstanceResetSslConfigCall<'a, C, NC, A> where NC: hyper::net
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Project ID of the project that contains the instance.    
+    /// Project ID of the project that contains the instance.
     pub fn project(mut self, new_value: &str) -> InstanceResetSslConfigCall<'a, C, NC, A> {
         self._project = new_value.to_string();
         self
@@ -4269,7 +4461,7 @@ impl<'a, C, NC, A> InstanceResetSslConfigCall<'a, C, NC, A> where NC: hyper::net
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Cloud SQL instance ID. This does not include the project ID.    
+    /// Cloud SQL instance ID. This does not include the project ID.
     pub fn instance(mut self, new_value: &str) -> InstanceResetSslConfigCall<'a, C, NC, A> {
         self._instance = new_value.to_string();
         self
@@ -4330,7 +4522,7 @@ impl<'a, C, NC, A> InstanceResetSslConfigCall<'a, C, NC, A> where NC: hyper::net
 /// Promotes the read replica instance to be a stand-alone Cloud SQL instance.
 ///
 /// A builder for the *promoteReplica* method supported by a *instance* resource.
-/// It is not used directly, but through a `InstanceMethods`.
+/// It is not used directly, but through a `InstanceMethods` instance.
 ///
 /// # Example
 ///
@@ -4390,7 +4582,7 @@ impl<'a, C, NC, A> InstancePromoteReplicaCall<'a, C, NC, A> where NC: hyper::net
         for &field in ["alt", "project", "instance"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -4443,7 +4635,7 @@ impl<'a, C, NC, A> InstancePromoteReplicaCall<'a, C, NC, A> where NC: hyper::net
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -4455,7 +4647,6 @@ impl<'a, C, NC, A> InstancePromoteReplicaCall<'a, C, NC, A> where NC: hyper::net
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -4465,7 +4656,7 @@ impl<'a, C, NC, A> InstancePromoteReplicaCall<'a, C, NC, A> where NC: hyper::net
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -4476,7 +4667,7 @@ impl<'a, C, NC, A> InstancePromoteReplicaCall<'a, C, NC, A> where NC: hyper::net
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -4485,13 +4676,13 @@ impl<'a, C, NC, A> InstancePromoteReplicaCall<'a, C, NC, A> where NC: hyper::net
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -4503,7 +4694,7 @@ impl<'a, C, NC, A> InstancePromoteReplicaCall<'a, C, NC, A> where NC: hyper::net
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// ID of the project that contains the read replica.    
+    /// ID of the project that contains the read replica.
     pub fn project(mut self, new_value: &str) -> InstancePromoteReplicaCall<'a, C, NC, A> {
         self._project = new_value.to_string();
         self
@@ -4513,7 +4704,7 @@ impl<'a, C, NC, A> InstancePromoteReplicaCall<'a, C, NC, A> where NC: hyper::net
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Cloud SQL read replica instance name.    
+    /// Cloud SQL read replica instance name.
     pub fn instance(mut self, new_value: &str) -> InstancePromoteReplicaCall<'a, C, NC, A> {
         self._instance = new_value.to_string();
         self
@@ -4574,7 +4765,7 @@ impl<'a, C, NC, A> InstancePromoteReplicaCall<'a, C, NC, A> where NC: hyper::net
 /// Retrieves a resource containing information about a Cloud SQL instance.
 ///
 /// A builder for the *get* method supported by a *instance* resource.
-/// It is not used directly, but through a `InstanceMethods`.
+/// It is not used directly, but through a `InstanceMethods` instance.
 ///
 /// # Example
 ///
@@ -4634,7 +4825,7 @@ impl<'a, C, NC, A> InstanceGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
         for &field in ["alt", "project", "instance"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -4687,7 +4878,7 @@ impl<'a, C, NC, A> InstanceGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -4699,7 +4890,6 @@ impl<'a, C, NC, A> InstanceGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -4709,7 +4899,7 @@ impl<'a, C, NC, A> InstanceGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -4720,7 +4910,7 @@ impl<'a, C, NC, A> InstanceGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -4729,13 +4919,13 @@ impl<'a, C, NC, A> InstanceGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -4747,7 +4937,7 @@ impl<'a, C, NC, A> InstanceGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Project ID of the project that contains the instance.    
+    /// Project ID of the project that contains the instance.
     pub fn project(mut self, new_value: &str) -> InstanceGetCall<'a, C, NC, A> {
         self._project = new_value.to_string();
         self
@@ -4757,7 +4947,7 @@ impl<'a, C, NC, A> InstanceGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Database instance ID. This does not include the project ID.    
+    /// Database instance ID. This does not include the project ID.
     pub fn instance(mut self, new_value: &str) -> InstanceGetCall<'a, C, NC, A> {
         self._instance = new_value.to_string();
         self
@@ -4818,7 +5008,7 @@ impl<'a, C, NC, A> InstanceGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
 /// Updates settings of a Cloud SQL instance. Caution: This is not a partial update, so you must include values for all the settings that you want to retain. For partial updates, use patch.. This method supports patch semantics.
 ///
 /// A builder for the *patch* method supported by a *instance* resource.
-/// It is not used directly, but through a `InstanceMethods`.
+/// It is not used directly, but through a `InstanceMethods` instance.
 ///
 /// # Example
 ///
@@ -4885,7 +5075,7 @@ impl<'a, C, NC, A> InstancePatchCall<'a, C, NC, A> where NC: hyper::net::Network
         for &field in ["alt", "project", "instance"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -4942,7 +5132,7 @@ impl<'a, C, NC, A> InstancePatchCall<'a, C, NC, A> where NC: hyper::net::Network
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -4958,7 +5148,6 @@ impl<'a, C, NC, A> InstancePatchCall<'a, C, NC, A> where NC: hyper::net::Network
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -4968,7 +5157,7 @@ impl<'a, C, NC, A> InstancePatchCall<'a, C, NC, A> where NC: hyper::net::Network
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -4979,7 +5168,7 @@ impl<'a, C, NC, A> InstancePatchCall<'a, C, NC, A> where NC: hyper::net::Network
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -4988,13 +5177,13 @@ impl<'a, C, NC, A> InstancePatchCall<'a, C, NC, A> where NC: hyper::net::Network
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -5015,7 +5204,7 @@ impl<'a, C, NC, A> InstancePatchCall<'a, C, NC, A> where NC: hyper::net::Network
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Project ID of the project that contains the instance.    
+    /// Project ID of the project that contains the instance.
     pub fn project(mut self, new_value: &str) -> InstancePatchCall<'a, C, NC, A> {
         self._project = new_value.to_string();
         self
@@ -5025,7 +5214,7 @@ impl<'a, C, NC, A> InstancePatchCall<'a, C, NC, A> where NC: hyper::net::Network
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Cloud SQL instance ID. This does not include the project ID.    
+    /// Cloud SQL instance ID. This does not include the project ID.
     pub fn instance(mut self, new_value: &str) -> InstancePatchCall<'a, C, NC, A> {
         self._instance = new_value.to_string();
         self
@@ -5086,7 +5275,7 @@ impl<'a, C, NC, A> InstancePatchCall<'a, C, NC, A> where NC: hyper::net::Network
 /// Restarts a Cloud SQL instance.
 ///
 /// A builder for the *restart* method supported by a *instance* resource.
-/// It is not used directly, but through a `InstanceMethods`.
+/// It is not used directly, but through a `InstanceMethods` instance.
 ///
 /// # Example
 ///
@@ -5146,7 +5335,7 @@ impl<'a, C, NC, A> InstanceRestartCall<'a, C, NC, A> where NC: hyper::net::Netwo
         for &field in ["alt", "project", "instance"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -5199,7 +5388,7 @@ impl<'a, C, NC, A> InstanceRestartCall<'a, C, NC, A> where NC: hyper::net::Netwo
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -5211,7 +5400,6 @@ impl<'a, C, NC, A> InstanceRestartCall<'a, C, NC, A> where NC: hyper::net::Netwo
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -5221,7 +5409,7 @@ impl<'a, C, NC, A> InstanceRestartCall<'a, C, NC, A> where NC: hyper::net::Netwo
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -5232,7 +5420,7 @@ impl<'a, C, NC, A> InstanceRestartCall<'a, C, NC, A> where NC: hyper::net::Netwo
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -5241,13 +5429,13 @@ impl<'a, C, NC, A> InstanceRestartCall<'a, C, NC, A> where NC: hyper::net::Netwo
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -5259,7 +5447,7 @@ impl<'a, C, NC, A> InstanceRestartCall<'a, C, NC, A> where NC: hyper::net::Netwo
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Project ID of the project that contains the instance to be restarted.    
+    /// Project ID of the project that contains the instance to be restarted.
     pub fn project(mut self, new_value: &str) -> InstanceRestartCall<'a, C, NC, A> {
         self._project = new_value.to_string();
         self
@@ -5269,7 +5457,7 @@ impl<'a, C, NC, A> InstanceRestartCall<'a, C, NC, A> where NC: hyper::net::Netwo
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Cloud SQL instance ID. This does not include the project ID.    
+    /// Cloud SQL instance ID. This does not include the project ID.
     pub fn instance(mut self, new_value: &str) -> InstanceRestartCall<'a, C, NC, A> {
         self._instance = new_value.to_string();
         self
@@ -5330,7 +5518,7 @@ impl<'a, C, NC, A> InstanceRestartCall<'a, C, NC, A> where NC: hyper::net::Netwo
 /// Deletes a Cloud SQL instance.
 ///
 /// A builder for the *delete* method supported by a *instance* resource.
-/// It is not used directly, but through a `InstanceMethods`.
+/// It is not used directly, but through a `InstanceMethods` instance.
 ///
 /// # Example
 ///
@@ -5390,7 +5578,7 @@ impl<'a, C, NC, A> InstanceDeleteCall<'a, C, NC, A> where NC: hyper::net::Networ
         for &field in ["alt", "project", "instance"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -5443,7 +5631,7 @@ impl<'a, C, NC, A> InstanceDeleteCall<'a, C, NC, A> where NC: hyper::net::Networ
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -5455,7 +5643,6 @@ impl<'a, C, NC, A> InstanceDeleteCall<'a, C, NC, A> where NC: hyper::net::Networ
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -5465,7 +5652,7 @@ impl<'a, C, NC, A> InstanceDeleteCall<'a, C, NC, A> where NC: hyper::net::Networ
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -5476,7 +5663,7 @@ impl<'a, C, NC, A> InstanceDeleteCall<'a, C, NC, A> where NC: hyper::net::Networ
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -5485,13 +5672,13 @@ impl<'a, C, NC, A> InstanceDeleteCall<'a, C, NC, A> where NC: hyper::net::Networ
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -5503,7 +5690,7 @@ impl<'a, C, NC, A> InstanceDeleteCall<'a, C, NC, A> where NC: hyper::net::Networ
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Project ID of the project that contains the instance to be deleted.    
+    /// Project ID of the project that contains the instance to be deleted.
     pub fn project(mut self, new_value: &str) -> InstanceDeleteCall<'a, C, NC, A> {
         self._project = new_value.to_string();
         self
@@ -5513,7 +5700,7 @@ impl<'a, C, NC, A> InstanceDeleteCall<'a, C, NC, A> where NC: hyper::net::Networ
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Cloud SQL instance ID. This does not include the project ID.    
+    /// Cloud SQL instance ID. This does not include the project ID.
     pub fn instance(mut self, new_value: &str) -> InstanceDeleteCall<'a, C, NC, A> {
         self._instance = new_value.to_string();
         self
@@ -5574,7 +5761,7 @@ impl<'a, C, NC, A> InstanceDeleteCall<'a, C, NC, A> where NC: hyper::net::Networ
 /// Stops the replication in the read replica instance.
 ///
 /// A builder for the *stopReplica* method supported by a *instance* resource.
-/// It is not used directly, but through a `InstanceMethods`.
+/// It is not used directly, but through a `InstanceMethods` instance.
 ///
 /// # Example
 ///
@@ -5634,7 +5821,7 @@ impl<'a, C, NC, A> InstanceStopReplicaCall<'a, C, NC, A> where NC: hyper::net::N
         for &field in ["alt", "project", "instance"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -5687,7 +5874,7 @@ impl<'a, C, NC, A> InstanceStopReplicaCall<'a, C, NC, A> where NC: hyper::net::N
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -5699,7 +5886,6 @@ impl<'a, C, NC, A> InstanceStopReplicaCall<'a, C, NC, A> where NC: hyper::net::N
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -5709,7 +5895,7 @@ impl<'a, C, NC, A> InstanceStopReplicaCall<'a, C, NC, A> where NC: hyper::net::N
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -5720,7 +5906,7 @@ impl<'a, C, NC, A> InstanceStopReplicaCall<'a, C, NC, A> where NC: hyper::net::N
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -5729,13 +5915,13 @@ impl<'a, C, NC, A> InstanceStopReplicaCall<'a, C, NC, A> where NC: hyper::net::N
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -5747,7 +5933,7 @@ impl<'a, C, NC, A> InstanceStopReplicaCall<'a, C, NC, A> where NC: hyper::net::N
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// ID of the project that contains the read replica.    
+    /// ID of the project that contains the read replica.
     pub fn project(mut self, new_value: &str) -> InstanceStopReplicaCall<'a, C, NC, A> {
         self._project = new_value.to_string();
         self
@@ -5757,7 +5943,7 @@ impl<'a, C, NC, A> InstanceStopReplicaCall<'a, C, NC, A> where NC: hyper::net::N
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Cloud SQL read replica instance name.    
+    /// Cloud SQL read replica instance name.
     pub fn instance(mut self, new_value: &str) -> InstanceStopReplicaCall<'a, C, NC, A> {
         self._instance = new_value.to_string();
         self
@@ -5818,7 +6004,7 @@ impl<'a, C, NC, A> InstanceStopReplicaCall<'a, C, NC, A> where NC: hyper::net::N
 /// Starts the replication in the read replica instance.
 ///
 /// A builder for the *startReplica* method supported by a *instance* resource.
-/// It is not used directly, but through a `InstanceMethods`.
+/// It is not used directly, but through a `InstanceMethods` instance.
 ///
 /// # Example
 ///
@@ -5878,7 +6064,7 @@ impl<'a, C, NC, A> InstanceStartReplicaCall<'a, C, NC, A> where NC: hyper::net::
         for &field in ["alt", "project", "instance"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -5931,7 +6117,7 @@ impl<'a, C, NC, A> InstanceStartReplicaCall<'a, C, NC, A> where NC: hyper::net::
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -5943,7 +6129,6 @@ impl<'a, C, NC, A> InstanceStartReplicaCall<'a, C, NC, A> where NC: hyper::net::
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -5953,7 +6138,7 @@ impl<'a, C, NC, A> InstanceStartReplicaCall<'a, C, NC, A> where NC: hyper::net::
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -5964,7 +6149,7 @@ impl<'a, C, NC, A> InstanceStartReplicaCall<'a, C, NC, A> where NC: hyper::net::
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -5973,13 +6158,13 @@ impl<'a, C, NC, A> InstanceStartReplicaCall<'a, C, NC, A> where NC: hyper::net::
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -5991,7 +6176,7 @@ impl<'a, C, NC, A> InstanceStartReplicaCall<'a, C, NC, A> where NC: hyper::net::
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// ID of the project that contains the read replica.    
+    /// ID of the project that contains the read replica.
     pub fn project(mut self, new_value: &str) -> InstanceStartReplicaCall<'a, C, NC, A> {
         self._project = new_value.to_string();
         self
@@ -6001,7 +6186,7 @@ impl<'a, C, NC, A> InstanceStartReplicaCall<'a, C, NC, A> where NC: hyper::net::
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Cloud SQL read replica instance name.    
+    /// Cloud SQL read replica instance name.
     pub fn instance(mut self, new_value: &str) -> InstanceStartReplicaCall<'a, C, NC, A> {
         self._instance = new_value.to_string();
         self
@@ -6062,7 +6247,7 @@ impl<'a, C, NC, A> InstanceStartReplicaCall<'a, C, NC, A> where NC: hyper::net::
 /// Creates a new Cloud SQL instance.
 ///
 /// A builder for the *insert* method supported by a *instance* resource.
-/// It is not used directly, but through a `InstanceMethods`.
+/// It is not used directly, but through a `InstanceMethods` instance.
 ///
 /// # Example
 ///
@@ -6127,7 +6312,7 @@ impl<'a, C, NC, A> InstanceInsertCall<'a, C, NC, A> where NC: hyper::net::Networ
         for &field in ["alt", "project"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -6184,7 +6369,7 @@ impl<'a, C, NC, A> InstanceInsertCall<'a, C, NC, A> where NC: hyper::net::Networ
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -6200,7 +6385,6 @@ impl<'a, C, NC, A> InstanceInsertCall<'a, C, NC, A> where NC: hyper::net::Networ
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -6210,7 +6394,7 @@ impl<'a, C, NC, A> InstanceInsertCall<'a, C, NC, A> where NC: hyper::net::Networ
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -6221,7 +6405,7 @@ impl<'a, C, NC, A> InstanceInsertCall<'a, C, NC, A> where NC: hyper::net::Networ
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -6230,13 +6414,13 @@ impl<'a, C, NC, A> InstanceInsertCall<'a, C, NC, A> where NC: hyper::net::Networ
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -6257,7 +6441,7 @@ impl<'a, C, NC, A> InstanceInsertCall<'a, C, NC, A> where NC: hyper::net::Networ
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Project ID of the project to which the newly created Cloud SQL instances should belong.    
+    /// Project ID of the project to which the newly created Cloud SQL instances should belong.
     pub fn project(mut self, new_value: &str) -> InstanceInsertCall<'a, C, NC, A> {
         self._project = new_value.to_string();
         self
@@ -6318,7 +6502,7 @@ impl<'a, C, NC, A> InstanceInsertCall<'a, C, NC, A> where NC: hyper::net::Networ
 /// Lists instances under a given project in the alphabetical order of the instance name.
 ///
 /// A builder for the *list* method supported by a *instance* resource.
-/// It is not used directly, but through a `InstanceMethods`.
+/// It is not used directly, but through a `InstanceMethods` instance.
 ///
 /// # Example
 ///
@@ -6386,7 +6570,7 @@ impl<'a, C, NC, A> InstanceListCall<'a, C, NC, A> where NC: hyper::net::NetworkC
         for &field in ["alt", "project", "pageToken", "maxResults"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -6439,7 +6623,7 @@ impl<'a, C, NC, A> InstanceListCall<'a, C, NC, A> where NC: hyper::net::NetworkC
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -6451,7 +6635,6 @@ impl<'a, C, NC, A> InstanceListCall<'a, C, NC, A> where NC: hyper::net::NetworkC
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -6461,7 +6644,7 @@ impl<'a, C, NC, A> InstanceListCall<'a, C, NC, A> where NC: hyper::net::NetworkC
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -6472,7 +6655,7 @@ impl<'a, C, NC, A> InstanceListCall<'a, C, NC, A> where NC: hyper::net::NetworkC
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -6481,13 +6664,13 @@ impl<'a, C, NC, A> InstanceListCall<'a, C, NC, A> where NC: hyper::net::NetworkC
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -6499,7 +6682,7 @@ impl<'a, C, NC, A> InstanceListCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Project ID of the project for which to list Cloud SQL instances.    
+    /// Project ID of the project for which to list Cloud SQL instances.
     pub fn project(mut self, new_value: &str) -> InstanceListCall<'a, C, NC, A> {
         self._project = new_value.to_string();
         self
@@ -6507,7 +6690,7 @@ impl<'a, C, NC, A> InstanceListCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// Sets the *page token* query property to the given value.
     ///
     /// 
-    /// A previously-returned page token representing part of the larger set of results to view.    
+    /// A previously-returned page token representing part of the larger set of results to view.
     pub fn page_token(mut self, new_value: &str) -> InstanceListCall<'a, C, NC, A> {
         self._page_token = Some(new_value.to_string());
         self
@@ -6515,7 +6698,7 @@ impl<'a, C, NC, A> InstanceListCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// Sets the *max results* query property to the given value.
     ///
     /// 
-    /// The maximum number of results to return per response.    
+    /// The maximum number of results to return per response.
     pub fn max_results(mut self, new_value: u32) -> InstanceListCall<'a, C, NC, A> {
         self._max_results = Some(new_value);
         self
@@ -6576,7 +6759,7 @@ impl<'a, C, NC, A> InstanceListCall<'a, C, NC, A> where NC: hyper::net::NetworkC
 /// Imports data into a Cloud SQL instance from a MySQL dump file in Google Cloud Storage.
 ///
 /// A builder for the *import* method supported by a *instance* resource.
-/// It is not used directly, but through a `InstanceMethods`.
+/// It is not used directly, but through a `InstanceMethods` instance.
 ///
 /// # Example
 ///
@@ -6643,7 +6826,7 @@ impl<'a, C, NC, A> InstanceImportCall<'a, C, NC, A> where NC: hyper::net::Networ
         for &field in ["alt", "project", "instance"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -6700,7 +6883,7 @@ impl<'a, C, NC, A> InstanceImportCall<'a, C, NC, A> where NC: hyper::net::Networ
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -6716,7 +6899,6 @@ impl<'a, C, NC, A> InstanceImportCall<'a, C, NC, A> where NC: hyper::net::Networ
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -6726,7 +6908,7 @@ impl<'a, C, NC, A> InstanceImportCall<'a, C, NC, A> where NC: hyper::net::Networ
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -6737,7 +6919,7 @@ impl<'a, C, NC, A> InstanceImportCall<'a, C, NC, A> where NC: hyper::net::Networ
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -6746,13 +6928,13 @@ impl<'a, C, NC, A> InstanceImportCall<'a, C, NC, A> where NC: hyper::net::Networ
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -6773,7 +6955,7 @@ impl<'a, C, NC, A> InstanceImportCall<'a, C, NC, A> where NC: hyper::net::Networ
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Project ID of the project that contains the instance.    
+    /// Project ID of the project that contains the instance.
     pub fn project(mut self, new_value: &str) -> InstanceImportCall<'a, C, NC, A> {
         self._project = new_value.to_string();
         self
@@ -6783,7 +6965,7 @@ impl<'a, C, NC, A> InstanceImportCall<'a, C, NC, A> where NC: hyper::net::Networ
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Cloud SQL instance ID. This does not include the project ID.    
+    /// Cloud SQL instance ID. This does not include the project ID.
     pub fn instance(mut self, new_value: &str) -> InstanceImportCall<'a, C, NC, A> {
         self._instance = new_value.to_string();
         self
@@ -6844,7 +7026,7 @@ impl<'a, C, NC, A> InstanceImportCall<'a, C, NC, A> where NC: hyper::net::Networ
 /// Updates settings of a Cloud SQL instance. Caution: This is not a partial update, so you must include values for all the settings that you want to retain. For partial updates, use patch.
 ///
 /// A builder for the *update* method supported by a *instance* resource.
-/// It is not used directly, but through a `InstanceMethods`.
+/// It is not used directly, but through a `InstanceMethods` instance.
 ///
 /// # Example
 ///
@@ -6911,7 +7093,7 @@ impl<'a, C, NC, A> InstanceUpdateCall<'a, C, NC, A> where NC: hyper::net::Networ
         for &field in ["alt", "project", "instance"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -6968,7 +7150,7 @@ impl<'a, C, NC, A> InstanceUpdateCall<'a, C, NC, A> where NC: hyper::net::Networ
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -6984,7 +7166,6 @@ impl<'a, C, NC, A> InstanceUpdateCall<'a, C, NC, A> where NC: hyper::net::Networ
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -6994,7 +7175,7 @@ impl<'a, C, NC, A> InstanceUpdateCall<'a, C, NC, A> where NC: hyper::net::Networ
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -7005,7 +7186,7 @@ impl<'a, C, NC, A> InstanceUpdateCall<'a, C, NC, A> where NC: hyper::net::Networ
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -7014,13 +7195,13 @@ impl<'a, C, NC, A> InstanceUpdateCall<'a, C, NC, A> where NC: hyper::net::Networ
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -7041,7 +7222,7 @@ impl<'a, C, NC, A> InstanceUpdateCall<'a, C, NC, A> where NC: hyper::net::Networ
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Project ID of the project that contains the instance.    
+    /// Project ID of the project that contains the instance.
     pub fn project(mut self, new_value: &str) -> InstanceUpdateCall<'a, C, NC, A> {
         self._project = new_value.to_string();
         self
@@ -7051,7 +7232,7 @@ impl<'a, C, NC, A> InstanceUpdateCall<'a, C, NC, A> where NC: hyper::net::Networ
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Cloud SQL instance ID. This does not include the project ID.    
+    /// Cloud SQL instance ID. This does not include the project ID.
     pub fn instance(mut self, new_value: &str) -> InstanceUpdateCall<'a, C, NC, A> {
         self._instance = new_value.to_string();
         self
@@ -7112,7 +7293,7 @@ impl<'a, C, NC, A> InstanceUpdateCall<'a, C, NC, A> where NC: hyper::net::Networ
 /// Creates a Cloud SQL instance as a clone of the source instance.
 ///
 /// A builder for the *clone* method supported by a *instance* resource.
-/// It is not used directly, but through a `InstanceMethods`.
+/// It is not used directly, but through a `InstanceMethods` instance.
 ///
 /// # Example
 ///
@@ -7179,7 +7360,7 @@ impl<'a, C, NC, A> InstanceCloneCall<'a, C, NC, A> where NC: hyper::net::Network
         for &field in ["alt", "project", "instance"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -7236,7 +7417,7 @@ impl<'a, C, NC, A> InstanceCloneCall<'a, C, NC, A> where NC: hyper::net::Network
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -7252,7 +7433,6 @@ impl<'a, C, NC, A> InstanceCloneCall<'a, C, NC, A> where NC: hyper::net::Network
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -7262,7 +7442,7 @@ impl<'a, C, NC, A> InstanceCloneCall<'a, C, NC, A> where NC: hyper::net::Network
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -7273,7 +7453,7 @@ impl<'a, C, NC, A> InstanceCloneCall<'a, C, NC, A> where NC: hyper::net::Network
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -7282,13 +7462,13 @@ impl<'a, C, NC, A> InstanceCloneCall<'a, C, NC, A> where NC: hyper::net::Network
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -7309,7 +7489,7 @@ impl<'a, C, NC, A> InstanceCloneCall<'a, C, NC, A> where NC: hyper::net::Network
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Project ID of the source as well as the clone Cloud SQL instance.    
+    /// Project ID of the source as well as the clone Cloud SQL instance.
     pub fn project(mut self, new_value: &str) -> InstanceCloneCall<'a, C, NC, A> {
         self._project = new_value.to_string();
         self
@@ -7319,7 +7499,7 @@ impl<'a, C, NC, A> InstanceCloneCall<'a, C, NC, A> where NC: hyper::net::Network
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The ID of the Cloud SQL instance to be cloned (source). This does not include the project ID.    
+    /// The ID of the Cloud SQL instance to be cloned (source). This does not include the project ID.
     pub fn instance(mut self, new_value: &str) -> InstanceCloneCall<'a, C, NC, A> {
         self._instance = new_value.to_string();
         self
@@ -7380,7 +7560,7 @@ impl<'a, C, NC, A> InstanceCloneCall<'a, C, NC, A> where NC: hyper::net::Network
 /// Exports data from a Cloud SQL instance to a Google Cloud Storage bucket as a MySQL dump file.
 ///
 /// A builder for the *export* method supported by a *instance* resource.
-/// It is not used directly, but through a `InstanceMethods`.
+/// It is not used directly, but through a `InstanceMethods` instance.
 ///
 /// # Example
 ///
@@ -7447,7 +7627,7 @@ impl<'a, C, NC, A> InstanceExportCall<'a, C, NC, A> where NC: hyper::net::Networ
         for &field in ["alt", "project", "instance"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -7504,7 +7684,7 @@ impl<'a, C, NC, A> InstanceExportCall<'a, C, NC, A> where NC: hyper::net::Networ
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -7520,7 +7700,6 @@ impl<'a, C, NC, A> InstanceExportCall<'a, C, NC, A> where NC: hyper::net::Networ
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -7530,7 +7709,7 @@ impl<'a, C, NC, A> InstanceExportCall<'a, C, NC, A> where NC: hyper::net::Networ
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -7541,7 +7720,7 @@ impl<'a, C, NC, A> InstanceExportCall<'a, C, NC, A> where NC: hyper::net::Networ
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -7550,13 +7729,13 @@ impl<'a, C, NC, A> InstanceExportCall<'a, C, NC, A> where NC: hyper::net::Networ
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -7577,7 +7756,7 @@ impl<'a, C, NC, A> InstanceExportCall<'a, C, NC, A> where NC: hyper::net::Networ
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Project ID of the project that contains the instance to be exported.    
+    /// Project ID of the project that contains the instance to be exported.
     pub fn project(mut self, new_value: &str) -> InstanceExportCall<'a, C, NC, A> {
         self._project = new_value.to_string();
         self
@@ -7587,7 +7766,7 @@ impl<'a, C, NC, A> InstanceExportCall<'a, C, NC, A> where NC: hyper::net::Networ
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Cloud SQL instance ID. This does not include the project ID.    
+    /// Cloud SQL instance ID. This does not include the project ID.
     pub fn instance(mut self, new_value: &str) -> InstanceExportCall<'a, C, NC, A> {
         self._instance = new_value.to_string();
         self
@@ -7648,7 +7827,7 @@ impl<'a, C, NC, A> InstanceExportCall<'a, C, NC, A> where NC: hyper::net::Networ
 /// Restores a backup of a Cloud SQL instance.
 ///
 /// A builder for the *restoreBackup* method supported by a *instance* resource.
-/// It is not used directly, but through a `InstanceMethods`.
+/// It is not used directly, but through a `InstanceMethods` instance.
 ///
 /// # Example
 ///
@@ -7715,7 +7894,7 @@ impl<'a, C, NC, A> InstanceRestoreBackupCall<'a, C, NC, A> where NC: hyper::net:
         for &field in ["alt", "project", "instance"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -7772,7 +7951,7 @@ impl<'a, C, NC, A> InstanceRestoreBackupCall<'a, C, NC, A> where NC: hyper::net:
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -7788,7 +7967,6 @@ impl<'a, C, NC, A> InstanceRestoreBackupCall<'a, C, NC, A> where NC: hyper::net:
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -7798,7 +7976,7 @@ impl<'a, C, NC, A> InstanceRestoreBackupCall<'a, C, NC, A> where NC: hyper::net:
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -7809,7 +7987,7 @@ impl<'a, C, NC, A> InstanceRestoreBackupCall<'a, C, NC, A> where NC: hyper::net:
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -7818,13 +7996,13 @@ impl<'a, C, NC, A> InstanceRestoreBackupCall<'a, C, NC, A> where NC: hyper::net:
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -7845,7 +8023,7 @@ impl<'a, C, NC, A> InstanceRestoreBackupCall<'a, C, NC, A> where NC: hyper::net:
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Project ID of the project that contains the instance.    
+    /// Project ID of the project that contains the instance.
     pub fn project(mut self, new_value: &str) -> InstanceRestoreBackupCall<'a, C, NC, A> {
         self._project = new_value.to_string();
         self
@@ -7855,7 +8033,7 @@ impl<'a, C, NC, A> InstanceRestoreBackupCall<'a, C, NC, A> where NC: hyper::net:
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Cloud SQL instance ID. This does not include the project ID.    
+    /// Cloud SQL instance ID. This does not include the project ID.
     pub fn instance(mut self, new_value: &str) -> InstanceRestoreBackupCall<'a, C, NC, A> {
         self._instance = new_value.to_string();
         self
@@ -7916,7 +8094,7 @@ impl<'a, C, NC, A> InstanceRestoreBackupCall<'a, C, NC, A> where NC: hyper::net:
 /// List all available database flags for Google Cloud SQL instances.
 ///
 /// A builder for the *list* method supported by a *flag* resource.
-/// It is not used directly, but through a `FlagMethods`.
+/// It is not used directly, but through a `FlagMethods` instance.
 ///
 /// # Example
 ///
@@ -7972,7 +8150,7 @@ impl<'a, C, NC, A> FlagListCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
         for &field in ["alt"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -8001,7 +8179,7 @@ impl<'a, C, NC, A> FlagListCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -8013,7 +8191,6 @@ impl<'a, C, NC, A> FlagListCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -8023,7 +8200,7 @@ impl<'a, C, NC, A> FlagListCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -8034,7 +8211,7 @@ impl<'a, C, NC, A> FlagListCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -8043,13 +8220,13 @@ impl<'a, C, NC, A> FlagListCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -8112,7 +8289,7 @@ impl<'a, C, NC, A> FlagListCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
 /// Deletes a resource containing information about a database inside a Cloud SQL instance.
 ///
 /// A builder for the *delete* method supported by a *database* resource.
-/// It is not used directly, but through a `DatabaseMethods`.
+/// It is not used directly, but through a `DatabaseMethods` instance.
 ///
 /// # Example
 ///
@@ -8174,7 +8351,7 @@ impl<'a, C, NC, A> DatabaseDeleteCall<'a, C, NC, A> where NC: hyper::net::Networ
         for &field in ["alt", "project", "instance", "database"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -8227,7 +8404,7 @@ impl<'a, C, NC, A> DatabaseDeleteCall<'a, C, NC, A> where NC: hyper::net::Networ
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -8239,7 +8416,6 @@ impl<'a, C, NC, A> DatabaseDeleteCall<'a, C, NC, A> where NC: hyper::net::Networ
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -8249,7 +8425,7 @@ impl<'a, C, NC, A> DatabaseDeleteCall<'a, C, NC, A> where NC: hyper::net::Networ
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -8260,7 +8436,7 @@ impl<'a, C, NC, A> DatabaseDeleteCall<'a, C, NC, A> where NC: hyper::net::Networ
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -8269,13 +8445,13 @@ impl<'a, C, NC, A> DatabaseDeleteCall<'a, C, NC, A> where NC: hyper::net::Networ
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -8287,7 +8463,7 @@ impl<'a, C, NC, A> DatabaseDeleteCall<'a, C, NC, A> where NC: hyper::net::Networ
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Project ID of the project that contains the instance.    
+    /// Project ID of the project that contains the instance.
     pub fn project(mut self, new_value: &str) -> DatabaseDeleteCall<'a, C, NC, A> {
         self._project = new_value.to_string();
         self
@@ -8297,7 +8473,7 @@ impl<'a, C, NC, A> DatabaseDeleteCall<'a, C, NC, A> where NC: hyper::net::Networ
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Database instance ID. This does not include the project ID.    
+    /// Database instance ID. This does not include the project ID.
     pub fn instance(mut self, new_value: &str) -> DatabaseDeleteCall<'a, C, NC, A> {
         self._instance = new_value.to_string();
         self
@@ -8307,7 +8483,7 @@ impl<'a, C, NC, A> DatabaseDeleteCall<'a, C, NC, A> where NC: hyper::net::Networ
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Name of the database to be deleted in the instance.    
+    /// Name of the database to be deleted in the instance.
     pub fn database(mut self, new_value: &str) -> DatabaseDeleteCall<'a, C, NC, A> {
         self._database = new_value.to_string();
         self
@@ -8368,7 +8544,7 @@ impl<'a, C, NC, A> DatabaseDeleteCall<'a, C, NC, A> where NC: hyper::net::Networ
 /// Updates a resource containing information about a database inside a Cloud SQL instance. This method supports patch semantics.
 ///
 /// A builder for the *patch* method supported by a *database* resource.
-/// It is not used directly, but through a `DatabaseMethods`.
+/// It is not used directly, but through a `DatabaseMethods` instance.
 ///
 /// # Example
 ///
@@ -8437,7 +8613,7 @@ impl<'a, C, NC, A> DatabasePatchCall<'a, C, NC, A> where NC: hyper::net::Network
         for &field in ["alt", "project", "instance", "database"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -8494,7 +8670,7 @@ impl<'a, C, NC, A> DatabasePatchCall<'a, C, NC, A> where NC: hyper::net::Network
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -8510,7 +8686,6 @@ impl<'a, C, NC, A> DatabasePatchCall<'a, C, NC, A> where NC: hyper::net::Network
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -8520,7 +8695,7 @@ impl<'a, C, NC, A> DatabasePatchCall<'a, C, NC, A> where NC: hyper::net::Network
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -8531,7 +8706,7 @@ impl<'a, C, NC, A> DatabasePatchCall<'a, C, NC, A> where NC: hyper::net::Network
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -8540,13 +8715,13 @@ impl<'a, C, NC, A> DatabasePatchCall<'a, C, NC, A> where NC: hyper::net::Network
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -8567,7 +8742,7 @@ impl<'a, C, NC, A> DatabasePatchCall<'a, C, NC, A> where NC: hyper::net::Network
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Project ID of the project that contains the instance.    
+    /// Project ID of the project that contains the instance.
     pub fn project(mut self, new_value: &str) -> DatabasePatchCall<'a, C, NC, A> {
         self._project = new_value.to_string();
         self
@@ -8577,7 +8752,7 @@ impl<'a, C, NC, A> DatabasePatchCall<'a, C, NC, A> where NC: hyper::net::Network
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Database instance ID. This does not include the project ID.    
+    /// Database instance ID. This does not include the project ID.
     pub fn instance(mut self, new_value: &str) -> DatabasePatchCall<'a, C, NC, A> {
         self._instance = new_value.to_string();
         self
@@ -8587,7 +8762,7 @@ impl<'a, C, NC, A> DatabasePatchCall<'a, C, NC, A> where NC: hyper::net::Network
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Name of the database to be updated in the instance.    
+    /// Name of the database to be updated in the instance.
     pub fn database(mut self, new_value: &str) -> DatabasePatchCall<'a, C, NC, A> {
         self._database = new_value.to_string();
         self
@@ -8648,7 +8823,7 @@ impl<'a, C, NC, A> DatabasePatchCall<'a, C, NC, A> where NC: hyper::net::Network
 /// Lists databases in the specified Cloud SQL instance.
 ///
 /// A builder for the *list* method supported by a *database* resource.
-/// It is not used directly, but through a `DatabaseMethods`.
+/// It is not used directly, but through a `DatabaseMethods` instance.
 ///
 /// # Example
 ///
@@ -8708,7 +8883,7 @@ impl<'a, C, NC, A> DatabaseListCall<'a, C, NC, A> where NC: hyper::net::NetworkC
         for &field in ["alt", "project", "instance"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -8761,7 +8936,7 @@ impl<'a, C, NC, A> DatabaseListCall<'a, C, NC, A> where NC: hyper::net::NetworkC
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -8773,7 +8948,6 @@ impl<'a, C, NC, A> DatabaseListCall<'a, C, NC, A> where NC: hyper::net::NetworkC
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -8783,7 +8957,7 @@ impl<'a, C, NC, A> DatabaseListCall<'a, C, NC, A> where NC: hyper::net::NetworkC
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -8794,7 +8968,7 @@ impl<'a, C, NC, A> DatabaseListCall<'a, C, NC, A> where NC: hyper::net::NetworkC
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -8803,13 +8977,13 @@ impl<'a, C, NC, A> DatabaseListCall<'a, C, NC, A> where NC: hyper::net::NetworkC
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -8821,7 +8995,7 @@ impl<'a, C, NC, A> DatabaseListCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Project ID of the project for which to list Cloud SQL instances.    
+    /// Project ID of the project for which to list Cloud SQL instances.
     pub fn project(mut self, new_value: &str) -> DatabaseListCall<'a, C, NC, A> {
         self._project = new_value.to_string();
         self
@@ -8831,7 +9005,7 @@ impl<'a, C, NC, A> DatabaseListCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Cloud SQL instance ID. This does not include the project ID.    
+    /// Cloud SQL instance ID. This does not include the project ID.
     pub fn instance(mut self, new_value: &str) -> DatabaseListCall<'a, C, NC, A> {
         self._instance = new_value.to_string();
         self
@@ -8892,7 +9066,7 @@ impl<'a, C, NC, A> DatabaseListCall<'a, C, NC, A> where NC: hyper::net::NetworkC
 /// Inserts a resource containing information about a database inside a Cloud SQL instance.
 ///
 /// A builder for the *insert* method supported by a *database* resource.
-/// It is not used directly, but through a `DatabaseMethods`.
+/// It is not used directly, but through a `DatabaseMethods` instance.
 ///
 /// # Example
 ///
@@ -8959,7 +9133,7 @@ impl<'a, C, NC, A> DatabaseInsertCall<'a, C, NC, A> where NC: hyper::net::Networ
         for &field in ["alt", "project", "instance"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -9016,7 +9190,7 @@ impl<'a, C, NC, A> DatabaseInsertCall<'a, C, NC, A> where NC: hyper::net::Networ
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -9032,7 +9206,6 @@ impl<'a, C, NC, A> DatabaseInsertCall<'a, C, NC, A> where NC: hyper::net::Networ
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -9042,7 +9215,7 @@ impl<'a, C, NC, A> DatabaseInsertCall<'a, C, NC, A> where NC: hyper::net::Networ
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -9053,7 +9226,7 @@ impl<'a, C, NC, A> DatabaseInsertCall<'a, C, NC, A> where NC: hyper::net::Networ
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -9062,13 +9235,13 @@ impl<'a, C, NC, A> DatabaseInsertCall<'a, C, NC, A> where NC: hyper::net::Networ
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -9089,7 +9262,7 @@ impl<'a, C, NC, A> DatabaseInsertCall<'a, C, NC, A> where NC: hyper::net::Networ
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Project ID of the project that contains the instance.    
+    /// Project ID of the project that contains the instance.
     pub fn project(mut self, new_value: &str) -> DatabaseInsertCall<'a, C, NC, A> {
         self._project = new_value.to_string();
         self
@@ -9099,7 +9272,7 @@ impl<'a, C, NC, A> DatabaseInsertCall<'a, C, NC, A> where NC: hyper::net::Networ
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Database instance ID. This does not include the project ID.    
+    /// Database instance ID. This does not include the project ID.
     pub fn instance(mut self, new_value: &str) -> DatabaseInsertCall<'a, C, NC, A> {
         self._instance = new_value.to_string();
         self
@@ -9160,7 +9333,7 @@ impl<'a, C, NC, A> DatabaseInsertCall<'a, C, NC, A> where NC: hyper::net::Networ
 /// Retrieves a resource containing information about a database inside a Cloud SQL instance.
 ///
 /// A builder for the *get* method supported by a *database* resource.
-/// It is not used directly, but through a `DatabaseMethods`.
+/// It is not used directly, but through a `DatabaseMethods` instance.
 ///
 /// # Example
 ///
@@ -9222,7 +9395,7 @@ impl<'a, C, NC, A> DatabaseGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
         for &field in ["alt", "project", "instance", "database"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -9275,7 +9448,7 @@ impl<'a, C, NC, A> DatabaseGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -9287,7 +9460,6 @@ impl<'a, C, NC, A> DatabaseGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -9297,7 +9469,7 @@ impl<'a, C, NC, A> DatabaseGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -9308,7 +9480,7 @@ impl<'a, C, NC, A> DatabaseGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -9317,13 +9489,13 @@ impl<'a, C, NC, A> DatabaseGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -9335,7 +9507,7 @@ impl<'a, C, NC, A> DatabaseGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Project ID of the project that contains the instance.    
+    /// Project ID of the project that contains the instance.
     pub fn project(mut self, new_value: &str) -> DatabaseGetCall<'a, C, NC, A> {
         self._project = new_value.to_string();
         self
@@ -9345,7 +9517,7 @@ impl<'a, C, NC, A> DatabaseGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Database instance ID. This does not include the project ID.    
+    /// Database instance ID. This does not include the project ID.
     pub fn instance(mut self, new_value: &str) -> DatabaseGetCall<'a, C, NC, A> {
         self._instance = new_value.to_string();
         self
@@ -9355,7 +9527,7 @@ impl<'a, C, NC, A> DatabaseGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Name of the database in the instance.    
+    /// Name of the database in the instance.
     pub fn database(mut self, new_value: &str) -> DatabaseGetCall<'a, C, NC, A> {
         self._database = new_value.to_string();
         self
@@ -9416,7 +9588,7 @@ impl<'a, C, NC, A> DatabaseGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
 /// Updates a resource containing information about a database inside a Cloud SQL instance.
 ///
 /// A builder for the *update* method supported by a *database* resource.
-/// It is not used directly, but through a `DatabaseMethods`.
+/// It is not used directly, but through a `DatabaseMethods` instance.
 ///
 /// # Example
 ///
@@ -9485,7 +9657,7 @@ impl<'a, C, NC, A> DatabaseUpdateCall<'a, C, NC, A> where NC: hyper::net::Networ
         for &field in ["alt", "project", "instance", "database"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -9542,7 +9714,7 @@ impl<'a, C, NC, A> DatabaseUpdateCall<'a, C, NC, A> where NC: hyper::net::Networ
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -9558,7 +9730,6 @@ impl<'a, C, NC, A> DatabaseUpdateCall<'a, C, NC, A> where NC: hyper::net::Networ
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -9568,7 +9739,7 @@ impl<'a, C, NC, A> DatabaseUpdateCall<'a, C, NC, A> where NC: hyper::net::Networ
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -9579,7 +9750,7 @@ impl<'a, C, NC, A> DatabaseUpdateCall<'a, C, NC, A> where NC: hyper::net::Networ
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -9588,13 +9759,13 @@ impl<'a, C, NC, A> DatabaseUpdateCall<'a, C, NC, A> where NC: hyper::net::Networ
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -9615,7 +9786,7 @@ impl<'a, C, NC, A> DatabaseUpdateCall<'a, C, NC, A> where NC: hyper::net::Networ
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Project ID of the project that contains the instance.    
+    /// Project ID of the project that contains the instance.
     pub fn project(mut self, new_value: &str) -> DatabaseUpdateCall<'a, C, NC, A> {
         self._project = new_value.to_string();
         self
@@ -9625,7 +9796,7 @@ impl<'a, C, NC, A> DatabaseUpdateCall<'a, C, NC, A> where NC: hyper::net::Networ
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Database instance ID. This does not include the project ID.    
+    /// Database instance ID. This does not include the project ID.
     pub fn instance(mut self, new_value: &str) -> DatabaseUpdateCall<'a, C, NC, A> {
         self._instance = new_value.to_string();
         self
@@ -9635,7 +9806,7 @@ impl<'a, C, NC, A> DatabaseUpdateCall<'a, C, NC, A> where NC: hyper::net::Networ
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Name of the database to be updated in the instance.    
+    /// Name of the database to be updated in the instance.
     pub fn database(mut self, new_value: &str) -> DatabaseUpdateCall<'a, C, NC, A> {
         self._database = new_value.to_string();
         self
@@ -9696,7 +9867,7 @@ impl<'a, C, NC, A> DatabaseUpdateCall<'a, C, NC, A> where NC: hyper::net::Networ
 /// Creates an SSL certificate and returns it along with the private key and server certificate authority. The new certificate will not be usable until the instance is restarted.
 ///
 /// A builder for the *insert* method supported by a *sslCert* resource.
-/// It is not used directly, but through a `SslCertMethods`.
+/// It is not used directly, but through a `SslCertMethods` instance.
 ///
 /// # Example
 ///
@@ -9763,7 +9934,7 @@ impl<'a, C, NC, A> SslCertInsertCall<'a, C, NC, A> where NC: hyper::net::Network
         for &field in ["alt", "project", "instance"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -9820,7 +9991,7 @@ impl<'a, C, NC, A> SslCertInsertCall<'a, C, NC, A> where NC: hyper::net::Network
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -9836,7 +10007,6 @@ impl<'a, C, NC, A> SslCertInsertCall<'a, C, NC, A> where NC: hyper::net::Network
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -9846,7 +10016,7 @@ impl<'a, C, NC, A> SslCertInsertCall<'a, C, NC, A> where NC: hyper::net::Network
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -9857,7 +10027,7 @@ impl<'a, C, NC, A> SslCertInsertCall<'a, C, NC, A> where NC: hyper::net::Network
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -9866,13 +10036,13 @@ impl<'a, C, NC, A> SslCertInsertCall<'a, C, NC, A> where NC: hyper::net::Network
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -9893,7 +10063,7 @@ impl<'a, C, NC, A> SslCertInsertCall<'a, C, NC, A> where NC: hyper::net::Network
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Project ID of the project to which the newly created Cloud SQL instances should belong.    
+    /// Project ID of the project to which the newly created Cloud SQL instances should belong.
     pub fn project(mut self, new_value: &str) -> SslCertInsertCall<'a, C, NC, A> {
         self._project = new_value.to_string();
         self
@@ -9903,7 +10073,7 @@ impl<'a, C, NC, A> SslCertInsertCall<'a, C, NC, A> where NC: hyper::net::Network
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Cloud SQL instance ID. This does not include the project ID.    
+    /// Cloud SQL instance ID. This does not include the project ID.
     pub fn instance(mut self, new_value: &str) -> SslCertInsertCall<'a, C, NC, A> {
         self._instance = new_value.to_string();
         self
@@ -9964,7 +10134,7 @@ impl<'a, C, NC, A> SslCertInsertCall<'a, C, NC, A> where NC: hyper::net::Network
 /// Deletes the SSL certificate. The change will not take effect until the instance is restarted.
 ///
 /// A builder for the *delete* method supported by a *sslCert* resource.
-/// It is not used directly, but through a `SslCertMethods`.
+/// It is not used directly, but through a `SslCertMethods` instance.
 ///
 /// # Example
 ///
@@ -10026,7 +10196,7 @@ impl<'a, C, NC, A> SslCertDeleteCall<'a, C, NC, A> where NC: hyper::net::Network
         for &field in ["alt", "project", "instance", "sha1Fingerprint"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -10079,7 +10249,7 @@ impl<'a, C, NC, A> SslCertDeleteCall<'a, C, NC, A> where NC: hyper::net::Network
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -10091,7 +10261,6 @@ impl<'a, C, NC, A> SslCertDeleteCall<'a, C, NC, A> where NC: hyper::net::Network
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -10101,7 +10270,7 @@ impl<'a, C, NC, A> SslCertDeleteCall<'a, C, NC, A> where NC: hyper::net::Network
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -10112,7 +10281,7 @@ impl<'a, C, NC, A> SslCertDeleteCall<'a, C, NC, A> where NC: hyper::net::Network
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -10121,13 +10290,13 @@ impl<'a, C, NC, A> SslCertDeleteCall<'a, C, NC, A> where NC: hyper::net::Network
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -10139,7 +10308,7 @@ impl<'a, C, NC, A> SslCertDeleteCall<'a, C, NC, A> where NC: hyper::net::Network
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Project ID of the project that contains the instance to be deleted.    
+    /// Project ID of the project that contains the instance to be deleted.
     pub fn project(mut self, new_value: &str) -> SslCertDeleteCall<'a, C, NC, A> {
         self._project = new_value.to_string();
         self
@@ -10149,7 +10318,7 @@ impl<'a, C, NC, A> SslCertDeleteCall<'a, C, NC, A> where NC: hyper::net::Network
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Cloud SQL instance ID. This does not include the project ID.    
+    /// Cloud SQL instance ID. This does not include the project ID.
     pub fn instance(mut self, new_value: &str) -> SslCertDeleteCall<'a, C, NC, A> {
         self._instance = new_value.to_string();
         self
@@ -10159,7 +10328,7 @@ impl<'a, C, NC, A> SslCertDeleteCall<'a, C, NC, A> where NC: hyper::net::Network
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Sha1 FingerPrint.    
+    /// Sha1 FingerPrint.
     pub fn sha1_fingerprint(mut self, new_value: &str) -> SslCertDeleteCall<'a, C, NC, A> {
         self._sha1_fingerprint = new_value.to_string();
         self
@@ -10220,7 +10389,7 @@ impl<'a, C, NC, A> SslCertDeleteCall<'a, C, NC, A> where NC: hyper::net::Network
 /// Retrieves a particular SSL certificate. Does not include the private key (required for usage). The private key must be saved from the response to initial creation.
 ///
 /// A builder for the *get* method supported by a *sslCert* resource.
-/// It is not used directly, but through a `SslCertMethods`.
+/// It is not used directly, but through a `SslCertMethods` instance.
 ///
 /// # Example
 ///
@@ -10282,7 +10451,7 @@ impl<'a, C, NC, A> SslCertGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
         for &field in ["alt", "project", "instance", "sha1Fingerprint"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -10335,7 +10504,7 @@ impl<'a, C, NC, A> SslCertGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -10347,7 +10516,6 @@ impl<'a, C, NC, A> SslCertGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -10357,7 +10525,7 @@ impl<'a, C, NC, A> SslCertGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -10368,7 +10536,7 @@ impl<'a, C, NC, A> SslCertGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -10377,13 +10545,13 @@ impl<'a, C, NC, A> SslCertGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -10395,7 +10563,7 @@ impl<'a, C, NC, A> SslCertGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Project ID of the project that contains the instance.    
+    /// Project ID of the project that contains the instance.
     pub fn project(mut self, new_value: &str) -> SslCertGetCall<'a, C, NC, A> {
         self._project = new_value.to_string();
         self
@@ -10405,7 +10573,7 @@ impl<'a, C, NC, A> SslCertGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Cloud SQL instance ID. This does not include the project ID.    
+    /// Cloud SQL instance ID. This does not include the project ID.
     pub fn instance(mut self, new_value: &str) -> SslCertGetCall<'a, C, NC, A> {
         self._instance = new_value.to_string();
         self
@@ -10415,7 +10583,7 @@ impl<'a, C, NC, A> SslCertGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Sha1 FingerPrint.    
+    /// Sha1 FingerPrint.
     pub fn sha1_fingerprint(mut self, new_value: &str) -> SslCertGetCall<'a, C, NC, A> {
         self._sha1_fingerprint = new_value.to_string();
         self
@@ -10476,7 +10644,7 @@ impl<'a, C, NC, A> SslCertGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
 /// Lists all of the current SSL certificates for the instance.
 ///
 /// A builder for the *list* method supported by a *sslCert* resource.
-/// It is not used directly, but through a `SslCertMethods`.
+/// It is not used directly, but through a `SslCertMethods` instance.
 ///
 /// # Example
 ///
@@ -10536,7 +10704,7 @@ impl<'a, C, NC, A> SslCertListCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
         for &field in ["alt", "project", "instance"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -10589,7 +10757,7 @@ impl<'a, C, NC, A> SslCertListCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -10601,7 +10769,6 @@ impl<'a, C, NC, A> SslCertListCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -10611,7 +10778,7 @@ impl<'a, C, NC, A> SslCertListCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -10622,7 +10789,7 @@ impl<'a, C, NC, A> SslCertListCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -10631,13 +10798,13 @@ impl<'a, C, NC, A> SslCertListCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -10649,7 +10816,7 @@ impl<'a, C, NC, A> SslCertListCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Project ID of the project for which to list Cloud SQL instances.    
+    /// Project ID of the project for which to list Cloud SQL instances.
     pub fn project(mut self, new_value: &str) -> SslCertListCall<'a, C, NC, A> {
         self._project = new_value.to_string();
         self
@@ -10659,7 +10826,7 @@ impl<'a, C, NC, A> SslCertListCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Cloud SQL instance ID. This does not include the project ID.    
+    /// Cloud SQL instance ID. This does not include the project ID.
     pub fn instance(mut self, new_value: &str) -> SslCertListCall<'a, C, NC, A> {
         self._instance = new_value.to_string();
         self
@@ -10720,7 +10887,7 @@ impl<'a, C, NC, A> SslCertListCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
 /// Lists all backup runs associated with a given instance and configuration in the reverse chronological order of the enqueued time.
 ///
 /// A builder for the *list* method supported by a *backupRun* resource.
-/// It is not used directly, but through a `BackupRunMethods`.
+/// It is not used directly, but through a `BackupRunMethods` instance.
 ///
 /// # Example
 ///
@@ -10790,7 +10957,7 @@ impl<'a, C, NC, A> BackupRunListCall<'a, C, NC, A> where NC: hyper::net::Network
         for &field in ["alt", "project", "instance", "pageToken", "maxResults"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -10843,7 +11010,7 @@ impl<'a, C, NC, A> BackupRunListCall<'a, C, NC, A> where NC: hyper::net::Network
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -10855,7 +11022,6 @@ impl<'a, C, NC, A> BackupRunListCall<'a, C, NC, A> where NC: hyper::net::Network
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -10865,7 +11031,7 @@ impl<'a, C, NC, A> BackupRunListCall<'a, C, NC, A> where NC: hyper::net::Network
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -10876,7 +11042,7 @@ impl<'a, C, NC, A> BackupRunListCall<'a, C, NC, A> where NC: hyper::net::Network
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -10885,13 +11051,13 @@ impl<'a, C, NC, A> BackupRunListCall<'a, C, NC, A> where NC: hyper::net::Network
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -10903,7 +11069,7 @@ impl<'a, C, NC, A> BackupRunListCall<'a, C, NC, A> where NC: hyper::net::Network
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Project ID of the project that contains the instance.    
+    /// Project ID of the project that contains the instance.
     pub fn project(mut self, new_value: &str) -> BackupRunListCall<'a, C, NC, A> {
         self._project = new_value.to_string();
         self
@@ -10913,7 +11079,7 @@ impl<'a, C, NC, A> BackupRunListCall<'a, C, NC, A> where NC: hyper::net::Network
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Cloud SQL instance ID. This does not include the project ID.    
+    /// Cloud SQL instance ID. This does not include the project ID.
     pub fn instance(mut self, new_value: &str) -> BackupRunListCall<'a, C, NC, A> {
         self._instance = new_value.to_string();
         self
@@ -10921,7 +11087,7 @@ impl<'a, C, NC, A> BackupRunListCall<'a, C, NC, A> where NC: hyper::net::Network
     /// Sets the *page token* query property to the given value.
     ///
     /// 
-    /// A previously-returned page token representing part of the larger set of results to view.    
+    /// A previously-returned page token representing part of the larger set of results to view.
     pub fn page_token(mut self, new_value: &str) -> BackupRunListCall<'a, C, NC, A> {
         self._page_token = Some(new_value.to_string());
         self
@@ -10929,7 +11095,7 @@ impl<'a, C, NC, A> BackupRunListCall<'a, C, NC, A> where NC: hyper::net::Network
     /// Sets the *max results* query property to the given value.
     ///
     /// 
-    /// Maximum number of backup runs per response.    
+    /// Maximum number of backup runs per response.
     pub fn max_results(mut self, new_value: i32) -> BackupRunListCall<'a, C, NC, A> {
         self._max_results = Some(new_value);
         self
@@ -10990,7 +11156,7 @@ impl<'a, C, NC, A> BackupRunListCall<'a, C, NC, A> where NC: hyper::net::Network
 /// Retrieves a resource containing information about a backup run.
 ///
 /// A builder for the *get* method supported by a *backupRun* resource.
-/// It is not used directly, but through a `BackupRunMethods`.
+/// It is not used directly, but through a `BackupRunMethods` instance.
 ///
 /// # Example
 ///
@@ -11052,7 +11218,7 @@ impl<'a, C, NC, A> BackupRunGetCall<'a, C, NC, A> where NC: hyper::net::NetworkC
         for &field in ["alt", "project", "instance", "id"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -11105,7 +11271,7 @@ impl<'a, C, NC, A> BackupRunGetCall<'a, C, NC, A> where NC: hyper::net::NetworkC
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -11117,7 +11283,6 @@ impl<'a, C, NC, A> BackupRunGetCall<'a, C, NC, A> where NC: hyper::net::NetworkC
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -11127,7 +11292,7 @@ impl<'a, C, NC, A> BackupRunGetCall<'a, C, NC, A> where NC: hyper::net::NetworkC
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -11138,7 +11303,7 @@ impl<'a, C, NC, A> BackupRunGetCall<'a, C, NC, A> where NC: hyper::net::NetworkC
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -11147,13 +11312,13 @@ impl<'a, C, NC, A> BackupRunGetCall<'a, C, NC, A> where NC: hyper::net::NetworkC
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -11165,7 +11330,7 @@ impl<'a, C, NC, A> BackupRunGetCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Project ID of the project that contains the instance.    
+    /// Project ID of the project that contains the instance.
     pub fn project(mut self, new_value: &str) -> BackupRunGetCall<'a, C, NC, A> {
         self._project = new_value.to_string();
         self
@@ -11175,7 +11340,7 @@ impl<'a, C, NC, A> BackupRunGetCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Cloud SQL instance ID. This does not include the project ID.    
+    /// Cloud SQL instance ID. This does not include the project ID.
     pub fn instance(mut self, new_value: &str) -> BackupRunGetCall<'a, C, NC, A> {
         self._instance = new_value.to_string();
         self
@@ -11185,7 +11350,7 @@ impl<'a, C, NC, A> BackupRunGetCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The ID of this Backup Run.    
+    /// The ID of this Backup Run.
     pub fn id(mut self, new_value: &str) -> BackupRunGetCall<'a, C, NC, A> {
         self._id = new_value.to_string();
         self

@@ -1,8 +1,8 @@
 // DO NOT EDIT !
-// This file was generated automatically from 'src/mako/lib.rs.mako'
+// This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *bigquery* crate version *0.1.1+20141112*, where *20141112* is the exact revision of the *bigquery:v2* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.1*.
+//! This documentation was generated from *bigquery* crate version *0.1.2+20150303*, where *20150303* is the exact revision of the *bigquery:v2* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.2*.
 //! 
 //! Everything else about the *bigquery* *v2* API can be found at the
 //! [official documentation site](https://developers.google.com/bigquery/docs/overview).
@@ -37,6 +37,8 @@
 //! 
 //! * **[Hub](struct.Bigquery.html)**
 //!     * a central object to maintain state and allow accessing all *Activities*
+//!     * creates [*Method Builders*](trait.MethodsBuilder.html) which in turn
+//!       allow access to individual [*Call Builders*](trait.CallBuilder.html)
 //! * **[Resources](trait.Resource.html)**
 //!     * primary types that you can apply *Activities* to
 //!     * a collection of properties and *Parts*
@@ -45,6 +47,8 @@
 //!         * never directly used in *Activities*
 //! * **[Activities](trait.CallBuilder.html)**
 //!     * operations to apply to *Resources*
+//! 
+//! All *structures* are marked with applicable traits to further categorize them and ease browsing.
 //! 
 //! Generally speaking, you can invoke *Activities* like this:
 //! 
@@ -86,7 +90,7 @@
 //! extern crate "yup-oauth2" as oauth2;
 //! extern crate "google-bigquery2" as bigquery2;
 //! use bigquery2::Table;
-//! use bigquery2::Result;
+//! use bigquery2::{Result, Error};
 //! # #[test] fn egal() {
 //! use std::default::Default;
 //! use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -116,15 +120,17 @@
 //!              .doit();
 //! 
 //! match result {
-//!     Result::HttpError(err) => println!("HTTPERROR: {:?}", err),
-//!     Result::MissingAPIKey => println!("Auth: Missing API Key - used if there are no scopes"),
-//!     Result::MissingToken => println!("OAuth2: Missing Token"),
-//!     Result::Cancelled => println!("Operation cancelled by user"),
-//!     Result::UploadSizeLimitExceeded(size, max_size) => println!("Upload size too big: {} of {}", size, max_size),
-//!     Result::Failure(_) => println!("General Failure (hyper::client::Response doesn't print)"),
-//!     Result::FieldClash(clashed_field) => println!("You added custom parameter which is part of builder: {:?}", clashed_field),
-//!     Result::JsonDecodeError(err) => println!("Couldn't understand server reply - maybe API needs update: {:?}", err),
-//!     Result::Success(_) => println!("Success (value doesn't print)"),
+//!     Err(e) => match e {
+//!         Error::HttpError(err) => println!("HTTPERROR: {:?}", err),
+//!         Error::MissingAPIKey => println!("Auth: Missing API Key - used if there are no scopes"),
+//!         Error::MissingToken => println!("OAuth2: Missing Token"),
+//!         Error::Cancelled => println!("Operation canceled by user"),
+//!         Error::UploadSizeLimitExceeded(size, max_size) => println!("Upload size too big: {} of {}", size, max_size),
+//!         Error::Failure(_) => println!("General Failure (hyper::client::Response doesn't print)"),
+//!         Error::FieldClash(clashed_field) => println!("You added custom parameter which is part of builder: {:?}", clashed_field),
+//!         Error::JsonDecodeError(err) => println!("Couldn't understand server reply - maybe API needs update: {:?}", err),
+//!     },
+//!     Ok(_) => println!("Success (value doesn't print)"),
 //! }
 //! # }
 //! ```
@@ -137,7 +143,7 @@
 //! When delegates handle errors or intermediate values, they may have a chance to instruct the system to retry. This 
 //! makes the system potentially resilient to all kinds of errors.
 //! 
-//! ## Uploads and Downlods
+//! ## Uploads and Downloads
 //! If a method supports downloads, the response body, which is part of the [Result](enum.Result.html), should be
 //! read by you to obtain the media.
 //! If such a method also supports a [Response Result](trait.ResponseResult.html), it will return that by default.
@@ -160,8 +166,9 @@
 //! ## Optional Parts in Server-Requests
 //! 
 //! All structures provided by this library are made to be [enocodable](trait.RequestValue.html) and 
-//! [decodable](trait.ResponseResult.html) via json. Optionals are used to indicate that partial requests are responses are valid.
-//! Most optionals are are considered [Parts](trait.Part.html) which are identifyable by name, which will be sent to 
+//! [decodable](trait.ResponseResult.html) via *json*. Optionals are used to indicate that partial requests are responses 
+//! are valid.
+//! Most optionals are are considered [Parts](trait.Part.html) which are identifiable by name, which will be sent to 
 //! the server to indicate either the set parts of the request or the desired parts in the response.
 //! 
 //! ## Builder Arguments
@@ -210,7 +217,7 @@ use std::io;
 use std::fs;
 use std::thread::sleep;
 
-pub use cmn::{MultiPartReader, ToParts, MethodInfo, Result, CallBuilder, Hub, ReadSeek, Part, ResponseResult, RequestValue, NestedType, Delegate, DefaultDelegate, ResourceMethodsBuilder, Resource, JsonServerError};
+pub use cmn::{MultiPartReader, ToParts, MethodInfo, Result, Error, CallBuilder, Hub, ReadSeek, Part, ResponseResult, RequestValue, NestedType, Delegate, DefaultDelegate, MethodsBuilder, Resource, JsonServerError};
 
 
 // ##############
@@ -277,7 +284,7 @@ impl Default for Scope {
 /// extern crate "yup-oauth2" as oauth2;
 /// extern crate "google-bigquery2" as bigquery2;
 /// use bigquery2::Table;
-/// use bigquery2::Result;
+/// use bigquery2::{Result, Error};
 /// # #[test] fn egal() {
 /// use std::default::Default;
 /// use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -307,15 +314,17 @@ impl Default for Scope {
 ///              .doit();
 /// 
 /// match result {
-///     Result::HttpError(err) => println!("HTTPERROR: {:?}", err),
-///     Result::MissingAPIKey => println!("Auth: Missing API Key - used if there are no scopes"),
-///     Result::MissingToken => println!("OAuth2: Missing Token"),
-///     Result::Cancelled => println!("Operation cancelled by user"),
-///     Result::UploadSizeLimitExceeded(size, max_size) => println!("Upload size too big: {} of {}", size, max_size),
-///     Result::Failure(_) => println!("General Failure (hyper::client::Response doesn't print)"),
-///     Result::FieldClash(clashed_field) => println!("You added custom parameter which is part of builder: {:?}", clashed_field),
-///     Result::JsonDecodeError(err) => println!("Couldn't understand server reply - maybe API needs update: {:?}", err),
-///     Result::Success(_) => println!("Success (value doesn't print)"),
+///     Err(e) => match e {
+///         Error::HttpError(err) => println!("HTTPERROR: {:?}", err),
+///         Error::MissingAPIKey => println!("Auth: Missing API Key - used if there are no scopes"),
+///         Error::MissingToken => println!("OAuth2: Missing Token"),
+///         Error::Cancelled => println!("Operation canceled by user"),
+///         Error::UploadSizeLimitExceeded(size, max_size) => println!("Upload size too big: {} of {}", size, max_size),
+///         Error::Failure(_) => println!("General Failure (hyper::client::Response doesn't print)"),
+///         Error::FieldClash(clashed_field) => println!("You added custom parameter which is part of builder: {:?}", clashed_field),
+///         Error::JsonDecodeError(err) => println!("Couldn't understand server reply - maybe API needs update: {:?}", err),
+///     },
+///     Ok(_) => println!("Success (value doesn't print)"),
 /// }
 /// # }
 /// ```
@@ -336,7 +345,7 @@ impl<'a, C, NC, A> Bigquery<C, NC, A>
         Bigquery {
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/0.1.1".to_string(),
+            _user_agent: "google-api-rust-client/0.1.2".to_string(),
             _m: PhantomData
         }
     }
@@ -358,7 +367,7 @@ impl<'a, C, NC, A> Bigquery<C, NC, A>
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/0.1.1`.
+    /// It defaults to `google-api-rust-client/0.1.2`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -378,10 +387,10 @@ impl<'a, C, NC, A> Bigquery<C, NC, A>
 /// 
 #[derive(Default, Clone, Debug, Serialize)]
 pub struct TableDataInsertAllRequestRows {
-    /// [Optional] A unique ID for each row. BigQuery uses this property to detect duplicate insertion requests on a best-effort basis.    
+    /// [Optional] A unique ID for each row. BigQuery uses this property to detect duplicate insertion requests on a best-effort basis.
     #[serde(alias="insertId")]
     pub insert_id: String,
-    /// [Required] A JSON object that contains a row of data. The object's properties and values must match the destination table's schema.    
+    /// [Required] A JSON object that contains a row of data. The object's properties and values must match the destination table's schema.
     pub json: JsonObject,
 }
 
@@ -395,7 +404,7 @@ impl Part for TableDataInsertAllRequestRows {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct JobStatistics4 {
-    /// [Experimental] Number of files per destination URI or URI pattern specified in the extract configuration. These values will be in the same order as the URIs specified in the 'destinationUris' field.    
+    /// [Experimental] Number of files per destination URI or URI pattern specified in the extract configuration. These values will be in the same order as the URIs specified in the 'destinationUris' field.
     #[serde(alias="destinationUriFileCounts")]
     pub destination_uri_file_counts: Vec<i64>,
 }
@@ -414,26 +423,26 @@ impl Part for JobStatistics4 {}
 /// 
 #[derive(Default, Clone, Debug, Serialize)]
 pub struct QueryRequest {
-    /// [Optional] How long to wait for the query to complete, in milliseconds, before the request times out and returns. Note that this is only a timeout for the request, not the query. If the query takes longer to run than the timeout value, the call returns without any results and with the 'jobComplete' flag set to false. You can call GetQueryResults() to wait for the query to complete and read the results. The default value is 10000 milliseconds (10 seconds).    
+    /// [Optional] How long to wait for the query to complete, in milliseconds, before the request times out and returns. Note that this is only a timeout for the request, not the query. If the query takes longer to run than the timeout value, the call returns without any results and with the 'jobComplete' flag set to false. You can call GetQueryResults() to wait for the query to complete and read the results. The default value is 10000 milliseconds (10 seconds).
     #[serde(alias="timeoutMs")]
     pub timeout_ms: Option<u32>,
-    /// The resource type of the request.    
+    /// The resource type of the request.
     pub kind: Option<String>,
-    /// [Optional] If set, don't actually run this job. A valid query will return a mostly empty response with some processing statistics, while an invalid query will return the same error it would if it wasn't a dry run.    
+    /// [Optional] If set, don't actually run this job. A valid query will return a mostly empty response with some processing statistics, while an invalid query will return the same error it would if it wasn't a dry run.
     #[serde(alias="dryRun")]
     pub dry_run: Option<bool>,
-    /// [Optional] Whether to look for the result in the query cache. The query cache is a best-effort cache that will be flushed whenever tables in the query are modified. The default value is true.    
+    /// [Optional] Whether to look for the result in the query cache. The query cache is a best-effort cache that will be flushed whenever tables in the query are modified. The default value is true.
     #[serde(alias="useQueryCache")]
     pub use_query_cache: Option<bool>,
-    /// [Optional] Specifies the default datasetId and projectId to assume for any unqualified table names in the query. If not set, all table names in the query string must be qualified in the format 'datasetId.tableId'.    
+    /// [Optional] Specifies the default datasetId and projectId to assume for any unqualified table names in the query. If not set, all table names in the query string must be qualified in the format 'datasetId.tableId'.
     #[serde(alias="defaultDataset")]
     pub default_dataset: Option<DatasetReference>,
-    /// [Optional] The maximum number of rows of data to return per page of results. Setting this flag to a small value such as 1000 and then paging through results might improve reliability when the query result set is large. In addition to this limit, responses are also limited to 10 MB. By default, there is no maximum row count, and only the byte limit applies.    
+    /// [Optional] The maximum number of rows of data to return per page of results. Setting this flag to a small value such as 1000 and then paging through results might improve reliability when the query result set is large. In addition to this limit, responses are also limited to 10 MB. By default, there is no maximum row count, and only the byte limit applies.
     #[serde(alias="maxResults")]
     pub max_results: Option<u32>,
-    /// [Required] A query string, following the BigQuery query syntax, of the query to execute. Example: "SELECT count(f1) FROM [myProjectId:myDatasetId.myTableId]".    
+    /// [Required] A query string, following the BigQuery query syntax, of the query to execute. Example: "SELECT count(f1) FROM [myProjectId:myDatasetId.myTableId]".
     pub query: Option<String>,
-    /// [Deprecated] This property is deprecated.    
+    /// [Deprecated] This property is deprecated.
     #[serde(alias="preserveNulls")]
     pub preserve_nulls: Option<bool>,
 }
@@ -447,10 +456,10 @@ impl RequestValue for QueryRequest {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct JobStatistics2 {
-    /// [Output-only] Whether the query result was fetched from the query cache.    
+    /// [Output-only] Whether the query result was fetched from the query cache.
     #[serde(alias="cacheHit")]
     pub cache_hit: bool,
-    /// [Output-only] Total bytes processed for this job.    
+    /// [Output-only] Total bytes processed for this job.
     #[serde(alias="totalBytesProcessed")]
     pub total_bytes_processed: String,
 }
@@ -464,16 +473,16 @@ impl Part for JobStatistics2 {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct JobStatistics3 {
-    /// [Output-only] Number of rows imported in a load job. Note that while an import job is in the running state, this value may change.    
+    /// [Output-only] Number of rows imported in a load job. Note that while an import job is in the running state, this value may change.
     #[serde(alias="outputRows")]
     pub output_rows: String,
-    /// [Output-only] Number of source files in a load job.    
+    /// [Output-only] Number of source files in a load job.
     #[serde(alias="inputFiles")]
     pub input_files: String,
-    /// [Output-only] Number of bytes of source data in a joad job.    
+    /// [Output-only] Number of bytes of source data in a joad job.
     #[serde(alias="inputFileBytes")]
     pub input_file_bytes: String,
-    /// [Output-only] Size of the loaded data in bytes. Note that while an import job is in the running state, this value may change.    
+    /// [Output-only] Size of the loaded data in bytes. Note that while an import job is in the running state, this value may change.
     #[serde(alias="outputBytes")]
     pub output_bytes: String,
 }
@@ -502,17 +511,17 @@ impl Part for JsonObject {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct ProjectList {
-    /// A token to request the next page of results.    
+    /// A token to request the next page of results.
     #[serde(alias="nextPageToken")]
     pub next_page_token: String,
-    /// The total number of projects in the list.    
+    /// The total number of projects in the list.
     #[serde(alias="totalItems")]
     pub total_items: i32,
-    /// The type of list.    
+    /// The type of list.
     pub kind: String,
-    /// A hash of the page of results    
+    /// A hash of the page of results
     pub etag: String,
-    /// Projects to which you have at least READ access.    
+    /// Projects to which you have at least READ access.
     pub projects: Vec<ProjectListProjects>,
 }
 
@@ -525,16 +534,16 @@ impl ResponseResult for ProjectList {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct TableFieldSchema {
-    /// [Optional] Describes the nested schema fields if the type property is set to RECORD.    
+    /// [Optional] Describes the nested schema fields if the type property is set to RECORD.
     pub fields: Vec<TableFieldSchema>,
-    /// [Optional] The field description. The maximum length is 16K characters.    
+    /// [Optional] The field description. The maximum length is 16K characters.
     pub description: String,
-    /// [Required] The field data type. Possible values include STRING, INTEGER, FLOAT, BOOLEAN, TIMESTAMP or RECORD (where RECORD indicates that the field contains a nested schema).    
+    /// [Required] The field data type. Possible values include STRING, INTEGER, FLOAT, BOOLEAN, TIMESTAMP or RECORD (where RECORD indicates that the field contains a nested schema).
     #[serde(alias="type")]
     pub type_: String,
-    /// [Optional] The field mode. Possible values include NULLABLE, REQUIRED and REPEATED. The default value is NULLABLE.    
+    /// [Optional] The field mode. Possible values include NULLABLE, REQUIRED and REPEATED. The default value is NULLABLE.
     pub mode: String,
-    /// [Required] The field name. The name must contain only letters (a-z, A-Z), numbers (0-9), or underscores (_), and must start with a letter or underscore. The maximum length is 128 characters.    
+    /// [Required] The field name. The name must contain only letters (a-z, A-Z), numbers (0-9), or underscores (_), and must start with a letter or underscore. The maximum length is 128 characters.
     pub name: String,
 }
 
@@ -557,29 +566,29 @@ impl Part for TableFieldSchema {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Dataset {
-    /// [Output-only] The resource type.    
+    /// [Output-only] The resource type.
     pub kind: Option<String>,
-    /// [Optional] A user-friendly description of the dataset.    
+    /// [Optional] A user-friendly description of the dataset.
     pub description: Option<String>,
-    /// [Required] A reference that identifies the dataset.    
+    /// [Required] A reference that identifies the dataset.
     #[serde(alias="datasetReference")]
     pub dataset_reference: Option<DatasetReference>,
-    /// [Output-only] The time when this dataset was created, in milliseconds since the epoch.    
+    /// [Output-only] The time when this dataset was created, in milliseconds since the epoch.
     #[serde(alias="creationTime")]
     pub creation_time: Option<String>,
-    /// [Optional] An array of objects that define dataset access for one or more entities. You can set this property when inserting or updating a dataset in order to control who is allowed to access the data. If unspecified at dataset creation time, BigQuery adds default dataset access for the following entities: access.specialGroup: projectReaders; access.role: READER; access.specialGroup: projectWriters; access.role: WRITER; access.specialGroup: projectOwners; access.role: OWNER; access.userByEmail: [dataset creator email]; access.role: OWNER;    
+    /// [Optional] An array of objects that define dataset access for one or more entities. You can set this property when inserting or updating a dataset in order to control who is allowed to access the data. If unspecified at dataset creation time, BigQuery adds default dataset access for the following entities: access.specialGroup: projectReaders; access.role: READER; access.specialGroup: projectWriters; access.role: WRITER; access.specialGroup: projectOwners; access.role: OWNER; access.userByEmail: [dataset creator email]; access.role: OWNER;
     pub access: Option<Vec<DatasetAccess>>,
-    /// [Output-only] A hash of the resource.    
+    /// [Output-only] A hash of the resource.
     pub etag: Option<String>,
-    /// [Optional] A descriptive name for the dataset.    
+    /// [Optional] A descriptive name for the dataset.
     #[serde(alias="friendlyName")]
     pub friendly_name: Option<String>,
-    /// [Output-only] The date when this dataset or any of its tables was last modified, in milliseconds since the epoch.    
+    /// [Output-only] The date when this dataset or any of its tables was last modified, in milliseconds since the epoch.
     #[serde(alias="lastModifiedTime")]
     pub last_modified_time: Option<String>,
-    /// [Output-only] The fully-qualified unique name of the dataset in the format projectId:datasetId. The dataset name without the project name is given in the datasetId field. When creating a new dataset, leave this field blank, and instead specify the datasetId field.    
+    /// [Output-only] The fully-qualified unique name of the dataset in the format projectId:datasetId. The dataset name without the project name is given in the datasetId field. When creating a new dataset, leave this field blank, and instead specify the datasetId field.
     pub id: Option<String>,
-    /// [Output-only] A URL that can be used to access the resource again. You can use this URL in Get or Update requests to the resource.    
+    /// [Output-only] A URL that can be used to access the resource again. You can use this URL in Get or Update requests to the resource.
     #[serde(alias="selfLink")]
     pub self_link: Option<String>,
 }
@@ -595,9 +604,9 @@ impl ResponseResult for Dataset {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct TableDataInsertAllResponseInsertErrors {
-    /// The index of the row that error applies to.    
+    /// The index of the row that error applies to.
     pub index: u32,
-    /// Error information for the row indicated by the index property.    
+    /// Error information for the row indicated by the index property.
     pub errors: Vec<ErrorProto>,
 }
 
@@ -611,7 +620,7 @@ impl Part for TableDataInsertAllResponseInsertErrors {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct TableCell {
-    /// no description provided    
+    /// no description provided
     pub v: String,
 }
 
@@ -624,10 +633,10 @@ impl Part for TableCell {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct JobReference {
-    /// [Required] The ID of the project containing this job.    
+    /// [Required] The ID of the project containing this job.
     #[serde(alias="projectId")]
     pub project_id: String,
-    /// [Required] The ID of the job. The ID must contain only letters (a-z, A-Z), numbers (0-9), underscores (_), or dashes (-). The maximum length is 1,024 characters.    
+    /// [Required] The ID of the job. The ID must contain only letters (a-z, A-Z), numbers (0-9), underscores (_), or dashes (-). The maximum length is 1,024 characters.
     #[serde(alias="jobId")]
     pub job_id: String,
 }
@@ -641,14 +650,14 @@ impl Part for JobReference {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct DatasetListDatasets {
-    /// A descriptive name for the dataset, if one exists.    
+    /// A descriptive name for the dataset, if one exists.
     #[serde(alias="friendlyName")]
     pub friendly_name: String,
-    /// The resource type. This property always returns the value "bigquery#dataset".    
+    /// The resource type. This property always returns the value "bigquery#dataset".
     pub kind: String,
-    /// The fully-qualified, unique, opaque ID of the dataset.    
+    /// The fully-qualified, unique, opaque ID of the dataset.
     pub id: String,
-    /// The dataset reference. Use this property to access specific parts of the dataset's ID, such as project ID or dataset ID.    
+    /// The dataset reference. Use this property to access specific parts of the dataset's ID, such as project ID or dataset ID.
     #[serde(alias="datasetReference")]
     pub dataset_reference: DatasetReference,
 }
@@ -663,17 +672,17 @@ impl Part for DatasetListDatasets {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct TableListTables {
-    /// The user-friendly name for this table.    
+    /// The user-friendly name for this table.
     #[serde(alias="friendlyName")]
     pub friendly_name: String,
-    /// The resource type.    
+    /// The resource type.
     pub kind: String,
-    /// The type of table. Possible values are: TABLE, VIEW.    
+    /// The type of table. Possible values are: TABLE, VIEW.
     #[serde(alias="type")]
     pub type_: String,
-    /// An opaque ID of the table    
+    /// An opaque ID of the table
     pub id: String,
-    /// A reference uniquely identifying the table.    
+    /// A reference uniquely identifying the table.
     #[serde(alias="tableReference")]
     pub table_reference: TableReference,
 }
@@ -693,16 +702,16 @@ impl Part for TableListTables {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct TableList {
-    /// A token to request the next page of results.    
+    /// A token to request the next page of results.
     #[serde(alias="nextPageToken")]
     pub next_page_token: String,
-    /// Tables in the requested dataset.    
+    /// Tables in the requested dataset.
     pub tables: Vec<TableListTables>,
-    /// The type of list.    
+    /// The type of list.
     pub kind: String,
-    /// A hash of this page of results.    
+    /// A hash of this page of results.
     pub etag: String,
-    /// The total number of tables in the dataset.    
+    /// The total number of tables in the dataset.
     #[serde(alias="totalItems")]
     pub total_items: i32,
 }
@@ -716,7 +725,7 @@ impl ResponseResult for TableList {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct ProjectReference {
-    /// [Required] ID of the project. Can be either the numeric ID or the assigned ID of the project.    
+    /// [Required] ID of the project. Can be either the numeric ID or the assigned ID of the project.
     #[serde(alias="projectId")]
     pub project_id: String,
 }
@@ -735,16 +744,16 @@ impl Part for ProjectReference {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct TableDataList {
-    /// A token used for paging results. Providing this token instead of the startIndex parameter can help you retrieve stable results when an underlying table is changing.    
+    /// A token used for paging results. Providing this token instead of the startIndex parameter can help you retrieve stable results when an underlying table is changing.
     #[serde(alias="pageToken")]
     pub page_token: String,
-    /// The resource type of the response.    
+    /// The resource type of the response.
     pub kind: String,
-    /// A hash of this page of results.    
+    /// A hash of this page of results.
     pub etag: String,
-    /// Rows of results.    
+    /// Rows of results.
     pub rows: Vec<TableRow>,
-    /// The total number of rows in the complete table.    
+    /// The total number of rows in the complete table.
     #[serde(alias="totalRows")]
     pub total_rows: String,
 }
@@ -767,25 +776,25 @@ impl ResponseResult for TableDataList {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Job {
-    /// [Output-only] The status of this job. Examine this value when polling an asynchronous job to see if the job is complete.    
+    /// [Output-only] The status of this job. Examine this value when polling an asynchronous job to see if the job is complete.
     pub status: Option<JobStatus>,
-    /// [Output-only] The type of the resource.    
+    /// [Output-only] The type of the resource.
     pub kind: Option<String>,
-    /// [Output-only] Information about the job, including starting time and ending time of the job.    
+    /// [Output-only] Information about the job, including starting time and ending time of the job.
     pub statistics: Option<JobStatistics>,
-    /// [Optional] Reference describing the unique-per-user name of the job.    
+    /// [Optional] Reference describing the unique-per-user name of the job.
     #[serde(alias="jobReference")]
     pub job_reference: Option<JobReference>,
-    /// [Output-only] A hash of this resource.    
+    /// [Output-only] A hash of this resource.
     pub etag: Option<String>,
-    /// [Output-only] A URL that can be used to access this resource again.    
+    /// [Output-only] A URL that can be used to access this resource again.
     #[serde(alias="selfLink")]
     pub self_link: Option<String>,
-    /// [Required] Describes the job configuration.    
+    /// [Required] Describes the job configuration.
     pub configuration: Option<JobConfiguration>,
-    /// [Output-only] Opaque ID field of the job    
+    /// [Output-only] Opaque ID field of the job
     pub id: Option<String>,
-    /// [Output-only] Email address of the user who ran the job.    
+    /// [Output-only] Email address of the user who ran the job.
     pub user_email: Option<String>,
 }
 
@@ -800,25 +809,25 @@ impl ResponseResult for Job {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct JobListJobs {
-    /// [Full-projection-only] Describes the state of the job.    
+    /// [Full-projection-only] Describes the state of the job.
     pub status: JobStatus,
-    /// The resource type.    
+    /// The resource type.
     pub kind: String,
-    /// [Output-only] Information about the job, including starting time and ending time of the job.    
+    /// [Output-only] Information about the job, including starting time and ending time of the job.
     pub statistics: JobStatistics,
-    /// Job reference uniquely identifying the job.    
+    /// Job reference uniquely identifying the job.
     #[serde(alias="jobReference")]
     pub job_reference: JobReference,
-    /// Running state of the job. When the state is DONE, errorResult can be checked to determine whether the job succeeded or failed.    
+    /// Running state of the job. When the state is DONE, errorResult can be checked to determine whether the job succeeded or failed.
     pub state: String,
-    /// A result object that will be present only if the job has failed.    
+    /// A result object that will be present only if the job has failed.
     #[serde(alias="errorResult")]
     pub error_result: ErrorProto,
-    /// [Full-projection-only] Specifies the job configuration.    
+    /// [Full-projection-only] Specifies the job configuration.
     pub configuration: JobConfiguration,
-    /// Unique opaque ID of the job.    
+    /// Unique opaque ID of the job.
     pub id: String,
-    /// [Full-projection-only] Email address of the user who ran the job.    
+    /// [Full-projection-only] Email address of the user who ran the job.
     pub user_email: String,
 }
 
@@ -832,53 +841,53 @@ impl Part for JobListJobs {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct JobConfigurationLoad {
-    /// [Optional] The character encoding of the data. The supported values are UTF-8 or ISO-8859-1. The default value is UTF-8. BigQuery decodes the data after the raw, binary data has been split using the values of the quote and fieldDelimiter properties.    
+    /// [Optional] The character encoding of the data. The supported values are UTF-8 or ISO-8859-1. The default value is UTF-8. BigQuery decodes the data after the raw, binary data has been split using the values of the quote and fieldDelimiter properties.
     pub encoding: String,
-    /// [Optional] The value that is used to quote data sections in a CSV file. BigQuery converts the string to ISO-8859-1 encoding, and then uses the first byte of the encoded string to split the data in its raw, binary state. The default value is a double-quote ('"'). If your data does not contain quoted sections, set the property value to an empty string. If your data contains quoted newline characters, you must also set the allowQuotedNewlines property to true.    
+    /// [Optional] The value that is used to quote data sections in a CSV file. BigQuery converts the string to ISO-8859-1 encoding, and then uses the first byte of the encoded string to split the data in its raw, binary state. The default value is a double-quote ('"'). If your data does not contain quoted sections, set the property value to an empty string. If your data contains quoted newline characters, you must also set the allowQuotedNewlines property to true.
     pub quote: String,
-    /// [Required] The destination table to load the data into.    
+    /// [Required] The destination table to load the data into.
     #[serde(alias="destinationTable")]
     pub destination_table: TableReference,
-    /// [Required] The fully-qualified URIs that point to your data in Google Cloud Storage. Wildcard names are only supported when they appear at the end of the URI.    
+    /// [Required] The fully-qualified URIs that point to your data in Google Cloud Storage. Wildcard names are only supported when they appear at the end of the URI.
     #[serde(alias="sourceUris")]
     pub source_uris: Vec<String>,
-    /// Indicates if BigQuery should allow quoted data sections that contain newline characters in a CSV file. The default value is false.    
+    /// Indicates if BigQuery should allow quoted data sections that contain newline characters in a CSV file. The default value is false.
     #[serde(alias="allowQuotedNewlines")]
     pub allow_quoted_newlines: bool,
-    /// [Experimental] Names(case-sensitive) of properties to keep when importing data. If this is populated, only the specified properties will be imported for each entity. Currently, this is only supported for DATASTORE_BACKUP imports and only top level properties are supported. If any specified property is not found in the Datastore 'Kind' being imported, that is an error. Note: This feature is experimental and can change in the future.    
+    /// [Experimental] Names(case-sensitive) of properties to keep when importing data. If this is populated, only the specified properties will be imported for each entity. Currently, this is only supported for DATASTORE_BACKUP imports and only top level properties are supported. If any specified property is not found in the Datastore 'Kind' being imported, that is an error. Note: This feature is experimental and can change in the future.
     #[serde(alias="projectionFields")]
     pub projection_fields: Vec<String>,
-    /// [Optional] Accept rows that are missing trailing optional columns. The missing values are treated as nulls. Default is false which treats short rows as errors. Only applicable to CSV, ignored for other formats.    
+    /// [Optional] Accept rows that are missing trailing optional columns. The missing values are treated as nulls. Default is false which treats short rows as errors. Only applicable to CSV, ignored for other formats.
     #[serde(alias="allowJaggedRows")]
     pub allow_jagged_rows: bool,
-    /// [Optional] The separator for fields in a CSV file. BigQuery converts the string to ISO-8859-1 encoding, and then uses the first byte of the encoded string to split the data in its raw, binary state. BigQuery also supports the escape sequence "\t" to specify a tab separator. The default value is a comma (',').    
+    /// [Optional] The separator for fields in a CSV file. BigQuery converts the string to ISO-8859-1 encoding, and then uses the first byte of the encoded string to split the data in its raw, binary state. BigQuery also supports the escape sequence "\t" to specify a tab separator. The default value is a comma (',').
     #[serde(alias="fieldDelimiter")]
     pub field_delimiter: String,
-    /// [Optional] The format of the data files. For CSV files, specify "CSV". For datastore backups, specify "DATASTORE_BACKUP". For newline-delimited JSON, specify "NEWLINE_DELIMITED_JSON". The default value is CSV.    
+    /// [Optional] The format of the data files. For CSV files, specify "CSV". For datastore backups, specify "DATASTORE_BACKUP". For newline-delimited JSON, specify "NEWLINE_DELIMITED_JSON". The default value is CSV.
     #[serde(alias="sourceFormat")]
     pub source_format: String,
-    /// [Optional] The maximum number of bad records that BigQuery can ignore when running the job. If the number of bad records exceeds this value, an 'invalid' error is returned in the job result and the job fails. The default value is 0, which requires that all records are valid.    
+    /// [Optional] The maximum number of bad records that BigQuery can ignore when running the job. If the number of bad records exceeds this value, an 'invalid' error is returned in the job result and the job fails. The default value is 0, which requires that all records are valid.
     #[serde(alias="maxBadRecords")]
     pub max_bad_records: i32,
-    /// [Optional] Accept rows that contain values that do not match the schema. The unknown values are ignored. Default is false which treats unknown values as errors. For CSV this ignores extra values at the end of a line. For JSON this ignores named values that do not match any column name.    
+    /// [Optional] Accept rows that contain values that do not match the schema. The unknown values are ignored. Default is false which treats unknown values as errors. For CSV this ignores extra values at the end of a line. For JSON this ignores named values that do not match any column name.
     #[serde(alias="ignoreUnknownValues")]
     pub ignore_unknown_values: bool,
-    /// [Optional] Specifies the action that occurs if the destination table already exists. The following values are supported: WRITE_TRUNCATE: If the table already exists, BigQuery overwrites the table data. WRITE_APPEND: If the table already exists, BigQuery appends the data to the table. WRITE_EMPTY: If the table already exists and contains data, a 'duplicate' error is returned in the job result. The default value is WRITE_EMPTY. Each action is atomic and only occurs if BigQuery is able to complete the job successfully. Creation, truncation and append actions occur as one atomic update upon job completion.    
+    /// [Optional] Specifies the action that occurs if the destination table already exists. The following values are supported: WRITE_TRUNCATE: If the table already exists, BigQuery overwrites the table data. WRITE_APPEND: If the table already exists, BigQuery appends the data to the table. WRITE_EMPTY: If the table already exists and contains data, a 'duplicate' error is returned in the job result. The default value is WRITE_EMPTY. Each action is atomic and only occurs if BigQuery is able to complete the job successfully. Creation, truncation and append actions occur as one atomic update upon job completion.
     #[serde(alias="writeDisposition")]
     pub write_disposition: String,
-    /// [Optional] The number of rows at the top of a CSV file that BigQuery will skip when loading the data. The default value is 0. This property is useful if you have header rows in the file that should be skipped.    
+    /// [Optional] The number of rows at the top of a CSV file that BigQuery will skip when loading the data. The default value is 0. This property is useful if you have header rows in the file that should be skipped.
     #[serde(alias="skipLeadingRows")]
     pub skip_leading_rows: i32,
-    /// [Optional] Specifies whether the job is allowed to create new tables. The following values are supported: CREATE_IF_NEEDED: If the table does not exist, BigQuery creates the table. CREATE_NEVER: The table must already exist. If it does not, a 'notFound' error is returned in the job result. The default value is CREATE_IF_NEEDED. Creation, truncation and append actions occur as one atomic update upon job completion.    
+    /// [Optional] Specifies whether the job is allowed to create new tables. The following values are supported: CREATE_IF_NEEDED: If the table does not exist, BigQuery creates the table. CREATE_NEVER: The table must already exist. If it does not, a 'notFound' error is returned in the job result. The default value is CREATE_IF_NEEDED. Creation, truncation and append actions occur as one atomic update upon job completion.
     #[serde(alias="createDisposition")]
     pub create_disposition: String,
-    /// [Deprecated] The format of the schemaInline property.    
+    /// [Deprecated] The format of the schemaInline property.
     #[serde(alias="schemaInlineFormat")]
     pub schema_inline_format: String,
-    /// [Deprecated] The inline schema. For CSV schemas, specify as "Field1:Type1[,Field2:Type2]*". For example, "foo:STRING, bar:INTEGER, baz:FLOAT".    
+    /// [Deprecated] The inline schema. For CSV schemas, specify as "Field1:Type1[,Field2:Type2]*". For example, "foo:STRING, bar:INTEGER, baz:FLOAT".
     #[serde(alias="schemaInline")]
     pub schema_inline: String,
-    /// [Optional] The schema for the destination table. The schema can be omitted if the destination table already exists or if the schema can be inferred from the loaded data.    
+    /// [Optional] The schema for the destination table. The schema can be omitted if the destination table already exists or if the schema can be inferred from the loaded data.
     pub schema: TableSchema,
 }
 
@@ -896,17 +905,17 @@ impl Part for JobConfigurationLoad {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct JobList {
-    /// A token to request the next page of results.    
+    /// A token to request the next page of results.
     #[serde(alias="nextPageToken")]
     pub next_page_token: String,
-    /// Total number of jobs in this collection.    
+    /// Total number of jobs in this collection.
     #[serde(alias="totalItems")]
     pub total_items: i32,
-    /// The resource type of the response.    
+    /// The resource type of the response.
     pub kind: String,
-    /// A hash of this page of results.    
+    /// A hash of this page of results.
     pub etag: String,
-    /// List of jobs that were requested.    
+    /// List of jobs that were requested.
     pub jobs: Vec<JobListJobs>,
 }
 
@@ -919,24 +928,24 @@ impl ResponseResult for JobList {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct JobConfigurationExtract {
-    /// [Pick one] DEPRECATED: Use destinationUris instead, passing only one URI as necessary. The fully-qualified Google Cloud Storage URI where the extracted table should be written.    
+    /// [Pick one] DEPRECATED: Use destinationUris instead, passing only one URI as necessary. The fully-qualified Google Cloud Storage URI where the extracted table should be written.
     #[serde(alias="destinationUri")]
     pub destination_uri: String,
-    /// [Optional] The exported file format. Possible values include CSV, NEWLINE_DELIMITED_JSON and AVRO. The default value is CSV. Tables with nested or repeated fields cannot be exported as CSV.    
+    /// [Optional] The exported file format. Possible values include CSV, NEWLINE_DELIMITED_JSON and AVRO. The default value is CSV. Tables with nested or repeated fields cannot be exported as CSV.
     #[serde(alias="destinationFormat")]
     pub destination_format: String,
-    /// [Optional] The compression type to use for exported files. Possible values include GZIP and NONE. The default value is NONE.    
+    /// [Optional] The compression type to use for exported files. Possible values include GZIP and NONE. The default value is NONE.
     pub compression: String,
-    /// [Pick one] A list of fully-qualified Google Cloud Storage URIs where the extracted table should be written.    
+    /// [Pick one] A list of fully-qualified Google Cloud Storage URIs where the extracted table should be written.
     #[serde(alias="destinationUris")]
     pub destination_uris: Vec<String>,
-    /// [Optional] Whether to print out a header row in the results. Default is true.    
+    /// [Optional] Whether to print out a header row in the results. Default is true.
     #[serde(alias="printHeader")]
     pub print_header: bool,
-    /// [Optional] Delimiter to use between fields in the exported data. Default is ','    
+    /// [Optional] Delimiter to use between fields in the exported data. Default is ','
     #[serde(alias="fieldDelimiter")]
     pub field_delimiter: String,
-    /// [Required] A reference to the table being exported.    
+    /// [Required] A reference to the table being exported.
     #[serde(alias="sourceTable")]
     pub source_table: TableReference,
 }
@@ -955,31 +964,31 @@ impl Part for JobConfigurationExtract {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct GetQueryResultsResponse {
-    /// The resource type of the response.    
+    /// The resource type of the response.
     pub kind: String,
-    /// An object with as many results as can be contained within the maximum permitted reply size. To get any additional rows, you can call GetQueryResults and specify the jobReference returned above. Present only when the query completes successfully.    
+    /// An object with as many results as can be contained within the maximum permitted reply size. To get any additional rows, you can call GetQueryResults and specify the jobReference returned above. Present only when the query completes successfully.
     pub rows: Vec<TableRow>,
-    /// Reference to the BigQuery Job that was created to run the query. This field will be present even if the original request timed out, in which case GetQueryResults can be used to read the results once the query has completed. Since this API only returns the first page of results, subsequent pages can be fetched via the same mechanism (GetQueryResults).    
+    /// Reference to the BigQuery Job that was created to run the query. This field will be present even if the original request timed out, in which case GetQueryResults can be used to read the results once the query has completed. Since this API only returns the first page of results, subsequent pages can be fetched via the same mechanism (GetQueryResults).
     #[serde(alias="jobReference")]
     pub job_reference: JobReference,
-    /// Whether the query result was fetched from the query cache.    
+    /// Whether the query result was fetched from the query cache.
     #[serde(alias="cacheHit")]
     pub cache_hit: bool,
-    /// Whether the query has completed or not. If rows or totalRows are present, this will always be true. If this is false, totalRows will not be available.    
+    /// Whether the query has completed or not. If rows or totalRows are present, this will always be true. If this is false, totalRows will not be available.
     #[serde(alias="jobComplete")]
     pub job_complete: bool,
-    /// The total number of rows in the complete query result set, which can be more than the number of rows in this single page of results. Present only when the query completes successfully.    
+    /// The total number of rows in the complete query result set, which can be more than the number of rows in this single page of results. Present only when the query completes successfully.
     #[serde(alias="totalRows")]
     pub total_rows: String,
-    /// The total number of bytes processed for this query.    
+    /// The total number of bytes processed for this query.
     #[serde(alias="totalBytesProcessed")]
     pub total_bytes_processed: String,
-    /// A token used for paging results.    
+    /// A token used for paging results.
     #[serde(alias="pageToken")]
     pub page_token: String,
-    /// A hash of this response.    
+    /// A hash of this response.
     pub etag: String,
-    /// The schema of the results. Present only when the query completes successfully.    
+    /// The schema of the results. Present only when the query completes successfully.
     pub schema: TableSchema,
 }
 
@@ -992,14 +1001,14 @@ impl ResponseResult for GetQueryResultsResponse {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ErrorProto {
-    /// Debugging information. This property is internal to Google and should not be used.    
+    /// Debugging information. This property is internal to Google and should not be used.
     #[serde(alias="debugInfo")]
     pub debug_info: String,
-    /// A human-readable description of the error.    
+    /// A human-readable description of the error.
     pub message: String,
-    /// A short error code that summarizes the error.    
+    /// A short error code that summarizes the error.
     pub reason: String,
-    /// Specifies where the error occurred, if present.    
+    /// Specifies where the error occurred, if present.
     pub location: String,
 }
 
@@ -1012,16 +1021,16 @@ impl Part for ErrorProto {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct JobConfigurationLink {
-    /// [Optional] Specifies whether the job is allowed to create new tables. The following values are supported: CREATE_IF_NEEDED: If the table does not exist, BigQuery creates the table. CREATE_NEVER: The table must already exist. If it does not, a 'notFound' error is returned in the job result. The default value is CREATE_IF_NEEDED. Creation, truncation and append actions occur as one atomic update upon job completion.    
+    /// [Optional] Specifies whether the job is allowed to create new tables. The following values are supported: CREATE_IF_NEEDED: If the table does not exist, BigQuery creates the table. CREATE_NEVER: The table must already exist. If it does not, a 'notFound' error is returned in the job result. The default value is CREATE_IF_NEEDED. Creation, truncation and append actions occur as one atomic update upon job completion.
     #[serde(alias="createDisposition")]
     pub create_disposition: String,
-    /// [Optional] Specifies the action that occurs if the destination table already exists. The following values are supported: WRITE_TRUNCATE: If the table already exists, BigQuery overwrites the table data. WRITE_APPEND: If the table already exists, BigQuery appends the data to the table. WRITE_EMPTY: If the table already exists and contains data, a 'duplicate' error is returned in the job result. The default value is WRITE_EMPTY. Each action is atomic and only occurs if BigQuery is able to complete the job successfully. Creation, truncation and append actions occur as one atomic update upon job completion.    
+    /// [Optional] Specifies the action that occurs if the destination table already exists. The following values are supported: WRITE_TRUNCATE: If the table already exists, BigQuery overwrites the table data. WRITE_APPEND: If the table already exists, BigQuery appends the data to the table. WRITE_EMPTY: If the table already exists and contains data, a 'duplicate' error is returned in the job result. The default value is WRITE_EMPTY. Each action is atomic and only occurs if BigQuery is able to complete the job successfully. Creation, truncation and append actions occur as one atomic update upon job completion.
     #[serde(alias="writeDisposition")]
     pub write_disposition: String,
-    /// [Required] The destination table of the link job.    
+    /// [Required] The destination table of the link job.
     #[serde(alias="destinationTable")]
     pub destination_table: TableReference,
-    /// [Required] URI of source table to link.    
+    /// [Required] URI of source table to link.
     #[serde(alias="sourceUri")]
     pub source_uri: Vec<String>,
 }
@@ -1035,7 +1044,7 @@ impl Part for JobConfigurationLink {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ViewDefinition {
-    /// [Required] A query that BigQuery executes when the view is referenced.    
+    /// [Required] A query that BigQuery executes when the view is referenced.
     pub query: String,
 }
 
@@ -1048,20 +1057,20 @@ impl Part for ViewDefinition {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct DatasetAccess {
-    /// [Pick one] A domain to grant access to. Any users signed in with the domain specified will be granted the specified access. Example: "example.com".    
+    /// [Pick one] A domain to grant access to. Any users signed in with the domain specified will be granted the specified access. Example: "example.com".
     pub domain: String,
-    /// [Required] Describes the rights granted to the user specified by the other member of the access object. The following string values are supported: READER, WRITER, OWNER.    
+    /// [Required] Describes the rights granted to the user specified by the other member of the access object. The following string values are supported: READER, WRITER, OWNER.
     pub role: String,
-    /// [Pick one] An email address of a user to grant access to. For example: fred@example.com.    
+    /// [Pick one] An email address of a user to grant access to. For example: fred@example.com.
     #[serde(alias="userByEmail")]
     pub user_by_email: String,
-    /// [Pick one] A special group to grant access to. Possible values include: projectOwners: Owners of the enclosing project. projectReaders: Readers of the enclosing project. projectWriters: Writers of the enclosing project. allAuthenticatedUsers: All authenticated BigQuery users.    
+    /// [Pick one] A special group to grant access to. Possible values include: projectOwners: Owners of the enclosing project. projectReaders: Readers of the enclosing project. projectWriters: Writers of the enclosing project. allAuthenticatedUsers: All authenticated BigQuery users.
     #[serde(alias="specialGroup")]
     pub special_group: String,
-    /// [Pick one] An email address of a Google Group to grant access to.    
+    /// [Pick one] An email address of a Google Group to grant access to.
     #[serde(alias="groupByEmail")]
     pub group_by_email: String,
-    /// [Pick one] A view from a different dataset to grant access to. Queries executed against that view will have read access to tables in this dataset. The role field is not required when this field is set. If that view is updated by any user, access to the view needs to be granted again via an update operation.    
+    /// [Pick one] A view from a different dataset to grant access to. Queries executed against that view will have read access to tables in this dataset. The role field is not required when this field is set. If that view is updated by any user, access to the view needs to be granted again via an update operation.
     pub view: TableReference,
 }
 
@@ -1075,11 +1084,11 @@ impl Part for DatasetAccess {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct JobStatus {
-    /// [Output-only] Running state of the job.    
+    /// [Output-only] Running state of the job.
     pub state: String,
-    /// [Output-only] All errors encountered during the running of the job. Errors here do not necessarily mean that the job has completed or was unsuccessful.    
+    /// [Output-only] All errors encountered during the running of the job. Errors here do not necessarily mean that the job has completed or was unsuccessful.
     pub errors: Vec<ErrorProto>,
-    /// [Output-only] Final error result of the job. If present, indicates that the job has completed and was unsuccessful.    
+    /// [Output-only] Final error result of the job. If present, indicates that the job has completed and was unsuccessful.
     #[serde(alias="errorResult")]
     pub error_result: ErrorProto,
 }
@@ -1093,7 +1102,7 @@ impl Part for JobStatus {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct TableSchema {
-    /// Describes the fields in a table.    
+    /// Describes the fields in a table.
     pub fields: Vec<TableFieldSchema>,
 }
 
@@ -1129,14 +1138,14 @@ impl Part for JsonValue {}
 /// 
 #[derive(Default, Clone, Debug, Serialize)]
 pub struct TableDataInsertAllRequest {
-    /// [Optional] Accept rows that contain values that do not match the schema. The unknown values are ignored. Default is false, which treats unknown values as errors.    
+    /// [Optional] Accept rows that contain values that do not match the schema. The unknown values are ignored. Default is false, which treats unknown values as errors.
     #[serde(alias="ignoreUnknownValues")]
     pub ignore_unknown_values: Option<bool>,
-    /// The resource type of the response.    
+    /// The resource type of the response.
     pub kind: Option<String>,
-    /// The rows to insert.    
+    /// The rows to insert.
     pub rows: Option<Vec<TableDataInsertAllRequestRows>>,
-    /// [Optional] Insert all valid rows of a request, even if invalid rows exist. The default value is false, which causes the entire request to fail if any invalid rows exist.    
+    /// [Optional] Insert all valid rows of a request, even if invalid rows exist. The default value is false, which causes the entire request to fail if any invalid rows exist.
     #[serde(alias="skipInvalidRows")]
     pub skip_invalid_rows: Option<bool>,
 }
@@ -1155,14 +1164,14 @@ impl RequestValue for TableDataInsertAllRequest {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct DatasetList {
-    /// A token that can be used to request the next results page. This property is omitted on the final results page.    
+    /// A token that can be used to request the next results page. This property is omitted on the final results page.
     #[serde(alias="nextPageToken")]
     pub next_page_token: String,
-    /// The list type. This property always returns the value "bigquery#datasetList".    
+    /// The list type. This property always returns the value "bigquery#datasetList".
     pub kind: String,
-    /// An array of the dataset resources in the project. Each resource contains basic information. For full information about a particular dataset resource, use the Datasets: get method. This property is omitted when there are no datasets in the project.    
+    /// An array of the dataset resources in the project. Each resource contains basic information. For full information about a particular dataset resource, use the Datasets: get method. This property is omitted when there are no datasets in the project.
     pub datasets: Vec<DatasetListDatasets>,
-    /// A hash value of the results page. You can use this property to determine if the page has changed since the last request.    
+    /// A hash value of the results page. You can use this property to determine if the page has changed since the last request.
     pub etag: String,
 }
 
@@ -1175,22 +1184,22 @@ impl ResponseResult for DatasetList {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct JobStatistics {
-    /// [Output-only] Statistics for a load job.    
+    /// [Output-only] Statistics for a load job.
     pub load: JobStatistics3,
-    /// [Output-only] Statistics for an extract job.    
+    /// [Output-only] Statistics for an extract job.
     pub extract: JobStatistics4,
-    /// [Output-only] Start time of this job, in milliseconds since the epoch. This field will be present when the job transitions from the PENDING state to either RUNNING or DONE.    
+    /// [Output-only] Start time of this job, in milliseconds since the epoch. This field will be present when the job transitions from the PENDING state to either RUNNING or DONE.
     #[serde(alias="startTime")]
     pub start_time: String,
-    /// [Output-only] Statistics for a query job.    
+    /// [Output-only] Statistics for a query job.
     pub query: JobStatistics2,
-    /// [Output-only] End time of this job, in milliseconds since the epoch. This field will be present whenever a job is in the DONE state.    
+    /// [Output-only] End time of this job, in milliseconds since the epoch. This field will be present whenever a job is in the DONE state.
     #[serde(alias="endTime")]
     pub end_time: String,
-    /// [Output-only] Creation time of this job, in milliseconds since the epoch. This field will be present on all jobs.    
+    /// [Output-only] Creation time of this job, in milliseconds since the epoch. This field will be present on all jobs.
     #[serde(alias="creationTime")]
     pub creation_time: String,
-    /// [Output-only] [Deprecated] Use the bytes processed in the query statistics instead.    
+    /// [Output-only] [Deprecated] Use the bytes processed in the query statistics instead.
     #[serde(alias="totalBytesProcessed")]
     pub total_bytes_processed: String,
 }
@@ -1204,32 +1213,32 @@ impl Part for JobStatistics {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct JobConfigurationQuery {
-    /// [Experimental] Flattens all nested and repeated fields in the query results. The default value is true. allowLargeResults must be true if this is set to false.    
+    /// [Experimental] Flattens all nested and repeated fields in the query results. The default value is true. allowLargeResults must be true if this is set to false.
     #[serde(alias="flattenResults")]
     pub flatten_results: bool,
-    /// [Optional] Whether to look for the result in the query cache. The query cache is a best-effort cache that will be flushed whenever tables in the query are modified. Moreover, the query cache is only available when a query does not have a destination table specified.    
+    /// [Optional] Whether to look for the result in the query cache. The query cache is a best-effort cache that will be flushed whenever tables in the query are modified. Moreover, the query cache is only available when a query does not have a destination table specified.
     #[serde(alias="useQueryCache")]
     pub use_query_cache: bool,
-    /// [Optional] Specifies the default dataset to use for unqualified table names in the query.    
+    /// [Optional] Specifies the default dataset to use for unqualified table names in the query.
     #[serde(alias="defaultDataset")]
     pub default_dataset: DatasetReference,
-    /// [Optional] Describes the table where the query results should be stored. If not present, a new table will be created to store the results.    
+    /// [Optional] Describes the table where the query results should be stored. If not present, a new table will be created to store the results.
     #[serde(alias="destinationTable")]
     pub destination_table: TableReference,
-    /// [Optional] Specifies a priority for the query. Possible values include INTERACTIVE and BATCH. The default value is INTERACTIVE.    
+    /// [Optional] Specifies a priority for the query. Possible values include INTERACTIVE and BATCH. The default value is INTERACTIVE.
     pub priority: String,
-    /// [Optional] Specifies the action that occurs if the destination table already exists. The following values are supported: WRITE_TRUNCATE: If the table already exists, BigQuery overwrites the table data. WRITE_APPEND: If the table already exists, BigQuery appends the data to the table. WRITE_EMPTY: If the table already exists and contains data, a 'duplicate' error is returned in the job result. The default value is WRITE_EMPTY. Each action is atomic and only occurs if BigQuery is able to complete the job successfully. Creation, truncation and append actions occur as one atomic update upon job completion.    
+    /// [Optional] Specifies the action that occurs if the destination table already exists. The following values are supported: WRITE_TRUNCATE: If the table already exists, BigQuery overwrites the table data. WRITE_APPEND: If the table already exists, BigQuery appends the data to the table. WRITE_EMPTY: If the table already exists and contains data, a 'duplicate' error is returned in the job result. The default value is WRITE_EMPTY. Each action is atomic and only occurs if BigQuery is able to complete the job successfully. Creation, truncation and append actions occur as one atomic update upon job completion.
     #[serde(alias="writeDisposition")]
     pub write_disposition: String,
-    /// If true, allows the query to produce arbitrarily large result tables at a slight cost in performance. Requires destinationTable to be set.    
+    /// If true, allows the query to produce arbitrarily large result tables at a slight cost in performance. Requires destinationTable to be set.
     #[serde(alias="allowLargeResults")]
     pub allow_large_results: bool,
-    /// [Optional] Specifies whether the job is allowed to create new tables. The following values are supported: CREATE_IF_NEEDED: If the table does not exist, BigQuery creates the table. CREATE_NEVER: The table must already exist. If it does not, a 'notFound' error is returned in the job result. The default value is CREATE_IF_NEEDED. Creation, truncation and append actions occur as one atomic update upon job completion.    
+    /// [Optional] Specifies whether the job is allowed to create new tables. The following values are supported: CREATE_IF_NEEDED: If the table does not exist, BigQuery creates the table. CREATE_NEVER: The table must already exist. If it does not, a 'notFound' error is returned in the job result. The default value is CREATE_IF_NEEDED. Creation, truncation and append actions occur as one atomic update upon job completion.
     #[serde(alias="createDisposition")]
     pub create_disposition: String,
-    /// [Required] BigQuery SQL query to execute.    
+    /// [Required] BigQuery SQL query to execute.
     pub query: String,
-    /// [Deprecated] This property is deprecated.    
+    /// [Deprecated] This property is deprecated.
     #[serde(alias="preserveNulls")]
     pub preserve_nulls: bool,
 }
@@ -1243,10 +1252,10 @@ impl Part for JobConfigurationQuery {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct DatasetReference {
-    /// [Optional] The ID of the project containing this dataset.    
+    /// [Optional] The ID of the project containing this dataset.
     #[serde(alias="projectId")]
     pub project_id: String,
-    /// [Required] A unique ID for this dataset, without the project name. The ID must contain only letters (a-z, A-Z), numbers (0-9), or underscores (_). The maximum length is 1,024 characters.    
+    /// [Required] A unique ID for this dataset, without the project name. The ID must contain only letters (a-z, A-Z), numbers (0-9), or underscores (_). The maximum length is 1,024 characters.
     #[serde(alias="datasetId")]
     pub dataset_id: String,
 }
@@ -1260,7 +1269,7 @@ impl Part for DatasetReference {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct TableRow {
-    /// no description provided    
+    /// no description provided
     pub f: Vec<TableCell>,
 }
 
@@ -1273,18 +1282,18 @@ impl Part for TableRow {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct JobConfiguration {
-    /// [Pick one] Configures a load job.    
+    /// [Pick one] Configures a load job.
     pub load: JobConfigurationLoad,
-    /// [Optional] If set, don't actually run this job. A valid query will return a mostly empty response with some processing statistics, while an invalid query will return the same error it would if it wasn't a dry run. Behavior of non-query jobs is undefined.    
+    /// [Optional] If set, don't actually run this job. A valid query will return a mostly empty response with some processing statistics, while an invalid query will return the same error it would if it wasn't a dry run. Behavior of non-query jobs is undefined.
     #[serde(alias="dryRun")]
     pub dry_run: bool,
-    /// [Pick one] Configures a query job.    
+    /// [Pick one] Configures a query job.
     pub query: JobConfigurationQuery,
-    /// [Pick one] Configures a link job.    
+    /// [Pick one] Configures a link job.
     pub link: JobConfigurationLink,
-    /// [Pick one] Copies a table.    
+    /// [Pick one] Copies a table.
     pub copy: JobConfigurationTableCopy,
-    /// [Pick one] Configures an extract job.    
+    /// [Pick one] Configures an extract job.
     pub extract: JobConfigurationExtract,
 }
 
@@ -1297,17 +1306,17 @@ impl Part for JobConfiguration {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct ProjectListProjects {
-    /// A descriptive name for this project.    
+    /// A descriptive name for this project.
     #[serde(alias="friendlyName")]
     pub friendly_name: String,
-    /// The resource type.    
+    /// The resource type.
     pub kind: String,
-    /// The numeric ID of this project.    
+    /// The numeric ID of this project.
     #[serde(alias="numericId")]
     pub numeric_id: String,
-    /// An opaque ID of this project.    
+    /// An opaque ID of this project.
     pub id: String,
-    /// A unique reference to this project.    
+    /// A unique reference to this project.
     #[serde(alias="projectReference")]
     pub project_reference: ProjectReference,
 }
@@ -1322,13 +1331,13 @@ impl Part for ProjectListProjects {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct TableReference {
-    /// [Required] The ID of the project containing this table.    
+    /// [Required] The ID of the project containing this table.
     #[serde(alias="projectId")]
     pub project_id: String,
-    /// [Required] The ID of the table. The ID must contain only letters (a-z, A-Z), numbers (0-9), or underscores (_). The maximum length is 1,024 characters.    
+    /// [Required] The ID of the table. The ID must contain only letters (a-z, A-Z), numbers (0-9), or underscores (_). The maximum length is 1,024 characters.
     #[serde(alias="tableId")]
     pub table_id: String,
-    /// [Required] The ID of the dataset containing this table.    
+    /// [Required] The ID of the dataset containing this table.
     #[serde(alias="datasetId")]
     pub dataset_id: String,
 }
@@ -1352,44 +1361,44 @@ impl Part for TableReference {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Table {
-    /// [Output-only] The type of the resource.    
+    /// [Output-only] The type of the resource.
     pub kind: Option<String>,
-    /// [Optional] The time when this table expires, in milliseconds since the epoch. If not present, the table will persist indefinitely. Expired tables will be deleted and their storage reclaimed.    
+    /// [Optional] The time when this table expires, in milliseconds since the epoch. If not present, the table will persist indefinitely. Expired tables will be deleted and their storage reclaimed.
     #[serde(alias="expirationTime")]
     pub expiration_time: Option<String>,
-    /// [Optional] A user-friendly description of this table.    
+    /// [Optional] A user-friendly description of this table.
     pub description: Option<String>,
-    /// [Output-only] The time when this table was created, in milliseconds since the epoch.    
+    /// [Output-only] The time when this table was created, in milliseconds since the epoch.
     #[serde(alias="creationTime")]
     pub creation_time: Option<String>,
-    /// [Output-only] An opaque ID uniquely identifying the table.    
+    /// [Output-only] An opaque ID uniquely identifying the table.
     pub id: Option<String>,
-    /// [Output-only] The number of rows of data in this table. This property is unavailable for tables that are actively receiving streaming inserts.    
+    /// [Output-only] The number of rows of data in this table. This property is unavailable for tables that are actively receiving streaming inserts.
     #[serde(alias="numRows")]
     pub num_rows: Option<String>,
-    /// [Output-only] The size of the table in bytes. This property is unavailable for tables that are actively receiving streaming inserts.    
+    /// [Output-only] The size of the table in bytes. This property is unavailable for tables that are actively receiving streaming inserts.
     #[serde(alias="numBytes")]
     pub num_bytes: Option<String>,
-    /// [Output-only] A hash of this resource.    
+    /// [Output-only] A hash of this resource.
     pub etag: Option<String>,
-    /// [Optional] A descriptive name for this table.    
+    /// [Optional] A descriptive name for this table.
     #[serde(alias="friendlyName")]
     pub friendly_name: Option<String>,
-    /// [Output-only] The time when this table was last modified, in milliseconds since the epoch.    
+    /// [Output-only] The time when this table was last modified, in milliseconds since the epoch.
     #[serde(alias="lastModifiedTime")]
     pub last_modified_time: Option<String>,
-    /// [Optional] Describes the schema of this table.    
+    /// [Optional] Describes the schema of this table.
     pub schema: Option<TableSchema>,
-    /// [Output-only] Describes the table type. The following values are supported: TABLE: A normal BigQuery table. VIEW: A virtual table defined by a SQL query. The default value is TABLE.    
+    /// [Output-only] Describes the table type. The following values are supported: TABLE: A normal BigQuery table. VIEW: A virtual table defined by a SQL query. The default value is TABLE.
     #[serde(alias="type")]
     pub type_: Option<String>,
-    /// [Required] Reference describing the ID of this table.    
+    /// [Required] Reference describing the ID of this table.
     #[serde(alias="tableReference")]
     pub table_reference: Option<TableReference>,
-    /// [Output-only] A URL that can be used to access this resource again.    
+    /// [Output-only] A URL that can be used to access this resource again.
     #[serde(alias="selfLink")]
     pub self_link: Option<String>,
-    /// [Optional] The view definition.    
+    /// [Optional] The view definition.
     pub view: Option<ViewDefinition>,
 }
 
@@ -1409,9 +1418,9 @@ impl ResponseResult for Table {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct TableDataInsertAllResponse {
-    /// The resource type of the response.    
+    /// The resource type of the response.
     pub kind: String,
-    /// An array of errors for rows that were not inserted.    
+    /// An array of errors for rows that were not inserted.
     #[serde(alias="insertErrors")]
     pub insert_errors: Vec<TableDataInsertAllResponseInsertErrors>,
 }
@@ -1430,29 +1439,29 @@ impl ResponseResult for TableDataInsertAllResponse {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct QueryResponse {
-    /// The resource type.    
+    /// The resource type.
     pub kind: String,
-    /// An object with as many results as can be contained within the maximum permitted reply size. To get any additional rows, you can call GetQueryResults and specify the jobReference returned above.    
+    /// An object with as many results as can be contained within the maximum permitted reply size. To get any additional rows, you can call GetQueryResults and specify the jobReference returned above.
     pub rows: Vec<TableRow>,
-    /// Reference to the Job that was created to run the query. This field will be present even if the original request timed out, in which case GetQueryResults can be used to read the results once the query has completed. Since this API only returns the first page of results, subsequent pages can be fetched via the same mechanism (GetQueryResults).    
+    /// Reference to the Job that was created to run the query. This field will be present even if the original request timed out, in which case GetQueryResults can be used to read the results once the query has completed. Since this API only returns the first page of results, subsequent pages can be fetched via the same mechanism (GetQueryResults).
     #[serde(alias="jobReference")]
     pub job_reference: JobReference,
-    /// Whether the query result was fetched from the query cache.    
+    /// Whether the query result was fetched from the query cache.
     #[serde(alias="cacheHit")]
     pub cache_hit: bool,
-    /// Whether the query has completed or not. If rows or totalRows are present, this will always be true. If this is false, totalRows will not be available.    
+    /// Whether the query has completed or not. If rows or totalRows are present, this will always be true. If this is false, totalRows will not be available.
     #[serde(alias="jobComplete")]
     pub job_complete: bool,
-    /// The total number of rows in the complete query result set, which can be more than the number of rows in this single page of results.    
+    /// The total number of rows in the complete query result set, which can be more than the number of rows in this single page of results.
     #[serde(alias="totalRows")]
     pub total_rows: String,
-    /// The total number of bytes processed for this query. If this query was a dry run, this is the number of bytes that would be processed if the query were run.    
+    /// The total number of bytes processed for this query. If this query was a dry run, this is the number of bytes that would be processed if the query were run.
     #[serde(alias="totalBytesProcessed")]
     pub total_bytes_processed: String,
-    /// A token used for paging results.    
+    /// A token used for paging results.
     #[serde(alias="pageToken")]
     pub page_token: String,
-    /// The schema of the results. Present only when the query completes successfully.    
+    /// The schema of the results. Present only when the query completes successfully.
     pub schema: TableSchema,
 }
 
@@ -1465,19 +1474,19 @@ impl ResponseResult for QueryResponse {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct JobConfigurationTableCopy {
-    /// [Optional] Specifies whether the job is allowed to create new tables. The following values are supported: CREATE_IF_NEEDED: If the table does not exist, BigQuery creates the table. CREATE_NEVER: The table must already exist. If it does not, a 'notFound' error is returned in the job result. The default value is CREATE_IF_NEEDED. Creation, truncation and append actions occur as one atomic update upon job completion.    
+    /// [Optional] Specifies whether the job is allowed to create new tables. The following values are supported: CREATE_IF_NEEDED: If the table does not exist, BigQuery creates the table. CREATE_NEVER: The table must already exist. If it does not, a 'notFound' error is returned in the job result. The default value is CREATE_IF_NEEDED. Creation, truncation and append actions occur as one atomic update upon job completion.
     #[serde(alias="createDisposition")]
     pub create_disposition: String,
-    /// [Pick one] Source tables to copy.    
+    /// [Pick one] Source tables to copy.
     #[serde(alias="sourceTables")]
     pub source_tables: Vec<TableReference>,
-    /// [Optional] Specifies the action that occurs if the destination table already exists. The following values are supported: WRITE_TRUNCATE: If the table already exists, BigQuery overwrites the table data. WRITE_APPEND: If the table already exists, BigQuery appends the data to the table. WRITE_EMPTY: If the table already exists and contains data, a 'duplicate' error is returned in the job result. The default value is WRITE_EMPTY. Each action is atomic and only occurs if BigQuery is able to complete the job successfully. Creation, truncation and append actions occur as one atomic update upon job completion.    
+    /// [Optional] Specifies the action that occurs if the destination table already exists. The following values are supported: WRITE_TRUNCATE: If the table already exists, BigQuery overwrites the table data. WRITE_APPEND: If the table already exists, BigQuery appends the data to the table. WRITE_EMPTY: If the table already exists and contains data, a 'duplicate' error is returned in the job result. The default value is WRITE_EMPTY. Each action is atomic and only occurs if BigQuery is able to complete the job successfully. Creation, truncation and append actions occur as one atomic update upon job completion.
     #[serde(alias="writeDisposition")]
     pub write_disposition: String,
-    /// [Required] The destination table    
+    /// [Required] The destination table
     #[serde(alias="destinationTable")]
     pub destination_table: TableReference,
-    /// [Pick one] Source table to copy.    
+    /// [Pick one] Source table to copy.
     #[serde(alias="sourceTable")]
     pub source_table: TableReference,
 }
@@ -1524,13 +1533,20 @@ pub struct TableMethods<'a, C, NC, A>
     hub: &'a Bigquery<C, NC, A>,
 }
 
-impl<'a, C, NC, A> ResourceMethodsBuilder for TableMethods<'a, C, NC, A> {}
+impl<'a, C, NC, A> MethodsBuilder for TableMethods<'a, C, NC, A> {}
 
 impl<'a, C, NC, A> TableMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Updates information in an existing table. The update method replaces the entire table resource, whereas the patch method only replaces fields that are provided in the submitted table resource.    
+    /// Updates information in an existing table. The update method replaces the entire table resource, whereas the patch method only replaces fields that are provided in the submitted table resource.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `projectId` - Project ID of the table to update
+    /// * `datasetId` - Dataset ID of the table to update
+    /// * `tableId` - Table ID of the table to update
     pub fn update(&self, request: &Table, project_id: &str, dataset_id: &str, table_id: &str) -> TableUpdateCall<'a, C, NC, A> {
         TableUpdateCall {
             hub: self.hub,
@@ -1546,7 +1562,13 @@ impl<'a, C, NC, A> TableMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Creates a new, empty table in the dataset.    
+    /// Creates a new, empty table in the dataset.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `projectId` - Project ID of the new table
+    /// * `datasetId` - Dataset ID of the new table
     pub fn insert(&self, request: &Table, project_id: &str, dataset_id: &str) -> TableInsertCall<'a, C, NC, A> {
         TableInsertCall {
             hub: self.hub,
@@ -1561,7 +1583,12 @@ impl<'a, C, NC, A> TableMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Lists all tables in the specified dataset.    
+    /// Lists all tables in the specified dataset.
+    /// 
+    /// # Arguments
+    ///
+    /// * `projectId` - Project ID of the tables to list
+    /// * `datasetId` - Dataset ID of the tables to list
     pub fn list(&self, project_id: &str, dataset_id: &str) -> TableListCall<'a, C, NC, A> {
         TableListCall {
             hub: self.hub,
@@ -1577,7 +1604,13 @@ impl<'a, C, NC, A> TableMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Deletes the table specified by tableId from the dataset. If the table contains data, all the data will be deleted.    
+    /// Deletes the table specified by tableId from the dataset. If the table contains data, all the data will be deleted.
+    /// 
+    /// # Arguments
+    ///
+    /// * `projectId` - Project ID of the table to delete
+    /// * `datasetId` - Dataset ID of the table to delete
+    /// * `tableId` - Table ID of the table to delete
     pub fn delete(&self, project_id: &str, dataset_id: &str, table_id: &str) -> TableDeleteCall<'a, C, NC, A> {
         TableDeleteCall {
             hub: self.hub,
@@ -1592,7 +1625,13 @@ impl<'a, C, NC, A> TableMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Gets the specified table resource by table ID. This method does not return the data in the table, it only returns the table resource, which describes the structure of this table.    
+    /// Gets the specified table resource by table ID. This method does not return the data in the table, it only returns the table resource, which describes the structure of this table.
+    /// 
+    /// # Arguments
+    ///
+    /// * `projectId` - Project ID of the requested table
+    /// * `datasetId` - Dataset ID of the requested table
+    /// * `tableId` - Table ID of the requested table
     pub fn get(&self, project_id: &str, dataset_id: &str, table_id: &str) -> TableGetCall<'a, C, NC, A> {
         TableGetCall {
             hub: self.hub,
@@ -1607,7 +1646,14 @@ impl<'a, C, NC, A> TableMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Updates information in an existing table. The update method replaces the entire table resource, whereas the patch method only replaces fields that are provided in the submitted table resource. This method supports patch semantics.    
+    /// Updates information in an existing table. The update method replaces the entire table resource, whereas the patch method only replaces fields that are provided in the submitted table resource. This method supports patch semantics.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `projectId` - Project ID of the table to update
+    /// * `datasetId` - Dataset ID of the table to update
+    /// * `tableId` - Table ID of the table to update
     pub fn patch(&self, request: &Table, project_id: &str, dataset_id: &str, table_id: &str) -> TablePatchCall<'a, C, NC, A> {
         TablePatchCall {
             hub: self.hub,
@@ -1658,13 +1704,19 @@ pub struct DatasetMethods<'a, C, NC, A>
     hub: &'a Bigquery<C, NC, A>,
 }
 
-impl<'a, C, NC, A> ResourceMethodsBuilder for DatasetMethods<'a, C, NC, A> {}
+impl<'a, C, NC, A> MethodsBuilder for DatasetMethods<'a, C, NC, A> {}
 
 impl<'a, C, NC, A> DatasetMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Updates information in an existing dataset. The update method replaces the entire dataset resource, whereas the patch method only replaces fields that are provided in the submitted dataset resource. This method supports patch semantics.    
+    /// Updates information in an existing dataset. The update method replaces the entire dataset resource, whereas the patch method only replaces fields that are provided in the submitted dataset resource. This method supports patch semantics.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `projectId` - Project ID of the dataset being updated
+    /// * `datasetId` - Dataset ID of the dataset being updated
     pub fn patch(&self, request: &Dataset, project_id: &str, dataset_id: &str) -> DatasetPatchCall<'a, C, NC, A> {
         DatasetPatchCall {
             hub: self.hub,
@@ -1679,7 +1731,12 @@ impl<'a, C, NC, A> DatasetMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Returns the dataset specified by datasetID.    
+    /// Returns the dataset specified by datasetID.
+    /// 
+    /// # Arguments
+    ///
+    /// * `projectId` - Project ID of the requested dataset
+    /// * `datasetId` - Dataset ID of the requested dataset
     pub fn get(&self, project_id: &str, dataset_id: &str) -> DatasetGetCall<'a, C, NC, A> {
         DatasetGetCall {
             hub: self.hub,
@@ -1693,7 +1750,11 @@ impl<'a, C, NC, A> DatasetMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Lists all the datasets in the specified project to which the caller has read access; however, a project owner can list (but not necessarily get) all datasets in his project.    
+    /// Lists all the datasets in the specified project to which the caller has read access; however, a project owner can list (but not necessarily get) all datasets in his project.
+    /// 
+    /// # Arguments
+    ///
+    /// * `projectId` - Project ID of the datasets to be listed
     pub fn list(&self, project_id: &str) -> DatasetListCall<'a, C, NC, A> {
         DatasetListCall {
             hub: self.hub,
@@ -1709,7 +1770,13 @@ impl<'a, C, NC, A> DatasetMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Updates information in an existing dataset. The update method replaces the entire dataset resource, whereas the patch method only replaces fields that are provided in the submitted dataset resource.    
+    /// Updates information in an existing dataset. The update method replaces the entire dataset resource, whereas the patch method only replaces fields that are provided in the submitted dataset resource.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `projectId` - Project ID of the dataset being updated
+    /// * `datasetId` - Dataset ID of the dataset being updated
     pub fn update(&self, request: &Dataset, project_id: &str, dataset_id: &str) -> DatasetUpdateCall<'a, C, NC, A> {
         DatasetUpdateCall {
             hub: self.hub,
@@ -1724,7 +1791,12 @@ impl<'a, C, NC, A> DatasetMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Deletes the dataset specified by the datasetId value. Before you can delete a dataset, you must delete all its tables, either manually or by specifying deleteContents. Immediately after deletion, you can create another dataset with the same name.    
+    /// Deletes the dataset specified by the datasetId value. Before you can delete a dataset, you must delete all its tables, either manually or by specifying deleteContents. Immediately after deletion, you can create another dataset with the same name.
+    /// 
+    /// # Arguments
+    ///
+    /// * `projectId` - Project ID of the dataset being deleted
+    /// * `datasetId` - Dataset ID of dataset being deleted
     pub fn delete(&self, project_id: &str, dataset_id: &str) -> DatasetDeleteCall<'a, C, NC, A> {
         DatasetDeleteCall {
             hub: self.hub,
@@ -1739,7 +1811,12 @@ impl<'a, C, NC, A> DatasetMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Creates a new empty dataset.    
+    /// Creates a new empty dataset.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `projectId` - Project ID of the new dataset
     pub fn insert(&self, request: &Dataset, project_id: &str) -> DatasetInsertCall<'a, C, NC, A> {
         DatasetInsertCall {
             hub: self.hub,
@@ -1788,13 +1865,18 @@ pub struct JobMethods<'a, C, NC, A>
     hub: &'a Bigquery<C, NC, A>,
 }
 
-impl<'a, C, NC, A> ResourceMethodsBuilder for JobMethods<'a, C, NC, A> {}
+impl<'a, C, NC, A> MethodsBuilder for JobMethods<'a, C, NC, A> {}
 
 impl<'a, C, NC, A> JobMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Runs a BigQuery SQL query synchronously and returns query results if the query completes within a specified timeout.    
+    /// Runs a BigQuery SQL query synchronously and returns query results if the query completes within a specified timeout.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `projectId` - Project ID of the project billed for the query
     pub fn query(&self, request: &QueryRequest, project_id: &str) -> JobQueryCall<'a, C, NC, A> {
         JobQueryCall {
             hub: self.hub,
@@ -1808,7 +1890,12 @@ impl<'a, C, NC, A> JobMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Retrieves the results of a query job.    
+    /// Retrieves the results of a query job.
+    /// 
+    /// # Arguments
+    ///
+    /// * `projectId` - Project ID of the query job
+    /// * `jobId` - Job ID of the query job
     pub fn get_query_results(&self, project_id: &str, job_id: &str) -> JobGetQueryResultCall<'a, C, NC, A> {
         JobGetQueryResultCall {
             hub: self.hub,
@@ -1826,7 +1913,11 @@ impl<'a, C, NC, A> JobMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Lists all the Jobs in the specified project that were started by the user. The job list returns in reverse chronological order of when the jobs were created, starting with the most recent job created.    
+    /// Lists all the Jobs in the specified project that were started by the user. The job list returns in reverse chronological order of when the jobs were created, starting with the most recent job created.
+    /// 
+    /// # Arguments
+    ///
+    /// * `projectId` - Project ID of the jobs to list
     pub fn list(&self, project_id: &str) -> JobListCall<'a, C, NC, A> {
         JobListCall {
             hub: self.hub,
@@ -1844,7 +1935,12 @@ impl<'a, C, NC, A> JobMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Retrieves the specified job by ID.    
+    /// Retrieves the specified job by ID.
+    /// 
+    /// # Arguments
+    ///
+    /// * `projectId` - Project ID of the requested job
+    /// * `jobId` - Job ID of the requested job
     pub fn get(&self, project_id: &str, job_id: &str) -> JobGetCall<'a, C, NC, A> {
         JobGetCall {
             hub: self.hub,
@@ -1858,7 +1954,12 @@ impl<'a, C, NC, A> JobMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Starts a new asynchronous job.    
+    /// Starts a new asynchronous job.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `projectId` - Project ID of the project that will be billed for the job
     pub fn insert(&self, request: &Job, project_id: &str) -> JobInsertCall<'a, C, NC, A> {
         JobInsertCall {
             hub: self.hub,
@@ -1907,13 +2008,20 @@ pub struct TabledataMethods<'a, C, NC, A>
     hub: &'a Bigquery<C, NC, A>,
 }
 
-impl<'a, C, NC, A> ResourceMethodsBuilder for TabledataMethods<'a, C, NC, A> {}
+impl<'a, C, NC, A> MethodsBuilder for TabledataMethods<'a, C, NC, A> {}
 
 impl<'a, C, NC, A> TabledataMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Streams data into BigQuery one record at a time without needing to run a load job.    
+    /// Streams data into BigQuery one record at a time without needing to run a load job.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `projectId` - Project ID of the destination table.
+    /// * `datasetId` - Dataset ID of the destination table.
+    /// * `tableId` - Table ID of the destination table.
     pub fn insert_all(&self, request: &TableDataInsertAllRequest, project_id: &str, dataset_id: &str, table_id: &str) -> TabledataInsertAllCall<'a, C, NC, A> {
         TabledataInsertAllCall {
             hub: self.hub,
@@ -1929,7 +2037,13 @@ impl<'a, C, NC, A> TabledataMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Retrieves table data from a specified set of rows.    
+    /// Retrieves table data from a specified set of rows.
+    /// 
+    /// # Arguments
+    ///
+    /// * `projectId` - Project ID of the table to read
+    /// * `datasetId` - Dataset ID of the table to read
+    /// * `tableId` - Table ID of the table to read
     pub fn list(&self, project_id: &str, dataset_id: &str, table_id: &str) -> TabledataListCall<'a, C, NC, A> {
         TabledataListCall {
             hub: self.hub,
@@ -1982,13 +2096,13 @@ pub struct ProjectMethods<'a, C, NC, A>
     hub: &'a Bigquery<C, NC, A>,
 }
 
-impl<'a, C, NC, A> ResourceMethodsBuilder for ProjectMethods<'a, C, NC, A> {}
+impl<'a, C, NC, A> MethodsBuilder for ProjectMethods<'a, C, NC, A> {}
 
 impl<'a, C, NC, A> ProjectMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Lists the projects to which you have at least read access.    
+    /// Lists the projects to which you have at least read access.
     pub fn list(&self) -> ProjectListCall<'a, C, NC, A> {
         ProjectListCall {
             hub: self.hub,
@@ -2012,7 +2126,7 @@ impl<'a, C, NC, A> ProjectMethods<'a, C, NC, A> {
 /// Updates information in an existing table. The update method replaces the entire table resource, whereas the patch method only replaces fields that are provided in the submitted table resource.
 ///
 /// A builder for the *update* method supported by a *table* resource.
-/// It is not used directly, but through a `TableMethods`.
+/// It is not used directly, but through a `TableMethods` instance.
 ///
 /// # Example
 ///
@@ -2081,7 +2195,7 @@ impl<'a, C, NC, A> TableUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
         for &field in ["alt", "projectId", "datasetId", "tableId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -2138,7 +2252,7 @@ impl<'a, C, NC, A> TableUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -2154,7 +2268,6 @@ impl<'a, C, NC, A> TableUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -2164,7 +2277,7 @@ impl<'a, C, NC, A> TableUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -2175,7 +2288,7 @@ impl<'a, C, NC, A> TableUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -2184,13 +2297,13 @@ impl<'a, C, NC, A> TableUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -2211,7 +2324,7 @@ impl<'a, C, NC, A> TableUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Project ID of the table to update    
+    /// Project ID of the table to update
     pub fn project_id(mut self, new_value: &str) -> TableUpdateCall<'a, C, NC, A> {
         self._project_id = new_value.to_string();
         self
@@ -2221,7 +2334,7 @@ impl<'a, C, NC, A> TableUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Dataset ID of the table to update    
+    /// Dataset ID of the table to update
     pub fn dataset_id(mut self, new_value: &str) -> TableUpdateCall<'a, C, NC, A> {
         self._dataset_id = new_value.to_string();
         self
@@ -2231,7 +2344,7 @@ impl<'a, C, NC, A> TableUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Table ID of the table to update    
+    /// Table ID of the table to update
     pub fn table_id(mut self, new_value: &str) -> TableUpdateCall<'a, C, NC, A> {
         self._table_id = new_value.to_string();
         self
@@ -2292,7 +2405,7 @@ impl<'a, C, NC, A> TableUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
 /// Creates a new, empty table in the dataset.
 ///
 /// A builder for the *insert* method supported by a *table* resource.
-/// It is not used directly, but through a `TableMethods`.
+/// It is not used directly, but through a `TableMethods` instance.
 ///
 /// # Example
 ///
@@ -2359,7 +2472,7 @@ impl<'a, C, NC, A> TableInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
         for &field in ["alt", "projectId", "datasetId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -2416,7 +2529,7 @@ impl<'a, C, NC, A> TableInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -2432,7 +2545,6 @@ impl<'a, C, NC, A> TableInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -2442,7 +2554,7 @@ impl<'a, C, NC, A> TableInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -2453,7 +2565,7 @@ impl<'a, C, NC, A> TableInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -2462,13 +2574,13 @@ impl<'a, C, NC, A> TableInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -2489,7 +2601,7 @@ impl<'a, C, NC, A> TableInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Project ID of the new table    
+    /// Project ID of the new table
     pub fn project_id(mut self, new_value: &str) -> TableInsertCall<'a, C, NC, A> {
         self._project_id = new_value.to_string();
         self
@@ -2499,7 +2611,7 @@ impl<'a, C, NC, A> TableInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Dataset ID of the new table    
+    /// Dataset ID of the new table
     pub fn dataset_id(mut self, new_value: &str) -> TableInsertCall<'a, C, NC, A> {
         self._dataset_id = new_value.to_string();
         self
@@ -2560,7 +2672,7 @@ impl<'a, C, NC, A> TableInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
 /// Lists all tables in the specified dataset.
 ///
 /// A builder for the *list* method supported by a *table* resource.
-/// It is not used directly, but through a `TableMethods`.
+/// It is not used directly, but through a `TableMethods` instance.
 ///
 /// # Example
 ///
@@ -2630,7 +2742,7 @@ impl<'a, C, NC, A> TableListCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
         for &field in ["alt", "projectId", "datasetId", "pageToken", "maxResults"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -2683,7 +2795,7 @@ impl<'a, C, NC, A> TableListCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -2695,7 +2807,6 @@ impl<'a, C, NC, A> TableListCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -2705,7 +2816,7 @@ impl<'a, C, NC, A> TableListCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -2716,7 +2827,7 @@ impl<'a, C, NC, A> TableListCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -2725,13 +2836,13 @@ impl<'a, C, NC, A> TableListCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -2743,7 +2854,7 @@ impl<'a, C, NC, A> TableListCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Project ID of the tables to list    
+    /// Project ID of the tables to list
     pub fn project_id(mut self, new_value: &str) -> TableListCall<'a, C, NC, A> {
         self._project_id = new_value.to_string();
         self
@@ -2753,7 +2864,7 @@ impl<'a, C, NC, A> TableListCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Dataset ID of the tables to list    
+    /// Dataset ID of the tables to list
     pub fn dataset_id(mut self, new_value: &str) -> TableListCall<'a, C, NC, A> {
         self._dataset_id = new_value.to_string();
         self
@@ -2761,7 +2872,7 @@ impl<'a, C, NC, A> TableListCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     /// Sets the *page token* query property to the given value.
     ///
     /// 
-    /// Page token, returned by a previous call, to request the next page of results    
+    /// Page token, returned by a previous call, to request the next page of results
     pub fn page_token(mut self, new_value: &str) -> TableListCall<'a, C, NC, A> {
         self._page_token = Some(new_value.to_string());
         self
@@ -2769,7 +2880,7 @@ impl<'a, C, NC, A> TableListCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     /// Sets the *max results* query property to the given value.
     ///
     /// 
-    /// Maximum number of results to return    
+    /// Maximum number of results to return
     pub fn max_results(mut self, new_value: u32) -> TableListCall<'a, C, NC, A> {
         self._max_results = Some(new_value);
         self
@@ -2830,7 +2941,7 @@ impl<'a, C, NC, A> TableListCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
 /// Deletes the table specified by tableId from the dataset. If the table contains data, all the data will be deleted.
 ///
 /// A builder for the *delete* method supported by a *table* resource.
-/// It is not used directly, but through a `TableMethods`.
+/// It is not used directly, but through a `TableMethods` instance.
 ///
 /// # Example
 ///
@@ -2892,7 +3003,7 @@ impl<'a, C, NC, A> TableDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
         for &field in ["projectId", "datasetId", "tableId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -2944,7 +3055,7 @@ impl<'a, C, NC, A> TableDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -2956,7 +3067,6 @@ impl<'a, C, NC, A> TableDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -2966,7 +3076,7 @@ impl<'a, C, NC, A> TableDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -2977,12 +3087,12 @@ impl<'a, C, NC, A> TableDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = res;
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -2994,7 +3104,7 @@ impl<'a, C, NC, A> TableDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Project ID of the table to delete    
+    /// Project ID of the table to delete
     pub fn project_id(mut self, new_value: &str) -> TableDeleteCall<'a, C, NC, A> {
         self._project_id = new_value.to_string();
         self
@@ -3004,7 +3114,7 @@ impl<'a, C, NC, A> TableDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Dataset ID of the table to delete    
+    /// Dataset ID of the table to delete
     pub fn dataset_id(mut self, new_value: &str) -> TableDeleteCall<'a, C, NC, A> {
         self._dataset_id = new_value.to_string();
         self
@@ -3014,7 +3124,7 @@ impl<'a, C, NC, A> TableDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Table ID of the table to delete    
+    /// Table ID of the table to delete
     pub fn table_id(mut self, new_value: &str) -> TableDeleteCall<'a, C, NC, A> {
         self._table_id = new_value.to_string();
         self
@@ -3075,7 +3185,7 @@ impl<'a, C, NC, A> TableDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
 /// Gets the specified table resource by table ID. This method does not return the data in the table, it only returns the table resource, which describes the structure of this table.
 ///
 /// A builder for the *get* method supported by a *table* resource.
-/// It is not used directly, but through a `TableMethods`.
+/// It is not used directly, but through a `TableMethods` instance.
 ///
 /// # Example
 ///
@@ -3137,7 +3247,7 @@ impl<'a, C, NC, A> TableGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
         for &field in ["alt", "projectId", "datasetId", "tableId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -3190,7 +3300,7 @@ impl<'a, C, NC, A> TableGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -3202,7 +3312,6 @@ impl<'a, C, NC, A> TableGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -3212,7 +3321,7 @@ impl<'a, C, NC, A> TableGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -3223,7 +3332,7 @@ impl<'a, C, NC, A> TableGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -3232,13 +3341,13 @@ impl<'a, C, NC, A> TableGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -3250,7 +3359,7 @@ impl<'a, C, NC, A> TableGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Project ID of the requested table    
+    /// Project ID of the requested table
     pub fn project_id(mut self, new_value: &str) -> TableGetCall<'a, C, NC, A> {
         self._project_id = new_value.to_string();
         self
@@ -3260,7 +3369,7 @@ impl<'a, C, NC, A> TableGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Dataset ID of the requested table    
+    /// Dataset ID of the requested table
     pub fn dataset_id(mut self, new_value: &str) -> TableGetCall<'a, C, NC, A> {
         self._dataset_id = new_value.to_string();
         self
@@ -3270,7 +3379,7 @@ impl<'a, C, NC, A> TableGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Table ID of the requested table    
+    /// Table ID of the requested table
     pub fn table_id(mut self, new_value: &str) -> TableGetCall<'a, C, NC, A> {
         self._table_id = new_value.to_string();
         self
@@ -3331,7 +3440,7 @@ impl<'a, C, NC, A> TableGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
 /// Updates information in an existing table. The update method replaces the entire table resource, whereas the patch method only replaces fields that are provided in the submitted table resource. This method supports patch semantics.
 ///
 /// A builder for the *patch* method supported by a *table* resource.
-/// It is not used directly, but through a `TableMethods`.
+/// It is not used directly, but through a `TableMethods` instance.
 ///
 /// # Example
 ///
@@ -3400,7 +3509,7 @@ impl<'a, C, NC, A> TablePatchCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
         for &field in ["alt", "projectId", "datasetId", "tableId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -3457,7 +3566,7 @@ impl<'a, C, NC, A> TablePatchCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -3473,7 +3582,6 @@ impl<'a, C, NC, A> TablePatchCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -3483,7 +3591,7 @@ impl<'a, C, NC, A> TablePatchCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -3494,7 +3602,7 @@ impl<'a, C, NC, A> TablePatchCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -3503,13 +3611,13 @@ impl<'a, C, NC, A> TablePatchCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -3530,7 +3638,7 @@ impl<'a, C, NC, A> TablePatchCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Project ID of the table to update    
+    /// Project ID of the table to update
     pub fn project_id(mut self, new_value: &str) -> TablePatchCall<'a, C, NC, A> {
         self._project_id = new_value.to_string();
         self
@@ -3540,7 +3648,7 @@ impl<'a, C, NC, A> TablePatchCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Dataset ID of the table to update    
+    /// Dataset ID of the table to update
     pub fn dataset_id(mut self, new_value: &str) -> TablePatchCall<'a, C, NC, A> {
         self._dataset_id = new_value.to_string();
         self
@@ -3550,7 +3658,7 @@ impl<'a, C, NC, A> TablePatchCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Table ID of the table to update    
+    /// Table ID of the table to update
     pub fn table_id(mut self, new_value: &str) -> TablePatchCall<'a, C, NC, A> {
         self._table_id = new_value.to_string();
         self
@@ -3611,7 +3719,7 @@ impl<'a, C, NC, A> TablePatchCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
 /// Updates information in an existing dataset. The update method replaces the entire dataset resource, whereas the patch method only replaces fields that are provided in the submitted dataset resource. This method supports patch semantics.
 ///
 /// A builder for the *patch* method supported by a *dataset* resource.
-/// It is not used directly, but through a `DatasetMethods`.
+/// It is not used directly, but through a `DatasetMethods` instance.
 ///
 /// # Example
 ///
@@ -3678,7 +3786,7 @@ impl<'a, C, NC, A> DatasetPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkC
         for &field in ["alt", "projectId", "datasetId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -3735,7 +3843,7 @@ impl<'a, C, NC, A> DatasetPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkC
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -3751,7 +3859,6 @@ impl<'a, C, NC, A> DatasetPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkC
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -3761,7 +3868,7 @@ impl<'a, C, NC, A> DatasetPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkC
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -3772,7 +3879,7 @@ impl<'a, C, NC, A> DatasetPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkC
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -3781,13 +3888,13 @@ impl<'a, C, NC, A> DatasetPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkC
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -3808,7 +3915,7 @@ impl<'a, C, NC, A> DatasetPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Project ID of the dataset being updated    
+    /// Project ID of the dataset being updated
     pub fn project_id(mut self, new_value: &str) -> DatasetPatchCall<'a, C, NC, A> {
         self._project_id = new_value.to_string();
         self
@@ -3818,7 +3925,7 @@ impl<'a, C, NC, A> DatasetPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Dataset ID of the dataset being updated    
+    /// Dataset ID of the dataset being updated
     pub fn dataset_id(mut self, new_value: &str) -> DatasetPatchCall<'a, C, NC, A> {
         self._dataset_id = new_value.to_string();
         self
@@ -3879,7 +3986,7 @@ impl<'a, C, NC, A> DatasetPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkC
 /// Returns the dataset specified by datasetID.
 ///
 /// A builder for the *get* method supported by a *dataset* resource.
-/// It is not used directly, but through a `DatasetMethods`.
+/// It is not used directly, but through a `DatasetMethods` instance.
 ///
 /// # Example
 ///
@@ -3939,7 +4046,7 @@ impl<'a, C, NC, A> DatasetGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
         for &field in ["alt", "projectId", "datasetId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -3992,7 +4099,7 @@ impl<'a, C, NC, A> DatasetGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -4004,7 +4111,6 @@ impl<'a, C, NC, A> DatasetGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -4014,7 +4120,7 @@ impl<'a, C, NC, A> DatasetGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -4025,7 +4131,7 @@ impl<'a, C, NC, A> DatasetGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -4034,13 +4140,13 @@ impl<'a, C, NC, A> DatasetGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -4052,7 +4158,7 @@ impl<'a, C, NC, A> DatasetGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Project ID of the requested dataset    
+    /// Project ID of the requested dataset
     pub fn project_id(mut self, new_value: &str) -> DatasetGetCall<'a, C, NC, A> {
         self._project_id = new_value.to_string();
         self
@@ -4062,7 +4168,7 @@ impl<'a, C, NC, A> DatasetGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Dataset ID of the requested dataset    
+    /// Dataset ID of the requested dataset
     pub fn dataset_id(mut self, new_value: &str) -> DatasetGetCall<'a, C, NC, A> {
         self._dataset_id = new_value.to_string();
         self
@@ -4123,7 +4229,7 @@ impl<'a, C, NC, A> DatasetGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
 /// Lists all the datasets in the specified project to which the caller has read access; however, a project owner can list (but not necessarily get) all datasets in his project.
 ///
 /// A builder for the *list* method supported by a *dataset* resource.
-/// It is not used directly, but through a `DatasetMethods`.
+/// It is not used directly, but through a `DatasetMethods` instance.
 ///
 /// # Example
 ///
@@ -4196,7 +4302,7 @@ impl<'a, C, NC, A> DatasetListCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
         for &field in ["alt", "projectId", "pageToken", "maxResults", "all"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -4249,7 +4355,7 @@ impl<'a, C, NC, A> DatasetListCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -4261,7 +4367,6 @@ impl<'a, C, NC, A> DatasetListCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -4271,7 +4376,7 @@ impl<'a, C, NC, A> DatasetListCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -4282,7 +4387,7 @@ impl<'a, C, NC, A> DatasetListCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -4291,13 +4396,13 @@ impl<'a, C, NC, A> DatasetListCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -4309,7 +4414,7 @@ impl<'a, C, NC, A> DatasetListCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Project ID of the datasets to be listed    
+    /// Project ID of the datasets to be listed
     pub fn project_id(mut self, new_value: &str) -> DatasetListCall<'a, C, NC, A> {
         self._project_id = new_value.to_string();
         self
@@ -4317,7 +4422,7 @@ impl<'a, C, NC, A> DatasetListCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// Sets the *page token* query property to the given value.
     ///
     /// 
-    /// Page token, returned by a previous call, to request the next page of results    
+    /// Page token, returned by a previous call, to request the next page of results
     pub fn page_token(mut self, new_value: &str) -> DatasetListCall<'a, C, NC, A> {
         self._page_token = Some(new_value.to_string());
         self
@@ -4325,7 +4430,7 @@ impl<'a, C, NC, A> DatasetListCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// Sets the *max results* query property to the given value.
     ///
     /// 
-    /// The maximum number of results to return    
+    /// The maximum number of results to return
     pub fn max_results(mut self, new_value: u32) -> DatasetListCall<'a, C, NC, A> {
         self._max_results = Some(new_value);
         self
@@ -4333,7 +4438,7 @@ impl<'a, C, NC, A> DatasetListCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// Sets the *all* query property to the given value.
     ///
     /// 
-    /// Whether to list all datasets, including hidden ones    
+    /// Whether to list all datasets, including hidden ones
     pub fn all(mut self, new_value: bool) -> DatasetListCall<'a, C, NC, A> {
         self._all = Some(new_value);
         self
@@ -4394,7 +4499,7 @@ impl<'a, C, NC, A> DatasetListCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
 /// Updates information in an existing dataset. The update method replaces the entire dataset resource, whereas the patch method only replaces fields that are provided in the submitted dataset resource.
 ///
 /// A builder for the *update* method supported by a *dataset* resource.
-/// It is not used directly, but through a `DatasetMethods`.
+/// It is not used directly, but through a `DatasetMethods` instance.
 ///
 /// # Example
 ///
@@ -4461,7 +4566,7 @@ impl<'a, C, NC, A> DatasetUpdateCall<'a, C, NC, A> where NC: hyper::net::Network
         for &field in ["alt", "projectId", "datasetId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -4518,7 +4623,7 @@ impl<'a, C, NC, A> DatasetUpdateCall<'a, C, NC, A> where NC: hyper::net::Network
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -4534,7 +4639,6 @@ impl<'a, C, NC, A> DatasetUpdateCall<'a, C, NC, A> where NC: hyper::net::Network
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -4544,7 +4648,7 @@ impl<'a, C, NC, A> DatasetUpdateCall<'a, C, NC, A> where NC: hyper::net::Network
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -4555,7 +4659,7 @@ impl<'a, C, NC, A> DatasetUpdateCall<'a, C, NC, A> where NC: hyper::net::Network
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -4564,13 +4668,13 @@ impl<'a, C, NC, A> DatasetUpdateCall<'a, C, NC, A> where NC: hyper::net::Network
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -4591,7 +4695,7 @@ impl<'a, C, NC, A> DatasetUpdateCall<'a, C, NC, A> where NC: hyper::net::Network
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Project ID of the dataset being updated    
+    /// Project ID of the dataset being updated
     pub fn project_id(mut self, new_value: &str) -> DatasetUpdateCall<'a, C, NC, A> {
         self._project_id = new_value.to_string();
         self
@@ -4601,7 +4705,7 @@ impl<'a, C, NC, A> DatasetUpdateCall<'a, C, NC, A> where NC: hyper::net::Network
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Dataset ID of the dataset being updated    
+    /// Dataset ID of the dataset being updated
     pub fn dataset_id(mut self, new_value: &str) -> DatasetUpdateCall<'a, C, NC, A> {
         self._dataset_id = new_value.to_string();
         self
@@ -4662,7 +4766,7 @@ impl<'a, C, NC, A> DatasetUpdateCall<'a, C, NC, A> where NC: hyper::net::Network
 /// Deletes the dataset specified by the datasetId value. Before you can delete a dataset, you must delete all its tables, either manually or by specifying deleteContents. Immediately after deletion, you can create another dataset with the same name.
 ///
 /// A builder for the *delete* method supported by a *dataset* resource.
-/// It is not used directly, but through a `DatasetMethods`.
+/// It is not used directly, but through a `DatasetMethods` instance.
 ///
 /// # Example
 ///
@@ -4727,7 +4831,7 @@ impl<'a, C, NC, A> DatasetDeleteCall<'a, C, NC, A> where NC: hyper::net::Network
         for &field in ["projectId", "datasetId", "deleteContents"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -4779,7 +4883,7 @@ impl<'a, C, NC, A> DatasetDeleteCall<'a, C, NC, A> where NC: hyper::net::Network
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -4791,7 +4895,6 @@ impl<'a, C, NC, A> DatasetDeleteCall<'a, C, NC, A> where NC: hyper::net::Network
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -4801,7 +4904,7 @@ impl<'a, C, NC, A> DatasetDeleteCall<'a, C, NC, A> where NC: hyper::net::Network
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -4812,12 +4915,12 @@ impl<'a, C, NC, A> DatasetDeleteCall<'a, C, NC, A> where NC: hyper::net::Network
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = res;
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -4829,7 +4932,7 @@ impl<'a, C, NC, A> DatasetDeleteCall<'a, C, NC, A> where NC: hyper::net::Network
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Project ID of the dataset being deleted    
+    /// Project ID of the dataset being deleted
     pub fn project_id(mut self, new_value: &str) -> DatasetDeleteCall<'a, C, NC, A> {
         self._project_id = new_value.to_string();
         self
@@ -4839,7 +4942,7 @@ impl<'a, C, NC, A> DatasetDeleteCall<'a, C, NC, A> where NC: hyper::net::Network
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Dataset ID of dataset being deleted    
+    /// Dataset ID of dataset being deleted
     pub fn dataset_id(mut self, new_value: &str) -> DatasetDeleteCall<'a, C, NC, A> {
         self._dataset_id = new_value.to_string();
         self
@@ -4847,7 +4950,7 @@ impl<'a, C, NC, A> DatasetDeleteCall<'a, C, NC, A> where NC: hyper::net::Network
     /// Sets the *delete contents* query property to the given value.
     ///
     /// 
-    /// If True, delete all the tables in the dataset. If False and the dataset contains tables, the request will fail. Default is False    
+    /// If True, delete all the tables in the dataset. If False and the dataset contains tables, the request will fail. Default is False
     pub fn delete_contents(mut self, new_value: bool) -> DatasetDeleteCall<'a, C, NC, A> {
         self._delete_contents = Some(new_value);
         self
@@ -4908,7 +5011,7 @@ impl<'a, C, NC, A> DatasetDeleteCall<'a, C, NC, A> where NC: hyper::net::Network
 /// Creates a new empty dataset.
 ///
 /// A builder for the *insert* method supported by a *dataset* resource.
-/// It is not used directly, but through a `DatasetMethods`.
+/// It is not used directly, but through a `DatasetMethods` instance.
 ///
 /// # Example
 ///
@@ -4973,7 +5076,7 @@ impl<'a, C, NC, A> DatasetInsertCall<'a, C, NC, A> where NC: hyper::net::Network
         for &field in ["alt", "projectId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -5030,7 +5133,7 @@ impl<'a, C, NC, A> DatasetInsertCall<'a, C, NC, A> where NC: hyper::net::Network
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -5046,7 +5149,6 @@ impl<'a, C, NC, A> DatasetInsertCall<'a, C, NC, A> where NC: hyper::net::Network
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -5056,7 +5158,7 @@ impl<'a, C, NC, A> DatasetInsertCall<'a, C, NC, A> where NC: hyper::net::Network
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -5067,7 +5169,7 @@ impl<'a, C, NC, A> DatasetInsertCall<'a, C, NC, A> where NC: hyper::net::Network
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -5076,13 +5178,13 @@ impl<'a, C, NC, A> DatasetInsertCall<'a, C, NC, A> where NC: hyper::net::Network
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -5103,7 +5205,7 @@ impl<'a, C, NC, A> DatasetInsertCall<'a, C, NC, A> where NC: hyper::net::Network
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Project ID of the new dataset    
+    /// Project ID of the new dataset
     pub fn project_id(mut self, new_value: &str) -> DatasetInsertCall<'a, C, NC, A> {
         self._project_id = new_value.to_string();
         self
@@ -5164,7 +5266,7 @@ impl<'a, C, NC, A> DatasetInsertCall<'a, C, NC, A> where NC: hyper::net::Network
 /// Runs a BigQuery SQL query synchronously and returns query results if the query completes within a specified timeout.
 ///
 /// A builder for the *query* method supported by a *job* resource.
-/// It is not used directly, but through a `JobMethods`.
+/// It is not used directly, but through a `JobMethods` instance.
 ///
 /// # Example
 ///
@@ -5229,7 +5331,7 @@ impl<'a, C, NC, A> JobQueryCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
         for &field in ["alt", "projectId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -5286,7 +5388,7 @@ impl<'a, C, NC, A> JobQueryCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -5302,7 +5404,6 @@ impl<'a, C, NC, A> JobQueryCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -5312,7 +5413,7 @@ impl<'a, C, NC, A> JobQueryCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -5323,7 +5424,7 @@ impl<'a, C, NC, A> JobQueryCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -5332,13 +5433,13 @@ impl<'a, C, NC, A> JobQueryCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -5359,7 +5460,7 @@ impl<'a, C, NC, A> JobQueryCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Project ID of the project billed for the query    
+    /// Project ID of the project billed for the query
     pub fn project_id(mut self, new_value: &str) -> JobQueryCall<'a, C, NC, A> {
         self._project_id = new_value.to_string();
         self
@@ -5420,7 +5521,7 @@ impl<'a, C, NC, A> JobQueryCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
 /// Retrieves the results of a query job.
 ///
 /// A builder for the *getQueryResults* method supported by a *job* resource.
-/// It is not used directly, but through a `JobMethods`.
+/// It is not used directly, but through a `JobMethods` instance.
 ///
 /// # Example
 ///
@@ -5500,7 +5601,7 @@ impl<'a, C, NC, A> JobGetQueryResultCall<'a, C, NC, A> where NC: hyper::net::Net
         for &field in ["alt", "projectId", "jobId", "timeoutMs", "startIndex", "pageToken", "maxResults"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -5553,7 +5654,7 @@ impl<'a, C, NC, A> JobGetQueryResultCall<'a, C, NC, A> where NC: hyper::net::Net
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -5565,7 +5666,6 @@ impl<'a, C, NC, A> JobGetQueryResultCall<'a, C, NC, A> where NC: hyper::net::Net
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -5575,7 +5675,7 @@ impl<'a, C, NC, A> JobGetQueryResultCall<'a, C, NC, A> where NC: hyper::net::Net
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -5586,7 +5686,7 @@ impl<'a, C, NC, A> JobGetQueryResultCall<'a, C, NC, A> where NC: hyper::net::Net
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -5595,13 +5695,13 @@ impl<'a, C, NC, A> JobGetQueryResultCall<'a, C, NC, A> where NC: hyper::net::Net
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -5613,7 +5713,7 @@ impl<'a, C, NC, A> JobGetQueryResultCall<'a, C, NC, A> where NC: hyper::net::Net
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Project ID of the query job    
+    /// Project ID of the query job
     pub fn project_id(mut self, new_value: &str) -> JobGetQueryResultCall<'a, C, NC, A> {
         self._project_id = new_value.to_string();
         self
@@ -5623,7 +5723,7 @@ impl<'a, C, NC, A> JobGetQueryResultCall<'a, C, NC, A> where NC: hyper::net::Net
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Job ID of the query job    
+    /// Job ID of the query job
     pub fn job_id(mut self, new_value: &str) -> JobGetQueryResultCall<'a, C, NC, A> {
         self._job_id = new_value.to_string();
         self
@@ -5631,7 +5731,7 @@ impl<'a, C, NC, A> JobGetQueryResultCall<'a, C, NC, A> where NC: hyper::net::Net
     /// Sets the *timeout ms* query property to the given value.
     ///
     /// 
-    /// How long to wait for the query to complete, in milliseconds, before returning. Default is to return immediately. If the timeout passes before the job completes, the request will fail with a TIMEOUT error    
+    /// How long to wait for the query to complete, in milliseconds, before returning. Default is to return immediately. If the timeout passes before the job completes, the request will fail with a TIMEOUT error
     pub fn timeout_ms(mut self, new_value: u32) -> JobGetQueryResultCall<'a, C, NC, A> {
         self._timeout_ms = Some(new_value);
         self
@@ -5639,7 +5739,7 @@ impl<'a, C, NC, A> JobGetQueryResultCall<'a, C, NC, A> where NC: hyper::net::Net
     /// Sets the *start index* query property to the given value.
     ///
     /// 
-    /// Zero-based index of the starting row    
+    /// Zero-based index of the starting row
     pub fn start_index(mut self, new_value: &str) -> JobGetQueryResultCall<'a, C, NC, A> {
         self._start_index = Some(new_value.to_string());
         self
@@ -5647,7 +5747,7 @@ impl<'a, C, NC, A> JobGetQueryResultCall<'a, C, NC, A> where NC: hyper::net::Net
     /// Sets the *page token* query property to the given value.
     ///
     /// 
-    /// Page token, returned by a previous call, to request the next page of results    
+    /// Page token, returned by a previous call, to request the next page of results
     pub fn page_token(mut self, new_value: &str) -> JobGetQueryResultCall<'a, C, NC, A> {
         self._page_token = Some(new_value.to_string());
         self
@@ -5655,7 +5755,7 @@ impl<'a, C, NC, A> JobGetQueryResultCall<'a, C, NC, A> where NC: hyper::net::Net
     /// Sets the *max results* query property to the given value.
     ///
     /// 
-    /// Maximum number of results to read    
+    /// Maximum number of results to read
     pub fn max_results(mut self, new_value: u32) -> JobGetQueryResultCall<'a, C, NC, A> {
         self._max_results = Some(new_value);
         self
@@ -5716,7 +5816,7 @@ impl<'a, C, NC, A> JobGetQueryResultCall<'a, C, NC, A> where NC: hyper::net::Net
 /// Lists all the Jobs in the specified project that were started by the user. The job list returns in reverse chronological order of when the jobs were created, starting with the most recent job created.
 ///
 /// A builder for the *list* method supported by a *job* resource.
-/// It is not used directly, but through a `JobMethods`.
+/// It is not used directly, but through a `JobMethods` instance.
 ///
 /// # Example
 ///
@@ -5803,7 +5903,7 @@ impl<'a, C, NC, A> JobListCall<'a, C, NC, A> where NC: hyper::net::NetworkConnec
         for &field in ["alt", "projectId", "stateFilter", "projection", "pageToken", "maxResults", "allUsers"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -5856,7 +5956,7 @@ impl<'a, C, NC, A> JobListCall<'a, C, NC, A> where NC: hyper::net::NetworkConnec
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -5868,7 +5968,6 @@ impl<'a, C, NC, A> JobListCall<'a, C, NC, A> where NC: hyper::net::NetworkConnec
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -5878,7 +5977,7 @@ impl<'a, C, NC, A> JobListCall<'a, C, NC, A> where NC: hyper::net::NetworkConnec
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -5889,7 +5988,7 @@ impl<'a, C, NC, A> JobListCall<'a, C, NC, A> where NC: hyper::net::NetworkConnec
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -5898,13 +5997,13 @@ impl<'a, C, NC, A> JobListCall<'a, C, NC, A> where NC: hyper::net::NetworkConnec
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -5916,7 +6015,7 @@ impl<'a, C, NC, A> JobListCall<'a, C, NC, A> where NC: hyper::net::NetworkConnec
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Project ID of the jobs to list    
+    /// Project ID of the jobs to list
     pub fn project_id(mut self, new_value: &str) -> JobListCall<'a, C, NC, A> {
         self._project_id = new_value.to_string();
         self
@@ -5925,7 +6024,7 @@ impl<'a, C, NC, A> JobListCall<'a, C, NC, A> where NC: hyper::net::NetworkConnec
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
     ///
     /// 
-    /// Filter for job state    
+    /// Filter for job state
     pub fn add_state_filter(mut self, new_value: &str) -> JobListCall<'a, C, NC, A> {
         self._state_filter.push(new_value.to_string());
         self
@@ -5933,7 +6032,7 @@ impl<'a, C, NC, A> JobListCall<'a, C, NC, A> where NC: hyper::net::NetworkConnec
     /// Sets the *projection* query property to the given value.
     ///
     /// 
-    /// Restrict information returned to a set of selected fields    
+    /// Restrict information returned to a set of selected fields
     pub fn projection(mut self, new_value: &str) -> JobListCall<'a, C, NC, A> {
         self._projection = Some(new_value.to_string());
         self
@@ -5941,7 +6040,7 @@ impl<'a, C, NC, A> JobListCall<'a, C, NC, A> where NC: hyper::net::NetworkConnec
     /// Sets the *page token* query property to the given value.
     ///
     /// 
-    /// Page token, returned by a previous call, to request the next page of results    
+    /// Page token, returned by a previous call, to request the next page of results
     pub fn page_token(mut self, new_value: &str) -> JobListCall<'a, C, NC, A> {
         self._page_token = Some(new_value.to_string());
         self
@@ -5949,7 +6048,7 @@ impl<'a, C, NC, A> JobListCall<'a, C, NC, A> where NC: hyper::net::NetworkConnec
     /// Sets the *max results* query property to the given value.
     ///
     /// 
-    /// Maximum number of results to return    
+    /// Maximum number of results to return
     pub fn max_results(mut self, new_value: u32) -> JobListCall<'a, C, NC, A> {
         self._max_results = Some(new_value);
         self
@@ -5957,7 +6056,7 @@ impl<'a, C, NC, A> JobListCall<'a, C, NC, A> where NC: hyper::net::NetworkConnec
     /// Sets the *all users* query property to the given value.
     ///
     /// 
-    /// Whether to display jobs owned by all users in the project. Default false    
+    /// Whether to display jobs owned by all users in the project. Default false
     pub fn all_users(mut self, new_value: bool) -> JobListCall<'a, C, NC, A> {
         self._all_users = Some(new_value);
         self
@@ -6018,7 +6117,7 @@ impl<'a, C, NC, A> JobListCall<'a, C, NC, A> where NC: hyper::net::NetworkConnec
 /// Retrieves the specified job by ID.
 ///
 /// A builder for the *get* method supported by a *job* resource.
-/// It is not used directly, but through a `JobMethods`.
+/// It is not used directly, but through a `JobMethods` instance.
 ///
 /// # Example
 ///
@@ -6078,7 +6177,7 @@ impl<'a, C, NC, A> JobGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnect
         for &field in ["alt", "projectId", "jobId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -6131,7 +6230,7 @@ impl<'a, C, NC, A> JobGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnect
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -6143,7 +6242,6 @@ impl<'a, C, NC, A> JobGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnect
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -6153,7 +6251,7 @@ impl<'a, C, NC, A> JobGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnect
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -6164,7 +6262,7 @@ impl<'a, C, NC, A> JobGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnect
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -6173,13 +6271,13 @@ impl<'a, C, NC, A> JobGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnect
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -6191,7 +6289,7 @@ impl<'a, C, NC, A> JobGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnect
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Project ID of the requested job    
+    /// Project ID of the requested job
     pub fn project_id(mut self, new_value: &str) -> JobGetCall<'a, C, NC, A> {
         self._project_id = new_value.to_string();
         self
@@ -6201,7 +6299,7 @@ impl<'a, C, NC, A> JobGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnect
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Job ID of the requested job    
+    /// Job ID of the requested job
     pub fn job_id(mut self, new_value: &str) -> JobGetCall<'a, C, NC, A> {
         self._job_id = new_value.to_string();
         self
@@ -6262,7 +6360,7 @@ impl<'a, C, NC, A> JobGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnect
 /// Starts a new asynchronous job.
 ///
 /// A builder for the *insert* method supported by a *job* resource.
-/// It is not used directly, but through a `JobMethods`.
+/// It is not used directly, but through a `JobMethods` instance.
 ///
 /// # Example
 ///
@@ -6329,7 +6427,7 @@ impl<'a, C, NC, A> JobInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
         for &field in ["alt", "projectId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -6396,7 +6494,7 @@ impl<'a, C, NC, A> JobInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -6442,7 +6540,6 @@ impl<'a, C, NC, A> JobInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     
                     dlg.pre_request();
                     req.send()
-    
                 }
             };
 
@@ -6453,7 +6550,7 @@ impl<'a, C, NC, A> JobInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -6464,7 +6561,7 @@ impl<'a, C, NC, A> JobInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     if protocol == "resumable" {
                         let size = reader.seek(io::SeekFrom::End(0)).unwrap();
@@ -6493,17 +6590,17 @@ impl<'a, C, NC, A> JobInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
                         match upload_result {
                             None => {
                                 dlg.finished(false);
-                                return Result::Cancelled
+                                return Err(Error::Cancelled)
                             }
                             Some(Err(err)) => {
                                 dlg.finished(false);
-                                return Result::HttpError(err)
+                                return Err(Error::HttpError(err))
                             }
                             Some(Ok(upload_result)) => {
                                 res = upload_result;
                                 if !res.status.is_success() {
                                     dlg.finished(false);
-                                    return Result::Failure(res)
+                                    return Err(Error::Failure(res))
                                 }
                             }
                         }
@@ -6515,13 +6612,13 @@ impl<'a, C, NC, A> JobInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -6537,11 +6634,14 @@ impl<'a, C, NC, A> JobInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
                 where RS: ReadSeek {
         self.doit(stream, mime_type, "simple")
     }
-    /// Upload media in a resumeable fashion.
+    /// Upload media in a resumable fashion.
     /// Even if the upload fails or is interrupted, it can be resumed for a 
     /// certain amount of time as the server maintains state temporarily.
     /// 
-    /// TODO: Write more about how delegation works in this particular case.
+    /// The delegate will be asked for an `upload_url()`, and if not provided, will be asked to store an upload URL 
+    /// that was provided by the server, using `store_upload_url(...)`. The upload will be done in chunks, the delegate
+    /// may specify the `chunk_size()` and may cancel the operation before each chunk is uploaded, using
+    /// `cancel_chunk_upload(...)`.
     ///
     /// * *max size*: 0kb
     /// * *multipart*: yes
@@ -6565,7 +6665,7 @@ impl<'a, C, NC, A> JobInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Project ID of the project that will be billed for the job    
+    /// Project ID of the project that will be billed for the job
     pub fn project_id(mut self, new_value: &str) -> JobInsertCall<'a, C, NC, A> {
         self._project_id = new_value.to_string();
         self
@@ -6626,7 +6726,7 @@ impl<'a, C, NC, A> JobInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
 /// Streams data into BigQuery one record at a time without needing to run a load job.
 ///
 /// A builder for the *insertAll* method supported by a *tabledata* resource.
-/// It is not used directly, but through a `TabledataMethods`.
+/// It is not used directly, but through a `TabledataMethods` instance.
 ///
 /// # Example
 ///
@@ -6695,7 +6795,7 @@ impl<'a, C, NC, A> TabledataInsertAllCall<'a, C, NC, A> where NC: hyper::net::Ne
         for &field in ["alt", "projectId", "datasetId", "tableId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -6752,7 +6852,7 @@ impl<'a, C, NC, A> TabledataInsertAllCall<'a, C, NC, A> where NC: hyper::net::Ne
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -6768,7 +6868,6 @@ impl<'a, C, NC, A> TabledataInsertAllCall<'a, C, NC, A> where NC: hyper::net::Ne
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -6778,7 +6877,7 @@ impl<'a, C, NC, A> TabledataInsertAllCall<'a, C, NC, A> where NC: hyper::net::Ne
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -6789,7 +6888,7 @@ impl<'a, C, NC, A> TabledataInsertAllCall<'a, C, NC, A> where NC: hyper::net::Ne
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -6798,13 +6897,13 @@ impl<'a, C, NC, A> TabledataInsertAllCall<'a, C, NC, A> where NC: hyper::net::Ne
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -6825,7 +6924,7 @@ impl<'a, C, NC, A> TabledataInsertAllCall<'a, C, NC, A> where NC: hyper::net::Ne
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Project ID of the destination table.    
+    /// Project ID of the destination table.
     pub fn project_id(mut self, new_value: &str) -> TabledataInsertAllCall<'a, C, NC, A> {
         self._project_id = new_value.to_string();
         self
@@ -6835,7 +6934,7 @@ impl<'a, C, NC, A> TabledataInsertAllCall<'a, C, NC, A> where NC: hyper::net::Ne
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Dataset ID of the destination table.    
+    /// Dataset ID of the destination table.
     pub fn dataset_id(mut self, new_value: &str) -> TabledataInsertAllCall<'a, C, NC, A> {
         self._dataset_id = new_value.to_string();
         self
@@ -6845,7 +6944,7 @@ impl<'a, C, NC, A> TabledataInsertAllCall<'a, C, NC, A> where NC: hyper::net::Ne
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Table ID of the destination table.    
+    /// Table ID of the destination table.
     pub fn table_id(mut self, new_value: &str) -> TabledataInsertAllCall<'a, C, NC, A> {
         self._table_id = new_value.to_string();
         self
@@ -6906,7 +7005,7 @@ impl<'a, C, NC, A> TabledataInsertAllCall<'a, C, NC, A> where NC: hyper::net::Ne
 /// Retrieves table data from a specified set of rows.
 ///
 /// A builder for the *list* method supported by a *tabledata* resource.
-/// It is not used directly, but through a `TabledataMethods`.
+/// It is not used directly, but through a `TabledataMethods` instance.
 ///
 /// # Example
 ///
@@ -6983,7 +7082,7 @@ impl<'a, C, NC, A> TabledataListCall<'a, C, NC, A> where NC: hyper::net::Network
         for &field in ["alt", "projectId", "datasetId", "tableId", "startIndex", "pageToken", "maxResults"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -7036,7 +7135,7 @@ impl<'a, C, NC, A> TabledataListCall<'a, C, NC, A> where NC: hyper::net::Network
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -7048,7 +7147,6 @@ impl<'a, C, NC, A> TabledataListCall<'a, C, NC, A> where NC: hyper::net::Network
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -7058,7 +7156,7 @@ impl<'a, C, NC, A> TabledataListCall<'a, C, NC, A> where NC: hyper::net::Network
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -7069,7 +7167,7 @@ impl<'a, C, NC, A> TabledataListCall<'a, C, NC, A> where NC: hyper::net::Network
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -7078,13 +7176,13 @@ impl<'a, C, NC, A> TabledataListCall<'a, C, NC, A> where NC: hyper::net::Network
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -7096,7 +7194,7 @@ impl<'a, C, NC, A> TabledataListCall<'a, C, NC, A> where NC: hyper::net::Network
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Project ID of the table to read    
+    /// Project ID of the table to read
     pub fn project_id(mut self, new_value: &str) -> TabledataListCall<'a, C, NC, A> {
         self._project_id = new_value.to_string();
         self
@@ -7106,7 +7204,7 @@ impl<'a, C, NC, A> TabledataListCall<'a, C, NC, A> where NC: hyper::net::Network
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Dataset ID of the table to read    
+    /// Dataset ID of the table to read
     pub fn dataset_id(mut self, new_value: &str) -> TabledataListCall<'a, C, NC, A> {
         self._dataset_id = new_value.to_string();
         self
@@ -7116,7 +7214,7 @@ impl<'a, C, NC, A> TabledataListCall<'a, C, NC, A> where NC: hyper::net::Network
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Table ID of the table to read    
+    /// Table ID of the table to read
     pub fn table_id(mut self, new_value: &str) -> TabledataListCall<'a, C, NC, A> {
         self._table_id = new_value.to_string();
         self
@@ -7124,7 +7222,7 @@ impl<'a, C, NC, A> TabledataListCall<'a, C, NC, A> where NC: hyper::net::Network
     /// Sets the *start index* query property to the given value.
     ///
     /// 
-    /// Zero-based index of the starting row to read    
+    /// Zero-based index of the starting row to read
     pub fn start_index(mut self, new_value: &str) -> TabledataListCall<'a, C, NC, A> {
         self._start_index = Some(new_value.to_string());
         self
@@ -7132,7 +7230,7 @@ impl<'a, C, NC, A> TabledataListCall<'a, C, NC, A> where NC: hyper::net::Network
     /// Sets the *page token* query property to the given value.
     ///
     /// 
-    /// Page token, returned by a previous call, identifying the result set    
+    /// Page token, returned by a previous call, identifying the result set
     pub fn page_token(mut self, new_value: &str) -> TabledataListCall<'a, C, NC, A> {
         self._page_token = Some(new_value.to_string());
         self
@@ -7140,7 +7238,7 @@ impl<'a, C, NC, A> TabledataListCall<'a, C, NC, A> where NC: hyper::net::Network
     /// Sets the *max results* query property to the given value.
     ///
     /// 
-    /// Maximum number of results to return    
+    /// Maximum number of results to return
     pub fn max_results(mut self, new_value: u32) -> TabledataListCall<'a, C, NC, A> {
         self._max_results = Some(new_value);
         self
@@ -7201,7 +7299,7 @@ impl<'a, C, NC, A> TabledataListCall<'a, C, NC, A> where NC: hyper::net::Network
 /// Lists the projects to which you have at least read access.
 ///
 /// A builder for the *list* method supported by a *project* resource.
-/// It is not used directly, but through a `ProjectMethods`.
+/// It is not used directly, but through a `ProjectMethods` instance.
 ///
 /// # Example
 ///
@@ -7267,7 +7365,7 @@ impl<'a, C, NC, A> ProjectListCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
         for &field in ["alt", "pageToken", "maxResults"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -7296,7 +7394,7 @@ impl<'a, C, NC, A> ProjectListCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -7308,7 +7406,6 @@ impl<'a, C, NC, A> ProjectListCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -7318,7 +7415,7 @@ impl<'a, C, NC, A> ProjectListCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -7329,7 +7426,7 @@ impl<'a, C, NC, A> ProjectListCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -7338,13 +7435,13 @@ impl<'a, C, NC, A> ProjectListCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -7354,7 +7451,7 @@ impl<'a, C, NC, A> ProjectListCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// Sets the *page token* query property to the given value.
     ///
     /// 
-    /// Page token, returned by a previous call, to request the next page of results    
+    /// Page token, returned by a previous call, to request the next page of results
     pub fn page_token(mut self, new_value: &str) -> ProjectListCall<'a, C, NC, A> {
         self._page_token = Some(new_value.to_string());
         self
@@ -7362,7 +7459,7 @@ impl<'a, C, NC, A> ProjectListCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// Sets the *max results* query property to the given value.
     ///
     /// 
-    /// Maximum number of results to return    
+    /// Maximum number of results to return
     pub fn max_results(mut self, new_value: u32) -> ProjectListCall<'a, C, NC, A> {
         self._max_results = Some(new_value);
         self

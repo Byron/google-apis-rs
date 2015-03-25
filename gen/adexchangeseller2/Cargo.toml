@@ -4,7 +4,7 @@
 [package]
 
 name = "google-adexchangeseller2"
-version = "0.1.1+20150313"
+version = "0.1.2+20150309"
 authors = ["Sebastian Thiel <byronimo@gmail>"]
 description = "A complete library to interact with Ad Exchange Seller (protocol v2.0)"
 repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/adexchangeseller2"
@@ -16,7 +16,7 @@ keywords = ["adexchangeseller", "google", "protocol", "web", "api"]
 [dependencies]
 hyper = "*"
 mime = "*"
+yup-oauth2 = "*"
 url = "*"
 serde = "*"
 serde_macros = "*"
-yup-oauth2 = "*"

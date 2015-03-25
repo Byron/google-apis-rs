@@ -4,7 +4,7 @@
 [package]
 
 name = "google-cloudmonitoring2_beta2"
-version = "0.1.1+20150305"
+version = "0.1.2+20150305"
 authors = ["Sebastian Thiel <byronimo@gmail>"]
 description = "A complete library to interact with Cloud Monitoring (protocol v2beta2)"
 repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/cloudmonitoring2_beta2"
@@ -16,7 +16,7 @@ keywords = ["cloudmonitoring", "google", "protocol", "web", "api"]
 [dependencies]
 hyper = "*"
 mime = "*"
+yup-oauth2 = "*"
 url = "*"
 serde = "*"
 serde_macros = "*"
-yup-oauth2 = "*"

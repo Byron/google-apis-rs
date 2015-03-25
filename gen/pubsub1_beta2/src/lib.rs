@@ -1,8 +1,8 @@
 // DO NOT EDIT !
-// This file was generated automatically from 'src/mako/lib.rs.mako'
+// This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *pubsub* crate version *0.1.1+20150213*, where *20150213* is the exact revision of the *pubsub:v1beta2* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.1*.
+//! This documentation was generated from *pubsub* crate version *0.1.2+20150213*, where *20150213* is the exact revision of the *pubsub:v1beta2* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.2*.
 //! The original source code is [on github](https://github.com/Byron/google-apis-rs/tree/master/gen/pubsub1_beta2).
 //! # Features
 //! 
@@ -22,6 +22,8 @@
 //! 
 //! * **[Hub](struct.Pubsub.html)**
 //!     * a central object to maintain state and allow accessing all *Activities*
+//!     * creates [*Method Builders*](trait.MethodsBuilder.html) which in turn
+//!       allow access to individual [*Call Builders*](trait.CallBuilder.html)
 //! * **[Resources](trait.Resource.html)**
 //!     * primary types that you can apply *Activities* to
 //!     * a collection of properties and *Parts*
@@ -30,6 +32,8 @@
 //!         * never directly used in *Activities*
 //! * **[Activities](trait.CallBuilder.html)**
 //!     * operations to apply to *Resources*
+//! 
+//! All *structures* are marked with applicable traits to further categorize them and ease browsing.
 //! 
 //! Generally speaking, you can invoke *Activities* like this:
 //! 
@@ -70,7 +74,7 @@
 //! extern crate "yup-oauth2" as oauth2;
 //! extern crate "google-pubsub1_beta2" as pubsub1_beta2;
 //! use pubsub1_beta2::AcknowledgeRequest;
-//! use pubsub1_beta2::Result;
+//! use pubsub1_beta2::{Result, Error};
 //! # #[test] fn egal() {
 //! use std::default::Default;
 //! use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -100,15 +104,17 @@
 //!              .doit();
 //! 
 //! match result {
-//!     Result::HttpError(err) => println!("HTTPERROR: {:?}", err),
-//!     Result::MissingAPIKey => println!("Auth: Missing API Key - used if there are no scopes"),
-//!     Result::MissingToken => println!("OAuth2: Missing Token"),
-//!     Result::Cancelled => println!("Operation cancelled by user"),
-//!     Result::UploadSizeLimitExceeded(size, max_size) => println!("Upload size too big: {} of {}", size, max_size),
-//!     Result::Failure(_) => println!("General Failure (hyper::client::Response doesn't print)"),
-//!     Result::FieldClash(clashed_field) => println!("You added custom parameter which is part of builder: {:?}", clashed_field),
-//!     Result::JsonDecodeError(err) => println!("Couldn't understand server reply - maybe API needs update: {:?}", err),
-//!     Result::Success(_) => println!("Success (value doesn't print)"),
+//!     Err(e) => match e {
+//!         Error::HttpError(err) => println!("HTTPERROR: {:?}", err),
+//!         Error::MissingAPIKey => println!("Auth: Missing API Key - used if there are no scopes"),
+//!         Error::MissingToken => println!("OAuth2: Missing Token"),
+//!         Error::Cancelled => println!("Operation canceled by user"),
+//!         Error::UploadSizeLimitExceeded(size, max_size) => println!("Upload size too big: {} of {}", size, max_size),
+//!         Error::Failure(_) => println!("General Failure (hyper::client::Response doesn't print)"),
+//!         Error::FieldClash(clashed_field) => println!("You added custom parameter which is part of builder: {:?}", clashed_field),
+//!         Error::JsonDecodeError(err) => println!("Couldn't understand server reply - maybe API needs update: {:?}", err),
+//!     },
+//!     Ok(_) => println!("Success (value doesn't print)"),
 //! }
 //! # }
 //! ```
@@ -121,7 +127,7 @@
 //! When delegates handle errors or intermediate values, they may have a chance to instruct the system to retry. This 
 //! makes the system potentially resilient to all kinds of errors.
 //! 
-//! ## Uploads and Downlods
+//! ## Uploads and Downloads
 //! If a method supports downloads, the response body, which is part of the [Result](enum.Result.html), should be
 //! read by you to obtain the media.
 //! If such a method also supports a [Response Result](trait.ResponseResult.html), it will return that by default.
@@ -144,8 +150,9 @@
 //! ## Optional Parts in Server-Requests
 //! 
 //! All structures provided by this library are made to be [enocodable](trait.RequestValue.html) and 
-//! [decodable](trait.ResponseResult.html) via json. Optionals are used to indicate that partial requests are responses are valid.
-//! Most optionals are are considered [Parts](trait.Part.html) which are identifyable by name, which will be sent to 
+//! [decodable](trait.ResponseResult.html) via *json*. Optionals are used to indicate that partial requests are responses 
+//! are valid.
+//! Most optionals are are considered [Parts](trait.Part.html) which are identifiable by name, which will be sent to 
 //! the server to indicate either the set parts of the request or the desired parts in the response.
 //! 
 //! ## Builder Arguments
@@ -194,7 +201,7 @@ use std::io;
 use std::fs;
 use std::thread::sleep;
 
-pub use cmn::{MultiPartReader, ToParts, MethodInfo, Result, CallBuilder, Hub, ReadSeek, Part, ResponseResult, RequestValue, NestedType, Delegate, DefaultDelegate, ResourceMethodsBuilder, Resource, JsonServerError};
+pub use cmn::{MultiPartReader, ToParts, MethodInfo, Result, Error, CallBuilder, Hub, ReadSeek, Part, ResponseResult, RequestValue, NestedType, Delegate, DefaultDelegate, MethodsBuilder, Resource, JsonServerError};
 
 
 // ##############
@@ -245,7 +252,7 @@ impl Default for Scope {
 /// extern crate "yup-oauth2" as oauth2;
 /// extern crate "google-pubsub1_beta2" as pubsub1_beta2;
 /// use pubsub1_beta2::AcknowledgeRequest;
-/// use pubsub1_beta2::Result;
+/// use pubsub1_beta2::{Result, Error};
 /// # #[test] fn egal() {
 /// use std::default::Default;
 /// use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -275,15 +282,17 @@ impl Default for Scope {
 ///              .doit();
 /// 
 /// match result {
-///     Result::HttpError(err) => println!("HTTPERROR: {:?}", err),
-///     Result::MissingAPIKey => println!("Auth: Missing API Key - used if there are no scopes"),
-///     Result::MissingToken => println!("OAuth2: Missing Token"),
-///     Result::Cancelled => println!("Operation cancelled by user"),
-///     Result::UploadSizeLimitExceeded(size, max_size) => println!("Upload size too big: {} of {}", size, max_size),
-///     Result::Failure(_) => println!("General Failure (hyper::client::Response doesn't print)"),
-///     Result::FieldClash(clashed_field) => println!("You added custom parameter which is part of builder: {:?}", clashed_field),
-///     Result::JsonDecodeError(err) => println!("Couldn't understand server reply - maybe API needs update: {:?}", err),
-///     Result::Success(_) => println!("Success (value doesn't print)"),
+///     Err(e) => match e {
+///         Error::HttpError(err) => println!("HTTPERROR: {:?}", err),
+///         Error::MissingAPIKey => println!("Auth: Missing API Key - used if there are no scopes"),
+///         Error::MissingToken => println!("OAuth2: Missing Token"),
+///         Error::Cancelled => println!("Operation canceled by user"),
+///         Error::UploadSizeLimitExceeded(size, max_size) => println!("Upload size too big: {} of {}", size, max_size),
+///         Error::Failure(_) => println!("General Failure (hyper::client::Response doesn't print)"),
+///         Error::FieldClash(clashed_field) => println!("You added custom parameter which is part of builder: {:?}", clashed_field),
+///         Error::JsonDecodeError(err) => println!("Couldn't understand server reply - maybe API needs update: {:?}", err),
+///     },
+///     Ok(_) => println!("Success (value doesn't print)"),
 /// }
 /// # }
 /// ```
@@ -304,7 +313,7 @@ impl<'a, C, NC, A> Pubsub<C, NC, A>
         Pubsub {
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/0.1.1".to_string(),
+            _user_agent: "google-api-rust-client/0.1.2".to_string(),
             _m: PhantomData
         }
     }
@@ -314,7 +323,7 @@ impl<'a, C, NC, A> Pubsub<C, NC, A>
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/0.1.1`.
+    /// It defaults to `google-api-rust-client/0.1.2`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -339,10 +348,10 @@ impl<'a, C, NC, A> Pubsub<C, NC, A>
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct ListTopicSubscriptionsResponse {
-    /// no description provided    
+    /// no description provided
     #[serde(alias="nextPageToken")]
     pub next_page_token: String,
-    /// no description provided    
+    /// no description provided
     pub subscriptions: Vec<String>,
 }
 
@@ -355,10 +364,10 @@ impl ResponseResult for ListTopicSubscriptionsResponse {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct ReceivedMessage {
-    /// no description provided    
+    /// no description provided
     #[serde(alias="ackId")]
     pub ack_id: String,
-    /// no description provided    
+    /// no description provided
     pub message: PubsubMessage,
 }
 
@@ -376,7 +385,7 @@ impl Part for ReceivedMessage {}
 /// 
 #[derive(Default, Clone, Debug, Serialize)]
 pub struct AcknowledgeRequest {
-    /// no description provided    
+    /// no description provided
     #[serde(alias="ackIds")]
     pub ack_ids: Option<Vec<String>>,
 }
@@ -395,10 +404,10 @@ impl RequestValue for AcknowledgeRequest {}
 /// 
 #[derive(Default, Clone, Debug, Serialize)]
 pub struct ModifyAckDeadlineRequest {
-    /// no description provided    
+    /// no description provided
     #[serde(alias="ackDeadlineSeconds")]
     pub ack_deadline_seconds: Option<i32>,
-    /// no description provided    
+    /// no description provided
     #[serde(alias="ackId")]
     pub ack_id: Option<String>,
 }
@@ -417,7 +426,7 @@ impl RequestValue for ModifyAckDeadlineRequest {}
 /// 
 #[derive(Default, Clone, Debug, Serialize)]
 pub struct PublishRequest {
-    /// no description provided    
+    /// no description provided
     pub messages: Option<Vec<PubsubMessage>>,
 }
 
@@ -435,10 +444,10 @@ impl RequestValue for PublishRequest {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct ListSubscriptionsResponse {
-    /// no description provided    
+    /// no description provided
     #[serde(alias="nextPageToken")]
     pub next_page_token: String,
-    /// no description provided    
+    /// no description provided
     pub subscriptions: Vec<Subscription>,
 }
 
@@ -456,10 +465,10 @@ impl ResponseResult for ListSubscriptionsResponse {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct ListTopicsResponse {
-    /// no description provided    
+    /// no description provided
     #[serde(alias="nextPageToken")]
     pub next_page_token: String,
-    /// no description provided    
+    /// no description provided
     pub topics: Vec<Topic>,
 }
 
@@ -477,7 +486,7 @@ impl ResponseResult for ListTopicsResponse {}
 /// 
 #[derive(Default, Clone, Debug, Serialize)]
 pub struct ModifyPushConfigRequest {
-    /// no description provided    
+    /// no description provided
     #[serde(alias="pushConfig")]
     pub push_config: Option<PushConfig>,
 }
@@ -515,10 +524,10 @@ impl ResponseResult for Empty {}
 /// 
 #[derive(Default, Clone, Debug, Serialize)]
 pub struct PullRequest {
-    /// no description provided    
+    /// no description provided
     #[serde(alias="returnImmediately")]
     pub return_immediately: Option<bool>,
-    /// no description provided    
+    /// no description provided
     #[serde(alias="maxMessages")]
     pub max_messages: Option<i32>,
 }
@@ -532,9 +541,9 @@ impl RequestValue for PullRequest {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct PushConfig {
-    /// no description provided    
+    /// no description provided
     pub attributes: HashMap<String, String>,
-    /// no description provided    
+    /// no description provided
     #[serde(alias="pushEndpoint")]
     pub push_endpoint: String,
 }
@@ -554,7 +563,7 @@ impl Part for PushConfig {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Topic {
-    /// no description provided    
+    /// no description provided
     pub name: Option<String>,
 }
 
@@ -573,7 +582,7 @@ impl ResponseResult for Topic {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct PublishResponse {
-    /// no description provided    
+    /// no description provided
     #[serde(alias="messageIds")]
     pub message_ids: Vec<String>,
 }
@@ -592,7 +601,7 @@ impl ResponseResult for PublishResponse {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct PullResponse {
-    /// no description provided    
+    /// no description provided
     #[serde(alias="receivedMessages")]
     pub received_messages: Vec<ReceivedMessage>,
 }
@@ -606,11 +615,11 @@ impl ResponseResult for PullResponse {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct PubsubMessage {
-    /// no description provided    
+    /// no description provided
     pub attributes: HashMap<String, String>,
-    /// no description provided    
+    /// no description provided
     pub data: String,
-    /// no description provided    
+    /// no description provided
     #[serde(alias="messageId")]
     pub message_id: String,
 }
@@ -630,15 +639,15 @@ impl Part for PubsubMessage {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Subscription {
-    /// no description provided    
+    /// no description provided
     #[serde(alias="ackDeadlineSeconds")]
     pub ack_deadline_seconds: Option<i32>,
-    /// no description provided    
+    /// no description provided
     pub topic: Option<String>,
-    /// no description provided    
+    /// no description provided
     #[serde(alias="pushConfig")]
     pub push_config: Option<PushConfig>,
-    /// no description provided    
+    /// no description provided
     pub name: Option<String>,
 }
 
@@ -685,13 +694,17 @@ pub struct ProjectMethods<'a, C, NC, A>
     hub: &'a Pubsub<C, NC, A>,
 }
 
-impl<'a, C, NC, A> ResourceMethodsBuilder for ProjectMethods<'a, C, NC, A> {}
+impl<'a, C, NC, A> MethodsBuilder for ProjectMethods<'a, C, NC, A> {}
 
 impl<'a, C, NC, A> ProjectMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Lists matching topics.    
+    /// Lists matching topics.
+    /// 
+    /// # Arguments
+    ///
+    /// * `project` - No description provided.
     pub fn topics_list(&self, project: &str) -> ProjectTopicListCall<'a, C, NC, A> {
         ProjectTopicListCall {
             hub: self.hub,
@@ -706,7 +719,12 @@ impl<'a, C, NC, A> ProjectMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Pulls messages from the server. Returns an empty list if there are no messages available in the backlog. The server may return UNAVAILABLE if there are too many concurrent pull requests pending for the given subscription.    
+    /// Pulls messages from the server. Returns an empty list if there are no messages available in the backlog. The server may return UNAVAILABLE if there are too many concurrent pull requests pending for the given subscription.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `subscription` - No description provided.
     pub fn subscriptions_pull(&self, request: &PullRequest, subscription: &str) -> ProjectSubscriptionPullCall<'a, C, NC, A> {
         ProjectSubscriptionPullCall {
             hub: self.hub,
@@ -720,7 +738,12 @@ impl<'a, C, NC, A> ProjectMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Creates the given topic with the given name.    
+    /// Creates the given topic with the given name.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `name` - No description provided.
     pub fn topics_create(&self, request: &Topic, name: &str) -> ProjectTopicCreateCall<'a, C, NC, A> {
         ProjectTopicCreateCall {
             hub: self.hub,
@@ -734,7 +757,11 @@ impl<'a, C, NC, A> ProjectMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Deletes the topic with the given name. All subscriptions to this topic are detached from the topic. Returns NOT_FOUND if the topic does not exist. After a topic is deleted, a new topic may be created with the same name; this is an entirely new topic with none of the old configuration or subscriptions.    
+    /// Deletes the topic with the given name. All subscriptions to this topic are detached from the topic. Returns NOT_FOUND if the topic does not exist. After a topic is deleted, a new topic may be created with the same name; this is an entirely new topic with none of the old configuration or subscriptions.
+    /// 
+    /// # Arguments
+    ///
+    /// * `topic` - No description provided.
     pub fn topics_delete(&self, topic: &str) -> ProjectTopicDeleteCall<'a, C, NC, A> {
         ProjectTopicDeleteCall {
             hub: self.hub,
@@ -747,7 +774,12 @@ impl<'a, C, NC, A> ProjectMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Modifies the PushConfig for a specified subscription. This may be used to change a push subscription to a pull one (signified by an empty PushConfig) or vice versa, or change the endpoint URL and other attributes of a push subscription. Messages will accumulate for delivery continuously through the call regardless of changes to the PushConfig.    
+    /// Modifies the PushConfig for a specified subscription. This may be used to change a push subscription to a pull one (signified by an empty PushConfig) or vice versa, or change the endpoint URL and other attributes of a push subscription. Messages will accumulate for delivery continuously through the call regardless of changes to the PushConfig.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `subscription` - No description provided.
     pub fn subscriptions_modify_push_config(&self, request: &ModifyPushConfigRequest, subscription: &str) -> ProjectSubscriptionModifyPushConfigCall<'a, C, NC, A> {
         ProjectSubscriptionModifyPushConfigCall {
             hub: self.hub,
@@ -761,7 +793,12 @@ impl<'a, C, NC, A> ProjectMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Adds one or more messages to the topic. Returns NOT_FOUND if the topic does not exist.    
+    /// Adds one or more messages to the topic. Returns NOT_FOUND if the topic does not exist.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `topic` - No description provided.
     pub fn topics_publish(&self, request: &PublishRequest, topic: &str) -> ProjectTopicPublishCall<'a, C, NC, A> {
         ProjectTopicPublishCall {
             hub: self.hub,
@@ -775,7 +812,11 @@ impl<'a, C, NC, A> ProjectMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Gets the configuration of a topic.    
+    /// Gets the configuration of a topic.
+    /// 
+    /// # Arguments
+    ///
+    /// * `topic` - No description provided.
     pub fn topics_get(&self, topic: &str) -> ProjectTopicGetCall<'a, C, NC, A> {
         ProjectTopicGetCall {
             hub: self.hub,
@@ -788,7 +829,12 @@ impl<'a, C, NC, A> ProjectMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Modifies the ack deadline for a specific message. This method is useful to indicate that more time is needed to process a message by the subscriber, or to make the message available for redelivery if the processing was interrupted.    
+    /// Modifies the ack deadline for a specific message. This method is useful to indicate that more time is needed to process a message by the subscriber, or to make the message available for redelivery if the processing was interrupted.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `subscription` - No description provided.
     pub fn subscriptions_modify_ack_deadline(&self, request: &ModifyAckDeadlineRequest, subscription: &str) -> ProjectSubscriptionModifyAckDeadlineCall<'a, C, NC, A> {
         ProjectSubscriptionModifyAckDeadlineCall {
             hub: self.hub,
@@ -802,7 +848,12 @@ impl<'a, C, NC, A> ProjectMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Acknowledges the messages associated with the ack tokens in the AcknowledgeRequest. The Pub/Sub system can remove the relevant messages from the subscription. Acknowledging a message whose ack deadline has expired may succeed, but such a message may be redelivered later. Acknowledging a message more than once will not result in an error.    
+    /// Acknowledges the messages associated with the ack tokens in the AcknowledgeRequest. The Pub/Sub system can remove the relevant messages from the subscription. Acknowledging a message whose ack deadline has expired may succeed, but such a message may be redelivered later. Acknowledging a message more than once will not result in an error.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `subscription` - No description provided.
     pub fn subscriptions_acknowledge(&self, request: &AcknowledgeRequest, subscription: &str) -> ProjectSubscriptionAcknowledgeCall<'a, C, NC, A> {
         ProjectSubscriptionAcknowledgeCall {
             hub: self.hub,
@@ -816,7 +867,11 @@ impl<'a, C, NC, A> ProjectMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Deletes an existing subscription. All pending messages in the subscription are immediately dropped. Calls to Pull after deletion will return NOT_FOUND. After a subscription is deleted, a new one may be created with the same name, but the new one has no association with the old subscription, or its topic unless the same topic is specified.    
+    /// Deletes an existing subscription. All pending messages in the subscription are immediately dropped. Calls to Pull after deletion will return NOT_FOUND. After a subscription is deleted, a new one may be created with the same name, but the new one has no association with the old subscription, or its topic unless the same topic is specified.
+    /// 
+    /// # Arguments
+    ///
+    /// * `subscription` - No description provided.
     pub fn subscriptions_delete(&self, subscription: &str) -> ProjectSubscriptionDeleteCall<'a, C, NC, A> {
         ProjectSubscriptionDeleteCall {
             hub: self.hub,
@@ -829,7 +884,12 @@ impl<'a, C, NC, A> ProjectMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Creates a subscription to a given topic for a given subscriber. If the subscription already exists, returns ALREADY_EXISTS. If the corresponding topic doesn't exist, returns NOT_FOUND. If the name is not provided in the request, the server will assign a random name for this subscription on the same project as the topic.    
+    /// Creates a subscription to a given topic for a given subscriber. If the subscription already exists, returns ALREADY_EXISTS. If the corresponding topic doesn't exist, returns NOT_FOUND. If the name is not provided in the request, the server will assign a random name for this subscription on the same project as the topic.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `name` - No description provided.
     pub fn subscriptions_create(&self, request: &Subscription, name: &str) -> ProjectSubscriptionCreateCall<'a, C, NC, A> {
         ProjectSubscriptionCreateCall {
             hub: self.hub,
@@ -843,7 +903,11 @@ impl<'a, C, NC, A> ProjectMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Gets the configuration details of a subscription.    
+    /// Gets the configuration details of a subscription.
+    /// 
+    /// # Arguments
+    ///
+    /// * `subscription` - No description provided.
     pub fn subscriptions_get(&self, subscription: &str) -> ProjectSubscriptionGetCall<'a, C, NC, A> {
         ProjectSubscriptionGetCall {
             hub: self.hub,
@@ -856,7 +920,11 @@ impl<'a, C, NC, A> ProjectMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Lists the name of the subscriptions for this topic.    
+    /// Lists the name of the subscriptions for this topic.
+    /// 
+    /// # Arguments
+    ///
+    /// * `topic` - No description provided.
     pub fn topics_subscriptions_list(&self, topic: &str) -> ProjectTopicSubscriptionListCall<'a, C, NC, A> {
         ProjectTopicSubscriptionListCall {
             hub: self.hub,
@@ -871,7 +939,11 @@ impl<'a, C, NC, A> ProjectMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Lists matching subscriptions.    
+    /// Lists matching subscriptions.
+    /// 
+    /// # Arguments
+    ///
+    /// * `project` - No description provided.
     pub fn subscriptions_list(&self, project: &str) -> ProjectSubscriptionListCall<'a, C, NC, A> {
         ProjectSubscriptionListCall {
             hub: self.hub,
@@ -896,7 +968,7 @@ impl<'a, C, NC, A> ProjectMethods<'a, C, NC, A> {
 /// Lists matching topics.
 ///
 /// A builder for the *topics.list* method supported by a *project* resource.
-/// It is not used directly, but through a `ProjectMethods`.
+/// It is not used directly, but through a `ProjectMethods` instance.
 ///
 /// # Example
 ///
@@ -965,7 +1037,7 @@ impl<'a, C, NC, A> ProjectTopicListCall<'a, C, NC, A> where NC: hyper::net::Netw
         for &field in ["alt", "project", "pageToken", "pageSize"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -1021,7 +1093,7 @@ impl<'a, C, NC, A> ProjectTopicListCall<'a, C, NC, A> where NC: hyper::net::Netw
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -1033,7 +1105,6 @@ impl<'a, C, NC, A> ProjectTopicListCall<'a, C, NC, A> where NC: hyper::net::Netw
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -1043,7 +1114,7 @@ impl<'a, C, NC, A> ProjectTopicListCall<'a, C, NC, A> where NC: hyper::net::Netw
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -1054,7 +1125,7 @@ impl<'a, C, NC, A> ProjectTopicListCall<'a, C, NC, A> where NC: hyper::net::Netw
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -1063,13 +1134,13 @@ impl<'a, C, NC, A> ProjectTopicListCall<'a, C, NC, A> where NC: hyper::net::Netw
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -1155,7 +1226,7 @@ impl<'a, C, NC, A> ProjectTopicListCall<'a, C, NC, A> where NC: hyper::net::Netw
 /// Pulls messages from the server. Returns an empty list if there are no messages available in the backlog. The server may return UNAVAILABLE if there are too many concurrent pull requests pending for the given subscription.
 ///
 /// A builder for the *subscriptions.pull* method supported by a *project* resource.
-/// It is not used directly, but through a `ProjectMethods`.
+/// It is not used directly, but through a `ProjectMethods` instance.
 ///
 /// # Example
 ///
@@ -1221,7 +1292,7 @@ impl<'a, C, NC, A> ProjectSubscriptionPullCall<'a, C, NC, A> where NC: hyper::ne
         for &field in ["alt", "subscription"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -1281,7 +1352,7 @@ impl<'a, C, NC, A> ProjectSubscriptionPullCall<'a, C, NC, A> where NC: hyper::ne
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -1297,7 +1368,6 @@ impl<'a, C, NC, A> ProjectSubscriptionPullCall<'a, C, NC, A> where NC: hyper::ne
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -1307,7 +1377,7 @@ impl<'a, C, NC, A> ProjectSubscriptionPullCall<'a, C, NC, A> where NC: hyper::ne
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -1318,7 +1388,7 @@ impl<'a, C, NC, A> ProjectSubscriptionPullCall<'a, C, NC, A> where NC: hyper::ne
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -1327,13 +1397,13 @@ impl<'a, C, NC, A> ProjectSubscriptionPullCall<'a, C, NC, A> where NC: hyper::ne
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -1414,7 +1484,7 @@ impl<'a, C, NC, A> ProjectSubscriptionPullCall<'a, C, NC, A> where NC: hyper::ne
 /// Creates the given topic with the given name.
 ///
 /// A builder for the *topics.create* method supported by a *project* resource.
-/// It is not used directly, but through a `ProjectMethods`.
+/// It is not used directly, but through a `ProjectMethods` instance.
 ///
 /// # Example
 ///
@@ -1480,7 +1550,7 @@ impl<'a, C, NC, A> ProjectTopicCreateCall<'a, C, NC, A> where NC: hyper::net::Ne
         for &field in ["alt", "name"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -1540,7 +1610,7 @@ impl<'a, C, NC, A> ProjectTopicCreateCall<'a, C, NC, A> where NC: hyper::net::Ne
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -1556,7 +1626,6 @@ impl<'a, C, NC, A> ProjectTopicCreateCall<'a, C, NC, A> where NC: hyper::net::Ne
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -1566,7 +1635,7 @@ impl<'a, C, NC, A> ProjectTopicCreateCall<'a, C, NC, A> where NC: hyper::net::Ne
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -1577,7 +1646,7 @@ impl<'a, C, NC, A> ProjectTopicCreateCall<'a, C, NC, A> where NC: hyper::net::Ne
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -1586,13 +1655,13 @@ impl<'a, C, NC, A> ProjectTopicCreateCall<'a, C, NC, A> where NC: hyper::net::Ne
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -1673,7 +1742,7 @@ impl<'a, C, NC, A> ProjectTopicCreateCall<'a, C, NC, A> where NC: hyper::net::Ne
 /// Deletes the topic with the given name. All subscriptions to this topic are detached from the topic. Returns NOT_FOUND if the topic does not exist. After a topic is deleted, a new topic may be created with the same name; this is an entirely new topic with none of the old configuration or subscriptions.
 ///
 /// A builder for the *topics.delete* method supported by a *project* resource.
-/// It is not used directly, but through a `ProjectMethods`.
+/// It is not used directly, but through a `ProjectMethods` instance.
 ///
 /// # Example
 ///
@@ -1732,7 +1801,7 @@ impl<'a, C, NC, A> ProjectTopicDeleteCall<'a, C, NC, A> where NC: hyper::net::Ne
         for &field in ["alt", "topic"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -1788,7 +1857,7 @@ impl<'a, C, NC, A> ProjectTopicDeleteCall<'a, C, NC, A> where NC: hyper::net::Ne
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -1800,7 +1869,6 @@ impl<'a, C, NC, A> ProjectTopicDeleteCall<'a, C, NC, A> where NC: hyper::net::Ne
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -1810,7 +1878,7 @@ impl<'a, C, NC, A> ProjectTopicDeleteCall<'a, C, NC, A> where NC: hyper::net::Ne
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -1821,7 +1889,7 @@ impl<'a, C, NC, A> ProjectTopicDeleteCall<'a, C, NC, A> where NC: hyper::net::Ne
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -1830,13 +1898,13 @@ impl<'a, C, NC, A> ProjectTopicDeleteCall<'a, C, NC, A> where NC: hyper::net::Ne
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -1908,7 +1976,7 @@ impl<'a, C, NC, A> ProjectTopicDeleteCall<'a, C, NC, A> where NC: hyper::net::Ne
 /// Modifies the PushConfig for a specified subscription. This may be used to change a push subscription to a pull one (signified by an empty PushConfig) or vice versa, or change the endpoint URL and other attributes of a push subscription. Messages will accumulate for delivery continuously through the call regardless of changes to the PushConfig.
 ///
 /// A builder for the *subscriptions.modifyPushConfig* method supported by a *project* resource.
-/// It is not used directly, but through a `ProjectMethods`.
+/// It is not used directly, but through a `ProjectMethods` instance.
 ///
 /// # Example
 ///
@@ -1974,7 +2042,7 @@ impl<'a, C, NC, A> ProjectSubscriptionModifyPushConfigCall<'a, C, NC, A> where N
         for &field in ["alt", "subscription"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -2034,7 +2102,7 @@ impl<'a, C, NC, A> ProjectSubscriptionModifyPushConfigCall<'a, C, NC, A> where N
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -2050,7 +2118,6 @@ impl<'a, C, NC, A> ProjectSubscriptionModifyPushConfigCall<'a, C, NC, A> where N
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -2060,7 +2127,7 @@ impl<'a, C, NC, A> ProjectSubscriptionModifyPushConfigCall<'a, C, NC, A> where N
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -2071,7 +2138,7 @@ impl<'a, C, NC, A> ProjectSubscriptionModifyPushConfigCall<'a, C, NC, A> where N
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -2080,13 +2147,13 @@ impl<'a, C, NC, A> ProjectSubscriptionModifyPushConfigCall<'a, C, NC, A> where N
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -2167,7 +2234,7 @@ impl<'a, C, NC, A> ProjectSubscriptionModifyPushConfigCall<'a, C, NC, A> where N
 /// Adds one or more messages to the topic. Returns NOT_FOUND if the topic does not exist.
 ///
 /// A builder for the *topics.publish* method supported by a *project* resource.
-/// It is not used directly, but through a `ProjectMethods`.
+/// It is not used directly, but through a `ProjectMethods` instance.
 ///
 /// # Example
 ///
@@ -2233,7 +2300,7 @@ impl<'a, C, NC, A> ProjectTopicPublishCall<'a, C, NC, A> where NC: hyper::net::N
         for &field in ["alt", "topic"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -2293,7 +2360,7 @@ impl<'a, C, NC, A> ProjectTopicPublishCall<'a, C, NC, A> where NC: hyper::net::N
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -2309,7 +2376,6 @@ impl<'a, C, NC, A> ProjectTopicPublishCall<'a, C, NC, A> where NC: hyper::net::N
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -2319,7 +2385,7 @@ impl<'a, C, NC, A> ProjectTopicPublishCall<'a, C, NC, A> where NC: hyper::net::N
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -2330,7 +2396,7 @@ impl<'a, C, NC, A> ProjectTopicPublishCall<'a, C, NC, A> where NC: hyper::net::N
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -2339,13 +2405,13 @@ impl<'a, C, NC, A> ProjectTopicPublishCall<'a, C, NC, A> where NC: hyper::net::N
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -2426,7 +2492,7 @@ impl<'a, C, NC, A> ProjectTopicPublishCall<'a, C, NC, A> where NC: hyper::net::N
 /// Gets the configuration of a topic.
 ///
 /// A builder for the *topics.get* method supported by a *project* resource.
-/// It is not used directly, but through a `ProjectMethods`.
+/// It is not used directly, but through a `ProjectMethods` instance.
 ///
 /// # Example
 ///
@@ -2485,7 +2551,7 @@ impl<'a, C, NC, A> ProjectTopicGetCall<'a, C, NC, A> where NC: hyper::net::Netwo
         for &field in ["alt", "topic"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -2541,7 +2607,7 @@ impl<'a, C, NC, A> ProjectTopicGetCall<'a, C, NC, A> where NC: hyper::net::Netwo
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -2553,7 +2619,6 @@ impl<'a, C, NC, A> ProjectTopicGetCall<'a, C, NC, A> where NC: hyper::net::Netwo
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -2563,7 +2628,7 @@ impl<'a, C, NC, A> ProjectTopicGetCall<'a, C, NC, A> where NC: hyper::net::Netwo
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -2574,7 +2639,7 @@ impl<'a, C, NC, A> ProjectTopicGetCall<'a, C, NC, A> where NC: hyper::net::Netwo
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -2583,13 +2648,13 @@ impl<'a, C, NC, A> ProjectTopicGetCall<'a, C, NC, A> where NC: hyper::net::Netwo
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -2661,7 +2726,7 @@ impl<'a, C, NC, A> ProjectTopicGetCall<'a, C, NC, A> where NC: hyper::net::Netwo
 /// Modifies the ack deadline for a specific message. This method is useful to indicate that more time is needed to process a message by the subscriber, or to make the message available for redelivery if the processing was interrupted.
 ///
 /// A builder for the *subscriptions.modifyAckDeadline* method supported by a *project* resource.
-/// It is not used directly, but through a `ProjectMethods`.
+/// It is not used directly, but through a `ProjectMethods` instance.
 ///
 /// # Example
 ///
@@ -2727,7 +2792,7 @@ impl<'a, C, NC, A> ProjectSubscriptionModifyAckDeadlineCall<'a, C, NC, A> where 
         for &field in ["alt", "subscription"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -2787,7 +2852,7 @@ impl<'a, C, NC, A> ProjectSubscriptionModifyAckDeadlineCall<'a, C, NC, A> where 
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -2803,7 +2868,6 @@ impl<'a, C, NC, A> ProjectSubscriptionModifyAckDeadlineCall<'a, C, NC, A> where 
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -2813,7 +2877,7 @@ impl<'a, C, NC, A> ProjectSubscriptionModifyAckDeadlineCall<'a, C, NC, A> where 
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -2824,7 +2888,7 @@ impl<'a, C, NC, A> ProjectSubscriptionModifyAckDeadlineCall<'a, C, NC, A> where 
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -2833,13 +2897,13 @@ impl<'a, C, NC, A> ProjectSubscriptionModifyAckDeadlineCall<'a, C, NC, A> where 
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -2920,7 +2984,7 @@ impl<'a, C, NC, A> ProjectSubscriptionModifyAckDeadlineCall<'a, C, NC, A> where 
 /// Acknowledges the messages associated with the ack tokens in the AcknowledgeRequest. The Pub/Sub system can remove the relevant messages from the subscription. Acknowledging a message whose ack deadline has expired may succeed, but such a message may be redelivered later. Acknowledging a message more than once will not result in an error.
 ///
 /// A builder for the *subscriptions.acknowledge* method supported by a *project* resource.
-/// It is not used directly, but through a `ProjectMethods`.
+/// It is not used directly, but through a `ProjectMethods` instance.
 ///
 /// # Example
 ///
@@ -2986,7 +3050,7 @@ impl<'a, C, NC, A> ProjectSubscriptionAcknowledgeCall<'a, C, NC, A> where NC: hy
         for &field in ["alt", "subscription"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -3046,7 +3110,7 @@ impl<'a, C, NC, A> ProjectSubscriptionAcknowledgeCall<'a, C, NC, A> where NC: hy
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -3062,7 +3126,6 @@ impl<'a, C, NC, A> ProjectSubscriptionAcknowledgeCall<'a, C, NC, A> where NC: hy
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -3072,7 +3135,7 @@ impl<'a, C, NC, A> ProjectSubscriptionAcknowledgeCall<'a, C, NC, A> where NC: hy
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -3083,7 +3146,7 @@ impl<'a, C, NC, A> ProjectSubscriptionAcknowledgeCall<'a, C, NC, A> where NC: hy
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -3092,13 +3155,13 @@ impl<'a, C, NC, A> ProjectSubscriptionAcknowledgeCall<'a, C, NC, A> where NC: hy
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -3179,7 +3242,7 @@ impl<'a, C, NC, A> ProjectSubscriptionAcknowledgeCall<'a, C, NC, A> where NC: hy
 /// Deletes an existing subscription. All pending messages in the subscription are immediately dropped. Calls to Pull after deletion will return NOT_FOUND. After a subscription is deleted, a new one may be created with the same name, but the new one has no association with the old subscription, or its topic unless the same topic is specified.
 ///
 /// A builder for the *subscriptions.delete* method supported by a *project* resource.
-/// It is not used directly, but through a `ProjectMethods`.
+/// It is not used directly, but through a `ProjectMethods` instance.
 ///
 /// # Example
 ///
@@ -3238,7 +3301,7 @@ impl<'a, C, NC, A> ProjectSubscriptionDeleteCall<'a, C, NC, A> where NC: hyper::
         for &field in ["alt", "subscription"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -3294,7 +3357,7 @@ impl<'a, C, NC, A> ProjectSubscriptionDeleteCall<'a, C, NC, A> where NC: hyper::
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -3306,7 +3369,6 @@ impl<'a, C, NC, A> ProjectSubscriptionDeleteCall<'a, C, NC, A> where NC: hyper::
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -3316,7 +3378,7 @@ impl<'a, C, NC, A> ProjectSubscriptionDeleteCall<'a, C, NC, A> where NC: hyper::
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -3327,7 +3389,7 @@ impl<'a, C, NC, A> ProjectSubscriptionDeleteCall<'a, C, NC, A> where NC: hyper::
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -3336,13 +3398,13 @@ impl<'a, C, NC, A> ProjectSubscriptionDeleteCall<'a, C, NC, A> where NC: hyper::
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -3414,7 +3476,7 @@ impl<'a, C, NC, A> ProjectSubscriptionDeleteCall<'a, C, NC, A> where NC: hyper::
 /// Creates a subscription to a given topic for a given subscriber. If the subscription already exists, returns ALREADY_EXISTS. If the corresponding topic doesn't exist, returns NOT_FOUND. If the name is not provided in the request, the server will assign a random name for this subscription on the same project as the topic.
 ///
 /// A builder for the *subscriptions.create* method supported by a *project* resource.
-/// It is not used directly, but through a `ProjectMethods`.
+/// It is not used directly, but through a `ProjectMethods` instance.
 ///
 /// # Example
 ///
@@ -3480,7 +3542,7 @@ impl<'a, C, NC, A> ProjectSubscriptionCreateCall<'a, C, NC, A> where NC: hyper::
         for &field in ["alt", "name"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -3540,7 +3602,7 @@ impl<'a, C, NC, A> ProjectSubscriptionCreateCall<'a, C, NC, A> where NC: hyper::
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -3556,7 +3618,6 @@ impl<'a, C, NC, A> ProjectSubscriptionCreateCall<'a, C, NC, A> where NC: hyper::
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -3566,7 +3627,7 @@ impl<'a, C, NC, A> ProjectSubscriptionCreateCall<'a, C, NC, A> where NC: hyper::
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -3577,7 +3638,7 @@ impl<'a, C, NC, A> ProjectSubscriptionCreateCall<'a, C, NC, A> where NC: hyper::
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -3586,13 +3647,13 @@ impl<'a, C, NC, A> ProjectSubscriptionCreateCall<'a, C, NC, A> where NC: hyper::
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -3673,7 +3734,7 @@ impl<'a, C, NC, A> ProjectSubscriptionCreateCall<'a, C, NC, A> where NC: hyper::
 /// Gets the configuration details of a subscription.
 ///
 /// A builder for the *subscriptions.get* method supported by a *project* resource.
-/// It is not used directly, but through a `ProjectMethods`.
+/// It is not used directly, but through a `ProjectMethods` instance.
 ///
 /// # Example
 ///
@@ -3732,7 +3793,7 @@ impl<'a, C, NC, A> ProjectSubscriptionGetCall<'a, C, NC, A> where NC: hyper::net
         for &field in ["alt", "subscription"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -3788,7 +3849,7 @@ impl<'a, C, NC, A> ProjectSubscriptionGetCall<'a, C, NC, A> where NC: hyper::net
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -3800,7 +3861,6 @@ impl<'a, C, NC, A> ProjectSubscriptionGetCall<'a, C, NC, A> where NC: hyper::net
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -3810,7 +3870,7 @@ impl<'a, C, NC, A> ProjectSubscriptionGetCall<'a, C, NC, A> where NC: hyper::net
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -3821,7 +3881,7 @@ impl<'a, C, NC, A> ProjectSubscriptionGetCall<'a, C, NC, A> where NC: hyper::net
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -3830,13 +3890,13 @@ impl<'a, C, NC, A> ProjectSubscriptionGetCall<'a, C, NC, A> where NC: hyper::net
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -3908,7 +3968,7 @@ impl<'a, C, NC, A> ProjectSubscriptionGetCall<'a, C, NC, A> where NC: hyper::net
 /// Lists the name of the subscriptions for this topic.
 ///
 /// A builder for the *topics.subscriptions.list* method supported by a *project* resource.
-/// It is not used directly, but through a `ProjectMethods`.
+/// It is not used directly, but through a `ProjectMethods` instance.
 ///
 /// # Example
 ///
@@ -3977,7 +4037,7 @@ impl<'a, C, NC, A> ProjectTopicSubscriptionListCall<'a, C, NC, A> where NC: hype
         for &field in ["alt", "topic", "pageToken", "pageSize"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -4033,7 +4093,7 @@ impl<'a, C, NC, A> ProjectTopicSubscriptionListCall<'a, C, NC, A> where NC: hype
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -4045,7 +4105,6 @@ impl<'a, C, NC, A> ProjectTopicSubscriptionListCall<'a, C, NC, A> where NC: hype
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -4055,7 +4114,7 @@ impl<'a, C, NC, A> ProjectTopicSubscriptionListCall<'a, C, NC, A> where NC: hype
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -4066,7 +4125,7 @@ impl<'a, C, NC, A> ProjectTopicSubscriptionListCall<'a, C, NC, A> where NC: hype
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -4075,13 +4134,13 @@ impl<'a, C, NC, A> ProjectTopicSubscriptionListCall<'a, C, NC, A> where NC: hype
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -4167,7 +4226,7 @@ impl<'a, C, NC, A> ProjectTopicSubscriptionListCall<'a, C, NC, A> where NC: hype
 /// Lists matching subscriptions.
 ///
 /// A builder for the *subscriptions.list* method supported by a *project* resource.
-/// It is not used directly, but through a `ProjectMethods`.
+/// It is not used directly, but through a `ProjectMethods` instance.
 ///
 /// # Example
 ///
@@ -4236,7 +4295,7 @@ impl<'a, C, NC, A> ProjectSubscriptionListCall<'a, C, NC, A> where NC: hyper::ne
         for &field in ["alt", "project", "pageToken", "pageSize"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -4292,7 +4351,7 @@ impl<'a, C, NC, A> ProjectSubscriptionListCall<'a, C, NC, A> where NC: hyper::ne
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -4304,7 +4363,6 @@ impl<'a, C, NC, A> ProjectSubscriptionListCall<'a, C, NC, A> where NC: hyper::ne
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -4314,7 +4372,7 @@ impl<'a, C, NC, A> ProjectSubscriptionListCall<'a, C, NC, A> where NC: hyper::ne
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -4325,7 +4383,7 @@ impl<'a, C, NC, A> ProjectSubscriptionListCall<'a, C, NC, A> where NC: hyper::ne
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -4334,13 +4392,13 @@ impl<'a, C, NC, A> ProjectSubscriptionListCall<'a, C, NC, A> where NC: hyper::ne
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }

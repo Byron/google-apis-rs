@@ -1,8 +1,8 @@
 // DO NOT EDIT !
-// This file was generated automatically from 'src/mako/lib.rs.mako'
+// This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *DoubleClick Bid Manager* crate version *0.1.1+20150122*, where *20150122* is the exact revision of the *doubleclickbidmanager:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.1*.
+//! This documentation was generated from *DoubleClick Bid Manager* crate version *0.1.2+20150122*, where *20150122* is the exact revision of the *doubleclickbidmanager:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.2*.
 //! 
 //! Everything else about the *DoubleClick Bid Manager* *v1* API can be found at the
 //! [official documentation site](https://developers.google.com/bid-manager/).
@@ -29,6 +29,8 @@
 //! 
 //! * **[Hub](struct.DoubleClickBidManager.html)**
 //!     * a central object to maintain state and allow accessing all *Activities*
+//!     * creates [*Method Builders*](trait.MethodsBuilder.html) which in turn
+//!       allow access to individual [*Call Builders*](trait.CallBuilder.html)
 //! * **[Resources](trait.Resource.html)**
 //!     * primary types that you can apply *Activities* to
 //!     * a collection of properties and *Parts*
@@ -37,6 +39,8 @@
 //!         * never directly used in *Activities*
 //! * **[Activities](trait.CallBuilder.html)**
 //!     * operations to apply to *Resources*
+//! 
+//! All *structures* are marked with applicable traits to further categorize them and ease browsing.
 //! 
 //! Generally speaking, you can invoke *Activities* like this:
 //! 
@@ -73,7 +77,7 @@
 //! extern crate hyper;
 //! extern crate "yup-oauth2" as oauth2;
 //! extern crate "google-doubleclickbidmanager1" as doubleclickbidmanager1;
-//! use doubleclickbidmanager1::Result;
+//! use doubleclickbidmanager1::{Result, Error};
 //! # #[test] fn egal() {
 //! use std::default::Default;
 //! use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -98,15 +102,17 @@
 //!              .doit();
 //! 
 //! match result {
-//!     Result::HttpError(err) => println!("HTTPERROR: {:?}", err),
-//!     Result::MissingAPIKey => println!("Auth: Missing API Key - used if there are no scopes"),
-//!     Result::MissingToken => println!("OAuth2: Missing Token"),
-//!     Result::Cancelled => println!("Operation cancelled by user"),
-//!     Result::UploadSizeLimitExceeded(size, max_size) => println!("Upload size too big: {} of {}", size, max_size),
-//!     Result::Failure(_) => println!("General Failure (hyper::client::Response doesn't print)"),
-//!     Result::FieldClash(clashed_field) => println!("You added custom parameter which is part of builder: {:?}", clashed_field),
-//!     Result::JsonDecodeError(err) => println!("Couldn't understand server reply - maybe API needs update: {:?}", err),
-//!     Result::Success(_) => println!("Success (value doesn't print)"),
+//!     Err(e) => match e {
+//!         Error::HttpError(err) => println!("HTTPERROR: {:?}", err),
+//!         Error::MissingAPIKey => println!("Auth: Missing API Key - used if there are no scopes"),
+//!         Error::MissingToken => println!("OAuth2: Missing Token"),
+//!         Error::Cancelled => println!("Operation canceled by user"),
+//!         Error::UploadSizeLimitExceeded(size, max_size) => println!("Upload size too big: {} of {}", size, max_size),
+//!         Error::Failure(_) => println!("General Failure (hyper::client::Response doesn't print)"),
+//!         Error::FieldClash(clashed_field) => println!("You added custom parameter which is part of builder: {:?}", clashed_field),
+//!         Error::JsonDecodeError(err) => println!("Couldn't understand server reply - maybe API needs update: {:?}", err),
+//!     },
+//!     Ok(_) => println!("Success (value doesn't print)"),
 //! }
 //! # }
 //! ```
@@ -119,7 +125,7 @@
 //! When delegates handle errors or intermediate values, they may have a chance to instruct the system to retry. This 
 //! makes the system potentially resilient to all kinds of errors.
 //! 
-//! ## Uploads and Downlods
+//! ## Uploads and Downloads
 //! If a method supports downloads, the response body, which is part of the [Result](enum.Result.html), should be
 //! read by you to obtain the media.
 //! If such a method also supports a [Response Result](trait.ResponseResult.html), it will return that by default.
@@ -142,8 +148,9 @@
 //! ## Optional Parts in Server-Requests
 //! 
 //! All structures provided by this library are made to be [enocodable](trait.RequestValue.html) and 
-//! [decodable](trait.ResponseResult.html) via json. Optionals are used to indicate that partial requests are responses are valid.
-//! Most optionals are are considered [Parts](trait.Part.html) which are identifyable by name, which will be sent to 
+//! [decodable](trait.ResponseResult.html) via *json*. Optionals are used to indicate that partial requests are responses 
+//! are valid.
+//! Most optionals are are considered [Parts](trait.Part.html) which are identifiable by name, which will be sent to 
 //! the server to indicate either the set parts of the request or the desired parts in the response.
 //! 
 //! ## Builder Arguments
@@ -192,7 +199,7 @@ use std::io;
 use std::fs;
 use std::thread::sleep;
 
-pub use cmn::{MultiPartReader, ToParts, MethodInfo, Result, CallBuilder, Hub, ReadSeek, Part, ResponseResult, RequestValue, NestedType, Delegate, DefaultDelegate, ResourceMethodsBuilder, Resource, JsonServerError};
+pub use cmn::{MultiPartReader, ToParts, MethodInfo, Result, Error, CallBuilder, Hub, ReadSeek, Part, ResponseResult, RequestValue, NestedType, Delegate, DefaultDelegate, MethodsBuilder, Resource, JsonServerError};
 
 
 // ##############
@@ -216,7 +223,7 @@ pub use cmn::{MultiPartReader, ToParts, MethodInfo, Result, CallBuilder, Hub, Re
 /// extern crate hyper;
 /// extern crate "yup-oauth2" as oauth2;
 /// extern crate "google-doubleclickbidmanager1" as doubleclickbidmanager1;
-/// use doubleclickbidmanager1::Result;
+/// use doubleclickbidmanager1::{Result, Error};
 /// # #[test] fn egal() {
 /// use std::default::Default;
 /// use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -241,15 +248,17 @@ pub use cmn::{MultiPartReader, ToParts, MethodInfo, Result, CallBuilder, Hub, Re
 ///              .doit();
 /// 
 /// match result {
-///     Result::HttpError(err) => println!("HTTPERROR: {:?}", err),
-///     Result::MissingAPIKey => println!("Auth: Missing API Key - used if there are no scopes"),
-///     Result::MissingToken => println!("OAuth2: Missing Token"),
-///     Result::Cancelled => println!("Operation cancelled by user"),
-///     Result::UploadSizeLimitExceeded(size, max_size) => println!("Upload size too big: {} of {}", size, max_size),
-///     Result::Failure(_) => println!("General Failure (hyper::client::Response doesn't print)"),
-///     Result::FieldClash(clashed_field) => println!("You added custom parameter which is part of builder: {:?}", clashed_field),
-///     Result::JsonDecodeError(err) => println!("Couldn't understand server reply - maybe API needs update: {:?}", err),
-///     Result::Success(_) => println!("Success (value doesn't print)"),
+///     Err(e) => match e {
+///         Error::HttpError(err) => println!("HTTPERROR: {:?}", err),
+///         Error::MissingAPIKey => println!("Auth: Missing API Key - used if there are no scopes"),
+///         Error::MissingToken => println!("OAuth2: Missing Token"),
+///         Error::Cancelled => println!("Operation canceled by user"),
+///         Error::UploadSizeLimitExceeded(size, max_size) => println!("Upload size too big: {} of {}", size, max_size),
+///         Error::Failure(_) => println!("General Failure (hyper::client::Response doesn't print)"),
+///         Error::FieldClash(clashed_field) => println!("You added custom parameter which is part of builder: {:?}", clashed_field),
+///         Error::JsonDecodeError(err) => println!("Couldn't understand server reply - maybe API needs update: {:?}", err),
+///     },
+///     Ok(_) => println!("Success (value doesn't print)"),
 /// }
 /// # }
 /// ```
@@ -270,7 +279,7 @@ impl<'a, C, NC, A> DoubleClickBidManager<C, NC, A>
         DoubleClickBidManager {
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/0.1.1".to_string(),
+            _user_agent: "google-api-rust-client/0.1.2".to_string(),
             _m: PhantomData
         }
     }
@@ -286,7 +295,7 @@ impl<'a, C, NC, A> DoubleClickBidManager<C, NC, A>
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/0.1.1`.
+    /// It defaults to `google-api-rust-client/0.1.2`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -311,13 +320,13 @@ impl<'a, C, NC, A> DoubleClickBidManager<C, NC, A>
 /// 
 #[derive(Default, Clone, Debug, Serialize)]
 pub struct DownloadLineItemsRequest {
-    /// Filter type used to filter line items to fetch.    
+    /// Filter type used to filter line items to fetch.
     #[serde(alias="filterType")]
     pub filter_type: Option<String>,
-    /// Ids of the specified filter type used to filter line items to fetch. If omitted, all the line items will be returned.    
+    /// Ids of the specified filter type used to filter line items to fetch. If omitted, all the line items will be returned.
     #[serde(alias="filterIds")]
     pub filter_ids: Option<Vec<String>>,
-    /// Format in which the line items will be returned. Default to CSV.    
+    /// Format in which the line items will be returned. Default to CSV.
     pub format: Option<String>,
 }
 
@@ -330,7 +339,7 @@ impl RequestValue for DownloadLineItemsRequest {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct ReportFailure {
-    /// Error code that shows why the report was not created.    
+    /// Error code that shows why the report was not created.
     #[serde(alias="errorCode")]
     pub error_code: String,
 }
@@ -344,17 +353,17 @@ impl Part for ReportFailure {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Parameters {
-    /// Metrics to include as columns in your report.    
+    /// Metrics to include as columns in your report.
     pub metrics: Vec<String>,
-    /// Filters used to match traffic data in your report.    
+    /// Filters used to match traffic data in your report.
     pub filters: Vec<FilterPair>,
-    /// Report type.    
+    /// Report type.
     #[serde(alias="type")]
     pub type_: String,
-    /// Data is grouped by the filters listed in this field.    
+    /// Data is grouped by the filters listed in this field.
     #[serde(alias="groupBys")]
     pub group_bys: Vec<String>,
-    /// Whether to include data from Invite Media.    
+    /// Whether to include data from Invite Media.
     #[serde(alias="includeInviteData")]
     pub include_invite_data: bool,
 }
@@ -368,10 +377,10 @@ impl Part for Parameters {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct ReportKey {
-    /// Query ID.    
+    /// Query ID.
     #[serde(alias="queryId")]
     pub query_id: String,
-    /// Report ID.    
+    /// Report ID.
     #[serde(alias="reportId")]
     pub report_id: String,
 }
@@ -390,13 +399,13 @@ impl Part for ReportKey {}
 /// 
 #[derive(Default, Clone, Debug, Serialize)]
 pub struct UploadLineItemsRequest {
-    /// Line items in CSV to upload. Refer to  Entity Write File Format for more information on file format.    
+    /// Line items in CSV to upload. Refer to  Entity Write File Format for more information on file format.
     #[serde(alias="lineItems")]
     pub line_items: Option<String>,
-    /// Set to true to get upload status without actually persisting the line items.    
+    /// Set to true to get upload status without actually persisting the line items.
     #[serde(alias="dryRun")]
     pub dry_run: Option<bool>,
-    /// Format the line items are in. Default to CSV.    
+    /// Format the line items are in. Default to CSV.
     pub format: Option<String>,
 }
 
@@ -414,9 +423,9 @@ impl RequestValue for UploadLineItemsRequest {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct ListQueriesResponse {
-    /// Identifies what kind of resource this is. Value: the fixed string "doubleclickbidmanager#listQueriesResponse".    
+    /// Identifies what kind of resource this is. Value: the fixed string "doubleclickbidmanager#listQueriesResponse".
     pub kind: String,
-    /// Retrieved queries.    
+    /// Retrieved queries.
     pub queries: Vec<Query>,
 }
 
@@ -429,15 +438,15 @@ impl ResponseResult for ListQueriesResponse {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct ReportMetadata {
-    /// Report status.    
+    /// Report status.
     pub status: ReportStatus,
-    /// The ending time for the data that is shown in the report.    
+    /// The ending time for the data that is shown in the report.
     #[serde(alias="reportDataEndTimeMs")]
     pub report_data_end_time_ms: String,
-    /// The path to the location in Google Cloud Storage where the report is stored.    
+    /// The path to the location in Google Cloud Storage where the report is stored.
     #[serde(alias="googleCloudStoragePath")]
     pub google_cloud_storage_path: String,
-    /// The starting time for the data that is shown in the report.    
+    /// The starting time for the data that is shown in the report.
     #[serde(alias="reportDataStartTimeMs")]
     pub report_data_start_time_ms: String,
 }
@@ -451,15 +460,15 @@ impl Part for ReportMetadata {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct QuerySchedule {
-    /// Datetime to periodically run the query until.    
+    /// Datetime to periodically run the query until.
     #[serde(alias="endTimeMs")]
     pub end_time_ms: String,
-    /// How often the query is run.    
+    /// How often the query is run.
     pub frequency: String,
-    /// Time of day at which a new report will be generated, represented as minutes past midnight. Range is 0 to 1439. Only applies to scheduled reports.    
+    /// Time of day at which a new report will be generated, represented as minutes past midnight. Range is 0 to 1439. Only applies to scheduled reports.
     #[serde(alias="nextRunMinuteOfDay")]
     pub next_run_minute_of_day: i32,
-    /// Canonical timezone code for report generation time. Defaults to America/New_York.    
+    /// Canonical timezone code for report generation time. Defaults to America/New_York.
     #[serde(alias="nextRunTimezoneCode")]
     pub next_run_timezone_code: String,
 }
@@ -478,16 +487,16 @@ impl Part for QuerySchedule {}
 /// 
 #[derive(Default, Clone, Debug, Serialize)]
 pub struct RunQueryRequest {
-    /// The ending time for the data that is shown in the report. Note, reportDataEndTimeMs is required if dataRange is CUSTOM_DATES and ignored otherwise.    
+    /// The ending time for the data that is shown in the report. Note, reportDataEndTimeMs is required if dataRange is CUSTOM_DATES and ignored otherwise.
     #[serde(alias="reportDataEndTimeMs")]
     pub report_data_end_time_ms: Option<String>,
-    /// Canonical timezone code for report data time. Defaults to America/New_York.    
+    /// Canonical timezone code for report data time. Defaults to America/New_York.
     #[serde(alias="timezoneCode")]
     pub timezone_code: Option<String>,
-    /// The starting time for the data that is shown in the report. Note, reportDataStartTimeMs is required if dataRange is CUSTOM_DATES and ignored otherwise.    
+    /// The starting time for the data that is shown in the report. Note, reportDataStartTimeMs is required if dataRange is CUSTOM_DATES and ignored otherwise.
     #[serde(alias="reportDataStartTimeMs")]
     pub report_data_start_time_ms: Option<String>,
-    /// Report data range used to generate the report.    
+    /// Report data range used to generate the report.
     #[serde(alias="dataRange")]
     pub data_range: Option<String>,
 }
@@ -506,7 +515,7 @@ impl RequestValue for RunQueryRequest {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct UploadLineItemsResponse {
-    /// Status of upload.    
+    /// Status of upload.
     #[serde(alias="uploadStatus")]
     pub upload_status: UploadStatus,
 }
@@ -520,36 +529,36 @@ impl ResponseResult for UploadLineItemsResponse {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct QueryMetadata {
-    /// The path to the location in Google Cloud Storage where the latest report is stored.    
+    /// The path to the location in Google Cloud Storage where the latest report is stored.
     #[serde(alias="googleCloudStoragePathForLatestReport")]
     pub google_cloud_storage_path_for_latest_report: String,
-    /// Range of report data.    
+    /// Range of report data.
     #[serde(alias="dataRange")]
     pub data_range: String,
-    /// Whether to send an email notification when a report is ready. Default to false.    
+    /// Whether to send an email notification when a report is ready. Default to false.
     #[serde(alias="sendNotification")]
     pub send_notification: bool,
     /// Locale of the generated reports. Valid values are cs CZECH de GERMAN en ENGLISH es SPANISH fr FRENCH it ITALIAN ja JAPANESE ko KOREAN pl POLISH pt-BR BRAZILIAN_PORTUGUESE ru RUSSIAN tr TURKISH uk UKRAINIAN zh-CN CHINA_CHINESE zh-TW TAIWAN_CHINESE
     /// 
     /// An locale string not in the list above will generate reports in English.
     pub locale: String,
-    /// The path in Google Drive for the latest report.    
+    /// The path in Google Drive for the latest report.
     #[serde(alias="googleDrivePathForLatestReport")]
     pub google_drive_path_for_latest_report: String,
-    /// Format of the generated report.    
+    /// Format of the generated report.
     pub format: String,
-    /// List of email addresses which are sent email notifications when the report is finished. Separate from sendNotification.    
+    /// List of email addresses which are sent email notifications when the report is finished. Separate from sendNotification.
     #[serde(alias="shareEmailAddress")]
     pub share_email_address: Vec<String>,
-    /// Number of reports that have been generated for the query.    
+    /// Number of reports that have been generated for the query.
     #[serde(alias="reportCount")]
     pub report_count: i32,
-    /// Whether the latest report is currently running.    
+    /// Whether the latest report is currently running.
     pub running: bool,
-    /// The time when the latest report started to run.    
+    /// The time when the latest report started to run.
     #[serde(alias="latestReportRunTimeMs")]
     pub latest_report_run_time_ms: String,
-    /// Query title. It is used to name the reports generated from this query.    
+    /// Query title. It is used to name the reports generated from this query.
     pub title: String,
 }
 
@@ -562,14 +571,14 @@ impl Part for QueryMetadata {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct ReportStatus {
-    /// If the report failed, this records the cause.    
+    /// If the report failed, this records the cause.
     pub failure: ReportFailure,
-    /// The state of the report.    
+    /// The state of the report.
     pub state: String,
-    /// The time when this report either completed successfully or failed.    
+    /// The time when this report either completed successfully or failed.
     #[serde(alias="finishTimeMs")]
     pub finish_time_ms: String,
-    /// The file type of the report.    
+    /// The file type of the report.
     pub format: String,
 }
 
@@ -587,9 +596,9 @@ impl Part for ReportStatus {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct ListReportsResponse {
-    /// Identifies what kind of resource this is. Value: the fixed string "doubleclickbidmanager#listReportsResponse".    
+    /// Identifies what kind of resource this is. Value: the fixed string "doubleclickbidmanager#listReportsResponse".
     pub kind: String,
-    /// Retrieved reports.    
+    /// Retrieved reports.
     pub reports: Vec<Report>,
 }
 
@@ -602,19 +611,19 @@ impl ResponseResult for ListReportsResponse {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct RowStatus {
-    /// Whether the entity is persisted.    
+    /// Whether the entity is persisted.
     pub persisted: bool,
-    /// Reasons why the entity can't be uploaded.    
+    /// Reasons why the entity can't be uploaded.
     pub errors: Vec<String>,
-    /// Entity name.    
+    /// Entity name.
     #[serde(alias="entityName")]
     pub entity_name: String,
-    /// Whether the stored entity is changed as a result of upload.    
+    /// Whether the stored entity is changed as a result of upload.
     pub changed: bool,
-    /// Entity Id.    
+    /// Entity Id.
     #[serde(alias="entityId")]
     pub entity_id: String,
-    /// Row number.    
+    /// Row number.
     #[serde(alias="rowNumber")]
     pub row_number: i32,
 }
@@ -633,11 +642,11 @@ impl Part for RowStatus {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct Report {
-    /// Report parameters.    
+    /// Report parameters.
     pub params: Option<Parameters>,
-    /// Key used to identify a report.    
+    /// Key used to identify a report.
     pub key: Option<ReportKey>,
-    /// Report metadata.    
+    /// Report metadata.
     pub metadata: Option<ReportMetadata>,
 }
 
@@ -656,25 +665,25 @@ impl Resource for Report {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Query {
-    /// Identifies what kind of resource this is. Value: the fixed string "doubleclickbidmanager#query".    
+    /// Identifies what kind of resource this is. Value: the fixed string "doubleclickbidmanager#query".
     pub kind: Option<String>,
-    /// Information on how often and when to run a query.    
+    /// Information on how often and when to run a query.
     pub schedule: Option<QuerySchedule>,
-    /// Canonical timezone code for report data time. Defaults to America/New_York.    
+    /// Canonical timezone code for report data time. Defaults to America/New_York.
     #[serde(alias="timezoneCode")]
     pub timezone_code: Option<String>,
-    /// The ending time for the data that is shown in the report. Note, reportDataEndTimeMs is required if metadata.dataRange is CUSTOM_DATES and ignored otherwise.    
+    /// The ending time for the data that is shown in the report. Note, reportDataEndTimeMs is required if metadata.dataRange is CUSTOM_DATES and ignored otherwise.
     #[serde(alias="reportDataEndTimeMs")]
     pub report_data_end_time_ms: Option<String>,
-    /// Query ID.    
+    /// Query ID.
     #[serde(alias="queryId")]
     pub query_id: Option<String>,
-    /// Query parameters.    
+    /// Query parameters.
     pub params: Option<Parameters>,
-    /// The starting time for the data that is shown in the report. Note, reportDataStartTimeMs is required if metadata.dataRange is CUSTOM_DATES and ignored otherwise.    
+    /// The starting time for the data that is shown in the report. Note, reportDataStartTimeMs is required if metadata.dataRange is CUSTOM_DATES and ignored otherwise.
     #[serde(alias="reportDataStartTimeMs")]
     pub report_data_start_time_ms: Option<String>,
-    /// Query metadata.    
+    /// Query metadata.
     pub metadata: Option<QueryMetadata>,
 }
 
@@ -693,7 +702,7 @@ impl ResponseResult for Query {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct DownloadLineItemsResponse {
-    /// Retrieved line items in CSV format. Refer to  Entity Write File Format for more information on file format.    
+    /// Retrieved line items in CSV format. Refer to  Entity Write File Format for more information on file format.
     #[serde(alias="lineItems")]
     pub line_items: String,
 }
@@ -707,10 +716,10 @@ impl ResponseResult for DownloadLineItemsResponse {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct FilterPair {
-    /// Filter type.    
+    /// Filter type.
     #[serde(alias="type")]
     pub type_: String,
-    /// Filter value.    
+    /// Filter value.
     pub value: String,
 }
 
@@ -723,9 +732,9 @@ impl Part for FilterPair {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct UploadStatus {
-    /// Reasons why upload can't be completed.    
+    /// Reasons why upload can't be completed.
     pub errors: Vec<String>,
-    /// Per-row upload status.    
+    /// Per-row upload status.
     #[serde(alias="rowStatus")]
     pub row_status: Vec<RowStatus>,
 }
@@ -772,13 +781,17 @@ pub struct LineitemMethods<'a, C, NC, A>
     hub: &'a DoubleClickBidManager<C, NC, A>,
 }
 
-impl<'a, C, NC, A> ResourceMethodsBuilder for LineitemMethods<'a, C, NC, A> {}
+impl<'a, C, NC, A> MethodsBuilder for LineitemMethods<'a, C, NC, A> {}
 
 impl<'a, C, NC, A> LineitemMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Uploads line items in CSV format.    
+    /// Uploads line items in CSV format.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
     pub fn uploadlineitems(&self, request: &UploadLineItemsRequest) -> LineitemUploadlineitemCall<'a, C, NC, A> {
         LineitemUploadlineitemCall {
             hub: self.hub,
@@ -790,7 +803,11 @@ impl<'a, C, NC, A> LineitemMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Retrieves line items in CSV format.    
+    /// Retrieves line items in CSV format.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
     pub fn downloadlineitems(&self, request: &DownloadLineItemsRequest) -> LineitemDownloadlineitemCall<'a, C, NC, A> {
         LineitemDownloadlineitemCall {
             hub: self.hub,
@@ -837,13 +854,17 @@ pub struct ReportMethods<'a, C, NC, A>
     hub: &'a DoubleClickBidManager<C, NC, A>,
 }
 
-impl<'a, C, NC, A> ResourceMethodsBuilder for ReportMethods<'a, C, NC, A> {}
+impl<'a, C, NC, A> MethodsBuilder for ReportMethods<'a, C, NC, A> {}
 
 impl<'a, C, NC, A> ReportMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Retrieves stored reports.    
+    /// Retrieves stored reports.
+    /// 
+    /// # Arguments
+    ///
+    /// * `queryId` - Query ID with which the reports are associated.
     pub fn listreports(&self, query_id: &str) -> ReportListreportCall<'a, C, NC, A> {
         ReportListreportCall {
             hub: self.hub,
@@ -890,13 +911,13 @@ pub struct QueryMethods<'a, C, NC, A>
     hub: &'a DoubleClickBidManager<C, NC, A>,
 }
 
-impl<'a, C, NC, A> ResourceMethodsBuilder for QueryMethods<'a, C, NC, A> {}
+impl<'a, C, NC, A> MethodsBuilder for QueryMethods<'a, C, NC, A> {}
 
 impl<'a, C, NC, A> QueryMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Retrieves stored queries.    
+    /// Retrieves stored queries.
     pub fn listqueries(&self) -> QueryListqueryCall<'a, C, NC, A> {
         QueryListqueryCall {
             hub: self.hub,
@@ -907,7 +928,11 @@ impl<'a, C, NC, A> QueryMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Retrieves a stored query.    
+    /// Retrieves a stored query.
+    /// 
+    /// # Arguments
+    ///
+    /// * `queryId` - Query ID to retrieve.
     pub fn getquery(&self, query_id: &str) -> QueryGetqueryCall<'a, C, NC, A> {
         QueryGetqueryCall {
             hub: self.hub,
@@ -919,7 +944,11 @@ impl<'a, C, NC, A> QueryMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Creates a query.    
+    /// Creates a query.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
     pub fn createquery(&self, request: &Query) -> QueryCreatequeryCall<'a, C, NC, A> {
         QueryCreatequeryCall {
             hub: self.hub,
@@ -931,7 +960,11 @@ impl<'a, C, NC, A> QueryMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Deletes a stored query as well as the associated stored reports.    
+    /// Deletes a stored query as well as the associated stored reports.
+    /// 
+    /// # Arguments
+    ///
+    /// * `queryId` - Query ID to delete.
     pub fn deletequery(&self, query_id: &str) -> QueryDeletequeryCall<'a, C, NC, A> {
         QueryDeletequeryCall {
             hub: self.hub,
@@ -943,7 +976,12 @@ impl<'a, C, NC, A> QueryMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Runs a stored query to generate a report.    
+    /// Runs a stored query to generate a report.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `queryId` - Query ID to run.
     pub fn runquery(&self, request: &RunQueryRequest, query_id: &str) -> QueryRunqueryCall<'a, C, NC, A> {
         QueryRunqueryCall {
             hub: self.hub,
@@ -966,7 +1004,7 @@ impl<'a, C, NC, A> QueryMethods<'a, C, NC, A> {
 /// Uploads line items in CSV format.
 ///
 /// A builder for the *uploadlineitems* method supported by a *lineitem* resource.
-/// It is not used directly, but through a `LineitemMethods`.
+/// It is not used directly, but through a `LineitemMethods` instance.
 ///
 /// # Example
 ///
@@ -1028,7 +1066,7 @@ impl<'a, C, NC, A> LineitemUploadlineitemCall<'a, C, NC, A> where NC: hyper::net
         for &field in ["alt"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -1047,7 +1085,7 @@ impl<'a, C, NC, A> LineitemUploadlineitemCall<'a, C, NC, A> where NC: hyper::net
             Some(value) => params.push(("key", value)),
             None => {
                 dlg.finished(false);
-                return Result::MissingAPIKey
+                return Err(Error::MissingAPIKey)
             }
         }
 
@@ -1075,7 +1113,6 @@ impl<'a, C, NC, A> LineitemUploadlineitemCall<'a, C, NC, A> where NC: hyper::net
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -1085,7 +1122,7 @@ impl<'a, C, NC, A> LineitemUploadlineitemCall<'a, C, NC, A> where NC: hyper::net
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -1096,7 +1133,7 @@ impl<'a, C, NC, A> LineitemUploadlineitemCall<'a, C, NC, A> where NC: hyper::net
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -1105,13 +1142,13 @@ impl<'a, C, NC, A> LineitemUploadlineitemCall<'a, C, NC, A> where NC: hyper::net
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -1167,7 +1204,7 @@ impl<'a, C, NC, A> LineitemUploadlineitemCall<'a, C, NC, A> where NC: hyper::net
 /// Retrieves line items in CSV format.
 ///
 /// A builder for the *downloadlineitems* method supported by a *lineitem* resource.
-/// It is not used directly, but through a `LineitemMethods`.
+/// It is not used directly, but through a `LineitemMethods` instance.
 ///
 /// # Example
 ///
@@ -1229,7 +1266,7 @@ impl<'a, C, NC, A> LineitemDownloadlineitemCall<'a, C, NC, A> where NC: hyper::n
         for &field in ["alt"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -1248,7 +1285,7 @@ impl<'a, C, NC, A> LineitemDownloadlineitemCall<'a, C, NC, A> where NC: hyper::n
             Some(value) => params.push(("key", value)),
             None => {
                 dlg.finished(false);
-                return Result::MissingAPIKey
+                return Err(Error::MissingAPIKey)
             }
         }
 
@@ -1276,7 +1313,6 @@ impl<'a, C, NC, A> LineitemDownloadlineitemCall<'a, C, NC, A> where NC: hyper::n
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -1286,7 +1322,7 @@ impl<'a, C, NC, A> LineitemDownloadlineitemCall<'a, C, NC, A> where NC: hyper::n
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -1297,7 +1333,7 @@ impl<'a, C, NC, A> LineitemDownloadlineitemCall<'a, C, NC, A> where NC: hyper::n
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -1306,13 +1342,13 @@ impl<'a, C, NC, A> LineitemDownloadlineitemCall<'a, C, NC, A> where NC: hyper::n
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -1368,7 +1404,7 @@ impl<'a, C, NC, A> LineitemDownloadlineitemCall<'a, C, NC, A> where NC: hyper::n
 /// Retrieves stored reports.
 ///
 /// A builder for the *listreports* method supported by a *report* resource.
-/// It is not used directly, but through a `ReportMethods`.
+/// It is not used directly, but through a `ReportMethods` instance.
 ///
 /// # Example
 ///
@@ -1425,7 +1461,7 @@ impl<'a, C, NC, A> ReportListreportCall<'a, C, NC, A> where NC: hyper::net::Netw
         for &field in ["alt", "queryId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -1444,7 +1480,7 @@ impl<'a, C, NC, A> ReportListreportCall<'a, C, NC, A> where NC: hyper::net::Netw
             Some(value) => params.push(("key", value)),
             None => {
                 dlg.finished(false);
-                return Result::MissingAPIKey
+                return Err(Error::MissingAPIKey)
             }
         }
 
@@ -1488,7 +1524,6 @@ impl<'a, C, NC, A> ReportListreportCall<'a, C, NC, A> where NC: hyper::net::Netw
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -1498,7 +1533,7 @@ impl<'a, C, NC, A> ReportListreportCall<'a, C, NC, A> where NC: hyper::net::Netw
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -1509,7 +1544,7 @@ impl<'a, C, NC, A> ReportListreportCall<'a, C, NC, A> where NC: hyper::net::Netw
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -1518,13 +1553,13 @@ impl<'a, C, NC, A> ReportListreportCall<'a, C, NC, A> where NC: hyper::net::Netw
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -1536,7 +1571,7 @@ impl<'a, C, NC, A> ReportListreportCall<'a, C, NC, A> where NC: hyper::net::Netw
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Query ID with which the reports are associated.    
+    /// Query ID with which the reports are associated.
     pub fn query_id(mut self, new_value: &str) -> ReportListreportCall<'a, C, NC, A> {
         self._query_id = new_value.to_string();
         self
@@ -1581,7 +1616,7 @@ impl<'a, C, NC, A> ReportListreportCall<'a, C, NC, A> where NC: hyper::net::Netw
 /// Retrieves stored queries.
 ///
 /// A builder for the *listqueries* method supported by a *query* resource.
-/// It is not used directly, but through a `QueryMethods`.
+/// It is not used directly, but through a `QueryMethods` instance.
 ///
 /// # Example
 ///
@@ -1636,7 +1671,7 @@ impl<'a, C, NC, A> QueryListqueryCall<'a, C, NC, A> where NC: hyper::net::Networ
         for &field in ["alt"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -1655,7 +1690,7 @@ impl<'a, C, NC, A> QueryListqueryCall<'a, C, NC, A> where NC: hyper::net::Networ
             Some(value) => params.push(("key", value)),
             None => {
                 dlg.finished(false);
-                return Result::MissingAPIKey
+                return Err(Error::MissingAPIKey)
             }
         }
 
@@ -1675,7 +1710,6 @@ impl<'a, C, NC, A> QueryListqueryCall<'a, C, NC, A> where NC: hyper::net::Networ
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -1685,7 +1719,7 @@ impl<'a, C, NC, A> QueryListqueryCall<'a, C, NC, A> where NC: hyper::net::Networ
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -1696,7 +1730,7 @@ impl<'a, C, NC, A> QueryListqueryCall<'a, C, NC, A> where NC: hyper::net::Networ
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -1705,13 +1739,13 @@ impl<'a, C, NC, A> QueryListqueryCall<'a, C, NC, A> where NC: hyper::net::Networ
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -1758,7 +1792,7 @@ impl<'a, C, NC, A> QueryListqueryCall<'a, C, NC, A> where NC: hyper::net::Networ
 /// Retrieves a stored query.
 ///
 /// A builder for the *getquery* method supported by a *query* resource.
-/// It is not used directly, but through a `QueryMethods`.
+/// It is not used directly, but through a `QueryMethods` instance.
 ///
 /// # Example
 ///
@@ -1815,7 +1849,7 @@ impl<'a, C, NC, A> QueryGetqueryCall<'a, C, NC, A> where NC: hyper::net::Network
         for &field in ["alt", "queryId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -1834,7 +1868,7 @@ impl<'a, C, NC, A> QueryGetqueryCall<'a, C, NC, A> where NC: hyper::net::Network
             Some(value) => params.push(("key", value)),
             None => {
                 dlg.finished(false);
-                return Result::MissingAPIKey
+                return Err(Error::MissingAPIKey)
             }
         }
 
@@ -1878,7 +1912,6 @@ impl<'a, C, NC, A> QueryGetqueryCall<'a, C, NC, A> where NC: hyper::net::Network
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -1888,7 +1921,7 @@ impl<'a, C, NC, A> QueryGetqueryCall<'a, C, NC, A> where NC: hyper::net::Network
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -1899,7 +1932,7 @@ impl<'a, C, NC, A> QueryGetqueryCall<'a, C, NC, A> where NC: hyper::net::Network
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -1908,13 +1941,13 @@ impl<'a, C, NC, A> QueryGetqueryCall<'a, C, NC, A> where NC: hyper::net::Network
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -1926,7 +1959,7 @@ impl<'a, C, NC, A> QueryGetqueryCall<'a, C, NC, A> where NC: hyper::net::Network
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Query ID to retrieve.    
+    /// Query ID to retrieve.
     pub fn query_id(mut self, new_value: &str) -> QueryGetqueryCall<'a, C, NC, A> {
         self._query_id = new_value.to_string();
         self
@@ -1971,7 +2004,7 @@ impl<'a, C, NC, A> QueryGetqueryCall<'a, C, NC, A> where NC: hyper::net::Network
 /// Creates a query.
 ///
 /// A builder for the *createquery* method supported by a *query* resource.
-/// It is not used directly, but through a `QueryMethods`.
+/// It is not used directly, but through a `QueryMethods` instance.
 ///
 /// # Example
 ///
@@ -2033,7 +2066,7 @@ impl<'a, C, NC, A> QueryCreatequeryCall<'a, C, NC, A> where NC: hyper::net::Netw
         for &field in ["alt"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -2052,7 +2085,7 @@ impl<'a, C, NC, A> QueryCreatequeryCall<'a, C, NC, A> where NC: hyper::net::Netw
             Some(value) => params.push(("key", value)),
             None => {
                 dlg.finished(false);
-                return Result::MissingAPIKey
+                return Err(Error::MissingAPIKey)
             }
         }
 
@@ -2080,7 +2113,6 @@ impl<'a, C, NC, A> QueryCreatequeryCall<'a, C, NC, A> where NC: hyper::net::Netw
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -2090,7 +2122,7 @@ impl<'a, C, NC, A> QueryCreatequeryCall<'a, C, NC, A> where NC: hyper::net::Netw
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -2101,7 +2133,7 @@ impl<'a, C, NC, A> QueryCreatequeryCall<'a, C, NC, A> where NC: hyper::net::Netw
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -2110,13 +2142,13 @@ impl<'a, C, NC, A> QueryCreatequeryCall<'a, C, NC, A> where NC: hyper::net::Netw
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -2172,7 +2204,7 @@ impl<'a, C, NC, A> QueryCreatequeryCall<'a, C, NC, A> where NC: hyper::net::Netw
 /// Deletes a stored query as well as the associated stored reports.
 ///
 /// A builder for the *deletequery* method supported by a *query* resource.
-/// It is not used directly, but through a `QueryMethods`.
+/// It is not used directly, but through a `QueryMethods` instance.
 ///
 /// # Example
 ///
@@ -2229,7 +2261,7 @@ impl<'a, C, NC, A> QueryDeletequeryCall<'a, C, NC, A> where NC: hyper::net::Netw
         for &field in ["queryId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -2247,7 +2279,7 @@ impl<'a, C, NC, A> QueryDeletequeryCall<'a, C, NC, A> where NC: hyper::net::Netw
             Some(value) => params.push(("key", value)),
             None => {
                 dlg.finished(false);
-                return Result::MissingAPIKey
+                return Err(Error::MissingAPIKey)
             }
         }
 
@@ -2291,7 +2323,6 @@ impl<'a, C, NC, A> QueryDeletequeryCall<'a, C, NC, A> where NC: hyper::net::Netw
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -2301,7 +2332,7 @@ impl<'a, C, NC, A> QueryDeletequeryCall<'a, C, NC, A> where NC: hyper::net::Netw
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -2312,12 +2343,12 @@ impl<'a, C, NC, A> QueryDeletequeryCall<'a, C, NC, A> where NC: hyper::net::Netw
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = res;
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -2329,7 +2360,7 @@ impl<'a, C, NC, A> QueryDeletequeryCall<'a, C, NC, A> where NC: hyper::net::Netw
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Query ID to delete.    
+    /// Query ID to delete.
     pub fn query_id(mut self, new_value: &str) -> QueryDeletequeryCall<'a, C, NC, A> {
         self._query_id = new_value.to_string();
         self
@@ -2374,7 +2405,7 @@ impl<'a, C, NC, A> QueryDeletequeryCall<'a, C, NC, A> where NC: hyper::net::Netw
 /// Runs a stored query to generate a report.
 ///
 /// A builder for the *runquery* method supported by a *query* resource.
-/// It is not used directly, but through a `QueryMethods`.
+/// It is not used directly, but through a `QueryMethods` instance.
 ///
 /// # Example
 ///
@@ -2438,7 +2469,7 @@ impl<'a, C, NC, A> QueryRunqueryCall<'a, C, NC, A> where NC: hyper::net::Network
         for &field in ["queryId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -2456,7 +2487,7 @@ impl<'a, C, NC, A> QueryRunqueryCall<'a, C, NC, A> where NC: hyper::net::Network
             Some(value) => params.push(("key", value)),
             None => {
                 dlg.finished(false);
-                return Result::MissingAPIKey
+                return Err(Error::MissingAPIKey)
             }
         }
 
@@ -2508,7 +2539,6 @@ impl<'a, C, NC, A> QueryRunqueryCall<'a, C, NC, A> where NC: hyper::net::Network
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -2518,7 +2548,7 @@ impl<'a, C, NC, A> QueryRunqueryCall<'a, C, NC, A> where NC: hyper::net::Network
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -2529,12 +2559,12 @@ impl<'a, C, NC, A> QueryRunqueryCall<'a, C, NC, A> where NC: hyper::net::Network
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = res;
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -2555,7 +2585,7 @@ impl<'a, C, NC, A> QueryRunqueryCall<'a, C, NC, A> where NC: hyper::net::Network
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Query ID to run.    
+    /// Query ID to run.
     pub fn query_id(mut self, new_value: &str) -> QueryRunqueryCall<'a, C, NC, A> {
         self._query_id = new_value.to_string();
         self

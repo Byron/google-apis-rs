@@ -4,7 +4,7 @@
 [package]
 
 name = "google-qpxexpress1"
-version = "0.1.1+20140321"
+version = "0.1.2+20140321"
 authors = ["Sebastian Thiel <byronimo@gmail>"]
 description = "A complete library to interact with QPX Express (protocol v1)"
 repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/qpxexpress1"
@@ -16,7 +16,7 @@ keywords = ["qpxExpress", "google", "protocol", "web", "api"]
 [dependencies]
 hyper = "*"
 mime = "*"
+yup-oauth2 = "*"
 url = "*"
 serde = "*"
 serde_macros = "*"
-yup-oauth2 = "*"

@@ -1,8 +1,8 @@
 // DO NOT EDIT !
-// This file was generated automatically from 'src/mako/lib.rs.mako'
+// This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *fusiontables* crate version *0.1.1+20141113*, where *20141113* is the exact revision of the *fusiontables:v2* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.1*.
+//! This documentation was generated from *fusiontables* crate version *0.1.2+20150226*, where *20150226* is the exact revision of the *fusiontables:v2* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.2*.
 //! 
 //! Everything else about the *fusiontables* *v2* API can be found at the
 //! [official documentation site](https://developers.google.com/fusiontables).
@@ -46,6 +46,8 @@
 //! 
 //! * **[Hub](struct.Fusiontables.html)**
 //!     * a central object to maintain state and allow accessing all *Activities*
+//!     * creates [*Method Builders*](trait.MethodsBuilder.html) which in turn
+//!       allow access to individual [*Call Builders*](trait.CallBuilder.html)
 //! * **[Resources](trait.Resource.html)**
 //!     * primary types that you can apply *Activities* to
 //!     * a collection of properties and *Parts*
@@ -54,6 +56,8 @@
 //!         * never directly used in *Activities*
 //! * **[Activities](trait.CallBuilder.html)**
 //!     * operations to apply to *Resources*
+//! 
+//! All *structures* are marked with applicable traits to further categorize them and ease browsing.
 //! 
 //! Generally speaking, you can invoke *Activities* like this:
 //! 
@@ -94,7 +98,7 @@
 //! extern crate hyper;
 //! extern crate "yup-oauth2" as oauth2;
 //! extern crate "google-fusiontables2" as fusiontables2;
-//! use fusiontables2::Result;
+//! use fusiontables2::{Result, Error};
 //! use std::fs;
 //! # #[test] fn egal() {
 //! use std::default::Default;
@@ -122,15 +126,17 @@
 //!              .upload_resumable(fs::File::open("file.ext").unwrap(), "application/octet-stream".parse().unwrap());
 //! 
 //! match result {
-//!     Result::HttpError(err) => println!("HTTPERROR: {:?}", err),
-//!     Result::MissingAPIKey => println!("Auth: Missing API Key - used if there are no scopes"),
-//!     Result::MissingToken => println!("OAuth2: Missing Token"),
-//!     Result::Cancelled => println!("Operation cancelled by user"),
-//!     Result::UploadSizeLimitExceeded(size, max_size) => println!("Upload size too big: {} of {}", size, max_size),
-//!     Result::Failure(_) => println!("General Failure (hyper::client::Response doesn't print)"),
-//!     Result::FieldClash(clashed_field) => println!("You added custom parameter which is part of builder: {:?}", clashed_field),
-//!     Result::JsonDecodeError(err) => println!("Couldn't understand server reply - maybe API needs update: {:?}", err),
-//!     Result::Success(_) => println!("Success (value doesn't print)"),
+//!     Err(e) => match e {
+//!         Error::HttpError(err) => println!("HTTPERROR: {:?}", err),
+//!         Error::MissingAPIKey => println!("Auth: Missing API Key - used if there are no scopes"),
+//!         Error::MissingToken => println!("OAuth2: Missing Token"),
+//!         Error::Cancelled => println!("Operation canceled by user"),
+//!         Error::UploadSizeLimitExceeded(size, max_size) => println!("Upload size too big: {} of {}", size, max_size),
+//!         Error::Failure(_) => println!("General Failure (hyper::client::Response doesn't print)"),
+//!         Error::FieldClash(clashed_field) => println!("You added custom parameter which is part of builder: {:?}", clashed_field),
+//!         Error::JsonDecodeError(err) => println!("Couldn't understand server reply - maybe API needs update: {:?}", err),
+//!     },
+//!     Ok(_) => println!("Success (value doesn't print)"),
 //! }
 //! # }
 //! ```
@@ -143,7 +149,7 @@
 //! When delegates handle errors or intermediate values, they may have a chance to instruct the system to retry. This 
 //! makes the system potentially resilient to all kinds of errors.
 //! 
-//! ## Uploads and Downlods
+//! ## Uploads and Downloads
 //! If a method supports downloads, the response body, which is part of the [Result](enum.Result.html), should be
 //! read by you to obtain the media.
 //! If such a method also supports a [Response Result](trait.ResponseResult.html), it will return that by default.
@@ -166,8 +172,9 @@
 //! ## Optional Parts in Server-Requests
 //! 
 //! All structures provided by this library are made to be [enocodable](trait.RequestValue.html) and 
-//! [decodable](trait.ResponseResult.html) via json. Optionals are used to indicate that partial requests are responses are valid.
-//! Most optionals are are considered [Parts](trait.Part.html) which are identifyable by name, which will be sent to 
+//! [decodable](trait.ResponseResult.html) via *json*. Optionals are used to indicate that partial requests are responses 
+//! are valid.
+//! Most optionals are are considered [Parts](trait.Part.html) which are identifiable by name, which will be sent to 
 //! the server to indicate either the set parts of the request or the desired parts in the response.
 //! 
 //! ## Builder Arguments
@@ -216,7 +223,7 @@ use std::io;
 use std::fs;
 use std::thread::sleep;
 
-pub use cmn::{MultiPartReader, ToParts, MethodInfo, Result, CallBuilder, Hub, ReadSeek, Part, ResponseResult, RequestValue, NestedType, Delegate, DefaultDelegate, ResourceMethodsBuilder, Resource, JsonServerError};
+pub use cmn::{MultiPartReader, ToParts, MethodInfo, Result, Error, CallBuilder, Hub, ReadSeek, Part, ResponseResult, RequestValue, NestedType, Delegate, DefaultDelegate, MethodsBuilder, Resource, JsonServerError};
 
 
 // ##############
@@ -266,7 +273,7 @@ impl Default for Scope {
 /// extern crate hyper;
 /// extern crate "yup-oauth2" as oauth2;
 /// extern crate "google-fusiontables2" as fusiontables2;
-/// use fusiontables2::Result;
+/// use fusiontables2::{Result, Error};
 /// use std::fs;
 /// # #[test] fn egal() {
 /// use std::default::Default;
@@ -294,15 +301,17 @@ impl Default for Scope {
 ///              .upload_resumable(fs::File::open("file.ext").unwrap(), "application/octet-stream".parse().unwrap());
 /// 
 /// match result {
-///     Result::HttpError(err) => println!("HTTPERROR: {:?}", err),
-///     Result::MissingAPIKey => println!("Auth: Missing API Key - used if there are no scopes"),
-///     Result::MissingToken => println!("OAuth2: Missing Token"),
-///     Result::Cancelled => println!("Operation cancelled by user"),
-///     Result::UploadSizeLimitExceeded(size, max_size) => println!("Upload size too big: {} of {}", size, max_size),
-///     Result::Failure(_) => println!("General Failure (hyper::client::Response doesn't print)"),
-///     Result::FieldClash(clashed_field) => println!("You added custom parameter which is part of builder: {:?}", clashed_field),
-///     Result::JsonDecodeError(err) => println!("Couldn't understand server reply - maybe API needs update: {:?}", err),
-///     Result::Success(_) => println!("Success (value doesn't print)"),
+///     Err(e) => match e {
+///         Error::HttpError(err) => println!("HTTPERROR: {:?}", err),
+///         Error::MissingAPIKey => println!("Auth: Missing API Key - used if there are no scopes"),
+///         Error::MissingToken => println!("OAuth2: Missing Token"),
+///         Error::Cancelled => println!("Operation canceled by user"),
+///         Error::UploadSizeLimitExceeded(size, max_size) => println!("Upload size too big: {} of {}", size, max_size),
+///         Error::Failure(_) => println!("General Failure (hyper::client::Response doesn't print)"),
+///         Error::FieldClash(clashed_field) => println!("You added custom parameter which is part of builder: {:?}", clashed_field),
+///         Error::JsonDecodeError(err) => println!("Couldn't understand server reply - maybe API needs update: {:?}", err),
+///     },
+///     Ok(_) => println!("Success (value doesn't print)"),
 /// }
 /// # }
 /// ```
@@ -323,7 +332,7 @@ impl<'a, C, NC, A> Fusiontables<C, NC, A>
         Fusiontables {
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/0.1.1".to_string(),
+            _user_agent: "google-api-rust-client/0.1.2".to_string(),
             _m: PhantomData
         }
     }
@@ -348,7 +357,7 @@ impl<'a, C, NC, A> Fusiontables<C, NC, A>
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/0.1.1`.
+    /// It defaults to `google-api-rust-client/0.1.2`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -362,7 +371,7 @@ impl<'a, C, NC, A> Fusiontables<C, NC, A>
 // ############
 // SCHEMAS ###
 // ##########
-/// A background task on a table, initiated for time and or resource consuming operations such as a column type change or delete all rows operation.
+/// A background task on a table, initiated for time- or resource-consuming operations such as changing column types or deleting all rows.
 /// 
 /// # Activities
 /// 
@@ -374,16 +383,16 @@ impl<'a, C, NC, A> Fusiontables<C, NC, A>
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct Task {
-    /// True if the task is in progress, its progress indicator will indicated where it is, and it can't be deleted.    
+    /// false while the table is busy with some other task. true if this background task is currently running.
     pub started: bool,
-    /// Task percentage completion.    
+    /// Task percentage completion.
     pub progress: String,
-    /// Type name: a template for an individual task.    
+    /// Type of the resource. This is always "fusiontables#task".
     pub kind: String,
-    /// The type of task being executed in the background.    
+    /// Type of background task.
     #[serde(alias="type")]
     pub type_: String,
-    /// Identifier for the task.    
+    /// Identifier for the task.
     #[serde(alias="taskId")]
     pub task_id: String,
 }
@@ -407,38 +416,39 @@ impl ResponseResult for Task {}
 pub struct Column {
     /// Column graph predicate.
     /// Used to map table to graph data model (subject,predicate,object)
-    /// See http://www.w3.org/TR/2014/REC-rdf11-concepts-20140225/#data-model
+    /// See W3C Graph-based Data Model.
     #[serde(alias="graphPredicate")]
     pub graph_predicate: Option<String>,
-    /// Type name: a template for an individual column.    
+    /// The kind of item this is. For a column, this is always fusiontables#column.
     pub kind: Option<String>,
-    /// List of valid values used to validate data and supply a drop-down list of values in the web application.    
+    /// List of valid values used to validate data and supply a drop-down list of values in the web application.
     #[serde(alias="validValues")]
     pub valid_values: Option<Vec<String>>,
-    /// Column description.    
+    /// Column description.
     pub description: Option<String>,
-    /// Identifier of the base column. If present, this column is derived from the specified base column.    
+    /// Identifier of the base column. If present, this column is derived from the specified base column.
     #[serde(alias="baseColumn")]
     pub base_column: Option<ColumnBaseColumn>,
-    /// Identifier for the column.    
+    /// Identifier for the column.
     #[serde(alias="columnId")]
     pub column_id: Option<i32>,
-    /// JSON object containing custom column properties.    
+    /// JSON object containing custom column properties.
     #[serde(alias="columnPropertiesJson")]
     pub column_properties_json: Option<String>,
-    /// Format pattern.    
+    /// Format pattern.
+    /// Acceptable values are DT_DATE_MEDIUMe.g Dec 24, 2008 DT_DATE_SHORTfor example 12/24/08 DT_DATE_TIME_MEDIUMfor example Dec 24, 2008 8:30:45 PM DT_DATE_TIME_SHORTfor example 12/24/08 8:30 PM DT_DAY_MONTH_2_DIGIT_YEARfor example 24/12/08 DT_DAY_MONTH_2_DIGIT_YEAR_TIMEfor example 24/12/08 20:30 DT_DAY_MONTH_2_DIGIT_YEAR_TIME_MERIDIANfor example 24/12/08 8:30 PM DT_DAY_MONTH_4_DIGIT_YEARfor example 24/12/2008 DT_DAY_MONTH_4_DIGIT_YEAR_TIMEfor example 24/12/2008 20:30 DT_DAY_MONTH_4_DIGIT_YEAR_TIME_MERIDIANfor example 24/12/2008 8:30 PM DT_ISO_YEAR_MONTH_DAYfor example 2008-12-24 DT_ISO_YEAR_MONTH_DAY_TIMEfor example 2008-12-24 20:30:45 DT_MONTH_DAY_4_DIGIT_YEARfor example 12/24/2008 DT_TIME_LONGfor example 8:30:45 PM UTC-6 DT_TIME_MEDIUMfor example 8:30:45 PM DT_TIME_SHORTfor example 8:30 PM DT_YEAR_ONLYfor example 2008 HIGHLIGHT_UNTYPED_CELLSHighlight cell data that does not match the data type NONENo formatting (default) NUMBER_CURRENCYfor example $1234.56 NUMBER_DEFAULTfor example 1,234.56 NUMBER_INTEGERfor example 1235 NUMBER_NO_SEPARATORfor example 1234.56 NUMBER_PERCENTfor example 123,456% NUMBER_SCIENTIFICfor example 1E3 STRING_EIGHT_LINE_IMAGEDisplays thumbnail images as tall as eight lines of text STRING_FOUR_LINE_IMAGEDisplays thumbnail images as tall as four lines of text STRING_JSON_TEXTAllows JSON editing of text in UI STRING_LINKTreats cell as a link (must start with http:// or https://) STRING_ONE_LINE_IMAGEDisplays thumbnail images as tall as one line of text STRING_VIDEO_OR_MAPDisplay a video or map thumbnail
     #[serde(alias="formatPattern")]
     pub format_pattern: Option<String>,
-    /// JSON schema for interpreting JSON in this column.    
+    /// JSON schema for interpreting JSON in this column.
     #[serde(alias="columnJsonSchema")]
     pub column_json_schema: Option<String>,
-    /// Type of the column.    
+    /// Type of the column.
     #[serde(alias="type")]
     pub type_: Option<String>,
-    /// If true, data entered via the web application is validated.    
+    /// If true, data entered via the web application is validated.
     #[serde(alias="validateData")]
     pub validate_data: Option<bool>,
-    /// Name of the column.    
+    /// Name of the column.
     pub name: Option<String>,
 }
 
@@ -452,17 +462,17 @@ impl ResponseResult for Column {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Bucket {
-    /// Opacity of the color: 0.0 (transparent) to 1.0 (opaque).    
+    /// Opacity of the color: 0.0 (transparent) to 1.0 (opaque).
     pub opacity: f64,
-    /// Width of a line (in pixels).    
+    /// Width of a line (in pixels).
     pub weight: i32,
-    /// Minimum value in the selected column for a row to be styled according to the bucket color, opacity, icon, or weight.    
+    /// Minimum value in the selected column for a row to be styled according to the bucket color, opacity, icon, or weight.
     pub min: f64,
-    /// Color of line or the interior of a polygon in #RRGGBB format.    
+    /// Color of line or the interior of a polygon in #RRGGBB format.
     pub color: String,
-    /// Maximum value in the selected column for a row to be styled according to the bucket color, opacity, icon, or weight.    
+    /// Maximum value in the selected column for a row to be styled according to the bucket color, opacity, icon, or weight.
     pub max: f64,
-    /// Icon name used for a point.    
+    /// Icon name used for a point.
     pub icon: String,
 }
 
@@ -475,21 +485,21 @@ impl Part for Bucket {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct StyleFunction {
-    /// Gradient function that interpolates a range of colors based on column value.    
+    /// Gradient function that interpolates a range of colors based on column value.
     pub gradient: StyleFunctionGradient,
-    /// Name of the column whose value is used in the style.    
+    /// Name of the column whose value is used in the style.
     #[serde(alias="columnName")]
     pub column_name: String,
-    /// Bucket function that assigns a style based on the range a column value falls into.    
+    /// Bucket function that assigns a style based on the range a column value falls into.
     pub buckets: Vec<Bucket>,
-    /// Stylers can be one of three kinds: "fusiontables#fromColumn" if the column value is to be used as is, i.e., the column values can have colors in #RRGGBBAA format or integer line widths or icon names; "fusiontables#gradient" if the styling of the row is to be based on applying the gradient function on the column value; or "fusiontables#buckets" if the styling is to based on the bucket into which the the column value falls.    
+    /// Stylers can be one of three kinds: "fusiontables#fromColumn if the column value is to be used as is, i.e., the column values can have colors in #RRGGBBAA format or integer line widths or icon names; fusiontables#gradient if the styling of the row is to be based on applying the gradient function on the column value; or fusiontables#buckets if the styling is to based on the bucket into which the the column value falls.
     pub kind: String,
 }
 
 impl Part for StyleFunction {}
 
 
-/// Represents a list of tasks in a table.
+/// Represents a list of tasks for a table.
 /// 
 /// # Activities
 /// 
@@ -500,14 +510,14 @@ impl Part for StyleFunction {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct TaskList {
-    /// Token used to access the next page of this result. No token is displayed if there are no more tokens left.    
+    /// Token used to access the next page of this result. No token is displayed if there are no more pages left.
     #[serde(alias="nextPageToken")]
     pub next_page_token: String,
-    /// List of all requested tasks.    
+    /// List of all requested tasks.
     pub items: Vec<Task>,
-    /// Type name: a list of all tasks.    
+    /// Type of the resource. This is always "fusiontables#taskList".
     pub kind: String,
-    /// Total number of tasks for the table.    
+    /// Total number of tasks for the table.
     #[serde(alias="totalItems")]
     pub total_items: i32,
 }
@@ -521,11 +531,11 @@ impl ResponseResult for TaskList {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct StyleFunctionGradient {
-    /// Higher-end of the interpolation range: rows with this value will be assigned to colors[n-1].    
+    /// Higher-end of the interpolation range: rows with this value will be assigned to colors[n-1].
     pub max: f64,
-    /// Array with two or more colors.    
+    /// Array with two or more colors.
     pub colors: Vec<StyleFunctionGradientColors>,
-    /// Lower-end of the interpolation range: rows with this value will be assigned to colors[0].    
+    /// Lower-end of the interpolation range: rows with this value will be assigned to colors[0].
     pub min: f64,
 }
 
@@ -547,19 +557,19 @@ impl Part for StyleFunctionGradient {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Template {
-    /// Body of the template. It contains HTML with {column_name} to insert values from a particular column. The body is sanitized to remove certain tags, e.g., script. Only one of body or automaticColumns can be specified.    
+    /// Body of the template. It contains HTML with {column_name} to insert values from a particular column. The body is sanitized to remove certain tags, e.g., script. Only one of body or automaticColumns can be specified.
     pub body: Option<String>,
-    /// Type name: a template for the info window contents. The template can either include an HTML body or a list of columns from which the template is computed automatically.    
+    /// The kind of item this is. For a template, this is always fusiontables#template.
     pub kind: Option<String>,
-    /// Identifier for the table for which the template is defined.    
+    /// Identifier for the table for which the template is defined.
     #[serde(alias="tableId")]
     pub table_id: Option<String>,
-    /// Optional name assigned to a template.    
+    /// Optional name assigned to a template.
     pub name: Option<String>,
-    /// Identifier for the template, unique within the context of a particular table.    
+    /// Identifier for the template, unique within the context of a particular table.
     #[serde(alias="templateId")]
     pub template_id: Option<i32>,
-    /// List of columns from which the template is to be automatically constructed. Only one of body or automaticColumns can be specified.    
+    /// List of columns from which the template is to be automatically constructed. Only one of body or automaticColumns can be specified.
     #[serde(alias="automaticColumnNames")]
     pub automatic_column_names: Option<Vec<String>>,
 }
@@ -574,10 +584,10 @@ impl ResponseResult for Template {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ColumnBaseColumn {
-    /// Offset to the entry in the list of base tables in the table definition.    
+    /// Offset to the entry in the list of base tables in the table definition.
     #[serde(alias="tableIndex")]
     pub table_index: i32,
-    /// The id of the column in the base table from which this column is derived.    
+    /// The id of the column in the base table from which this column is derived.
     #[serde(alias="columnId")]
     pub column_id: i32,
 }
@@ -597,14 +607,14 @@ impl Part for ColumnBaseColumn {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct ColumnList {
-    /// Token used to access the next page of this result. No token is displayed if there are no more tokens left.    
+    /// Token used to access the next page of this result. No token is displayed if there are no more pages left.
     #[serde(alias="nextPageToken")]
     pub next_page_token: String,
-    /// List of all requested columns.    
+    /// List of all requested columns.
     pub items: Vec<Column>,
-    /// Type name: a list of all columns.    
+    /// The kind of item this is. For a column list, this is always fusiontables#columnList.
     pub kind: String,
-    /// Total number of columns for the table.    
+    /// Total number of columns for the table.
     #[serde(alias="totalItems")]
     pub total_items: i32,
 }
@@ -623,10 +633,10 @@ impl ResponseResult for ColumnList {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct Import {
-    /// The number of rows received from the import request.    
+    /// The number of rows received from the import request.
     #[serde(alias="numRowsReceived")]
     pub num_rows_received: String,
-    /// Type name: a template for an import request.    
+    /// The kind of item this is. For an import, this is always fusiontables#import.
     pub kind: String,
 }
 
@@ -639,19 +649,19 @@ impl ResponseResult for Import {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct LineStyle {
-    /// Width of the line in pixels.    
+    /// Width of the line in pixels.
     #[serde(alias="strokeWeight")]
     pub stroke_weight: i32,
-    /// Column-value or bucket styler that is used to determine the width of the line.    
+    /// Column-value or bucket styler that is used to determine the width of the line.
     #[serde(alias="strokeWeightStyler")]
     pub stroke_weight_styler: StyleFunction,
-    /// Color of the line in #RRGGBB format.    
+    /// Color of the line in #RRGGBB format.
     #[serde(alias="strokeColor")]
     pub stroke_color: String,
-    /// Opacity of the line : 0.0 (transparent) to 1.0 (opaque).    
+    /// Opacity of the line : 0.0 (transparent) to 1.0 (opaque).
     #[serde(alias="strokeOpacity")]
     pub stroke_opacity: f64,
-    /// Column-value, gradient or buckets styler that is used to determine the line color and opacity.    
+    /// Column-value, gradient or buckets styler that is used to determine the line color and opacity.
     #[serde(alias="strokeColorStyler")]
     pub stroke_color_styler: StyleFunction,
 }
@@ -665,28 +675,28 @@ impl Part for LineStyle {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct PolygonStyle {
-    /// Column-value, gradient or buckets styler that is used to determine the border color and opacity.    
+    /// Column-value, gradient or buckets styler that is used to determine the border color and opacity.
     #[serde(alias="strokeColorStyler")]
     pub stroke_color_styler: StyleFunction,
-    /// Width of the polyon border in pixels.    
+    /// Width of the polyon border in pixels.
     #[serde(alias="strokeWeight")]
     pub stroke_weight: i32,
-    /// Opacity of the polygon border: 0.0 (transparent) to 1.0 (opaque).    
+    /// Opacity of the polygon border: 0.0 (transparent) to 1.0 (opaque).
     #[serde(alias="strokeOpacity")]
     pub stroke_opacity: f64,
-    /// Column-value or bucket styler that is used to determine the width of the polygon border.    
+    /// Column-value or bucket styler that is used to determine the width of the polygon border.
     #[serde(alias="strokeWeightStyler")]
     pub stroke_weight_styler: StyleFunction,
-    /// Column-value, gradient, or bucket styler that is used to determine the interior color and opacity of the polygon.    
+    /// Column-value, gradient, or bucket styler that is used to determine the interior color and opacity of the polygon.
     #[serde(alias="fillColorStyler")]
     pub fill_color_styler: StyleFunction,
-    /// Color of the interior of the polygon in #RRGGBB format.    
+    /// Color of the interior of the polygon in #RRGGBB format.
     #[serde(alias="fillColor")]
     pub fill_color: String,
-    /// Color of the polygon border in #RRGGBB format.    
+    /// Color of the polygon border in #RRGGBB format.
     #[serde(alias="strokeColor")]
     pub stroke_color: String,
-    /// Opacity of the interior of the polygon: 0.0 (transparent) to 1.0 (opaque).    
+    /// Opacity of the interior of the polygon: 0.0 (transparent) to 1.0 (opaque).
     #[serde(alias="fillOpacity")]
     pub fill_opacity: f64,
 }
@@ -705,14 +715,14 @@ impl Part for PolygonStyle {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct StyleSettingList {
-    /// Token used to access the next page of this result. No token is displayed if there are no more styles left.    
+    /// Token used to access the next page of this result. No token is displayed if there are no more styles left.
     #[serde(alias="nextPageToken")]
     pub next_page_token: String,
-    /// All requested style settings.    
+    /// All requested style settings.
     pub items: Vec<StyleSetting>,
-    /// Type name: in this case, a list of style settings.    
+    /// The kind of item this is. For a style list, this is always fusiontables#styleSettingList .
     pub kind: String,
-    /// Total number of styles for the table.    
+    /// Total number of styles for the table.
     #[serde(alias="totalItems")]
     pub total_items: i32,
 }
@@ -720,7 +730,7 @@ pub struct StyleSettingList {
 impl ResponseResult for StyleSettingList {}
 
 
-/// Represents a response to an sql statement.
+/// Represents a response to a SQL statement.
 /// 
 /// # Activities
 /// 
@@ -732,11 +742,11 @@ impl ResponseResult for StyleSettingList {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct Sqlresponse {
-    /// Type name: a template for an individual table.    
+    /// The kind of item this is. For responses to SQL queries, this is always fusiontables#sqlresponse.
     pub kind: String,
-    /// The rows in the table. For each cell we print out whatever cell value (e.g., numeric, string) exists. Thus it is important that each cell contains only one value.    
+    /// The rows in the table. For each cell we print out whatever cell value (e.g., numeric, string) exists. Thus it is important that each cell contains only one value.
     pub rows: Vec<Vec<String>>,
-    /// Columns in the table.    
+    /// Columns in the table.
     pub columns: Vec<String>,
 }
 
@@ -749,10 +759,10 @@ impl ResponseResult for Sqlresponse {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct PointStyle {
-    /// Column or a bucket value from which the icon name is to be determined.    
+    /// Column or a bucket value from which the icon name is to be determined.
     #[serde(alias="iconStyler")]
     pub icon_styler: StyleFunction,
-    /// Name of the icon. Use values defined in http://www.google.com/fusiontables/DataSource?dsrcid=308519    
+    /// Name of the icon. Use values defined in http://www.google.com/fusiontables/DataSource?dsrcid=308519
     #[serde(alias="iconName")]
     pub icon_name: String,
 }
@@ -774,23 +784,23 @@ impl Part for PointStyle {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct StyleSetting {
-    /// Style definition for points in the table.    
+    /// Style definition for points in the table.
     #[serde(alias="markerOptions")]
     pub marker_options: Option<PointStyle>,
-    /// Type name: an individual style setting. A StyleSetting contains the style defintions for points, lines, and polygons in a table. Since a table can have any one or all of them, a style definition can have point, line and polygon style definitions.    
+    /// The kind of item this is. A StyleSetting contains the style definitions for points, lines, and polygons in a table. Since a table can have any one or all of them, a style definition can have point, line and polygon style definitions.
     pub kind: Option<String>,
-    /// Identifier for the table.    
+    /// Identifier for the table.
     #[serde(alias="tableId")]
     pub table_id: Option<String>,
-    /// Optional name for the style setting.    
+    /// Optional name for the style setting.
     pub name: Option<String>,
-    /// Style definition for polygons in the table.    
+    /// Style definition for polygons in the table.
     #[serde(alias="polygonOptions")]
     pub polygon_options: Option<PolygonStyle>,
-    /// Style definition for lines in the table.    
+    /// Style definition for lines in the table.
     #[serde(alias="polylineOptions")]
     pub polyline_options: Option<LineStyle>,
-    /// Identifier for the style setting (unique only within tables).    
+    /// Identifier for the style setting (unique only within tables).
     #[serde(alias="styleId")]
     pub style_id: Option<i32>,
 }
@@ -810,12 +820,12 @@ impl ResponseResult for StyleSetting {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct TableList {
-    /// Token used to access the next page of this result. No token is displayed if there are no more tokens left.    
+    /// Token used to access the next page of this result. No token is displayed if there are no more pages left.
     #[serde(alias="nextPageToken")]
     pub next_page_token: String,
-    /// List of all requested tables.    
+    /// List of all requested tables.
     pub items: Vec<Table>,
-    /// Type name: a list of all tables.    
+    /// The kind of item this is. For table list, this is always fusiontables#tableList.
     pub kind: String,
 }
 
@@ -833,14 +843,14 @@ impl ResponseResult for TableList {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct TemplateList {
-    /// Token used to access the next page of this result. No token is displayed if there are no more tokens left.    
+    /// Token used to access the next page of this result. No token is displayed if there are no more pages left.
     #[serde(alias="nextPageToken")]
     pub next_page_token: String,
-    /// List of all requested templates.    
+    /// List of all requested templates.
     pub items: Vec<Template>,
-    /// Type name: a list of all templates.    
+    /// The kind of item this is. For a template list, this is always fusiontables#templateList .
     pub kind: String,
-    /// Total number of templates for the table.    
+    /// Total number of templates for the table.
     #[serde(alias="totalItems")]
     pub total_items: i32,
 }
@@ -864,38 +874,38 @@ impl ResponseResult for TemplateList {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Table {
-    /// JSON schema for validating the JSON table properties.    
+    /// JSON schema for validating the JSON table properties.
     #[serde(alias="tablePropertiesJsonSchema")]
     pub table_properties_json_schema: Option<String>,
-    /// Type name: a template for an individual table.    
+    /// The kind of item this is. For a table, this is always fusiontables#table.
     pub kind: Option<String>,
-    /// Attribution assigned to the table.    
+    /// Attribution assigned to the table.
     pub attribution: Option<String>,
-    /// Description assigned to the table.    
+    /// Description assigned to the table.
     pub description: Option<String>,
-    /// Default JSON schema for validating all JSON column properties.    
+    /// Default JSON schema for validating all JSON column properties.
     #[serde(alias="columnPropertiesJsonSchema")]
     pub column_properties_json_schema: Option<String>,
-    /// Variable for whether table is exportable.    
+    /// Variable for whether table is exportable.
     #[serde(alias="isExportable")]
     pub is_exportable: Option<bool>,
-    /// Base table identifier if this table is a view or merged table.    
+    /// Base table identifier if this table is a view or merged table.
     #[serde(alias="baseTableIds")]
     pub base_table_ids: Option<Vec<String>>,
-    /// JSON object containing custom table properties.    
+    /// JSON object containing custom table properties.
     #[serde(alias="tablePropertiesJson")]
     pub table_properties_json: Option<String>,
-    /// Optional link for attribution.    
+    /// Optional link for attribution.
     #[serde(alias="attributionLink")]
     pub attribution_link: Option<String>,
-    /// SQL that encodes the table definition for derived tables.    
+    /// SQL that encodes the table definition for derived tables.
     pub sql: Option<String>,
-    /// Encrypted unique alphanumeric identifier for the table.    
+    /// Encrypted unique alphanumeric identifier for the table.
     #[serde(alias="tableId")]
     pub table_id: Option<String>,
-    /// Columns in the table.    
+    /// Columns in the table.
     pub columns: Option<Vec<Column>>,
-    /// Name assigned to a table.    
+    /// Name assigned to a table.
     pub name: Option<String>,
 }
 
@@ -909,9 +919,9 @@ impl ResponseResult for Table {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct StyleFunctionGradientColors {
-    /// Color in #RRGGBB format.    
+    /// Color in #RRGGBB format.
     pub color: String,
-    /// Opacity of the color: 0.0 (transparent) to 1.0 (opaque).    
+    /// Opacity of the color: 0.0 (transparent) to 1.0 (opaque).
     pub opacity: f64,
 }
 
@@ -958,13 +968,17 @@ pub struct StyleMethods<'a, C, NC, A>
     hub: &'a Fusiontables<C, NC, A>,
 }
 
-impl<'a, C, NC, A> ResourceMethodsBuilder for StyleMethods<'a, C, NC, A> {}
+impl<'a, C, NC, A> MethodsBuilder for StyleMethods<'a, C, NC, A> {}
 
 impl<'a, C, NC, A> StyleMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Retrieves a list of styles.    
+    /// Retrieves a list of styles.
+    /// 
+    /// # Arguments
+    ///
+    /// * `tableId` - Table whose styles are being listed
     pub fn list(&self, table_id: &str) -> StyleListCall<'a, C, NC, A> {
         StyleListCall {
             hub: self.hub,
@@ -979,7 +993,13 @@ impl<'a, C, NC, A> StyleMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Updates an existing style.    
+    /// Updates an existing style.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `tableId` - Table whose style is being updated.
+    /// * `styleId` - Identifier (within a table) for the style being updated.
     pub fn update(&self, request: &StyleSetting, table_id: &str, style_id: i32) -> StyleUpdateCall<'a, C, NC, A> {
         StyleUpdateCall {
             hub: self.hub,
@@ -994,7 +1014,12 @@ impl<'a, C, NC, A> StyleMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Adds a new style for the table.    
+    /// Adds a new style for the table.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `tableId` - Table for which a new style is being added
     pub fn insert(&self, request: &StyleSetting, table_id: &str) -> StyleInsertCall<'a, C, NC, A> {
         StyleInsertCall {
             hub: self.hub,
@@ -1008,7 +1033,12 @@ impl<'a, C, NC, A> StyleMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Gets a specific style.    
+    /// Gets a specific style.
+    /// 
+    /// # Arguments
+    ///
+    /// * `tableId` - Table to which the requested style belongs
+    /// * `styleId` - Identifier (integer) for a specific style in a table
     pub fn get(&self, table_id: &str, style_id: i32) -> StyleGetCall<'a, C, NC, A> {
         StyleGetCall {
             hub: self.hub,
@@ -1022,7 +1052,12 @@ impl<'a, C, NC, A> StyleMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Deletes a style.    
+    /// Deletes a style.
+    /// 
+    /// # Arguments
+    ///
+    /// * `tableId` - Table from which the style is being deleted
+    /// * `styleId` - Identifier (within a table) for the style being deleted
     pub fn delete(&self, table_id: &str, style_id: i32) -> StyleDeleteCall<'a, C, NC, A> {
         StyleDeleteCall {
             hub: self.hub,
@@ -1036,7 +1071,13 @@ impl<'a, C, NC, A> StyleMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Updates an existing style. This method supports patch semantics.    
+    /// Updates an existing style. This method supports patch semantics.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `tableId` - Table whose style is being updated.
+    /// * `styleId` - Identifier (within a table) for the style being updated.
     pub fn patch(&self, request: &StyleSetting, table_id: &str, style_id: i32) -> StylePatchCall<'a, C, NC, A> {
         StylePatchCall {
             hub: self.hub,
@@ -1086,13 +1127,17 @@ pub struct TaskMethods<'a, C, NC, A>
     hub: &'a Fusiontables<C, NC, A>,
 }
 
-impl<'a, C, NC, A> ResourceMethodsBuilder for TaskMethods<'a, C, NC, A> {}
+impl<'a, C, NC, A> MethodsBuilder for TaskMethods<'a, C, NC, A> {}
 
 impl<'a, C, NC, A> TaskMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Retrieves a list of tasks.    
+    /// Retrieves a list of tasks.
+    /// 
+    /// # Arguments
+    ///
+    /// * `tableId` - Table whose tasks are being listed.
     pub fn list(&self, table_id: &str) -> TaskListCall<'a, C, NC, A> {
         TaskListCall {
             hub: self.hub,
@@ -1108,7 +1153,12 @@ impl<'a, C, NC, A> TaskMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Deletes the task, unless already started.    
+    /// Deletes a specific task by its ID, unless that task has already started running.
+    /// 
+    /// # Arguments
+    ///
+    /// * `tableId` - Table from which the task is being deleted.
+    /// * `taskId` - The identifier of the task to delete.
     pub fn delete(&self, table_id: &str, task_id: &str) -> TaskDeleteCall<'a, C, NC, A> {
         TaskDeleteCall {
             hub: self.hub,
@@ -1122,7 +1172,12 @@ impl<'a, C, NC, A> TaskMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Retrieves a specific task by its id.    
+    /// Retrieves a specific task by its ID.
+    /// 
+    /// # Arguments
+    ///
+    /// * `tableId` - Table to which the task belongs.
+    /// * `taskId` - The identifier of the task to get.
     pub fn get(&self, table_id: &str, task_id: &str) -> TaskGetCall<'a, C, NC, A> {
         TaskGetCall {
             hub: self.hub,
@@ -1171,13 +1226,18 @@ pub struct ColumnMethods<'a, C, NC, A>
     hub: &'a Fusiontables<C, NC, A>,
 }
 
-impl<'a, C, NC, A> ResourceMethodsBuilder for ColumnMethods<'a, C, NC, A> {}
+impl<'a, C, NC, A> MethodsBuilder for ColumnMethods<'a, C, NC, A> {}
 
 impl<'a, C, NC, A> ColumnMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Adds a new column to the table.    
+    /// Adds a new column to the table.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `tableId` - Table for which a new column is being added.
     pub fn insert(&self, request: &Column, table_id: &str) -> ColumnInsertCall<'a, C, NC, A> {
         ColumnInsertCall {
             hub: self.hub,
@@ -1191,7 +1251,13 @@ impl<'a, C, NC, A> ColumnMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Updates the name or type of an existing column.    
+    /// Updates the name or type of an existing column.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `tableId` - Table for which the column is being updated.
+    /// * `columnId` - Name or identifier for the column that is being updated.
     pub fn update(&self, request: &Column, table_id: &str, column_id: &str) -> ColumnUpdateCall<'a, C, NC, A> {
         ColumnUpdateCall {
             hub: self.hub,
@@ -1206,7 +1272,11 @@ impl<'a, C, NC, A> ColumnMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Retrieves a list of columns.    
+    /// Retrieves a list of columns.
+    /// 
+    /// # Arguments
+    ///
+    /// * `tableId` - Table whose columns are being listed.
     pub fn list(&self, table_id: &str) -> ColumnListCall<'a, C, NC, A> {
         ColumnListCall {
             hub: self.hub,
@@ -1221,7 +1291,13 @@ impl<'a, C, NC, A> ColumnMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Updates the name or type of an existing column. This method supports patch semantics.    
+    /// Updates the name or type of an existing column. This method supports patch semantics.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `tableId` - Table for which the column is being updated.
+    /// * `columnId` - Name or identifier for the column that is being updated.
     pub fn patch(&self, request: &Column, table_id: &str, column_id: &str) -> ColumnPatchCall<'a, C, NC, A> {
         ColumnPatchCall {
             hub: self.hub,
@@ -1236,7 +1312,12 @@ impl<'a, C, NC, A> ColumnMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Deletes the column.    
+    /// Deletes the specified column.
+    /// 
+    /// # Arguments
+    ///
+    /// * `tableId` - Table from which the column is being deleted.
+    /// * `columnId` - Name or identifier for the column being deleted.
     pub fn delete(&self, table_id: &str, column_id: &str) -> ColumnDeleteCall<'a, C, NC, A> {
         ColumnDeleteCall {
             hub: self.hub,
@@ -1250,7 +1331,12 @@ impl<'a, C, NC, A> ColumnMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Retrieves a specific column by its id.    
+    /// Retrieves a specific column by its ID.
+    /// 
+    /// # Arguments
+    ///
+    /// * `tableId` - Table to which the column belongs.
+    /// * `columnId` - Name or identifier for the column that is being requested.
     pub fn get(&self, table_id: &str, column_id: &str) -> ColumnGetCall<'a, C, NC, A> {
         ColumnGetCall {
             hub: self.hub,
@@ -1299,13 +1385,19 @@ pub struct TemplateMethods<'a, C, NC, A>
     hub: &'a Fusiontables<C, NC, A>,
 }
 
-impl<'a, C, NC, A> ResourceMethodsBuilder for TemplateMethods<'a, C, NC, A> {}
+impl<'a, C, NC, A> MethodsBuilder for TemplateMethods<'a, C, NC, A> {}
 
 impl<'a, C, NC, A> TemplateMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Updates an existing template    
+    /// Updates an existing template
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `tableId` - Table to which the updated template belongs
+    /// * `templateId` - Identifier for the template that is being updated
     pub fn update(&self, request: &Template, table_id: &str, template_id: i32) -> TemplateUpdateCall<'a, C, NC, A> {
         TemplateUpdateCall {
             hub: self.hub,
@@ -1320,7 +1412,11 @@ impl<'a, C, NC, A> TemplateMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Retrieves a list of templates.    
+    /// Retrieves a list of templates.
+    /// 
+    /// # Arguments
+    ///
+    /// * `tableId` - Identifier for the table whose templates are being requested
     pub fn list(&self, table_id: &str) -> TemplateListCall<'a, C, NC, A> {
         TemplateListCall {
             hub: self.hub,
@@ -1335,7 +1431,12 @@ impl<'a, C, NC, A> TemplateMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Deletes a template    
+    /// Deletes a template
+    /// 
+    /// # Arguments
+    ///
+    /// * `tableId` - Table from which the template is being deleted
+    /// * `templateId` - Identifier for the template which is being deleted
     pub fn delete(&self, table_id: &str, template_id: i32) -> TemplateDeleteCall<'a, C, NC, A> {
         TemplateDeleteCall {
             hub: self.hub,
@@ -1349,7 +1450,12 @@ impl<'a, C, NC, A> TemplateMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Creates a new template for the table.    
+    /// Creates a new template for the table.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `tableId` - Table for which a new template is being created
     pub fn insert(&self, request: &Template, table_id: &str) -> TemplateInsertCall<'a, C, NC, A> {
         TemplateInsertCall {
             hub: self.hub,
@@ -1363,7 +1469,13 @@ impl<'a, C, NC, A> TemplateMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Updates an existing template. This method supports patch semantics.    
+    /// Updates an existing template. This method supports patch semantics.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `tableId` - Table to which the updated template belongs
+    /// * `templateId` - Identifier for the template that is being updated
     pub fn patch(&self, request: &Template, table_id: &str, template_id: i32) -> TemplatePatchCall<'a, C, NC, A> {
         TemplatePatchCall {
             hub: self.hub,
@@ -1378,7 +1490,12 @@ impl<'a, C, NC, A> TemplateMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Retrieves a specific template by its id    
+    /// Retrieves a specific template by its id
+    /// 
+    /// # Arguments
+    ///
+    /// * `tableId` - Table to which the template belongs
+    /// * `templateId` - Identifier for the template that is being requested
     pub fn get(&self, table_id: &str, template_id: i32) -> TemplateGetCall<'a, C, NC, A> {
         TemplateGetCall {
             hub: self.hub,
@@ -1427,13 +1544,23 @@ pub struct QueryMethods<'a, C, NC, A>
     hub: &'a Fusiontables<C, NC, A>,
 }
 
-impl<'a, C, NC, A> ResourceMethodsBuilder for QueryMethods<'a, C, NC, A> {}
+impl<'a, C, NC, A> MethodsBuilder for QueryMethods<'a, C, NC, A> {}
 
 impl<'a, C, NC, A> QueryMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Executes an SQL SELECT/SHOW/DESCRIBE statement.    
+    /// Executes a SQL statement which can be any of 
+    /// - SELECT
+    /// - SHOW
+    /// - DESCRIBE
+    /// 
+    /// # Arguments
+    ///
+    /// * `sql` - A SQL statement which can be any of 
+    ///           - SELECT
+    ///           - SHOW
+    ///           - DESCRIBE
     pub fn sql_get(&self, sql: &str) -> QuerySqlGetCall<'a, C, NC, A> {
         QuerySqlGetCall {
             hub: self.hub,
@@ -1448,7 +1575,25 @@ impl<'a, C, NC, A> QueryMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Executes an SQL SELECT/INSERT/UPDATE/DELETE/SHOW/DESCRIBE/CREATE statement.    
+    /// Executes a Fusion Tables SQL statement, which can be any of 
+    /// - SELECT
+    /// - INSERT
+    /// - UPDATE
+    /// - DELETE
+    /// - SHOW
+    /// - DESCRIBE
+    /// - CREATE statement.
+    /// 
+    /// # Arguments
+    ///
+    /// * `sql` - A Fusion Tables SQL statement, which can be any of 
+    ///           - SELECT
+    ///           - INSERT
+    ///           - UPDATE
+    ///           - DELETE
+    ///           - SHOW
+    ///           - DESCRIBE
+    ///           - CREATE
     pub fn sql(&self, sql: &str) -> QuerySqlCall<'a, C, NC, A> {
         QuerySqlCall {
             hub: self.hub,
@@ -1498,13 +1643,18 @@ pub struct TableMethods<'a, C, NC, A>
     hub: &'a Fusiontables<C, NC, A>,
 }
 
-impl<'a, C, NC, A> ResourceMethodsBuilder for TableMethods<'a, C, NC, A> {}
+impl<'a, C, NC, A> MethodsBuilder for TableMethods<'a, C, NC, A> {}
 
 impl<'a, C, NC, A> TableMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Updates an existing table. Unless explicitly requested, only the name, description, and attribution will be updated. This method supports patch semantics.    
+    /// Updates an existing table. Unless explicitly requested, only the name, description, and attribution will be updated. This method supports patch semantics.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `tableId` - ID of the table that is being updated.
     pub fn patch(&self, request: &Table, table_id: &str) -> TablePatchCall<'a, C, NC, A> {
         TablePatchCall {
             hub: self.hub,
@@ -1519,7 +1669,11 @@ impl<'a, C, NC, A> TableMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Replaces rows of an existing table. Current rows remain visible until all replacement rows are ready.    
+    /// Replaces rows of an existing table. Current rows remain visible until all replacement rows are ready.
+    /// 
+    /// # Arguments
+    ///
+    /// * `tableId` - Table whose rows will be replaced.
     pub fn replace_rows(&self, table_id: &str) -> TableReplaceRowCall<'a, C, NC, A> {
         TableReplaceRowCall {
             hub: self.hub,
@@ -1537,7 +1691,12 @@ impl<'a, C, NC, A> TableMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Updates an existing table. Unless explicitly requested, only the name, description, and attribution will be updated.    
+    /// Updates an existing table. Unless explicitly requested, only the name, description, and attribution will be updated.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `tableId` - ID of the table that is being updated.
     pub fn update(&self, request: &Table, table_id: &str) -> TableUpdateCall<'a, C, NC, A> {
         TableUpdateCall {
             hub: self.hub,
@@ -1552,7 +1711,11 @@ impl<'a, C, NC, A> TableMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Deletes a table.    
+    /// Deletes a table.
+    /// 
+    /// # Arguments
+    ///
+    /// * `tableId` - ID of the table to be deleted.
     pub fn delete(&self, table_id: &str) -> TableDeleteCall<'a, C, NC, A> {
         TableDeleteCall {
             hub: self.hub,
@@ -1565,7 +1728,11 @@ impl<'a, C, NC, A> TableMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Creates a new table.    
+    /// Creates a new table.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
     pub fn insert(&self, request: &Table) -> TableInsertCall<'a, C, NC, A> {
         TableInsertCall {
             hub: self.hub,
@@ -1578,7 +1745,11 @@ impl<'a, C, NC, A> TableMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Retrieves a specific table by its id.    
+    /// Retrieves a specific table by its ID.
+    /// 
+    /// # Arguments
+    ///
+    /// * `tableId` - Identifier for the table being requested.
     pub fn get(&self, table_id: &str) -> TableGetCall<'a, C, NC, A> {
         TableGetCall {
             hub: self.hub,
@@ -1591,7 +1762,7 @@ impl<'a, C, NC, A> TableMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Retrieves a list of tables a user owns.    
+    /// Retrieves a list of tables a user owns.
     pub fn list(&self) -> TableListCall<'a, C, NC, A> {
         TableListCall {
             hub: self.hub,
@@ -1605,7 +1776,11 @@ impl<'a, C, NC, A> TableMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Import more rows into a table.    
+    /// Imports more rows into a table.
+    /// 
+    /// # Arguments
+    ///
+    /// * `tableId` - The table into which new rows are being imported.
     pub fn import_rows(&self, table_id: &str) -> TableImportRowCall<'a, C, NC, A> {
         TableImportRowCall {
             hub: self.hub,
@@ -1623,7 +1798,11 @@ impl<'a, C, NC, A> TableMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Import a new table.    
+    /// Imports a new table.
+    /// 
+    /// # Arguments
+    ///
+    /// * `name` - The name to be assigned to the new table.
     pub fn import_table(&self, name: &str) -> TableImportTableCall<'a, C, NC, A> {
         TableImportTableCall {
             hub: self.hub,
@@ -1638,7 +1817,11 @@ impl<'a, C, NC, A> TableMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Copies a table.    
+    /// Copies a table.
+    /// 
+    /// # Arguments
+    ///
+    /// * `tableId` - ID of the table that is being copied.
     pub fn copy(&self, table_id: &str) -> TableCopyCall<'a, C, NC, A> {
         TableCopyCall {
             hub: self.hub,
@@ -1662,7 +1845,7 @@ impl<'a, C, NC, A> TableMethods<'a, C, NC, A> {
 /// Retrieves a list of styles.
 ///
 /// A builder for the *list* method supported by a *style* resource.
-/// It is not used directly, but through a `StyleMethods`.
+/// It is not used directly, but through a `StyleMethods` instance.
 ///
 /// # Example
 ///
@@ -1730,7 +1913,7 @@ impl<'a, C, NC, A> StyleListCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
         for &field in ["alt", "tableId", "pageToken", "maxResults"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -1783,7 +1966,7 @@ impl<'a, C, NC, A> StyleListCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -1795,7 +1978,6 @@ impl<'a, C, NC, A> StyleListCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -1805,7 +1987,7 @@ impl<'a, C, NC, A> StyleListCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -1816,7 +1998,7 @@ impl<'a, C, NC, A> StyleListCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -1825,13 +2007,13 @@ impl<'a, C, NC, A> StyleListCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -1843,7 +2025,7 @@ impl<'a, C, NC, A> StyleListCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Table whose styles are being listed    
+    /// Table whose styles are being listed
     pub fn table_id(mut self, new_value: &str) -> StyleListCall<'a, C, NC, A> {
         self._table_id = new_value.to_string();
         self
@@ -1851,7 +2033,7 @@ impl<'a, C, NC, A> StyleListCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     /// Sets the *page token* query property to the given value.
     ///
     /// 
-    /// Continuation token specifying which result page to return. Optional.    
+    /// Continuation token specifying which result page to return. Optional.
     pub fn page_token(mut self, new_value: &str) -> StyleListCall<'a, C, NC, A> {
         self._page_token = Some(new_value.to_string());
         self
@@ -1859,7 +2041,7 @@ impl<'a, C, NC, A> StyleListCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     /// Sets the *max results* query property to the given value.
     ///
     /// 
-    /// Maximum number of styles to return. Optional. Default is 5.    
+    /// Maximum number of styles to return. Optional. Default is 5.
     pub fn max_results(mut self, new_value: u32) -> StyleListCall<'a, C, NC, A> {
         self._max_results = Some(new_value);
         self
@@ -1920,7 +2102,7 @@ impl<'a, C, NC, A> StyleListCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
 /// Updates an existing style.
 ///
 /// A builder for the *update* method supported by a *style* resource.
-/// It is not used directly, but through a `StyleMethods`.
+/// It is not used directly, but through a `StyleMethods` instance.
 ///
 /// # Example
 ///
@@ -1987,7 +2169,7 @@ impl<'a, C, NC, A> StyleUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
         for &field in ["alt", "tableId", "styleId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -2044,7 +2226,7 @@ impl<'a, C, NC, A> StyleUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -2060,7 +2242,6 @@ impl<'a, C, NC, A> StyleUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -2070,7 +2251,7 @@ impl<'a, C, NC, A> StyleUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -2081,7 +2262,7 @@ impl<'a, C, NC, A> StyleUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -2090,13 +2271,13 @@ impl<'a, C, NC, A> StyleUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -2117,7 +2298,7 @@ impl<'a, C, NC, A> StyleUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Table whose style is being updated.    
+    /// Table whose style is being updated.
     pub fn table_id(mut self, new_value: &str) -> StyleUpdateCall<'a, C, NC, A> {
         self._table_id = new_value.to_string();
         self
@@ -2127,7 +2308,7 @@ impl<'a, C, NC, A> StyleUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Identifier (within a table) for the style being updated.    
+    /// Identifier (within a table) for the style being updated.
     pub fn style_id(mut self, new_value: i32) -> StyleUpdateCall<'a, C, NC, A> {
         self._style_id = new_value;
         self
@@ -2188,7 +2369,7 @@ impl<'a, C, NC, A> StyleUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
 /// Adds a new style for the table.
 ///
 /// A builder for the *insert* method supported by a *style* resource.
-/// It is not used directly, but through a `StyleMethods`.
+/// It is not used directly, but through a `StyleMethods` instance.
 ///
 /// # Example
 ///
@@ -2253,7 +2434,7 @@ impl<'a, C, NC, A> StyleInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
         for &field in ["alt", "tableId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -2310,7 +2491,7 @@ impl<'a, C, NC, A> StyleInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -2326,7 +2507,6 @@ impl<'a, C, NC, A> StyleInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -2336,7 +2516,7 @@ impl<'a, C, NC, A> StyleInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -2347,7 +2527,7 @@ impl<'a, C, NC, A> StyleInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -2356,13 +2536,13 @@ impl<'a, C, NC, A> StyleInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -2383,7 +2563,7 @@ impl<'a, C, NC, A> StyleInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Table for which a new style is being added    
+    /// Table for which a new style is being added
     pub fn table_id(mut self, new_value: &str) -> StyleInsertCall<'a, C, NC, A> {
         self._table_id = new_value.to_string();
         self
@@ -2444,7 +2624,7 @@ impl<'a, C, NC, A> StyleInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
 /// Gets a specific style.
 ///
 /// A builder for the *get* method supported by a *style* resource.
-/// It is not used directly, but through a `StyleMethods`.
+/// It is not used directly, but through a `StyleMethods` instance.
 ///
 /// # Example
 ///
@@ -2504,7 +2684,7 @@ impl<'a, C, NC, A> StyleGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
         for &field in ["alt", "tableId", "styleId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -2557,7 +2737,7 @@ impl<'a, C, NC, A> StyleGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -2569,7 +2749,6 @@ impl<'a, C, NC, A> StyleGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -2579,7 +2758,7 @@ impl<'a, C, NC, A> StyleGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -2590,7 +2769,7 @@ impl<'a, C, NC, A> StyleGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -2599,13 +2778,13 @@ impl<'a, C, NC, A> StyleGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -2617,7 +2796,7 @@ impl<'a, C, NC, A> StyleGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Table to which the requested style belongs    
+    /// Table to which the requested style belongs
     pub fn table_id(mut self, new_value: &str) -> StyleGetCall<'a, C, NC, A> {
         self._table_id = new_value.to_string();
         self
@@ -2627,7 +2806,7 @@ impl<'a, C, NC, A> StyleGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Identifier (integer) for a specific style in a table    
+    /// Identifier (integer) for a specific style in a table
     pub fn style_id(mut self, new_value: i32) -> StyleGetCall<'a, C, NC, A> {
         self._style_id = new_value;
         self
@@ -2688,7 +2867,7 @@ impl<'a, C, NC, A> StyleGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
 /// Deletes a style.
 ///
 /// A builder for the *delete* method supported by a *style* resource.
-/// It is not used directly, but through a `StyleMethods`.
+/// It is not used directly, but through a `StyleMethods` instance.
 ///
 /// # Example
 ///
@@ -2748,7 +2927,7 @@ impl<'a, C, NC, A> StyleDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
         for &field in ["tableId", "styleId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -2800,7 +2979,7 @@ impl<'a, C, NC, A> StyleDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -2812,7 +2991,6 @@ impl<'a, C, NC, A> StyleDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -2822,7 +3000,7 @@ impl<'a, C, NC, A> StyleDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -2833,12 +3011,12 @@ impl<'a, C, NC, A> StyleDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = res;
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -2850,7 +3028,7 @@ impl<'a, C, NC, A> StyleDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Table from which the style is being deleted    
+    /// Table from which the style is being deleted
     pub fn table_id(mut self, new_value: &str) -> StyleDeleteCall<'a, C, NC, A> {
         self._table_id = new_value.to_string();
         self
@@ -2860,7 +3038,7 @@ impl<'a, C, NC, A> StyleDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Identifier (within a table) for the style being deleted    
+    /// Identifier (within a table) for the style being deleted
     pub fn style_id(mut self, new_value: i32) -> StyleDeleteCall<'a, C, NC, A> {
         self._style_id = new_value;
         self
@@ -2921,7 +3099,7 @@ impl<'a, C, NC, A> StyleDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
 /// Updates an existing style. This method supports patch semantics.
 ///
 /// A builder for the *patch* method supported by a *style* resource.
-/// It is not used directly, but through a `StyleMethods`.
+/// It is not used directly, but through a `StyleMethods` instance.
 ///
 /// # Example
 ///
@@ -2988,7 +3166,7 @@ impl<'a, C, NC, A> StylePatchCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
         for &field in ["alt", "tableId", "styleId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -3045,7 +3223,7 @@ impl<'a, C, NC, A> StylePatchCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -3061,7 +3239,6 @@ impl<'a, C, NC, A> StylePatchCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -3071,7 +3248,7 @@ impl<'a, C, NC, A> StylePatchCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -3082,7 +3259,7 @@ impl<'a, C, NC, A> StylePatchCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -3091,13 +3268,13 @@ impl<'a, C, NC, A> StylePatchCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -3118,7 +3295,7 @@ impl<'a, C, NC, A> StylePatchCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Table whose style is being updated.    
+    /// Table whose style is being updated.
     pub fn table_id(mut self, new_value: &str) -> StylePatchCall<'a, C, NC, A> {
         self._table_id = new_value.to_string();
         self
@@ -3128,7 +3305,7 @@ impl<'a, C, NC, A> StylePatchCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Identifier (within a table) for the style being updated.    
+    /// Identifier (within a table) for the style being updated.
     pub fn style_id(mut self, new_value: i32) -> StylePatchCall<'a, C, NC, A> {
         self._style_id = new_value;
         self
@@ -3189,7 +3366,7 @@ impl<'a, C, NC, A> StylePatchCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
 /// Retrieves a list of tasks.
 ///
 /// A builder for the *list* method supported by a *task* resource.
-/// It is not used directly, but through a `TaskMethods`.
+/// It is not used directly, but through a `TaskMethods` instance.
 ///
 /// # Example
 ///
@@ -3262,7 +3439,7 @@ impl<'a, C, NC, A> TaskListCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
         for &field in ["alt", "tableId", "startIndex", "pageToken", "maxResults"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -3315,7 +3492,7 @@ impl<'a, C, NC, A> TaskListCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -3327,7 +3504,6 @@ impl<'a, C, NC, A> TaskListCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -3337,7 +3513,7 @@ impl<'a, C, NC, A> TaskListCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -3348,7 +3524,7 @@ impl<'a, C, NC, A> TaskListCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -3357,13 +3533,13 @@ impl<'a, C, NC, A> TaskListCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -3375,7 +3551,7 @@ impl<'a, C, NC, A> TaskListCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Table whose tasks are being listed.    
+    /// Table whose tasks are being listed.
     pub fn table_id(mut self, new_value: &str) -> TaskListCall<'a, C, NC, A> {
         self._table_id = new_value.to_string();
         self
@@ -3383,7 +3559,7 @@ impl<'a, C, NC, A> TaskListCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
     /// Sets the *start index* query property to the given value.
     ///
     /// 
-    /// Index of the first result returned in the current page.    
+    /// Index of the first result returned in the current page.
     pub fn start_index(mut self, new_value: u32) -> TaskListCall<'a, C, NC, A> {
         self._start_index = Some(new_value);
         self
@@ -3391,7 +3567,7 @@ impl<'a, C, NC, A> TaskListCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
     /// Sets the *page token* query property to the given value.
     ///
     /// 
-    /// Continuation token specifying which result page to return.    
+    /// Continuation token specifying which result page to return.
     pub fn page_token(mut self, new_value: &str) -> TaskListCall<'a, C, NC, A> {
         self._page_token = Some(new_value.to_string());
         self
@@ -3399,7 +3575,7 @@ impl<'a, C, NC, A> TaskListCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
     /// Sets the *max results* query property to the given value.
     ///
     /// 
-    /// Maximum number of tasks to return. Default is 5.    
+    /// Maximum number of tasks to return. Default is 5.
     pub fn max_results(mut self, new_value: u32) -> TaskListCall<'a, C, NC, A> {
         self._max_results = Some(new_value);
         self
@@ -3457,10 +3633,10 @@ impl<'a, C, NC, A> TaskListCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
 }
 
 
-/// Deletes the task, unless already started.
+/// Deletes a specific task by its ID, unless that task has already started running.
 ///
 /// A builder for the *delete* method supported by a *task* resource.
-/// It is not used directly, but through a `TaskMethods`.
+/// It is not used directly, but through a `TaskMethods` instance.
 ///
 /// # Example
 ///
@@ -3520,7 +3696,7 @@ impl<'a, C, NC, A> TaskDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
         for &field in ["tableId", "taskId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -3572,7 +3748,7 @@ impl<'a, C, NC, A> TaskDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -3584,7 +3760,6 @@ impl<'a, C, NC, A> TaskDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -3594,7 +3769,7 @@ impl<'a, C, NC, A> TaskDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -3605,12 +3780,12 @@ impl<'a, C, NC, A> TaskDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = res;
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -3622,7 +3797,7 @@ impl<'a, C, NC, A> TaskDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Table from which the task is being deleted.    
+    /// Table from which the task is being deleted.
     pub fn table_id(mut self, new_value: &str) -> TaskDeleteCall<'a, C, NC, A> {
         self._table_id = new_value.to_string();
         self
@@ -3632,6 +3807,7 @@ impl<'a, C, NC, A> TaskDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
+    /// The identifier of the task to delete.
     pub fn task_id(mut self, new_value: &str) -> TaskDeleteCall<'a, C, NC, A> {
         self._task_id = new_value.to_string();
         self
@@ -3689,10 +3865,10 @@ impl<'a, C, NC, A> TaskDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
 }
 
 
-/// Retrieves a specific task by its id.
+/// Retrieves a specific task by its ID.
 ///
 /// A builder for the *get* method supported by a *task* resource.
-/// It is not used directly, but through a `TaskMethods`.
+/// It is not used directly, but through a `TaskMethods` instance.
 ///
 /// # Example
 ///
@@ -3752,7 +3928,7 @@ impl<'a, C, NC, A> TaskGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnec
         for &field in ["alt", "tableId", "taskId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -3805,7 +3981,7 @@ impl<'a, C, NC, A> TaskGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnec
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -3817,7 +3993,6 @@ impl<'a, C, NC, A> TaskGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnec
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -3827,7 +4002,7 @@ impl<'a, C, NC, A> TaskGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnec
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -3838,7 +4013,7 @@ impl<'a, C, NC, A> TaskGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnec
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -3847,13 +4022,13 @@ impl<'a, C, NC, A> TaskGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnec
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -3865,7 +4040,7 @@ impl<'a, C, NC, A> TaskGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnec
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Table to which the task belongs.    
+    /// Table to which the task belongs.
     pub fn table_id(mut self, new_value: &str) -> TaskGetCall<'a, C, NC, A> {
         self._table_id = new_value.to_string();
         self
@@ -3875,6 +4050,7 @@ impl<'a, C, NC, A> TaskGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnec
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
+    /// The identifier of the task to get.
     pub fn task_id(mut self, new_value: &str) -> TaskGetCall<'a, C, NC, A> {
         self._task_id = new_value.to_string();
         self
@@ -3935,7 +4111,7 @@ impl<'a, C, NC, A> TaskGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnec
 /// Adds a new column to the table.
 ///
 /// A builder for the *insert* method supported by a *column* resource.
-/// It is not used directly, but through a `ColumnMethods`.
+/// It is not used directly, but through a `ColumnMethods` instance.
 ///
 /// # Example
 ///
@@ -4000,7 +4176,7 @@ impl<'a, C, NC, A> ColumnInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkC
         for &field in ["alt", "tableId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -4057,7 +4233,7 @@ impl<'a, C, NC, A> ColumnInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkC
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -4073,7 +4249,6 @@ impl<'a, C, NC, A> ColumnInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkC
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -4083,7 +4258,7 @@ impl<'a, C, NC, A> ColumnInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkC
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -4094,7 +4269,7 @@ impl<'a, C, NC, A> ColumnInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkC
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -4103,13 +4278,13 @@ impl<'a, C, NC, A> ColumnInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkC
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -4130,7 +4305,7 @@ impl<'a, C, NC, A> ColumnInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Table for which a new column is being added.    
+    /// Table for which a new column is being added.
     pub fn table_id(mut self, new_value: &str) -> ColumnInsertCall<'a, C, NC, A> {
         self._table_id = new_value.to_string();
         self
@@ -4191,7 +4366,7 @@ impl<'a, C, NC, A> ColumnInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkC
 /// Updates the name or type of an existing column.
 ///
 /// A builder for the *update* method supported by a *column* resource.
-/// It is not used directly, but through a `ColumnMethods`.
+/// It is not used directly, but through a `ColumnMethods` instance.
 ///
 /// # Example
 ///
@@ -4258,7 +4433,7 @@ impl<'a, C, NC, A> ColumnUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkC
         for &field in ["alt", "tableId", "columnId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -4315,7 +4490,7 @@ impl<'a, C, NC, A> ColumnUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkC
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -4331,7 +4506,6 @@ impl<'a, C, NC, A> ColumnUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkC
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -4341,7 +4515,7 @@ impl<'a, C, NC, A> ColumnUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkC
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -4352,7 +4526,7 @@ impl<'a, C, NC, A> ColumnUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkC
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -4361,13 +4535,13 @@ impl<'a, C, NC, A> ColumnUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkC
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -4388,7 +4562,7 @@ impl<'a, C, NC, A> ColumnUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Table for which the column is being updated.    
+    /// Table for which the column is being updated.
     pub fn table_id(mut self, new_value: &str) -> ColumnUpdateCall<'a, C, NC, A> {
         self._table_id = new_value.to_string();
         self
@@ -4398,7 +4572,7 @@ impl<'a, C, NC, A> ColumnUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Name or identifier for the column that is being updated.    
+    /// Name or identifier for the column that is being updated.
     pub fn column_id(mut self, new_value: &str) -> ColumnUpdateCall<'a, C, NC, A> {
         self._column_id = new_value.to_string();
         self
@@ -4459,7 +4633,7 @@ impl<'a, C, NC, A> ColumnUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkC
 /// Retrieves a list of columns.
 ///
 /// A builder for the *list* method supported by a *column* resource.
-/// It is not used directly, but through a `ColumnMethods`.
+/// It is not used directly, but through a `ColumnMethods` instance.
 ///
 /// # Example
 ///
@@ -4527,7 +4701,7 @@ impl<'a, C, NC, A> ColumnListCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
         for &field in ["alt", "tableId", "pageToken", "maxResults"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -4580,7 +4754,7 @@ impl<'a, C, NC, A> ColumnListCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -4592,7 +4766,6 @@ impl<'a, C, NC, A> ColumnListCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -4602,7 +4775,7 @@ impl<'a, C, NC, A> ColumnListCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -4613,7 +4786,7 @@ impl<'a, C, NC, A> ColumnListCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -4622,13 +4795,13 @@ impl<'a, C, NC, A> ColumnListCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -4640,7 +4813,7 @@ impl<'a, C, NC, A> ColumnListCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Table whose columns are being listed.    
+    /// Table whose columns are being listed.
     pub fn table_id(mut self, new_value: &str) -> ColumnListCall<'a, C, NC, A> {
         self._table_id = new_value.to_string();
         self
@@ -4648,7 +4821,7 @@ impl<'a, C, NC, A> ColumnListCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// Sets the *page token* query property to the given value.
     ///
     /// 
-    /// Continuation token specifying which result page to return.    
+    /// Continuation token specifying which result page to return.
     pub fn page_token(mut self, new_value: &str) -> ColumnListCall<'a, C, NC, A> {
         self._page_token = Some(new_value.to_string());
         self
@@ -4656,7 +4829,7 @@ impl<'a, C, NC, A> ColumnListCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// Sets the *max results* query property to the given value.
     ///
     /// 
-    /// Maximum number of columns to return. Default is 5.    
+    /// Maximum number of columns to return. Default is 5.
     pub fn max_results(mut self, new_value: u32) -> ColumnListCall<'a, C, NC, A> {
         self._max_results = Some(new_value);
         self
@@ -4717,7 +4890,7 @@ impl<'a, C, NC, A> ColumnListCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
 /// Updates the name or type of an existing column. This method supports patch semantics.
 ///
 /// A builder for the *patch* method supported by a *column* resource.
-/// It is not used directly, but through a `ColumnMethods`.
+/// It is not used directly, but through a `ColumnMethods` instance.
 ///
 /// # Example
 ///
@@ -4784,7 +4957,7 @@ impl<'a, C, NC, A> ColumnPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
         for &field in ["alt", "tableId", "columnId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -4841,7 +5014,7 @@ impl<'a, C, NC, A> ColumnPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -4857,7 +5030,6 @@ impl<'a, C, NC, A> ColumnPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -4867,7 +5039,7 @@ impl<'a, C, NC, A> ColumnPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -4878,7 +5050,7 @@ impl<'a, C, NC, A> ColumnPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -4887,13 +5059,13 @@ impl<'a, C, NC, A> ColumnPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -4914,7 +5086,7 @@ impl<'a, C, NC, A> ColumnPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Table for which the column is being updated.    
+    /// Table for which the column is being updated.
     pub fn table_id(mut self, new_value: &str) -> ColumnPatchCall<'a, C, NC, A> {
         self._table_id = new_value.to_string();
         self
@@ -4924,7 +5096,7 @@ impl<'a, C, NC, A> ColumnPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Name or identifier for the column that is being updated.    
+    /// Name or identifier for the column that is being updated.
     pub fn column_id(mut self, new_value: &str) -> ColumnPatchCall<'a, C, NC, A> {
         self._column_id = new_value.to_string();
         self
@@ -4982,10 +5154,10 @@ impl<'a, C, NC, A> ColumnPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
 }
 
 
-/// Deletes the column.
+/// Deletes the specified column.
 ///
 /// A builder for the *delete* method supported by a *column* resource.
-/// It is not used directly, but through a `ColumnMethods`.
+/// It is not used directly, but through a `ColumnMethods` instance.
 ///
 /// # Example
 ///
@@ -5045,7 +5217,7 @@ impl<'a, C, NC, A> ColumnDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkC
         for &field in ["tableId", "columnId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -5097,7 +5269,7 @@ impl<'a, C, NC, A> ColumnDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkC
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -5109,7 +5281,6 @@ impl<'a, C, NC, A> ColumnDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkC
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -5119,7 +5290,7 @@ impl<'a, C, NC, A> ColumnDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkC
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -5130,12 +5301,12 @@ impl<'a, C, NC, A> ColumnDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkC
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = res;
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -5147,7 +5318,7 @@ impl<'a, C, NC, A> ColumnDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Table from which the column is being deleted.    
+    /// Table from which the column is being deleted.
     pub fn table_id(mut self, new_value: &str) -> ColumnDeleteCall<'a, C, NC, A> {
         self._table_id = new_value.to_string();
         self
@@ -5157,7 +5328,7 @@ impl<'a, C, NC, A> ColumnDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Name or identifier for the column being deleted.    
+    /// Name or identifier for the column being deleted.
     pub fn column_id(mut self, new_value: &str) -> ColumnDeleteCall<'a, C, NC, A> {
         self._column_id = new_value.to_string();
         self
@@ -5215,10 +5386,10 @@ impl<'a, C, NC, A> ColumnDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkC
 }
 
 
-/// Retrieves a specific column by its id.
+/// Retrieves a specific column by its ID.
 ///
 /// A builder for the *get* method supported by a *column* resource.
-/// It is not used directly, but through a `ColumnMethods`.
+/// It is not used directly, but through a `ColumnMethods` instance.
 ///
 /// # Example
 ///
@@ -5278,7 +5449,7 @@ impl<'a, C, NC, A> ColumnGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
         for &field in ["alt", "tableId", "columnId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -5331,7 +5502,7 @@ impl<'a, C, NC, A> ColumnGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -5343,7 +5514,6 @@ impl<'a, C, NC, A> ColumnGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -5353,7 +5523,7 @@ impl<'a, C, NC, A> ColumnGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -5364,7 +5534,7 @@ impl<'a, C, NC, A> ColumnGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -5373,13 +5543,13 @@ impl<'a, C, NC, A> ColumnGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -5391,7 +5561,7 @@ impl<'a, C, NC, A> ColumnGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Table to which the column belongs.    
+    /// Table to which the column belongs.
     pub fn table_id(mut self, new_value: &str) -> ColumnGetCall<'a, C, NC, A> {
         self._table_id = new_value.to_string();
         self
@@ -5401,7 +5571,7 @@ impl<'a, C, NC, A> ColumnGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Name or identifier for the column that is being requested.    
+    /// Name or identifier for the column that is being requested.
     pub fn column_id(mut self, new_value: &str) -> ColumnGetCall<'a, C, NC, A> {
         self._column_id = new_value.to_string();
         self
@@ -5462,7 +5632,7 @@ impl<'a, C, NC, A> ColumnGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
 /// Updates an existing template
 ///
 /// A builder for the *update* method supported by a *template* resource.
-/// It is not used directly, but through a `TemplateMethods`.
+/// It is not used directly, but through a `TemplateMethods` instance.
 ///
 /// # Example
 ///
@@ -5529,7 +5699,7 @@ impl<'a, C, NC, A> TemplateUpdateCall<'a, C, NC, A> where NC: hyper::net::Networ
         for &field in ["alt", "tableId", "templateId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -5586,7 +5756,7 @@ impl<'a, C, NC, A> TemplateUpdateCall<'a, C, NC, A> where NC: hyper::net::Networ
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -5602,7 +5772,6 @@ impl<'a, C, NC, A> TemplateUpdateCall<'a, C, NC, A> where NC: hyper::net::Networ
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -5612,7 +5781,7 @@ impl<'a, C, NC, A> TemplateUpdateCall<'a, C, NC, A> where NC: hyper::net::Networ
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -5623,7 +5792,7 @@ impl<'a, C, NC, A> TemplateUpdateCall<'a, C, NC, A> where NC: hyper::net::Networ
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -5632,13 +5801,13 @@ impl<'a, C, NC, A> TemplateUpdateCall<'a, C, NC, A> where NC: hyper::net::Networ
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -5659,7 +5828,7 @@ impl<'a, C, NC, A> TemplateUpdateCall<'a, C, NC, A> where NC: hyper::net::Networ
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Table to which the updated template belongs    
+    /// Table to which the updated template belongs
     pub fn table_id(mut self, new_value: &str) -> TemplateUpdateCall<'a, C, NC, A> {
         self._table_id = new_value.to_string();
         self
@@ -5669,7 +5838,7 @@ impl<'a, C, NC, A> TemplateUpdateCall<'a, C, NC, A> where NC: hyper::net::Networ
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Identifier for the template that is being updated    
+    /// Identifier for the template that is being updated
     pub fn template_id(mut self, new_value: i32) -> TemplateUpdateCall<'a, C, NC, A> {
         self._template_id = new_value;
         self
@@ -5730,7 +5899,7 @@ impl<'a, C, NC, A> TemplateUpdateCall<'a, C, NC, A> where NC: hyper::net::Networ
 /// Retrieves a list of templates.
 ///
 /// A builder for the *list* method supported by a *template* resource.
-/// It is not used directly, but through a `TemplateMethods`.
+/// It is not used directly, but through a `TemplateMethods` instance.
 ///
 /// # Example
 ///
@@ -5798,7 +5967,7 @@ impl<'a, C, NC, A> TemplateListCall<'a, C, NC, A> where NC: hyper::net::NetworkC
         for &field in ["alt", "tableId", "pageToken", "maxResults"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -5851,7 +6020,7 @@ impl<'a, C, NC, A> TemplateListCall<'a, C, NC, A> where NC: hyper::net::NetworkC
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -5863,7 +6032,6 @@ impl<'a, C, NC, A> TemplateListCall<'a, C, NC, A> where NC: hyper::net::NetworkC
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -5873,7 +6041,7 @@ impl<'a, C, NC, A> TemplateListCall<'a, C, NC, A> where NC: hyper::net::NetworkC
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -5884,7 +6052,7 @@ impl<'a, C, NC, A> TemplateListCall<'a, C, NC, A> where NC: hyper::net::NetworkC
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -5893,13 +6061,13 @@ impl<'a, C, NC, A> TemplateListCall<'a, C, NC, A> where NC: hyper::net::NetworkC
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -5911,7 +6079,7 @@ impl<'a, C, NC, A> TemplateListCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Identifier for the table whose templates are being requested    
+    /// Identifier for the table whose templates are being requested
     pub fn table_id(mut self, new_value: &str) -> TemplateListCall<'a, C, NC, A> {
         self._table_id = new_value.to_string();
         self
@@ -5919,7 +6087,7 @@ impl<'a, C, NC, A> TemplateListCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// Sets the *page token* query property to the given value.
     ///
     /// 
-    /// Continuation token specifying which results page to return. Optional.    
+    /// Continuation token specifying which results page to return. Optional.
     pub fn page_token(mut self, new_value: &str) -> TemplateListCall<'a, C, NC, A> {
         self._page_token = Some(new_value.to_string());
         self
@@ -5927,7 +6095,7 @@ impl<'a, C, NC, A> TemplateListCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// Sets the *max results* query property to the given value.
     ///
     /// 
-    /// Maximum number of templates to return. Optional. Default is 5.    
+    /// Maximum number of templates to return. Optional. Default is 5.
     pub fn max_results(mut self, new_value: u32) -> TemplateListCall<'a, C, NC, A> {
         self._max_results = Some(new_value);
         self
@@ -5988,7 +6156,7 @@ impl<'a, C, NC, A> TemplateListCall<'a, C, NC, A> where NC: hyper::net::NetworkC
 /// Deletes a template
 ///
 /// A builder for the *delete* method supported by a *template* resource.
-/// It is not used directly, but through a `TemplateMethods`.
+/// It is not used directly, but through a `TemplateMethods` instance.
 ///
 /// # Example
 ///
@@ -6048,7 +6216,7 @@ impl<'a, C, NC, A> TemplateDeleteCall<'a, C, NC, A> where NC: hyper::net::Networ
         for &field in ["tableId", "templateId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -6100,7 +6268,7 @@ impl<'a, C, NC, A> TemplateDeleteCall<'a, C, NC, A> where NC: hyper::net::Networ
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -6112,7 +6280,6 @@ impl<'a, C, NC, A> TemplateDeleteCall<'a, C, NC, A> where NC: hyper::net::Networ
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -6122,7 +6289,7 @@ impl<'a, C, NC, A> TemplateDeleteCall<'a, C, NC, A> where NC: hyper::net::Networ
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -6133,12 +6300,12 @@ impl<'a, C, NC, A> TemplateDeleteCall<'a, C, NC, A> where NC: hyper::net::Networ
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = res;
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -6150,7 +6317,7 @@ impl<'a, C, NC, A> TemplateDeleteCall<'a, C, NC, A> where NC: hyper::net::Networ
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Table from which the template is being deleted    
+    /// Table from which the template is being deleted
     pub fn table_id(mut self, new_value: &str) -> TemplateDeleteCall<'a, C, NC, A> {
         self._table_id = new_value.to_string();
         self
@@ -6160,7 +6327,7 @@ impl<'a, C, NC, A> TemplateDeleteCall<'a, C, NC, A> where NC: hyper::net::Networ
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Identifier for the template which is being deleted    
+    /// Identifier for the template which is being deleted
     pub fn template_id(mut self, new_value: i32) -> TemplateDeleteCall<'a, C, NC, A> {
         self._template_id = new_value;
         self
@@ -6221,7 +6388,7 @@ impl<'a, C, NC, A> TemplateDeleteCall<'a, C, NC, A> where NC: hyper::net::Networ
 /// Creates a new template for the table.
 ///
 /// A builder for the *insert* method supported by a *template* resource.
-/// It is not used directly, but through a `TemplateMethods`.
+/// It is not used directly, but through a `TemplateMethods` instance.
 ///
 /// # Example
 ///
@@ -6286,7 +6453,7 @@ impl<'a, C, NC, A> TemplateInsertCall<'a, C, NC, A> where NC: hyper::net::Networ
         for &field in ["alt", "tableId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -6343,7 +6510,7 @@ impl<'a, C, NC, A> TemplateInsertCall<'a, C, NC, A> where NC: hyper::net::Networ
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -6359,7 +6526,6 @@ impl<'a, C, NC, A> TemplateInsertCall<'a, C, NC, A> where NC: hyper::net::Networ
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -6369,7 +6535,7 @@ impl<'a, C, NC, A> TemplateInsertCall<'a, C, NC, A> where NC: hyper::net::Networ
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -6380,7 +6546,7 @@ impl<'a, C, NC, A> TemplateInsertCall<'a, C, NC, A> where NC: hyper::net::Networ
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -6389,13 +6555,13 @@ impl<'a, C, NC, A> TemplateInsertCall<'a, C, NC, A> where NC: hyper::net::Networ
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -6416,7 +6582,7 @@ impl<'a, C, NC, A> TemplateInsertCall<'a, C, NC, A> where NC: hyper::net::Networ
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Table for which a new template is being created    
+    /// Table for which a new template is being created
     pub fn table_id(mut self, new_value: &str) -> TemplateInsertCall<'a, C, NC, A> {
         self._table_id = new_value.to_string();
         self
@@ -6477,7 +6643,7 @@ impl<'a, C, NC, A> TemplateInsertCall<'a, C, NC, A> where NC: hyper::net::Networ
 /// Updates an existing template. This method supports patch semantics.
 ///
 /// A builder for the *patch* method supported by a *template* resource.
-/// It is not used directly, but through a `TemplateMethods`.
+/// It is not used directly, but through a `TemplateMethods` instance.
 ///
 /// # Example
 ///
@@ -6544,7 +6710,7 @@ impl<'a, C, NC, A> TemplatePatchCall<'a, C, NC, A> where NC: hyper::net::Network
         for &field in ["alt", "tableId", "templateId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -6601,7 +6767,7 @@ impl<'a, C, NC, A> TemplatePatchCall<'a, C, NC, A> where NC: hyper::net::Network
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -6617,7 +6783,6 @@ impl<'a, C, NC, A> TemplatePatchCall<'a, C, NC, A> where NC: hyper::net::Network
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -6627,7 +6792,7 @@ impl<'a, C, NC, A> TemplatePatchCall<'a, C, NC, A> where NC: hyper::net::Network
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -6638,7 +6803,7 @@ impl<'a, C, NC, A> TemplatePatchCall<'a, C, NC, A> where NC: hyper::net::Network
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -6647,13 +6812,13 @@ impl<'a, C, NC, A> TemplatePatchCall<'a, C, NC, A> where NC: hyper::net::Network
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -6674,7 +6839,7 @@ impl<'a, C, NC, A> TemplatePatchCall<'a, C, NC, A> where NC: hyper::net::Network
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Table to which the updated template belongs    
+    /// Table to which the updated template belongs
     pub fn table_id(mut self, new_value: &str) -> TemplatePatchCall<'a, C, NC, A> {
         self._table_id = new_value.to_string();
         self
@@ -6684,7 +6849,7 @@ impl<'a, C, NC, A> TemplatePatchCall<'a, C, NC, A> where NC: hyper::net::Network
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Identifier for the template that is being updated    
+    /// Identifier for the template that is being updated
     pub fn template_id(mut self, new_value: i32) -> TemplatePatchCall<'a, C, NC, A> {
         self._template_id = new_value;
         self
@@ -6745,7 +6910,7 @@ impl<'a, C, NC, A> TemplatePatchCall<'a, C, NC, A> where NC: hyper::net::Network
 /// Retrieves a specific template by its id
 ///
 /// A builder for the *get* method supported by a *template* resource.
-/// It is not used directly, but through a `TemplateMethods`.
+/// It is not used directly, but through a `TemplateMethods` instance.
 ///
 /// # Example
 ///
@@ -6805,7 +6970,7 @@ impl<'a, C, NC, A> TemplateGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
         for &field in ["alt", "tableId", "templateId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -6858,7 +7023,7 @@ impl<'a, C, NC, A> TemplateGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -6870,7 +7035,6 @@ impl<'a, C, NC, A> TemplateGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -6880,7 +7044,7 @@ impl<'a, C, NC, A> TemplateGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -6891,7 +7055,7 @@ impl<'a, C, NC, A> TemplateGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -6900,13 +7064,13 @@ impl<'a, C, NC, A> TemplateGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -6918,7 +7082,7 @@ impl<'a, C, NC, A> TemplateGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Table to which the template belongs    
+    /// Table to which the template belongs
     pub fn table_id(mut self, new_value: &str) -> TemplateGetCall<'a, C, NC, A> {
         self._table_id = new_value.to_string();
         self
@@ -6928,7 +7092,7 @@ impl<'a, C, NC, A> TemplateGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Identifier for the template that is being requested    
+    /// Identifier for the template that is being requested
     pub fn template_id(mut self, new_value: i32) -> TemplateGetCall<'a, C, NC, A> {
         self._template_id = new_value;
         self
@@ -6986,7 +7150,10 @@ impl<'a, C, NC, A> TemplateGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
 }
 
 
-/// Executes an SQL SELECT/SHOW/DESCRIBE statement.
+/// Executes a SQL statement which can be any of 
+/// - SELECT
+/// - SHOW
+/// - DESCRIBE
 ///
 /// This method supports **media download**. To enable it, adjust the builder like this:
 /// `.param("alt", "media")`.
@@ -6994,7 +7161,7 @@ impl<'a, C, NC, A> TemplateGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
 /// but not the `Sqlresponse` structure that you would usually get. The latter will be a default value.
 ///
 /// A builder for the *sqlGet* method supported by a *query* resource.
-/// It is not used directly, but through a `QueryMethods`.
+/// It is not used directly, but through a `QueryMethods` instance.
 ///
 /// # Example
 ///
@@ -7062,7 +7229,7 @@ impl<'a, C, NC, A> QuerySqlGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
         for &field in ["sql", "typed", "hdrs"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -7107,7 +7274,7 @@ impl<'a, C, NC, A> QuerySqlGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -7119,7 +7286,6 @@ impl<'a, C, NC, A> QuerySqlGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -7129,7 +7295,7 @@ impl<'a, C, NC, A> QuerySqlGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -7140,7 +7306,7 @@ impl<'a, C, NC, A> QuerySqlGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = if enable_resource_parsing {
                         let mut json_response = String::new();
@@ -7149,13 +7315,13 @@ impl<'a, C, NC, A> QuerySqlGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     } else { (res, Default::default()) };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -7167,7 +7333,10 @@ impl<'a, C, NC, A> QuerySqlGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// An SQL SELECT/SHOW/DESCRIBE statement.    
+    /// A SQL statement which can be any of 
+    /// - SELECT
+    /// - SHOW
+    /// - DESCRIBE
     pub fn sql(mut self, new_value: &str) -> QuerySqlGetCall<'a, C, NC, A> {
         self._sql = new_value.to_string();
         self
@@ -7175,7 +7344,7 @@ impl<'a, C, NC, A> QuerySqlGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// Sets the *typed* query property to the given value.
     ///
     /// 
-    /// Should typed values be returned in the (JSON) response -- numbers for numeric values and parsed geometries for KML values? Default is true.    
+    /// Whether typed values are returned in the (JSON) response: numbers for numeric values and parsed geometries for KML values. Default is true.
     pub fn typed(mut self, new_value: bool) -> QuerySqlGetCall<'a, C, NC, A> {
         self._typed = Some(new_value);
         self
@@ -7183,7 +7352,7 @@ impl<'a, C, NC, A> QuerySqlGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// Sets the *hdrs* query property to the given value.
     ///
     /// 
-    /// Should column names be included (in the first row)?. Default is true.    
+    /// Whether column names are included (in the first row). Default is true.
     pub fn hdrs(mut self, new_value: bool) -> QuerySqlGetCall<'a, C, NC, A> {
         self._hdrs = Some(new_value);
         self
@@ -7241,7 +7410,14 @@ impl<'a, C, NC, A> QuerySqlGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
 }
 
 
-/// Executes an SQL SELECT/INSERT/UPDATE/DELETE/SHOW/DESCRIBE/CREATE statement.
+/// Executes a Fusion Tables SQL statement, which can be any of 
+/// - SELECT
+/// - INSERT
+/// - UPDATE
+/// - DELETE
+/// - SHOW
+/// - DESCRIBE
+/// - CREATE statement.
 ///
 /// This method supports **media download**. To enable it, adjust the builder like this:
 /// `.param("alt", "media")`.
@@ -7249,7 +7425,7 @@ impl<'a, C, NC, A> QuerySqlGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
 /// but not the `Sqlresponse` structure that you would usually get. The latter will be a default value.
 ///
 /// A builder for the *sql* method supported by a *query* resource.
-/// It is not used directly, but through a `QueryMethods`.
+/// It is not used directly, but through a `QueryMethods` instance.
 ///
 /// # Example
 ///
@@ -7317,7 +7493,7 @@ impl<'a, C, NC, A> QuerySqlCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
         for &field in ["sql", "typed", "hdrs"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -7362,7 +7538,7 @@ impl<'a, C, NC, A> QuerySqlCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -7374,7 +7550,6 @@ impl<'a, C, NC, A> QuerySqlCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -7384,7 +7559,7 @@ impl<'a, C, NC, A> QuerySqlCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -7395,7 +7570,7 @@ impl<'a, C, NC, A> QuerySqlCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = if enable_resource_parsing {
                         let mut json_response = String::new();
@@ -7404,13 +7579,13 @@ impl<'a, C, NC, A> QuerySqlCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     } else { (res, Default::default()) };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -7422,7 +7597,14 @@ impl<'a, C, NC, A> QuerySqlCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// An SQL SELECT/SHOW/DESCRIBE/INSERT/UPDATE/DELETE/CREATE statement.    
+    /// A Fusion Tables SQL statement, which can be any of 
+    /// - SELECT
+    /// - INSERT
+    /// - UPDATE
+    /// - DELETE
+    /// - SHOW
+    /// - DESCRIBE
+    /// - CREATE
     pub fn sql(mut self, new_value: &str) -> QuerySqlCall<'a, C, NC, A> {
         self._sql = new_value.to_string();
         self
@@ -7430,7 +7612,7 @@ impl<'a, C, NC, A> QuerySqlCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
     /// Sets the *typed* query property to the given value.
     ///
     /// 
-    /// Should typed values be returned in the (JSON) response -- numbers for numeric values and parsed geometries for KML values? Default is true.    
+    /// Whether typed values are returned in the (JSON) response: numbers for numeric values and parsed geometries for KML values. Default is true.
     pub fn typed(mut self, new_value: bool) -> QuerySqlCall<'a, C, NC, A> {
         self._typed = Some(new_value);
         self
@@ -7438,7 +7620,7 @@ impl<'a, C, NC, A> QuerySqlCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
     /// Sets the *hdrs* query property to the given value.
     ///
     /// 
-    /// Should column names be included (in the first row)?. Default is true.    
+    /// Whether column names are included in the first row. Default is true.
     pub fn hdrs(mut self, new_value: bool) -> QuerySqlCall<'a, C, NC, A> {
         self._hdrs = Some(new_value);
         self
@@ -7499,7 +7681,7 @@ impl<'a, C, NC, A> QuerySqlCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
 /// Updates an existing table. Unless explicitly requested, only the name, description, and attribution will be updated. This method supports patch semantics.
 ///
 /// A builder for the *patch* method supported by a *table* resource.
-/// It is not used directly, but through a `TableMethods`.
+/// It is not used directly, but through a `TableMethods` instance.
 ///
 /// # Example
 ///
@@ -7569,7 +7751,7 @@ impl<'a, C, NC, A> TablePatchCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
         for &field in ["alt", "tableId", "replaceViewDefinition"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -7626,7 +7808,7 @@ impl<'a, C, NC, A> TablePatchCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -7642,7 +7824,6 @@ impl<'a, C, NC, A> TablePatchCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -7652,7 +7833,7 @@ impl<'a, C, NC, A> TablePatchCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -7663,7 +7844,7 @@ impl<'a, C, NC, A> TablePatchCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -7672,13 +7853,13 @@ impl<'a, C, NC, A> TablePatchCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -7699,7 +7880,7 @@ impl<'a, C, NC, A> TablePatchCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// ID of the table that is being updated.    
+    /// ID of the table that is being updated.
     pub fn table_id(mut self, new_value: &str) -> TablePatchCall<'a, C, NC, A> {
         self._table_id = new_value.to_string();
         self
@@ -7707,7 +7888,7 @@ impl<'a, C, NC, A> TablePatchCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// Sets the *replace view definition* query property to the given value.
     ///
     /// 
-    /// Should the view definition also be updated? The specified view definition replaces the existing one. Only a view can be updated with a new definition.    
+    /// Whether the view definition is also updated. The specified view definition replaces the existing one. Only a view can be updated with a new definition.
     pub fn replace_view_definition(mut self, new_value: bool) -> TablePatchCall<'a, C, NC, A> {
         self._replace_view_definition = Some(new_value);
         self
@@ -7768,7 +7949,7 @@ impl<'a, C, NC, A> TablePatchCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
 /// Replaces rows of an existing table. Current rows remain visible until all replacement rows are ready.
 ///
 /// A builder for the *replaceRows* method supported by a *table* resource.
-/// It is not used directly, but through a `TableMethods`.
+/// It is not used directly, but through a `TableMethods` instance.
 ///
 /// # Example
 ///
@@ -7853,7 +8034,7 @@ impl<'a, C, NC, A> TableReplaceRowCall<'a, C, NC, A> where NC: hyper::net::Netwo
         for &field in ["alt", "tableId", "startLine", "isStrict", "endLine", "encoding", "delimiter"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -7916,7 +8097,7 @@ impl<'a, C, NC, A> TableReplaceRowCall<'a, C, NC, A> where NC: hyper::net::Netwo
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -7942,7 +8123,7 @@ impl<'a, C, NC, A> TableReplaceRowCall<'a, C, NC, A> where NC: hyper::net::Netwo
                         let size = reader.seek(io::SeekFrom::End(0)).unwrap();
                     reader.seek(io::SeekFrom::Start(0)).unwrap();
                     if size > 262144000 {
-                    	return Result::UploadSizeLimitExceeded(size, 262144000)
+                    	return Err(Error::UploadSizeLimitExceeded(size, 262144000))
                     }
                         req = req.header(ContentType(reader_mime_type.clone()))
                                  .header(ContentLength(size))
@@ -7955,7 +8136,6 @@ impl<'a, C, NC, A> TableReplaceRowCall<'a, C, NC, A> where NC: hyper::net::Netwo
     
                     dlg.pre_request();
                     req.send()
-    
                 }
             };
 
@@ -7966,7 +8146,7 @@ impl<'a, C, NC, A> TableReplaceRowCall<'a, C, NC, A> where NC: hyper::net::Netwo
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -7977,13 +8157,13 @@ impl<'a, C, NC, A> TableReplaceRowCall<'a, C, NC, A> where NC: hyper::net::Netwo
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     if protocol == "resumable" {
                         let size = reader.seek(io::SeekFrom::End(0)).unwrap();
                         reader.seek(io::SeekFrom::Start(0)).unwrap();
                         if size > 262144000 {
-                        	return Result::UploadSizeLimitExceeded(size, 262144000)
+                        	return Err(Error::UploadSizeLimitExceeded(size, 262144000))
                         }
                         let mut client = &mut *self.hub.client.borrow_mut();
                         let upload_result = {
@@ -8008,17 +8188,17 @@ impl<'a, C, NC, A> TableReplaceRowCall<'a, C, NC, A> where NC: hyper::net::Netwo
                         match upload_result {
                             None => {
                                 dlg.finished(false);
-                                return Result::Cancelled
+                                return Err(Error::Cancelled)
                             }
                             Some(Err(err)) => {
                                 dlg.finished(false);
-                                return Result::HttpError(err)
+                                return Err(Error::HttpError(err))
                             }
                             Some(Ok(upload_result)) => {
                                 res = upload_result;
                                 if !res.status.is_success() {
                                     dlg.finished(false);
-                                    return Result::Failure(res)
+                                    return Err(Error::Failure(res))
                                 }
                             }
                         }
@@ -8030,13 +8210,13 @@ impl<'a, C, NC, A> TableReplaceRowCall<'a, C, NC, A> where NC: hyper::net::Netwo
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -8052,11 +8232,14 @@ impl<'a, C, NC, A> TableReplaceRowCall<'a, C, NC, A> where NC: hyper::net::Netwo
                 where RS: ReadSeek {
         self.doit(stream, mime_type, "simple")
     }
-    /// Upload media in a resumeable fashion.
+    /// Upload media in a resumable fashion.
     /// Even if the upload fails or is interrupted, it can be resumed for a 
     /// certain amount of time as the server maintains state temporarily.
     /// 
-    /// TODO: Write more about how delegation works in this particular case.
+    /// The delegate will be asked for an `upload_url()`, and if not provided, will be asked to store an upload URL 
+    /// that was provided by the server, using `store_upload_url(...)`. The upload will be done in chunks, the delegate
+    /// may specify the `chunk_size()` and may cancel the operation before each chunk is uploaded, using
+    /// `cancel_chunk_upload(...)`.
     ///
     /// * *max size*: 250MB
     /// * *multipart*: yes
@@ -8071,7 +8254,7 @@ impl<'a, C, NC, A> TableReplaceRowCall<'a, C, NC, A> where NC: hyper::net::Netwo
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Table whose rows will be replaced.    
+    /// Table whose rows will be replaced.
     pub fn table_id(mut self, new_value: &str) -> TableReplaceRowCall<'a, C, NC, A> {
         self._table_id = new_value.to_string();
         self
@@ -8079,7 +8262,7 @@ impl<'a, C, NC, A> TableReplaceRowCall<'a, C, NC, A> where NC: hyper::net::Netwo
     /// Sets the *start line* query property to the given value.
     ///
     /// 
-    /// The index of the first line from which to start importing, inclusive. Default is 0.    
+    /// The index of the first line from which to start importing, inclusive. Default is 0.
     pub fn start_line(mut self, new_value: i32) -> TableReplaceRowCall<'a, C, NC, A> {
         self._start_line = Some(new_value);
         self
@@ -8087,7 +8270,7 @@ impl<'a, C, NC, A> TableReplaceRowCall<'a, C, NC, A> where NC: hyper::net::Netwo
     /// Sets the *is strict* query property to the given value.
     ///
     /// 
-    /// Whether the CSV must have the same number of column values for each row. If true, throws an exception if the CSV does not not have the same number of columns. If false, rows with fewer column values will be padded with empty values. Default is true.    
+    /// Whether the imported CSV must have the same number of column values for each row. If true, throws an exception if the CSV does not have the same number of columns. If false, rows with fewer column values will be padded with empty values. Default is true.
     pub fn is_strict(mut self, new_value: bool) -> TableReplaceRowCall<'a, C, NC, A> {
         self._is_strict = Some(new_value);
         self
@@ -8095,7 +8278,7 @@ impl<'a, C, NC, A> TableReplaceRowCall<'a, C, NC, A> where NC: hyper::net::Netwo
     /// Sets the *end line* query property to the given value.
     ///
     /// 
-    /// The index of the last line to import, exclusive. 'endLine - startLine' rows will be imported. Default is to import through the end of the file. If endLine is negative, it is an offset from the end of the file; the imported content will exclude the last endLine lines.    
+    /// The index of the line up to which data will be imported. Default is to import the entire file. If endLine is negative, it is an offset from the end of the file; the imported content will exclude the last endLine lines.
     pub fn end_line(mut self, new_value: i32) -> TableReplaceRowCall<'a, C, NC, A> {
         self._end_line = Some(new_value);
         self
@@ -8103,7 +8286,7 @@ impl<'a, C, NC, A> TableReplaceRowCall<'a, C, NC, A> where NC: hyper::net::Netwo
     /// Sets the *encoding* query property to the given value.
     ///
     /// 
-    /// The encoding of the content. Default is UTF-8. Use 'auto-detect' if you are unsure of the encoding.    
+    /// The encoding of the content. Default is UTF-8. Use 'auto-detect' if you are unsure of the encoding.
     pub fn encoding(mut self, new_value: &str) -> TableReplaceRowCall<'a, C, NC, A> {
         self._encoding = Some(new_value.to_string());
         self
@@ -8111,7 +8294,7 @@ impl<'a, C, NC, A> TableReplaceRowCall<'a, C, NC, A> where NC: hyper::net::Netwo
     /// Sets the *delimiter* query property to the given value.
     ///
     /// 
-    /// The delimiter used to separate cell values. This can only consist of a single character. Default is ','.    
+    /// The delimiter used to separate cell values. This can only consist of a single character. Default is ,.
     pub fn delimiter(mut self, new_value: &str) -> TableReplaceRowCall<'a, C, NC, A> {
         self._delimiter = Some(new_value.to_string());
         self
@@ -8172,7 +8355,7 @@ impl<'a, C, NC, A> TableReplaceRowCall<'a, C, NC, A> where NC: hyper::net::Netwo
 /// Updates an existing table. Unless explicitly requested, only the name, description, and attribution will be updated.
 ///
 /// A builder for the *update* method supported by a *table* resource.
-/// It is not used directly, but through a `TableMethods`.
+/// It is not used directly, but through a `TableMethods` instance.
 ///
 /// # Example
 ///
@@ -8242,7 +8425,7 @@ impl<'a, C, NC, A> TableUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
         for &field in ["alt", "tableId", "replaceViewDefinition"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -8299,7 +8482,7 @@ impl<'a, C, NC, A> TableUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -8315,7 +8498,6 @@ impl<'a, C, NC, A> TableUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -8325,7 +8507,7 @@ impl<'a, C, NC, A> TableUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -8336,7 +8518,7 @@ impl<'a, C, NC, A> TableUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -8345,13 +8527,13 @@ impl<'a, C, NC, A> TableUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -8372,7 +8554,7 @@ impl<'a, C, NC, A> TableUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// ID of the table that is being updated.    
+    /// ID of the table that is being updated.
     pub fn table_id(mut self, new_value: &str) -> TableUpdateCall<'a, C, NC, A> {
         self._table_id = new_value.to_string();
         self
@@ -8380,7 +8562,7 @@ impl<'a, C, NC, A> TableUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// Sets the *replace view definition* query property to the given value.
     ///
     /// 
-    /// Should the view definition also be updated? The specified view definition replaces the existing one. Only a view can be updated with a new definition.    
+    /// Whether the view definition is also updated. The specified view definition replaces the existing one. Only a view can be updated with a new definition.
     pub fn replace_view_definition(mut self, new_value: bool) -> TableUpdateCall<'a, C, NC, A> {
         self._replace_view_definition = Some(new_value);
         self
@@ -8441,7 +8623,7 @@ impl<'a, C, NC, A> TableUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
 /// Deletes a table.
 ///
 /// A builder for the *delete* method supported by a *table* resource.
-/// It is not used directly, but through a `TableMethods`.
+/// It is not used directly, but through a `TableMethods` instance.
 ///
 /// # Example
 ///
@@ -8499,7 +8681,7 @@ impl<'a, C, NC, A> TableDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
         for &field in ["tableId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -8551,7 +8733,7 @@ impl<'a, C, NC, A> TableDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -8563,7 +8745,6 @@ impl<'a, C, NC, A> TableDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -8573,7 +8754,7 @@ impl<'a, C, NC, A> TableDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -8584,12 +8765,12 @@ impl<'a, C, NC, A> TableDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = res;
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -8601,7 +8782,7 @@ impl<'a, C, NC, A> TableDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// ID of the table that is being deleted.    
+    /// ID of the table to be deleted.
     pub fn table_id(mut self, new_value: &str) -> TableDeleteCall<'a, C, NC, A> {
         self._table_id = new_value.to_string();
         self
@@ -8662,7 +8843,7 @@ impl<'a, C, NC, A> TableDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
 /// Creates a new table.
 ///
 /// A builder for the *insert* method supported by a *table* resource.
-/// It is not used directly, but through a `TableMethods`.
+/// It is not used directly, but through a `TableMethods` instance.
 ///
 /// # Example
 ///
@@ -8725,7 +8906,7 @@ impl<'a, C, NC, A> TableInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
         for &field in ["alt"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -8758,7 +8939,7 @@ impl<'a, C, NC, A> TableInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -8774,7 +8955,6 @@ impl<'a, C, NC, A> TableInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -8784,7 +8964,7 @@ impl<'a, C, NC, A> TableInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -8795,7 +8975,7 @@ impl<'a, C, NC, A> TableInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -8804,13 +8984,13 @@ impl<'a, C, NC, A> TableInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -8879,10 +9059,10 @@ impl<'a, C, NC, A> TableInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
 }
 
 
-/// Retrieves a specific table by its id.
+/// Retrieves a specific table by its ID.
 ///
 /// A builder for the *get* method supported by a *table* resource.
-/// It is not used directly, but through a `TableMethods`.
+/// It is not used directly, but through a `TableMethods` instance.
 ///
 /// # Example
 ///
@@ -8940,7 +9120,7 @@ impl<'a, C, NC, A> TableGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
         for &field in ["alt", "tableId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -8993,7 +9173,7 @@ impl<'a, C, NC, A> TableGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -9005,7 +9185,6 @@ impl<'a, C, NC, A> TableGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -9015,7 +9194,7 @@ impl<'a, C, NC, A> TableGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -9026,7 +9205,7 @@ impl<'a, C, NC, A> TableGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -9035,13 +9214,13 @@ impl<'a, C, NC, A> TableGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -9053,7 +9232,7 @@ impl<'a, C, NC, A> TableGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Identifier(ID) for the table being requested.    
+    /// Identifier for the table being requested.
     pub fn table_id(mut self, new_value: &str) -> TableGetCall<'a, C, NC, A> {
         self._table_id = new_value.to_string();
         self
@@ -9114,7 +9293,7 @@ impl<'a, C, NC, A> TableGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
 /// Retrieves a list of tables a user owns.
 ///
 /// A builder for the *list* method supported by a *table* resource.
-/// It is not used directly, but through a `TableMethods`.
+/// It is not used directly, but through a `TableMethods` instance.
 ///
 /// # Example
 ///
@@ -9180,7 +9359,7 @@ impl<'a, C, NC, A> TableListCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
         for &field in ["alt", "pageToken", "maxResults"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -9209,7 +9388,7 @@ impl<'a, C, NC, A> TableListCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -9221,7 +9400,6 @@ impl<'a, C, NC, A> TableListCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -9231,7 +9409,7 @@ impl<'a, C, NC, A> TableListCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -9242,7 +9420,7 @@ impl<'a, C, NC, A> TableListCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -9251,13 +9429,13 @@ impl<'a, C, NC, A> TableListCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -9267,7 +9445,7 @@ impl<'a, C, NC, A> TableListCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     /// Sets the *page token* query property to the given value.
     ///
     /// 
-    /// Continuation token specifying which result page to return. Optional.    
+    /// Continuation token specifying which result page to return.
     pub fn page_token(mut self, new_value: &str) -> TableListCall<'a, C, NC, A> {
         self._page_token = Some(new_value.to_string());
         self
@@ -9275,7 +9453,7 @@ impl<'a, C, NC, A> TableListCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     /// Sets the *max results* query property to the given value.
     ///
     /// 
-    /// Maximum number of styles to return. Optional. Default is 5.    
+    /// Maximum number of tables to return. Default is 5.
     pub fn max_results(mut self, new_value: u32) -> TableListCall<'a, C, NC, A> {
         self._max_results = Some(new_value);
         self
@@ -9333,10 +9511,10 @@ impl<'a, C, NC, A> TableListCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
 }
 
 
-/// Import more rows into a table.
+/// Imports more rows into a table.
 ///
 /// A builder for the *importRows* method supported by a *table* resource.
-/// It is not used directly, but through a `TableMethods`.
+/// It is not used directly, but through a `TableMethods` instance.
 ///
 /// # Example
 ///
@@ -9421,7 +9599,7 @@ impl<'a, C, NC, A> TableImportRowCall<'a, C, NC, A> where NC: hyper::net::Networ
         for &field in ["alt", "tableId", "startLine", "isStrict", "endLine", "encoding", "delimiter"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -9484,7 +9662,7 @@ impl<'a, C, NC, A> TableImportRowCall<'a, C, NC, A> where NC: hyper::net::Networ
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -9510,7 +9688,7 @@ impl<'a, C, NC, A> TableImportRowCall<'a, C, NC, A> where NC: hyper::net::Networ
                         let size = reader.seek(io::SeekFrom::End(0)).unwrap();
                     reader.seek(io::SeekFrom::Start(0)).unwrap();
                     if size > 262144000 {
-                    	return Result::UploadSizeLimitExceeded(size, 262144000)
+                    	return Err(Error::UploadSizeLimitExceeded(size, 262144000))
                     }
                         req = req.header(ContentType(reader_mime_type.clone()))
                                  .header(ContentLength(size))
@@ -9523,7 +9701,6 @@ impl<'a, C, NC, A> TableImportRowCall<'a, C, NC, A> where NC: hyper::net::Networ
     
                     dlg.pre_request();
                     req.send()
-    
                 }
             };
 
@@ -9534,7 +9711,7 @@ impl<'a, C, NC, A> TableImportRowCall<'a, C, NC, A> where NC: hyper::net::Networ
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -9545,13 +9722,13 @@ impl<'a, C, NC, A> TableImportRowCall<'a, C, NC, A> where NC: hyper::net::Networ
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     if protocol == "resumable" {
                         let size = reader.seek(io::SeekFrom::End(0)).unwrap();
                         reader.seek(io::SeekFrom::Start(0)).unwrap();
                         if size > 262144000 {
-                        	return Result::UploadSizeLimitExceeded(size, 262144000)
+                        	return Err(Error::UploadSizeLimitExceeded(size, 262144000))
                         }
                         let mut client = &mut *self.hub.client.borrow_mut();
                         let upload_result = {
@@ -9576,17 +9753,17 @@ impl<'a, C, NC, A> TableImportRowCall<'a, C, NC, A> where NC: hyper::net::Networ
                         match upload_result {
                             None => {
                                 dlg.finished(false);
-                                return Result::Cancelled
+                                return Err(Error::Cancelled)
                             }
                             Some(Err(err)) => {
                                 dlg.finished(false);
-                                return Result::HttpError(err)
+                                return Err(Error::HttpError(err))
                             }
                             Some(Ok(upload_result)) => {
                                 res = upload_result;
                                 if !res.status.is_success() {
                                     dlg.finished(false);
-                                    return Result::Failure(res)
+                                    return Err(Error::Failure(res))
                                 }
                             }
                         }
@@ -9598,13 +9775,13 @@ impl<'a, C, NC, A> TableImportRowCall<'a, C, NC, A> where NC: hyper::net::Networ
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -9620,11 +9797,14 @@ impl<'a, C, NC, A> TableImportRowCall<'a, C, NC, A> where NC: hyper::net::Networ
                 where RS: ReadSeek {
         self.doit(stream, mime_type, "simple")
     }
-    /// Upload media in a resumeable fashion.
+    /// Upload media in a resumable fashion.
     /// Even if the upload fails or is interrupted, it can be resumed for a 
     /// certain amount of time as the server maintains state temporarily.
     /// 
-    /// TODO: Write more about how delegation works in this particular case.
+    /// The delegate will be asked for an `upload_url()`, and if not provided, will be asked to store an upload URL 
+    /// that was provided by the server, using `store_upload_url(...)`. The upload will be done in chunks, the delegate
+    /// may specify the `chunk_size()` and may cancel the operation before each chunk is uploaded, using
+    /// `cancel_chunk_upload(...)`.
     ///
     /// * *max size*: 250MB
     /// * *multipart*: yes
@@ -9639,7 +9819,7 @@ impl<'a, C, NC, A> TableImportRowCall<'a, C, NC, A> where NC: hyper::net::Networ
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The table into which new rows are being imported.    
+    /// The table into which new rows are being imported.
     pub fn table_id(mut self, new_value: &str) -> TableImportRowCall<'a, C, NC, A> {
         self._table_id = new_value.to_string();
         self
@@ -9647,7 +9827,7 @@ impl<'a, C, NC, A> TableImportRowCall<'a, C, NC, A> where NC: hyper::net::Networ
     /// Sets the *start line* query property to the given value.
     ///
     /// 
-    /// The index of the first line from which to start importing, inclusive. Default is 0.    
+    /// The index of the first line from which to start importing, inclusive. Default is 0.
     pub fn start_line(mut self, new_value: i32) -> TableImportRowCall<'a, C, NC, A> {
         self._start_line = Some(new_value);
         self
@@ -9655,7 +9835,7 @@ impl<'a, C, NC, A> TableImportRowCall<'a, C, NC, A> where NC: hyper::net::Networ
     /// Sets the *is strict* query property to the given value.
     ///
     /// 
-    /// Whether the CSV must have the same number of values for each row. If false, rows with fewer values will be padded with empty values. Default is true.    
+    /// Whether the imported CSV must have the same number of values for each row. If false, rows with fewer values will be padded with empty values. Default is true.
     pub fn is_strict(mut self, new_value: bool) -> TableImportRowCall<'a, C, NC, A> {
         self._is_strict = Some(new_value);
         self
@@ -9663,7 +9843,7 @@ impl<'a, C, NC, A> TableImportRowCall<'a, C, NC, A> where NC: hyper::net::Networ
     /// Sets the *end line* query property to the given value.
     ///
     /// 
-    /// The index of the last line from which to start importing, exclusive. Thus, the number of imported lines is endLine - startLine. If this parameter is not provided, the file will be imported until the last line of the file. If endLine is negative, then the imported content will exclude the last endLine lines. That is, if endline is negative, no line will be imported whose index is greater than N + endLine where N is the number of lines in the file, and the number of imported lines will be N + endLine - startLine.    
+    /// The index of the line up to which data will be imported. Default is to import the entire file. If endLine is negative, it is an offset from the end of the file; the imported content will exclude the last endLine lines.
     pub fn end_line(mut self, new_value: i32) -> TableImportRowCall<'a, C, NC, A> {
         self._end_line = Some(new_value);
         self
@@ -9671,7 +9851,7 @@ impl<'a, C, NC, A> TableImportRowCall<'a, C, NC, A> where NC: hyper::net::Networ
     /// Sets the *encoding* query property to the given value.
     ///
     /// 
-    /// The encoding of the content. Default is UTF-8. Use 'auto-detect' if you are unsure of the encoding.    
+    /// The encoding of the content. Default is UTF-8. Use auto-detect if you are unsure of the encoding.
     pub fn encoding(mut self, new_value: &str) -> TableImportRowCall<'a, C, NC, A> {
         self._encoding = Some(new_value.to_string());
         self
@@ -9679,7 +9859,7 @@ impl<'a, C, NC, A> TableImportRowCall<'a, C, NC, A> where NC: hyper::net::Networ
     /// Sets the *delimiter* query property to the given value.
     ///
     /// 
-    /// The delimiter used to separate cell values. This can only consist of a single character. Default is ','.    
+    /// The delimiter used to separate cell values. This can only consist of a single character. Default is ,.
     pub fn delimiter(mut self, new_value: &str) -> TableImportRowCall<'a, C, NC, A> {
         self._delimiter = Some(new_value.to_string());
         self
@@ -9737,10 +9917,10 @@ impl<'a, C, NC, A> TableImportRowCall<'a, C, NC, A> where NC: hyper::net::Networ
 }
 
 
-/// Import a new table.
+/// Imports a new table.
 ///
 /// A builder for the *importTable* method supported by a *table* resource.
-/// It is not used directly, but through a `TableMethods`.
+/// It is not used directly, but through a `TableMethods` instance.
 ///
 /// # Example
 ///
@@ -9810,7 +9990,7 @@ impl<'a, C, NC, A> TableImportTableCall<'a, C, NC, A> where NC: hyper::net::Netw
         for &field in ["alt", "name", "encoding", "delimiter"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -9849,7 +10029,7 @@ impl<'a, C, NC, A> TableImportTableCall<'a, C, NC, A> where NC: hyper::net::Netw
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -9875,7 +10055,7 @@ impl<'a, C, NC, A> TableImportTableCall<'a, C, NC, A> where NC: hyper::net::Netw
                         let size = reader.seek(io::SeekFrom::End(0)).unwrap();
                     reader.seek(io::SeekFrom::Start(0)).unwrap();
                     if size > 262144000 {
-                    	return Result::UploadSizeLimitExceeded(size, 262144000)
+                    	return Err(Error::UploadSizeLimitExceeded(size, 262144000))
                     }
                         req = req.header(ContentType(reader_mime_type.clone()))
                                  .header(ContentLength(size))
@@ -9888,7 +10068,6 @@ impl<'a, C, NC, A> TableImportTableCall<'a, C, NC, A> where NC: hyper::net::Netw
     
                     dlg.pre_request();
                     req.send()
-    
                 }
             };
 
@@ -9899,7 +10078,7 @@ impl<'a, C, NC, A> TableImportTableCall<'a, C, NC, A> where NC: hyper::net::Netw
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -9910,13 +10089,13 @@ impl<'a, C, NC, A> TableImportTableCall<'a, C, NC, A> where NC: hyper::net::Netw
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     if protocol == "resumable" {
                         let size = reader.seek(io::SeekFrom::End(0)).unwrap();
                         reader.seek(io::SeekFrom::Start(0)).unwrap();
                         if size > 262144000 {
-                        	return Result::UploadSizeLimitExceeded(size, 262144000)
+                        	return Err(Error::UploadSizeLimitExceeded(size, 262144000))
                         }
                         let mut client = &mut *self.hub.client.borrow_mut();
                         let upload_result = {
@@ -9941,17 +10120,17 @@ impl<'a, C, NC, A> TableImportTableCall<'a, C, NC, A> where NC: hyper::net::Netw
                         match upload_result {
                             None => {
                                 dlg.finished(false);
-                                return Result::Cancelled
+                                return Err(Error::Cancelled)
                             }
                             Some(Err(err)) => {
                                 dlg.finished(false);
-                                return Result::HttpError(err)
+                                return Err(Error::HttpError(err))
                             }
                             Some(Ok(upload_result)) => {
                                 res = upload_result;
                                 if !res.status.is_success() {
                                     dlg.finished(false);
-                                    return Result::Failure(res)
+                                    return Err(Error::Failure(res))
                                 }
                             }
                         }
@@ -9963,13 +10142,13 @@ impl<'a, C, NC, A> TableImportTableCall<'a, C, NC, A> where NC: hyper::net::Netw
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -9985,11 +10164,14 @@ impl<'a, C, NC, A> TableImportTableCall<'a, C, NC, A> where NC: hyper::net::Netw
                 where RS: ReadSeek {
         self.doit(stream, mime_type, "simple")
     }
-    /// Upload media in a resumeable fashion.
+    /// Upload media in a resumable fashion.
     /// Even if the upload fails or is interrupted, it can be resumed for a 
     /// certain amount of time as the server maintains state temporarily.
     /// 
-    /// TODO: Write more about how delegation works in this particular case.
+    /// The delegate will be asked for an `upload_url()`, and if not provided, will be asked to store an upload URL 
+    /// that was provided by the server, using `store_upload_url(...)`. The upload will be done in chunks, the delegate
+    /// may specify the `chunk_size()` and may cancel the operation before each chunk is uploaded, using
+    /// `cancel_chunk_upload(...)`.
     ///
     /// * *max size*: 250MB
     /// * *multipart*: yes
@@ -10004,7 +10186,7 @@ impl<'a, C, NC, A> TableImportTableCall<'a, C, NC, A> where NC: hyper::net::Netw
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The name to be assigned to the new table.    
+    /// The name to be assigned to the new table.
     pub fn name(mut self, new_value: &str) -> TableImportTableCall<'a, C, NC, A> {
         self._name = new_value.to_string();
         self
@@ -10012,7 +10194,7 @@ impl<'a, C, NC, A> TableImportTableCall<'a, C, NC, A> where NC: hyper::net::Netw
     /// Sets the *encoding* query property to the given value.
     ///
     /// 
-    /// The encoding of the content. Default is UTF-8. Use 'auto-detect' if you are unsure of the encoding.    
+    /// The encoding of the content. Default is UTF-8. Use auto-detect if you are unsure of the encoding.
     pub fn encoding(mut self, new_value: &str) -> TableImportTableCall<'a, C, NC, A> {
         self._encoding = Some(new_value.to_string());
         self
@@ -10020,7 +10202,7 @@ impl<'a, C, NC, A> TableImportTableCall<'a, C, NC, A> where NC: hyper::net::Netw
     /// Sets the *delimiter* query property to the given value.
     ///
     /// 
-    /// The delimiter used to separate cell values. This can only consist of a single character. Default is ','.    
+    /// The delimiter used to separate cell values. This can only consist of a single character. Default is ,.
     pub fn delimiter(mut self, new_value: &str) -> TableImportTableCall<'a, C, NC, A> {
         self._delimiter = Some(new_value.to_string());
         self
@@ -10081,7 +10263,7 @@ impl<'a, C, NC, A> TableImportTableCall<'a, C, NC, A> where NC: hyper::net::Netw
 /// Copies a table.
 ///
 /// A builder for the *copy* method supported by a *table* resource.
-/// It is not used directly, but through a `TableMethods`.
+/// It is not used directly, but through a `TableMethods` instance.
 ///
 /// # Example
 ///
@@ -10144,7 +10326,7 @@ impl<'a, C, NC, A> TableCopyCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
         for &field in ["alt", "tableId", "copyPresentation"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -10197,7 +10379,7 @@ impl<'a, C, NC, A> TableCopyCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -10209,7 +10391,6 @@ impl<'a, C, NC, A> TableCopyCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -10219,7 +10400,7 @@ impl<'a, C, NC, A> TableCopyCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -10230,7 +10411,7 @@ impl<'a, C, NC, A> TableCopyCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -10239,13 +10420,13 @@ impl<'a, C, NC, A> TableCopyCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -10257,7 +10438,7 @@ impl<'a, C, NC, A> TableCopyCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// ID of the table that is being copied.    
+    /// ID of the table that is being copied.
     pub fn table_id(mut self, new_value: &str) -> TableCopyCall<'a, C, NC, A> {
         self._table_id = new_value.to_string();
         self
@@ -10265,7 +10446,7 @@ impl<'a, C, NC, A> TableCopyCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     /// Sets the *copy presentation* query property to the given value.
     ///
     /// 
-    /// Whether to also copy tabs, styles, and templates. Default is false.    
+    /// Whether to also copy tabs, styles, and templates. Default is false.
     pub fn copy_presentation(mut self, new_value: bool) -> TableCopyCall<'a, C, NC, A> {
         self._copy_presentation = Some(new_value);
         self

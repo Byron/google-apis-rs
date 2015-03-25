@@ -1,8 +1,8 @@
 // DO NOT EDIT !
-// This file was generated automatically from 'src/mako/lib.rs.mako'
+// This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *appsactivity* crate version *0.1.1+20140828*, where *20140828* is the exact revision of the *appsactivity:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.1*.
+//! This documentation was generated from *appsactivity* crate version *0.1.2+20140828*, where *20140828* is the exact revision of the *appsactivity:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.2*.
 //! 
 //! Everything else about the *appsactivity* *v1* API can be found at the
 //! [official documentation site](https://developers.google.com/google-apps/activity/).
@@ -25,6 +25,8 @@
 //! 
 //! * **[Hub](struct.Appsactivity.html)**
 //!     * a central object to maintain state and allow accessing all *Activities*
+//!     * creates [*Method Builders*](trait.MethodsBuilder.html) which in turn
+//!       allow access to individual [*Call Builders*](trait.CallBuilder.html)
 //! * **[Resources](trait.Resource.html)**
 //!     * primary types that you can apply *Activities* to
 //!     * a collection of properties and *Parts*
@@ -33,6 +35,8 @@
 //!         * never directly used in *Activities*
 //! * **[Activities](trait.CallBuilder.html)**
 //!     * operations to apply to *Resources*
+//! 
+//! All *structures* are marked with applicable traits to further categorize them and ease browsing.
 //! 
 //! Generally speaking, you can invoke *Activities* like this:
 //! 
@@ -68,7 +72,7 @@
 //! extern crate hyper;
 //! extern crate "yup-oauth2" as oauth2;
 //! extern crate "google-appsactivity1" as appsactivity1;
-//! use appsactivity1::Result;
+//! use appsactivity1::{Result, Error};
 //! # #[test] fn egal() {
 //! use std::default::Default;
 //! use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -100,15 +104,17 @@
 //!              .doit();
 //! 
 //! match result {
-//!     Result::HttpError(err) => println!("HTTPERROR: {:?}", err),
-//!     Result::MissingAPIKey => println!("Auth: Missing API Key - used if there are no scopes"),
-//!     Result::MissingToken => println!("OAuth2: Missing Token"),
-//!     Result::Cancelled => println!("Operation cancelled by user"),
-//!     Result::UploadSizeLimitExceeded(size, max_size) => println!("Upload size too big: {} of {}", size, max_size),
-//!     Result::Failure(_) => println!("General Failure (hyper::client::Response doesn't print)"),
-//!     Result::FieldClash(clashed_field) => println!("You added custom parameter which is part of builder: {:?}", clashed_field),
-//!     Result::JsonDecodeError(err) => println!("Couldn't understand server reply - maybe API needs update: {:?}", err),
-//!     Result::Success(_) => println!("Success (value doesn't print)"),
+//!     Err(e) => match e {
+//!         Error::HttpError(err) => println!("HTTPERROR: {:?}", err),
+//!         Error::MissingAPIKey => println!("Auth: Missing API Key - used if there are no scopes"),
+//!         Error::MissingToken => println!("OAuth2: Missing Token"),
+//!         Error::Cancelled => println!("Operation canceled by user"),
+//!         Error::UploadSizeLimitExceeded(size, max_size) => println!("Upload size too big: {} of {}", size, max_size),
+//!         Error::Failure(_) => println!("General Failure (hyper::client::Response doesn't print)"),
+//!         Error::FieldClash(clashed_field) => println!("You added custom parameter which is part of builder: {:?}", clashed_field),
+//!         Error::JsonDecodeError(err) => println!("Couldn't understand server reply - maybe API needs update: {:?}", err),
+//!     },
+//!     Ok(_) => println!("Success (value doesn't print)"),
 //! }
 //! # }
 //! ```
@@ -121,7 +127,7 @@
 //! When delegates handle errors or intermediate values, they may have a chance to instruct the system to retry. This 
 //! makes the system potentially resilient to all kinds of errors.
 //! 
-//! ## Uploads and Downlods
+//! ## Uploads and Downloads
 //! If a method supports downloads, the response body, which is part of the [Result](enum.Result.html), should be
 //! read by you to obtain the media.
 //! If such a method also supports a [Response Result](trait.ResponseResult.html), it will return that by default.
@@ -144,8 +150,9 @@
 //! ## Optional Parts in Server-Requests
 //! 
 //! All structures provided by this library are made to be [enocodable](trait.RequestValue.html) and 
-//! [decodable](trait.ResponseResult.html) via json. Optionals are used to indicate that partial requests are responses are valid.
-//! Most optionals are are considered [Parts](trait.Part.html) which are identifyable by name, which will be sent to 
+//! [decodable](trait.ResponseResult.html) via *json*. Optionals are used to indicate that partial requests are responses 
+//! are valid.
+//! Most optionals are are considered [Parts](trait.Part.html) which are identifiable by name, which will be sent to 
 //! the server to indicate either the set parts of the request or the desired parts in the response.
 //! 
 //! ## Builder Arguments
@@ -194,7 +201,7 @@ use std::io;
 use std::fs;
 use std::thread::sleep;
 
-pub use cmn::{MultiPartReader, ToParts, MethodInfo, Result, CallBuilder, Hub, ReadSeek, Part, ResponseResult, RequestValue, NestedType, Delegate, DefaultDelegate, ResourceMethodsBuilder, Resource, JsonServerError};
+pub use cmn::{MultiPartReader, ToParts, MethodInfo, Result, Error, CallBuilder, Hub, ReadSeek, Part, ResponseResult, RequestValue, NestedType, Delegate, DefaultDelegate, MethodsBuilder, Resource, JsonServerError};
 
 
 // ##############
@@ -252,7 +259,7 @@ impl Default for Scope {
 /// extern crate hyper;
 /// extern crate "yup-oauth2" as oauth2;
 /// extern crate "google-appsactivity1" as appsactivity1;
-/// use appsactivity1::Result;
+/// use appsactivity1::{Result, Error};
 /// # #[test] fn egal() {
 /// use std::default::Default;
 /// use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -284,15 +291,17 @@ impl Default for Scope {
 ///              .doit();
 /// 
 /// match result {
-///     Result::HttpError(err) => println!("HTTPERROR: {:?}", err),
-///     Result::MissingAPIKey => println!("Auth: Missing API Key - used if there are no scopes"),
-///     Result::MissingToken => println!("OAuth2: Missing Token"),
-///     Result::Cancelled => println!("Operation cancelled by user"),
-///     Result::UploadSizeLimitExceeded(size, max_size) => println!("Upload size too big: {} of {}", size, max_size),
-///     Result::Failure(_) => println!("General Failure (hyper::client::Response doesn't print)"),
-///     Result::FieldClash(clashed_field) => println!("You added custom parameter which is part of builder: {:?}", clashed_field),
-///     Result::JsonDecodeError(err) => println!("Couldn't understand server reply - maybe API needs update: {:?}", err),
-///     Result::Success(_) => println!("Success (value doesn't print)"),
+///     Err(e) => match e {
+///         Error::HttpError(err) => println!("HTTPERROR: {:?}", err),
+///         Error::MissingAPIKey => println!("Auth: Missing API Key - used if there are no scopes"),
+///         Error::MissingToken => println!("OAuth2: Missing Token"),
+///         Error::Cancelled => println!("Operation canceled by user"),
+///         Error::UploadSizeLimitExceeded(size, max_size) => println!("Upload size too big: {} of {}", size, max_size),
+///         Error::Failure(_) => println!("General Failure (hyper::client::Response doesn't print)"),
+///         Error::FieldClash(clashed_field) => println!("You added custom parameter which is part of builder: {:?}", clashed_field),
+///         Error::JsonDecodeError(err) => println!("Couldn't understand server reply - maybe API needs update: {:?}", err),
+///     },
+///     Ok(_) => println!("Success (value doesn't print)"),
 /// }
 /// # }
 /// ```
@@ -313,7 +322,7 @@ impl<'a, C, NC, A> Appsactivity<C, NC, A>
         Appsactivity {
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/0.1.1".to_string(),
+            _user_agent: "google-api-rust-client/0.1.2".to_string(),
             _m: PhantomData
         }
     }
@@ -323,7 +332,7 @@ impl<'a, C, NC, A> Appsactivity<C, NC, A>
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/0.1.1`.
+    /// It defaults to `google-api-rust-client/0.1.2`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -343,10 +352,10 @@ impl<'a, C, NC, A> Appsactivity<C, NC, A>
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct Rename {
-    /// The new title.    
+    /// The new title.
     #[serde(alias="newTitle")]
     pub new_title: String,
-    /// The old title.    
+    /// The old title.
     #[serde(alias="oldTitle")]
     pub old_title: String,
 }
@@ -360,10 +369,10 @@ impl Part for Rename {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct PermissionChange {
-    /// Lists all Permission objects removed.    
+    /// Lists all Permission objects removed.
     #[serde(alias="removedPermissions")]
     pub removed_permissions: Vec<Permission>,
-    /// Lists all Permission objects added.    
+    /// Lists all Permission objects added.
     #[serde(alias="addedPermissions")]
     pub added_permissions: Vec<Permission>,
 }
@@ -377,12 +386,12 @@ impl Part for PermissionChange {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct Target {
-    /// The MIME type of the target.    
+    /// The MIME type of the target.
     #[serde(alias="mimeType")]
     pub mime_type: String,
-    /// The ID of the target. For example, in Google Drive, this is the file or folder ID.    
+    /// The ID of the target. For example, in Google Drive, this is the file or folder ID.
     pub id: String,
-    /// The name of the target. For example, in Google Drive, this is the title of the file.    
+    /// The name of the target. For example, in Google Drive, this is the title of the file.
     pub name: String,
 }
 
@@ -395,12 +404,12 @@ impl Part for Target {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct Parent {
-    /// The parent's ID.    
+    /// The parent's ID.
     pub id: String,
-    /// Whether this is the root folder.    
+    /// Whether this is the root folder.
     #[serde(alias="isRoot")]
     pub is_root: bool,
-    /// The parent's title.    
+    /// The parent's title.
     pub title: String,
 }
 
@@ -413,20 +422,20 @@ impl Part for Parent {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct Permission {
-    /// Whether the permission requires a link to the file.    
+    /// Whether the permission requires a link to the file.
     #[serde(alias="withLink")]
     pub with_link: bool,
-    /// The ID for this permission. Corresponds to the Drive API's permission ID returned as part of the Drive Permissions resource.    
+    /// The ID for this permission. Corresponds to the Drive API's permission ID returned as part of the Drive Permissions resource.
     #[serde(alias="permissionId")]
     pub permission_id: String,
-    /// Indicates the Google Drive permissions role. The role determines a user's ability to read, write, or comment on the file.    
+    /// Indicates the Google Drive permissions role. The role determines a user's ability to read, write, or comment on the file.
     pub role: String,
-    /// The name of the user or group the permission applies to.    
+    /// The name of the user or group the permission applies to.
     pub name: String,
-    /// Indicates how widely permissions are granted.    
+    /// Indicates how widely permissions are granted.
     #[serde(alias="type")]
     pub type_: String,
-    /// The user's information if the type is USER.    
+    /// The user's information if the type is USER.
     pub user: User,
 }
 
@@ -439,7 +448,7 @@ impl Part for Permission {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct Photo {
-    /// The URL of the photo.    
+    /// The URL of the photo.
     pub url: String,
 }
 
@@ -452,10 +461,10 @@ impl Part for Photo {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct Move {
-    /// The removed parent(s).    
+    /// The removed parent(s).
     #[serde(alias="removedParents")]
     pub removed_parents: Vec<Parent>,
-    /// The added parent(s).    
+    /// The added parent(s).
     #[serde(alias="addedParents")]
     pub added_parents: Vec<Parent>,
 }
@@ -474,10 +483,10 @@ impl Part for Move {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct ListActivitiesResponse {
-    /// Token for the next page of results.    
+    /// Token for the next page of results.
     #[serde(alias="nextPageToken")]
     pub next_page_token: String,
-    /// List of activities.    
+    /// List of activities.
     pub activities: Vec<Activity>,
 }
 
@@ -490,9 +499,9 @@ impl ResponseResult for ListActivitiesResponse {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct User {
-    /// The profile photo of the user.    
+    /// The profile photo of the user.
     pub photo: Photo,
-    /// The displayable name of the user.    
+    /// The displayable name of the user.
     pub name: String,
 }
 
@@ -505,10 +514,10 @@ impl Part for User {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct Activity {
-    /// The fields common to all of the singleEvents that make up the Activity.    
+    /// The fields common to all of the singleEvents that make up the Activity.
     #[serde(alias="combinedEvent")]
     pub combined_event: Event,
-    /// A list of all the Events that make up the Activity.    
+    /// A list of all the Events that make up the Activity.
     #[serde(alias="singleEvents")]
     pub single_events: Vec<Event>,
 }
@@ -522,28 +531,28 @@ impl Part for Activity {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct Event {
-    /// Extra information for rename type events, such as the old and new names.    
+    /// Extra information for rename type events, such as the old and new names.
     pub rename: Rename,
-    /// Information specific to the Target object modified by the event.    
+    /// Information specific to the Target object modified by the event.
     pub target: Target,
-    /// Additional event types. Some events may have multiple types when multiple actions are part of a single event. For example, creating a document, renaming it, and sharing it may be part of a single file-creation event.    
+    /// Additional event types. Some events may have multiple types when multiple actions are part of a single event. For example, creating a document, renaming it, and sharing it may be part of a single file-creation event.
     #[serde(alias="additionalEventTypes")]
     pub additional_event_types: Vec<String>,
-    /// Extra information for move type events, such as changes in an object's parents.    
+    /// Extra information for move type events, such as changes in an object's parents.
     #[serde(alias="move")]
     pub move_: Move,
-    /// Extra information for permissionChange type events, such as the user or group the new permission applies to.    
+    /// Extra information for permissionChange type events, such as the user or group the new permission applies to.
     #[serde(alias="permissionChanges")]
     pub permission_changes: Vec<PermissionChange>,
-    /// Represents the user responsible for the event.    
+    /// Represents the user responsible for the event.
     pub user: User,
-    /// The time at which the event occurred formatted as Unix time in milliseconds.    
+    /// The time at which the event occurred formatted as Unix time in milliseconds.
     #[serde(alias="eventTimeMillis")]
     pub event_time_millis: String,
-    /// The main type of event that occurred.    
+    /// The main type of event that occurred.
     #[serde(alias="primaryEventType")]
     pub primary_event_type: String,
-    /// Whether this event is caused by a user being deleted.    
+    /// Whether this event is caused by a user being deleted.
     #[serde(alias="fromUserDeletion")]
     pub from_user_deletion: bool,
 }
@@ -590,13 +599,13 @@ pub struct ActivityMethods<'a, C, NC, A>
     hub: &'a Appsactivity<C, NC, A>,
 }
 
-impl<'a, C, NC, A> ResourceMethodsBuilder for ActivityMethods<'a, C, NC, A> {}
+impl<'a, C, NC, A> MethodsBuilder for ActivityMethods<'a, C, NC, A> {}
 
 impl<'a, C, NC, A> ActivityMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Returns a list of activities visible to the current logged in user. Visible activities are determined by the visiblity settings of the object that was acted on, e.g. Drive files a user can see. An activity is a record of past events. Multiple events may be merged if they are similar. A request is scoped to activities from a given Google service using the source parameter.    
+    /// Returns a list of activities visible to the current logged in user. Visible activities are determined by the visiblity settings of the object that was acted on, e.g. Drive files a user can see. An activity is a record of past events. Multiple events may be merged if they are similar. A request is scoped to activities from a given Google service using the source parameter.
     pub fn list(&self) -> ActivityListCall<'a, C, NC, A> {
         ActivityListCall {
             hub: self.hub,
@@ -625,7 +634,7 @@ impl<'a, C, NC, A> ActivityMethods<'a, C, NC, A> {
 /// Returns a list of activities visible to the current logged in user. Visible activities are determined by the visiblity settings of the object that was acted on, e.g. Drive files a user can see. An activity is a record of past events. Multiple events may be merged if they are similar. A request is scoped to activities from a given Google service using the source parameter.
 ///
 /// A builder for the *list* method supported by a *activity* resource.
-/// It is not used directly, but through a `ActivityMethods`.
+/// It is not used directly, but through a `ActivityMethods` instance.
 ///
 /// # Example
 ///
@@ -716,7 +725,7 @@ impl<'a, C, NC, A> ActivityListCall<'a, C, NC, A> where NC: hyper::net::NetworkC
         for &field in ["alt", "userId", "source", "pageToken", "pageSize", "groupingStrategy", "drive.fileId", "drive.ancestorId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -745,7 +754,7 @@ impl<'a, C, NC, A> ActivityListCall<'a, C, NC, A> where NC: hyper::net::NetworkC
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -757,7 +766,6 @@ impl<'a, C, NC, A> ActivityListCall<'a, C, NC, A> where NC: hyper::net::NetworkC
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -767,7 +775,7 @@ impl<'a, C, NC, A> ActivityListCall<'a, C, NC, A> where NC: hyper::net::NetworkC
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -778,7 +786,7 @@ impl<'a, C, NC, A> ActivityListCall<'a, C, NC, A> where NC: hyper::net::NetworkC
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -787,13 +795,13 @@ impl<'a, C, NC, A> ActivityListCall<'a, C, NC, A> where NC: hyper::net::NetworkC
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -803,7 +811,7 @@ impl<'a, C, NC, A> ActivityListCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// Sets the *user id* query property to the given value.
     ///
     /// 
-    /// Indicates the user to return activity for. Use the special value me to indicate the currently authenticated user.    
+    /// Indicates the user to return activity for. Use the special value me to indicate the currently authenticated user.
     pub fn user_id(mut self, new_value: &str) -> ActivityListCall<'a, C, NC, A> {
         self._user_id = Some(new_value.to_string());
         self
@@ -820,7 +828,7 @@ impl<'a, C, NC, A> ActivityListCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// Sets the *page token* query property to the given value.
     ///
     /// 
-    /// A token to retrieve a specific page of results.    
+    /// A token to retrieve a specific page of results.
     pub fn page_token(mut self, new_value: &str) -> ActivityListCall<'a, C, NC, A> {
         self._page_token = Some(new_value.to_string());
         self
@@ -828,7 +836,7 @@ impl<'a, C, NC, A> ActivityListCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// Sets the *page size* query property to the given value.
     ///
     /// 
-    /// The maximum number of events to return on a page. The response includes a continuation token if there are more events.    
+    /// The maximum number of events to return on a page. The response includes a continuation token if there are more events.
     pub fn page_size(mut self, new_value: i32) -> ActivityListCall<'a, C, NC, A> {
         self._page_size = Some(new_value);
         self
@@ -836,7 +844,7 @@ impl<'a, C, NC, A> ActivityListCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// Sets the *grouping strategy* query property to the given value.
     ///
     /// 
-    /// Indicates the strategy to use when grouping singleEvents items in the associated combinedEvent object.    
+    /// Indicates the strategy to use when grouping singleEvents items in the associated combinedEvent object.
     pub fn grouping_strategy(mut self, new_value: &str) -> ActivityListCall<'a, C, NC, A> {
         self._grouping_strategy = Some(new_value.to_string());
         self
@@ -844,7 +852,7 @@ impl<'a, C, NC, A> ActivityListCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// Sets the *drive.file id* query property to the given value.
     ///
     /// 
-    /// Identifies the Drive item to return activities for.    
+    /// Identifies the Drive item to return activities for.
     pub fn drive_file_id(mut self, new_value: &str) -> ActivityListCall<'a, C, NC, A> {
         self._drive_file_id = Some(new_value.to_string());
         self
@@ -852,7 +860,7 @@ impl<'a, C, NC, A> ActivityListCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// Sets the *drive.ancestor id* query property to the given value.
     ///
     /// 
-    /// Identifies the Drive folder containing the items for which to return activities.    
+    /// Identifies the Drive folder containing the items for which to return activities.
     pub fn drive_ancestor_id(mut self, new_value: &str) -> ActivityListCall<'a, C, NC, A> {
         self._drive_ancestor_id = Some(new_value.to_string());
         self

@@ -1,8 +1,8 @@
 // DO NOT EDIT !
-// This file was generated automatically from 'src/mako/lib.rs.mako'
+// This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *storage* crate version *0.1.1+20150213*, where *20150213* is the exact revision of the *storage:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.1*.
+//! This documentation was generated from *storage* crate version *0.1.2+20150213*, where *20150213* is the exact revision of the *storage:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.2*.
 //! 
 //! Everything else about the *storage* *v1* API can be found at the
 //! [official documentation site](https://developers.google.com/storage/docs/json_api/).
@@ -52,6 +52,8 @@
 //! 
 //! * **[Hub](struct.Storage.html)**
 //!     * a central object to maintain state and allow accessing all *Activities*
+//!     * creates [*Method Builders*](trait.MethodsBuilder.html) which in turn
+//!       allow access to individual [*Call Builders*](trait.CallBuilder.html)
 //! * **[Resources](trait.Resource.html)**
 //!     * primary types that you can apply *Activities* to
 //!     * a collection of properties and *Parts*
@@ -60,6 +62,8 @@
 //!         * never directly used in *Activities*
 //! * **[Activities](trait.CallBuilder.html)**
 //!     * operations to apply to *Resources*
+//! 
+//! All *structures* are marked with applicable traits to further categorize them and ease browsing.
 //! 
 //! Generally speaking, you can invoke *Activities* like this:
 //! 
@@ -105,7 +109,7 @@
 //! extern crate "yup-oauth2" as oauth2;
 //! extern crate "google-storage1" as storage1;
 //! use storage1::ObjectAccessControl;
-//! use storage1::Result;
+//! use storage1::{Result, Error};
 //! # #[test] fn egal() {
 //! use std::default::Default;
 //! use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -136,15 +140,17 @@
 //!              .doit();
 //! 
 //! match result {
-//!     Result::HttpError(err) => println!("HTTPERROR: {:?}", err),
-//!     Result::MissingAPIKey => println!("Auth: Missing API Key - used if there are no scopes"),
-//!     Result::MissingToken => println!("OAuth2: Missing Token"),
-//!     Result::Cancelled => println!("Operation cancelled by user"),
-//!     Result::UploadSizeLimitExceeded(size, max_size) => println!("Upload size too big: {} of {}", size, max_size),
-//!     Result::Failure(_) => println!("General Failure (hyper::client::Response doesn't print)"),
-//!     Result::FieldClash(clashed_field) => println!("You added custom parameter which is part of builder: {:?}", clashed_field),
-//!     Result::JsonDecodeError(err) => println!("Couldn't understand server reply - maybe API needs update: {:?}", err),
-//!     Result::Success(_) => println!("Success (value doesn't print)"),
+//!     Err(e) => match e {
+//!         Error::HttpError(err) => println!("HTTPERROR: {:?}", err),
+//!         Error::MissingAPIKey => println!("Auth: Missing API Key - used if there are no scopes"),
+//!         Error::MissingToken => println!("OAuth2: Missing Token"),
+//!         Error::Cancelled => println!("Operation canceled by user"),
+//!         Error::UploadSizeLimitExceeded(size, max_size) => println!("Upload size too big: {} of {}", size, max_size),
+//!         Error::Failure(_) => println!("General Failure (hyper::client::Response doesn't print)"),
+//!         Error::FieldClash(clashed_field) => println!("You added custom parameter which is part of builder: {:?}", clashed_field),
+//!         Error::JsonDecodeError(err) => println!("Couldn't understand server reply - maybe API needs update: {:?}", err),
+//!     },
+//!     Ok(_) => println!("Success (value doesn't print)"),
 //! }
 //! # }
 //! ```
@@ -157,7 +163,7 @@
 //! When delegates handle errors or intermediate values, they may have a chance to instruct the system to retry. This 
 //! makes the system potentially resilient to all kinds of errors.
 //! 
-//! ## Uploads and Downlods
+//! ## Uploads and Downloads
 //! If a method supports downloads, the response body, which is part of the [Result](enum.Result.html), should be
 //! read by you to obtain the media.
 //! If such a method also supports a [Response Result](trait.ResponseResult.html), it will return that by default.
@@ -180,8 +186,9 @@
 //! ## Optional Parts in Server-Requests
 //! 
 //! All structures provided by this library are made to be [enocodable](trait.RequestValue.html) and 
-//! [decodable](trait.ResponseResult.html) via json. Optionals are used to indicate that partial requests are responses are valid.
-//! Most optionals are are considered [Parts](trait.Part.html) which are identifyable by name, which will be sent to 
+//! [decodable](trait.ResponseResult.html) via *json*. Optionals are used to indicate that partial requests are responses 
+//! are valid.
+//! Most optionals are are considered [Parts](trait.Part.html) which are identifiable by name, which will be sent to 
 //! the server to indicate either the set parts of the request or the desired parts in the response.
 //! 
 //! ## Builder Arguments
@@ -230,7 +237,7 @@ use std::io;
 use std::fs;
 use std::thread::sleep;
 
-pub use cmn::{MultiPartReader, ToParts, MethodInfo, Result, CallBuilder, Hub, ReadSeek, Part, ResponseResult, RequestValue, NestedType, Delegate, DefaultDelegate, ResourceMethodsBuilder, Resource, JsonServerError};
+pub use cmn::{MultiPartReader, ToParts, MethodInfo, Result, Error, CallBuilder, Hub, ReadSeek, Part, ResponseResult, RequestValue, NestedType, Delegate, DefaultDelegate, MethodsBuilder, Resource, JsonServerError};
 
 
 // ##############
@@ -289,7 +296,7 @@ impl Default for Scope {
 /// extern crate "yup-oauth2" as oauth2;
 /// extern crate "google-storage1" as storage1;
 /// use storage1::ObjectAccessControl;
-/// use storage1::Result;
+/// use storage1::{Result, Error};
 /// # #[test] fn egal() {
 /// use std::default::Default;
 /// use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -320,15 +327,17 @@ impl Default for Scope {
 ///              .doit();
 /// 
 /// match result {
-///     Result::HttpError(err) => println!("HTTPERROR: {:?}", err),
-///     Result::MissingAPIKey => println!("Auth: Missing API Key - used if there are no scopes"),
-///     Result::MissingToken => println!("OAuth2: Missing Token"),
-///     Result::Cancelled => println!("Operation cancelled by user"),
-///     Result::UploadSizeLimitExceeded(size, max_size) => println!("Upload size too big: {} of {}", size, max_size),
-///     Result::Failure(_) => println!("General Failure (hyper::client::Response doesn't print)"),
-///     Result::FieldClash(clashed_field) => println!("You added custom parameter which is part of builder: {:?}", clashed_field),
-///     Result::JsonDecodeError(err) => println!("Couldn't understand server reply - maybe API needs update: {:?}", err),
-///     Result::Success(_) => println!("Success (value doesn't print)"),
+///     Err(e) => match e {
+///         Error::HttpError(err) => println!("HTTPERROR: {:?}", err),
+///         Error::MissingAPIKey => println!("Auth: Missing API Key - used if there are no scopes"),
+///         Error::MissingToken => println!("OAuth2: Missing Token"),
+///         Error::Cancelled => println!("Operation canceled by user"),
+///         Error::UploadSizeLimitExceeded(size, max_size) => println!("Upload size too big: {} of {}", size, max_size),
+///         Error::Failure(_) => println!("General Failure (hyper::client::Response doesn't print)"),
+///         Error::FieldClash(clashed_field) => println!("You added custom parameter which is part of builder: {:?}", clashed_field),
+///         Error::JsonDecodeError(err) => println!("Couldn't understand server reply - maybe API needs update: {:?}", err),
+///     },
+///     Ok(_) => println!("Success (value doesn't print)"),
 /// }
 /// # }
 /// ```
@@ -349,7 +358,7 @@ impl<'a, C, NC, A> Storage<C, NC, A>
         Storage {
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/0.1.1".to_string(),
+            _user_agent: "google-api-rust-client/0.1.2".to_string(),
             _m: PhantomData
         }
     }
@@ -374,7 +383,7 @@ impl<'a, C, NC, A> Storage<C, NC, A>
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/0.1.1`.
+    /// It defaults to `google-api-rust-client/0.1.2`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -399,9 +408,9 @@ impl<'a, C, NC, A> Storage<C, NC, A>
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct BucketAccessControls {
-    /// The list of items.    
+    /// The list of items.
     pub items: Vec<BucketAccessControl>,
-    /// The kind of item this is. For lists of bucket access control entries, this is always storage#bucketAccessControls.    
+    /// The kind of item this is. For lists of bucket access control entries, this is always storage#bucketAccessControls.
     pub kind: String,
 }
 
@@ -414,9 +423,9 @@ impl ResponseResult for BucketAccessControls {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct BucketLifecycleRule {
-    /// The action to take.    
+    /// The action to take.
     pub action: BucketLifecycleRuleAction,
-    /// The condition(s) under which the action will be taken.    
+    /// The condition(s) under which the action will be taken.
     pub condition: BucketLifecycleRuleCondition,
 }
 
@@ -430,10 +439,10 @@ impl Part for BucketLifecycleRule {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ObjectAccessControlProjectTeam {
-    /// The project number.    
+    /// The project number.
     #[serde(alias="projectNumber")]
     pub project_number: String,
-    /// The team. Can be owners, editors, or viewers.    
+    /// The team. Can be owners, editors, or viewers.
     pub team: String,
 }
 
@@ -447,15 +456,15 @@ impl Part for ObjectAccessControlProjectTeam {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct BucketLifecycleRuleCondition {
-    /// Relevant only for versioned objects. If the value is true, this condition matches live objects; if the value is false, it matches archived objects.    
+    /// Relevant only for versioned objects. If the value is true, this condition matches live objects; if the value is false, it matches archived objects.
     #[serde(alias="isLive")]
     pub is_live: bool,
-    /// Relevant only for versioned objects. If the value is N, this condition is satisfied when there are at least N versions (including the live version) newer than this version of the object.    
+    /// Relevant only for versioned objects. If the value is N, this condition is satisfied when there are at least N versions (including the live version) newer than this version of the object.
     #[serde(alias="numNewerVersions")]
     pub num_newer_versions: i32,
-    /// Age of an object (in days). This condition is satisfied when an object reaches the specified age.    
+    /// Age of an object (in days). This condition is satisfied when an object reaches the specified age.
     pub age: i32,
-    /// A date in RFC 3339 format with only the date part (for instance, "2013-01-15"). This condition is satisfied when an object is created before midnight of the specified date in UTC.    
+    /// A date in RFC 3339 format with only the date part (for instance, "2013-01-15"). This condition is satisfied when an object is created before midnight of the specified date in UTC.
     #[serde(alias="createdBefore")]
     pub created_before: String,
 }
@@ -470,10 +479,10 @@ impl Part for BucketLifecycleRuleCondition {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct BucketWebsite {
-    /// The custom object to return when a requested resource is not found.    
+    /// The custom object to return when a requested resource is not found.
     #[serde(alias="notFoundPage")]
     pub not_found_page: String,
-    /// Behaves as the bucket's directory index where missing objects are treated as potential directories.    
+    /// Behaves as the bucket's directory index where missing objects are treated as potential directories.
     #[serde(alias="mainPageSuffix")]
     pub main_page_suffix: String,
 }
@@ -494,28 +503,28 @@ impl Part for BucketWebsite {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Channel {
-    /// A version-specific identifier for the watched resource.    
+    /// A version-specific identifier for the watched resource.
     #[serde(alias="resourceUri")]
     pub resource_uri: Option<String>,
-    /// Identifies this as a notification channel used to watch for changes to a resource. Value: the fixed string "api#channel".    
+    /// Identifies this as a notification channel used to watch for changes to a resource. Value: the fixed string "api#channel".
     pub kind: Option<String>,
-    /// An opaque ID that identifies the resource being watched on this channel. Stable across different API versions.    
+    /// An opaque ID that identifies the resource being watched on this channel. Stable across different API versions.
     #[serde(alias="resourceId")]
     pub resource_id: Option<String>,
-    /// A UUID or similar unique string that identifies this channel.    
+    /// A UUID or similar unique string that identifies this channel.
     pub id: Option<String>,
-    /// An arbitrary string delivered to the target address with each notification delivered over this channel. Optional.    
+    /// An arbitrary string delivered to the target address with each notification delivered over this channel. Optional.
     pub token: Option<String>,
-    /// Additional parameters controlling delivery channel behavior. Optional.    
+    /// Additional parameters controlling delivery channel behavior. Optional.
     pub params: Option<HashMap<String, String>>,
-    /// Date and time of notification channel expiration, expressed as a Unix timestamp, in milliseconds. Optional.    
+    /// Date and time of notification channel expiration, expressed as a Unix timestamp, in milliseconds. Optional.
     pub expiration: Option<String>,
-    /// The address where notifications are delivered for this channel.    
+    /// The address where notifications are delivered for this channel.
     pub address: Option<String>,
-    /// The type of delivery mechanism used for this channel.    
+    /// The type of delivery mechanism used for this channel.
     #[serde(alias="type")]
     pub type_: Option<String>,
-    /// A Boolean value to indicate whether payload is wanted. Optional.    
+    /// A Boolean value to indicate whether payload is wanted. Optional.
     pub payload: Option<bool>,
 }
 
@@ -530,10 +539,10 @@ impl ResponseResult for Channel {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct BucketLogging {
-    /// A prefix for log object names.    
+    /// A prefix for log object names.
     #[serde(alias="logObjectPrefix")]
     pub log_object_prefix: String,
-    /// The destination bucket where the current bucket's logs should be placed.    
+    /// The destination bucket where the current bucket's logs should be placed.
     #[serde(alias="logBucket")]
     pub log_bucket: String,
 }
@@ -548,7 +557,7 @@ impl Part for BucketLogging {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct BucketLifecycle {
-    /// A lifecycle management rule, which is made of an action to take and the condition(s) under which the action will be taken.    
+    /// A lifecycle management rule, which is made of an action to take and the condition(s) under which the action will be taken.
     pub rule: Vec<BucketLifecycleRule>,
 }
 
@@ -562,7 +571,7 @@ impl Part for BucketLifecycle {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct BucketVersioning {
-    /// While set to true, versioning is fully enabled for this bucket.    
+    /// While set to true, versioning is fully enabled for this bucket.
     pub enabled: bool,
 }
 
@@ -589,64 +598,64 @@ impl Part for BucketVersioning {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Object {
-    /// The link to this object.    
+    /// The link to this object.
     #[serde(alias="selfLink")]
     pub self_link: Option<String>,
-    /// The creation or modification time of the object in RFC 3339 format. For buckets with versioning enabled, changing an object's metadata does not change this property.    
+    /// The creation or modification time of the object in RFC 3339 format. For buckets with versioning enabled, changing an object's metadata does not change this property.
     pub updated: Option<String>,
-    /// Content-Type of the object data.    
+    /// Content-Type of the object data.
     #[serde(alias="contentType")]
     pub content_type: Option<String>,
-    /// Content-Language of the object data.    
+    /// Content-Language of the object data.
     #[serde(alias="contentLanguage")]
     pub content_language: Option<String>,
-    /// The content generation of this object. Used for object versioning.    
+    /// The content generation of this object. Used for object versioning.
     pub generation: Option<String>,
-    /// Number of underlying components that make up this object. Components are accumulated by compose operations.    
+    /// Number of underlying components that make up this object. Components are accumulated by compose operations.
     #[serde(alias="componentCount")]
     pub component_count: Option<i32>,
-    /// The version of the metadata for this object at this generation. Used for preconditions and for detecting changes in metadata. A metageneration number is only meaningful in the context of a particular generation of a particular object.    
+    /// The version of the metadata for this object at this generation. Used for preconditions and for detecting changes in metadata. A metageneration number is only meaningful in the context of a particular generation of a particular object.
     pub metageneration: Option<String>,
-    /// Media download link.    
+    /// Media download link.
     #[serde(alias="mediaLink")]
     pub media_link: Option<String>,
-    /// The owner of the object. This will always be the uploader of the object.    
+    /// The owner of the object. This will always be the uploader of the object.
     pub owner: Option<ObjectOwner>,
-    /// Cache-Control directive for the object data.    
+    /// Cache-Control directive for the object data.
     #[serde(alias="cacheControl")]
     pub cache_control: Option<String>,
-    /// Content-Encoding of the object data.    
+    /// Content-Encoding of the object data.
     #[serde(alias="contentEncoding")]
     pub content_encoding: Option<String>,
-    /// The ID of the object.    
+    /// The ID of the object.
     pub id: Option<String>,
-    /// Content-Length of the data in bytes.    
+    /// Content-Length of the data in bytes.
     pub size: Option<String>,
-    /// The deletion time of the object in RFC 3339 format. Will be returned if and only if this version of the object has been deleted.    
+    /// The deletion time of the object in RFC 3339 format. Will be returned if and only if this version of the object has been deleted.
     #[serde(alias="timeDeleted")]
     pub time_deleted: Option<String>,
-    /// The kind of item this is. For objects, this is always storage#object.    
+    /// The kind of item this is. For objects, this is always storage#object.
     pub kind: Option<String>,
-    /// The name of this object. Required if not specified by URL parameter.    
+    /// The name of this object. Required if not specified by URL parameter.
     pub name: Option<String>,
-    /// MD5 hash of the data; encoded using base64.    
+    /// MD5 hash of the data; encoded using base64.
     #[serde(alias="md5Hash")]
     pub md5_hash: Option<String>,
-    /// The name of the bucket containing this object.    
+    /// The name of the bucket containing this object.
     pub bucket: Option<String>,
-    /// Access controls on the object.    
+    /// Access controls on the object.
     pub acl: Option<Vec<ObjectAccessControl>>,
-    /// CRC32c checksum, as described in RFC 4960, Appendix B; encoded using base64.    
+    /// CRC32c checksum, as described in RFC 4960, Appendix B; encoded using base64.
     pub crc32c: Option<String>,
-    /// HTTP 1.1 Entity tag for the object.    
+    /// HTTP 1.1 Entity tag for the object.
     pub etag: Option<String>,
-    /// Storage class of the object.    
+    /// Storage class of the object.
     #[serde(alias="storageClass")]
     pub storage_class: Option<String>,
-    /// Content-Disposition of the object data.    
+    /// Content-Disposition of the object data.
     #[serde(alias="contentDisposition")]
     pub content_disposition: Option<String>,
-    /// User-provided metadata, in key/value pairs.    
+    /// User-provided metadata, in key/value pairs.
     pub metadata: Option<HashMap<String, String>>,
 }
 
@@ -666,14 +675,14 @@ impl ResponseResult for Object {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct Objects {
-    /// The continuation token, used to page through large result sets. Provide this value in a subsequent request to return the next page of results.    
+    /// The continuation token, used to page through large result sets. Provide this value in a subsequent request to return the next page of results.
     #[serde(alias="nextPageToken")]
     pub next_page_token: String,
-    /// The list of items.    
+    /// The list of items.
     pub items: Vec<Object>,
-    /// The kind of item this is. For lists of objects, this is always storage#objects.    
+    /// The kind of item this is. For lists of objects, this is always storage#objects.
     pub kind: String,
-    /// The list of prefixes of objects matching-but-not-listed up to and including the requested delimiter.    
+    /// The list of prefixes of objects matching-but-not-listed up to and including the requested delimiter.
     pub prefixes: Vec<String>,
 }
 
@@ -686,14 +695,14 @@ impl ResponseResult for Objects {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct BucketCors {
-    /// The list of Origins eligible to receive CORS response headers. Note: "*" is permitted in the list of origins, and means "any Origin".    
+    /// The list of Origins eligible to receive CORS response headers. Note: "*" is permitted in the list of origins, and means "any Origin".
     pub origin: Vec<String>,
-    /// The list of HTTP headers other than the simple response headers to give permission for the user-agent to share across domains.    
+    /// The list of HTTP headers other than the simple response headers to give permission for the user-agent to share across domains.
     #[serde(alias="responseHeader")]
     pub response_header: Vec<String>,
-    /// The list of HTTP methods on which to include CORS response headers, (GET, OPTIONS, POST, etc) Note: "*" is permitted in the list of methods, and means "any method".    
+    /// The list of HTTP methods on which to include CORS response headers, (GET, OPTIONS, POST, etc) Note: "*" is permitted in the list of methods, and means "any method".
     pub method: Vec<String>,
-    /// The value, in seconds, to return in the  Access-Control-Max-Age header used in preflight responses.    
+    /// The value, in seconds, to return in the  Access-Control-Max-Age header used in preflight responses.
     #[serde(alias="maxAgeSeconds")]
     pub max_age_seconds: i32,
 }
@@ -714,9 +723,9 @@ impl Part for BucketCors {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct ObjectAccessControls {
-    /// The list of items.    
+    /// The list of items.
     pub items: Vec<String>,
-    /// The kind of item this is. For lists of object access control entries, this is always storage#objectAccessControls.    
+    /// The kind of item this is. For lists of object access control entries, this is always storage#objectAccessControls.
     pub kind: String,
 }
 
@@ -729,10 +738,10 @@ impl ResponseResult for ObjectAccessControls {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct BucketAccessControlProjectTeam {
-    /// The project number.    
+    /// The project number.
     #[serde(alias="projectNumber")]
     pub project_number: String,
-    /// The team. Can be owners, editors, or viewers.    
+    /// The team. Can be owners, editors, or viewers.
     pub team: String,
 }
 
@@ -746,7 +755,7 @@ impl Part for BucketAccessControlProjectTeam {}
 /// 
 #[derive(Default, Clone, Debug, Serialize)]
 pub struct ComposeRequestSourceObjectsObjectPreconditions {
-    /// Only perform the composition if the generation of the source object that would be used matches this value. If this value and a generation are both specified, they must be the same value or the call will fail.    
+    /// Only perform the composition if the generation of the source object that would be used matches this value. If this value and a generation are both specified, they must be the same value or the call will fail.
     #[serde(alias="ifGenerationMatch")]
     pub if_generation_match: String,
 }
@@ -761,11 +770,11 @@ impl Part for ComposeRequestSourceObjectsObjectPreconditions {}
 /// 
 #[derive(Default, Clone, Debug, Serialize)]
 pub struct ComposeRequestSourceObjects {
-    /// The generation of this object to use as the source.    
+    /// The generation of this object to use as the source.
     pub generation: String,
-    /// The source object's name. The source object's bucket is implicitly the destination bucket.    
+    /// The source object's name. The source object's bucket is implicitly the destination bucket.
     pub name: String,
-    /// Conditions that must be met for this operation to execute.    
+    /// Conditions that must be met for this operation to execute.
     #[serde(alias="objectPreconditions")]
     pub object_preconditions: ComposeRequestSourceObjectsObjectPreconditions,
 }
@@ -790,46 +799,46 @@ impl Part for ComposeRequestSourceObjects {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Bucket {
-    /// The bucket's website configuration.    
+    /// The bucket's website configuration.
     pub website: Option<BucketWebsite>,
-    /// Creation time of the bucket in RFC 3339 format.    
+    /// Creation time of the bucket in RFC 3339 format.
     #[serde(alias="timeCreated")]
     pub time_created: Option<String>,
-    /// The bucket's versioning configuration.    
+    /// The bucket's versioning configuration.
     pub versioning: Option<BucketVersioning>,
-    /// Default access controls to apply to new objects when no ACL is provided.    
+    /// Default access controls to apply to new objects when no ACL is provided.
     #[serde(alias="defaultObjectAcl")]
     pub default_object_acl: Option<Vec<ObjectAccessControl>>,
-    /// The metadata generation of this bucket.    
+    /// The metadata generation of this bucket.
     pub metageneration: Option<String>,
-    /// The bucket's Cross-Origin Resource Sharing (CORS) configuration.    
+    /// The bucket's Cross-Origin Resource Sharing (CORS) configuration.
     pub cors: Option<Vec<BucketCors>>,
-    /// The owner of the bucket. This is always the project team's owner group.    
+    /// The owner of the bucket. This is always the project team's owner group.
     pub owner: Option<BucketOwner>,
-    /// Access controls on the bucket.    
+    /// Access controls on the bucket.
     pub acl: Option<Vec<BucketAccessControl>>,
-    /// The ID of the bucket.    
+    /// The ID of the bucket.
     pub id: Option<String>,
-    /// The kind of item this is. For buckets, this is always storage#bucket.    
+    /// The kind of item this is. For buckets, this is always storage#bucket.
     pub kind: Option<String>,
-    /// The bucket's logging configuration, which defines the destination bucket and optional name prefix for the current bucket's logs.    
+    /// The bucket's logging configuration, which defines the destination bucket and optional name prefix for the current bucket's logs.
     pub logging: Option<BucketLogging>,
-    /// The name of the bucket.    
+    /// The name of the bucket.
     pub name: Option<String>,
-    /// The project number of the project the bucket belongs to.    
+    /// The project number of the project the bucket belongs to.
     #[serde(alias="projectNumber")]
     pub project_number: Option<String>,
-    /// HTTP 1.1 Entity tag for the bucket.    
+    /// HTTP 1.1 Entity tag for the bucket.
     pub etag: Option<String>,
-    /// The bucket's storage class. This defines how objects in the bucket are stored and determines the SLA and the cost of storage. Typical values are STANDARD and DURABLE_REDUCED_AVAILABILITY. Defaults to STANDARD. See the developer's guide for the authoritative list.    
+    /// The bucket's storage class. This defines how objects in the bucket are stored and determines the SLA and the cost of storage. Typical values are STANDARD and DURABLE_REDUCED_AVAILABILITY. Defaults to STANDARD. See the developer's guide for the authoritative list.
     #[serde(alias="storageClass")]
     pub storage_class: Option<String>,
-    /// The bucket's lifecycle configuration. See lifecycle management for more information.    
+    /// The bucket's lifecycle configuration. See lifecycle management for more information.
     pub lifecycle: Option<BucketLifecycle>,
-    /// The URI of this bucket.    
+    /// The URI of this bucket.
     #[serde(alias="selfLink")]
     pub self_link: Option<String>,
-    /// The location of the bucket. Object data for objects in the bucket resides in physical storage within this region. Defaults to US. See the developer's guide for the authoritative list.    
+    /// The location of the bucket. Object data for objects in the bucket resides in physical storage within this region. Defaults to US. See the developer's guide for the authoritative list.
     pub location: Option<String>,
 }
 
@@ -854,11 +863,11 @@ impl ResponseResult for Bucket {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct BucketAccessControl {
-    /// The domain associated with the entity, if any.    
+    /// The domain associated with the entity, if any.
     pub domain: Option<String>,
-    /// The name of the bucket.    
+    /// The name of the bucket.
     pub bucket: Option<String>,
-    /// The kind of item this is. For bucket access control entries, this is always storage#bucketAccessControl.    
+    /// The kind of item this is. For bucket access control entries, this is always storage#bucketAccessControl.
     pub kind: Option<String>,
     /// The entity holding the permission, in one of the following forms: 
     /// - user-userId 
@@ -873,21 +882,21 @@ pub struct BucketAccessControl {
     /// - The group example@googlegroups.com would be group-example@googlegroups.com. 
     /// - To refer to all members of the Google Apps for Business domain example.com, the entity would be domain-example.com.
     pub entity: Option<String>,
-    /// The email address associated with the entity, if any.    
+    /// The email address associated with the entity, if any.
     pub email: Option<String>,
-    /// HTTP 1.1 Entity tag for the access-control entry.    
+    /// HTTP 1.1 Entity tag for the access-control entry.
     pub etag: Option<String>,
-    /// The access permission for the entity. Can be READER, WRITER, or OWNER.    
+    /// The access permission for the entity. Can be READER, WRITER, or OWNER.
     pub role: Option<String>,
-    /// The ID for the entity, if any.    
+    /// The ID for the entity, if any.
     #[serde(alias="entityId")]
     pub entity_id: Option<String>,
-    /// The project team associated with the entity, if any.    
+    /// The project team associated with the entity, if any.
     #[serde(alias="projectTeam")]
     pub project_team: Option<BucketAccessControlProjectTeam>,
-    /// The ID of the access-control entry.    
+    /// The ID of the access-control entry.
     pub id: Option<String>,
-    /// The link to this access-control entry.    
+    /// The link to this access-control entry.
     #[serde(alias="selfLink")]
     pub self_link: Option<String>,
 }
@@ -917,15 +926,15 @@ impl ResponseResult for BucketAccessControl {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ObjectAccessControl {
-    /// The domain associated with the entity, if any.    
+    /// The domain associated with the entity, if any.
     pub domain: Option<String>,
-    /// The content generation of the object.    
+    /// The content generation of the object.
     pub generation: Option<String>,
-    /// The name of the object.    
+    /// The name of the object.
     pub object: Option<String>,
-    /// The name of the bucket.    
+    /// The name of the bucket.
     pub bucket: Option<String>,
-    /// The kind of item this is. For object access control entries, this is always storage#objectAccessControl.    
+    /// The kind of item this is. For object access control entries, this is always storage#objectAccessControl.
     pub kind: Option<String>,
     /// The entity holding the permission, in one of the following forms: 
     /// - user-userId 
@@ -940,21 +949,21 @@ pub struct ObjectAccessControl {
     /// - The group example@googlegroups.com would be group-example@googlegroups.com. 
     /// - To refer to all members of the Google Apps for Business domain example.com, the entity would be domain-example.com.
     pub entity: Option<String>,
-    /// The email address associated with the entity, if any.    
+    /// The email address associated with the entity, if any.
     pub email: Option<String>,
-    /// HTTP 1.1 Entity tag for the access-control entry.    
+    /// HTTP 1.1 Entity tag for the access-control entry.
     pub etag: Option<String>,
-    /// The access permission for the entity. Can be READER or OWNER.    
+    /// The access permission for the entity. Can be READER or OWNER.
     pub role: Option<String>,
-    /// The ID for the entity, if any.    
+    /// The ID for the entity, if any.
     #[serde(alias="entityId")]
     pub entity_id: Option<String>,
-    /// The project team associated with the entity, if any.    
+    /// The project team associated with the entity, if any.
     #[serde(alias="projectTeam")]
     pub project_team: Option<ObjectAccessControlProjectTeam>,
-    /// The ID of the access-control entry.    
+    /// The ID of the access-control entry.
     pub id: Option<String>,
-    /// The link to this access-control entry.    
+    /// The link to this access-control entry.
     #[serde(alias="selfLink")]
     pub self_link: Option<String>,
 }
@@ -970,10 +979,10 @@ impl ResponseResult for ObjectAccessControl {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ObjectOwner {
-    /// The ID for the entity.    
+    /// The ID for the entity.
     #[serde(alias="entityId")]
     pub entity_id: String,
-    /// The entity, in the form user-userId.    
+    /// The entity, in the form user-userId.
     pub entity: String,
 }
 
@@ -987,7 +996,7 @@ impl Part for ObjectOwner {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct BucketLifecycleRuleAction {
-    /// Type of the action. Currently, only Delete is supported.    
+    /// Type of the action. Currently, only Delete is supported.
     #[serde(alias="type")]
     pub type_: String,
 }
@@ -1002,10 +1011,10 @@ impl Part for BucketLifecycleRuleAction {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct BucketOwner {
-    /// The ID for the entity.    
+    /// The ID for the entity.
     #[serde(alias="entityId")]
     pub entity_id: String,
-    /// The entity, in the form project-owner-projectId.    
+    /// The entity, in the form project-owner-projectId.
     pub entity: String,
 }
 
@@ -1024,11 +1033,11 @@ impl Part for BucketOwner {}
 /// 
 #[derive(Default, Clone, Debug, Serialize)]
 pub struct ComposeRequest {
-    /// The kind of item this is.    
+    /// The kind of item this is.
     pub kind: Option<String>,
-    /// Properties of the resulting object.    
+    /// Properties of the resulting object.
     pub destination: Option<Object>,
-    /// The list of source objects that will be concatenated into a single object.    
+    /// The list of source objects that will be concatenated into a single object.
     #[serde(alias="sourceObjects")]
     pub source_objects: Option<Vec<ComposeRequestSourceObjects>>,
 }
@@ -1047,12 +1056,12 @@ impl RequestValue for ComposeRequest {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct Buckets {
-    /// The continuation token, used to page through large result sets. Provide this value in a subsequent request to return the next page of results.    
+    /// The continuation token, used to page through large result sets. Provide this value in a subsequent request to return the next page of results.
     #[serde(alias="nextPageToken")]
     pub next_page_token: String,
-    /// The list of items.    
+    /// The list of items.
     pub items: Vec<Bucket>,
-    /// The kind of item this is. For lists of buckets, this is always storage#buckets.    
+    /// The kind of item this is. For lists of buckets, this is always storage#buckets.
     pub kind: String,
 }
 
@@ -1098,13 +1107,18 @@ pub struct DefaultObjectAccessControlMethods<'a, C, NC, A>
     hub: &'a Storage<C, NC, A>,
 }
 
-impl<'a, C, NC, A> ResourceMethodsBuilder for DefaultObjectAccessControlMethods<'a, C, NC, A> {}
+impl<'a, C, NC, A> MethodsBuilder for DefaultObjectAccessControlMethods<'a, C, NC, A> {}
 
 impl<'a, C, NC, A> DefaultObjectAccessControlMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Creates a new default object ACL entry on the specified bucket.    
+    /// Creates a new default object ACL entry on the specified bucket.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `bucket` - Name of a bucket.
     pub fn insert(&self, request: &ObjectAccessControl, bucket: &str) -> DefaultObjectAccessControlInsertCall<'a, C, NC, A> {
         DefaultObjectAccessControlInsertCall {
             hub: self.hub,
@@ -1118,7 +1132,13 @@ impl<'a, C, NC, A> DefaultObjectAccessControlMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Updates a default object ACL entry on the specified bucket.    
+    /// Updates a default object ACL entry on the specified bucket.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `bucket` - Name of a bucket.
+    /// * `entity` - The entity holding the permission. Can be user-userId, user-emailAddress, group-groupId, group-emailAddress, allUsers, or allAuthenticatedUsers.
     pub fn update(&self, request: &ObjectAccessControl, bucket: &str, entity: &str) -> DefaultObjectAccessControlUpdateCall<'a, C, NC, A> {
         DefaultObjectAccessControlUpdateCall {
             hub: self.hub,
@@ -1133,7 +1153,11 @@ impl<'a, C, NC, A> DefaultObjectAccessControlMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Retrieves default object ACL entries on the specified bucket.    
+    /// Retrieves default object ACL entries on the specified bucket.
+    /// 
+    /// # Arguments
+    ///
+    /// * `bucket` - Name of a bucket.
     pub fn list(&self, bucket: &str) -> DefaultObjectAccessControlListCall<'a, C, NC, A> {
         DefaultObjectAccessControlListCall {
             hub: self.hub,
@@ -1148,7 +1172,13 @@ impl<'a, C, NC, A> DefaultObjectAccessControlMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Updates a default object ACL entry on the specified bucket. This method supports patch semantics.    
+    /// Updates a default object ACL entry on the specified bucket. This method supports patch semantics.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `bucket` - Name of a bucket.
+    /// * `entity` - The entity holding the permission. Can be user-userId, user-emailAddress, group-groupId, group-emailAddress, allUsers, or allAuthenticatedUsers.
     pub fn patch(&self, request: &ObjectAccessControl, bucket: &str, entity: &str) -> DefaultObjectAccessControlPatchCall<'a, C, NC, A> {
         DefaultObjectAccessControlPatchCall {
             hub: self.hub,
@@ -1163,7 +1193,12 @@ impl<'a, C, NC, A> DefaultObjectAccessControlMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Permanently deletes the default object ACL entry for the specified entity on the specified bucket.    
+    /// Permanently deletes the default object ACL entry for the specified entity on the specified bucket.
+    /// 
+    /// # Arguments
+    ///
+    /// * `bucket` - Name of a bucket.
+    /// * `entity` - The entity holding the permission. Can be user-userId, user-emailAddress, group-groupId, group-emailAddress, allUsers, or allAuthenticatedUsers.
     pub fn delete(&self, bucket: &str, entity: &str) -> DefaultObjectAccessControlDeleteCall<'a, C, NC, A> {
         DefaultObjectAccessControlDeleteCall {
             hub: self.hub,
@@ -1177,7 +1212,12 @@ impl<'a, C, NC, A> DefaultObjectAccessControlMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Returns the default object ACL entry for the specified entity on the specified bucket.    
+    /// Returns the default object ACL entry for the specified entity on the specified bucket.
+    /// 
+    /// # Arguments
+    ///
+    /// * `bucket` - Name of a bucket.
+    /// * `entity` - The entity holding the permission. Can be user-userId, user-emailAddress, group-groupId, group-emailAddress, allUsers, or allAuthenticatedUsers.
     pub fn get(&self, bucket: &str, entity: &str) -> DefaultObjectAccessControlGetCall<'a, C, NC, A> {
         DefaultObjectAccessControlGetCall {
             hub: self.hub,
@@ -1226,13 +1266,19 @@ pub struct BucketAccessControlMethods<'a, C, NC, A>
     hub: &'a Storage<C, NC, A>,
 }
 
-impl<'a, C, NC, A> ResourceMethodsBuilder for BucketAccessControlMethods<'a, C, NC, A> {}
+impl<'a, C, NC, A> MethodsBuilder for BucketAccessControlMethods<'a, C, NC, A> {}
 
 impl<'a, C, NC, A> BucketAccessControlMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Updates an ACL entry on the specified bucket. This method supports patch semantics.    
+    /// Updates an ACL entry on the specified bucket. This method supports patch semantics.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `bucket` - Name of a bucket.
+    /// * `entity` - The entity holding the permission. Can be user-userId, user-emailAddress, group-groupId, group-emailAddress, allUsers, or allAuthenticatedUsers.
     pub fn patch(&self, request: &BucketAccessControl, bucket: &str, entity: &str) -> BucketAccessControlPatchCall<'a, C, NC, A> {
         BucketAccessControlPatchCall {
             hub: self.hub,
@@ -1247,7 +1293,12 @@ impl<'a, C, NC, A> BucketAccessControlMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Permanently deletes the ACL entry for the specified entity on the specified bucket.    
+    /// Permanently deletes the ACL entry for the specified entity on the specified bucket.
+    /// 
+    /// # Arguments
+    ///
+    /// * `bucket` - Name of a bucket.
+    /// * `entity` - The entity holding the permission. Can be user-userId, user-emailAddress, group-groupId, group-emailAddress, allUsers, or allAuthenticatedUsers.
     pub fn delete(&self, bucket: &str, entity: &str) -> BucketAccessControlDeleteCall<'a, C, NC, A> {
         BucketAccessControlDeleteCall {
             hub: self.hub,
@@ -1261,7 +1312,12 @@ impl<'a, C, NC, A> BucketAccessControlMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Creates a new ACL entry on the specified bucket.    
+    /// Creates a new ACL entry on the specified bucket.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `bucket` - Name of a bucket.
     pub fn insert(&self, request: &BucketAccessControl, bucket: &str) -> BucketAccessControlInsertCall<'a, C, NC, A> {
         BucketAccessControlInsertCall {
             hub: self.hub,
@@ -1275,7 +1331,12 @@ impl<'a, C, NC, A> BucketAccessControlMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Returns the ACL entry for the specified entity on the specified bucket.    
+    /// Returns the ACL entry for the specified entity on the specified bucket.
+    /// 
+    /// # Arguments
+    ///
+    /// * `bucket` - Name of a bucket.
+    /// * `entity` - The entity holding the permission. Can be user-userId, user-emailAddress, group-groupId, group-emailAddress, allUsers, or allAuthenticatedUsers.
     pub fn get(&self, bucket: &str, entity: &str) -> BucketAccessControlGetCall<'a, C, NC, A> {
         BucketAccessControlGetCall {
             hub: self.hub,
@@ -1289,7 +1350,13 @@ impl<'a, C, NC, A> BucketAccessControlMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Updates an ACL entry on the specified bucket.    
+    /// Updates an ACL entry on the specified bucket.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `bucket` - Name of a bucket.
+    /// * `entity` - The entity holding the permission. Can be user-userId, user-emailAddress, group-groupId, group-emailAddress, allUsers, or allAuthenticatedUsers.
     pub fn update(&self, request: &BucketAccessControl, bucket: &str, entity: &str) -> BucketAccessControlUpdateCall<'a, C, NC, A> {
         BucketAccessControlUpdateCall {
             hub: self.hub,
@@ -1304,7 +1371,11 @@ impl<'a, C, NC, A> BucketAccessControlMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Retrieves ACL entries on the specified bucket.    
+    /// Retrieves ACL entries on the specified bucket.
+    /// 
+    /// # Arguments
+    ///
+    /// * `bucket` - Name of a bucket.
     pub fn list(&self, bucket: &str) -> BucketAccessControlListCall<'a, C, NC, A> {
         BucketAccessControlListCall {
             hub: self.hub,
@@ -1352,13 +1423,17 @@ pub struct ChannelMethods<'a, C, NC, A>
     hub: &'a Storage<C, NC, A>,
 }
 
-impl<'a, C, NC, A> ResourceMethodsBuilder for ChannelMethods<'a, C, NC, A> {}
+impl<'a, C, NC, A> MethodsBuilder for ChannelMethods<'a, C, NC, A> {}
 
 impl<'a, C, NC, A> ChannelMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Stop watching resources through this channel    
+    /// Stop watching resources through this channel
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
     pub fn stop(&self, request: &Channel) -> ChannelStopCall<'a, C, NC, A> {
         ChannelStopCall {
             hub: self.hub,
@@ -1406,13 +1481,18 @@ pub struct ObjectMethods<'a, C, NC, A>
     hub: &'a Storage<C, NC, A>,
 }
 
-impl<'a, C, NC, A> ResourceMethodsBuilder for ObjectMethods<'a, C, NC, A> {}
+impl<'a, C, NC, A> MethodsBuilder for ObjectMethods<'a, C, NC, A> {}
 
 impl<'a, C, NC, A> ObjectMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Retrieves an object or its metadata.    
+    /// Retrieves an object or its metadata.
+    /// 
+    /// # Arguments
+    ///
+    /// * `bucket` - Name of the bucket in which the object resides.
+    /// * `object` - Name of the object.
     pub fn get(&self, bucket: &str, object: &str) -> ObjectGetCall<'a, C, NC, A> {
         ObjectGetCall {
             hub: self.hub,
@@ -1432,7 +1512,12 @@ impl<'a, C, NC, A> ObjectMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Watch for changes on all objects in a bucket.    
+    /// Watch for changes on all objects in a bucket.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `bucket` - Name of the bucket in which to look for objects.
     pub fn watch_all(&self, request: &Channel, bucket: &str) -> ObjectWatchAllCall<'a, C, NC, A> {
         ObjectWatchAllCall {
             hub: self.hub,
@@ -1452,7 +1537,13 @@ impl<'a, C, NC, A> ObjectMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Updates an object's metadata.    
+    /// Updates an object's metadata.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `bucket` - Name of the bucket in which the object resides.
+    /// * `object` - Name of the object.
     pub fn update(&self, request: &Object, bucket: &str, object: &str) -> ObjectUpdateCall<'a, C, NC, A> {
         ObjectUpdateCall {
             hub: self.hub,
@@ -1474,7 +1565,12 @@ impl<'a, C, NC, A> ObjectMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Stores a new object and metadata.    
+    /// Stores a new object and metadata.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `bucket` - Name of the bucket in which to store the new object. Overrides the provided object metadata's bucket value, if any.
     pub fn insert(&self, request: &Object, bucket: &str) -> ObjectInsertCall<'a, C, NC, A> {
         ObjectInsertCall {
             hub: self.hub,
@@ -1496,7 +1592,13 @@ impl<'a, C, NC, A> ObjectMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Concatenates a list of existing objects into a new object in the same bucket.    
+    /// Concatenates a list of existing objects into a new object in the same bucket.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `destinationBucket` - Name of the bucket in which to store the new object.
+    /// * `destinationObject` - Name of the new object.
     pub fn compose(&self, request: &ComposeRequest, destination_bucket: &str, destination_object: &str) -> ObjectComposeCall<'a, C, NC, A> {
         ObjectComposeCall {
             hub: self.hub,
@@ -1514,7 +1616,12 @@ impl<'a, C, NC, A> ObjectMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Deletes an object and its metadata. Deletions are permanent if versioning is not enabled for the bucket, or if the generation parameter is used.    
+    /// Deletes an object and its metadata. Deletions are permanent if versioning is not enabled for the bucket, or if the generation parameter is used.
+    /// 
+    /// # Arguments
+    ///
+    /// * `bucket` - Name of the bucket in which the object resides.
+    /// * `object` - Name of the object.
     pub fn delete(&self, bucket: &str, object: &str) -> ObjectDeleteCall<'a, C, NC, A> {
         ObjectDeleteCall {
             hub: self.hub,
@@ -1533,7 +1640,11 @@ impl<'a, C, NC, A> ObjectMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Retrieves a list of objects matching the criteria.    
+    /// Retrieves a list of objects matching the criteria.
+    /// 
+    /// # Arguments
+    ///
+    /// * `bucket` - Name of the bucket in which to look for objects.
     pub fn list(&self, bucket: &str) -> ObjectListCall<'a, C, NC, A> {
         ObjectListCall {
             hub: self.hub,
@@ -1552,7 +1663,15 @@ impl<'a, C, NC, A> ObjectMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Copies an object to a specified location. Optionally overrides metadata.    
+    /// Copies an object to a specified location. Optionally overrides metadata.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `sourceBucket` - Name of the bucket in which to find the source object.
+    /// * `sourceObject` - Name of the source object.
+    /// * `destinationBucket` - Name of the bucket in which to store the new object. Overrides the provided object metadata's bucket value, if any.
+    /// * `destinationObject` - Name of the new object. Required when the object metadata is not otherwise provided. Overrides the object metadata's name value, if any.
     pub fn copy(&self, request: &Object, source_bucket: &str, source_object: &str, destination_bucket: &str, destination_object: &str) -> ObjectCopyCall<'a, C, NC, A> {
         ObjectCopyCall {
             hub: self.hub,
@@ -1580,7 +1699,13 @@ impl<'a, C, NC, A> ObjectMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Updates an object's metadata. This method supports patch semantics.    
+    /// Updates an object's metadata. This method supports patch semantics.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `bucket` - Name of the bucket in which the object resides.
+    /// * `object` - Name of the object.
     pub fn patch(&self, request: &Object, bucket: &str, object: &str) -> ObjectPatchCall<'a, C, NC, A> {
         ObjectPatchCall {
             hub: self.hub,
@@ -1637,13 +1762,19 @@ pub struct ObjectAccessControlMethods<'a, C, NC, A>
     hub: &'a Storage<C, NC, A>,
 }
 
-impl<'a, C, NC, A> ResourceMethodsBuilder for ObjectAccessControlMethods<'a, C, NC, A> {}
+impl<'a, C, NC, A> MethodsBuilder for ObjectAccessControlMethods<'a, C, NC, A> {}
 
 impl<'a, C, NC, A> ObjectAccessControlMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Returns the ACL entry for the specified entity on the specified object.    
+    /// Returns the ACL entry for the specified entity on the specified object.
+    /// 
+    /// # Arguments
+    ///
+    /// * `bucket` - Name of a bucket.
+    /// * `object` - Name of the object.
+    /// * `entity` - The entity holding the permission. Can be user-userId, user-emailAddress, group-groupId, group-emailAddress, allUsers, or allAuthenticatedUsers.
     pub fn get(&self, bucket: &str, object: &str, entity: &str) -> ObjectAccessControlGetCall<'a, C, NC, A> {
         ObjectAccessControlGetCall {
             hub: self.hub,
@@ -1659,7 +1790,13 @@ impl<'a, C, NC, A> ObjectAccessControlMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Creates a new ACL entry on the specified object.    
+    /// Creates a new ACL entry on the specified object.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `bucket` - Name of a bucket.
+    /// * `object` - Name of the object.
     pub fn insert(&self, request: &ObjectAccessControl, bucket: &str, object: &str) -> ObjectAccessControlInsertCall<'a, C, NC, A> {
         ObjectAccessControlInsertCall {
             hub: self.hub,
@@ -1675,7 +1812,14 @@ impl<'a, C, NC, A> ObjectAccessControlMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Updates an ACL entry on the specified object. This method supports patch semantics.    
+    /// Updates an ACL entry on the specified object. This method supports patch semantics.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `bucket` - Name of a bucket.
+    /// * `object` - Name of the object.
+    /// * `entity` - The entity holding the permission. Can be user-userId, user-emailAddress, group-groupId, group-emailAddress, allUsers, or allAuthenticatedUsers.
     pub fn patch(&self, request: &ObjectAccessControl, bucket: &str, object: &str, entity: &str) -> ObjectAccessControlPatchCall<'a, C, NC, A> {
         ObjectAccessControlPatchCall {
             hub: self.hub,
@@ -1692,7 +1836,12 @@ impl<'a, C, NC, A> ObjectAccessControlMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Retrieves ACL entries on the specified object.    
+    /// Retrieves ACL entries on the specified object.
+    /// 
+    /// # Arguments
+    ///
+    /// * `bucket` - Name of a bucket.
+    /// * `object` - Name of the object.
     pub fn list(&self, bucket: &str, object: &str) -> ObjectAccessControlListCall<'a, C, NC, A> {
         ObjectAccessControlListCall {
             hub: self.hub,
@@ -1707,7 +1856,13 @@ impl<'a, C, NC, A> ObjectAccessControlMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Permanently deletes the ACL entry for the specified entity on the specified object.    
+    /// Permanently deletes the ACL entry for the specified entity on the specified object.
+    /// 
+    /// # Arguments
+    ///
+    /// * `bucket` - Name of a bucket.
+    /// * `object` - Name of the object.
+    /// * `entity` - The entity holding the permission. Can be user-userId, user-emailAddress, group-groupId, group-emailAddress, allUsers, or allAuthenticatedUsers.
     pub fn delete(&self, bucket: &str, object: &str, entity: &str) -> ObjectAccessControlDeleteCall<'a, C, NC, A> {
         ObjectAccessControlDeleteCall {
             hub: self.hub,
@@ -1723,7 +1878,14 @@ impl<'a, C, NC, A> ObjectAccessControlMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Updates an ACL entry on the specified object.    
+    /// Updates an ACL entry on the specified object.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `bucket` - Name of a bucket.
+    /// * `object` - Name of the object.
+    /// * `entity` - The entity holding the permission. Can be user-userId, user-emailAddress, group-groupId, group-emailAddress, allUsers, or allAuthenticatedUsers.
     pub fn update(&self, request: &ObjectAccessControl, bucket: &str, object: &str, entity: &str) -> ObjectAccessControlUpdateCall<'a, C, NC, A> {
         ObjectAccessControlUpdateCall {
             hub: self.hub,
@@ -1775,13 +1937,18 @@ pub struct BucketMethods<'a, C, NC, A>
     hub: &'a Storage<C, NC, A>,
 }
 
-impl<'a, C, NC, A> ResourceMethodsBuilder for BucketMethods<'a, C, NC, A> {}
+impl<'a, C, NC, A> MethodsBuilder for BucketMethods<'a, C, NC, A> {}
 
 impl<'a, C, NC, A> BucketMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Updates a bucket.    
+    /// Updates a bucket.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `bucket` - Name of a bucket.
     pub fn update(&self, request: &Bucket, bucket: &str) -> BucketUpdateCall<'a, C, NC, A> {
         BucketUpdateCall {
             hub: self.hub,
@@ -1800,7 +1967,11 @@ impl<'a, C, NC, A> BucketMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Returns metadata for the specified bucket.    
+    /// Returns metadata for the specified bucket.
+    /// 
+    /// # Arguments
+    ///
+    /// * `bucket` - Name of a bucket.
     pub fn get(&self, bucket: &str) -> BucketGetCall<'a, C, NC, A> {
         BucketGetCall {
             hub: self.hub,
@@ -1816,7 +1987,11 @@ impl<'a, C, NC, A> BucketMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Permanently deletes an empty bucket.    
+    /// Permanently deletes an empty bucket.
+    /// 
+    /// # Arguments
+    ///
+    /// * `bucket` - Name of a bucket.
     pub fn delete(&self, bucket: &str) -> BucketDeleteCall<'a, C, NC, A> {
         BucketDeleteCall {
             hub: self.hub,
@@ -1831,7 +2006,12 @@ impl<'a, C, NC, A> BucketMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Creates a new bucket.    
+    /// Creates a new bucket.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `project` - A valid API project identifier.
     pub fn insert(&self, request: &Bucket, project: &str) -> BucketInsertCall<'a, C, NC, A> {
         BucketInsertCall {
             hub: self.hub,
@@ -1848,7 +2028,12 @@ impl<'a, C, NC, A> BucketMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Updates a bucket. This method supports patch semantics.    
+    /// Updates a bucket. This method supports patch semantics.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `bucket` - Name of a bucket.
     pub fn patch(&self, request: &Bucket, bucket: &str) -> BucketPatchCall<'a, C, NC, A> {
         BucketPatchCall {
             hub: self.hub,
@@ -1867,7 +2052,11 @@ impl<'a, C, NC, A> BucketMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Retrieves a list of buckets for a given project.    
+    /// Retrieves a list of buckets for a given project.
+    /// 
+    /// # Arguments
+    ///
+    /// * `project` - A valid API project identifier.
     pub fn list(&self, project: &str) -> BucketListCall<'a, C, NC, A> {
         BucketListCall {
             hub: self.hub,
@@ -1894,7 +2083,7 @@ impl<'a, C, NC, A> BucketMethods<'a, C, NC, A> {
 /// Creates a new default object ACL entry on the specified bucket.
 ///
 /// A builder for the *insert* method supported by a *defaultObjectAccessControl* resource.
-/// It is not used directly, but through a `DefaultObjectAccessControlMethods`.
+/// It is not used directly, but through a `DefaultObjectAccessControlMethods` instance.
 ///
 /// # Example
 ///
@@ -1959,7 +2148,7 @@ impl<'a, C, NC, A> DefaultObjectAccessControlInsertCall<'a, C, NC, A> where NC: 
         for &field in ["alt", "bucket"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -2016,7 +2205,7 @@ impl<'a, C, NC, A> DefaultObjectAccessControlInsertCall<'a, C, NC, A> where NC: 
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -2032,7 +2221,6 @@ impl<'a, C, NC, A> DefaultObjectAccessControlInsertCall<'a, C, NC, A> where NC: 
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -2042,7 +2230,7 @@ impl<'a, C, NC, A> DefaultObjectAccessControlInsertCall<'a, C, NC, A> where NC: 
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -2053,7 +2241,7 @@ impl<'a, C, NC, A> DefaultObjectAccessControlInsertCall<'a, C, NC, A> where NC: 
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -2062,13 +2250,13 @@ impl<'a, C, NC, A> DefaultObjectAccessControlInsertCall<'a, C, NC, A> where NC: 
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -2089,7 +2277,7 @@ impl<'a, C, NC, A> DefaultObjectAccessControlInsertCall<'a, C, NC, A> where NC: 
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Name of a bucket.    
+    /// Name of a bucket.
     pub fn bucket(mut self, new_value: &str) -> DefaultObjectAccessControlInsertCall<'a, C, NC, A> {
         self._bucket = new_value.to_string();
         self
@@ -2150,7 +2338,7 @@ impl<'a, C, NC, A> DefaultObjectAccessControlInsertCall<'a, C, NC, A> where NC: 
 /// Updates a default object ACL entry on the specified bucket.
 ///
 /// A builder for the *update* method supported by a *defaultObjectAccessControl* resource.
-/// It is not used directly, but through a `DefaultObjectAccessControlMethods`.
+/// It is not used directly, but through a `DefaultObjectAccessControlMethods` instance.
 ///
 /// # Example
 ///
@@ -2217,7 +2405,7 @@ impl<'a, C, NC, A> DefaultObjectAccessControlUpdateCall<'a, C, NC, A> where NC: 
         for &field in ["alt", "bucket", "entity"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -2274,7 +2462,7 @@ impl<'a, C, NC, A> DefaultObjectAccessControlUpdateCall<'a, C, NC, A> where NC: 
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -2290,7 +2478,6 @@ impl<'a, C, NC, A> DefaultObjectAccessControlUpdateCall<'a, C, NC, A> where NC: 
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -2300,7 +2487,7 @@ impl<'a, C, NC, A> DefaultObjectAccessControlUpdateCall<'a, C, NC, A> where NC: 
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -2311,7 +2498,7 @@ impl<'a, C, NC, A> DefaultObjectAccessControlUpdateCall<'a, C, NC, A> where NC: 
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -2320,13 +2507,13 @@ impl<'a, C, NC, A> DefaultObjectAccessControlUpdateCall<'a, C, NC, A> where NC: 
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -2347,7 +2534,7 @@ impl<'a, C, NC, A> DefaultObjectAccessControlUpdateCall<'a, C, NC, A> where NC: 
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Name of a bucket.    
+    /// Name of a bucket.
     pub fn bucket(mut self, new_value: &str) -> DefaultObjectAccessControlUpdateCall<'a, C, NC, A> {
         self._bucket = new_value.to_string();
         self
@@ -2357,7 +2544,7 @@ impl<'a, C, NC, A> DefaultObjectAccessControlUpdateCall<'a, C, NC, A> where NC: 
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The entity holding the permission. Can be user-userId, user-emailAddress, group-groupId, group-emailAddress, allUsers, or allAuthenticatedUsers.    
+    /// The entity holding the permission. Can be user-userId, user-emailAddress, group-groupId, group-emailAddress, allUsers, or allAuthenticatedUsers.
     pub fn entity(mut self, new_value: &str) -> DefaultObjectAccessControlUpdateCall<'a, C, NC, A> {
         self._entity = new_value.to_string();
         self
@@ -2418,7 +2605,7 @@ impl<'a, C, NC, A> DefaultObjectAccessControlUpdateCall<'a, C, NC, A> where NC: 
 /// Retrieves default object ACL entries on the specified bucket.
 ///
 /// A builder for the *list* method supported by a *defaultObjectAccessControl* resource.
-/// It is not used directly, but through a `DefaultObjectAccessControlMethods`.
+/// It is not used directly, but through a `DefaultObjectAccessControlMethods` instance.
 ///
 /// # Example
 ///
@@ -2486,7 +2673,7 @@ impl<'a, C, NC, A> DefaultObjectAccessControlListCall<'a, C, NC, A> where NC: hy
         for &field in ["alt", "bucket", "ifMetagenerationNotMatch", "ifMetagenerationMatch"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -2539,7 +2726,7 @@ impl<'a, C, NC, A> DefaultObjectAccessControlListCall<'a, C, NC, A> where NC: hy
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -2551,7 +2738,6 @@ impl<'a, C, NC, A> DefaultObjectAccessControlListCall<'a, C, NC, A> where NC: hy
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -2561,7 +2747,7 @@ impl<'a, C, NC, A> DefaultObjectAccessControlListCall<'a, C, NC, A> where NC: hy
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -2572,7 +2758,7 @@ impl<'a, C, NC, A> DefaultObjectAccessControlListCall<'a, C, NC, A> where NC: hy
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -2581,13 +2767,13 @@ impl<'a, C, NC, A> DefaultObjectAccessControlListCall<'a, C, NC, A> where NC: hy
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -2599,7 +2785,7 @@ impl<'a, C, NC, A> DefaultObjectAccessControlListCall<'a, C, NC, A> where NC: hy
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Name of a bucket.    
+    /// Name of a bucket.
     pub fn bucket(mut self, new_value: &str) -> DefaultObjectAccessControlListCall<'a, C, NC, A> {
         self._bucket = new_value.to_string();
         self
@@ -2607,7 +2793,7 @@ impl<'a, C, NC, A> DefaultObjectAccessControlListCall<'a, C, NC, A> where NC: hy
     /// Sets the *if metageneration not match* query property to the given value.
     ///
     /// 
-    /// If present, only return default ACL listing if the bucket's current metageneration does not match the given value.    
+    /// If present, only return default ACL listing if the bucket's current metageneration does not match the given value.
     pub fn if_metageneration_not_match(mut self, new_value: &str) -> DefaultObjectAccessControlListCall<'a, C, NC, A> {
         self._if_metageneration_not_match = Some(new_value.to_string());
         self
@@ -2615,7 +2801,7 @@ impl<'a, C, NC, A> DefaultObjectAccessControlListCall<'a, C, NC, A> where NC: hy
     /// Sets the *if metageneration match* query property to the given value.
     ///
     /// 
-    /// If present, only return default ACL listing if the bucket's current metageneration matches this value.    
+    /// If present, only return default ACL listing if the bucket's current metageneration matches this value.
     pub fn if_metageneration_match(mut self, new_value: &str) -> DefaultObjectAccessControlListCall<'a, C, NC, A> {
         self._if_metageneration_match = Some(new_value.to_string());
         self
@@ -2676,7 +2862,7 @@ impl<'a, C, NC, A> DefaultObjectAccessControlListCall<'a, C, NC, A> where NC: hy
 /// Updates a default object ACL entry on the specified bucket. This method supports patch semantics.
 ///
 /// A builder for the *patch* method supported by a *defaultObjectAccessControl* resource.
-/// It is not used directly, but through a `DefaultObjectAccessControlMethods`.
+/// It is not used directly, but through a `DefaultObjectAccessControlMethods` instance.
 ///
 /// # Example
 ///
@@ -2743,7 +2929,7 @@ impl<'a, C, NC, A> DefaultObjectAccessControlPatchCall<'a, C, NC, A> where NC: h
         for &field in ["alt", "bucket", "entity"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -2800,7 +2986,7 @@ impl<'a, C, NC, A> DefaultObjectAccessControlPatchCall<'a, C, NC, A> where NC: h
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -2816,7 +3002,6 @@ impl<'a, C, NC, A> DefaultObjectAccessControlPatchCall<'a, C, NC, A> where NC: h
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -2826,7 +3011,7 @@ impl<'a, C, NC, A> DefaultObjectAccessControlPatchCall<'a, C, NC, A> where NC: h
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -2837,7 +3022,7 @@ impl<'a, C, NC, A> DefaultObjectAccessControlPatchCall<'a, C, NC, A> where NC: h
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -2846,13 +3031,13 @@ impl<'a, C, NC, A> DefaultObjectAccessControlPatchCall<'a, C, NC, A> where NC: h
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -2873,7 +3058,7 @@ impl<'a, C, NC, A> DefaultObjectAccessControlPatchCall<'a, C, NC, A> where NC: h
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Name of a bucket.    
+    /// Name of a bucket.
     pub fn bucket(mut self, new_value: &str) -> DefaultObjectAccessControlPatchCall<'a, C, NC, A> {
         self._bucket = new_value.to_string();
         self
@@ -2883,7 +3068,7 @@ impl<'a, C, NC, A> DefaultObjectAccessControlPatchCall<'a, C, NC, A> where NC: h
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The entity holding the permission. Can be user-userId, user-emailAddress, group-groupId, group-emailAddress, allUsers, or allAuthenticatedUsers.    
+    /// The entity holding the permission. Can be user-userId, user-emailAddress, group-groupId, group-emailAddress, allUsers, or allAuthenticatedUsers.
     pub fn entity(mut self, new_value: &str) -> DefaultObjectAccessControlPatchCall<'a, C, NC, A> {
         self._entity = new_value.to_string();
         self
@@ -2944,7 +3129,7 @@ impl<'a, C, NC, A> DefaultObjectAccessControlPatchCall<'a, C, NC, A> where NC: h
 /// Permanently deletes the default object ACL entry for the specified entity on the specified bucket.
 ///
 /// A builder for the *delete* method supported by a *defaultObjectAccessControl* resource.
-/// It is not used directly, but through a `DefaultObjectAccessControlMethods`.
+/// It is not used directly, but through a `DefaultObjectAccessControlMethods` instance.
 ///
 /// # Example
 ///
@@ -3004,7 +3189,7 @@ impl<'a, C, NC, A> DefaultObjectAccessControlDeleteCall<'a, C, NC, A> where NC: 
         for &field in ["bucket", "entity"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -3056,7 +3241,7 @@ impl<'a, C, NC, A> DefaultObjectAccessControlDeleteCall<'a, C, NC, A> where NC: 
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -3068,7 +3253,6 @@ impl<'a, C, NC, A> DefaultObjectAccessControlDeleteCall<'a, C, NC, A> where NC: 
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -3078,7 +3262,7 @@ impl<'a, C, NC, A> DefaultObjectAccessControlDeleteCall<'a, C, NC, A> where NC: 
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -3089,12 +3273,12 @@ impl<'a, C, NC, A> DefaultObjectAccessControlDeleteCall<'a, C, NC, A> where NC: 
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = res;
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -3106,7 +3290,7 @@ impl<'a, C, NC, A> DefaultObjectAccessControlDeleteCall<'a, C, NC, A> where NC: 
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Name of a bucket.    
+    /// Name of a bucket.
     pub fn bucket(mut self, new_value: &str) -> DefaultObjectAccessControlDeleteCall<'a, C, NC, A> {
         self._bucket = new_value.to_string();
         self
@@ -3116,7 +3300,7 @@ impl<'a, C, NC, A> DefaultObjectAccessControlDeleteCall<'a, C, NC, A> where NC: 
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The entity holding the permission. Can be user-userId, user-emailAddress, group-groupId, group-emailAddress, allUsers, or allAuthenticatedUsers.    
+    /// The entity holding the permission. Can be user-userId, user-emailAddress, group-groupId, group-emailAddress, allUsers, or allAuthenticatedUsers.
     pub fn entity(mut self, new_value: &str) -> DefaultObjectAccessControlDeleteCall<'a, C, NC, A> {
         self._entity = new_value.to_string();
         self
@@ -3177,7 +3361,7 @@ impl<'a, C, NC, A> DefaultObjectAccessControlDeleteCall<'a, C, NC, A> where NC: 
 /// Returns the default object ACL entry for the specified entity on the specified bucket.
 ///
 /// A builder for the *get* method supported by a *defaultObjectAccessControl* resource.
-/// It is not used directly, but through a `DefaultObjectAccessControlMethods`.
+/// It is not used directly, but through a `DefaultObjectAccessControlMethods` instance.
 ///
 /// # Example
 ///
@@ -3237,7 +3421,7 @@ impl<'a, C, NC, A> DefaultObjectAccessControlGetCall<'a, C, NC, A> where NC: hyp
         for &field in ["alt", "bucket", "entity"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -3290,7 +3474,7 @@ impl<'a, C, NC, A> DefaultObjectAccessControlGetCall<'a, C, NC, A> where NC: hyp
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -3302,7 +3486,6 @@ impl<'a, C, NC, A> DefaultObjectAccessControlGetCall<'a, C, NC, A> where NC: hyp
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -3312,7 +3495,7 @@ impl<'a, C, NC, A> DefaultObjectAccessControlGetCall<'a, C, NC, A> where NC: hyp
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -3323,7 +3506,7 @@ impl<'a, C, NC, A> DefaultObjectAccessControlGetCall<'a, C, NC, A> where NC: hyp
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -3332,13 +3515,13 @@ impl<'a, C, NC, A> DefaultObjectAccessControlGetCall<'a, C, NC, A> where NC: hyp
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -3350,7 +3533,7 @@ impl<'a, C, NC, A> DefaultObjectAccessControlGetCall<'a, C, NC, A> where NC: hyp
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Name of a bucket.    
+    /// Name of a bucket.
     pub fn bucket(mut self, new_value: &str) -> DefaultObjectAccessControlGetCall<'a, C, NC, A> {
         self._bucket = new_value.to_string();
         self
@@ -3360,7 +3543,7 @@ impl<'a, C, NC, A> DefaultObjectAccessControlGetCall<'a, C, NC, A> where NC: hyp
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The entity holding the permission. Can be user-userId, user-emailAddress, group-groupId, group-emailAddress, allUsers, or allAuthenticatedUsers.    
+    /// The entity holding the permission. Can be user-userId, user-emailAddress, group-groupId, group-emailAddress, allUsers, or allAuthenticatedUsers.
     pub fn entity(mut self, new_value: &str) -> DefaultObjectAccessControlGetCall<'a, C, NC, A> {
         self._entity = new_value.to_string();
         self
@@ -3421,7 +3604,7 @@ impl<'a, C, NC, A> DefaultObjectAccessControlGetCall<'a, C, NC, A> where NC: hyp
 /// Updates an ACL entry on the specified bucket. This method supports patch semantics.
 ///
 /// A builder for the *patch* method supported by a *bucketAccessControl* resource.
-/// It is not used directly, but through a `BucketAccessControlMethods`.
+/// It is not used directly, but through a `BucketAccessControlMethods` instance.
 ///
 /// # Example
 ///
@@ -3488,7 +3671,7 @@ impl<'a, C, NC, A> BucketAccessControlPatchCall<'a, C, NC, A> where NC: hyper::n
         for &field in ["alt", "bucket", "entity"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -3545,7 +3728,7 @@ impl<'a, C, NC, A> BucketAccessControlPatchCall<'a, C, NC, A> where NC: hyper::n
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -3561,7 +3744,6 @@ impl<'a, C, NC, A> BucketAccessControlPatchCall<'a, C, NC, A> where NC: hyper::n
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -3571,7 +3753,7 @@ impl<'a, C, NC, A> BucketAccessControlPatchCall<'a, C, NC, A> where NC: hyper::n
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -3582,7 +3764,7 @@ impl<'a, C, NC, A> BucketAccessControlPatchCall<'a, C, NC, A> where NC: hyper::n
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -3591,13 +3773,13 @@ impl<'a, C, NC, A> BucketAccessControlPatchCall<'a, C, NC, A> where NC: hyper::n
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -3618,7 +3800,7 @@ impl<'a, C, NC, A> BucketAccessControlPatchCall<'a, C, NC, A> where NC: hyper::n
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Name of a bucket.    
+    /// Name of a bucket.
     pub fn bucket(mut self, new_value: &str) -> BucketAccessControlPatchCall<'a, C, NC, A> {
         self._bucket = new_value.to_string();
         self
@@ -3628,7 +3810,7 @@ impl<'a, C, NC, A> BucketAccessControlPatchCall<'a, C, NC, A> where NC: hyper::n
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The entity holding the permission. Can be user-userId, user-emailAddress, group-groupId, group-emailAddress, allUsers, or allAuthenticatedUsers.    
+    /// The entity holding the permission. Can be user-userId, user-emailAddress, group-groupId, group-emailAddress, allUsers, or allAuthenticatedUsers.
     pub fn entity(mut self, new_value: &str) -> BucketAccessControlPatchCall<'a, C, NC, A> {
         self._entity = new_value.to_string();
         self
@@ -3689,7 +3871,7 @@ impl<'a, C, NC, A> BucketAccessControlPatchCall<'a, C, NC, A> where NC: hyper::n
 /// Permanently deletes the ACL entry for the specified entity on the specified bucket.
 ///
 /// A builder for the *delete* method supported by a *bucketAccessControl* resource.
-/// It is not used directly, but through a `BucketAccessControlMethods`.
+/// It is not used directly, but through a `BucketAccessControlMethods` instance.
 ///
 /// # Example
 ///
@@ -3749,7 +3931,7 @@ impl<'a, C, NC, A> BucketAccessControlDeleteCall<'a, C, NC, A> where NC: hyper::
         for &field in ["bucket", "entity"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -3801,7 +3983,7 @@ impl<'a, C, NC, A> BucketAccessControlDeleteCall<'a, C, NC, A> where NC: hyper::
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -3813,7 +3995,6 @@ impl<'a, C, NC, A> BucketAccessControlDeleteCall<'a, C, NC, A> where NC: hyper::
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -3823,7 +4004,7 @@ impl<'a, C, NC, A> BucketAccessControlDeleteCall<'a, C, NC, A> where NC: hyper::
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -3834,12 +4015,12 @@ impl<'a, C, NC, A> BucketAccessControlDeleteCall<'a, C, NC, A> where NC: hyper::
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = res;
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -3851,7 +4032,7 @@ impl<'a, C, NC, A> BucketAccessControlDeleteCall<'a, C, NC, A> where NC: hyper::
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Name of a bucket.    
+    /// Name of a bucket.
     pub fn bucket(mut self, new_value: &str) -> BucketAccessControlDeleteCall<'a, C, NC, A> {
         self._bucket = new_value.to_string();
         self
@@ -3861,7 +4042,7 @@ impl<'a, C, NC, A> BucketAccessControlDeleteCall<'a, C, NC, A> where NC: hyper::
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The entity holding the permission. Can be user-userId, user-emailAddress, group-groupId, group-emailAddress, allUsers, or allAuthenticatedUsers.    
+    /// The entity holding the permission. Can be user-userId, user-emailAddress, group-groupId, group-emailAddress, allUsers, or allAuthenticatedUsers.
     pub fn entity(mut self, new_value: &str) -> BucketAccessControlDeleteCall<'a, C, NC, A> {
         self._entity = new_value.to_string();
         self
@@ -3922,7 +4103,7 @@ impl<'a, C, NC, A> BucketAccessControlDeleteCall<'a, C, NC, A> where NC: hyper::
 /// Creates a new ACL entry on the specified bucket.
 ///
 /// A builder for the *insert* method supported by a *bucketAccessControl* resource.
-/// It is not used directly, but through a `BucketAccessControlMethods`.
+/// It is not used directly, but through a `BucketAccessControlMethods` instance.
 ///
 /// # Example
 ///
@@ -3987,7 +4168,7 @@ impl<'a, C, NC, A> BucketAccessControlInsertCall<'a, C, NC, A> where NC: hyper::
         for &field in ["alt", "bucket"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -4044,7 +4225,7 @@ impl<'a, C, NC, A> BucketAccessControlInsertCall<'a, C, NC, A> where NC: hyper::
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -4060,7 +4241,6 @@ impl<'a, C, NC, A> BucketAccessControlInsertCall<'a, C, NC, A> where NC: hyper::
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -4070,7 +4250,7 @@ impl<'a, C, NC, A> BucketAccessControlInsertCall<'a, C, NC, A> where NC: hyper::
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -4081,7 +4261,7 @@ impl<'a, C, NC, A> BucketAccessControlInsertCall<'a, C, NC, A> where NC: hyper::
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -4090,13 +4270,13 @@ impl<'a, C, NC, A> BucketAccessControlInsertCall<'a, C, NC, A> where NC: hyper::
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -4117,7 +4297,7 @@ impl<'a, C, NC, A> BucketAccessControlInsertCall<'a, C, NC, A> where NC: hyper::
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Name of a bucket.    
+    /// Name of a bucket.
     pub fn bucket(mut self, new_value: &str) -> BucketAccessControlInsertCall<'a, C, NC, A> {
         self._bucket = new_value.to_string();
         self
@@ -4178,7 +4358,7 @@ impl<'a, C, NC, A> BucketAccessControlInsertCall<'a, C, NC, A> where NC: hyper::
 /// Returns the ACL entry for the specified entity on the specified bucket.
 ///
 /// A builder for the *get* method supported by a *bucketAccessControl* resource.
-/// It is not used directly, but through a `BucketAccessControlMethods`.
+/// It is not used directly, but through a `BucketAccessControlMethods` instance.
 ///
 /// # Example
 ///
@@ -4238,7 +4418,7 @@ impl<'a, C, NC, A> BucketAccessControlGetCall<'a, C, NC, A> where NC: hyper::net
         for &field in ["alt", "bucket", "entity"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -4291,7 +4471,7 @@ impl<'a, C, NC, A> BucketAccessControlGetCall<'a, C, NC, A> where NC: hyper::net
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -4303,7 +4483,6 @@ impl<'a, C, NC, A> BucketAccessControlGetCall<'a, C, NC, A> where NC: hyper::net
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -4313,7 +4492,7 @@ impl<'a, C, NC, A> BucketAccessControlGetCall<'a, C, NC, A> where NC: hyper::net
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -4324,7 +4503,7 @@ impl<'a, C, NC, A> BucketAccessControlGetCall<'a, C, NC, A> where NC: hyper::net
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -4333,13 +4512,13 @@ impl<'a, C, NC, A> BucketAccessControlGetCall<'a, C, NC, A> where NC: hyper::net
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -4351,7 +4530,7 @@ impl<'a, C, NC, A> BucketAccessControlGetCall<'a, C, NC, A> where NC: hyper::net
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Name of a bucket.    
+    /// Name of a bucket.
     pub fn bucket(mut self, new_value: &str) -> BucketAccessControlGetCall<'a, C, NC, A> {
         self._bucket = new_value.to_string();
         self
@@ -4361,7 +4540,7 @@ impl<'a, C, NC, A> BucketAccessControlGetCall<'a, C, NC, A> where NC: hyper::net
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The entity holding the permission. Can be user-userId, user-emailAddress, group-groupId, group-emailAddress, allUsers, or allAuthenticatedUsers.    
+    /// The entity holding the permission. Can be user-userId, user-emailAddress, group-groupId, group-emailAddress, allUsers, or allAuthenticatedUsers.
     pub fn entity(mut self, new_value: &str) -> BucketAccessControlGetCall<'a, C, NC, A> {
         self._entity = new_value.to_string();
         self
@@ -4422,7 +4601,7 @@ impl<'a, C, NC, A> BucketAccessControlGetCall<'a, C, NC, A> where NC: hyper::net
 /// Updates an ACL entry on the specified bucket.
 ///
 /// A builder for the *update* method supported by a *bucketAccessControl* resource.
-/// It is not used directly, but through a `BucketAccessControlMethods`.
+/// It is not used directly, but through a `BucketAccessControlMethods` instance.
 ///
 /// # Example
 ///
@@ -4489,7 +4668,7 @@ impl<'a, C, NC, A> BucketAccessControlUpdateCall<'a, C, NC, A> where NC: hyper::
         for &field in ["alt", "bucket", "entity"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -4546,7 +4725,7 @@ impl<'a, C, NC, A> BucketAccessControlUpdateCall<'a, C, NC, A> where NC: hyper::
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -4562,7 +4741,6 @@ impl<'a, C, NC, A> BucketAccessControlUpdateCall<'a, C, NC, A> where NC: hyper::
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -4572,7 +4750,7 @@ impl<'a, C, NC, A> BucketAccessControlUpdateCall<'a, C, NC, A> where NC: hyper::
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -4583,7 +4761,7 @@ impl<'a, C, NC, A> BucketAccessControlUpdateCall<'a, C, NC, A> where NC: hyper::
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -4592,13 +4770,13 @@ impl<'a, C, NC, A> BucketAccessControlUpdateCall<'a, C, NC, A> where NC: hyper::
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -4619,7 +4797,7 @@ impl<'a, C, NC, A> BucketAccessControlUpdateCall<'a, C, NC, A> where NC: hyper::
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Name of a bucket.    
+    /// Name of a bucket.
     pub fn bucket(mut self, new_value: &str) -> BucketAccessControlUpdateCall<'a, C, NC, A> {
         self._bucket = new_value.to_string();
         self
@@ -4629,7 +4807,7 @@ impl<'a, C, NC, A> BucketAccessControlUpdateCall<'a, C, NC, A> where NC: hyper::
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The entity holding the permission. Can be user-userId, user-emailAddress, group-groupId, group-emailAddress, allUsers, or allAuthenticatedUsers.    
+    /// The entity holding the permission. Can be user-userId, user-emailAddress, group-groupId, group-emailAddress, allUsers, or allAuthenticatedUsers.
     pub fn entity(mut self, new_value: &str) -> BucketAccessControlUpdateCall<'a, C, NC, A> {
         self._entity = new_value.to_string();
         self
@@ -4690,7 +4868,7 @@ impl<'a, C, NC, A> BucketAccessControlUpdateCall<'a, C, NC, A> where NC: hyper::
 /// Retrieves ACL entries on the specified bucket.
 ///
 /// A builder for the *list* method supported by a *bucketAccessControl* resource.
-/// It is not used directly, but through a `BucketAccessControlMethods`.
+/// It is not used directly, but through a `BucketAccessControlMethods` instance.
 ///
 /// # Example
 ///
@@ -4748,7 +4926,7 @@ impl<'a, C, NC, A> BucketAccessControlListCall<'a, C, NC, A> where NC: hyper::ne
         for &field in ["alt", "bucket"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -4801,7 +4979,7 @@ impl<'a, C, NC, A> BucketAccessControlListCall<'a, C, NC, A> where NC: hyper::ne
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -4813,7 +4991,6 @@ impl<'a, C, NC, A> BucketAccessControlListCall<'a, C, NC, A> where NC: hyper::ne
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -4823,7 +5000,7 @@ impl<'a, C, NC, A> BucketAccessControlListCall<'a, C, NC, A> where NC: hyper::ne
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -4834,7 +5011,7 @@ impl<'a, C, NC, A> BucketAccessControlListCall<'a, C, NC, A> where NC: hyper::ne
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -4843,13 +5020,13 @@ impl<'a, C, NC, A> BucketAccessControlListCall<'a, C, NC, A> where NC: hyper::ne
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -4861,7 +5038,7 @@ impl<'a, C, NC, A> BucketAccessControlListCall<'a, C, NC, A> where NC: hyper::ne
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Name of a bucket.    
+    /// Name of a bucket.
     pub fn bucket(mut self, new_value: &str) -> BucketAccessControlListCall<'a, C, NC, A> {
         self._bucket = new_value.to_string();
         self
@@ -4922,7 +5099,7 @@ impl<'a, C, NC, A> BucketAccessControlListCall<'a, C, NC, A> where NC: hyper::ne
 /// Stop watching resources through this channel
 ///
 /// A builder for the *stop* method supported by a *channel* resource.
-/// It is not used directly, but through a `ChannelMethods`.
+/// It is not used directly, but through a `ChannelMethods` instance.
 ///
 /// # Example
 ///
@@ -4985,7 +5162,7 @@ impl<'a, C, NC, A> ChannelStopCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
         for &field in [].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -5017,7 +5194,7 @@ impl<'a, C, NC, A> ChannelStopCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -5033,7 +5210,6 @@ impl<'a, C, NC, A> ChannelStopCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -5043,7 +5219,7 @@ impl<'a, C, NC, A> ChannelStopCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -5054,12 +5230,12 @@ impl<'a, C, NC, A> ChannelStopCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = res;
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -5136,7 +5312,7 @@ impl<'a, C, NC, A> ChannelStopCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
 /// but not the `Object` structure that you would usually get. The latter will be a default value.
 ///
 /// A builder for the *get* method supported by a *object* resource.
-/// It is not used directly, but through a `ObjectMethods`.
+/// It is not used directly, but through a `ObjectMethods` instance.
 ///
 /// # Example
 ///
@@ -5226,7 +5402,7 @@ impl<'a, C, NC, A> ObjectGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
         for &field in ["bucket", "object", "projection", "ifMetagenerationNotMatch", "ifMetagenerationMatch", "ifGenerationNotMatch", "ifGenerationMatch", "generation"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -5295,7 +5471,7 @@ impl<'a, C, NC, A> ObjectGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -5307,7 +5483,6 @@ impl<'a, C, NC, A> ObjectGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -5317,7 +5492,7 @@ impl<'a, C, NC, A> ObjectGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -5328,7 +5503,7 @@ impl<'a, C, NC, A> ObjectGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = if enable_resource_parsing {
                         let mut json_response = String::new();
@@ -5337,13 +5512,13 @@ impl<'a, C, NC, A> ObjectGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     } else { (res, Default::default()) };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -5355,7 +5530,7 @@ impl<'a, C, NC, A> ObjectGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Name of the bucket in which the object resides.    
+    /// Name of the bucket in which the object resides.
     pub fn bucket(mut self, new_value: &str) -> ObjectGetCall<'a, C, NC, A> {
         self._bucket = new_value.to_string();
         self
@@ -5365,7 +5540,7 @@ impl<'a, C, NC, A> ObjectGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Name of the object.    
+    /// Name of the object.
     pub fn object(mut self, new_value: &str) -> ObjectGetCall<'a, C, NC, A> {
         self._object = new_value.to_string();
         self
@@ -5373,7 +5548,7 @@ impl<'a, C, NC, A> ObjectGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     /// Sets the *projection* query property to the given value.
     ///
     /// 
-    /// Set of properties to return. Defaults to noAcl.    
+    /// Set of properties to return. Defaults to noAcl.
     pub fn projection(mut self, new_value: &str) -> ObjectGetCall<'a, C, NC, A> {
         self._projection = Some(new_value.to_string());
         self
@@ -5381,7 +5556,7 @@ impl<'a, C, NC, A> ObjectGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     /// Sets the *if metageneration not match* query property to the given value.
     ///
     /// 
-    /// Makes the operation conditional on whether the object's current metageneration does not match the given value.    
+    /// Makes the operation conditional on whether the object's current metageneration does not match the given value.
     pub fn if_metageneration_not_match(mut self, new_value: &str) -> ObjectGetCall<'a, C, NC, A> {
         self._if_metageneration_not_match = Some(new_value.to_string());
         self
@@ -5389,7 +5564,7 @@ impl<'a, C, NC, A> ObjectGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     /// Sets the *if metageneration match* query property to the given value.
     ///
     /// 
-    /// Makes the operation conditional on whether the object's current metageneration matches the given value.    
+    /// Makes the operation conditional on whether the object's current metageneration matches the given value.
     pub fn if_metageneration_match(mut self, new_value: &str) -> ObjectGetCall<'a, C, NC, A> {
         self._if_metageneration_match = Some(new_value.to_string());
         self
@@ -5397,7 +5572,7 @@ impl<'a, C, NC, A> ObjectGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     /// Sets the *if generation not match* query property to the given value.
     ///
     /// 
-    /// Makes the operation conditional on whether the object's generation does not match the given value.    
+    /// Makes the operation conditional on whether the object's generation does not match the given value.
     pub fn if_generation_not_match(mut self, new_value: &str) -> ObjectGetCall<'a, C, NC, A> {
         self._if_generation_not_match = Some(new_value.to_string());
         self
@@ -5405,7 +5580,7 @@ impl<'a, C, NC, A> ObjectGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     /// Sets the *if generation match* query property to the given value.
     ///
     /// 
-    /// Makes the operation conditional on whether the object's generation matches the given value.    
+    /// Makes the operation conditional on whether the object's generation matches the given value.
     pub fn if_generation_match(mut self, new_value: &str) -> ObjectGetCall<'a, C, NC, A> {
         self._if_generation_match = Some(new_value.to_string());
         self
@@ -5413,7 +5588,7 @@ impl<'a, C, NC, A> ObjectGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     /// Sets the *generation* query property to the given value.
     ///
     /// 
-    /// If present, selects a specific revision of this object (as opposed to the latest version, the default).    
+    /// If present, selects a specific revision of this object (as opposed to the latest version, the default).
     pub fn generation(mut self, new_value: &str) -> ObjectGetCall<'a, C, NC, A> {
         self._generation = Some(new_value.to_string());
         self
@@ -5474,7 +5649,7 @@ impl<'a, C, NC, A> ObjectGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
 /// Watch for changes on all objects in a bucket.
 ///
 /// A builder for the *watchAll* method supported by a *object* resource.
-/// It is not used directly, but through a `ObjectMethods`.
+/// It is not used directly, but through a `ObjectMethods` instance.
 ///
 /// # Example
 ///
@@ -5569,7 +5744,7 @@ impl<'a, C, NC, A> ObjectWatchAllCall<'a, C, NC, A> where NC: hyper::net::Networ
         for &field in ["alt", "bucket", "versions", "projection", "prefix", "pageToken", "maxResults", "delimiter"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -5626,7 +5801,7 @@ impl<'a, C, NC, A> ObjectWatchAllCall<'a, C, NC, A> where NC: hyper::net::Networ
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -5642,7 +5817,6 @@ impl<'a, C, NC, A> ObjectWatchAllCall<'a, C, NC, A> where NC: hyper::net::Networ
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -5652,7 +5826,7 @@ impl<'a, C, NC, A> ObjectWatchAllCall<'a, C, NC, A> where NC: hyper::net::Networ
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -5663,7 +5837,7 @@ impl<'a, C, NC, A> ObjectWatchAllCall<'a, C, NC, A> where NC: hyper::net::Networ
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -5672,13 +5846,13 @@ impl<'a, C, NC, A> ObjectWatchAllCall<'a, C, NC, A> where NC: hyper::net::Networ
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -5699,7 +5873,7 @@ impl<'a, C, NC, A> ObjectWatchAllCall<'a, C, NC, A> where NC: hyper::net::Networ
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Name of the bucket in which to look for objects.    
+    /// Name of the bucket in which to look for objects.
     pub fn bucket(mut self, new_value: &str) -> ObjectWatchAllCall<'a, C, NC, A> {
         self._bucket = new_value.to_string();
         self
@@ -5707,7 +5881,7 @@ impl<'a, C, NC, A> ObjectWatchAllCall<'a, C, NC, A> where NC: hyper::net::Networ
     /// Sets the *versions* query property to the given value.
     ///
     /// 
-    /// If true, lists all versions of a file as distinct results.    
+    /// If true, lists all versions of a file as distinct results.
     pub fn versions(mut self, new_value: bool) -> ObjectWatchAllCall<'a, C, NC, A> {
         self._versions = Some(new_value);
         self
@@ -5715,7 +5889,7 @@ impl<'a, C, NC, A> ObjectWatchAllCall<'a, C, NC, A> where NC: hyper::net::Networ
     /// Sets the *projection* query property to the given value.
     ///
     /// 
-    /// Set of properties to return. Defaults to noAcl.    
+    /// Set of properties to return. Defaults to noAcl.
     pub fn projection(mut self, new_value: &str) -> ObjectWatchAllCall<'a, C, NC, A> {
         self._projection = Some(new_value.to_string());
         self
@@ -5723,7 +5897,7 @@ impl<'a, C, NC, A> ObjectWatchAllCall<'a, C, NC, A> where NC: hyper::net::Networ
     /// Sets the *prefix* query property to the given value.
     ///
     /// 
-    /// Filter results to objects whose names begin with this prefix.    
+    /// Filter results to objects whose names begin with this prefix.
     pub fn prefix(mut self, new_value: &str) -> ObjectWatchAllCall<'a, C, NC, A> {
         self._prefix = Some(new_value.to_string());
         self
@@ -5731,7 +5905,7 @@ impl<'a, C, NC, A> ObjectWatchAllCall<'a, C, NC, A> where NC: hyper::net::Networ
     /// Sets the *page token* query property to the given value.
     ///
     /// 
-    /// A previously-returned page token representing part of the larger set of results to view.    
+    /// A previously-returned page token representing part of the larger set of results to view.
     pub fn page_token(mut self, new_value: &str) -> ObjectWatchAllCall<'a, C, NC, A> {
         self._page_token = Some(new_value.to_string());
         self
@@ -5739,7 +5913,7 @@ impl<'a, C, NC, A> ObjectWatchAllCall<'a, C, NC, A> where NC: hyper::net::Networ
     /// Sets the *max results* query property to the given value.
     ///
     /// 
-    /// Maximum number of items plus prefixes to return. As duplicate prefixes are omitted, fewer total results may be returned than requested.    
+    /// Maximum number of items plus prefixes to return. As duplicate prefixes are omitted, fewer total results may be returned than requested.
     pub fn max_results(mut self, new_value: u32) -> ObjectWatchAllCall<'a, C, NC, A> {
         self._max_results = Some(new_value);
         self
@@ -5747,7 +5921,7 @@ impl<'a, C, NC, A> ObjectWatchAllCall<'a, C, NC, A> where NC: hyper::net::Networ
     /// Sets the *delimiter* query property to the given value.
     ///
     /// 
-    /// Returns results in a directory-like mode. items will contain only objects whose names, aside from the prefix, do not contain delimiter. Objects whose names, aside from the prefix, contain delimiter will have their name, truncated after the delimiter, returned in prefixes. Duplicate prefixes are omitted.    
+    /// Returns results in a directory-like mode. items will contain only objects whose names, aside from the prefix, do not contain delimiter. Objects whose names, aside from the prefix, contain delimiter will have their name, truncated after the delimiter, returned in prefixes. Duplicate prefixes are omitted.
     pub fn delimiter(mut self, new_value: &str) -> ObjectWatchAllCall<'a, C, NC, A> {
         self._delimiter = Some(new_value.to_string());
         self
@@ -5813,7 +5987,7 @@ impl<'a, C, NC, A> ObjectWatchAllCall<'a, C, NC, A> where NC: hyper::net::Networ
 /// but not the `Object` structure that you would usually get. The latter will be a default value.
 ///
 /// A builder for the *update* method supported by a *object* resource.
-/// It is not used directly, but through a `ObjectMethods`.
+/// It is not used directly, but through a `ObjectMethods` instance.
 ///
 /// # Example
 ///
@@ -5915,7 +6089,7 @@ impl<'a, C, NC, A> ObjectUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkC
         for &field in ["bucket", "object", "projection", "predefinedAcl", "ifMetagenerationNotMatch", "ifMetagenerationMatch", "ifGenerationNotMatch", "ifGenerationMatch", "generation"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -5988,7 +6162,7 @@ impl<'a, C, NC, A> ObjectUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkC
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -6004,7 +6178,6 @@ impl<'a, C, NC, A> ObjectUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkC
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -6014,7 +6187,7 @@ impl<'a, C, NC, A> ObjectUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkC
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -6025,7 +6198,7 @@ impl<'a, C, NC, A> ObjectUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkC
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = if enable_resource_parsing {
                         let mut json_response = String::new();
@@ -6034,13 +6207,13 @@ impl<'a, C, NC, A> ObjectUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkC
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     } else { (res, Default::default()) };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -6061,7 +6234,7 @@ impl<'a, C, NC, A> ObjectUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Name of the bucket in which the object resides.    
+    /// Name of the bucket in which the object resides.
     pub fn bucket(mut self, new_value: &str) -> ObjectUpdateCall<'a, C, NC, A> {
         self._bucket = new_value.to_string();
         self
@@ -6071,7 +6244,7 @@ impl<'a, C, NC, A> ObjectUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Name of the object.    
+    /// Name of the object.
     pub fn object(mut self, new_value: &str) -> ObjectUpdateCall<'a, C, NC, A> {
         self._object = new_value.to_string();
         self
@@ -6079,7 +6252,7 @@ impl<'a, C, NC, A> ObjectUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// Sets the *projection* query property to the given value.
     ///
     /// 
-    /// Set of properties to return. Defaults to full.    
+    /// Set of properties to return. Defaults to full.
     pub fn projection(mut self, new_value: &str) -> ObjectUpdateCall<'a, C, NC, A> {
         self._projection = Some(new_value.to_string());
         self
@@ -6087,7 +6260,7 @@ impl<'a, C, NC, A> ObjectUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// Sets the *predefined acl* query property to the given value.
     ///
     /// 
-    /// Apply a predefined set of access controls to this object.    
+    /// Apply a predefined set of access controls to this object.
     pub fn predefined_acl(mut self, new_value: &str) -> ObjectUpdateCall<'a, C, NC, A> {
         self._predefined_acl = Some(new_value.to_string());
         self
@@ -6095,7 +6268,7 @@ impl<'a, C, NC, A> ObjectUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// Sets the *if metageneration not match* query property to the given value.
     ///
     /// 
-    /// Makes the operation conditional on whether the object's current metageneration does not match the given value.    
+    /// Makes the operation conditional on whether the object's current metageneration does not match the given value.
     pub fn if_metageneration_not_match(mut self, new_value: &str) -> ObjectUpdateCall<'a, C, NC, A> {
         self._if_metageneration_not_match = Some(new_value.to_string());
         self
@@ -6103,7 +6276,7 @@ impl<'a, C, NC, A> ObjectUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// Sets the *if metageneration match* query property to the given value.
     ///
     /// 
-    /// Makes the operation conditional on whether the object's current metageneration matches the given value.    
+    /// Makes the operation conditional on whether the object's current metageneration matches the given value.
     pub fn if_metageneration_match(mut self, new_value: &str) -> ObjectUpdateCall<'a, C, NC, A> {
         self._if_metageneration_match = Some(new_value.to_string());
         self
@@ -6111,7 +6284,7 @@ impl<'a, C, NC, A> ObjectUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// Sets the *if generation not match* query property to the given value.
     ///
     /// 
-    /// Makes the operation conditional on whether the object's current generation does not match the given value.    
+    /// Makes the operation conditional on whether the object's current generation does not match the given value.
     pub fn if_generation_not_match(mut self, new_value: &str) -> ObjectUpdateCall<'a, C, NC, A> {
         self._if_generation_not_match = Some(new_value.to_string());
         self
@@ -6119,7 +6292,7 @@ impl<'a, C, NC, A> ObjectUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// Sets the *if generation match* query property to the given value.
     ///
     /// 
-    /// Makes the operation conditional on whether the object's current generation matches the given value.    
+    /// Makes the operation conditional on whether the object's current generation matches the given value.
     pub fn if_generation_match(mut self, new_value: &str) -> ObjectUpdateCall<'a, C, NC, A> {
         self._if_generation_match = Some(new_value.to_string());
         self
@@ -6127,7 +6300,7 @@ impl<'a, C, NC, A> ObjectUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// Sets the *generation* query property to the given value.
     ///
     /// 
-    /// If present, selects a specific revision of this object (as opposed to the latest version, the default).    
+    /// If present, selects a specific revision of this object (as opposed to the latest version, the default).
     pub fn generation(mut self, new_value: &str) -> ObjectUpdateCall<'a, C, NC, A> {
         self._generation = Some(new_value.to_string());
         self
@@ -6193,7 +6366,7 @@ impl<'a, C, NC, A> ObjectUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkC
 /// but not the `Object` structure that you would usually get. The latter will be a default value.
 ///
 /// A builder for the *insert* method supported by a *object* resource.
-/// It is not used directly, but through a `ObjectMethods`.
+/// It is not used directly, but through a `ObjectMethods` instance.
 ///
 /// # Example
 ///
@@ -6300,7 +6473,7 @@ impl<'a, C, NC, A> ObjectInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkC
         for &field in ["bucket", "projection", "predefinedAcl", "name", "ifMetagenerationNotMatch", "ifMetagenerationMatch", "ifGenerationNotMatch", "ifGenerationMatch", "contentEncoding"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -6383,7 +6556,7 @@ impl<'a, C, NC, A> ObjectInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkC
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -6429,7 +6602,6 @@ impl<'a, C, NC, A> ObjectInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     
                     dlg.pre_request();
                     req.send()
-    
                 }
             };
 
@@ -6440,7 +6612,7 @@ impl<'a, C, NC, A> ObjectInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkC
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -6451,7 +6623,7 @@ impl<'a, C, NC, A> ObjectInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkC
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     if protocol == "resumable" {
                         let size = reader.seek(io::SeekFrom::End(0)).unwrap();
@@ -6480,17 +6652,17 @@ impl<'a, C, NC, A> ObjectInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkC
                         match upload_result {
                             None => {
                                 dlg.finished(false);
-                                return Result::Cancelled
+                                return Err(Error::Cancelled)
                             }
                             Some(Err(err)) => {
                                 dlg.finished(false);
-                                return Result::HttpError(err)
+                                return Err(Error::HttpError(err))
                             }
                             Some(Ok(upload_result)) => {
                                 res = upload_result;
                                 if !res.status.is_success() {
                                     dlg.finished(false);
-                                    return Result::Failure(res)
+                                    return Err(Error::Failure(res))
                                 }
                             }
                         }
@@ -6502,13 +6674,13 @@ impl<'a, C, NC, A> ObjectInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkC
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     } else { (res, Default::default()) };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -6524,11 +6696,14 @@ impl<'a, C, NC, A> ObjectInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkC
                 where RS: ReadSeek {
         self.doit(stream, mime_type, "simple")
     }
-    /// Upload media in a resumeable fashion.
+    /// Upload media in a resumable fashion.
     /// Even if the upload fails or is interrupted, it can be resumed for a 
     /// certain amount of time as the server maintains state temporarily.
     /// 
-    /// TODO: Write more about how delegation works in this particular case.
+    /// The delegate will be asked for an `upload_url()`, and if not provided, will be asked to store an upload URL 
+    /// that was provided by the server, using `store_upload_url(...)`. The upload will be done in chunks, the delegate
+    /// may specify the `chunk_size()` and may cancel the operation before each chunk is uploaded, using
+    /// `cancel_chunk_upload(...)`.
     ///
     /// * *max size*: 0kb
     /// * *multipart*: yes
@@ -6552,7 +6727,7 @@ impl<'a, C, NC, A> ObjectInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Name of the bucket in which to store the new object. Overrides the provided object metadata's bucket value, if any.    
+    /// Name of the bucket in which to store the new object. Overrides the provided object metadata's bucket value, if any.
     pub fn bucket(mut self, new_value: &str) -> ObjectInsertCall<'a, C, NC, A> {
         self._bucket = new_value.to_string();
         self
@@ -6560,7 +6735,7 @@ impl<'a, C, NC, A> ObjectInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// Sets the *projection* query property to the given value.
     ///
     /// 
-    /// Set of properties to return. Defaults to noAcl, unless the object resource specifies the acl property, when it defaults to full.    
+    /// Set of properties to return. Defaults to noAcl, unless the object resource specifies the acl property, when it defaults to full.
     pub fn projection(mut self, new_value: &str) -> ObjectInsertCall<'a, C, NC, A> {
         self._projection = Some(new_value.to_string());
         self
@@ -6568,7 +6743,7 @@ impl<'a, C, NC, A> ObjectInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// Sets the *predefined acl* query property to the given value.
     ///
     /// 
-    /// Apply a predefined set of access controls to this object.    
+    /// Apply a predefined set of access controls to this object.
     pub fn predefined_acl(mut self, new_value: &str) -> ObjectInsertCall<'a, C, NC, A> {
         self._predefined_acl = Some(new_value.to_string());
         self
@@ -6576,7 +6751,7 @@ impl<'a, C, NC, A> ObjectInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// Sets the *name* query property to the given value.
     ///
     /// 
-    /// Name of the object. Required when the object metadata is not otherwise provided. Overrides the object metadata's name value, if any.    
+    /// Name of the object. Required when the object metadata is not otherwise provided. Overrides the object metadata's name value, if any.
     pub fn name(mut self, new_value: &str) -> ObjectInsertCall<'a, C, NC, A> {
         self._name = Some(new_value.to_string());
         self
@@ -6584,7 +6759,7 @@ impl<'a, C, NC, A> ObjectInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// Sets the *if metageneration not match* query property to the given value.
     ///
     /// 
-    /// Makes the operation conditional on whether the object's current metageneration does not match the given value.    
+    /// Makes the operation conditional on whether the object's current metageneration does not match the given value.
     pub fn if_metageneration_not_match(mut self, new_value: &str) -> ObjectInsertCall<'a, C, NC, A> {
         self._if_metageneration_not_match = Some(new_value.to_string());
         self
@@ -6592,7 +6767,7 @@ impl<'a, C, NC, A> ObjectInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// Sets the *if metageneration match* query property to the given value.
     ///
     /// 
-    /// Makes the operation conditional on whether the object's current metageneration matches the given value.    
+    /// Makes the operation conditional on whether the object's current metageneration matches the given value.
     pub fn if_metageneration_match(mut self, new_value: &str) -> ObjectInsertCall<'a, C, NC, A> {
         self._if_metageneration_match = Some(new_value.to_string());
         self
@@ -6600,7 +6775,7 @@ impl<'a, C, NC, A> ObjectInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// Sets the *if generation not match* query property to the given value.
     ///
     /// 
-    /// Makes the operation conditional on whether the object's current generation does not match the given value.    
+    /// Makes the operation conditional on whether the object's current generation does not match the given value.
     pub fn if_generation_not_match(mut self, new_value: &str) -> ObjectInsertCall<'a, C, NC, A> {
         self._if_generation_not_match = Some(new_value.to_string());
         self
@@ -6608,7 +6783,7 @@ impl<'a, C, NC, A> ObjectInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// Sets the *if generation match* query property to the given value.
     ///
     /// 
-    /// Makes the operation conditional on whether the object's current generation matches the given value.    
+    /// Makes the operation conditional on whether the object's current generation matches the given value.
     pub fn if_generation_match(mut self, new_value: &str) -> ObjectInsertCall<'a, C, NC, A> {
         self._if_generation_match = Some(new_value.to_string());
         self
@@ -6616,7 +6791,7 @@ impl<'a, C, NC, A> ObjectInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// Sets the *content encoding* query property to the given value.
     ///
     /// 
-    /// If set, sets the contentEncoding property of the final object to this value. Setting this parameter is equivalent to setting the contentEncoding metadata property. This can be useful when uploading an object with uploadType=media to indicate the encoding of the content being uploaded.    
+    /// If set, sets the contentEncoding property of the final object to this value. Setting this parameter is equivalent to setting the contentEncoding metadata property. This can be useful when uploading an object with uploadType=media to indicate the encoding of the content being uploaded.
     pub fn content_encoding(mut self, new_value: &str) -> ObjectInsertCall<'a, C, NC, A> {
         self._content_encoding = Some(new_value.to_string());
         self
@@ -6682,7 +6857,7 @@ impl<'a, C, NC, A> ObjectInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkC
 /// but not the `Object` structure that you would usually get. The latter will be a default value.
 ///
 /// A builder for the *compose* method supported by a *object* resource.
-/// It is not used directly, but through a `ObjectMethods`.
+/// It is not used directly, but through a `ObjectMethods` instance.
 ///
 /// # Example
 ///
@@ -6764,7 +6939,7 @@ impl<'a, C, NC, A> ObjectComposeCall<'a, C, NC, A> where NC: hyper::net::Network
         for &field in ["destinationBucket", "destinationObject", "ifMetagenerationMatch", "ifGenerationMatch", "destinationPredefinedAcl"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -6837,7 +7012,7 @@ impl<'a, C, NC, A> ObjectComposeCall<'a, C, NC, A> where NC: hyper::net::Network
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -6853,7 +7028,6 @@ impl<'a, C, NC, A> ObjectComposeCall<'a, C, NC, A> where NC: hyper::net::Network
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -6863,7 +7037,7 @@ impl<'a, C, NC, A> ObjectComposeCall<'a, C, NC, A> where NC: hyper::net::Network
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -6874,7 +7048,7 @@ impl<'a, C, NC, A> ObjectComposeCall<'a, C, NC, A> where NC: hyper::net::Network
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = if enable_resource_parsing {
                         let mut json_response = String::new();
@@ -6883,13 +7057,13 @@ impl<'a, C, NC, A> ObjectComposeCall<'a, C, NC, A> where NC: hyper::net::Network
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     } else { (res, Default::default()) };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -6910,7 +7084,7 @@ impl<'a, C, NC, A> ObjectComposeCall<'a, C, NC, A> where NC: hyper::net::Network
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Name of the bucket in which to store the new object.    
+    /// Name of the bucket in which to store the new object.
     pub fn destination_bucket(mut self, new_value: &str) -> ObjectComposeCall<'a, C, NC, A> {
         self._destination_bucket = new_value.to_string();
         self
@@ -6920,7 +7094,7 @@ impl<'a, C, NC, A> ObjectComposeCall<'a, C, NC, A> where NC: hyper::net::Network
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Name of the new object.    
+    /// Name of the new object.
     pub fn destination_object(mut self, new_value: &str) -> ObjectComposeCall<'a, C, NC, A> {
         self._destination_object = new_value.to_string();
         self
@@ -6928,7 +7102,7 @@ impl<'a, C, NC, A> ObjectComposeCall<'a, C, NC, A> where NC: hyper::net::Network
     /// Sets the *if metageneration match* query property to the given value.
     ///
     /// 
-    /// Makes the operation conditional on whether the object's current metageneration matches the given value.    
+    /// Makes the operation conditional on whether the object's current metageneration matches the given value.
     pub fn if_metageneration_match(mut self, new_value: &str) -> ObjectComposeCall<'a, C, NC, A> {
         self._if_metageneration_match = Some(new_value.to_string());
         self
@@ -6936,7 +7110,7 @@ impl<'a, C, NC, A> ObjectComposeCall<'a, C, NC, A> where NC: hyper::net::Network
     /// Sets the *if generation match* query property to the given value.
     ///
     /// 
-    /// Makes the operation conditional on whether the object's current generation matches the given value.    
+    /// Makes the operation conditional on whether the object's current generation matches the given value.
     pub fn if_generation_match(mut self, new_value: &str) -> ObjectComposeCall<'a, C, NC, A> {
         self._if_generation_match = Some(new_value.to_string());
         self
@@ -6944,7 +7118,7 @@ impl<'a, C, NC, A> ObjectComposeCall<'a, C, NC, A> where NC: hyper::net::Network
     /// Sets the *destination predefined acl* query property to the given value.
     ///
     /// 
-    /// Apply a predefined set of access controls to the destination object.    
+    /// Apply a predefined set of access controls to the destination object.
     pub fn destination_predefined_acl(mut self, new_value: &str) -> ObjectComposeCall<'a, C, NC, A> {
         self._destination_predefined_acl = Some(new_value.to_string());
         self
@@ -7005,7 +7179,7 @@ impl<'a, C, NC, A> ObjectComposeCall<'a, C, NC, A> where NC: hyper::net::Network
 /// Deletes an object and its metadata. Deletions are permanent if versioning is not enabled for the bucket, or if the generation parameter is used.
 ///
 /// A builder for the *delete* method supported by a *object* resource.
-/// It is not used directly, but through a `ObjectMethods`.
+/// It is not used directly, but through a `ObjectMethods` instance.
 ///
 /// # Example
 ///
@@ -7090,7 +7264,7 @@ impl<'a, C, NC, A> ObjectDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkC
         for &field in ["bucket", "object", "ifMetagenerationNotMatch", "ifMetagenerationMatch", "ifGenerationNotMatch", "ifGenerationMatch", "generation"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -7142,7 +7316,7 @@ impl<'a, C, NC, A> ObjectDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkC
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -7154,7 +7328,6 @@ impl<'a, C, NC, A> ObjectDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkC
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -7164,7 +7337,7 @@ impl<'a, C, NC, A> ObjectDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkC
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -7175,12 +7348,12 @@ impl<'a, C, NC, A> ObjectDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkC
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = res;
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -7192,7 +7365,7 @@ impl<'a, C, NC, A> ObjectDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Name of the bucket in which the object resides.    
+    /// Name of the bucket in which the object resides.
     pub fn bucket(mut self, new_value: &str) -> ObjectDeleteCall<'a, C, NC, A> {
         self._bucket = new_value.to_string();
         self
@@ -7202,7 +7375,7 @@ impl<'a, C, NC, A> ObjectDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Name of the object.    
+    /// Name of the object.
     pub fn object(mut self, new_value: &str) -> ObjectDeleteCall<'a, C, NC, A> {
         self._object = new_value.to_string();
         self
@@ -7210,7 +7383,7 @@ impl<'a, C, NC, A> ObjectDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// Sets the *if metageneration not match* query property to the given value.
     ///
     /// 
-    /// Makes the operation conditional on whether the object's current metageneration does not match the given value.    
+    /// Makes the operation conditional on whether the object's current metageneration does not match the given value.
     pub fn if_metageneration_not_match(mut self, new_value: &str) -> ObjectDeleteCall<'a, C, NC, A> {
         self._if_metageneration_not_match = Some(new_value.to_string());
         self
@@ -7218,7 +7391,7 @@ impl<'a, C, NC, A> ObjectDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// Sets the *if metageneration match* query property to the given value.
     ///
     /// 
-    /// Makes the operation conditional on whether the object's current metageneration matches the given value.    
+    /// Makes the operation conditional on whether the object's current metageneration matches the given value.
     pub fn if_metageneration_match(mut self, new_value: &str) -> ObjectDeleteCall<'a, C, NC, A> {
         self._if_metageneration_match = Some(new_value.to_string());
         self
@@ -7226,7 +7399,7 @@ impl<'a, C, NC, A> ObjectDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// Sets the *if generation not match* query property to the given value.
     ///
     /// 
-    /// Makes the operation conditional on whether the object's current generation does not match the given value.    
+    /// Makes the operation conditional on whether the object's current generation does not match the given value.
     pub fn if_generation_not_match(mut self, new_value: &str) -> ObjectDeleteCall<'a, C, NC, A> {
         self._if_generation_not_match = Some(new_value.to_string());
         self
@@ -7234,7 +7407,7 @@ impl<'a, C, NC, A> ObjectDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// Sets the *if generation match* query property to the given value.
     ///
     /// 
-    /// Makes the operation conditional on whether the object's current generation matches the given value.    
+    /// Makes the operation conditional on whether the object's current generation matches the given value.
     pub fn if_generation_match(mut self, new_value: &str) -> ObjectDeleteCall<'a, C, NC, A> {
         self._if_generation_match = Some(new_value.to_string());
         self
@@ -7242,7 +7415,7 @@ impl<'a, C, NC, A> ObjectDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// Sets the *generation* query property to the given value.
     ///
     /// 
-    /// If present, permanently deletes a specific revision of this object (as opposed to the latest version, the default).    
+    /// If present, permanently deletes a specific revision of this object (as opposed to the latest version, the default).
     pub fn generation(mut self, new_value: &str) -> ObjectDeleteCall<'a, C, NC, A> {
         self._generation = Some(new_value.to_string());
         self
@@ -7303,7 +7476,7 @@ impl<'a, C, NC, A> ObjectDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkC
 /// Retrieves a list of objects matching the criteria.
 ///
 /// A builder for the *list* method supported by a *object* resource.
-/// It is not used directly, but through a `ObjectMethods`.
+/// It is not used directly, but through a `ObjectMethods` instance.
 ///
 /// # Example
 ///
@@ -7391,7 +7564,7 @@ impl<'a, C, NC, A> ObjectListCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
         for &field in ["alt", "bucket", "versions", "projection", "prefix", "pageToken", "maxResults", "delimiter"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -7444,7 +7617,7 @@ impl<'a, C, NC, A> ObjectListCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -7456,7 +7629,6 @@ impl<'a, C, NC, A> ObjectListCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -7466,7 +7638,7 @@ impl<'a, C, NC, A> ObjectListCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -7477,7 +7649,7 @@ impl<'a, C, NC, A> ObjectListCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -7486,13 +7658,13 @@ impl<'a, C, NC, A> ObjectListCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -7504,7 +7676,7 @@ impl<'a, C, NC, A> ObjectListCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Name of the bucket in which to look for objects.    
+    /// Name of the bucket in which to look for objects.
     pub fn bucket(mut self, new_value: &str) -> ObjectListCall<'a, C, NC, A> {
         self._bucket = new_value.to_string();
         self
@@ -7512,7 +7684,7 @@ impl<'a, C, NC, A> ObjectListCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// Sets the *versions* query property to the given value.
     ///
     /// 
-    /// If true, lists all versions of a file as distinct results.    
+    /// If true, lists all versions of a file as distinct results.
     pub fn versions(mut self, new_value: bool) -> ObjectListCall<'a, C, NC, A> {
         self._versions = Some(new_value);
         self
@@ -7520,7 +7692,7 @@ impl<'a, C, NC, A> ObjectListCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// Sets the *projection* query property to the given value.
     ///
     /// 
-    /// Set of properties to return. Defaults to noAcl.    
+    /// Set of properties to return. Defaults to noAcl.
     pub fn projection(mut self, new_value: &str) -> ObjectListCall<'a, C, NC, A> {
         self._projection = Some(new_value.to_string());
         self
@@ -7528,7 +7700,7 @@ impl<'a, C, NC, A> ObjectListCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// Sets the *prefix* query property to the given value.
     ///
     /// 
-    /// Filter results to objects whose names begin with this prefix.    
+    /// Filter results to objects whose names begin with this prefix.
     pub fn prefix(mut self, new_value: &str) -> ObjectListCall<'a, C, NC, A> {
         self._prefix = Some(new_value.to_string());
         self
@@ -7536,7 +7708,7 @@ impl<'a, C, NC, A> ObjectListCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// Sets the *page token* query property to the given value.
     ///
     /// 
-    /// A previously-returned page token representing part of the larger set of results to view.    
+    /// A previously-returned page token representing part of the larger set of results to view.
     pub fn page_token(mut self, new_value: &str) -> ObjectListCall<'a, C, NC, A> {
         self._page_token = Some(new_value.to_string());
         self
@@ -7544,7 +7716,7 @@ impl<'a, C, NC, A> ObjectListCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// Sets the *max results* query property to the given value.
     ///
     /// 
-    /// Maximum number of items plus prefixes to return. As duplicate prefixes are omitted, fewer total results may be returned than requested.    
+    /// Maximum number of items plus prefixes to return. As duplicate prefixes are omitted, fewer total results may be returned than requested.
     pub fn max_results(mut self, new_value: u32) -> ObjectListCall<'a, C, NC, A> {
         self._max_results = Some(new_value);
         self
@@ -7552,7 +7724,7 @@ impl<'a, C, NC, A> ObjectListCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// Sets the *delimiter* query property to the given value.
     ///
     /// 
-    /// Returns results in a directory-like mode. items will contain only objects whose names, aside from the prefix, do not contain delimiter. Objects whose names, aside from the prefix, contain delimiter will have their name, truncated after the delimiter, returned in prefixes. Duplicate prefixes are omitted.    
+    /// Returns results in a directory-like mode. items will contain only objects whose names, aside from the prefix, do not contain delimiter. Objects whose names, aside from the prefix, contain delimiter will have their name, truncated after the delimiter, returned in prefixes. Duplicate prefixes are omitted.
     pub fn delimiter(mut self, new_value: &str) -> ObjectListCall<'a, C, NC, A> {
         self._delimiter = Some(new_value.to_string());
         self
@@ -7618,7 +7790,7 @@ impl<'a, C, NC, A> ObjectListCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
 /// but not the `Object` structure that you would usually get. The latter will be a default value.
 ///
 /// A builder for the *copy* method supported by a *object* resource.
-/// It is not used directly, but through a `ObjectMethods`.
+/// It is not used directly, but through a `ObjectMethods` instance.
 ///
 /// # Example
 ///
@@ -7744,7 +7916,7 @@ impl<'a, C, NC, A> ObjectCopyCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
         for &field in ["sourceBucket", "sourceObject", "destinationBucket", "destinationObject", "sourceGeneration", "projection", "ifSourceMetagenerationNotMatch", "ifSourceMetagenerationMatch", "ifSourceGenerationNotMatch", "ifSourceGenerationMatch", "ifMetagenerationNotMatch", "ifMetagenerationMatch", "ifGenerationNotMatch", "ifGenerationMatch", "destinationPredefinedAcl"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -7817,7 +7989,7 @@ impl<'a, C, NC, A> ObjectCopyCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -7833,7 +8005,6 @@ impl<'a, C, NC, A> ObjectCopyCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -7843,7 +8014,7 @@ impl<'a, C, NC, A> ObjectCopyCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -7854,7 +8025,7 @@ impl<'a, C, NC, A> ObjectCopyCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = if enable_resource_parsing {
                         let mut json_response = String::new();
@@ -7863,13 +8034,13 @@ impl<'a, C, NC, A> ObjectCopyCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     } else { (res, Default::default()) };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -7890,7 +8061,7 @@ impl<'a, C, NC, A> ObjectCopyCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Name of the bucket in which to find the source object.    
+    /// Name of the bucket in which to find the source object.
     pub fn source_bucket(mut self, new_value: &str) -> ObjectCopyCall<'a, C, NC, A> {
         self._source_bucket = new_value.to_string();
         self
@@ -7900,7 +8071,7 @@ impl<'a, C, NC, A> ObjectCopyCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Name of the source object.    
+    /// Name of the source object.
     pub fn source_object(mut self, new_value: &str) -> ObjectCopyCall<'a, C, NC, A> {
         self._source_object = new_value.to_string();
         self
@@ -7910,7 +8081,7 @@ impl<'a, C, NC, A> ObjectCopyCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Name of the bucket in which to store the new object. Overrides the provided object metadata's bucket value, if any.    
+    /// Name of the bucket in which to store the new object. Overrides the provided object metadata's bucket value, if any.
     pub fn destination_bucket(mut self, new_value: &str) -> ObjectCopyCall<'a, C, NC, A> {
         self._destination_bucket = new_value.to_string();
         self
@@ -7920,7 +8091,7 @@ impl<'a, C, NC, A> ObjectCopyCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Name of the new object. Required when the object metadata is not otherwise provided. Overrides the object metadata's name value, if any.    
+    /// Name of the new object. Required when the object metadata is not otherwise provided. Overrides the object metadata's name value, if any.
     pub fn destination_object(mut self, new_value: &str) -> ObjectCopyCall<'a, C, NC, A> {
         self._destination_object = new_value.to_string();
         self
@@ -7928,7 +8099,7 @@ impl<'a, C, NC, A> ObjectCopyCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// Sets the *source generation* query property to the given value.
     ///
     /// 
-    /// If present, selects a specific revision of the source object (as opposed to the latest version, the default).    
+    /// If present, selects a specific revision of the source object (as opposed to the latest version, the default).
     pub fn source_generation(mut self, new_value: &str) -> ObjectCopyCall<'a, C, NC, A> {
         self._source_generation = Some(new_value.to_string());
         self
@@ -7936,7 +8107,7 @@ impl<'a, C, NC, A> ObjectCopyCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// Sets the *projection* query property to the given value.
     ///
     /// 
-    /// Set of properties to return. Defaults to noAcl, unless the object resource specifies the acl property, when it defaults to full.    
+    /// Set of properties to return. Defaults to noAcl, unless the object resource specifies the acl property, when it defaults to full.
     pub fn projection(mut self, new_value: &str) -> ObjectCopyCall<'a, C, NC, A> {
         self._projection = Some(new_value.to_string());
         self
@@ -7944,7 +8115,7 @@ impl<'a, C, NC, A> ObjectCopyCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// Sets the *if source metageneration not match* query property to the given value.
     ///
     /// 
-    /// Makes the operation conditional on whether the source object's current metageneration does not match the given value.    
+    /// Makes the operation conditional on whether the source object's current metageneration does not match the given value.
     pub fn if_source_metageneration_not_match(mut self, new_value: &str) -> ObjectCopyCall<'a, C, NC, A> {
         self._if_source_metageneration_not_match = Some(new_value.to_string());
         self
@@ -7952,7 +8123,7 @@ impl<'a, C, NC, A> ObjectCopyCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// Sets the *if source metageneration match* query property to the given value.
     ///
     /// 
-    /// Makes the operation conditional on whether the source object's current metageneration matches the given value.    
+    /// Makes the operation conditional on whether the source object's current metageneration matches the given value.
     pub fn if_source_metageneration_match(mut self, new_value: &str) -> ObjectCopyCall<'a, C, NC, A> {
         self._if_source_metageneration_match = Some(new_value.to_string());
         self
@@ -7960,7 +8131,7 @@ impl<'a, C, NC, A> ObjectCopyCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// Sets the *if source generation not match* query property to the given value.
     ///
     /// 
-    /// Makes the operation conditional on whether the source object's generation does not match the given value.    
+    /// Makes the operation conditional on whether the source object's generation does not match the given value.
     pub fn if_source_generation_not_match(mut self, new_value: &str) -> ObjectCopyCall<'a, C, NC, A> {
         self._if_source_generation_not_match = Some(new_value.to_string());
         self
@@ -7968,7 +8139,7 @@ impl<'a, C, NC, A> ObjectCopyCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// Sets the *if source generation match* query property to the given value.
     ///
     /// 
-    /// Makes the operation conditional on whether the source object's generation matches the given value.    
+    /// Makes the operation conditional on whether the source object's generation matches the given value.
     pub fn if_source_generation_match(mut self, new_value: &str) -> ObjectCopyCall<'a, C, NC, A> {
         self._if_source_generation_match = Some(new_value.to_string());
         self
@@ -7976,7 +8147,7 @@ impl<'a, C, NC, A> ObjectCopyCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// Sets the *if metageneration not match* query property to the given value.
     ///
     /// 
-    /// Makes the operation conditional on whether the destination object's current metageneration does not match the given value.    
+    /// Makes the operation conditional on whether the destination object's current metageneration does not match the given value.
     pub fn if_metageneration_not_match(mut self, new_value: &str) -> ObjectCopyCall<'a, C, NC, A> {
         self._if_metageneration_not_match = Some(new_value.to_string());
         self
@@ -7984,7 +8155,7 @@ impl<'a, C, NC, A> ObjectCopyCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// Sets the *if metageneration match* query property to the given value.
     ///
     /// 
-    /// Makes the operation conditional on whether the destination object's current metageneration matches the given value.    
+    /// Makes the operation conditional on whether the destination object's current metageneration matches the given value.
     pub fn if_metageneration_match(mut self, new_value: &str) -> ObjectCopyCall<'a, C, NC, A> {
         self._if_metageneration_match = Some(new_value.to_string());
         self
@@ -7992,7 +8163,7 @@ impl<'a, C, NC, A> ObjectCopyCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// Sets the *if generation not match* query property to the given value.
     ///
     /// 
-    /// Makes the operation conditional on whether the destination object's current generation does not match the given value.    
+    /// Makes the operation conditional on whether the destination object's current generation does not match the given value.
     pub fn if_generation_not_match(mut self, new_value: &str) -> ObjectCopyCall<'a, C, NC, A> {
         self._if_generation_not_match = Some(new_value.to_string());
         self
@@ -8000,7 +8171,7 @@ impl<'a, C, NC, A> ObjectCopyCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// Sets the *if generation match* query property to the given value.
     ///
     /// 
-    /// Makes the operation conditional on whether the destination object's current generation matches the given value.    
+    /// Makes the operation conditional on whether the destination object's current generation matches the given value.
     pub fn if_generation_match(mut self, new_value: &str) -> ObjectCopyCall<'a, C, NC, A> {
         self._if_generation_match = Some(new_value.to_string());
         self
@@ -8008,7 +8179,7 @@ impl<'a, C, NC, A> ObjectCopyCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// Sets the *destination predefined acl* query property to the given value.
     ///
     /// 
-    /// Apply a predefined set of access controls to the destination object.    
+    /// Apply a predefined set of access controls to the destination object.
     pub fn destination_predefined_acl(mut self, new_value: &str) -> ObjectCopyCall<'a, C, NC, A> {
         self._destination_predefined_acl = Some(new_value.to_string());
         self
@@ -8069,7 +8240,7 @@ impl<'a, C, NC, A> ObjectCopyCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
 /// Updates an object's metadata. This method supports patch semantics.
 ///
 /// A builder for the *patch* method supported by a *object* resource.
-/// It is not used directly, but through a `ObjectMethods`.
+/// It is not used directly, but through a `ObjectMethods` instance.
 ///
 /// # Example
 ///
@@ -8171,7 +8342,7 @@ impl<'a, C, NC, A> ObjectPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
         for &field in ["alt", "bucket", "object", "projection", "predefinedAcl", "ifMetagenerationNotMatch", "ifMetagenerationMatch", "ifGenerationNotMatch", "ifGenerationMatch", "generation"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -8228,7 +8399,7 @@ impl<'a, C, NC, A> ObjectPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -8244,7 +8415,6 @@ impl<'a, C, NC, A> ObjectPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -8254,7 +8424,7 @@ impl<'a, C, NC, A> ObjectPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -8265,7 +8435,7 @@ impl<'a, C, NC, A> ObjectPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -8274,13 +8444,13 @@ impl<'a, C, NC, A> ObjectPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -8301,7 +8471,7 @@ impl<'a, C, NC, A> ObjectPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Name of the bucket in which the object resides.    
+    /// Name of the bucket in which the object resides.
     pub fn bucket(mut self, new_value: &str) -> ObjectPatchCall<'a, C, NC, A> {
         self._bucket = new_value.to_string();
         self
@@ -8311,7 +8481,7 @@ impl<'a, C, NC, A> ObjectPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Name of the object.    
+    /// Name of the object.
     pub fn object(mut self, new_value: &str) -> ObjectPatchCall<'a, C, NC, A> {
         self._object = new_value.to_string();
         self
@@ -8319,7 +8489,7 @@ impl<'a, C, NC, A> ObjectPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// Sets the *projection* query property to the given value.
     ///
     /// 
-    /// Set of properties to return. Defaults to full.    
+    /// Set of properties to return. Defaults to full.
     pub fn projection(mut self, new_value: &str) -> ObjectPatchCall<'a, C, NC, A> {
         self._projection = Some(new_value.to_string());
         self
@@ -8327,7 +8497,7 @@ impl<'a, C, NC, A> ObjectPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// Sets the *predefined acl* query property to the given value.
     ///
     /// 
-    /// Apply a predefined set of access controls to this object.    
+    /// Apply a predefined set of access controls to this object.
     pub fn predefined_acl(mut self, new_value: &str) -> ObjectPatchCall<'a, C, NC, A> {
         self._predefined_acl = Some(new_value.to_string());
         self
@@ -8335,7 +8505,7 @@ impl<'a, C, NC, A> ObjectPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// Sets the *if metageneration not match* query property to the given value.
     ///
     /// 
-    /// Makes the operation conditional on whether the object's current metageneration does not match the given value.    
+    /// Makes the operation conditional on whether the object's current metageneration does not match the given value.
     pub fn if_metageneration_not_match(mut self, new_value: &str) -> ObjectPatchCall<'a, C, NC, A> {
         self._if_metageneration_not_match = Some(new_value.to_string());
         self
@@ -8343,7 +8513,7 @@ impl<'a, C, NC, A> ObjectPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// Sets the *if metageneration match* query property to the given value.
     ///
     /// 
-    /// Makes the operation conditional on whether the object's current metageneration matches the given value.    
+    /// Makes the operation conditional on whether the object's current metageneration matches the given value.
     pub fn if_metageneration_match(mut self, new_value: &str) -> ObjectPatchCall<'a, C, NC, A> {
         self._if_metageneration_match = Some(new_value.to_string());
         self
@@ -8351,7 +8521,7 @@ impl<'a, C, NC, A> ObjectPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// Sets the *if generation not match* query property to the given value.
     ///
     /// 
-    /// Makes the operation conditional on whether the object's current generation does not match the given value.    
+    /// Makes the operation conditional on whether the object's current generation does not match the given value.
     pub fn if_generation_not_match(mut self, new_value: &str) -> ObjectPatchCall<'a, C, NC, A> {
         self._if_generation_not_match = Some(new_value.to_string());
         self
@@ -8359,7 +8529,7 @@ impl<'a, C, NC, A> ObjectPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// Sets the *if generation match* query property to the given value.
     ///
     /// 
-    /// Makes the operation conditional on whether the object's current generation matches the given value.    
+    /// Makes the operation conditional on whether the object's current generation matches the given value.
     pub fn if_generation_match(mut self, new_value: &str) -> ObjectPatchCall<'a, C, NC, A> {
         self._if_generation_match = Some(new_value.to_string());
         self
@@ -8367,7 +8537,7 @@ impl<'a, C, NC, A> ObjectPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// Sets the *generation* query property to the given value.
     ///
     /// 
-    /// If present, selects a specific revision of this object (as opposed to the latest version, the default).    
+    /// If present, selects a specific revision of this object (as opposed to the latest version, the default).
     pub fn generation(mut self, new_value: &str) -> ObjectPatchCall<'a, C, NC, A> {
         self._generation = Some(new_value.to_string());
         self
@@ -8428,7 +8598,7 @@ impl<'a, C, NC, A> ObjectPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
 /// Returns the ACL entry for the specified entity on the specified object.
 ///
 /// A builder for the *get* method supported by a *objectAccessControl* resource.
-/// It is not used directly, but through a `ObjectAccessControlMethods`.
+/// It is not used directly, but through a `ObjectAccessControlMethods` instance.
 ///
 /// # Example
 ///
@@ -8495,7 +8665,7 @@ impl<'a, C, NC, A> ObjectAccessControlGetCall<'a, C, NC, A> where NC: hyper::net
         for &field in ["alt", "bucket", "object", "entity", "generation"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -8548,7 +8718,7 @@ impl<'a, C, NC, A> ObjectAccessControlGetCall<'a, C, NC, A> where NC: hyper::net
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -8560,7 +8730,6 @@ impl<'a, C, NC, A> ObjectAccessControlGetCall<'a, C, NC, A> where NC: hyper::net
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -8570,7 +8739,7 @@ impl<'a, C, NC, A> ObjectAccessControlGetCall<'a, C, NC, A> where NC: hyper::net
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -8581,7 +8750,7 @@ impl<'a, C, NC, A> ObjectAccessControlGetCall<'a, C, NC, A> where NC: hyper::net
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -8590,13 +8759,13 @@ impl<'a, C, NC, A> ObjectAccessControlGetCall<'a, C, NC, A> where NC: hyper::net
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -8608,7 +8777,7 @@ impl<'a, C, NC, A> ObjectAccessControlGetCall<'a, C, NC, A> where NC: hyper::net
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Name of a bucket.    
+    /// Name of a bucket.
     pub fn bucket(mut self, new_value: &str) -> ObjectAccessControlGetCall<'a, C, NC, A> {
         self._bucket = new_value.to_string();
         self
@@ -8618,7 +8787,7 @@ impl<'a, C, NC, A> ObjectAccessControlGetCall<'a, C, NC, A> where NC: hyper::net
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Name of the object.    
+    /// Name of the object.
     pub fn object(mut self, new_value: &str) -> ObjectAccessControlGetCall<'a, C, NC, A> {
         self._object = new_value.to_string();
         self
@@ -8628,7 +8797,7 @@ impl<'a, C, NC, A> ObjectAccessControlGetCall<'a, C, NC, A> where NC: hyper::net
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The entity holding the permission. Can be user-userId, user-emailAddress, group-groupId, group-emailAddress, allUsers, or allAuthenticatedUsers.    
+    /// The entity holding the permission. Can be user-userId, user-emailAddress, group-groupId, group-emailAddress, allUsers, or allAuthenticatedUsers.
     pub fn entity(mut self, new_value: &str) -> ObjectAccessControlGetCall<'a, C, NC, A> {
         self._entity = new_value.to_string();
         self
@@ -8636,7 +8805,7 @@ impl<'a, C, NC, A> ObjectAccessControlGetCall<'a, C, NC, A> where NC: hyper::net
     /// Sets the *generation* query property to the given value.
     ///
     /// 
-    /// If present, selects a specific revision of this object (as opposed to the latest version, the default).    
+    /// If present, selects a specific revision of this object (as opposed to the latest version, the default).
     pub fn generation(mut self, new_value: &str) -> ObjectAccessControlGetCall<'a, C, NC, A> {
         self._generation = Some(new_value.to_string());
         self
@@ -8697,7 +8866,7 @@ impl<'a, C, NC, A> ObjectAccessControlGetCall<'a, C, NC, A> where NC: hyper::net
 /// Creates a new ACL entry on the specified object.
 ///
 /// A builder for the *insert* method supported by a *objectAccessControl* resource.
-/// It is not used directly, but through a `ObjectAccessControlMethods`.
+/// It is not used directly, but through a `ObjectAccessControlMethods` instance.
 ///
 /// # Example
 ///
@@ -8769,7 +8938,7 @@ impl<'a, C, NC, A> ObjectAccessControlInsertCall<'a, C, NC, A> where NC: hyper::
         for &field in ["alt", "bucket", "object", "generation"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -8826,7 +8995,7 @@ impl<'a, C, NC, A> ObjectAccessControlInsertCall<'a, C, NC, A> where NC: hyper::
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -8842,7 +9011,6 @@ impl<'a, C, NC, A> ObjectAccessControlInsertCall<'a, C, NC, A> where NC: hyper::
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -8852,7 +9020,7 @@ impl<'a, C, NC, A> ObjectAccessControlInsertCall<'a, C, NC, A> where NC: hyper::
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -8863,7 +9031,7 @@ impl<'a, C, NC, A> ObjectAccessControlInsertCall<'a, C, NC, A> where NC: hyper::
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -8872,13 +9040,13 @@ impl<'a, C, NC, A> ObjectAccessControlInsertCall<'a, C, NC, A> where NC: hyper::
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -8899,7 +9067,7 @@ impl<'a, C, NC, A> ObjectAccessControlInsertCall<'a, C, NC, A> where NC: hyper::
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Name of a bucket.    
+    /// Name of a bucket.
     pub fn bucket(mut self, new_value: &str) -> ObjectAccessControlInsertCall<'a, C, NC, A> {
         self._bucket = new_value.to_string();
         self
@@ -8909,7 +9077,7 @@ impl<'a, C, NC, A> ObjectAccessControlInsertCall<'a, C, NC, A> where NC: hyper::
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Name of the object.    
+    /// Name of the object.
     pub fn object(mut self, new_value: &str) -> ObjectAccessControlInsertCall<'a, C, NC, A> {
         self._object = new_value.to_string();
         self
@@ -8917,7 +9085,7 @@ impl<'a, C, NC, A> ObjectAccessControlInsertCall<'a, C, NC, A> where NC: hyper::
     /// Sets the *generation* query property to the given value.
     ///
     /// 
-    /// If present, selects a specific revision of this object (as opposed to the latest version, the default).    
+    /// If present, selects a specific revision of this object (as opposed to the latest version, the default).
     pub fn generation(mut self, new_value: &str) -> ObjectAccessControlInsertCall<'a, C, NC, A> {
         self._generation = Some(new_value.to_string());
         self
@@ -8978,7 +9146,7 @@ impl<'a, C, NC, A> ObjectAccessControlInsertCall<'a, C, NC, A> where NC: hyper::
 /// Updates an ACL entry on the specified object. This method supports patch semantics.
 ///
 /// A builder for the *patch* method supported by a *objectAccessControl* resource.
-/// It is not used directly, but through a `ObjectAccessControlMethods`.
+/// It is not used directly, but through a `ObjectAccessControlMethods` instance.
 ///
 /// # Example
 ///
@@ -9052,7 +9220,7 @@ impl<'a, C, NC, A> ObjectAccessControlPatchCall<'a, C, NC, A> where NC: hyper::n
         for &field in ["alt", "bucket", "object", "entity", "generation"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -9109,7 +9277,7 @@ impl<'a, C, NC, A> ObjectAccessControlPatchCall<'a, C, NC, A> where NC: hyper::n
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -9125,7 +9293,6 @@ impl<'a, C, NC, A> ObjectAccessControlPatchCall<'a, C, NC, A> where NC: hyper::n
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -9135,7 +9302,7 @@ impl<'a, C, NC, A> ObjectAccessControlPatchCall<'a, C, NC, A> where NC: hyper::n
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -9146,7 +9313,7 @@ impl<'a, C, NC, A> ObjectAccessControlPatchCall<'a, C, NC, A> where NC: hyper::n
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -9155,13 +9322,13 @@ impl<'a, C, NC, A> ObjectAccessControlPatchCall<'a, C, NC, A> where NC: hyper::n
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -9182,7 +9349,7 @@ impl<'a, C, NC, A> ObjectAccessControlPatchCall<'a, C, NC, A> where NC: hyper::n
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Name of a bucket.    
+    /// Name of a bucket.
     pub fn bucket(mut self, new_value: &str) -> ObjectAccessControlPatchCall<'a, C, NC, A> {
         self._bucket = new_value.to_string();
         self
@@ -9192,7 +9359,7 @@ impl<'a, C, NC, A> ObjectAccessControlPatchCall<'a, C, NC, A> where NC: hyper::n
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Name of the object.    
+    /// Name of the object.
     pub fn object(mut self, new_value: &str) -> ObjectAccessControlPatchCall<'a, C, NC, A> {
         self._object = new_value.to_string();
         self
@@ -9202,7 +9369,7 @@ impl<'a, C, NC, A> ObjectAccessControlPatchCall<'a, C, NC, A> where NC: hyper::n
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The entity holding the permission. Can be user-userId, user-emailAddress, group-groupId, group-emailAddress, allUsers, or allAuthenticatedUsers.    
+    /// The entity holding the permission. Can be user-userId, user-emailAddress, group-groupId, group-emailAddress, allUsers, or allAuthenticatedUsers.
     pub fn entity(mut self, new_value: &str) -> ObjectAccessControlPatchCall<'a, C, NC, A> {
         self._entity = new_value.to_string();
         self
@@ -9210,7 +9377,7 @@ impl<'a, C, NC, A> ObjectAccessControlPatchCall<'a, C, NC, A> where NC: hyper::n
     /// Sets the *generation* query property to the given value.
     ///
     /// 
-    /// If present, selects a specific revision of this object (as opposed to the latest version, the default).    
+    /// If present, selects a specific revision of this object (as opposed to the latest version, the default).
     pub fn generation(mut self, new_value: &str) -> ObjectAccessControlPatchCall<'a, C, NC, A> {
         self._generation = Some(new_value.to_string());
         self
@@ -9271,7 +9438,7 @@ impl<'a, C, NC, A> ObjectAccessControlPatchCall<'a, C, NC, A> where NC: hyper::n
 /// Retrieves ACL entries on the specified object.
 ///
 /// A builder for the *list* method supported by a *objectAccessControl* resource.
-/// It is not used directly, but through a `ObjectAccessControlMethods`.
+/// It is not used directly, but through a `ObjectAccessControlMethods` instance.
 ///
 /// # Example
 ///
@@ -9336,7 +9503,7 @@ impl<'a, C, NC, A> ObjectAccessControlListCall<'a, C, NC, A> where NC: hyper::ne
         for &field in ["alt", "bucket", "object", "generation"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -9389,7 +9556,7 @@ impl<'a, C, NC, A> ObjectAccessControlListCall<'a, C, NC, A> where NC: hyper::ne
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -9401,7 +9568,6 @@ impl<'a, C, NC, A> ObjectAccessControlListCall<'a, C, NC, A> where NC: hyper::ne
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -9411,7 +9577,7 @@ impl<'a, C, NC, A> ObjectAccessControlListCall<'a, C, NC, A> where NC: hyper::ne
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -9422,7 +9588,7 @@ impl<'a, C, NC, A> ObjectAccessControlListCall<'a, C, NC, A> where NC: hyper::ne
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -9431,13 +9597,13 @@ impl<'a, C, NC, A> ObjectAccessControlListCall<'a, C, NC, A> where NC: hyper::ne
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -9449,7 +9615,7 @@ impl<'a, C, NC, A> ObjectAccessControlListCall<'a, C, NC, A> where NC: hyper::ne
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Name of a bucket.    
+    /// Name of a bucket.
     pub fn bucket(mut self, new_value: &str) -> ObjectAccessControlListCall<'a, C, NC, A> {
         self._bucket = new_value.to_string();
         self
@@ -9459,7 +9625,7 @@ impl<'a, C, NC, A> ObjectAccessControlListCall<'a, C, NC, A> where NC: hyper::ne
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Name of the object.    
+    /// Name of the object.
     pub fn object(mut self, new_value: &str) -> ObjectAccessControlListCall<'a, C, NC, A> {
         self._object = new_value.to_string();
         self
@@ -9467,7 +9633,7 @@ impl<'a, C, NC, A> ObjectAccessControlListCall<'a, C, NC, A> where NC: hyper::ne
     /// Sets the *generation* query property to the given value.
     ///
     /// 
-    /// If present, selects a specific revision of this object (as opposed to the latest version, the default).    
+    /// If present, selects a specific revision of this object (as opposed to the latest version, the default).
     pub fn generation(mut self, new_value: &str) -> ObjectAccessControlListCall<'a, C, NC, A> {
         self._generation = Some(new_value.to_string());
         self
@@ -9528,7 +9694,7 @@ impl<'a, C, NC, A> ObjectAccessControlListCall<'a, C, NC, A> where NC: hyper::ne
 /// Permanently deletes the ACL entry for the specified entity on the specified object.
 ///
 /// A builder for the *delete* method supported by a *objectAccessControl* resource.
-/// It is not used directly, but through a `ObjectAccessControlMethods`.
+/// It is not used directly, but through a `ObjectAccessControlMethods` instance.
 ///
 /// # Example
 ///
@@ -9595,7 +9761,7 @@ impl<'a, C, NC, A> ObjectAccessControlDeleteCall<'a, C, NC, A> where NC: hyper::
         for &field in ["bucket", "object", "entity", "generation"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -9647,7 +9813,7 @@ impl<'a, C, NC, A> ObjectAccessControlDeleteCall<'a, C, NC, A> where NC: hyper::
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -9659,7 +9825,6 @@ impl<'a, C, NC, A> ObjectAccessControlDeleteCall<'a, C, NC, A> where NC: hyper::
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -9669,7 +9834,7 @@ impl<'a, C, NC, A> ObjectAccessControlDeleteCall<'a, C, NC, A> where NC: hyper::
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -9680,12 +9845,12 @@ impl<'a, C, NC, A> ObjectAccessControlDeleteCall<'a, C, NC, A> where NC: hyper::
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = res;
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -9697,7 +9862,7 @@ impl<'a, C, NC, A> ObjectAccessControlDeleteCall<'a, C, NC, A> where NC: hyper::
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Name of a bucket.    
+    /// Name of a bucket.
     pub fn bucket(mut self, new_value: &str) -> ObjectAccessControlDeleteCall<'a, C, NC, A> {
         self._bucket = new_value.to_string();
         self
@@ -9707,7 +9872,7 @@ impl<'a, C, NC, A> ObjectAccessControlDeleteCall<'a, C, NC, A> where NC: hyper::
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Name of the object.    
+    /// Name of the object.
     pub fn object(mut self, new_value: &str) -> ObjectAccessControlDeleteCall<'a, C, NC, A> {
         self._object = new_value.to_string();
         self
@@ -9717,7 +9882,7 @@ impl<'a, C, NC, A> ObjectAccessControlDeleteCall<'a, C, NC, A> where NC: hyper::
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The entity holding the permission. Can be user-userId, user-emailAddress, group-groupId, group-emailAddress, allUsers, or allAuthenticatedUsers.    
+    /// The entity holding the permission. Can be user-userId, user-emailAddress, group-groupId, group-emailAddress, allUsers, or allAuthenticatedUsers.
     pub fn entity(mut self, new_value: &str) -> ObjectAccessControlDeleteCall<'a, C, NC, A> {
         self._entity = new_value.to_string();
         self
@@ -9725,7 +9890,7 @@ impl<'a, C, NC, A> ObjectAccessControlDeleteCall<'a, C, NC, A> where NC: hyper::
     /// Sets the *generation* query property to the given value.
     ///
     /// 
-    /// If present, selects a specific revision of this object (as opposed to the latest version, the default).    
+    /// If present, selects a specific revision of this object (as opposed to the latest version, the default).
     pub fn generation(mut self, new_value: &str) -> ObjectAccessControlDeleteCall<'a, C, NC, A> {
         self._generation = Some(new_value.to_string());
         self
@@ -9786,7 +9951,7 @@ impl<'a, C, NC, A> ObjectAccessControlDeleteCall<'a, C, NC, A> where NC: hyper::
 /// Updates an ACL entry on the specified object.
 ///
 /// A builder for the *update* method supported by a *objectAccessControl* resource.
-/// It is not used directly, but through a `ObjectAccessControlMethods`.
+/// It is not used directly, but through a `ObjectAccessControlMethods` instance.
 ///
 /// # Example
 ///
@@ -9860,7 +10025,7 @@ impl<'a, C, NC, A> ObjectAccessControlUpdateCall<'a, C, NC, A> where NC: hyper::
         for &field in ["alt", "bucket", "object", "entity", "generation"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -9917,7 +10082,7 @@ impl<'a, C, NC, A> ObjectAccessControlUpdateCall<'a, C, NC, A> where NC: hyper::
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -9933,7 +10098,6 @@ impl<'a, C, NC, A> ObjectAccessControlUpdateCall<'a, C, NC, A> where NC: hyper::
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -9943,7 +10107,7 @@ impl<'a, C, NC, A> ObjectAccessControlUpdateCall<'a, C, NC, A> where NC: hyper::
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -9954,7 +10118,7 @@ impl<'a, C, NC, A> ObjectAccessControlUpdateCall<'a, C, NC, A> where NC: hyper::
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -9963,13 +10127,13 @@ impl<'a, C, NC, A> ObjectAccessControlUpdateCall<'a, C, NC, A> where NC: hyper::
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -9990,7 +10154,7 @@ impl<'a, C, NC, A> ObjectAccessControlUpdateCall<'a, C, NC, A> where NC: hyper::
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Name of a bucket.    
+    /// Name of a bucket.
     pub fn bucket(mut self, new_value: &str) -> ObjectAccessControlUpdateCall<'a, C, NC, A> {
         self._bucket = new_value.to_string();
         self
@@ -10000,7 +10164,7 @@ impl<'a, C, NC, A> ObjectAccessControlUpdateCall<'a, C, NC, A> where NC: hyper::
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Name of the object.    
+    /// Name of the object.
     pub fn object(mut self, new_value: &str) -> ObjectAccessControlUpdateCall<'a, C, NC, A> {
         self._object = new_value.to_string();
         self
@@ -10010,7 +10174,7 @@ impl<'a, C, NC, A> ObjectAccessControlUpdateCall<'a, C, NC, A> where NC: hyper::
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The entity holding the permission. Can be user-userId, user-emailAddress, group-groupId, group-emailAddress, allUsers, or allAuthenticatedUsers.    
+    /// The entity holding the permission. Can be user-userId, user-emailAddress, group-groupId, group-emailAddress, allUsers, or allAuthenticatedUsers.
     pub fn entity(mut self, new_value: &str) -> ObjectAccessControlUpdateCall<'a, C, NC, A> {
         self._entity = new_value.to_string();
         self
@@ -10018,7 +10182,7 @@ impl<'a, C, NC, A> ObjectAccessControlUpdateCall<'a, C, NC, A> where NC: hyper::
     /// Sets the *generation* query property to the given value.
     ///
     /// 
-    /// If present, selects a specific revision of this object (as opposed to the latest version, the default).    
+    /// If present, selects a specific revision of this object (as opposed to the latest version, the default).
     pub fn generation(mut self, new_value: &str) -> ObjectAccessControlUpdateCall<'a, C, NC, A> {
         self._generation = Some(new_value.to_string());
         self
@@ -10079,7 +10243,7 @@ impl<'a, C, NC, A> ObjectAccessControlUpdateCall<'a, C, NC, A> where NC: hyper::
 /// Updates a bucket.
 ///
 /// A builder for the *update* method supported by a *bucket* resource.
-/// It is not used directly, but through a `BucketMethods`.
+/// It is not used directly, but through a `BucketMethods` instance.
 ///
 /// # Example
 ///
@@ -10169,7 +10333,7 @@ impl<'a, C, NC, A> BucketUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkC
         for &field in ["alt", "bucket", "projection", "predefinedDefaultObjectAcl", "predefinedAcl", "ifMetagenerationNotMatch", "ifMetagenerationMatch"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -10226,7 +10390,7 @@ impl<'a, C, NC, A> BucketUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkC
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -10242,7 +10406,6 @@ impl<'a, C, NC, A> BucketUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkC
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -10252,7 +10415,7 @@ impl<'a, C, NC, A> BucketUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkC
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -10263,7 +10426,7 @@ impl<'a, C, NC, A> BucketUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkC
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -10272,13 +10435,13 @@ impl<'a, C, NC, A> BucketUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkC
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -10299,7 +10462,7 @@ impl<'a, C, NC, A> BucketUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Name of a bucket.    
+    /// Name of a bucket.
     pub fn bucket(mut self, new_value: &str) -> BucketUpdateCall<'a, C, NC, A> {
         self._bucket = new_value.to_string();
         self
@@ -10307,7 +10470,7 @@ impl<'a, C, NC, A> BucketUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// Sets the *projection* query property to the given value.
     ///
     /// 
-    /// Set of properties to return. Defaults to full.    
+    /// Set of properties to return. Defaults to full.
     pub fn projection(mut self, new_value: &str) -> BucketUpdateCall<'a, C, NC, A> {
         self._projection = Some(new_value.to_string());
         self
@@ -10315,7 +10478,7 @@ impl<'a, C, NC, A> BucketUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// Sets the *predefined default object acl* query property to the given value.
     ///
     /// 
-    /// Apply a predefined set of default object access controls to this bucket.    
+    /// Apply a predefined set of default object access controls to this bucket.
     pub fn predefined_default_object_acl(mut self, new_value: &str) -> BucketUpdateCall<'a, C, NC, A> {
         self._predefined_default_object_acl = Some(new_value.to_string());
         self
@@ -10323,7 +10486,7 @@ impl<'a, C, NC, A> BucketUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// Sets the *predefined acl* query property to the given value.
     ///
     /// 
-    /// Apply a predefined set of access controls to this bucket.    
+    /// Apply a predefined set of access controls to this bucket.
     pub fn predefined_acl(mut self, new_value: &str) -> BucketUpdateCall<'a, C, NC, A> {
         self._predefined_acl = Some(new_value.to_string());
         self
@@ -10331,7 +10494,7 @@ impl<'a, C, NC, A> BucketUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// Sets the *if metageneration not match* query property to the given value.
     ///
     /// 
-    /// Makes the return of the bucket metadata conditional on whether the bucket's current metageneration does not match the given value.    
+    /// Makes the return of the bucket metadata conditional on whether the bucket's current metageneration does not match the given value.
     pub fn if_metageneration_not_match(mut self, new_value: &str) -> BucketUpdateCall<'a, C, NC, A> {
         self._if_metageneration_not_match = Some(new_value.to_string());
         self
@@ -10339,7 +10502,7 @@ impl<'a, C, NC, A> BucketUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// Sets the *if metageneration match* query property to the given value.
     ///
     /// 
-    /// Makes the return of the bucket metadata conditional on whether the bucket's current metageneration matches the given value.    
+    /// Makes the return of the bucket metadata conditional on whether the bucket's current metageneration matches the given value.
     pub fn if_metageneration_match(mut self, new_value: &str) -> BucketUpdateCall<'a, C, NC, A> {
         self._if_metageneration_match = Some(new_value.to_string());
         self
@@ -10400,7 +10563,7 @@ impl<'a, C, NC, A> BucketUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkC
 /// Returns metadata for the specified bucket.
 ///
 /// A builder for the *get* method supported by a *bucket* resource.
-/// It is not used directly, but through a `BucketMethods`.
+/// It is not used directly, but through a `BucketMethods` instance.
 ///
 /// # Example
 ///
@@ -10473,7 +10636,7 @@ impl<'a, C, NC, A> BucketGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
         for &field in ["alt", "bucket", "projection", "ifMetagenerationNotMatch", "ifMetagenerationMatch"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -10526,7 +10689,7 @@ impl<'a, C, NC, A> BucketGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -10538,7 +10701,6 @@ impl<'a, C, NC, A> BucketGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -10548,7 +10710,7 @@ impl<'a, C, NC, A> BucketGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -10559,7 +10721,7 @@ impl<'a, C, NC, A> BucketGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -10568,13 +10730,13 @@ impl<'a, C, NC, A> BucketGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -10586,7 +10748,7 @@ impl<'a, C, NC, A> BucketGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Name of a bucket.    
+    /// Name of a bucket.
     pub fn bucket(mut self, new_value: &str) -> BucketGetCall<'a, C, NC, A> {
         self._bucket = new_value.to_string();
         self
@@ -10594,7 +10756,7 @@ impl<'a, C, NC, A> BucketGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     /// Sets the *projection* query property to the given value.
     ///
     /// 
-    /// Set of properties to return. Defaults to noAcl.    
+    /// Set of properties to return. Defaults to noAcl.
     pub fn projection(mut self, new_value: &str) -> BucketGetCall<'a, C, NC, A> {
         self._projection = Some(new_value.to_string());
         self
@@ -10602,7 +10764,7 @@ impl<'a, C, NC, A> BucketGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     /// Sets the *if metageneration not match* query property to the given value.
     ///
     /// 
-    /// Makes the return of the bucket metadata conditional on whether the bucket's current metageneration does not match the given value.    
+    /// Makes the return of the bucket metadata conditional on whether the bucket's current metageneration does not match the given value.
     pub fn if_metageneration_not_match(mut self, new_value: &str) -> BucketGetCall<'a, C, NC, A> {
         self._if_metageneration_not_match = Some(new_value.to_string());
         self
@@ -10610,7 +10772,7 @@ impl<'a, C, NC, A> BucketGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     /// Sets the *if metageneration match* query property to the given value.
     ///
     /// 
-    /// Makes the return of the bucket metadata conditional on whether the bucket's current metageneration matches the given value.    
+    /// Makes the return of the bucket metadata conditional on whether the bucket's current metageneration matches the given value.
     pub fn if_metageneration_match(mut self, new_value: &str) -> BucketGetCall<'a, C, NC, A> {
         self._if_metageneration_match = Some(new_value.to_string());
         self
@@ -10671,7 +10833,7 @@ impl<'a, C, NC, A> BucketGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
 /// Permanently deletes an empty bucket.
 ///
 /// A builder for the *delete* method supported by a *bucket* resource.
-/// It is not used directly, but through a `BucketMethods`.
+/// It is not used directly, but through a `BucketMethods` instance.
 ///
 /// # Example
 ///
@@ -10739,7 +10901,7 @@ impl<'a, C, NC, A> BucketDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkC
         for &field in ["bucket", "ifMetagenerationNotMatch", "ifMetagenerationMatch"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -10791,7 +10953,7 @@ impl<'a, C, NC, A> BucketDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkC
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -10803,7 +10965,6 @@ impl<'a, C, NC, A> BucketDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkC
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -10813,7 +10974,7 @@ impl<'a, C, NC, A> BucketDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkC
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -10824,12 +10985,12 @@ impl<'a, C, NC, A> BucketDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkC
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = res;
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -10841,7 +11002,7 @@ impl<'a, C, NC, A> BucketDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Name of a bucket.    
+    /// Name of a bucket.
     pub fn bucket(mut self, new_value: &str) -> BucketDeleteCall<'a, C, NC, A> {
         self._bucket = new_value.to_string();
         self
@@ -10849,7 +11010,7 @@ impl<'a, C, NC, A> BucketDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// Sets the *if metageneration not match* query property to the given value.
     ///
     /// 
-    /// If set, only deletes the bucket if its metageneration does not match this value.    
+    /// If set, only deletes the bucket if its metageneration does not match this value.
     pub fn if_metageneration_not_match(mut self, new_value: &str) -> BucketDeleteCall<'a, C, NC, A> {
         self._if_metageneration_not_match = Some(new_value.to_string());
         self
@@ -10857,7 +11018,7 @@ impl<'a, C, NC, A> BucketDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// Sets the *if metageneration match* query property to the given value.
     ///
     /// 
-    /// If set, only deletes the bucket if its metageneration matches this value.    
+    /// If set, only deletes the bucket if its metageneration matches this value.
     pub fn if_metageneration_match(mut self, new_value: &str) -> BucketDeleteCall<'a, C, NC, A> {
         self._if_metageneration_match = Some(new_value.to_string());
         self
@@ -10918,7 +11079,7 @@ impl<'a, C, NC, A> BucketDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkC
 /// Creates a new bucket.
 ///
 /// A builder for the *insert* method supported by a *bucket* resource.
-/// It is not used directly, but through a `BucketMethods`.
+/// It is not used directly, but through a `BucketMethods` instance.
 ///
 /// # Example
 ///
@@ -10998,7 +11159,7 @@ impl<'a, C, NC, A> BucketInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkC
         for &field in ["alt", "project", "projection", "predefinedDefaultObjectAcl", "predefinedAcl"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -11031,7 +11192,7 @@ impl<'a, C, NC, A> BucketInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkC
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -11047,7 +11208,6 @@ impl<'a, C, NC, A> BucketInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkC
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -11057,7 +11217,7 @@ impl<'a, C, NC, A> BucketInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkC
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -11068,7 +11228,7 @@ impl<'a, C, NC, A> BucketInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkC
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -11077,13 +11237,13 @@ impl<'a, C, NC, A> BucketInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkC
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -11104,7 +11264,7 @@ impl<'a, C, NC, A> BucketInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// A valid API project identifier.    
+    /// A valid API project identifier.
     pub fn project(mut self, new_value: &str) -> BucketInsertCall<'a, C, NC, A> {
         self._project = new_value.to_string();
         self
@@ -11112,7 +11272,7 @@ impl<'a, C, NC, A> BucketInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// Sets the *projection* query property to the given value.
     ///
     /// 
-    /// Set of properties to return. Defaults to noAcl, unless the bucket resource specifies acl or defaultObjectAcl properties, when it defaults to full.    
+    /// Set of properties to return. Defaults to noAcl, unless the bucket resource specifies acl or defaultObjectAcl properties, when it defaults to full.
     pub fn projection(mut self, new_value: &str) -> BucketInsertCall<'a, C, NC, A> {
         self._projection = Some(new_value.to_string());
         self
@@ -11120,7 +11280,7 @@ impl<'a, C, NC, A> BucketInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// Sets the *predefined default object acl* query property to the given value.
     ///
     /// 
-    /// Apply a predefined set of default object access controls to this bucket.    
+    /// Apply a predefined set of default object access controls to this bucket.
     pub fn predefined_default_object_acl(mut self, new_value: &str) -> BucketInsertCall<'a, C, NC, A> {
         self._predefined_default_object_acl = Some(new_value.to_string());
         self
@@ -11128,7 +11288,7 @@ impl<'a, C, NC, A> BucketInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// Sets the *predefined acl* query property to the given value.
     ///
     /// 
-    /// Apply a predefined set of access controls to this bucket.    
+    /// Apply a predefined set of access controls to this bucket.
     pub fn predefined_acl(mut self, new_value: &str) -> BucketInsertCall<'a, C, NC, A> {
         self._predefined_acl = Some(new_value.to_string());
         self
@@ -11189,7 +11349,7 @@ impl<'a, C, NC, A> BucketInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkC
 /// Updates a bucket. This method supports patch semantics.
 ///
 /// A builder for the *patch* method supported by a *bucket* resource.
-/// It is not used directly, but through a `BucketMethods`.
+/// It is not used directly, but through a `BucketMethods` instance.
 ///
 /// # Example
 ///
@@ -11279,7 +11439,7 @@ impl<'a, C, NC, A> BucketPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
         for &field in ["alt", "bucket", "projection", "predefinedDefaultObjectAcl", "predefinedAcl", "ifMetagenerationNotMatch", "ifMetagenerationMatch"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -11336,7 +11496,7 @@ impl<'a, C, NC, A> BucketPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -11352,7 +11512,6 @@ impl<'a, C, NC, A> BucketPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -11362,7 +11521,7 @@ impl<'a, C, NC, A> BucketPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -11373,7 +11532,7 @@ impl<'a, C, NC, A> BucketPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -11382,13 +11541,13 @@ impl<'a, C, NC, A> BucketPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -11409,7 +11568,7 @@ impl<'a, C, NC, A> BucketPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Name of a bucket.    
+    /// Name of a bucket.
     pub fn bucket(mut self, new_value: &str) -> BucketPatchCall<'a, C, NC, A> {
         self._bucket = new_value.to_string();
         self
@@ -11417,7 +11576,7 @@ impl<'a, C, NC, A> BucketPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// Sets the *projection* query property to the given value.
     ///
     /// 
-    /// Set of properties to return. Defaults to full.    
+    /// Set of properties to return. Defaults to full.
     pub fn projection(mut self, new_value: &str) -> BucketPatchCall<'a, C, NC, A> {
         self._projection = Some(new_value.to_string());
         self
@@ -11425,7 +11584,7 @@ impl<'a, C, NC, A> BucketPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// Sets the *predefined default object acl* query property to the given value.
     ///
     /// 
-    /// Apply a predefined set of default object access controls to this bucket.    
+    /// Apply a predefined set of default object access controls to this bucket.
     pub fn predefined_default_object_acl(mut self, new_value: &str) -> BucketPatchCall<'a, C, NC, A> {
         self._predefined_default_object_acl = Some(new_value.to_string());
         self
@@ -11433,7 +11592,7 @@ impl<'a, C, NC, A> BucketPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// Sets the *predefined acl* query property to the given value.
     ///
     /// 
-    /// Apply a predefined set of access controls to this bucket.    
+    /// Apply a predefined set of access controls to this bucket.
     pub fn predefined_acl(mut self, new_value: &str) -> BucketPatchCall<'a, C, NC, A> {
         self._predefined_acl = Some(new_value.to_string());
         self
@@ -11441,7 +11600,7 @@ impl<'a, C, NC, A> BucketPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// Sets the *if metageneration not match* query property to the given value.
     ///
     /// 
-    /// Makes the return of the bucket metadata conditional on whether the bucket's current metageneration does not match the given value.    
+    /// Makes the return of the bucket metadata conditional on whether the bucket's current metageneration does not match the given value.
     pub fn if_metageneration_not_match(mut self, new_value: &str) -> BucketPatchCall<'a, C, NC, A> {
         self._if_metageneration_not_match = Some(new_value.to_string());
         self
@@ -11449,7 +11608,7 @@ impl<'a, C, NC, A> BucketPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// Sets the *if metageneration match* query property to the given value.
     ///
     /// 
-    /// Makes the return of the bucket metadata conditional on whether the bucket's current metageneration matches the given value.    
+    /// Makes the return of the bucket metadata conditional on whether the bucket's current metageneration matches the given value.
     pub fn if_metageneration_match(mut self, new_value: &str) -> BucketPatchCall<'a, C, NC, A> {
         self._if_metageneration_match = Some(new_value.to_string());
         self
@@ -11510,7 +11669,7 @@ impl<'a, C, NC, A> BucketPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
 /// Retrieves a list of buckets for a given project.
 ///
 /// A builder for the *list* method supported by a *bucket* resource.
-/// It is not used directly, but through a `BucketMethods`.
+/// It is not used directly, but through a `BucketMethods` instance.
 ///
 /// # Example
 ///
@@ -11588,7 +11747,7 @@ impl<'a, C, NC, A> BucketListCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
         for &field in ["alt", "project", "projection", "prefix", "pageToken", "maxResults"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -11617,7 +11776,7 @@ impl<'a, C, NC, A> BucketListCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -11629,7 +11788,6 @@ impl<'a, C, NC, A> BucketListCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -11639,7 +11797,7 @@ impl<'a, C, NC, A> BucketListCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -11650,7 +11808,7 @@ impl<'a, C, NC, A> BucketListCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -11659,13 +11817,13 @@ impl<'a, C, NC, A> BucketListCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -11677,7 +11835,7 @@ impl<'a, C, NC, A> BucketListCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// A valid API project identifier.    
+    /// A valid API project identifier.
     pub fn project(mut self, new_value: &str) -> BucketListCall<'a, C, NC, A> {
         self._project = new_value.to_string();
         self
@@ -11685,7 +11843,7 @@ impl<'a, C, NC, A> BucketListCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// Sets the *projection* query property to the given value.
     ///
     /// 
-    /// Set of properties to return. Defaults to noAcl.    
+    /// Set of properties to return. Defaults to noAcl.
     pub fn projection(mut self, new_value: &str) -> BucketListCall<'a, C, NC, A> {
         self._projection = Some(new_value.to_string());
         self
@@ -11693,7 +11851,7 @@ impl<'a, C, NC, A> BucketListCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// Sets the *prefix* query property to the given value.
     ///
     /// 
-    /// Filter results to buckets whose names begin with this prefix.    
+    /// Filter results to buckets whose names begin with this prefix.
     pub fn prefix(mut self, new_value: &str) -> BucketListCall<'a, C, NC, A> {
         self._prefix = Some(new_value.to_string());
         self
@@ -11701,7 +11859,7 @@ impl<'a, C, NC, A> BucketListCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// Sets the *page token* query property to the given value.
     ///
     /// 
-    /// A previously-returned page token representing part of the larger set of results to view.    
+    /// A previously-returned page token representing part of the larger set of results to view.
     pub fn page_token(mut self, new_value: &str) -> BucketListCall<'a, C, NC, A> {
         self._page_token = Some(new_value.to_string());
         self
@@ -11709,7 +11867,7 @@ impl<'a, C, NC, A> BucketListCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// Sets the *max results* query property to the given value.
     ///
     /// 
-    /// Maximum number of buckets to return.    
+    /// Maximum number of buckets to return.
     pub fn max_results(mut self, new_value: u32) -> BucketListCall<'a, C, NC, A> {
         self._max_results = Some(new_value);
         self

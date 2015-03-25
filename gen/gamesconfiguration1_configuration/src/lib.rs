@@ -1,8 +1,8 @@
 // DO NOT EDIT !
-// This file was generated automatically from 'src/mako/lib.rs.mako'
+// This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *Games Configuration* crate version *0.1.1+20150309*, where *20150309* is the exact revision of the *gamesConfiguration:v1configuration* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.1*.
+//! This documentation was generated from *Games Configuration* crate version *0.1.2+20150316*, where *20150316* is the exact revision of the *gamesConfiguration:v1configuration* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.2*.
 //! 
 //! Everything else about the *Games Configuration* *v1_configuration* API can be found at the
 //! [official documentation site](https://developers.google.com/games/services).
@@ -33,6 +33,8 @@
 //! 
 //! * **[Hub](struct.GamesConfiguration.html)**
 //!     * a central object to maintain state and allow accessing all *Activities*
+//!     * creates [*Method Builders*](trait.MethodsBuilder.html) which in turn
+//!       allow access to individual [*Call Builders*](trait.CallBuilder.html)
 //! * **[Resources](trait.Resource.html)**
 //!     * primary types that you can apply *Activities* to
 //!     * a collection of properties and *Parts*
@@ -41,6 +43,8 @@
 //!         * never directly used in *Activities*
 //! * **[Activities](trait.CallBuilder.html)**
 //!     * operations to apply to *Resources*
+//! 
+//! All *structures* are marked with applicable traits to further categorize them and ease browsing.
 //! 
 //! Generally speaking, you can invoke *Activities* like this:
 //! 
@@ -81,7 +85,7 @@
 //! extern crate hyper;
 //! extern crate "yup-oauth2" as oauth2;
 //! extern crate "google-gamesconfiguration1_configuration" as gamesconfiguration1_configuration;
-//! use gamesconfiguration1_configuration::Result;
+//! use gamesconfiguration1_configuration::{Result, Error};
 //! # #[test] fn egal() {
 //! use std::default::Default;
 //! use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -108,15 +112,17 @@
 //!              .doit();
 //! 
 //! match result {
-//!     Result::HttpError(err) => println!("HTTPERROR: {:?}", err),
-//!     Result::MissingAPIKey => println!("Auth: Missing API Key - used if there are no scopes"),
-//!     Result::MissingToken => println!("OAuth2: Missing Token"),
-//!     Result::Cancelled => println!("Operation cancelled by user"),
-//!     Result::UploadSizeLimitExceeded(size, max_size) => println!("Upload size too big: {} of {}", size, max_size),
-//!     Result::Failure(_) => println!("General Failure (hyper::client::Response doesn't print)"),
-//!     Result::FieldClash(clashed_field) => println!("You added custom parameter which is part of builder: {:?}", clashed_field),
-//!     Result::JsonDecodeError(err) => println!("Couldn't understand server reply - maybe API needs update: {:?}", err),
-//!     Result::Success(_) => println!("Success (value doesn't print)"),
+//!     Err(e) => match e {
+//!         Error::HttpError(err) => println!("HTTPERROR: {:?}", err),
+//!         Error::MissingAPIKey => println!("Auth: Missing API Key - used if there are no scopes"),
+//!         Error::MissingToken => println!("OAuth2: Missing Token"),
+//!         Error::Cancelled => println!("Operation canceled by user"),
+//!         Error::UploadSizeLimitExceeded(size, max_size) => println!("Upload size too big: {} of {}", size, max_size),
+//!         Error::Failure(_) => println!("General Failure (hyper::client::Response doesn't print)"),
+//!         Error::FieldClash(clashed_field) => println!("You added custom parameter which is part of builder: {:?}", clashed_field),
+//!         Error::JsonDecodeError(err) => println!("Couldn't understand server reply - maybe API needs update: {:?}", err),
+//!     },
+//!     Ok(_) => println!("Success (value doesn't print)"),
 //! }
 //! # }
 //! ```
@@ -129,7 +135,7 @@
 //! When delegates handle errors or intermediate values, they may have a chance to instruct the system to retry. This 
 //! makes the system potentially resilient to all kinds of errors.
 //! 
-//! ## Uploads and Downlods
+//! ## Uploads and Downloads
 //! If a method supports downloads, the response body, which is part of the [Result](enum.Result.html), should be
 //! read by you to obtain the media.
 //! If such a method also supports a [Response Result](trait.ResponseResult.html), it will return that by default.
@@ -152,8 +158,9 @@
 //! ## Optional Parts in Server-Requests
 //! 
 //! All structures provided by this library are made to be [enocodable](trait.RequestValue.html) and 
-//! [decodable](trait.ResponseResult.html) via json. Optionals are used to indicate that partial requests are responses are valid.
-//! Most optionals are are considered [Parts](trait.Part.html) which are identifyable by name, which will be sent to 
+//! [decodable](trait.ResponseResult.html) via *json*. Optionals are used to indicate that partial requests are responses 
+//! are valid.
+//! Most optionals are are considered [Parts](trait.Part.html) which are identifiable by name, which will be sent to 
 //! the server to indicate either the set parts of the request or the desired parts in the response.
 //! 
 //! ## Builder Arguments
@@ -202,7 +209,7 @@ use std::io;
 use std::fs;
 use std::thread::sleep;
 
-pub use cmn::{MultiPartReader, ToParts, MethodInfo, Result, CallBuilder, Hub, ReadSeek, Part, ResponseResult, RequestValue, NestedType, Delegate, DefaultDelegate, ResourceMethodsBuilder, Resource, JsonServerError};
+pub use cmn::{MultiPartReader, ToParts, MethodInfo, Result, Error, CallBuilder, Hub, ReadSeek, Part, ResponseResult, RequestValue, NestedType, Delegate, DefaultDelegate, MethodsBuilder, Resource, JsonServerError};
 
 
 // ##############
@@ -248,7 +255,7 @@ impl Default for Scope {
 /// extern crate hyper;
 /// extern crate "yup-oauth2" as oauth2;
 /// extern crate "google-gamesconfiguration1_configuration" as gamesconfiguration1_configuration;
-/// use gamesconfiguration1_configuration::Result;
+/// use gamesconfiguration1_configuration::{Result, Error};
 /// # #[test] fn egal() {
 /// use std::default::Default;
 /// use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -275,15 +282,17 @@ impl Default for Scope {
 ///              .doit();
 /// 
 /// match result {
-///     Result::HttpError(err) => println!("HTTPERROR: {:?}", err),
-///     Result::MissingAPIKey => println!("Auth: Missing API Key - used if there are no scopes"),
-///     Result::MissingToken => println!("OAuth2: Missing Token"),
-///     Result::Cancelled => println!("Operation cancelled by user"),
-///     Result::UploadSizeLimitExceeded(size, max_size) => println!("Upload size too big: {} of {}", size, max_size),
-///     Result::Failure(_) => println!("General Failure (hyper::client::Response doesn't print)"),
-///     Result::FieldClash(clashed_field) => println!("You added custom parameter which is part of builder: {:?}", clashed_field),
-///     Result::JsonDecodeError(err) => println!("Couldn't understand server reply - maybe API needs update: {:?}", err),
-///     Result::Success(_) => println!("Success (value doesn't print)"),
+///     Err(e) => match e {
+///         Error::HttpError(err) => println!("HTTPERROR: {:?}", err),
+///         Error::MissingAPIKey => println!("Auth: Missing API Key - used if there are no scopes"),
+///         Error::MissingToken => println!("OAuth2: Missing Token"),
+///         Error::Cancelled => println!("Operation canceled by user"),
+///         Error::UploadSizeLimitExceeded(size, max_size) => println!("Upload size too big: {} of {}", size, max_size),
+///         Error::Failure(_) => println!("General Failure (hyper::client::Response doesn't print)"),
+///         Error::FieldClash(clashed_field) => println!("You added custom parameter which is part of builder: {:?}", clashed_field),
+///         Error::JsonDecodeError(err) => println!("Couldn't understand server reply - maybe API needs update: {:?}", err),
+///     },
+///     Ok(_) => println!("Success (value doesn't print)"),
 /// }
 /// # }
 /// ```
@@ -304,7 +313,7 @@ impl<'a, C, NC, A> GamesConfiguration<C, NC, A>
         GamesConfiguration {
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/0.1.1".to_string(),
+            _user_agent: "google-api-rust-client/0.1.2".to_string(),
             _m: PhantomData
         }
     }
@@ -320,7 +329,7 @@ impl<'a, C, NC, A> GamesConfiguration<C, NC, A>
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/0.1.1`.
+    /// It defaults to `google-api-rust-client/0.1.2`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -340,7 +349,7 @@ impl<'a, C, NC, A> GamesConfiguration<C, NC, A>
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GamesNumberFormatConfiguration {
-    /// The curreny code string. Only used for CURRENCY format type.    
+    /// The curreny code string. Only used for CURRENCY format type.
     #[serde(alias="currencyCode")]
     pub currency_code: String,
     /// The formatting for the number.
@@ -350,10 +359,10 @@ pub struct GamesNumberFormatConfiguration {
     /// - "CURRENCY" - Numbers are formatted to currency according to locale.
     #[serde(alias="numberFormatType")]
     pub number_format_type: String,
-    /// The number of decimal places for number. Only used for NUMERIC format type.    
+    /// The number of decimal places for number. Only used for NUMERIC format type.
     #[serde(alias="numDecimalPlaces")]
     pub num_decimal_places: i32,
-    /// An optional suffix for the NUMERIC format type. These strings follow the same  plural rules as all Android string resources.    
+    /// An optional suffix for the NUMERIC format type. These strings follow the same  plural rules as all Android string resources.
     pub suffix: GamesNumberAffixConfiguration,
 }
 
@@ -366,9 +375,9 @@ impl Part for GamesNumberFormatConfiguration {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct LocalizedStringBundle {
-    /// Uniquely identifies the type of this resource. Value is always the fixed string gamesConfiguration#localizedStringBundle.    
+    /// Uniquely identifies the type of this resource. Value is always the fixed string gamesConfiguration#localizedStringBundle.
     pub kind: String,
-    /// The locale strings.    
+    /// The locale strings.
     pub translations: Vec<LocalizedString>,
 }
 
@@ -381,11 +390,11 @@ impl Part for LocalizedStringBundle {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct LocalizedString {
-    /// The locale string.    
+    /// The locale string.
     pub locale: String,
-    /// Uniquely identifies the type of this resource. Value is always the fixed string gamesConfiguration#localizedString.    
+    /// Uniquely identifies the type of this resource. Value is always the fixed string gamesConfiguration#localizedString.
     pub kind: String,
-    /// The string value.    
+    /// The string value.
     pub value: String,
 }
 
@@ -403,12 +412,12 @@ impl Part for LocalizedString {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct AchievementConfigurationListResponse {
-    /// The pagination token for the next page of results.    
+    /// The pagination token for the next page of results.
     #[serde(alias="nextPageToken")]
     pub next_page_token: String,
-    /// The achievement configurations.    
+    /// The achievement configurations.
     pub items: Vec<AchievementConfiguration>,
-    /// Uniquely identifies the type of this resource. Value is always the fixed string games#achievementConfigurationListResponse.    
+    /// Uniquely identifies the type of this resource. Value is always the fixed string games#achievementConfigurationListResponse.
     pub kind: String,
 }
 
@@ -426,14 +435,14 @@ impl ResponseResult for AchievementConfigurationListResponse {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct ImageConfiguration {
-    /// The url for this image.    
+    /// The url for this image.
     pub url: String,
-    /// The resource ID of resource which the image belongs to.    
+    /// The resource ID of resource which the image belongs to.
     #[serde(alias="resourceId")]
     pub resource_id: String,
-    /// Uniquely identifies the type of this resource. Value is always the fixed string gamesConfiguration#imageConfiguration.    
+    /// Uniquely identifies the type of this resource. Value is always the fixed string gamesConfiguration#imageConfiguration.
     pub kind: String,
-    /// The image type for the image.    
+    /// The image type for the image.
     #[serde(alias="imageType")]
     pub image_type: String,
 }
@@ -448,17 +457,17 @@ impl ResponseResult for ImageConfiguration {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GamesNumberAffixConfiguration {
-    /// When the language requires special treatment of "small" numbers (as with 2, 3, and 4 in Czech; or numbers ending 2, 3, or 4 but not 12, 13, or 14 in Polish).    
+    /// When the language requires special treatment of "small" numbers (as with 2, 3, and 4 in Czech; or numbers ending 2, 3, or 4 but not 12, 13, or 14 in Polish).
     pub few: LocalizedStringBundle,
-    /// When the language requires special treatment of the number 0 (as in Arabic).    
+    /// When the language requires special treatment of the number 0 (as in Arabic).
     pub zero: LocalizedStringBundle,
-    /// When the language does not require special treatment of the given quantity (as with all numbers in Chinese, or 42 in English).    
+    /// When the language does not require special treatment of the given quantity (as with all numbers in Chinese, or 42 in English).
     pub other: LocalizedStringBundle,
-    /// When the language requires special treatment of "large" numbers (as with numbers ending 11-99 in Maltese).    
+    /// When the language requires special treatment of "large" numbers (as with numbers ending 11-99 in Maltese).
     pub many: LocalizedStringBundle,
-    /// When the language requires special treatment of numbers like two (as with 2 in Welsh, or 102 in Slovenian).    
+    /// When the language requires special treatment of numbers like two (as with 2 in Welsh, or 102 in Slovenian).
     pub two: LocalizedStringBundle,
-    /// When the language requires special treatment of numbers like one (as with the number 1 in English and most other languages; in Russian, any number ending in 1 but not ending in 11 is in this class).    
+    /// When the language requires special treatment of numbers like one (as with the number 1 in English and most other languages; in Russian, any number ending in 1 but not ending in 11 is in this class).
     pub one: LocalizedStringBundle,
 }
 
@@ -487,10 +496,10 @@ pub struct AchievementConfiguration {
     /// - "INCREMENTAL" - Achievement is incremental.
     #[serde(alias="achievementType")]
     pub achievement_type: Option<String>,
-    /// Steps to unlock. Only applicable to incremental achievements.    
+    /// Steps to unlock. Only applicable to incremental achievements.
     #[serde(alias="stepsToUnlock")]
     pub steps_to_unlock: Option<i32>,
-    /// Uniquely identifies the type of this resource. Value is always the fixed string gamesConfiguration#achievementConfiguration.    
+    /// Uniquely identifies the type of this resource. Value is always the fixed string gamesConfiguration#achievementConfiguration.
     pub kind: Option<String>,
     /// The initial state of the achievement.
     /// Possible values are:  
@@ -499,13 +508,13 @@ pub struct AchievementConfiguration {
     /// - "UNLOCKED" - Achievement is unlocked.
     #[serde(alias="initialState")]
     pub initial_state: Option<String>,
-    /// The token for this resource.    
+    /// The token for this resource.
     pub token: Option<String>,
-    /// The draft data of the achievement.    
+    /// The draft data of the achievement.
     pub draft: Option<AchievementConfigurationDetail>,
-    /// The read-only published data of the achievement.    
+    /// The read-only published data of the achievement.
     pub published: Option<AchievementConfigurationDetail>,
-    /// The ID of the achievement.    
+    /// The ID of the achievement.
     pub id: Option<String>,
 }
 
@@ -530,7 +539,7 @@ impl ResponseResult for AchievementConfiguration {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct LeaderboardConfiguration {
-    /// Uniquely identifies the type of this resource. Value is always the fixed string gamesConfiguration#leaderboardConfiguration.    
+    /// Uniquely identifies the type of this resource. Value is always the fixed string gamesConfiguration#leaderboardConfiguration.
     pub kind: Option<String>,
     /// The type of the leaderboard.
     /// Possible values are:  
@@ -538,19 +547,19 @@ pub struct LeaderboardConfiguration {
     /// - "SMALLER_IS_BETTER" - Smaller scores posted are ranked higher.
     #[serde(alias="scoreOrder")]
     pub score_order: Option<String>,
-    /// Minimum score that can be posted to this leaderboard.    
+    /// Minimum score that can be posted to this leaderboard.
     #[serde(alias="scoreMin")]
     pub score_min: Option<String>,
-    /// The token for this resource.    
+    /// The token for this resource.
     pub token: Option<String>,
-    /// Maximum score that can be posted to this leaderboard.    
+    /// Maximum score that can be posted to this leaderboard.
     #[serde(alias="scoreMax")]
     pub score_max: Option<String>,
-    /// The read-only published data of the leaderboard.    
+    /// The read-only published data of the leaderboard.
     pub published: Option<LeaderboardConfigurationDetail>,
-    /// The draft data of the leaderboard.    
+    /// The draft data of the leaderboard.
     pub draft: Option<LeaderboardConfigurationDetail>,
-    /// The ID of the leaderboard.    
+    /// The ID of the leaderboard.
     pub id: Option<String>,
 }
 
@@ -570,12 +579,12 @@ impl ResponseResult for LeaderboardConfiguration {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct LeaderboardConfigurationListResponse {
-    /// The pagination token for the next page of results.    
+    /// The pagination token for the next page of results.
     #[serde(alias="nextPageToken")]
     pub next_page_token: String,
-    /// The leaderboard configurations.    
+    /// The leaderboard configurations.
     pub items: Vec<LeaderboardConfiguration>,
-    /// Uniquely identifies the type of this resource. Value is always the fixed string games#leaderboardConfigurationListResponse.    
+    /// Uniquely identifies the type of this resource. Value is always the fixed string games#leaderboardConfigurationListResponse.
     pub kind: String,
 }
 
@@ -588,20 +597,20 @@ impl ResponseResult for LeaderboardConfigurationListResponse {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct AchievementConfigurationDetail {
-    /// The icon url of this achievement. Writes to this field are ignored.    
+    /// The icon url of this achievement. Writes to this field are ignored.
     #[serde(alias="iconUrl")]
     pub icon_url: String,
-    /// Uniquely identifies the type of this resource. Value is always the fixed string gamesConfiguration#achievementConfigurationDetail.    
+    /// Uniquely identifies the type of this resource. Value is always the fixed string gamesConfiguration#achievementConfigurationDetail.
     pub kind: String,
-    /// Localized strings for the achievement name.    
+    /// Localized strings for the achievement name.
     pub name: LocalizedStringBundle,
-    /// Point value for the achievement.    
+    /// Point value for the achievement.
     #[serde(alias="pointValue")]
     pub point_value: i32,
-    /// The sort rank of this achievement. Writes to this field are ignored.    
+    /// The sort rank of this achievement. Writes to this field are ignored.
     #[serde(alias="sortRank")]
     pub sort_rank: i32,
-    /// Localized strings for the achievement description.    
+    /// Localized strings for the achievement description.
     pub description: LocalizedStringBundle,
 }
 
@@ -614,17 +623,17 @@ impl Part for AchievementConfigurationDetail {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct LeaderboardConfigurationDetail {
-    /// The score formatting for the leaderboard.    
+    /// The score formatting for the leaderboard.
     #[serde(alias="scoreFormat")]
     pub score_format: GamesNumberFormatConfiguration,
-    /// The icon url of this leaderboard. Writes to this field are ignored.    
+    /// The icon url of this leaderboard. Writes to this field are ignored.
     #[serde(alias="iconUrl")]
     pub icon_url: String,
-    /// Uniquely identifies the type of this resource. Value is always the fixed string gamesConfiguration#leaderboardConfigurationDetail.    
+    /// Uniquely identifies the type of this resource. Value is always the fixed string gamesConfiguration#leaderboardConfigurationDetail.
     pub kind: String,
-    /// Localized strings for the leaderboard name.    
+    /// Localized strings for the leaderboard name.
     pub name: LocalizedStringBundle,
-    /// The sort rank of this leaderboard. Writes to this field are ignored.    
+    /// The sort rank of this leaderboard. Writes to this field are ignored.
     #[serde(alias="sortRank")]
     pub sort_rank: i32,
 }
@@ -671,13 +680,18 @@ pub struct ImageConfigurationMethods<'a, C, NC, A>
     hub: &'a GamesConfiguration<C, NC, A>,
 }
 
-impl<'a, C, NC, A> ResourceMethodsBuilder for ImageConfigurationMethods<'a, C, NC, A> {}
+impl<'a, C, NC, A> MethodsBuilder for ImageConfigurationMethods<'a, C, NC, A> {}
 
 impl<'a, C, NC, A> ImageConfigurationMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Uploads an image for a resource with the given ID and image type.    
+    /// Uploads an image for a resource with the given ID and image type.
+    /// 
+    /// # Arguments
+    ///
+    /// * `resourceId` - The ID of the resource used by this method.
+    /// * `imageType` - Selects which image in a resource for this method.
     pub fn upload(&self, resource_id: &str, image_type: &str) -> ImageConfigurationUploadCall<'a, C, NC, A> {
         ImageConfigurationUploadCall {
             hub: self.hub,
@@ -726,13 +740,17 @@ pub struct AchievementConfigurationMethods<'a, C, NC, A>
     hub: &'a GamesConfiguration<C, NC, A>,
 }
 
-impl<'a, C, NC, A> ResourceMethodsBuilder for AchievementConfigurationMethods<'a, C, NC, A> {}
+impl<'a, C, NC, A> MethodsBuilder for AchievementConfigurationMethods<'a, C, NC, A> {}
 
 impl<'a, C, NC, A> AchievementConfigurationMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Returns a list of the achievement configurations in this application.    
+    /// Returns a list of the achievement configurations in this application.
+    /// 
+    /// # Arguments
+    ///
+    /// * `applicationId` - The application ID from the Google Play developer console.
     pub fn list(&self, application_id: &str) -> AchievementConfigurationListCall<'a, C, NC, A> {
         AchievementConfigurationListCall {
             hub: self.hub,
@@ -747,7 +765,12 @@ impl<'a, C, NC, A> AchievementConfigurationMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Update the metadata of the achievement configuration with the given ID.    
+    /// Update the metadata of the achievement configuration with the given ID.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `achievementId` - The ID of the achievement used by this method.
     pub fn update(&self, request: &AchievementConfiguration, achievement_id: &str) -> AchievementConfigurationUpdateCall<'a, C, NC, A> {
         AchievementConfigurationUpdateCall {
             hub: self.hub,
@@ -761,7 +784,12 @@ impl<'a, C, NC, A> AchievementConfigurationMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Insert a new achievement configuration in this application.    
+    /// Insert a new achievement configuration in this application.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `applicationId` - The application ID from the Google Play developer console.
     pub fn insert(&self, request: &AchievementConfiguration, application_id: &str) -> AchievementConfigurationInsertCall<'a, C, NC, A> {
         AchievementConfigurationInsertCall {
             hub: self.hub,
@@ -775,7 +803,11 @@ impl<'a, C, NC, A> AchievementConfigurationMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Retrieves the metadata of the achievement configuration with the given ID.    
+    /// Retrieves the metadata of the achievement configuration with the given ID.
+    /// 
+    /// # Arguments
+    ///
+    /// * `achievementId` - The ID of the achievement used by this method.
     pub fn get(&self, achievement_id: &str) -> AchievementConfigurationGetCall<'a, C, NC, A> {
         AchievementConfigurationGetCall {
             hub: self.hub,
@@ -788,7 +820,12 @@ impl<'a, C, NC, A> AchievementConfigurationMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Update the metadata of the achievement configuration with the given ID. This method supports patch semantics.    
+    /// Update the metadata of the achievement configuration with the given ID. This method supports patch semantics.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `achievementId` - The ID of the achievement used by this method.
     pub fn patch(&self, request: &AchievementConfiguration, achievement_id: &str) -> AchievementConfigurationPatchCall<'a, C, NC, A> {
         AchievementConfigurationPatchCall {
             hub: self.hub,
@@ -802,7 +839,11 @@ impl<'a, C, NC, A> AchievementConfigurationMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Delete the achievement configuration with the given ID.    
+    /// Delete the achievement configuration with the given ID.
+    /// 
+    /// # Arguments
+    ///
+    /// * `achievementId` - The ID of the achievement used by this method.
     pub fn delete(&self, achievement_id: &str) -> AchievementConfigurationDeleteCall<'a, C, NC, A> {
         AchievementConfigurationDeleteCall {
             hub: self.hub,
@@ -850,13 +891,18 @@ pub struct LeaderboardConfigurationMethods<'a, C, NC, A>
     hub: &'a GamesConfiguration<C, NC, A>,
 }
 
-impl<'a, C, NC, A> ResourceMethodsBuilder for LeaderboardConfigurationMethods<'a, C, NC, A> {}
+impl<'a, C, NC, A> MethodsBuilder for LeaderboardConfigurationMethods<'a, C, NC, A> {}
 
 impl<'a, C, NC, A> LeaderboardConfigurationMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Insert a new leaderboard configuration in this application.    
+    /// Insert a new leaderboard configuration in this application.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `applicationId` - The application ID from the Google Play developer console.
     pub fn insert(&self, request: &LeaderboardConfiguration, application_id: &str) -> LeaderboardConfigurationInsertCall<'a, C, NC, A> {
         LeaderboardConfigurationInsertCall {
             hub: self.hub,
@@ -870,7 +916,11 @@ impl<'a, C, NC, A> LeaderboardConfigurationMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Retrieves the metadata of the leaderboard configuration with the given ID.    
+    /// Retrieves the metadata of the leaderboard configuration with the given ID.
+    /// 
+    /// # Arguments
+    ///
+    /// * `leaderboardId` - The ID of the leaderboard.
     pub fn get(&self, leaderboard_id: &str) -> LeaderboardConfigurationGetCall<'a, C, NC, A> {
         LeaderboardConfigurationGetCall {
             hub: self.hub,
@@ -883,7 +933,12 @@ impl<'a, C, NC, A> LeaderboardConfigurationMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Update the metadata of the leaderboard configuration with the given ID. This method supports patch semantics.    
+    /// Update the metadata of the leaderboard configuration with the given ID. This method supports patch semantics.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `leaderboardId` - The ID of the leaderboard.
     pub fn patch(&self, request: &LeaderboardConfiguration, leaderboard_id: &str) -> LeaderboardConfigurationPatchCall<'a, C, NC, A> {
         LeaderboardConfigurationPatchCall {
             hub: self.hub,
@@ -897,7 +952,12 @@ impl<'a, C, NC, A> LeaderboardConfigurationMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Update the metadata of the leaderboard configuration with the given ID.    
+    /// Update the metadata of the leaderboard configuration with the given ID.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `leaderboardId` - The ID of the leaderboard.
     pub fn update(&self, request: &LeaderboardConfiguration, leaderboard_id: &str) -> LeaderboardConfigurationUpdateCall<'a, C, NC, A> {
         LeaderboardConfigurationUpdateCall {
             hub: self.hub,
@@ -911,7 +971,11 @@ impl<'a, C, NC, A> LeaderboardConfigurationMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Returns a list of the leaderboard configurations in this application.    
+    /// Returns a list of the leaderboard configurations in this application.
+    /// 
+    /// # Arguments
+    ///
+    /// * `applicationId` - The application ID from the Google Play developer console.
     pub fn list(&self, application_id: &str) -> LeaderboardConfigurationListCall<'a, C, NC, A> {
         LeaderboardConfigurationListCall {
             hub: self.hub,
@@ -926,7 +990,11 @@ impl<'a, C, NC, A> LeaderboardConfigurationMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Delete the leaderboard configuration with the given ID.    
+    /// Delete the leaderboard configuration with the given ID.
+    /// 
+    /// # Arguments
+    ///
+    /// * `leaderboardId` - The ID of the leaderboard.
     pub fn delete(&self, leaderboard_id: &str) -> LeaderboardConfigurationDeleteCall<'a, C, NC, A> {
         LeaderboardConfigurationDeleteCall {
             hub: self.hub,
@@ -949,7 +1017,7 @@ impl<'a, C, NC, A> LeaderboardConfigurationMethods<'a, C, NC, A> {
 /// Uploads an image for a resource with the given ID and image type.
 ///
 /// A builder for the *upload* method supported by a *imageConfiguration* resource.
-/// It is not used directly, but through a `ImageConfigurationMethods`.
+/// It is not used directly, but through a `ImageConfigurationMethods` instance.
 ///
 /// # Example
 ///
@@ -1011,7 +1079,7 @@ impl<'a, C, NC, A> ImageConfigurationUploadCall<'a, C, NC, A> where NC: hyper::n
         for &field in ["alt", "resourceId", "imageType"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -1074,7 +1142,7 @@ impl<'a, C, NC, A> ImageConfigurationUploadCall<'a, C, NC, A> where NC: hyper::n
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -1100,7 +1168,7 @@ impl<'a, C, NC, A> ImageConfigurationUploadCall<'a, C, NC, A> where NC: hyper::n
                         let size = reader.seek(io::SeekFrom::End(0)).unwrap();
                     reader.seek(io::SeekFrom::Start(0)).unwrap();
                     if size > 15728640 {
-                    	return Result::UploadSizeLimitExceeded(size, 15728640)
+                    	return Err(Error::UploadSizeLimitExceeded(size, 15728640))
                     }
                         req = req.header(ContentType(reader_mime_type.clone()))
                                  .header(ContentLength(size))
@@ -1113,7 +1181,6 @@ impl<'a, C, NC, A> ImageConfigurationUploadCall<'a, C, NC, A> where NC: hyper::n
     
                     dlg.pre_request();
                     req.send()
-    
                 }
             };
 
@@ -1124,7 +1191,7 @@ impl<'a, C, NC, A> ImageConfigurationUploadCall<'a, C, NC, A> where NC: hyper::n
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -1135,13 +1202,13 @@ impl<'a, C, NC, A> ImageConfigurationUploadCall<'a, C, NC, A> where NC: hyper::n
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     if protocol == "resumable" {
                         let size = reader.seek(io::SeekFrom::End(0)).unwrap();
                         reader.seek(io::SeekFrom::Start(0)).unwrap();
                         if size > 15728640 {
-                        	return Result::UploadSizeLimitExceeded(size, 15728640)
+                        	return Err(Error::UploadSizeLimitExceeded(size, 15728640))
                         }
                         let mut client = &mut *self.hub.client.borrow_mut();
                         let upload_result = {
@@ -1166,17 +1233,17 @@ impl<'a, C, NC, A> ImageConfigurationUploadCall<'a, C, NC, A> where NC: hyper::n
                         match upload_result {
                             None => {
                                 dlg.finished(false);
-                                return Result::Cancelled
+                                return Err(Error::Cancelled)
                             }
                             Some(Err(err)) => {
                                 dlg.finished(false);
-                                return Result::HttpError(err)
+                                return Err(Error::HttpError(err))
                             }
                             Some(Ok(upload_result)) => {
                                 res = upload_result;
                                 if !res.status.is_success() {
                                     dlg.finished(false);
-                                    return Result::Failure(res)
+                                    return Err(Error::Failure(res))
                                 }
                             }
                         }
@@ -1188,13 +1255,13 @@ impl<'a, C, NC, A> ImageConfigurationUploadCall<'a, C, NC, A> where NC: hyper::n
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -1210,11 +1277,14 @@ impl<'a, C, NC, A> ImageConfigurationUploadCall<'a, C, NC, A> where NC: hyper::n
                 where RS: ReadSeek {
         self.doit(stream, mime_type, "simple")
     }
-    /// Upload media in a resumeable fashion.
+    /// Upload media in a resumable fashion.
     /// Even if the upload fails or is interrupted, it can be resumed for a 
     /// certain amount of time as the server maintains state temporarily.
     /// 
-    /// TODO: Write more about how delegation works in this particular case.
+    /// The delegate will be asked for an `upload_url()`, and if not provided, will be asked to store an upload URL 
+    /// that was provided by the server, using `store_upload_url(...)`. The upload will be done in chunks, the delegate
+    /// may specify the `chunk_size()` and may cancel the operation before each chunk is uploaded, using
+    /// `cancel_chunk_upload(...)`.
     ///
     /// * *max size*: 15MB
     /// * *multipart*: yes
@@ -1229,7 +1299,7 @@ impl<'a, C, NC, A> ImageConfigurationUploadCall<'a, C, NC, A> where NC: hyper::n
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The ID of the resource used by this method.    
+    /// The ID of the resource used by this method.
     pub fn resource_id(mut self, new_value: &str) -> ImageConfigurationUploadCall<'a, C, NC, A> {
         self._resource_id = new_value.to_string();
         self
@@ -1239,7 +1309,7 @@ impl<'a, C, NC, A> ImageConfigurationUploadCall<'a, C, NC, A> where NC: hyper::n
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Selects which image in a resource for this method.    
+    /// Selects which image in a resource for this method.
     pub fn image_type(mut self, new_value: &str) -> ImageConfigurationUploadCall<'a, C, NC, A> {
         self._image_type = new_value.to_string();
         self
@@ -1300,7 +1370,7 @@ impl<'a, C, NC, A> ImageConfigurationUploadCall<'a, C, NC, A> where NC: hyper::n
 /// Returns a list of the achievement configurations in this application.
 ///
 /// A builder for the *list* method supported by a *achievementConfiguration* resource.
-/// It is not used directly, but through a `AchievementConfigurationMethods`.
+/// It is not used directly, but through a `AchievementConfigurationMethods` instance.
 ///
 /// # Example
 ///
@@ -1368,7 +1438,7 @@ impl<'a, C, NC, A> AchievementConfigurationListCall<'a, C, NC, A> where NC: hype
         for &field in ["alt", "applicationId", "pageToken", "maxResults"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -1421,7 +1491,7 @@ impl<'a, C, NC, A> AchievementConfigurationListCall<'a, C, NC, A> where NC: hype
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -1433,7 +1503,6 @@ impl<'a, C, NC, A> AchievementConfigurationListCall<'a, C, NC, A> where NC: hype
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -1443,7 +1512,7 @@ impl<'a, C, NC, A> AchievementConfigurationListCall<'a, C, NC, A> where NC: hype
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -1454,7 +1523,7 @@ impl<'a, C, NC, A> AchievementConfigurationListCall<'a, C, NC, A> where NC: hype
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -1463,13 +1532,13 @@ impl<'a, C, NC, A> AchievementConfigurationListCall<'a, C, NC, A> where NC: hype
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -1481,7 +1550,7 @@ impl<'a, C, NC, A> AchievementConfigurationListCall<'a, C, NC, A> where NC: hype
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The application ID from the Google Play developer console.    
+    /// The application ID from the Google Play developer console.
     pub fn application_id(mut self, new_value: &str) -> AchievementConfigurationListCall<'a, C, NC, A> {
         self._application_id = new_value.to_string();
         self
@@ -1489,7 +1558,7 @@ impl<'a, C, NC, A> AchievementConfigurationListCall<'a, C, NC, A> where NC: hype
     /// Sets the *page token* query property to the given value.
     ///
     /// 
-    /// The token returned by the previous request.    
+    /// The token returned by the previous request.
     pub fn page_token(mut self, new_value: &str) -> AchievementConfigurationListCall<'a, C, NC, A> {
         self._page_token = Some(new_value.to_string());
         self
@@ -1497,7 +1566,7 @@ impl<'a, C, NC, A> AchievementConfigurationListCall<'a, C, NC, A> where NC: hype
     /// Sets the *max results* query property to the given value.
     ///
     /// 
-    /// The maximum number of resource configurations to return in the response, used for paging. For any response, the actual number of resources returned may be less than the specified maxResults.    
+    /// The maximum number of resource configurations to return in the response, used for paging. For any response, the actual number of resources returned may be less than the specified maxResults.
     pub fn max_results(mut self, new_value: i32) -> AchievementConfigurationListCall<'a, C, NC, A> {
         self._max_results = Some(new_value);
         self
@@ -1558,7 +1627,7 @@ impl<'a, C, NC, A> AchievementConfigurationListCall<'a, C, NC, A> where NC: hype
 /// Update the metadata of the achievement configuration with the given ID.
 ///
 /// A builder for the *update* method supported by a *achievementConfiguration* resource.
-/// It is not used directly, but through a `AchievementConfigurationMethods`.
+/// It is not used directly, but through a `AchievementConfigurationMethods` instance.
 ///
 /// # Example
 ///
@@ -1623,7 +1692,7 @@ impl<'a, C, NC, A> AchievementConfigurationUpdateCall<'a, C, NC, A> where NC: hy
         for &field in ["alt", "achievementId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -1680,7 +1749,7 @@ impl<'a, C, NC, A> AchievementConfigurationUpdateCall<'a, C, NC, A> where NC: hy
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -1696,7 +1765,6 @@ impl<'a, C, NC, A> AchievementConfigurationUpdateCall<'a, C, NC, A> where NC: hy
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -1706,7 +1774,7 @@ impl<'a, C, NC, A> AchievementConfigurationUpdateCall<'a, C, NC, A> where NC: hy
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -1717,7 +1785,7 @@ impl<'a, C, NC, A> AchievementConfigurationUpdateCall<'a, C, NC, A> where NC: hy
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -1726,13 +1794,13 @@ impl<'a, C, NC, A> AchievementConfigurationUpdateCall<'a, C, NC, A> where NC: hy
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -1753,7 +1821,7 @@ impl<'a, C, NC, A> AchievementConfigurationUpdateCall<'a, C, NC, A> where NC: hy
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The ID of the achievement used by this method.    
+    /// The ID of the achievement used by this method.
     pub fn achievement_id(mut self, new_value: &str) -> AchievementConfigurationUpdateCall<'a, C, NC, A> {
         self._achievement_id = new_value.to_string();
         self
@@ -1814,7 +1882,7 @@ impl<'a, C, NC, A> AchievementConfigurationUpdateCall<'a, C, NC, A> where NC: hy
 /// Insert a new achievement configuration in this application.
 ///
 /// A builder for the *insert* method supported by a *achievementConfiguration* resource.
-/// It is not used directly, but through a `AchievementConfigurationMethods`.
+/// It is not used directly, but through a `AchievementConfigurationMethods` instance.
 ///
 /// # Example
 ///
@@ -1879,7 +1947,7 @@ impl<'a, C, NC, A> AchievementConfigurationInsertCall<'a, C, NC, A> where NC: hy
         for &field in ["alt", "applicationId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -1936,7 +2004,7 @@ impl<'a, C, NC, A> AchievementConfigurationInsertCall<'a, C, NC, A> where NC: hy
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -1952,7 +2020,6 @@ impl<'a, C, NC, A> AchievementConfigurationInsertCall<'a, C, NC, A> where NC: hy
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -1962,7 +2029,7 @@ impl<'a, C, NC, A> AchievementConfigurationInsertCall<'a, C, NC, A> where NC: hy
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -1973,7 +2040,7 @@ impl<'a, C, NC, A> AchievementConfigurationInsertCall<'a, C, NC, A> where NC: hy
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -1982,13 +2049,13 @@ impl<'a, C, NC, A> AchievementConfigurationInsertCall<'a, C, NC, A> where NC: hy
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -2009,7 +2076,7 @@ impl<'a, C, NC, A> AchievementConfigurationInsertCall<'a, C, NC, A> where NC: hy
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The application ID from the Google Play developer console.    
+    /// The application ID from the Google Play developer console.
     pub fn application_id(mut self, new_value: &str) -> AchievementConfigurationInsertCall<'a, C, NC, A> {
         self._application_id = new_value.to_string();
         self
@@ -2070,7 +2137,7 @@ impl<'a, C, NC, A> AchievementConfigurationInsertCall<'a, C, NC, A> where NC: hy
 /// Retrieves the metadata of the achievement configuration with the given ID.
 ///
 /// A builder for the *get* method supported by a *achievementConfiguration* resource.
-/// It is not used directly, but through a `AchievementConfigurationMethods`.
+/// It is not used directly, but through a `AchievementConfigurationMethods` instance.
 ///
 /// # Example
 ///
@@ -2128,7 +2195,7 @@ impl<'a, C, NC, A> AchievementConfigurationGetCall<'a, C, NC, A> where NC: hyper
         for &field in ["alt", "achievementId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -2181,7 +2248,7 @@ impl<'a, C, NC, A> AchievementConfigurationGetCall<'a, C, NC, A> where NC: hyper
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -2193,7 +2260,6 @@ impl<'a, C, NC, A> AchievementConfigurationGetCall<'a, C, NC, A> where NC: hyper
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -2203,7 +2269,7 @@ impl<'a, C, NC, A> AchievementConfigurationGetCall<'a, C, NC, A> where NC: hyper
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -2214,7 +2280,7 @@ impl<'a, C, NC, A> AchievementConfigurationGetCall<'a, C, NC, A> where NC: hyper
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -2223,13 +2289,13 @@ impl<'a, C, NC, A> AchievementConfigurationGetCall<'a, C, NC, A> where NC: hyper
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -2241,7 +2307,7 @@ impl<'a, C, NC, A> AchievementConfigurationGetCall<'a, C, NC, A> where NC: hyper
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The ID of the achievement used by this method.    
+    /// The ID of the achievement used by this method.
     pub fn achievement_id(mut self, new_value: &str) -> AchievementConfigurationGetCall<'a, C, NC, A> {
         self._achievement_id = new_value.to_string();
         self
@@ -2302,7 +2368,7 @@ impl<'a, C, NC, A> AchievementConfigurationGetCall<'a, C, NC, A> where NC: hyper
 /// Update the metadata of the achievement configuration with the given ID. This method supports patch semantics.
 ///
 /// A builder for the *patch* method supported by a *achievementConfiguration* resource.
-/// It is not used directly, but through a `AchievementConfigurationMethods`.
+/// It is not used directly, but through a `AchievementConfigurationMethods` instance.
 ///
 /// # Example
 ///
@@ -2367,7 +2433,7 @@ impl<'a, C, NC, A> AchievementConfigurationPatchCall<'a, C, NC, A> where NC: hyp
         for &field in ["alt", "achievementId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -2424,7 +2490,7 @@ impl<'a, C, NC, A> AchievementConfigurationPatchCall<'a, C, NC, A> where NC: hyp
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -2440,7 +2506,6 @@ impl<'a, C, NC, A> AchievementConfigurationPatchCall<'a, C, NC, A> where NC: hyp
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -2450,7 +2515,7 @@ impl<'a, C, NC, A> AchievementConfigurationPatchCall<'a, C, NC, A> where NC: hyp
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -2461,7 +2526,7 @@ impl<'a, C, NC, A> AchievementConfigurationPatchCall<'a, C, NC, A> where NC: hyp
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -2470,13 +2535,13 @@ impl<'a, C, NC, A> AchievementConfigurationPatchCall<'a, C, NC, A> where NC: hyp
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -2497,7 +2562,7 @@ impl<'a, C, NC, A> AchievementConfigurationPatchCall<'a, C, NC, A> where NC: hyp
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The ID of the achievement used by this method.    
+    /// The ID of the achievement used by this method.
     pub fn achievement_id(mut self, new_value: &str) -> AchievementConfigurationPatchCall<'a, C, NC, A> {
         self._achievement_id = new_value.to_string();
         self
@@ -2558,7 +2623,7 @@ impl<'a, C, NC, A> AchievementConfigurationPatchCall<'a, C, NC, A> where NC: hyp
 /// Delete the achievement configuration with the given ID.
 ///
 /// A builder for the *delete* method supported by a *achievementConfiguration* resource.
-/// It is not used directly, but through a `AchievementConfigurationMethods`.
+/// It is not used directly, but through a `AchievementConfigurationMethods` instance.
 ///
 /// # Example
 ///
@@ -2616,7 +2681,7 @@ impl<'a, C, NC, A> AchievementConfigurationDeleteCall<'a, C, NC, A> where NC: hy
         for &field in ["achievementId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -2668,7 +2733,7 @@ impl<'a, C, NC, A> AchievementConfigurationDeleteCall<'a, C, NC, A> where NC: hy
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -2680,7 +2745,6 @@ impl<'a, C, NC, A> AchievementConfigurationDeleteCall<'a, C, NC, A> where NC: hy
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -2690,7 +2754,7 @@ impl<'a, C, NC, A> AchievementConfigurationDeleteCall<'a, C, NC, A> where NC: hy
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -2701,12 +2765,12 @@ impl<'a, C, NC, A> AchievementConfigurationDeleteCall<'a, C, NC, A> where NC: hy
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = res;
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -2718,7 +2782,7 @@ impl<'a, C, NC, A> AchievementConfigurationDeleteCall<'a, C, NC, A> where NC: hy
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The ID of the achievement used by this method.    
+    /// The ID of the achievement used by this method.
     pub fn achievement_id(mut self, new_value: &str) -> AchievementConfigurationDeleteCall<'a, C, NC, A> {
         self._achievement_id = new_value.to_string();
         self
@@ -2779,7 +2843,7 @@ impl<'a, C, NC, A> AchievementConfigurationDeleteCall<'a, C, NC, A> where NC: hy
 /// Insert a new leaderboard configuration in this application.
 ///
 /// A builder for the *insert* method supported by a *leaderboardConfiguration* resource.
-/// It is not used directly, but through a `LeaderboardConfigurationMethods`.
+/// It is not used directly, but through a `LeaderboardConfigurationMethods` instance.
 ///
 /// # Example
 ///
@@ -2844,7 +2908,7 @@ impl<'a, C, NC, A> LeaderboardConfigurationInsertCall<'a, C, NC, A> where NC: hy
         for &field in ["alt", "applicationId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -2901,7 +2965,7 @@ impl<'a, C, NC, A> LeaderboardConfigurationInsertCall<'a, C, NC, A> where NC: hy
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -2917,7 +2981,6 @@ impl<'a, C, NC, A> LeaderboardConfigurationInsertCall<'a, C, NC, A> where NC: hy
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -2927,7 +2990,7 @@ impl<'a, C, NC, A> LeaderboardConfigurationInsertCall<'a, C, NC, A> where NC: hy
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -2938,7 +3001,7 @@ impl<'a, C, NC, A> LeaderboardConfigurationInsertCall<'a, C, NC, A> where NC: hy
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -2947,13 +3010,13 @@ impl<'a, C, NC, A> LeaderboardConfigurationInsertCall<'a, C, NC, A> where NC: hy
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -2974,7 +3037,7 @@ impl<'a, C, NC, A> LeaderboardConfigurationInsertCall<'a, C, NC, A> where NC: hy
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The application ID from the Google Play developer console.    
+    /// The application ID from the Google Play developer console.
     pub fn application_id(mut self, new_value: &str) -> LeaderboardConfigurationInsertCall<'a, C, NC, A> {
         self._application_id = new_value.to_string();
         self
@@ -3035,7 +3098,7 @@ impl<'a, C, NC, A> LeaderboardConfigurationInsertCall<'a, C, NC, A> where NC: hy
 /// Retrieves the metadata of the leaderboard configuration with the given ID.
 ///
 /// A builder for the *get* method supported by a *leaderboardConfiguration* resource.
-/// It is not used directly, but through a `LeaderboardConfigurationMethods`.
+/// It is not used directly, but through a `LeaderboardConfigurationMethods` instance.
 ///
 /// # Example
 ///
@@ -3093,7 +3156,7 @@ impl<'a, C, NC, A> LeaderboardConfigurationGetCall<'a, C, NC, A> where NC: hyper
         for &field in ["alt", "leaderboardId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -3146,7 +3209,7 @@ impl<'a, C, NC, A> LeaderboardConfigurationGetCall<'a, C, NC, A> where NC: hyper
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -3158,7 +3221,6 @@ impl<'a, C, NC, A> LeaderboardConfigurationGetCall<'a, C, NC, A> where NC: hyper
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -3168,7 +3230,7 @@ impl<'a, C, NC, A> LeaderboardConfigurationGetCall<'a, C, NC, A> where NC: hyper
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -3179,7 +3241,7 @@ impl<'a, C, NC, A> LeaderboardConfigurationGetCall<'a, C, NC, A> where NC: hyper
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -3188,13 +3250,13 @@ impl<'a, C, NC, A> LeaderboardConfigurationGetCall<'a, C, NC, A> where NC: hyper
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -3206,7 +3268,7 @@ impl<'a, C, NC, A> LeaderboardConfigurationGetCall<'a, C, NC, A> where NC: hyper
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The ID of the leaderboard.    
+    /// The ID of the leaderboard.
     pub fn leaderboard_id(mut self, new_value: &str) -> LeaderboardConfigurationGetCall<'a, C, NC, A> {
         self._leaderboard_id = new_value.to_string();
         self
@@ -3267,7 +3329,7 @@ impl<'a, C, NC, A> LeaderboardConfigurationGetCall<'a, C, NC, A> where NC: hyper
 /// Update the metadata of the leaderboard configuration with the given ID. This method supports patch semantics.
 ///
 /// A builder for the *patch* method supported by a *leaderboardConfiguration* resource.
-/// It is not used directly, but through a `LeaderboardConfigurationMethods`.
+/// It is not used directly, but through a `LeaderboardConfigurationMethods` instance.
 ///
 /// # Example
 ///
@@ -3332,7 +3394,7 @@ impl<'a, C, NC, A> LeaderboardConfigurationPatchCall<'a, C, NC, A> where NC: hyp
         for &field in ["alt", "leaderboardId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -3389,7 +3451,7 @@ impl<'a, C, NC, A> LeaderboardConfigurationPatchCall<'a, C, NC, A> where NC: hyp
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -3405,7 +3467,6 @@ impl<'a, C, NC, A> LeaderboardConfigurationPatchCall<'a, C, NC, A> where NC: hyp
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -3415,7 +3476,7 @@ impl<'a, C, NC, A> LeaderboardConfigurationPatchCall<'a, C, NC, A> where NC: hyp
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -3426,7 +3487,7 @@ impl<'a, C, NC, A> LeaderboardConfigurationPatchCall<'a, C, NC, A> where NC: hyp
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -3435,13 +3496,13 @@ impl<'a, C, NC, A> LeaderboardConfigurationPatchCall<'a, C, NC, A> where NC: hyp
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -3462,7 +3523,7 @@ impl<'a, C, NC, A> LeaderboardConfigurationPatchCall<'a, C, NC, A> where NC: hyp
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The ID of the leaderboard.    
+    /// The ID of the leaderboard.
     pub fn leaderboard_id(mut self, new_value: &str) -> LeaderboardConfigurationPatchCall<'a, C, NC, A> {
         self._leaderboard_id = new_value.to_string();
         self
@@ -3523,7 +3584,7 @@ impl<'a, C, NC, A> LeaderboardConfigurationPatchCall<'a, C, NC, A> where NC: hyp
 /// Update the metadata of the leaderboard configuration with the given ID.
 ///
 /// A builder for the *update* method supported by a *leaderboardConfiguration* resource.
-/// It is not used directly, but through a `LeaderboardConfigurationMethods`.
+/// It is not used directly, but through a `LeaderboardConfigurationMethods` instance.
 ///
 /// # Example
 ///
@@ -3588,7 +3649,7 @@ impl<'a, C, NC, A> LeaderboardConfigurationUpdateCall<'a, C, NC, A> where NC: hy
         for &field in ["alt", "leaderboardId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -3645,7 +3706,7 @@ impl<'a, C, NC, A> LeaderboardConfigurationUpdateCall<'a, C, NC, A> where NC: hy
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -3661,7 +3722,6 @@ impl<'a, C, NC, A> LeaderboardConfigurationUpdateCall<'a, C, NC, A> where NC: hy
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -3671,7 +3731,7 @@ impl<'a, C, NC, A> LeaderboardConfigurationUpdateCall<'a, C, NC, A> where NC: hy
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -3682,7 +3742,7 @@ impl<'a, C, NC, A> LeaderboardConfigurationUpdateCall<'a, C, NC, A> where NC: hy
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -3691,13 +3751,13 @@ impl<'a, C, NC, A> LeaderboardConfigurationUpdateCall<'a, C, NC, A> where NC: hy
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -3718,7 +3778,7 @@ impl<'a, C, NC, A> LeaderboardConfigurationUpdateCall<'a, C, NC, A> where NC: hy
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The ID of the leaderboard.    
+    /// The ID of the leaderboard.
     pub fn leaderboard_id(mut self, new_value: &str) -> LeaderboardConfigurationUpdateCall<'a, C, NC, A> {
         self._leaderboard_id = new_value.to_string();
         self
@@ -3779,7 +3839,7 @@ impl<'a, C, NC, A> LeaderboardConfigurationUpdateCall<'a, C, NC, A> where NC: hy
 /// Returns a list of the leaderboard configurations in this application.
 ///
 /// A builder for the *list* method supported by a *leaderboardConfiguration* resource.
-/// It is not used directly, but through a `LeaderboardConfigurationMethods`.
+/// It is not used directly, but through a `LeaderboardConfigurationMethods` instance.
 ///
 /// # Example
 ///
@@ -3847,7 +3907,7 @@ impl<'a, C, NC, A> LeaderboardConfigurationListCall<'a, C, NC, A> where NC: hype
         for &field in ["alt", "applicationId", "pageToken", "maxResults"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -3900,7 +3960,7 @@ impl<'a, C, NC, A> LeaderboardConfigurationListCall<'a, C, NC, A> where NC: hype
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -3912,7 +3972,6 @@ impl<'a, C, NC, A> LeaderboardConfigurationListCall<'a, C, NC, A> where NC: hype
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -3922,7 +3981,7 @@ impl<'a, C, NC, A> LeaderboardConfigurationListCall<'a, C, NC, A> where NC: hype
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -3933,7 +3992,7 @@ impl<'a, C, NC, A> LeaderboardConfigurationListCall<'a, C, NC, A> where NC: hype
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -3942,13 +4001,13 @@ impl<'a, C, NC, A> LeaderboardConfigurationListCall<'a, C, NC, A> where NC: hype
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -3960,7 +4019,7 @@ impl<'a, C, NC, A> LeaderboardConfigurationListCall<'a, C, NC, A> where NC: hype
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The application ID from the Google Play developer console.    
+    /// The application ID from the Google Play developer console.
     pub fn application_id(mut self, new_value: &str) -> LeaderboardConfigurationListCall<'a, C, NC, A> {
         self._application_id = new_value.to_string();
         self
@@ -3968,7 +4027,7 @@ impl<'a, C, NC, A> LeaderboardConfigurationListCall<'a, C, NC, A> where NC: hype
     /// Sets the *page token* query property to the given value.
     ///
     /// 
-    /// The token returned by the previous request.    
+    /// The token returned by the previous request.
     pub fn page_token(mut self, new_value: &str) -> LeaderboardConfigurationListCall<'a, C, NC, A> {
         self._page_token = Some(new_value.to_string());
         self
@@ -3976,7 +4035,7 @@ impl<'a, C, NC, A> LeaderboardConfigurationListCall<'a, C, NC, A> where NC: hype
     /// Sets the *max results* query property to the given value.
     ///
     /// 
-    /// The maximum number of resource configurations to return in the response, used for paging. For any response, the actual number of resources returned may be less than the specified maxResults.    
+    /// The maximum number of resource configurations to return in the response, used for paging. For any response, the actual number of resources returned may be less than the specified maxResults.
     pub fn max_results(mut self, new_value: i32) -> LeaderboardConfigurationListCall<'a, C, NC, A> {
         self._max_results = Some(new_value);
         self
@@ -4037,7 +4096,7 @@ impl<'a, C, NC, A> LeaderboardConfigurationListCall<'a, C, NC, A> where NC: hype
 /// Delete the leaderboard configuration with the given ID.
 ///
 /// A builder for the *delete* method supported by a *leaderboardConfiguration* resource.
-/// It is not used directly, but through a `LeaderboardConfigurationMethods`.
+/// It is not used directly, but through a `LeaderboardConfigurationMethods` instance.
 ///
 /// # Example
 ///
@@ -4095,7 +4154,7 @@ impl<'a, C, NC, A> LeaderboardConfigurationDeleteCall<'a, C, NC, A> where NC: hy
         for &field in ["leaderboardId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -4147,7 +4206,7 @@ impl<'a, C, NC, A> LeaderboardConfigurationDeleteCall<'a, C, NC, A> where NC: hy
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -4159,7 +4218,6 @@ impl<'a, C, NC, A> LeaderboardConfigurationDeleteCall<'a, C, NC, A> where NC: hy
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -4169,7 +4227,7 @@ impl<'a, C, NC, A> LeaderboardConfigurationDeleteCall<'a, C, NC, A> where NC: hy
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -4180,12 +4238,12 @@ impl<'a, C, NC, A> LeaderboardConfigurationDeleteCall<'a, C, NC, A> where NC: hy
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = res;
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -4197,7 +4255,7 @@ impl<'a, C, NC, A> LeaderboardConfigurationDeleteCall<'a, C, NC, A> where NC: hy
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The ID of the leaderboard.    
+    /// The ID of the leaderboard.
     pub fn leaderboard_id(mut self, new_value: &str) -> LeaderboardConfigurationDeleteCall<'a, C, NC, A> {
         self._leaderboard_id = new_value.to_string();
         self

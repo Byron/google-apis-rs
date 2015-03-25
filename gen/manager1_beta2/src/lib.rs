@@ -1,8 +1,8 @@
 // DO NOT EDIT !
-// This file was generated automatically from 'src/mako/lib.rs.mako'
+// This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *manager* crate version *0.1.1+20140915*, where *20140915* is the exact revision of the *manager:v1beta2* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.1*.
+//! This documentation was generated from *manager* crate version *0.1.2+20140915*, where *20140915* is the exact revision of the *manager:v1beta2* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.2*.
 //! 
 //! Everything else about the *manager* *v1_beta2* API can be found at the
 //! [official documentation site](https://developers.google.com/deployment-manager/).
@@ -27,6 +27,8 @@
 //! 
 //! * **[Hub](struct.Manager.html)**
 //!     * a central object to maintain state and allow accessing all *Activities*
+//!     * creates [*Method Builders*](trait.MethodsBuilder.html) which in turn
+//!       allow access to individual [*Call Builders*](trait.CallBuilder.html)
 //! * **[Resources](trait.Resource.html)**
 //!     * primary types that you can apply *Activities* to
 //!     * a collection of properties and *Parts*
@@ -35,6 +37,8 @@
 //!         * never directly used in *Activities*
 //! * **[Activities](trait.CallBuilder.html)**
 //!     * operations to apply to *Resources*
+//! 
+//! All *structures* are marked with applicable traits to further categorize them and ease browsing.
 //! 
 //! Generally speaking, you can invoke *Activities* like this:
 //! 
@@ -73,7 +77,7 @@
 //! extern crate hyper;
 //! extern crate "yup-oauth2" as oauth2;
 //! extern crate "google-manager1_beta2" as manager1_beta2;
-//! use manager1_beta2::Result;
+//! use manager1_beta2::{Result, Error};
 //! # #[test] fn egal() {
 //! use std::default::Default;
 //! use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -100,15 +104,17 @@
 //!              .doit();
 //! 
 //! match result {
-//!     Result::HttpError(err) => println!("HTTPERROR: {:?}", err),
-//!     Result::MissingAPIKey => println!("Auth: Missing API Key - used if there are no scopes"),
-//!     Result::MissingToken => println!("OAuth2: Missing Token"),
-//!     Result::Cancelled => println!("Operation cancelled by user"),
-//!     Result::UploadSizeLimitExceeded(size, max_size) => println!("Upload size too big: {} of {}", size, max_size),
-//!     Result::Failure(_) => println!("General Failure (hyper::client::Response doesn't print)"),
-//!     Result::FieldClash(clashed_field) => println!("You added custom parameter which is part of builder: {:?}", clashed_field),
-//!     Result::JsonDecodeError(err) => println!("Couldn't understand server reply - maybe API needs update: {:?}", err),
-//!     Result::Success(_) => println!("Success (value doesn't print)"),
+//!     Err(e) => match e {
+//!         Error::HttpError(err) => println!("HTTPERROR: {:?}", err),
+//!         Error::MissingAPIKey => println!("Auth: Missing API Key - used if there are no scopes"),
+//!         Error::MissingToken => println!("OAuth2: Missing Token"),
+//!         Error::Cancelled => println!("Operation canceled by user"),
+//!         Error::UploadSizeLimitExceeded(size, max_size) => println!("Upload size too big: {} of {}", size, max_size),
+//!         Error::Failure(_) => println!("General Failure (hyper::client::Response doesn't print)"),
+//!         Error::FieldClash(clashed_field) => println!("You added custom parameter which is part of builder: {:?}", clashed_field),
+//!         Error::JsonDecodeError(err) => println!("Couldn't understand server reply - maybe API needs update: {:?}", err),
+//!     },
+//!     Ok(_) => println!("Success (value doesn't print)"),
 //! }
 //! # }
 //! ```
@@ -121,7 +127,7 @@
 //! When delegates handle errors or intermediate values, they may have a chance to instruct the system to retry. This 
 //! makes the system potentially resilient to all kinds of errors.
 //! 
-//! ## Uploads and Downlods
+//! ## Uploads and Downloads
 //! If a method supports downloads, the response body, which is part of the [Result](enum.Result.html), should be
 //! read by you to obtain the media.
 //! If such a method also supports a [Response Result](trait.ResponseResult.html), it will return that by default.
@@ -144,8 +150,9 @@
 //! ## Optional Parts in Server-Requests
 //! 
 //! All structures provided by this library are made to be [enocodable](trait.RequestValue.html) and 
-//! [decodable](trait.ResponseResult.html) via json. Optionals are used to indicate that partial requests are responses are valid.
-//! Most optionals are are considered [Parts](trait.Part.html) which are identifyable by name, which will be sent to 
+//! [decodable](trait.ResponseResult.html) via *json*. Optionals are used to indicate that partial requests are responses 
+//! are valid.
+//! Most optionals are are considered [Parts](trait.Part.html) which are identifiable by name, which will be sent to 
 //! the server to indicate either the set parts of the request or the desired parts in the response.
 //! 
 //! ## Builder Arguments
@@ -194,7 +201,7 @@ use std::io;
 use std::fs;
 use std::thread::sleep;
 
-pub use cmn::{MultiPartReader, ToParts, MethodInfo, Result, CallBuilder, Hub, ReadSeek, Part, ResponseResult, RequestValue, NestedType, Delegate, DefaultDelegate, ResourceMethodsBuilder, Resource, JsonServerError};
+pub use cmn::{MultiPartReader, ToParts, MethodInfo, Result, Error, CallBuilder, Hub, ReadSeek, Part, ResponseResult, RequestValue, NestedType, Delegate, DefaultDelegate, MethodsBuilder, Resource, JsonServerError};
 
 
 // ##############
@@ -260,7 +267,7 @@ impl Default for Scope {
 /// extern crate hyper;
 /// extern crate "yup-oauth2" as oauth2;
 /// extern crate "google-manager1_beta2" as manager1_beta2;
-/// use manager1_beta2::Result;
+/// use manager1_beta2::{Result, Error};
 /// # #[test] fn egal() {
 /// use std::default::Default;
 /// use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -287,15 +294,17 @@ impl Default for Scope {
 ///              .doit();
 /// 
 /// match result {
-///     Result::HttpError(err) => println!("HTTPERROR: {:?}", err),
-///     Result::MissingAPIKey => println!("Auth: Missing API Key - used if there are no scopes"),
-///     Result::MissingToken => println!("OAuth2: Missing Token"),
-///     Result::Cancelled => println!("Operation cancelled by user"),
-///     Result::UploadSizeLimitExceeded(size, max_size) => println!("Upload size too big: {} of {}", size, max_size),
-///     Result::Failure(_) => println!("General Failure (hyper::client::Response doesn't print)"),
-///     Result::FieldClash(clashed_field) => println!("You added custom parameter which is part of builder: {:?}", clashed_field),
-///     Result::JsonDecodeError(err) => println!("Couldn't understand server reply - maybe API needs update: {:?}", err),
-///     Result::Success(_) => println!("Success (value doesn't print)"),
+///     Err(e) => match e {
+///         Error::HttpError(err) => println!("HTTPERROR: {:?}", err),
+///         Error::MissingAPIKey => println!("Auth: Missing API Key - used if there are no scopes"),
+///         Error::MissingToken => println!("OAuth2: Missing Token"),
+///         Error::Cancelled => println!("Operation canceled by user"),
+///         Error::UploadSizeLimitExceeded(size, max_size) => println!("Upload size too big: {} of {}", size, max_size),
+///         Error::Failure(_) => println!("General Failure (hyper::client::Response doesn't print)"),
+///         Error::FieldClash(clashed_field) => println!("You added custom parameter which is part of builder: {:?}", clashed_field),
+///         Error::JsonDecodeError(err) => println!("Couldn't understand server reply - maybe API needs update: {:?}", err),
+///     },
+///     Ok(_) => println!("Success (value doesn't print)"),
 /// }
 /// # }
 /// ```
@@ -316,7 +325,7 @@ impl<'a, C, NC, A> Manager<C, NC, A>
         Manager {
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/0.1.1".to_string(),
+            _user_agent: "google-api-rust-client/0.1.2".to_string(),
             _m: PhantomData
         }
     }
@@ -329,7 +338,7 @@ impl<'a, C, NC, A> Manager<C, NC, A>
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/0.1.1`.
+    /// It defaults to `google-api-rust-client/0.1.2`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -349,24 +358,24 @@ impl<'a, C, NC, A> Manager<C, NC, A>
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct AutoscalingModule {
-    /// no description provided    
+    /// no description provided
     #[serde(alias="maxNumReplicas")]
     pub max_num_replicas: i32,
-    /// no description provided    
+    /// no description provided
     pub description: String,
-    /// no description provided    
+    /// no description provided
     #[serde(alias="targetModule")]
     pub target_module: String,
-    /// target_utilization should be in range [0,1].    
+    /// target_utilization should be in range [0,1].
     #[serde(alias="targetUtilization")]
     pub target_utilization: f64,
-    /// no description provided    
+    /// no description provided
     #[serde(alias="signalType")]
     pub signal_type: String,
-    /// no description provided    
+    /// no description provided
     #[serde(alias="minNumReplicas")]
     pub min_num_replicas: i32,
-    /// no description provided    
+    /// no description provided
     #[serde(alias="coolDownPeriodSec")]
     pub cool_down_period_sec: i32,
 }
@@ -380,20 +389,20 @@ impl Part for AutoscalingModule {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct FirewallModule {
-    /// The description of the firewall (optional)    
+    /// The description of the firewall (optional)
     pub description: String,
-    /// Target Tags to apply this firewall to, see the GCE Spec for details on syntax    
+    /// Target Tags to apply this firewall to, see the GCE Spec for details on syntax
     #[serde(alias="targetTags")]
     pub target_tags: Vec<String>,
-    /// The allowed ports or port ranges.    
+    /// The allowed ports or port ranges.
     pub allowed: Vec<AllowedRule>,
-    /// Source Tags to apply this firewall to, see the GCE Spec for details on syntax    
+    /// Source Tags to apply this firewall to, see the GCE Spec for details on syntax
     #[serde(alias="sourceTags")]
     pub source_tags: Vec<String>,
-    /// Source IP ranges to apply this firewall to, see the GCE Spec for details on syntax    
+    /// Source IP ranges to apply this firewall to, see the GCE Spec for details on syntax
     #[serde(alias="sourceRanges")]
     pub source_ranges: Vec<String>,
-    /// The NetworkModule to which this firewall should apply. If not specified, or if specified as 'default', this firewall will be applied to the 'default' network.    
+    /// The NetworkModule to which this firewall should apply. If not specified, or if specified as 'default', this firewall will be applied to the 'default' network.
     pub network: String,
 }
 
@@ -406,12 +415,12 @@ impl Part for FirewallModule {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct AccessConfig {
-    /// Type of this access configuration file. (Currently only ONE_TO_ONE_NAT is legal.)    
+    /// Type of this access configuration file. (Currently only ONE_TO_ONE_NAT is legal.)
     #[serde(alias="type")]
     pub type_: String,
-    /// Name of this access configuration.    
+    /// Name of this access configuration.
     pub name: String,
-    /// An external IP address associated with this instance.    
+    /// An external IP address associated with this instance.
     #[serde(alias="natIp")]
     pub nat_ip: String,
 }
@@ -425,25 +434,25 @@ impl Part for AccessConfig {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Module {
-    /// no description provided    
+    /// no description provided
     #[serde(alias="lbModule")]
     pub lb_module: LbModule,
-    /// no description provided    
+    /// no description provided
     #[serde(alias="replicaPoolModule")]
     pub replica_pool_module: ReplicaPoolModule,
-    /// no description provided    
+    /// no description provided
     #[serde(alias="firewallModule")]
     pub firewall_module: FirewallModule,
-    /// no description provided    
+    /// no description provided
     #[serde(alias="healthCheckModule")]
     pub health_check_module: HealthCheckModule,
-    /// no description provided    
+    /// no description provided
     #[serde(alias="autoscalingModule")]
     pub autoscaling_module: AutoscalingModule,
-    /// no description provided    
+    /// no description provided
     #[serde(alias="networkModule")]
     pub network_module: NetworkModule,
-    /// The type of this module. Valid values ("AUTOSCALING", "FIREWALL", "HEALTH_CHECK", "LOAD_BALANCING", "NETWORK", "REPLICA_POOL")    
+    /// The type of this module. Valid values ("AUTOSCALING", "FIREWALL", "HEALTH_CHECK", "LOAD_BALANCING", "NETWORK", "REPLICA_POOL")
     #[serde(alias="type")]
     pub type_: String,
 }
@@ -465,13 +474,13 @@ impl Part for Module {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Template {
-    /// A list of modules for this Template.    
+    /// A list of modules for this Template.
     pub modules: Option<HashMap<String, Module>>,
-    /// A user-supplied description of this Template.    
+    /// A user-supplied description of this Template.
     pub description: Option<String>,
-    /// Action definitions for use in Module intents in this Template.    
+    /// Action definitions for use in Module intents in this Template.
     pub actions: Option<HashMap<String, Action>>,
-    /// Name of this Template. The name must conform to the expression: [a-zA-Z0-9-_]{1,64}    
+    /// Name of this Template. The name must conform to the expression: [a-zA-Z0-9-_]{1,64}
     pub name: Option<String>,
 }
 
@@ -495,7 +504,7 @@ pub struct DeployState {
     /// - DELETED
     /// - DELETE_FAILED
     pub status: String,
-    /// [Output Only] Human readable details about the current state.    
+    /// [Output Only] Human readable details about the current state.
     pub details: String,
 }
 
@@ -508,7 +517,7 @@ impl Part for DeployState {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct FirewallModuleStatus {
-    /// [Output Only] The URL of the corresponding Firewall resource.    
+    /// [Output Only] The URL of the corresponding Firewall resource.
     #[serde(alias="firewallUrl")]
     pub firewall_url: String,
 }
@@ -522,9 +531,9 @@ impl Part for FirewallModuleStatus {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Metadata {
-    /// A list of metadata items.    
+    /// A list of metadata items.
     pub items: Vec<MetadataItem>,
-    /// The fingerprint of the metadata.    
+    /// The fingerprint of the metadata.
     #[serde(alias="fingerPrint")]
     pub finger_print: String,
 }
@@ -538,27 +547,27 @@ impl Part for Metadata {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ModuleStatus {
-    /// [Output Only] The status of the HealthCheckModule, set for type HEALTH_CHECK.    
+    /// [Output Only] The status of the HealthCheckModule, set for type HEALTH_CHECK.
     #[serde(alias="healthCheckModuleStatus")]
     pub health_check_module_status: HealthCheckModuleStatus,
-    /// [Output Only] The status of the NetworkModule, set for type NETWORK.    
+    /// [Output Only] The status of the NetworkModule, set for type NETWORK.
     #[serde(alias="networkModuleStatus")]
     pub network_module_status: NetworkModuleStatus,
-    /// [Output Only] The status of the ReplicaPoolModule, set for type VM.    
+    /// [Output Only] The status of the ReplicaPoolModule, set for type VM.
     #[serde(alias="replicaPoolModuleStatus")]
     pub replica_pool_module_status: ReplicaPoolModuleStatus,
-    /// [Output Only] The current state of the module.    
+    /// [Output Only] The current state of the module.
     pub state: DeployState,
-    /// [Output Only] The status of the AutoscalingModule, set for type AUTOSCALING.    
+    /// [Output Only] The status of the AutoscalingModule, set for type AUTOSCALING.
     #[serde(alias="autoscalingModuleStatus")]
     pub autoscaling_module_status: AutoscalingModuleStatus,
-    /// [Output Only] The status of the FirewallModule, set for type FIREWALL.    
+    /// [Output Only] The status of the FirewallModule, set for type FIREWALL.
     #[serde(alias="firewallModuleStatus")]
     pub firewall_module_status: FirewallModuleStatus,
-    /// [Output Only] The type of the module.    
+    /// [Output Only] The type of the module.
     #[serde(alias="type")]
     pub type_: String,
-    /// [Output Only] The status of the LbModule, set for type LOAD_BALANCING.    
+    /// [Output Only] The status of the LbModule, set for type LOAD_BALANCING.
     #[serde(alias="lbModuleStatus")]
     pub lb_module_status: LbModuleStatus,
 }
@@ -572,7 +581,7 @@ impl Part for ModuleStatus {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct NetworkModuleStatus {
-    /// [Output Only] The URL of the corresponding Network resource.    
+    /// [Output Only] The URL of the corresponding Network resource.
     #[serde(alias="networkUrl")]
     pub network_url: String,
 }
@@ -586,9 +595,9 @@ impl Part for NetworkModuleStatus {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct EnvVariable {
-    /// Whether this variable is hidden or visible.    
+    /// Whether this variable is hidden or visible.
     pub hidden: bool,
-    /// Value of the environment variable.    
+    /// Value of the environment variable.
     pub value: String,
 }
 
@@ -601,9 +610,9 @@ impl Part for EnvVariable {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ExistingDisk {
-    /// The fully-qualified URL of the Persistent Disk resource. It must be in the same zone as the Pool.    
+    /// The fully-qualified URL of the Persistent Disk resource. It must be in the same zone as the Pool.
     pub source: String,
-    /// Optional. How the disk will be attached to the Replica.    
+    /// Optional. How the disk will be attached to the Replica.
     pub attachment: DiskAttachment,
 }
 
@@ -616,7 +625,7 @@ impl Part for ExistingDisk {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ReplicaPoolParams {
-    /// ReplicaPoolParams specifications for use with ReplicaPools v1beta1.    
+    /// ReplicaPoolParams specifications for use with ReplicaPools v1beta1.
     pub v1beta1: ReplicaPoolParamsV1Beta1,
 }
 
@@ -634,10 +643,10 @@ impl Part for ReplicaPoolParams {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct TemplatesListResponse {
-    /// no description provided    
+    /// no description provided
     #[serde(alias="nextPageToken")]
     pub next_page_token: String,
-    /// no description provided    
+    /// no description provided
     pub resources: Vec<Template>,
 }
 
@@ -655,10 +664,10 @@ impl ResponseResult for TemplatesListResponse {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct DeploymentsListResponse {
-    /// no description provided    
+    /// no description provided
     #[serde(alias="nextPageToken")]
     pub next_page_token: String,
-    /// no description provided    
+    /// no description provided
     pub resources: Vec<Deployment>,
 }
 
@@ -679,21 +688,21 @@ impl ResponseResult for DeploymentsListResponse {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Deployment {
-    /// [Output Only] Current status of this deployment.    
+    /// [Output Only] Current status of this deployment.
     pub state: Option<DeployState>,
-    /// A user-supplied description of this Deployment.    
+    /// A user-supplied description of this Deployment.
     pub description: Option<String>,
-    /// The name of the Template on which this deployment is based.    
+    /// The name of the Template on which this deployment is based.
     #[serde(alias="templateName")]
     pub template_name: Option<String>,
-    /// The set of parameter overrides to apply to the corresponding Template before deploying.    
+    /// The set of parameter overrides to apply to the corresponding Template before deploying.
     pub overrides: Option<Vec<ParamOverride>>,
-    /// [Output Only] The time when this deployment was created.    
+    /// [Output Only] The time when this deployment was created.
     #[serde(alias="creationDate")]
     pub creation_date: Option<String>,
-    /// [Output Only] List of status for the modules in this deployment.    
+    /// [Output Only] List of status for the modules in this deployment.
     pub modules: Option<HashMap<String, ModuleStatus>>,
-    /// Name of this deployment. The name must conform to the following regular expression: [a-zA-Z0-9-_]{1,64}    
+    /// Name of this deployment. The name must conform to the following regular expression: [a-zA-Z0-9-_]{1,64}
     pub name: Option<String>,
 }
 
@@ -708,13 +717,13 @@ impl ResponseResult for Deployment {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct NewDiskInitializeParams {
-    /// The size of the created disk in gigabytes.    
+    /// The size of the created disk in gigabytes.
     #[serde(alias="diskSizeGb")]
     pub disk_size_gb: String,
-    /// The fully-qualified URL of a source image to use to create this disk.    
+    /// The fully-qualified URL of a source image to use to create this disk.
     #[serde(alias="sourceImage")]
     pub source_image: String,
-    /// Name of the disk type resource describing which disk type to use to create the disk. For example 'pd-ssd' or 'pd-standard'. Default is 'pd-standard'    
+    /// Name of the disk type resource describing which disk type to use to create the disk. For example 'pd-ssd' or 'pd-standard'. Default is 'pd-standard'
     #[serde(alias="diskType")]
     pub disk_type: String,
 }
@@ -728,13 +737,13 @@ impl Part for NewDiskInitializeParams {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct NetworkModule {
-    /// Required; The range of internal addresses that are legal on this network. This range is a CIDR specification, for example: 192.168.0.0/16.    
+    /// Required; The range of internal addresses that are legal on this network. This range is a CIDR specification, for example: 192.168.0.0/16.
     #[serde(alias="IPv4Range")]
     pub i_pv4_range: String,
-    /// An optional address that is used for default routing to other networks. This must be within the range specified by IPv4Range, and is typicall the first usable address in that range. If not specified, the default value is the first usable address in IPv4Range.    
+    /// An optional address that is used for default routing to other networks. This must be within the range specified by IPv4Range, and is typicall the first usable address in that range. If not specified, the default value is the first usable address in IPv4Range.
     #[serde(alias="gatewayIPv4")]
     pub gateway_i_pv4: String,
-    /// The description of the network.    
+    /// The description of the network.
     pub description: String,
 }
 
@@ -747,42 +756,42 @@ impl Part for NetworkModule {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ReplicaPoolParamsV1Beta1 {
-    /// A list of Disk resources to create and attach to each Replica in the Pool. Currently, you can only define one disk and it must be a root persistent disk. Note that Replica Pool will create a root persistent disk for each replica.    
+    /// A list of Disk resources to create and attach to each Replica in the Pool. Currently, you can only define one disk and it must be a root persistent disk. Note that Replica Pool will create a root persistent disk for each replica.
     #[serde(alias="disksToCreate")]
     pub disks_to_create: Vec<NewDisk>,
-    /// Whether these replicas should be restarted if they experience a failure. The default value is true.    
+    /// Whether these replicas should be restarted if they experience a failure. The default value is true.
     #[serde(alias="autoRestart")]
     pub auto_restart: bool,
-    /// Enables IP Forwarding    
+    /// Enables IP Forwarding
     #[serde(alias="canIpForward")]
     pub can_ip_forward: bool,
-    /// An optional textual description of the resource.    
+    /// An optional textual description of the resource.
     pub description: String,
-    /// The zone for this ReplicaPool.    
+    /// The zone for this ReplicaPool.
     pub zone: String,
-    /// A list of tags to apply to the Google Compute Engine instance to identify resources.    
+    /// A list of tags to apply to the Google Compute Engine instance to identify resources.
     pub tags: Tag,
-    /// no description provided    
+    /// no description provided
     #[serde(alias="onHostMaintenance")]
     pub on_host_maintenance: String,
-    /// A list of existing Persistent Disk resources to attach to each replica in the pool. Each disk will be attached in read-only mode to every replica.    
+    /// A list of existing Persistent Disk resources to attach to each replica in the pool. Each disk will be attached in read-only mode to every replica.
     #[serde(alias="disksToAttach")]
     pub disks_to_attach: Vec<ExistingDisk>,
-    /// The machine type for this instance. Either a complete URL, or the resource name (e.g. n1-standard-1).    
+    /// The machine type for this instance. Either a complete URL, or the resource name (e.g. n1-standard-1).
     #[serde(alias="machineType")]
     pub machine_type: String,
-    /// The base name for instances within this ReplicaPool.    
+    /// The base name for instances within this ReplicaPool.
     #[serde(alias="baseInstanceName")]
     pub base_instance_name: String,
-    /// Name of the Action to be run during initialization of a ReplicaPoolModule.    
+    /// Name of the Action to be run during initialization of a ReplicaPoolModule.
     #[serde(alias="initAction")]
     pub init_action: String,
-    /// The metadata key/value pairs assigned to this instance.    
+    /// The metadata key/value pairs assigned to this instance.
     pub metadata: Metadata,
-    /// A list of Service Accounts to enable for this instance.    
+    /// A list of Service Accounts to enable for this instance.
     #[serde(alias="serviceAccounts")]
     pub service_accounts: Vec<ServiceAccount>,
-    /// A list of network interfaces for the instance. Currently only one interface is supported by Google Compute Engine.    
+    /// A list of network interfaces for the instance. Currently only one interface is supported by Google Compute Engine.
     #[serde(alias="networkInterfaces")]
     pub network_interfaces: Vec<NetworkInterface>,
 }
@@ -796,9 +805,9 @@ impl Part for ReplicaPoolParamsV1Beta1 {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ParamOverride {
-    /// A JSON Path expression that specifies which parameter should be overridden.    
+    /// A JSON Path expression that specifies which parameter should be overridden.
     pub path: String,
-    /// The new value to assign to the overridden parameter.    
+    /// The new value to assign to the overridden parameter.
     pub value: String,
 }
 
@@ -811,10 +820,10 @@ impl Part for ParamOverride {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ReplicaPoolModuleStatus {
-    /// [Output Only] The URL of the Resource Group associated with this ReplicaPool.    
+    /// [Output Only] The URL of the Resource Group associated with this ReplicaPool.
     #[serde(alias="resourceViewUrl")]
     pub resource_view_url: String,
-    /// [Output Only] The URL of the associated ReplicaPool resource.    
+    /// [Output Only] The URL of the associated ReplicaPool resource.
     #[serde(alias="replicaPoolUrl")]
     pub replica_pool_url: String,
 }
@@ -828,9 +837,9 @@ impl Part for ReplicaPoolModuleStatus {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ServiceAccount {
-    /// List of OAuth2 scopes to obtain for the service account.    
+    /// List of OAuth2 scopes to obtain for the service account.
     pub scopes: Vec<String>,
-    /// Service account email address.    
+    /// Service account email address.
     pub email: String,
 }
 
@@ -843,15 +852,15 @@ impl Part for ServiceAccount {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct NetworkInterface {
-    /// An array of configurations for this interface. This specifies how this interface is configured to interact with other network services    
+    /// An array of configurations for this interface. This specifies how this interface is configured to interact with other network services
     #[serde(alias="accessConfigs")]
     pub access_configs: Vec<AccessConfig>,
-    /// An optional IPV4 internal network address to assign to the instance for this network interface.    
+    /// An optional IPV4 internal network address to assign to the instance for this network interface.
     #[serde(alias="networkIp")]
     pub network_ip: String,
-    /// Name of the interface.    
+    /// Name of the interface.
     pub name: String,
-    /// The name of the NetworkModule to which this interface applies. If not specified, or specified as 'default', this will use the 'default' network.    
+    /// The name of the NetworkModule to which this interface applies. If not specified, or specified as 'default', this will use the 'default' network.
     pub network: String,
 }
 
@@ -864,10 +873,10 @@ impl Part for NetworkInterface {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Action {
-    /// The timeout in milliseconds for this action to run.    
+    /// The timeout in milliseconds for this action to run.
     #[serde(alias="timeoutMs")]
     pub timeout_ms: i32,
-    /// A list of commands to run sequentially for this action.    
+    /// A list of commands to run sequentially for this action.
     pub commands: Vec<String>,
 }
 
@@ -880,7 +889,7 @@ impl Part for Action {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct AutoscalingModuleStatus {
-    /// [Output Only] The URL of the corresponding Autoscaling configuration.    
+    /// [Output Only] The URL of the corresponding Autoscaling configuration.
     #[serde(alias="autoscalingConfigUrl")]
     pub autoscaling_config_url: String,
 }
@@ -894,10 +903,10 @@ impl Part for AutoscalingModuleStatus {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct LbModuleStatus {
-    /// [Output Only] The URL of the corresponding ForwardingRule in GCE.    
+    /// [Output Only] The URL of the corresponding ForwardingRule in GCE.
     #[serde(alias="forwardingRuleUrl")]
     pub forwarding_rule_url: String,
-    /// [Output Only] The URL of the corresponding TargetPool resource in GCE.    
+    /// [Output Only] The URL of the corresponding TargetPool resource in GCE.
     #[serde(alias="targetPoolUrl")]
     pub target_pool_url: String,
 }
@@ -911,24 +920,24 @@ impl Part for LbModuleStatus {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct LbModule {
-    /// no description provided    
+    /// no description provided
     pub description: String,
-    /// no description provided    
+    /// no description provided
     #[serde(alias="healthChecks")]
     pub health_checks: Vec<String>,
-    /// no description provided    
+    /// no description provided
     #[serde(alias="portRange")]
     pub port_range: String,
-    /// no description provided    
+    /// no description provided
     #[serde(alias="targetModules")]
     pub target_modules: Vec<String>,
-    /// no description provided    
+    /// no description provided
     #[serde(alias="ipAddress")]
     pub ip_address: String,
-    /// no description provided    
+    /// no description provided
     #[serde(alias="ipProtocol")]
     pub ip_protocol: String,
-    /// no description provided    
+    /// no description provided
     #[serde(alias="sessionAffinity")]
     pub session_affinity: String,
 }
@@ -942,7 +951,7 @@ impl Part for LbModule {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct HealthCheckModuleStatus {
-    /// [Output Only] The HealthCheck URL.    
+    /// [Output Only] The HealthCheck URL.
     #[serde(alias="healthCheckUrl")]
     pub health_check_url: String,
 }
@@ -956,25 +965,25 @@ impl Part for HealthCheckModuleStatus {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct HealthCheckModule {
-    /// no description provided    
+    /// no description provided
     pub description: String,
-    /// no description provided    
+    /// no description provided
     #[serde(alias="timeoutSec")]
     pub timeout_sec: i32,
-    /// no description provided    
+    /// no description provided
     #[serde(alias="checkIntervalSec")]
     pub check_interval_sec: i32,
-    /// no description provided    
+    /// no description provided
     #[serde(alias="unhealthyThreshold")]
     pub unhealthy_threshold: i32,
-    /// no description provided    
+    /// no description provided
     #[serde(alias="healthyThreshold")]
     pub healthy_threshold: i32,
-    /// no description provided    
+    /// no description provided
     pub host: String,
-    /// no description provided    
+    /// no description provided
     pub path: String,
-    /// no description provided    
+    /// no description provided
     pub port: i32,
 }
 
@@ -987,14 +996,14 @@ impl Part for HealthCheckModule {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct NewDisk {
-    /// If true, indicates that this is the root persistent disk.    
+    /// If true, indicates that this is the root persistent disk.
     pub boot: bool,
-    /// Create the new disk using these parameters. The name of the disk will be <instance_name>-<five_random_charactersgt;.    
+    /// Create the new disk using these parameters. The name of the disk will be <instance_name>-<five_random_charactersgt;.
     #[serde(alias="initializeParams")]
     pub initialize_params: NewDiskInitializeParams,
-    /// How the disk will be attached to the Replica.    
+    /// How the disk will be attached to the Replica.
     pub attachment: DiskAttachment,
-    /// If true, then this disk will be deleted when the instance is deleted.    
+    /// If true, then this disk will be deleted when the instance is deleted.
     #[serde(alias="autoDelete")]
     pub auto_delete: bool,
 }
@@ -1008,10 +1017,10 @@ impl Part for NewDisk {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct AllowedRule {
-    /// ?tcp?, ?udp? or ?icmp?    
+    /// ?tcp?, ?udp? or ?icmp?
     #[serde(alias="IPProtocol")]
     pub ip_protocol: String,
-    /// List of ports or port ranges (Example inputs include: ["22"], [?33?, "12345-12349"].    
+    /// List of ports or port ranges (Example inputs include: ["22"], [?33?, "12345-12349"].
     pub ports: Vec<String>,
 }
 
@@ -1024,9 +1033,9 @@ impl Part for AllowedRule {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Tag {
-    /// Items contained in this tag.    
+    /// Items contained in this tag.
     pub items: Vec<String>,
-    /// The fingerprint of the tag.    
+    /// The fingerprint of the tag.
     #[serde(alias="fingerPrint")]
     pub finger_print: String,
 }
@@ -1040,19 +1049,19 @@ impl Part for Tag {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ReplicaPoolModule {
-    /// The Health Checks to configure for the ReplicaPoolModule    
+    /// The Health Checks to configure for the ReplicaPoolModule
     #[serde(alias="healthChecks")]
     pub health_checks: Vec<String>,
-    /// Information for a ReplicaPoolModule.    
+    /// Information for a ReplicaPoolModule.
     #[serde(alias="replicaPoolParams")]
     pub replica_pool_params: ReplicaPoolParams,
-    /// [Output Only] The name of the Resource View associated with a ReplicaPoolModule. This field will be generated by the service.    
+    /// [Output Only] The name of the Resource View associated with a ReplicaPoolModule. This field will be generated by the service.
     #[serde(alias="resourceView")]
     pub resource_view: String,
-    /// Number of replicas in this module.    
+    /// Number of replicas in this module.
     #[serde(alias="numReplicas")]
     pub num_replicas: i32,
-    /// A list of environment variables.    
+    /// A list of environment variables.
     #[serde(alias="envVariables")]
     pub env_variables: HashMap<String, EnvVariable>,
 }
@@ -1066,9 +1075,9 @@ impl Part for ReplicaPoolModule {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct MetadataItem {
-    /// A metadata key.    
+    /// A metadata key.
     pub key: String,
-    /// A metadata value.    
+    /// A metadata value.
     pub value: String,
 }
 
@@ -1081,10 +1090,10 @@ impl Part for MetadataItem {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct DiskAttachment {
-    /// The device name of this disk.    
+    /// The device name of this disk.
     #[serde(alias="deviceName")]
     pub device_name: String,
-    /// A zero-based index to assign to this disk, where 0 is reserved for the boot disk. If not specified, this is assigned by the server.    
+    /// A zero-based index to assign to this disk, where 0 is reserved for the boot disk. If not specified, this is assigned by the server.
     pub index: u32,
 }
 
@@ -1130,13 +1139,17 @@ pub struct TemplateMethods<'a, C, NC, A>
     hub: &'a Manager<C, NC, A>,
 }
 
-impl<'a, C, NC, A> ResourceMethodsBuilder for TemplateMethods<'a, C, NC, A> {}
+impl<'a, C, NC, A> MethodsBuilder for TemplateMethods<'a, C, NC, A> {}
 
 impl<'a, C, NC, A> TemplateMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    ///     
+    /// 
+    /// 
+    /// # Arguments
+    ///
+    /// * `projectId` - No description provided.
     pub fn list(&self, project_id: &str) -> TemplateListCall<'a, C, NC, A> {
         TemplateListCall {
             hub: self.hub,
@@ -1151,7 +1164,12 @@ impl<'a, C, NC, A> TemplateMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    ///     
+    /// 
+    /// 
+    /// # Arguments
+    ///
+    /// * `projectId` - No description provided.
+    /// * `templateName` - No description provided.
     pub fn delete(&self, project_id: &str, template_name: &str) -> TemplateDeleteCall<'a, C, NC, A> {
         TemplateDeleteCall {
             hub: self.hub,
@@ -1165,7 +1183,12 @@ impl<'a, C, NC, A> TemplateMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    ///     
+    /// 
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `projectId` - No description provided.
     pub fn insert(&self, request: &Template, project_id: &str) -> TemplateInsertCall<'a, C, NC, A> {
         TemplateInsertCall {
             hub: self.hub,
@@ -1179,7 +1202,12 @@ impl<'a, C, NC, A> TemplateMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    ///     
+    /// 
+    /// 
+    /// # Arguments
+    ///
+    /// * `projectId` - No description provided.
+    /// * `templateName` - No description provided.
     pub fn get(&self, project_id: &str, template_name: &str) -> TemplateGetCall<'a, C, NC, A> {
         TemplateGetCall {
             hub: self.hub,
@@ -1228,13 +1256,19 @@ pub struct DeploymentMethods<'a, C, NC, A>
     hub: &'a Manager<C, NC, A>,
 }
 
-impl<'a, C, NC, A> ResourceMethodsBuilder for DeploymentMethods<'a, C, NC, A> {}
+impl<'a, C, NC, A> MethodsBuilder for DeploymentMethods<'a, C, NC, A> {}
 
 impl<'a, C, NC, A> DeploymentMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    ///     
+    /// 
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `projectId` - No description provided.
+    /// * `region` - No description provided.
     pub fn insert(&self, request: &Deployment, project_id: &str, region: &str) -> DeploymentInsertCall<'a, C, NC, A> {
         DeploymentInsertCall {
             hub: self.hub,
@@ -1249,7 +1283,13 @@ impl<'a, C, NC, A> DeploymentMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    ///     
+    /// 
+    /// 
+    /// # Arguments
+    ///
+    /// * `projectId` - No description provided.
+    /// * `region` - No description provided.
+    /// * `deploymentName` - No description provided.
     pub fn get(&self, project_id: &str, region: &str, deployment_name: &str) -> DeploymentGetCall<'a, C, NC, A> {
         DeploymentGetCall {
             hub: self.hub,
@@ -1264,7 +1304,12 @@ impl<'a, C, NC, A> DeploymentMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    ///     
+    /// 
+    /// 
+    /// # Arguments
+    ///
+    /// * `projectId` - No description provided.
+    /// * `region` - No description provided.
     pub fn list(&self, project_id: &str, region: &str) -> DeploymentListCall<'a, C, NC, A> {
         DeploymentListCall {
             hub: self.hub,
@@ -1280,7 +1325,13 @@ impl<'a, C, NC, A> DeploymentMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    ///     
+    /// 
+    /// 
+    /// # Arguments
+    ///
+    /// * `projectId` - No description provided.
+    /// * `region` - No description provided.
+    /// * `deploymentName` - No description provided.
     pub fn delete(&self, project_id: &str, region: &str, deployment_name: &str) -> DeploymentDeleteCall<'a, C, NC, A> {
         DeploymentDeleteCall {
             hub: self.hub,
@@ -1305,7 +1356,7 @@ impl<'a, C, NC, A> DeploymentMethods<'a, C, NC, A> {
 /// 
 ///
 /// A builder for the *list* method supported by a *template* resource.
-/// It is not used directly, but through a `TemplateMethods`.
+/// It is not used directly, but through a `TemplateMethods` instance.
 ///
 /// # Example
 ///
@@ -1373,7 +1424,7 @@ impl<'a, C, NC, A> TemplateListCall<'a, C, NC, A> where NC: hyper::net::NetworkC
         for &field in ["alt", "projectId", "pageToken", "maxResults"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -1426,7 +1477,7 @@ impl<'a, C, NC, A> TemplateListCall<'a, C, NC, A> where NC: hyper::net::NetworkC
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -1438,7 +1489,6 @@ impl<'a, C, NC, A> TemplateListCall<'a, C, NC, A> where NC: hyper::net::NetworkC
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -1448,7 +1498,7 @@ impl<'a, C, NC, A> TemplateListCall<'a, C, NC, A> where NC: hyper::net::NetworkC
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -1459,7 +1509,7 @@ impl<'a, C, NC, A> TemplateListCall<'a, C, NC, A> where NC: hyper::net::NetworkC
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -1468,13 +1518,13 @@ impl<'a, C, NC, A> TemplateListCall<'a, C, NC, A> where NC: hyper::net::NetworkC
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -1493,7 +1543,7 @@ impl<'a, C, NC, A> TemplateListCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// Sets the *page token* query property to the given value.
     ///
     /// 
-    /// Specifies a nextPageToken returned by a previous list request. This token can be used to request the next page of results from a previous list request.    
+    /// Specifies a nextPageToken returned by a previous list request. This token can be used to request the next page of results from a previous list request.
     pub fn page_token(mut self, new_value: &str) -> TemplateListCall<'a, C, NC, A> {
         self._page_token = Some(new_value.to_string());
         self
@@ -1501,7 +1551,7 @@ impl<'a, C, NC, A> TemplateListCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// Sets the *max results* query property to the given value.
     ///
     /// 
-    /// Maximum count of results to be returned. Acceptable values are 0 to 100, inclusive. (Default: 50)    
+    /// Maximum count of results to be returned. Acceptable values are 0 to 100, inclusive. (Default: 50)
     pub fn max_results(mut self, new_value: i32) -> TemplateListCall<'a, C, NC, A> {
         self._max_results = Some(new_value);
         self
@@ -1562,7 +1612,7 @@ impl<'a, C, NC, A> TemplateListCall<'a, C, NC, A> where NC: hyper::net::NetworkC
 /// 
 ///
 /// A builder for the *delete* method supported by a *template* resource.
-/// It is not used directly, but through a `TemplateMethods`.
+/// It is not used directly, but through a `TemplateMethods` instance.
 ///
 /// # Example
 ///
@@ -1622,7 +1672,7 @@ impl<'a, C, NC, A> TemplateDeleteCall<'a, C, NC, A> where NC: hyper::net::Networ
         for &field in ["projectId", "templateName"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -1674,7 +1724,7 @@ impl<'a, C, NC, A> TemplateDeleteCall<'a, C, NC, A> where NC: hyper::net::Networ
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -1686,7 +1736,6 @@ impl<'a, C, NC, A> TemplateDeleteCall<'a, C, NC, A> where NC: hyper::net::Networ
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -1696,7 +1745,7 @@ impl<'a, C, NC, A> TemplateDeleteCall<'a, C, NC, A> where NC: hyper::net::Networ
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -1707,12 +1756,12 @@ impl<'a, C, NC, A> TemplateDeleteCall<'a, C, NC, A> where NC: hyper::net::Networ
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = res;
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -1793,7 +1842,7 @@ impl<'a, C, NC, A> TemplateDeleteCall<'a, C, NC, A> where NC: hyper::net::Networ
 /// 
 ///
 /// A builder for the *insert* method supported by a *template* resource.
-/// It is not used directly, but through a `TemplateMethods`.
+/// It is not used directly, but through a `TemplateMethods` instance.
 ///
 /// # Example
 ///
@@ -1858,7 +1907,7 @@ impl<'a, C, NC, A> TemplateInsertCall<'a, C, NC, A> where NC: hyper::net::Networ
         for &field in ["alt", "projectId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -1915,7 +1964,7 @@ impl<'a, C, NC, A> TemplateInsertCall<'a, C, NC, A> where NC: hyper::net::Networ
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -1931,7 +1980,6 @@ impl<'a, C, NC, A> TemplateInsertCall<'a, C, NC, A> where NC: hyper::net::Networ
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -1941,7 +1989,7 @@ impl<'a, C, NC, A> TemplateInsertCall<'a, C, NC, A> where NC: hyper::net::Networ
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -1952,7 +2000,7 @@ impl<'a, C, NC, A> TemplateInsertCall<'a, C, NC, A> where NC: hyper::net::Networ
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -1961,13 +2009,13 @@ impl<'a, C, NC, A> TemplateInsertCall<'a, C, NC, A> where NC: hyper::net::Networ
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -2048,7 +2096,7 @@ impl<'a, C, NC, A> TemplateInsertCall<'a, C, NC, A> where NC: hyper::net::Networ
 /// 
 ///
 /// A builder for the *get* method supported by a *template* resource.
-/// It is not used directly, but through a `TemplateMethods`.
+/// It is not used directly, but through a `TemplateMethods` instance.
 ///
 /// # Example
 ///
@@ -2108,7 +2156,7 @@ impl<'a, C, NC, A> TemplateGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
         for &field in ["alt", "projectId", "templateName"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -2161,7 +2209,7 @@ impl<'a, C, NC, A> TemplateGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -2173,7 +2221,6 @@ impl<'a, C, NC, A> TemplateGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -2183,7 +2230,7 @@ impl<'a, C, NC, A> TemplateGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -2194,7 +2241,7 @@ impl<'a, C, NC, A> TemplateGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -2203,13 +2250,13 @@ impl<'a, C, NC, A> TemplateGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -2290,7 +2337,7 @@ impl<'a, C, NC, A> TemplateGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
 /// 
 ///
 /// A builder for the *insert* method supported by a *deployment* resource.
-/// It is not used directly, but through a `DeploymentMethods`.
+/// It is not used directly, but through a `DeploymentMethods` instance.
 ///
 /// # Example
 ///
@@ -2357,7 +2404,7 @@ impl<'a, C, NC, A> DeploymentInsertCall<'a, C, NC, A> where NC: hyper::net::Netw
         for &field in ["alt", "projectId", "region"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -2414,7 +2461,7 @@ impl<'a, C, NC, A> DeploymentInsertCall<'a, C, NC, A> where NC: hyper::net::Netw
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -2430,7 +2477,6 @@ impl<'a, C, NC, A> DeploymentInsertCall<'a, C, NC, A> where NC: hyper::net::Netw
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -2440,7 +2486,7 @@ impl<'a, C, NC, A> DeploymentInsertCall<'a, C, NC, A> where NC: hyper::net::Netw
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -2451,7 +2497,7 @@ impl<'a, C, NC, A> DeploymentInsertCall<'a, C, NC, A> where NC: hyper::net::Netw
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -2460,13 +2506,13 @@ impl<'a, C, NC, A> DeploymentInsertCall<'a, C, NC, A> where NC: hyper::net::Netw
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -2556,7 +2602,7 @@ impl<'a, C, NC, A> DeploymentInsertCall<'a, C, NC, A> where NC: hyper::net::Netw
 /// 
 ///
 /// A builder for the *get* method supported by a *deployment* resource.
-/// It is not used directly, but through a `DeploymentMethods`.
+/// It is not used directly, but through a `DeploymentMethods` instance.
 ///
 /// # Example
 ///
@@ -2618,7 +2664,7 @@ impl<'a, C, NC, A> DeploymentGetCall<'a, C, NC, A> where NC: hyper::net::Network
         for &field in ["alt", "projectId", "region", "deploymentName"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -2671,7 +2717,7 @@ impl<'a, C, NC, A> DeploymentGetCall<'a, C, NC, A> where NC: hyper::net::Network
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -2683,7 +2729,6 @@ impl<'a, C, NC, A> DeploymentGetCall<'a, C, NC, A> where NC: hyper::net::Network
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -2693,7 +2738,7 @@ impl<'a, C, NC, A> DeploymentGetCall<'a, C, NC, A> where NC: hyper::net::Network
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -2704,7 +2749,7 @@ impl<'a, C, NC, A> DeploymentGetCall<'a, C, NC, A> where NC: hyper::net::Network
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -2713,13 +2758,13 @@ impl<'a, C, NC, A> DeploymentGetCall<'a, C, NC, A> where NC: hyper::net::Network
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -2809,7 +2854,7 @@ impl<'a, C, NC, A> DeploymentGetCall<'a, C, NC, A> where NC: hyper::net::Network
 /// 
 ///
 /// A builder for the *list* method supported by a *deployment* resource.
-/// It is not used directly, but through a `DeploymentMethods`.
+/// It is not used directly, but through a `DeploymentMethods` instance.
 ///
 /// # Example
 ///
@@ -2879,7 +2924,7 @@ impl<'a, C, NC, A> DeploymentListCall<'a, C, NC, A> where NC: hyper::net::Networ
         for &field in ["alt", "projectId", "region", "pageToken", "maxResults"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -2932,7 +2977,7 @@ impl<'a, C, NC, A> DeploymentListCall<'a, C, NC, A> where NC: hyper::net::Networ
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -2944,7 +2989,6 @@ impl<'a, C, NC, A> DeploymentListCall<'a, C, NC, A> where NC: hyper::net::Networ
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -2954,7 +2998,7 @@ impl<'a, C, NC, A> DeploymentListCall<'a, C, NC, A> where NC: hyper::net::Networ
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -2965,7 +3009,7 @@ impl<'a, C, NC, A> DeploymentListCall<'a, C, NC, A> where NC: hyper::net::Networ
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -2974,13 +3018,13 @@ impl<'a, C, NC, A> DeploymentListCall<'a, C, NC, A> where NC: hyper::net::Networ
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -3008,7 +3052,7 @@ impl<'a, C, NC, A> DeploymentListCall<'a, C, NC, A> where NC: hyper::net::Networ
     /// Sets the *page token* query property to the given value.
     ///
     /// 
-    /// Specifies a nextPageToken returned by a previous list request. This token can be used to request the next page of results from a previous list request.    
+    /// Specifies a nextPageToken returned by a previous list request. This token can be used to request the next page of results from a previous list request.
     pub fn page_token(mut self, new_value: &str) -> DeploymentListCall<'a, C, NC, A> {
         self._page_token = Some(new_value.to_string());
         self
@@ -3016,7 +3060,7 @@ impl<'a, C, NC, A> DeploymentListCall<'a, C, NC, A> where NC: hyper::net::Networ
     /// Sets the *max results* query property to the given value.
     ///
     /// 
-    /// Maximum count of results to be returned. Acceptable values are 0 to 100, inclusive. (Default: 50)    
+    /// Maximum count of results to be returned. Acceptable values are 0 to 100, inclusive. (Default: 50)
     pub fn max_results(mut self, new_value: i32) -> DeploymentListCall<'a, C, NC, A> {
         self._max_results = Some(new_value);
         self
@@ -3077,7 +3121,7 @@ impl<'a, C, NC, A> DeploymentListCall<'a, C, NC, A> where NC: hyper::net::Networ
 /// 
 ///
 /// A builder for the *delete* method supported by a *deployment* resource.
-/// It is not used directly, but through a `DeploymentMethods`.
+/// It is not used directly, but through a `DeploymentMethods` instance.
 ///
 /// # Example
 ///
@@ -3139,7 +3183,7 @@ impl<'a, C, NC, A> DeploymentDeleteCall<'a, C, NC, A> where NC: hyper::net::Netw
         for &field in ["projectId", "region", "deploymentName"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -3191,7 +3235,7 @@ impl<'a, C, NC, A> DeploymentDeleteCall<'a, C, NC, A> where NC: hyper::net::Netw
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -3203,7 +3247,6 @@ impl<'a, C, NC, A> DeploymentDeleteCall<'a, C, NC, A> where NC: hyper::net::Netw
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -3213,7 +3256,7 @@ impl<'a, C, NC, A> DeploymentDeleteCall<'a, C, NC, A> where NC: hyper::net::Netw
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -3224,12 +3267,12 @@ impl<'a, C, NC, A> DeploymentDeleteCall<'a, C, NC, A> where NC: hyper::net::Netw
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = res;
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }

@@ -1,8 +1,8 @@
 // DO NOT EDIT !
-// This file was generated automatically from 'src/mako/lib.rs.mako'
+// This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *prediction* crate version *0.1.1+20140522*, where *20140522* is the exact revision of the *prediction:v1.6* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.1*.
+//! This documentation was generated from *prediction* crate version *0.1.2+20140522*, where *20140522* is the exact revision of the *prediction:v1.6* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.2*.
 //! 
 //! Everything else about the *prediction* *v1d6* API can be found at the
 //! [official documentation site](https://developers.google.com/prediction/docs/developer-guide).
@@ -27,6 +27,8 @@
 //! 
 //! * **[Hub](struct.Prediction.html)**
 //!     * a central object to maintain state and allow accessing all *Activities*
+//!     * creates [*Method Builders*](trait.MethodsBuilder.html) which in turn
+//!       allow access to individual [*Call Builders*](trait.CallBuilder.html)
 //! * **[Resources](trait.Resource.html)**
 //!     * primary types that you can apply *Activities* to
 //!     * a collection of properties and *Parts*
@@ -35,6 +37,8 @@
 //!         * never directly used in *Activities*
 //! * **[Activities](trait.CallBuilder.html)**
 //!     * operations to apply to *Resources*
+//! 
+//! All *structures* are marked with applicable traits to further categorize them and ease browsing.
 //! 
 //! Generally speaking, you can invoke *Activities* like this:
 //! 
@@ -73,7 +77,7 @@
 //! extern crate "yup-oauth2" as oauth2;
 //! extern crate "google-prediction1d6" as prediction1d6;
 //! use prediction1d6::Update;
-//! use prediction1d6::Result;
+//! use prediction1d6::{Result, Error};
 //! # #[test] fn egal() {
 //! use std::default::Default;
 //! use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -103,15 +107,17 @@
 //!              .doit();
 //! 
 //! match result {
-//!     Result::HttpError(err) => println!("HTTPERROR: {:?}", err),
-//!     Result::MissingAPIKey => println!("Auth: Missing API Key - used if there are no scopes"),
-//!     Result::MissingToken => println!("OAuth2: Missing Token"),
-//!     Result::Cancelled => println!("Operation cancelled by user"),
-//!     Result::UploadSizeLimitExceeded(size, max_size) => println!("Upload size too big: {} of {}", size, max_size),
-//!     Result::Failure(_) => println!("General Failure (hyper::client::Response doesn't print)"),
-//!     Result::FieldClash(clashed_field) => println!("You added custom parameter which is part of builder: {:?}", clashed_field),
-//!     Result::JsonDecodeError(err) => println!("Couldn't understand server reply - maybe API needs update: {:?}", err),
-//!     Result::Success(_) => println!("Success (value doesn't print)"),
+//!     Err(e) => match e {
+//!         Error::HttpError(err) => println!("HTTPERROR: {:?}", err),
+//!         Error::MissingAPIKey => println!("Auth: Missing API Key - used if there are no scopes"),
+//!         Error::MissingToken => println!("OAuth2: Missing Token"),
+//!         Error::Cancelled => println!("Operation canceled by user"),
+//!         Error::UploadSizeLimitExceeded(size, max_size) => println!("Upload size too big: {} of {}", size, max_size),
+//!         Error::Failure(_) => println!("General Failure (hyper::client::Response doesn't print)"),
+//!         Error::FieldClash(clashed_field) => println!("You added custom parameter which is part of builder: {:?}", clashed_field),
+//!         Error::JsonDecodeError(err) => println!("Couldn't understand server reply - maybe API needs update: {:?}", err),
+//!     },
+//!     Ok(_) => println!("Success (value doesn't print)"),
 //! }
 //! # }
 //! ```
@@ -124,7 +130,7 @@
 //! When delegates handle errors or intermediate values, they may have a chance to instruct the system to retry. This 
 //! makes the system potentially resilient to all kinds of errors.
 //! 
-//! ## Uploads and Downlods
+//! ## Uploads and Downloads
 //! If a method supports downloads, the response body, which is part of the [Result](enum.Result.html), should be
 //! read by you to obtain the media.
 //! If such a method also supports a [Response Result](trait.ResponseResult.html), it will return that by default.
@@ -147,8 +153,9 @@
 //! ## Optional Parts in Server-Requests
 //! 
 //! All structures provided by this library are made to be [enocodable](trait.RequestValue.html) and 
-//! [decodable](trait.ResponseResult.html) via json. Optionals are used to indicate that partial requests are responses are valid.
-//! Most optionals are are considered [Parts](trait.Part.html) which are identifyable by name, which will be sent to 
+//! [decodable](trait.ResponseResult.html) via *json*. Optionals are used to indicate that partial requests are responses 
+//! are valid.
+//! Most optionals are are considered [Parts](trait.Part.html) which are identifiable by name, which will be sent to 
 //! the server to indicate either the set parts of the request or the desired parts in the response.
 //! 
 //! ## Builder Arguments
@@ -197,7 +204,7 @@ use std::io;
 use std::fs;
 use std::thread::sleep;
 
-pub use cmn::{MultiPartReader, ToParts, MethodInfo, Result, CallBuilder, Hub, ReadSeek, Part, ResponseResult, RequestValue, NestedType, Delegate, DefaultDelegate, ResourceMethodsBuilder, Resource, JsonServerError};
+pub use cmn::{MultiPartReader, ToParts, MethodInfo, Result, Error, CallBuilder, Hub, ReadSeek, Part, ResponseResult, RequestValue, NestedType, Delegate, DefaultDelegate, MethodsBuilder, Resource, JsonServerError};
 
 
 // ##############
@@ -256,7 +263,7 @@ impl Default for Scope {
 /// extern crate "yup-oauth2" as oauth2;
 /// extern crate "google-prediction1d6" as prediction1d6;
 /// use prediction1d6::Update;
-/// use prediction1d6::Result;
+/// use prediction1d6::{Result, Error};
 /// # #[test] fn egal() {
 /// use std::default::Default;
 /// use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -286,15 +293,17 @@ impl Default for Scope {
 ///              .doit();
 /// 
 /// match result {
-///     Result::HttpError(err) => println!("HTTPERROR: {:?}", err),
-///     Result::MissingAPIKey => println!("Auth: Missing API Key - used if there are no scopes"),
-///     Result::MissingToken => println!("OAuth2: Missing Token"),
-///     Result::Cancelled => println!("Operation cancelled by user"),
-///     Result::UploadSizeLimitExceeded(size, max_size) => println!("Upload size too big: {} of {}", size, max_size),
-///     Result::Failure(_) => println!("General Failure (hyper::client::Response doesn't print)"),
-///     Result::FieldClash(clashed_field) => println!("You added custom parameter which is part of builder: {:?}", clashed_field),
-///     Result::JsonDecodeError(err) => println!("Couldn't understand server reply - maybe API needs update: {:?}", err),
-///     Result::Success(_) => println!("Success (value doesn't print)"),
+///     Err(e) => match e {
+///         Error::HttpError(err) => println!("HTTPERROR: {:?}", err),
+///         Error::MissingAPIKey => println!("Auth: Missing API Key - used if there are no scopes"),
+///         Error::MissingToken => println!("OAuth2: Missing Token"),
+///         Error::Cancelled => println!("Operation canceled by user"),
+///         Error::UploadSizeLimitExceeded(size, max_size) => println!("Upload size too big: {} of {}", size, max_size),
+///         Error::Failure(_) => println!("General Failure (hyper::client::Response doesn't print)"),
+///         Error::FieldClash(clashed_field) => println!("You added custom parameter which is part of builder: {:?}", clashed_field),
+///         Error::JsonDecodeError(err) => println!("Couldn't understand server reply - maybe API needs update: {:?}", err),
+///     },
+///     Ok(_) => println!("Success (value doesn't print)"),
 /// }
 /// # }
 /// ```
@@ -315,7 +324,7 @@ impl<'a, C, NC, A> Prediction<C, NC, A>
         Prediction {
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/0.1.1".to_string(),
+            _user_agent: "google-api-rust-client/0.1.2".to_string(),
             _m: PhantomData
         }
     }
@@ -328,7 +337,7 @@ impl<'a, C, NC, A> Prediction<C, NC, A>
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/0.1.1`.
+    /// It defaults to `google-api-rust-client/0.1.2`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -348,9 +357,9 @@ impl<'a, C, NC, A> Prediction<C, NC, A>
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct AnalyzeDataDescriptionFeaturesCategoricalValues {
-    /// Number of times this feature had this value.    
+    /// Number of times this feature had this value.
     pub count: String,
-    /// The category name.    
+    /// The category name.
     pub value: String,
 }
 
@@ -369,27 +378,27 @@ impl Part for AnalyzeDataDescriptionFeaturesCategoricalValues {}
 /// 
 #[derive(Default, Clone, Debug, Serialize)]
 pub struct Insert {
-    /// Google storage location of the training data file.    
+    /// Google storage location of the training data file.
     #[serde(alias="storageDataLocation")]
     pub storage_data_location: Option<String>,
-    /// Type of predictive model (classification or regression).    
+    /// Type of predictive model (classification or regression).
     #[serde(alias="modelType")]
     pub model_type: Option<String>,
-    /// Google storage location of the pmml model file.    
+    /// Google storage location of the pmml model file.
     #[serde(alias="storagePMMLModelLocation")]
     pub storage_pmml_model_location: Option<String>,
-    /// The Id of the model to be copied over.    
+    /// The Id of the model to be copied over.
     #[serde(alias="sourceModel")]
     pub source_model: Option<String>,
-    /// Google storage location of the preprocessing pmml file.    
+    /// Google storage location of the preprocessing pmml file.
     #[serde(alias="storagePMMLLocation")]
     pub storage_pmml_location: Option<String>,
-    /// Instances to train model on.    
+    /// Instances to train model on.
     #[serde(alias="trainingInstances")]
     pub training_instances: Option<Vec<InsertTrainingInstances>>,
-    /// The unique name for the predictive model.    
+    /// The unique name for the predictive model.
     pub id: Option<String>,
-    /// A class weighting function, which allows the importance weights for class labels to be specified (Categorical models only).    
+    /// A class weighting function, which allows the importance weights for class labels to be specified (Categorical models only).
     pub utility: Option<Vec<HashMap<String, f64>>>,
 }
 
@@ -402,10 +411,10 @@ impl RequestValue for Insert {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct AnalyzeDataDescription {
-    /// Description of the output value or label.    
+    /// Description of the output value or label.
     #[serde(alias="outputFeature")]
     pub output_feature: AnalyzeDataDescriptionOutputFeature,
-    /// Description of the input features in the data set.    
+    /// Description of the input features in the data set.
     pub features: Vec<AnalyzeDataDescriptionFeatures>,
 }
 
@@ -419,11 +428,11 @@ impl Part for AnalyzeDataDescription {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct AnalyzeDataDescriptionFeaturesNumeric {
-    /// Number of numeric values for this feature in the data set.    
+    /// Number of numeric values for this feature in the data set.
     pub count: String,
-    /// Variance of the numeric values of this feature in the data set.    
+    /// Variance of the numeric values of this feature in the data set.
     pub variance: String,
-    /// Mean of the numeric values of this feature in the data set.    
+    /// Mean of the numeric values of this feature in the data set.
     pub mean: String,
 }
 
@@ -442,14 +451,14 @@ impl Part for AnalyzeDataDescriptionFeaturesNumeric {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct List {
-    /// Pagination token to fetch the next page, if one exists.    
+    /// Pagination token to fetch the next page, if one exists.
     #[serde(alias="nextPageToken")]
     pub next_page_token: String,
-    /// List of models.    
+    /// List of models.
     pub items: Vec<Insert2>,
-    /// What kind of resource this is.    
+    /// What kind of resource this is.
     pub kind: String,
-    /// A URL to re-request this resource.    
+    /// A URL to re-request this resource.
     #[serde(alias="selfLink")]
     pub self_link: String,
 }
@@ -463,7 +472,7 @@ impl ResponseResult for List {}
 /// 
 #[derive(Default, Clone, Debug, Serialize)]
 pub struct InputInput {
-    /// A list of input features, these can be strings or doubles.    
+    /// A list of input features, these can be strings or doubles.
     #[serde(alias="csvInstance")]
     pub csv_instance: Vec<String>,
 }
@@ -478,7 +487,7 @@ impl Part for InputInput {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct AnalyzeDataDescriptionFeaturesText {
-    /// Number of multiple-word text values for this feature.    
+    /// Number of multiple-word text values for this feature.
     pub count: String,
 }
 
@@ -492,13 +501,13 @@ impl Part for AnalyzeDataDescriptionFeaturesText {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct AnalyzeDataDescriptionFeatures {
-    /// The feature index.    
+    /// The feature index.
     pub index: String,
-    /// Description of the categorical values of this feature.    
+    /// Description of the categorical values of this feature.
     pub categorical: AnalyzeDataDescriptionFeaturesCategorical,
-    /// Description of the numeric values of this feature.    
+    /// Description of the numeric values of this feature.
     pub numeric: AnalyzeDataDescriptionFeaturesNumeric,
-    /// Description of multiple-word text values of this feature.    
+    /// Description of multiple-word text values of this feature.
     pub text: AnalyzeDataDescriptionFeaturesText,
 }
 
@@ -518,7 +527,7 @@ impl Part for AnalyzeDataDescriptionFeatures {}
 /// 
 #[derive(Default, Clone, Debug, Serialize)]
 pub struct Input {
-    /// Input to the model for a prediction.    
+    /// Input to the model for a prediction.
     pub input: Option<InputInput>,
 }
 
@@ -537,20 +546,20 @@ impl RequestValue for Input {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct Output {
-    /// What kind of resource this is.    
+    /// What kind of resource this is.
     pub kind: String,
-    /// A list of class labels with their estimated probabilities (Categorical models only).    
+    /// A list of class labels with their estimated probabilities (Categorical models only).
     #[serde(alias="outputMulti")]
     pub output_multi: Vec<OutputOutputMulti>,
-    /// The most likely class label (Categorical models only).    
+    /// The most likely class label (Categorical models only).
     #[serde(alias="outputLabel")]
     pub output_label: String,
-    /// The unique name for the predictive model.    
+    /// The unique name for the predictive model.
     pub id: String,
-    /// A URL to re-request this resource.    
+    /// A URL to re-request this resource.
     #[serde(alias="selfLink")]
     pub self_link: String,
-    /// The estimated regression value (Regression models only).    
+    /// The estimated regression value (Regression models only).
     #[serde(alias="outputValue")]
     pub output_value: f64,
 }
@@ -569,19 +578,19 @@ impl ResponseResult for Output {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct Analyze {
-    /// What kind of resource this is.    
+    /// What kind of resource this is.
     pub kind: String,
-    /// List of errors with the data.    
+    /// List of errors with the data.
     pub errors: Vec<HashMap<String, String>>,
-    /// Description of the data the model was trained on.    
+    /// Description of the data the model was trained on.
     #[serde(alias="dataDescription")]
     pub data_description: AnalyzeDataDescription,
-    /// Description of the model.    
+    /// Description of the model.
     #[serde(alias="modelDescription")]
     pub model_description: AnalyzeModelDescription,
-    /// The unique name for the predictive model.    
+    /// The unique name for the predictive model.
     pub id: String,
-    /// A URL to re-request this resource.    
+    /// A URL to re-request this resource.
     #[serde(alias="selfLink")]
     pub self_link: String,
 }
@@ -602,34 +611,34 @@ impl ResponseResult for Analyze {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct Insert2 {
-    /// What kind of resource this is.    
+    /// What kind of resource this is.
     pub kind: String,
-    /// Insert time of the model (as a RFC 3339 timestamp).    
+    /// Insert time of the model (as a RFC 3339 timestamp).
     pub created: String,
-    /// Google storage location of the preprocessing pmml file.    
+    /// Google storage location of the preprocessing pmml file.
     #[serde(alias="storagePMMLLocation")]
     pub storage_pmml_location: String,
-    /// Google storage location of the pmml model file.    
+    /// Google storage location of the pmml model file.
     #[serde(alias="storagePMMLModelLocation")]
     pub storage_pmml_model_location: String,
-    /// Type of predictive model (CLASSIFICATION or REGRESSION).    
+    /// Type of predictive model (CLASSIFICATION or REGRESSION).
     #[serde(alias="modelType")]
     pub model_type: String,
-    /// Google storage location of the training data file.    
+    /// Google storage location of the training data file.
     #[serde(alias="storageDataLocation")]
     pub storage_data_location: String,
-    /// A URL to re-request this resource.    
+    /// A URL to re-request this resource.
     #[serde(alias="selfLink")]
     pub self_link: String,
-    /// Model metadata.    
+    /// Model metadata.
     #[serde(alias="modelInfo")]
     pub model_info: Insert2ModelInfo,
-    /// Training completion time (as a RFC 3339 timestamp).    
+    /// Training completion time (as a RFC 3339 timestamp).
     #[serde(alias="trainingComplete")]
     pub training_complete: String,
-    /// The unique name for the predictive model.    
+    /// The unique name for the predictive model.
     pub id: String,
-    /// The current status of the training job. This can be one of following: RUNNING; DONE; ERROR; ERROR: TRAINING JOB NOT FOUND    
+    /// The current status of the training job. This can be one of following: RUNNING; DONE; ERROR; ERROR: TRAINING JOB NOT FOUND
     #[serde(alias="trainingStatus")]
     pub training_status: String,
 }
@@ -643,11 +652,11 @@ impl ResponseResult for Insert2 {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct AnalyzeDataDescriptionOutputFeatureNumeric {
-    /// Number of numeric output values in the data set.    
+    /// Number of numeric output values in the data set.
     pub count: String,
-    /// Variance of the output values in the data set.    
+    /// Variance of the output values in the data set.
     pub variance: String,
-    /// Mean of the output values in the data set.    
+    /// Mean of the output values in the data set.
     pub mean: String,
 }
 
@@ -661,9 +670,9 @@ impl Part for AnalyzeDataDescriptionOutputFeatureNumeric {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct AnalyzeDataDescriptionOutputFeature {
-    /// Description of the output labels in the data set.    
+    /// Description of the output labels in the data set.
     pub text: Vec<AnalyzeDataDescriptionOutputFeatureText>,
-    /// Description of the output values in the data set.    
+    /// Description of the output values in the data set.
     pub numeric: AnalyzeDataDescriptionOutputFeatureNumeric,
 }
 
@@ -677,13 +686,13 @@ impl Part for AnalyzeDataDescriptionOutputFeature {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct AnalyzeModelDescription {
-    /// An output confusion matrix. This shows an estimate for how this model will do in predictions. This is first indexed by the true class label. For each true class label, this provides a pair {predicted_label, count}, where count is the estimated number of times the model will predict the predicted label given the true label. Will not output if more then 100 classes (Categorical models only).    
+    /// An output confusion matrix. This shows an estimate for how this model will do in predictions. This is first indexed by the true class label. For each true class label, this provides a pair {predicted_label, count}, where count is the estimated number of times the model will predict the predicted label given the true label. Will not output if more then 100 classes (Categorical models only).
     #[serde(alias="confusionMatrix")]
     pub confusion_matrix: HashMap<String, HashMap<String, String>>,
-    /// A list of the confusion matrix row totals.    
+    /// A list of the confusion matrix row totals.
     #[serde(alias="confusionMatrixRowTotals")]
     pub confusion_matrix_row_totals: HashMap<String, String>,
-    /// Basic information about the model.    
+    /// Basic information about the model.
     pub modelinfo: Insert2,
 }
 
@@ -697,22 +706,22 @@ impl Part for AnalyzeModelDescription {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct Insert2ModelInfo {
-    /// Number of valid data instances used in the trained model.    
+    /// Number of valid data instances used in the trained model.
     #[serde(alias="numberInstances")]
     pub number_instances: String,
-    /// Estimated accuracy of model taking utility weights into account (Categorical models only).    
+    /// Estimated accuracy of model taking utility weights into account (Categorical models only).
     #[serde(alias="classWeightedAccuracy")]
     pub class_weighted_accuracy: String,
-    /// Number of class labels in the trained model (Categorical models only).    
+    /// Number of class labels in the trained model (Categorical models only).
     #[serde(alias="numberLabels")]
     pub number_labels: String,
-    /// A number between 0.0 and 1.0, where 1.0 is 100% accurate. This is an estimate, based on the amount and quality of the training data, of the estimated prediction accuracy. You can use this is a guide to decide whether the results are accurate enough for your needs. This estimate will be more reliable if your real input data is similar to your training data (Categorical models only).    
+    /// A number between 0.0 and 1.0, where 1.0 is 100% accurate. This is an estimate, based on the amount and quality of the training data, of the estimated prediction accuracy. You can use this is a guide to decide whether the results are accurate enough for your needs. This estimate will be more reliable if your real input data is similar to your training data (Categorical models only).
     #[serde(alias="classificationAccuracy")]
     pub classification_accuracy: String,
-    /// An estimated mean squared error. The can be used to measure the quality of the predicted model (Regression models only).    
+    /// An estimated mean squared error. The can be used to measure the quality of the predicted model (Regression models only).
     #[serde(alias="meanSquaredError")]
     pub mean_squared_error: String,
-    /// Type of predictive model (CLASSIFICATION or REGRESSION).    
+    /// Type of predictive model (CLASSIFICATION or REGRESSION).
     #[serde(alias="modelType")]
     pub model_type: String,
 }
@@ -727,9 +736,9 @@ impl Part for Insert2ModelInfo {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct AnalyzeDataDescriptionOutputFeatureText {
-    /// Number of times the output label occurred in the data set.    
+    /// Number of times the output label occurred in the data set.
     pub count: String,
-    /// The output label.    
+    /// The output label.
     pub value: String,
 }
 
@@ -743,9 +752,9 @@ impl Part for AnalyzeDataDescriptionOutputFeatureText {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct AnalyzeDataDescriptionFeaturesCategorical {
-    /// Number of categorical values for this feature in the data.    
+    /// Number of categorical values for this feature in the data.
     pub count: String,
-    /// List of all the categories for this feature in the data set.    
+    /// List of all the categories for this feature in the data set.
     pub values: Vec<AnalyzeDataDescriptionFeaturesCategoricalValues>,
 }
 
@@ -764,9 +773,9 @@ impl Part for AnalyzeDataDescriptionFeaturesCategorical {}
 /// 
 #[derive(Default, Clone, Debug, Serialize)]
 pub struct Update {
-    /// The generic output value - could be regression or class label.    
+    /// The generic output value - could be regression or class label.
     pub output: Option<String>,
-    /// The input features for this instance.    
+    /// The input features for this instance.
     #[serde(alias="csvInstance")]
     pub csv_instance: Option<Vec<String>>,
 }
@@ -780,9 +789,9 @@ impl RequestValue for Update {}
 /// 
 #[derive(Default, Clone, Debug, Serialize)]
 pub struct InsertTrainingInstances {
-    /// The generic output value - could be regression or class label.    
+    /// The generic output value - could be regression or class label.
     pub output: String,
-    /// The input features for this instance.    
+    /// The input features for this instance.
     #[serde(alias="csvInstance")]
     pub csv_instance: Vec<String>,
 }
@@ -797,9 +806,9 @@ impl Part for InsertTrainingInstances {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct OutputOutputMulti {
-    /// The probability of the class label.    
+    /// The probability of the class label.
     pub score: String,
-    /// The class label.    
+    /// The class label.
     pub label: String,
 }
 
@@ -846,13 +855,18 @@ pub struct TrainedmodelMethods<'a, C, NC, A>
     hub: &'a Prediction<C, NC, A>,
 }
 
-impl<'a, C, NC, A> ResourceMethodsBuilder for TrainedmodelMethods<'a, C, NC, A> {}
+impl<'a, C, NC, A> MethodsBuilder for TrainedmodelMethods<'a, C, NC, A> {}
 
 impl<'a, C, NC, A> TrainedmodelMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Check training status of your model.    
+    /// Check training status of your model.
+    /// 
+    /// # Arguments
+    ///
+    /// * `project` - The project associated with the model.
+    /// * `id` - The unique name for the predictive model.
     pub fn get(&self, project: &str, id: &str) -> TrainedmodelGetCall<'a, C, NC, A> {
         TrainedmodelGetCall {
             hub: self.hub,
@@ -866,7 +880,13 @@ impl<'a, C, NC, A> TrainedmodelMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Add new data to a trained model.    
+    /// Add new data to a trained model.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `project` - The project associated with the model.
+    /// * `id` - The unique name for the predictive model.
     pub fn update(&self, request: &Update, project: &str, id: &str) -> TrainedmodelUpdateCall<'a, C, NC, A> {
         TrainedmodelUpdateCall {
             hub: self.hub,
@@ -881,7 +901,11 @@ impl<'a, C, NC, A> TrainedmodelMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// List available models.    
+    /// List available models.
+    /// 
+    /// # Arguments
+    ///
+    /// * `project` - The project associated with the model.
     pub fn list(&self, project: &str) -> TrainedmodelListCall<'a, C, NC, A> {
         TrainedmodelListCall {
             hub: self.hub,
@@ -896,7 +920,12 @@ impl<'a, C, NC, A> TrainedmodelMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Delete a trained model.    
+    /// Delete a trained model.
+    /// 
+    /// # Arguments
+    ///
+    /// * `project` - The project associated with the model.
+    /// * `id` - The unique name for the predictive model.
     pub fn delete(&self, project: &str, id: &str) -> TrainedmodelDeleteCall<'a, C, NC, A> {
         TrainedmodelDeleteCall {
             hub: self.hub,
@@ -910,7 +939,12 @@ impl<'a, C, NC, A> TrainedmodelMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Train a Prediction API model.    
+    /// Train a Prediction API model.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `project` - The project associated with the model.
     pub fn insert(&self, request: &Insert, project: &str) -> TrainedmodelInsertCall<'a, C, NC, A> {
         TrainedmodelInsertCall {
             hub: self.hub,
@@ -924,7 +958,12 @@ impl<'a, C, NC, A> TrainedmodelMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Get analysis of the model and the data the model was trained on.    
+    /// Get analysis of the model and the data the model was trained on.
+    /// 
+    /// # Arguments
+    ///
+    /// * `project` - The project associated with the model.
+    /// * `id` - The unique name for the predictive model.
     pub fn analyze(&self, project: &str, id: &str) -> TrainedmodelAnalyzeCall<'a, C, NC, A> {
         TrainedmodelAnalyzeCall {
             hub: self.hub,
@@ -938,7 +977,13 @@ impl<'a, C, NC, A> TrainedmodelMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Submit model id and request a prediction.    
+    /// Submit model id and request a prediction.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `project` - The project associated with the model.
+    /// * `id` - The unique name for the predictive model.
     pub fn predict(&self, request: &Input, project: &str, id: &str) -> TrainedmodelPredictCall<'a, C, NC, A> {
         TrainedmodelPredictCall {
             hub: self.hub,
@@ -988,13 +1033,19 @@ pub struct HostedmodelMethods<'a, C, NC, A>
     hub: &'a Prediction<C, NC, A>,
 }
 
-impl<'a, C, NC, A> ResourceMethodsBuilder for HostedmodelMethods<'a, C, NC, A> {}
+impl<'a, C, NC, A> MethodsBuilder for HostedmodelMethods<'a, C, NC, A> {}
 
 impl<'a, C, NC, A> HostedmodelMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Submit input and request an output against a hosted model.    
+    /// Submit input and request an output against a hosted model.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `project` - The project associated with the model.
+    /// * `hostedModelName` - The name of a hosted model.
     pub fn predict(&self, request: &Input, project: &str, hosted_model_name: &str) -> HostedmodelPredictCall<'a, C, NC, A> {
         HostedmodelPredictCall {
             hub: self.hub,
@@ -1019,7 +1070,7 @@ impl<'a, C, NC, A> HostedmodelMethods<'a, C, NC, A> {
 /// Check training status of your model.
 ///
 /// A builder for the *get* method supported by a *trainedmodel* resource.
-/// It is not used directly, but through a `TrainedmodelMethods`.
+/// It is not used directly, but through a `TrainedmodelMethods` instance.
 ///
 /// # Example
 ///
@@ -1079,7 +1130,7 @@ impl<'a, C, NC, A> TrainedmodelGetCall<'a, C, NC, A> where NC: hyper::net::Netwo
         for &field in ["alt", "project", "id"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -1132,7 +1183,7 @@ impl<'a, C, NC, A> TrainedmodelGetCall<'a, C, NC, A> where NC: hyper::net::Netwo
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -1144,7 +1195,6 @@ impl<'a, C, NC, A> TrainedmodelGetCall<'a, C, NC, A> where NC: hyper::net::Netwo
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -1154,7 +1204,7 @@ impl<'a, C, NC, A> TrainedmodelGetCall<'a, C, NC, A> where NC: hyper::net::Netwo
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -1165,7 +1215,7 @@ impl<'a, C, NC, A> TrainedmodelGetCall<'a, C, NC, A> where NC: hyper::net::Netwo
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -1174,13 +1224,13 @@ impl<'a, C, NC, A> TrainedmodelGetCall<'a, C, NC, A> where NC: hyper::net::Netwo
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -1192,7 +1242,7 @@ impl<'a, C, NC, A> TrainedmodelGetCall<'a, C, NC, A> where NC: hyper::net::Netwo
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The project associated with the model.    
+    /// The project associated with the model.
     pub fn project(mut self, new_value: &str) -> TrainedmodelGetCall<'a, C, NC, A> {
         self._project = new_value.to_string();
         self
@@ -1202,7 +1252,7 @@ impl<'a, C, NC, A> TrainedmodelGetCall<'a, C, NC, A> where NC: hyper::net::Netwo
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The unique name for the predictive model.    
+    /// The unique name for the predictive model.
     pub fn id(mut self, new_value: &str) -> TrainedmodelGetCall<'a, C, NC, A> {
         self._id = new_value.to_string();
         self
@@ -1263,7 +1313,7 @@ impl<'a, C, NC, A> TrainedmodelGetCall<'a, C, NC, A> where NC: hyper::net::Netwo
 /// Add new data to a trained model.
 ///
 /// A builder for the *update* method supported by a *trainedmodel* resource.
-/// It is not used directly, but through a `TrainedmodelMethods`.
+/// It is not used directly, but through a `TrainedmodelMethods` instance.
 ///
 /// # Example
 ///
@@ -1330,7 +1380,7 @@ impl<'a, C, NC, A> TrainedmodelUpdateCall<'a, C, NC, A> where NC: hyper::net::Ne
         for &field in ["alt", "project", "id"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -1387,7 +1437,7 @@ impl<'a, C, NC, A> TrainedmodelUpdateCall<'a, C, NC, A> where NC: hyper::net::Ne
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -1403,7 +1453,6 @@ impl<'a, C, NC, A> TrainedmodelUpdateCall<'a, C, NC, A> where NC: hyper::net::Ne
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -1413,7 +1462,7 @@ impl<'a, C, NC, A> TrainedmodelUpdateCall<'a, C, NC, A> where NC: hyper::net::Ne
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -1424,7 +1473,7 @@ impl<'a, C, NC, A> TrainedmodelUpdateCall<'a, C, NC, A> where NC: hyper::net::Ne
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -1433,13 +1482,13 @@ impl<'a, C, NC, A> TrainedmodelUpdateCall<'a, C, NC, A> where NC: hyper::net::Ne
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -1460,7 +1509,7 @@ impl<'a, C, NC, A> TrainedmodelUpdateCall<'a, C, NC, A> where NC: hyper::net::Ne
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The project associated with the model.    
+    /// The project associated with the model.
     pub fn project(mut self, new_value: &str) -> TrainedmodelUpdateCall<'a, C, NC, A> {
         self._project = new_value.to_string();
         self
@@ -1470,7 +1519,7 @@ impl<'a, C, NC, A> TrainedmodelUpdateCall<'a, C, NC, A> where NC: hyper::net::Ne
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The unique name for the predictive model.    
+    /// The unique name for the predictive model.
     pub fn id(mut self, new_value: &str) -> TrainedmodelUpdateCall<'a, C, NC, A> {
         self._id = new_value.to_string();
         self
@@ -1531,7 +1580,7 @@ impl<'a, C, NC, A> TrainedmodelUpdateCall<'a, C, NC, A> where NC: hyper::net::Ne
 /// List available models.
 ///
 /// A builder for the *list* method supported by a *trainedmodel* resource.
-/// It is not used directly, but through a `TrainedmodelMethods`.
+/// It is not used directly, but through a `TrainedmodelMethods` instance.
 ///
 /// # Example
 ///
@@ -1599,7 +1648,7 @@ impl<'a, C, NC, A> TrainedmodelListCall<'a, C, NC, A> where NC: hyper::net::Netw
         for &field in ["alt", "project", "pageToken", "maxResults"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -1652,7 +1701,7 @@ impl<'a, C, NC, A> TrainedmodelListCall<'a, C, NC, A> where NC: hyper::net::Netw
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -1664,7 +1713,6 @@ impl<'a, C, NC, A> TrainedmodelListCall<'a, C, NC, A> where NC: hyper::net::Netw
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -1674,7 +1722,7 @@ impl<'a, C, NC, A> TrainedmodelListCall<'a, C, NC, A> where NC: hyper::net::Netw
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -1685,7 +1733,7 @@ impl<'a, C, NC, A> TrainedmodelListCall<'a, C, NC, A> where NC: hyper::net::Netw
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -1694,13 +1742,13 @@ impl<'a, C, NC, A> TrainedmodelListCall<'a, C, NC, A> where NC: hyper::net::Netw
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -1712,7 +1760,7 @@ impl<'a, C, NC, A> TrainedmodelListCall<'a, C, NC, A> where NC: hyper::net::Netw
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The project associated with the model.    
+    /// The project associated with the model.
     pub fn project(mut self, new_value: &str) -> TrainedmodelListCall<'a, C, NC, A> {
         self._project = new_value.to_string();
         self
@@ -1720,7 +1768,7 @@ impl<'a, C, NC, A> TrainedmodelListCall<'a, C, NC, A> where NC: hyper::net::Netw
     /// Sets the *page token* query property to the given value.
     ///
     /// 
-    /// Pagination token.    
+    /// Pagination token.
     pub fn page_token(mut self, new_value: &str) -> TrainedmodelListCall<'a, C, NC, A> {
         self._page_token = Some(new_value.to_string());
         self
@@ -1728,7 +1776,7 @@ impl<'a, C, NC, A> TrainedmodelListCall<'a, C, NC, A> where NC: hyper::net::Netw
     /// Sets the *max results* query property to the given value.
     ///
     /// 
-    /// Maximum number of results to return.    
+    /// Maximum number of results to return.
     pub fn max_results(mut self, new_value: u32) -> TrainedmodelListCall<'a, C, NC, A> {
         self._max_results = Some(new_value);
         self
@@ -1789,7 +1837,7 @@ impl<'a, C, NC, A> TrainedmodelListCall<'a, C, NC, A> where NC: hyper::net::Netw
 /// Delete a trained model.
 ///
 /// A builder for the *delete* method supported by a *trainedmodel* resource.
-/// It is not used directly, but through a `TrainedmodelMethods`.
+/// It is not used directly, but through a `TrainedmodelMethods` instance.
 ///
 /// # Example
 ///
@@ -1849,7 +1897,7 @@ impl<'a, C, NC, A> TrainedmodelDeleteCall<'a, C, NC, A> where NC: hyper::net::Ne
         for &field in ["project", "id"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -1901,7 +1949,7 @@ impl<'a, C, NC, A> TrainedmodelDeleteCall<'a, C, NC, A> where NC: hyper::net::Ne
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -1913,7 +1961,6 @@ impl<'a, C, NC, A> TrainedmodelDeleteCall<'a, C, NC, A> where NC: hyper::net::Ne
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -1923,7 +1970,7 @@ impl<'a, C, NC, A> TrainedmodelDeleteCall<'a, C, NC, A> where NC: hyper::net::Ne
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -1934,12 +1981,12 @@ impl<'a, C, NC, A> TrainedmodelDeleteCall<'a, C, NC, A> where NC: hyper::net::Ne
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = res;
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -1951,7 +1998,7 @@ impl<'a, C, NC, A> TrainedmodelDeleteCall<'a, C, NC, A> where NC: hyper::net::Ne
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The project associated with the model.    
+    /// The project associated with the model.
     pub fn project(mut self, new_value: &str) -> TrainedmodelDeleteCall<'a, C, NC, A> {
         self._project = new_value.to_string();
         self
@@ -1961,7 +2008,7 @@ impl<'a, C, NC, A> TrainedmodelDeleteCall<'a, C, NC, A> where NC: hyper::net::Ne
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The unique name for the predictive model.    
+    /// The unique name for the predictive model.
     pub fn id(mut self, new_value: &str) -> TrainedmodelDeleteCall<'a, C, NC, A> {
         self._id = new_value.to_string();
         self
@@ -2022,7 +2069,7 @@ impl<'a, C, NC, A> TrainedmodelDeleteCall<'a, C, NC, A> where NC: hyper::net::Ne
 /// Train a Prediction API model.
 ///
 /// A builder for the *insert* method supported by a *trainedmodel* resource.
-/// It is not used directly, but through a `TrainedmodelMethods`.
+/// It is not used directly, but through a `TrainedmodelMethods` instance.
 ///
 /// # Example
 ///
@@ -2087,7 +2134,7 @@ impl<'a, C, NC, A> TrainedmodelInsertCall<'a, C, NC, A> where NC: hyper::net::Ne
         for &field in ["alt", "project"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -2144,7 +2191,7 @@ impl<'a, C, NC, A> TrainedmodelInsertCall<'a, C, NC, A> where NC: hyper::net::Ne
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -2160,7 +2207,6 @@ impl<'a, C, NC, A> TrainedmodelInsertCall<'a, C, NC, A> where NC: hyper::net::Ne
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -2170,7 +2216,7 @@ impl<'a, C, NC, A> TrainedmodelInsertCall<'a, C, NC, A> where NC: hyper::net::Ne
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -2181,7 +2227,7 @@ impl<'a, C, NC, A> TrainedmodelInsertCall<'a, C, NC, A> where NC: hyper::net::Ne
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -2190,13 +2236,13 @@ impl<'a, C, NC, A> TrainedmodelInsertCall<'a, C, NC, A> where NC: hyper::net::Ne
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -2217,7 +2263,7 @@ impl<'a, C, NC, A> TrainedmodelInsertCall<'a, C, NC, A> where NC: hyper::net::Ne
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The project associated with the model.    
+    /// The project associated with the model.
     pub fn project(mut self, new_value: &str) -> TrainedmodelInsertCall<'a, C, NC, A> {
         self._project = new_value.to_string();
         self
@@ -2278,7 +2324,7 @@ impl<'a, C, NC, A> TrainedmodelInsertCall<'a, C, NC, A> where NC: hyper::net::Ne
 /// Get analysis of the model and the data the model was trained on.
 ///
 /// A builder for the *analyze* method supported by a *trainedmodel* resource.
-/// It is not used directly, but through a `TrainedmodelMethods`.
+/// It is not used directly, but through a `TrainedmodelMethods` instance.
 ///
 /// # Example
 ///
@@ -2338,7 +2384,7 @@ impl<'a, C, NC, A> TrainedmodelAnalyzeCall<'a, C, NC, A> where NC: hyper::net::N
         for &field in ["alt", "project", "id"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -2391,7 +2437,7 @@ impl<'a, C, NC, A> TrainedmodelAnalyzeCall<'a, C, NC, A> where NC: hyper::net::N
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -2403,7 +2449,6 @@ impl<'a, C, NC, A> TrainedmodelAnalyzeCall<'a, C, NC, A> where NC: hyper::net::N
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -2413,7 +2458,7 @@ impl<'a, C, NC, A> TrainedmodelAnalyzeCall<'a, C, NC, A> where NC: hyper::net::N
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -2424,7 +2469,7 @@ impl<'a, C, NC, A> TrainedmodelAnalyzeCall<'a, C, NC, A> where NC: hyper::net::N
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -2433,13 +2478,13 @@ impl<'a, C, NC, A> TrainedmodelAnalyzeCall<'a, C, NC, A> where NC: hyper::net::N
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -2451,7 +2496,7 @@ impl<'a, C, NC, A> TrainedmodelAnalyzeCall<'a, C, NC, A> where NC: hyper::net::N
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The project associated with the model.    
+    /// The project associated with the model.
     pub fn project(mut self, new_value: &str) -> TrainedmodelAnalyzeCall<'a, C, NC, A> {
         self._project = new_value.to_string();
         self
@@ -2461,7 +2506,7 @@ impl<'a, C, NC, A> TrainedmodelAnalyzeCall<'a, C, NC, A> where NC: hyper::net::N
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The unique name for the predictive model.    
+    /// The unique name for the predictive model.
     pub fn id(mut self, new_value: &str) -> TrainedmodelAnalyzeCall<'a, C, NC, A> {
         self._id = new_value.to_string();
         self
@@ -2522,7 +2567,7 @@ impl<'a, C, NC, A> TrainedmodelAnalyzeCall<'a, C, NC, A> where NC: hyper::net::N
 /// Submit model id and request a prediction.
 ///
 /// A builder for the *predict* method supported by a *trainedmodel* resource.
-/// It is not used directly, but through a `TrainedmodelMethods`.
+/// It is not used directly, but through a `TrainedmodelMethods` instance.
 ///
 /// # Example
 ///
@@ -2589,7 +2634,7 @@ impl<'a, C, NC, A> TrainedmodelPredictCall<'a, C, NC, A> where NC: hyper::net::N
         for &field in ["alt", "project", "id"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -2646,7 +2691,7 @@ impl<'a, C, NC, A> TrainedmodelPredictCall<'a, C, NC, A> where NC: hyper::net::N
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -2662,7 +2707,6 @@ impl<'a, C, NC, A> TrainedmodelPredictCall<'a, C, NC, A> where NC: hyper::net::N
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -2672,7 +2716,7 @@ impl<'a, C, NC, A> TrainedmodelPredictCall<'a, C, NC, A> where NC: hyper::net::N
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -2683,7 +2727,7 @@ impl<'a, C, NC, A> TrainedmodelPredictCall<'a, C, NC, A> where NC: hyper::net::N
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -2692,13 +2736,13 @@ impl<'a, C, NC, A> TrainedmodelPredictCall<'a, C, NC, A> where NC: hyper::net::N
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -2719,7 +2763,7 @@ impl<'a, C, NC, A> TrainedmodelPredictCall<'a, C, NC, A> where NC: hyper::net::N
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The project associated with the model.    
+    /// The project associated with the model.
     pub fn project(mut self, new_value: &str) -> TrainedmodelPredictCall<'a, C, NC, A> {
         self._project = new_value.to_string();
         self
@@ -2729,7 +2773,7 @@ impl<'a, C, NC, A> TrainedmodelPredictCall<'a, C, NC, A> where NC: hyper::net::N
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The unique name for the predictive model.    
+    /// The unique name for the predictive model.
     pub fn id(mut self, new_value: &str) -> TrainedmodelPredictCall<'a, C, NC, A> {
         self._id = new_value.to_string();
         self
@@ -2790,7 +2834,7 @@ impl<'a, C, NC, A> TrainedmodelPredictCall<'a, C, NC, A> where NC: hyper::net::N
 /// Submit input and request an output against a hosted model.
 ///
 /// A builder for the *predict* method supported by a *hostedmodel* resource.
-/// It is not used directly, but through a `HostedmodelMethods`.
+/// It is not used directly, but through a `HostedmodelMethods` instance.
 ///
 /// # Example
 ///
@@ -2857,7 +2901,7 @@ impl<'a, C, NC, A> HostedmodelPredictCall<'a, C, NC, A> where NC: hyper::net::Ne
         for &field in ["alt", "project", "hostedModelName"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -2914,7 +2958,7 @@ impl<'a, C, NC, A> HostedmodelPredictCall<'a, C, NC, A> where NC: hyper::net::Ne
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -2930,7 +2974,6 @@ impl<'a, C, NC, A> HostedmodelPredictCall<'a, C, NC, A> where NC: hyper::net::Ne
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -2940,7 +2983,7 @@ impl<'a, C, NC, A> HostedmodelPredictCall<'a, C, NC, A> where NC: hyper::net::Ne
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -2951,7 +2994,7 @@ impl<'a, C, NC, A> HostedmodelPredictCall<'a, C, NC, A> where NC: hyper::net::Ne
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -2960,13 +3003,13 @@ impl<'a, C, NC, A> HostedmodelPredictCall<'a, C, NC, A> where NC: hyper::net::Ne
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -2987,7 +3030,7 @@ impl<'a, C, NC, A> HostedmodelPredictCall<'a, C, NC, A> where NC: hyper::net::Ne
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The project associated with the model.    
+    /// The project associated with the model.
     pub fn project(mut self, new_value: &str) -> HostedmodelPredictCall<'a, C, NC, A> {
         self._project = new_value.to_string();
         self
@@ -2997,7 +3040,7 @@ impl<'a, C, NC, A> HostedmodelPredictCall<'a, C, NC, A> where NC: hyper::net::Ne
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The name of a hosted model.    
+    /// The name of a hosted model.
     pub fn hosted_model_name(mut self, new_value: &str) -> HostedmodelPredictCall<'a, C, NC, A> {
         self._hosted_model_name = new_value.to_string();
         self

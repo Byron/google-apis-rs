@@ -1,8 +1,8 @@
 // DO NOT EDIT !
-// This file was generated automatically from 'src/mako/lib.rs.mako'
+// This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *urlshortener* crate version *0.1.1+20150219*, where *20150219* is the exact revision of the *urlshortener:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.1*.
+//! This documentation was generated from *urlshortener* crate version *0.1.2+20150219*, where *20150219* is the exact revision of the *urlshortener:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.2*.
 //! 
 //! Everything else about the *urlshortener* *v1* API can be found at the
 //! [official documentation site](https://developers.google.com/url-shortener/v1/getting_started).
@@ -25,6 +25,8 @@
 //! 
 //! * **[Hub](struct.Urlshortener.html)**
 //!     * a central object to maintain state and allow accessing all *Activities*
+//!     * creates [*Method Builders*](trait.MethodsBuilder.html) which in turn
+//!       allow access to individual [*Call Builders*](trait.CallBuilder.html)
 //! * **[Resources](trait.Resource.html)**
 //!     * primary types that you can apply *Activities* to
 //!     * a collection of properties and *Parts*
@@ -33,6 +35,8 @@
 //!         * never directly used in *Activities*
 //! * **[Activities](trait.CallBuilder.html)**
 //!     * operations to apply to *Resources*
+//! 
+//! All *structures* are marked with applicable traits to further categorize them and ease browsing.
 //! 
 //! Generally speaking, you can invoke *Activities* like this:
 //! 
@@ -69,7 +73,7 @@
 //! extern crate hyper;
 //! extern crate "yup-oauth2" as oauth2;
 //! extern crate "google-urlshortener1" as urlshortener1;
-//! use urlshortener1::Result;
+//! use urlshortener1::{Result, Error};
 //! # #[test] fn egal() {
 //! use std::default::Default;
 //! use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -95,15 +99,17 @@
 //!              .doit();
 //! 
 //! match result {
-//!     Result::HttpError(err) => println!("HTTPERROR: {:?}", err),
-//!     Result::MissingAPIKey => println!("Auth: Missing API Key - used if there are no scopes"),
-//!     Result::MissingToken => println!("OAuth2: Missing Token"),
-//!     Result::Cancelled => println!("Operation cancelled by user"),
-//!     Result::UploadSizeLimitExceeded(size, max_size) => println!("Upload size too big: {} of {}", size, max_size),
-//!     Result::Failure(_) => println!("General Failure (hyper::client::Response doesn't print)"),
-//!     Result::FieldClash(clashed_field) => println!("You added custom parameter which is part of builder: {:?}", clashed_field),
-//!     Result::JsonDecodeError(err) => println!("Couldn't understand server reply - maybe API needs update: {:?}", err),
-//!     Result::Success(_) => println!("Success (value doesn't print)"),
+//!     Err(e) => match e {
+//!         Error::HttpError(err) => println!("HTTPERROR: {:?}", err),
+//!         Error::MissingAPIKey => println!("Auth: Missing API Key - used if there are no scopes"),
+//!         Error::MissingToken => println!("OAuth2: Missing Token"),
+//!         Error::Cancelled => println!("Operation canceled by user"),
+//!         Error::UploadSizeLimitExceeded(size, max_size) => println!("Upload size too big: {} of {}", size, max_size),
+//!         Error::Failure(_) => println!("General Failure (hyper::client::Response doesn't print)"),
+//!         Error::FieldClash(clashed_field) => println!("You added custom parameter which is part of builder: {:?}", clashed_field),
+//!         Error::JsonDecodeError(err) => println!("Couldn't understand server reply - maybe API needs update: {:?}", err),
+//!     },
+//!     Ok(_) => println!("Success (value doesn't print)"),
 //! }
 //! # }
 //! ```
@@ -116,7 +122,7 @@
 //! When delegates handle errors or intermediate values, they may have a chance to instruct the system to retry. This 
 //! makes the system potentially resilient to all kinds of errors.
 //! 
-//! ## Uploads and Downlods
+//! ## Uploads and Downloads
 //! If a method supports downloads, the response body, which is part of the [Result](enum.Result.html), should be
 //! read by you to obtain the media.
 //! If such a method also supports a [Response Result](trait.ResponseResult.html), it will return that by default.
@@ -139,8 +145,9 @@
 //! ## Optional Parts in Server-Requests
 //! 
 //! All structures provided by this library are made to be [enocodable](trait.RequestValue.html) and 
-//! [decodable](trait.ResponseResult.html) via json. Optionals are used to indicate that partial requests are responses are valid.
-//! Most optionals are are considered [Parts](trait.Part.html) which are identifyable by name, which will be sent to 
+//! [decodable](trait.ResponseResult.html) via *json*. Optionals are used to indicate that partial requests are responses 
+//! are valid.
+//! Most optionals are are considered [Parts](trait.Part.html) which are identifiable by name, which will be sent to 
 //! the server to indicate either the set parts of the request or the desired parts in the response.
 //! 
 //! ## Builder Arguments
@@ -189,7 +196,7 @@ use std::io;
 use std::fs;
 use std::thread::sleep;
 
-pub use cmn::{MultiPartReader, ToParts, MethodInfo, Result, CallBuilder, Hub, ReadSeek, Part, ResponseResult, RequestValue, NestedType, Delegate, DefaultDelegate, ResourceMethodsBuilder, Resource, JsonServerError};
+pub use cmn::{MultiPartReader, ToParts, MethodInfo, Result, Error, CallBuilder, Hub, ReadSeek, Part, ResponseResult, RequestValue, NestedType, Delegate, DefaultDelegate, MethodsBuilder, Resource, JsonServerError};
 
 
 // ##############
@@ -235,7 +242,7 @@ impl Default for Scope {
 /// extern crate hyper;
 /// extern crate "yup-oauth2" as oauth2;
 /// extern crate "google-urlshortener1" as urlshortener1;
-/// use urlshortener1::Result;
+/// use urlshortener1::{Result, Error};
 /// # #[test] fn egal() {
 /// use std::default::Default;
 /// use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -261,15 +268,17 @@ impl Default for Scope {
 ///              .doit();
 /// 
 /// match result {
-///     Result::HttpError(err) => println!("HTTPERROR: {:?}", err),
-///     Result::MissingAPIKey => println!("Auth: Missing API Key - used if there are no scopes"),
-///     Result::MissingToken => println!("OAuth2: Missing Token"),
-///     Result::Cancelled => println!("Operation cancelled by user"),
-///     Result::UploadSizeLimitExceeded(size, max_size) => println!("Upload size too big: {} of {}", size, max_size),
-///     Result::Failure(_) => println!("General Failure (hyper::client::Response doesn't print)"),
-///     Result::FieldClash(clashed_field) => println!("You added custom parameter which is part of builder: {:?}", clashed_field),
-///     Result::JsonDecodeError(err) => println!("Couldn't understand server reply - maybe API needs update: {:?}", err),
-///     Result::Success(_) => println!("Success (value doesn't print)"),
+///     Err(e) => match e {
+///         Error::HttpError(err) => println!("HTTPERROR: {:?}", err),
+///         Error::MissingAPIKey => println!("Auth: Missing API Key - used if there are no scopes"),
+///         Error::MissingToken => println!("OAuth2: Missing Token"),
+///         Error::Cancelled => println!("Operation canceled by user"),
+///         Error::UploadSizeLimitExceeded(size, max_size) => println!("Upload size too big: {} of {}", size, max_size),
+///         Error::Failure(_) => println!("General Failure (hyper::client::Response doesn't print)"),
+///         Error::FieldClash(clashed_field) => println!("You added custom parameter which is part of builder: {:?}", clashed_field),
+///         Error::JsonDecodeError(err) => println!("Couldn't understand server reply - maybe API needs update: {:?}", err),
+///     },
+///     Ok(_) => println!("Success (value doesn't print)"),
 /// }
 /// # }
 /// ```
@@ -290,7 +299,7 @@ impl<'a, C, NC, A> Urlshortener<C, NC, A>
         Urlshortener {
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/0.1.1".to_string(),
+            _user_agent: "google-api-rust-client/0.1.2".to_string(),
             _m: PhantomData
         }
     }
@@ -300,7 +309,7 @@ impl<'a, C, NC, A> Urlshortener<C, NC, A>
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/0.1.1`.
+    /// It defaults to `google-api-rust-client/0.1.2`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -320,17 +329,17 @@ impl<'a, C, NC, A> Urlshortener<C, NC, A>
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct AnalyticsSummary {
-    /// Click analytics over the last week.    
+    /// Click analytics over the last week.
     pub week: AnalyticsSnapshot,
-    /// Click analytics over all time.    
+    /// Click analytics over all time.
     #[serde(alias="allTime")]
     pub all_time: AnalyticsSnapshot,
-    /// Click analytics over the last two hours.    
+    /// Click analytics over the last two hours.
     #[serde(alias="twoHours")]
     pub two_hours: AnalyticsSnapshot,
-    /// Click analytics over the last day.    
+    /// Click analytics over the last day.
     pub day: AnalyticsSnapshot,
-    /// Click analytics over the last month.    
+    /// Click analytics over the last month.
     pub month: AnalyticsSnapshot,
 }
 
@@ -349,18 +358,18 @@ impl Part for AnalyticsSummary {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Url {
-    /// Status of the target URL. Possible values: "OK", "MALWARE", "PHISHING", or "REMOVED". A URL might be marked "REMOVED" if it was flagged as spam, for example.    
+    /// Status of the target URL. Possible values: "OK", "MALWARE", "PHISHING", or "REMOVED". A URL might be marked "REMOVED" if it was flagged as spam, for example.
     pub status: Option<String>,
-    /// A summary of the click analytics for the short and long URL. Might not be present if not requested or currently unavailable.    
+    /// A summary of the click analytics for the short and long URL. Might not be present if not requested or currently unavailable.
     pub analytics: Option<AnalyticsSummary>,
-    /// The fixed string "urlshortener#url".    
+    /// The fixed string "urlshortener#url".
     pub kind: Option<String>,
-    /// Time the short URL was created; ISO 8601 representation using the yyyy-MM-dd'T'HH:mm:ss.SSSZZ format, e.g. "2010-10-14T19:01:24.944+00:00".    
+    /// Time the short URL was created; ISO 8601 representation using the yyyy-MM-dd'T'HH:mm:ss.SSSZZ format, e.g. "2010-10-14T19:01:24.944+00:00".
     pub created: Option<String>,
-    /// Long URL, e.g. "http://www.google.com/". Might not be present if the status is "REMOVED".    
+    /// Long URL, e.g. "http://www.google.com/". Might not be present if the status is "REMOVED".
     #[serde(alias="longUrl")]
     pub long_url: Option<String>,
-    /// Short URL, e.g. "http://goo.gl/l6MS".    
+    /// Short URL, e.g. "http://goo.gl/l6MS".
     pub id: Option<String>,
 }
 
@@ -379,17 +388,17 @@ impl ResponseResult for Url {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct UrlHistory {
-    /// A token to provide to get the next page of results.    
+    /// A token to provide to get the next page of results.
     #[serde(alias="nextPageToken")]
     pub next_page_token: String,
-    /// A list of URL resources.    
+    /// A list of URL resources.
     pub items: Vec<Url>,
-    /// The fixed string "urlshortener#urlHistory".    
+    /// The fixed string "urlshortener#urlHistory".
     pub kind: String,
-    /// Number of items returned with each full "page" of results. Note that the last page could have fewer items than the "itemsPerPage" value.    
+    /// Number of items returned with each full "page" of results. Note that the last page could have fewer items than the "itemsPerPage" value.
     #[serde(alias="itemsPerPage")]
     pub items_per_page: i32,
-    /// Total number of short URLs associated with this user (may be approximate).    
+    /// Total number of short URLs associated with this user (may be approximate).
     #[serde(alias="totalItems")]
     pub total_items: i32,
 }
@@ -403,18 +412,18 @@ impl ResponseResult for UrlHistory {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct AnalyticsSnapshot {
-    /// Number of clicks on this short URL.    
+    /// Number of clicks on this short URL.
     #[serde(alias="shortUrlClicks")]
     pub short_url_clicks: String,
-    /// Top platforms or OSes, e.g. "Windows"; sorted by (descending) click counts. Only present if this data is available.    
+    /// Top platforms or OSes, e.g. "Windows"; sorted by (descending) click counts. Only present if this data is available.
     pub platforms: Vec<StringCount>,
-    /// Top browsers, e.g. "Chrome"; sorted by (descending) click counts. Only present if this data is available.    
+    /// Top browsers, e.g. "Chrome"; sorted by (descending) click counts. Only present if this data is available.
     pub browsers: Vec<StringCount>,
-    /// Top countries (expressed as country codes), e.g. "US" or "DE"; sorted by (descending) click counts. Only present if this data is available.    
+    /// Top countries (expressed as country codes), e.g. "US" or "DE"; sorted by (descending) click counts. Only present if this data is available.
     pub countries: Vec<StringCount>,
-    /// Top referring hosts, e.g. "www.google.com"; sorted by (descending) click counts. Only present if this data is available.    
+    /// Top referring hosts, e.g. "www.google.com"; sorted by (descending) click counts. Only present if this data is available.
     pub referrers: Vec<StringCount>,
-    /// Number of clicks on all goo.gl short URLs pointing to this long URL.    
+    /// Number of clicks on all goo.gl short URLs pointing to this long URL.
     #[serde(alias="longUrlClicks")]
     pub long_url_clicks: String,
 }
@@ -428,9 +437,9 @@ impl Part for AnalyticsSnapshot {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct StringCount {
-    /// Number of clicks for this top entry, e.g. for this particular country or browser.    
+    /// Number of clicks for this top entry, e.g. for this particular country or browser.
     pub count: String,
-    /// Label assigned to this top entry, e.g. "US" or "Chrome".    
+    /// Label assigned to this top entry, e.g. "US" or "Chrome".
     pub id: String,
 }
 
@@ -476,13 +485,17 @@ pub struct UrlMethods<'a, C, NC, A>
     hub: &'a Urlshortener<C, NC, A>,
 }
 
-impl<'a, C, NC, A> ResourceMethodsBuilder for UrlMethods<'a, C, NC, A> {}
+impl<'a, C, NC, A> MethodsBuilder for UrlMethods<'a, C, NC, A> {}
 
 impl<'a, C, NC, A> UrlMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Creates a new short URL.    
+    /// Creates a new short URL.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
     pub fn insert(&self, request: &Url) -> UrlInsertCall<'a, C, NC, A> {
         UrlInsertCall {
             hub: self.hub,
@@ -495,7 +508,11 @@ impl<'a, C, NC, A> UrlMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Expands a short URL or gets creation time and analytics.    
+    /// Expands a short URL or gets creation time and analytics.
+    /// 
+    /// # Arguments
+    ///
+    /// * `shortUrl` - The short URL, including the protocol.
     pub fn get(&self, short_url: &str) -> UrlGetCall<'a, C, NC, A> {
         UrlGetCall {
             hub: self.hub,
@@ -509,7 +526,7 @@ impl<'a, C, NC, A> UrlMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Retrieves a list of URLs shortened by a user.    
+    /// Retrieves a list of URLs shortened by a user.
     pub fn list(&self) -> UrlListCall<'a, C, NC, A> {
         UrlListCall {
             hub: self.hub,
@@ -533,7 +550,7 @@ impl<'a, C, NC, A> UrlMethods<'a, C, NC, A> {
 /// Creates a new short URL.
 ///
 /// A builder for the *insert* method supported by a *url* resource.
-/// It is not used directly, but through a `UrlMethods`.
+/// It is not used directly, but through a `UrlMethods` instance.
 ///
 /// # Example
 ///
@@ -596,7 +613,7 @@ impl<'a, C, NC, A> UrlInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
         for &field in ["alt"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -629,7 +646,7 @@ impl<'a, C, NC, A> UrlInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -645,7 +662,6 @@ impl<'a, C, NC, A> UrlInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -655,7 +671,7 @@ impl<'a, C, NC, A> UrlInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -666,7 +682,7 @@ impl<'a, C, NC, A> UrlInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -675,13 +691,13 @@ impl<'a, C, NC, A> UrlInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -753,7 +769,7 @@ impl<'a, C, NC, A> UrlInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
 /// Expands a short URL or gets creation time and analytics.
 ///
 /// A builder for the *get* method supported by a *url* resource.
-/// It is not used directly, but through a `UrlMethods`.
+/// It is not used directly, but through a `UrlMethods` instance.
 ///
 /// # Example
 ///
@@ -816,7 +832,7 @@ impl<'a, C, NC, A> UrlGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnect
         for &field in ["alt", "shortUrl", "projection"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -845,7 +861,7 @@ impl<'a, C, NC, A> UrlGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnect
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -857,7 +873,6 @@ impl<'a, C, NC, A> UrlGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnect
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -867,7 +882,7 @@ impl<'a, C, NC, A> UrlGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnect
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -878,7 +893,7 @@ impl<'a, C, NC, A> UrlGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnect
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -887,13 +902,13 @@ impl<'a, C, NC, A> UrlGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnect
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -905,7 +920,7 @@ impl<'a, C, NC, A> UrlGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnect
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The short URL, including the protocol.    
+    /// The short URL, including the protocol.
     pub fn short_url(mut self, new_value: &str) -> UrlGetCall<'a, C, NC, A> {
         self._short_url = new_value.to_string();
         self
@@ -913,7 +928,7 @@ impl<'a, C, NC, A> UrlGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnect
     /// Sets the *projection* query property to the given value.
     ///
     /// 
-    /// Additional information to return.    
+    /// Additional information to return.
     pub fn projection(mut self, new_value: &str) -> UrlGetCall<'a, C, NC, A> {
         self._projection = Some(new_value.to_string());
         self
@@ -974,7 +989,7 @@ impl<'a, C, NC, A> UrlGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnect
 /// Retrieves a list of URLs shortened by a user.
 ///
 /// A builder for the *list* method supported by a *url* resource.
-/// It is not used directly, but through a `UrlMethods`.
+/// It is not used directly, but through a `UrlMethods` instance.
 ///
 /// # Example
 ///
@@ -1040,7 +1055,7 @@ impl<'a, C, NC, A> UrlListCall<'a, C, NC, A> where NC: hyper::net::NetworkConnec
         for &field in ["alt", "start-token", "projection"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -1069,7 +1084,7 @@ impl<'a, C, NC, A> UrlListCall<'a, C, NC, A> where NC: hyper::net::NetworkConnec
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -1081,7 +1096,6 @@ impl<'a, C, NC, A> UrlListCall<'a, C, NC, A> where NC: hyper::net::NetworkConnec
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -1091,7 +1105,7 @@ impl<'a, C, NC, A> UrlListCall<'a, C, NC, A> where NC: hyper::net::NetworkConnec
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -1102,7 +1116,7 @@ impl<'a, C, NC, A> UrlListCall<'a, C, NC, A> where NC: hyper::net::NetworkConnec
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -1111,13 +1125,13 @@ impl<'a, C, NC, A> UrlListCall<'a, C, NC, A> where NC: hyper::net::NetworkConnec
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -1127,7 +1141,7 @@ impl<'a, C, NC, A> UrlListCall<'a, C, NC, A> where NC: hyper::net::NetworkConnec
     /// Sets the *start-token* query property to the given value.
     ///
     /// 
-    /// Token for requesting successive pages of results.    
+    /// Token for requesting successive pages of results.
     pub fn start_token(mut self, new_value: &str) -> UrlListCall<'a, C, NC, A> {
         self._start_token = Some(new_value.to_string());
         self
@@ -1135,7 +1149,7 @@ impl<'a, C, NC, A> UrlListCall<'a, C, NC, A> where NC: hyper::net::NetworkConnec
     /// Sets the *projection* query property to the given value.
     ///
     /// 
-    /// Additional information to return.    
+    /// Additional information to return.
     pub fn projection(mut self, new_value: &str) -> UrlListCall<'a, C, NC, A> {
         self._projection = Some(new_value.to_string());
         self

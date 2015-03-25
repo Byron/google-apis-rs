@@ -1,8 +1,8 @@
 // DO NOT EDIT !
-// This file was generated automatically from 'src/mako/lib.rs.mako'
+// This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *Maps Engine* crate version *0.1.1+20150225*, where *20150225* is the exact revision of the *mapsengine:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.1*.
+//! This documentation was generated from *Maps Engine* crate version *0.1.2+20150225*, where *20150225* is the exact revision of the *mapsengine:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.2*.
 //! 
 //! Everything else about the *Maps Engine* *v1* API can be found at the
 //! [official documentation site](https://developers.google.com/maps-engine/).
@@ -47,6 +47,8 @@
 //! 
 //! * **[Hub](struct.MapsEngine.html)**
 //!     * a central object to maintain state and allow accessing all *Activities*
+//!     * creates [*Method Builders*](trait.MethodsBuilder.html) which in turn
+//!       allow access to individual [*Call Builders*](trait.CallBuilder.html)
 //! * **[Resources](trait.Resource.html)**
 //!     * primary types that you can apply *Activities* to
 //!     * a collection of properties and *Parts*
@@ -55,6 +57,8 @@
 //!         * never directly used in *Activities*
 //! * **[Activities](trait.CallBuilder.html)**
 //!     * operations to apply to *Resources*
+//! 
+//! All *structures* are marked with applicable traits to further categorize them and ease browsing.
 //! 
 //! Generally speaking, you can invoke *Activities* like this:
 //! 
@@ -106,7 +110,7 @@
 //! extern crate hyper;
 //! extern crate "yup-oauth2" as oauth2;
 //! extern crate "google-mapsengine1" as mapsengine1;
-//! use mapsengine1::Result;
+//! use mapsengine1::{Result, Error};
 //! # #[test] fn egal() {
 //! use std::default::Default;
 //! use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -144,15 +148,17 @@
 //!              .doit();
 //! 
 //! match result {
-//!     Result::HttpError(err) => println!("HTTPERROR: {:?}", err),
-//!     Result::MissingAPIKey => println!("Auth: Missing API Key - used if there are no scopes"),
-//!     Result::MissingToken => println!("OAuth2: Missing Token"),
-//!     Result::Cancelled => println!("Operation cancelled by user"),
-//!     Result::UploadSizeLimitExceeded(size, max_size) => println!("Upload size too big: {} of {}", size, max_size),
-//!     Result::Failure(_) => println!("General Failure (hyper::client::Response doesn't print)"),
-//!     Result::FieldClash(clashed_field) => println!("You added custom parameter which is part of builder: {:?}", clashed_field),
-//!     Result::JsonDecodeError(err) => println!("Couldn't understand server reply - maybe API needs update: {:?}", err),
-//!     Result::Success(_) => println!("Success (value doesn't print)"),
+//!     Err(e) => match e {
+//!         Error::HttpError(err) => println!("HTTPERROR: {:?}", err),
+//!         Error::MissingAPIKey => println!("Auth: Missing API Key - used if there are no scopes"),
+//!         Error::MissingToken => println!("OAuth2: Missing Token"),
+//!         Error::Cancelled => println!("Operation canceled by user"),
+//!         Error::UploadSizeLimitExceeded(size, max_size) => println!("Upload size too big: {} of {}", size, max_size),
+//!         Error::Failure(_) => println!("General Failure (hyper::client::Response doesn't print)"),
+//!         Error::FieldClash(clashed_field) => println!("You added custom parameter which is part of builder: {:?}", clashed_field),
+//!         Error::JsonDecodeError(err) => println!("Couldn't understand server reply - maybe API needs update: {:?}", err),
+//!     },
+//!     Ok(_) => println!("Success (value doesn't print)"),
 //! }
 //! # }
 //! ```
@@ -165,7 +171,7 @@
 //! When delegates handle errors or intermediate values, they may have a chance to instruct the system to retry. This 
 //! makes the system potentially resilient to all kinds of errors.
 //! 
-//! ## Uploads and Downlods
+//! ## Uploads and Downloads
 //! If a method supports downloads, the response body, which is part of the [Result](enum.Result.html), should be
 //! read by you to obtain the media.
 //! If such a method also supports a [Response Result](trait.ResponseResult.html), it will return that by default.
@@ -188,8 +194,9 @@
 //! ## Optional Parts in Server-Requests
 //! 
 //! All structures provided by this library are made to be [enocodable](trait.RequestValue.html) and 
-//! [decodable](trait.ResponseResult.html) via json. Optionals are used to indicate that partial requests are responses are valid.
-//! Most optionals are are considered [Parts](trait.Part.html) which are identifyable by name, which will be sent to 
+//! [decodable](trait.ResponseResult.html) via *json*. Optionals are used to indicate that partial requests are responses 
+//! are valid.
+//! Most optionals are are considered [Parts](trait.Part.html) which are identifiable by name, which will be sent to 
 //! the server to indicate either the set parts of the request or the desired parts in the response.
 //! 
 //! ## Builder Arguments
@@ -238,7 +245,7 @@ use std::io;
 use std::fs;
 use std::thread::sleep;
 
-pub use cmn::{MultiPartReader, ToParts, MethodInfo, Result, CallBuilder, Hub, ReadSeek, Part, ResponseResult, RequestValue, NestedType, Delegate, DefaultDelegate, ResourceMethodsBuilder, Resource, JsonServerError};
+pub use cmn::{MultiPartReader, ToParts, MethodInfo, Result, Error, CallBuilder, Hub, ReadSeek, Part, ResponseResult, RequestValue, NestedType, Delegate, DefaultDelegate, MethodsBuilder, Resource, JsonServerError};
 
 
 // ##############
@@ -288,7 +295,7 @@ impl Default for Scope {
 /// extern crate hyper;
 /// extern crate "yup-oauth2" as oauth2;
 /// extern crate "google-mapsengine1" as mapsengine1;
-/// use mapsengine1::Result;
+/// use mapsengine1::{Result, Error};
 /// # #[test] fn egal() {
 /// use std::default::Default;
 /// use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -326,15 +333,17 @@ impl Default for Scope {
 ///              .doit();
 /// 
 /// match result {
-///     Result::HttpError(err) => println!("HTTPERROR: {:?}", err),
-///     Result::MissingAPIKey => println!("Auth: Missing API Key - used if there are no scopes"),
-///     Result::MissingToken => println!("OAuth2: Missing Token"),
-///     Result::Cancelled => println!("Operation cancelled by user"),
-///     Result::UploadSizeLimitExceeded(size, max_size) => println!("Upload size too big: {} of {}", size, max_size),
-///     Result::Failure(_) => println!("General Failure (hyper::client::Response doesn't print)"),
-///     Result::FieldClash(clashed_field) => println!("You added custom parameter which is part of builder: {:?}", clashed_field),
-///     Result::JsonDecodeError(err) => println!("Couldn't understand server reply - maybe API needs update: {:?}", err),
-///     Result::Success(_) => println!("Success (value doesn't print)"),
+///     Err(e) => match e {
+///         Error::HttpError(err) => println!("HTTPERROR: {:?}", err),
+///         Error::MissingAPIKey => println!("Auth: Missing API Key - used if there are no scopes"),
+///         Error::MissingToken => println!("OAuth2: Missing Token"),
+///         Error::Cancelled => println!("Operation canceled by user"),
+///         Error::UploadSizeLimitExceeded(size, max_size) => println!("Upload size too big: {} of {}", size, max_size),
+///         Error::Failure(_) => println!("General Failure (hyper::client::Response doesn't print)"),
+///         Error::FieldClash(clashed_field) => println!("You added custom parameter which is part of builder: {:?}", clashed_field),
+///         Error::JsonDecodeError(err) => println!("Couldn't understand server reply - maybe API needs update: {:?}", err),
+///     },
+///     Ok(_) => println!("Success (value doesn't print)"),
 /// }
 /// # }
 /// ```
@@ -355,7 +364,7 @@ impl<'a, C, NC, A> MapsEngine<C, NC, A>
         MapsEngine {
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/0.1.1".to_string(),
+            _user_agent: "google-api-rust-client/0.1.2".to_string(),
             _m: PhantomData
         }
     }
@@ -383,7 +392,7 @@ impl<'a, C, NC, A> MapsEngine<C, NC, A>
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/0.1.1`.
+    /// It defaults to `google-api-rust-client/0.1.2`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -403,26 +412,26 @@ impl<'a, C, NC, A> MapsEngine<C, NC, A>
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct RasterCollectionsRaster {
-    /// The description of this Raster, supplied by the author.    
+    /// The description of this Raster, supplied by the author.
     pub description: String,
-    /// Tags of this Raster.    
+    /// Tags of this Raster.
     pub tags: Vec<String>,
-    /// The ID of the project that this Raster is in.    
+    /// The ID of the project that this Raster is in.
     #[serde(alias="projectId")]
     pub project_id: String,
-    /// The creation time of this raster. The value is an RFC 3339 formatted date-time value (e.g. 1970-01-01T00:00:00Z).    
+    /// The creation time of this raster. The value is an RFC 3339 formatted date-time value (e.g. 1970-01-01T00:00:00Z).
     #[serde(alias="creationTime")]
     pub creation_time: String,
-    /// The name of this Raster, supplied by the author.    
+    /// The name of this Raster, supplied by the author.
     pub name: String,
-    /// A rectangular bounding box which contains all of the data in this Raster. The box is expressed as \"west, south, east, north\". The numbers represent latitudes and longitudes in decimal degrees.    
+    /// A rectangular bounding box which contains all of the data in this Raster. The box is expressed as \"west, south, east, north\". The numbers represent latitudes and longitudes in decimal degrees.
     pub bbox: Vec<f64>,
-    /// The last modified time of this raster. The value is an RFC 3339 formatted date-time value (e.g. 1970-01-01T00:00:00Z).    
+    /// The last modified time of this raster. The value is an RFC 3339 formatted date-time value (e.g. 1970-01-01T00:00:00Z).
     #[serde(alias="lastModifiedTime")]
     pub last_modified_time: String,
-    /// A globally unique ID, used to refer to this Raster.    
+    /// A globally unique ID, used to refer to this Raster.
     pub id: String,
-    /// The type of this Raster. Always "image" today.    
+    /// The type of this Raster. Always "image" today.
     #[serde(alias="rasterType")]
     pub raster_type: String,
 }
@@ -436,21 +445,21 @@ impl Part for RasterCollectionsRaster {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct DisplayRule {
-    /// The zoom levels that this display rule apply.    
+    /// The zoom levels that this display rule apply.
     #[serde(alias="zoomLevels")]
     pub zoom_levels: ZoomLevels,
-    /// Style applied to points. Required for Point Geometry.    
+    /// Style applied to points. Required for Point Geometry.
     #[serde(alias="pointOptions")]
     pub point_options: PointStyle,
-    /// Display rule name. Name is not unique and cannot be used for identification purpose.    
+    /// Display rule name. Name is not unique and cannot be used for identification purpose.
     pub name: String,
-    /// Style applied to polygons. Required for Polygon Geometry.    
+    /// Style applied to polygons. Required for Polygon Geometry.
     #[serde(alias="polygonOptions")]
     pub polygon_options: PolygonStyle,
-    /// Style applied to lines. Required for LineString Geometry.    
+    /// Style applied to lines. Required for LineString Geometry.
     #[serde(alias="lineOptions")]
     pub line_options: LineStyle,
-    /// This display rule will only be applied to features that match all of the filters here. If filters is empty, then the rule applies to all features.    
+    /// This display rule will only be applied to features that match all of the filters here. If filters is empty, then the rule applies to all features.
     pub filters: Vec<Filter>,
 }
 
@@ -468,9 +477,9 @@ impl Part for DisplayRule {}
 /// 
 #[derive(Default, Clone, Debug, Serialize)]
 pub struct FeaturesBatchDeleteRequest {
-    /// no description provided    
+    /// no description provided
     pub gx_ids: Option<Vec<String>>,
-    /// no description provided    
+    /// no description provided
     #[serde(alias="primaryKeys")]
     pub primary_keys: Option<Vec<String>>,
 }
@@ -489,7 +498,7 @@ impl RequestValue for FeaturesBatchDeleteRequest {}
 /// 
 #[derive(Default, Clone, Debug, Serialize)]
 pub struct RasterCollectionsRasterBatchDeleteRequest {
-    /// An array of Raster asset IDs to be removed from this RasterCollection.    
+    /// An array of Raster asset IDs to be removed from this RasterCollection.
     pub ids: Option<Vec<String>>,
 }
 
@@ -512,40 +521,40 @@ impl RequestValue for RasterCollectionsRasterBatchDeleteRequest {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct Asset {
-    /// The URL to query to retrieve the asset's complete object. The assets endpoint only returns high-level information about a resource.    
+    /// The URL to query to retrieve the asset's complete object. The assets endpoint only returns high-level information about a resource.
     pub resource: String,
-    /// The asset's description.    
+    /// The asset's description.
     pub description: String,
-    /// An array of text strings, with each string representing a tag. More information about tags can be found in the Tagging data article of the Maps Engine help center.    
+    /// An array of text strings, with each string representing a tag. More information about tags can be found in the Tagging data article of the Maps Engine help center.
     pub tags: Vec<String>,
-    /// The ID of the project to which the asset belongs.    
+    /// The ID of the project to which the asset belongs.
     #[serde(alias="projectId")]
     pub project_id: String,
-    /// The creation time of this asset. The value is an RFC 3339-formatted date-time value (for example, 1970-01-01T00:00:00Z).    
+    /// The creation time of this asset. The value is an RFC 3339-formatted date-time value (for example, 1970-01-01T00:00:00Z).
     #[serde(alias="creationTime")]
     pub creation_time: String,
-    /// If true, WRITERs of the asset are able to edit the asset permissions.    
+    /// If true, WRITERs of the asset are able to edit the asset permissions.
     #[serde(alias="writersCanEditPermissions")]
     pub writers_can_edit_permissions: bool,
-    /// The ETag, used to refer to the current version of the asset.    
+    /// The ETag, used to refer to the current version of the asset.
     pub etag: String,
-    /// The email address of the creator of this asset. This is only returned on GET requests and not LIST requests.    
+    /// The email address of the creator of this asset. This is only returned on GET requests and not LIST requests.
     #[serde(alias="creatorEmail")]
     pub creator_email: String,
-    /// A rectangular bounding box which contains all of the data in this asset. The box is expressed as \"west, south, east, north\". The numbers represent latitude and longitude in decimal degrees.    
+    /// A rectangular bounding box which contains all of the data in this asset. The box is expressed as \"west, south, east, north\". The numbers represent latitude and longitude in decimal degrees.
     pub bbox: Vec<f64>,
-    /// The email address of the last modifier of this asset. This is only returned on GET requests and not LIST requests.    
+    /// The email address of the last modifier of this asset. This is only returned on GET requests and not LIST requests.
     #[serde(alias="lastModifierEmail")]
     pub last_modifier_email: String,
-    /// The last modified time of this asset. The value is an RFC 3339-formatted date-time value (for example, 1970-01-01T00:00:00Z).    
+    /// The last modified time of this asset. The value is an RFC 3339-formatted date-time value (for example, 1970-01-01T00:00:00Z).
     #[serde(alias="lastModifiedTime")]
     pub last_modified_time: String,
-    /// The type of asset. One of raster, rasterCollection, table, map, or layer.    
+    /// The type of asset. One of raster, rasterCollection, table, map, or layer.
     #[serde(alias="type")]
     pub type_: String,
-    /// The asset's globally unique ID.    
+    /// The asset's globally unique ID.
     pub id: String,
-    /// The asset's name.    
+    /// The asset's name.
     pub name: String,
 }
 
@@ -564,10 +573,10 @@ impl ResponseResult for Asset {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct RasterCollectionsListResponse {
-    /// Next page token.    
+    /// Next page token.
     #[serde(alias="nextPageToken")]
     pub next_page_token: String,
-    /// Resources returned.    
+    /// Resources returned.
     #[serde(alias="rasterCollections")]
     pub raster_collections: Vec<RasterCollection>,
 }
@@ -581,10 +590,10 @@ impl ResponseResult for RasterCollectionsListResponse {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GeoJsonMultiPoint {
-    /// Identifies this object as a GeoJsonMultiPoint.    
+    /// Identifies this object as a GeoJsonMultiPoint.
     #[serde(alias="type")]
     pub type_: String,
-    /// An array of at least two GeoJsonPoint coordinate arrays.    
+    /// An array of at least two GeoJsonPoint coordinate arrays.
     pub coordinates: Vec<GeoJsonPosition>,
 }
 
@@ -597,10 +606,10 @@ impl Part for GeoJsonMultiPoint {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GeoJsonMultiLineString {
-    /// Identifies this object as a GeoJsonMultiLineString.    
+    /// Identifies this object as a GeoJsonMultiLineString.
     #[serde(alias="type")]
     pub type_: String,
-    /// An array of at least two GeoJsonLineString coordinate arrays.    
+    /// An array of at least two GeoJsonLineString coordinate arrays.
     pub coordinates: Vec<Vec<GeoJsonPosition>>,
 }
 
@@ -613,7 +622,7 @@ impl Part for GeoJsonMultiLineString {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct Parent {
-    /// The ID of this parent.    
+    /// The ID of this parent.
     pub id: String,
 }
 
@@ -641,10 +650,10 @@ impl ResponseResult for RasterCollectionsRastersBatchDeleteResponse {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct TableColumn {
-    /// The type of data stored in this column.    
+    /// The type of data stored in this column.
     #[serde(alias="type")]
     pub type_: String,
-    /// The column name.    
+    /// The column name.
     pub name: String,
 }
 
@@ -662,7 +671,7 @@ impl Part for TableColumn {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct ProjectsListResponse {
-    /// Projects returned.    
+    /// Projects returned.
     pub projects: Vec<Project>,
 }
 
@@ -680,18 +689,18 @@ impl ResponseResult for ProjectsListResponse {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct FeaturesListResponse {
-    /// Next page token.    
+    /// Next page token.
     #[serde(alias="nextPageToken")]
     pub next_page_token: String,
-    /// An indicator of the maximum rate at which queries may be made, if all queries were as expensive as this query.    
+    /// An indicator of the maximum rate at which queries may be made, if all queries were as expensive as this query.
     #[serde(alias="allowedQueriesPerSecond")]
     pub allowed_queries_per_second: f64,
-    /// no description provided    
+    /// no description provided
     #[serde(alias="type")]
     pub type_: String,
-    /// Resources returned.    
+    /// Resources returned.
     pub features: Vec<Feature>,
-    /// The feature schema.    
+    /// The feature schema.
     pub schema: Schema,
 }
 
@@ -728,10 +737,10 @@ impl ResponseResult for PermissionsBatchUpdateResponse {}
 /// 
 #[derive(Default, Clone, Debug, Serialize)]
 pub struct FeaturesBatchInsertRequest {
-    /// If true, the server will normalize feature geometries. It is assumed that the South Pole is exterior to any polygons given. See here for a list of normalizations. If false, all feature geometries must be given already normalized. The points in all LinearRings must be listed in counter-clockwise order, and LinearRings may not intersect.    
+    /// If true, the server will normalize feature geometries. It is assumed that the South Pole is exterior to any polygons given. See here for a list of normalizations. If false, all feature geometries must be given already normalized. The points in all LinearRings must be listed in counter-clockwise order, and LinearRings may not intersect.
     #[serde(alias="normalizeGeometries")]
     pub normalize_geometries: Option<bool>,
-    /// no description provided    
+    /// no description provided
     pub features: Option<Vec<Feature>>,
 }
 
@@ -749,10 +758,10 @@ impl RequestValue for FeaturesBatchInsertRequest {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct RastersListResponse {
-    /// Next page token.    
+    /// Next page token.
     #[serde(alias="nextPageToken")]
     pub next_page_token: String,
-    /// Resources returned.    
+    /// Resources returned.
     pub rasters: Vec<Raster>,
 }
 
@@ -765,10 +774,10 @@ impl ResponseResult for RastersListResponse {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GeoJsonLineString {
-    /// Identifies this object as a GeoJsonLineString.    
+    /// Identifies this object as a GeoJsonLineString.
     #[serde(alias="type")]
     pub type_: String,
-    /// An array of two or more positions, representing a line.    
+    /// An array of two or more positions, representing a line.
     pub coordinates: Vec<GeoJsonPosition>,
 }
 
@@ -781,13 +790,13 @@ impl Part for GeoJsonLineString {}
 /// 
 #[derive(Clone, Debug, Serialize, Deserialize)]
 pub enum MapItem {
-    /// no description provided    
+    /// no description provided
     #[serde(alias="folder")]
     Folder(MapFolder),
-    /// no description provided    
+    /// no description provided
     #[serde(alias="kmlLink")]
     KmlLink(MapKmlLink),
-    /// no description provided    
+    /// no description provided
     #[serde(alias="layer")]
     Layer(MapLayer),
 }
@@ -822,53 +831,53 @@ impl Part for MapItem {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Raster {
-    /// The files associated with this Raster.    
+    /// The files associated with this Raster.
     pub files: Option<Vec<File>>,
-    /// The name of the attribution to be used for this Raster.    
+    /// The name of the attribution to be used for this Raster.
     pub attribution: Option<String>,
-    /// The description of this Raster, supplied by the author.    
+    /// The description of this Raster, supplied by the author.
     pub description: Option<String>,
-    /// Tags of this Raster.    
+    /// Tags of this Raster.
     pub tags: Option<Tags>,
-    /// Deprecated: The name of an access list of the Map Editor type. The user on whose behalf the request is being sent must be an editor on that access list. Note: Google Maps Engine no longer uses access lists. Instead, each asset has its own list of permissions. For backward compatibility, the API still accepts access lists for projects that are already using access lists. If you created a GME account/project after July 14th, 2014, you will not be able to send API requests that include access lists. Note: This is an input field only. It is not returned in response to a list or get request.    
+    /// Deprecated: The name of an access list of the Map Editor type. The user on whose behalf the request is being sent must be an editor on that access list. Note: Google Maps Engine no longer uses access lists. Instead, each asset has its own list of permissions. For backward compatibility, the API still accepts access lists for projects that are already using access lists. If you created a GME account/project after July 14th, 2014, you will not be able to send API requests that include access lists. Note: This is an input field only. It is not returned in response to a list or get request.
     #[serde(alias="draftAccessList")]
     pub draft_access_list: Option<String>,
-    /// If true, WRITERs of the asset are able to edit the asset permissions.    
+    /// If true, WRITERs of the asset are able to edit the asset permissions.
     #[serde(alias="writersCanEditPermissions")]
     pub writers_can_edit_permissions: Option<bool>,
-    /// The email address of the creator of this raster. This is only returned on GET requests and not LIST requests.    
+    /// The email address of the creator of this raster. This is only returned on GET requests and not LIST requests.
     #[serde(alias="creatorEmail")]
     pub creator_email: Option<String>,
-    /// A rectangular bounding box which contains all of the data in this Raster. The box is expressed as \"west, south, east, north\". The numbers represent latitudes and longitudes in decimal degrees.    
+    /// A rectangular bounding box which contains all of the data in this Raster. The box is expressed as \"west, south, east, north\". The numbers represent latitudes and longitudes in decimal degrees.
     pub bbox: Option<Vec<f64>>,
-    /// The email address of the last modifier of this raster. This is only returned on GET requests and not LIST requests.    
+    /// The email address of the last modifier of this raster. This is only returned on GET requests and not LIST requests.
     #[serde(alias="lastModifierEmail")]
     pub last_modifier_email: Option<String>,
-    /// The last modified time of this raster. The value is an RFC 3339 formatted date-time value (e.g. 1970-01-01T00:00:00Z).    
+    /// The last modified time of this raster. The value is an RFC 3339 formatted date-time value (e.g. 1970-01-01T00:00:00Z).
     #[serde(alias="lastModifiedTime")]
     pub last_modified_time: Option<String>,
-    /// A globally unique ID, used to refer to this Raster.    
+    /// A globally unique ID, used to refer to this Raster.
     pub id: Option<String>,
-    /// The name of this Raster, supplied by the author.    
+    /// The name of this Raster, supplied by the author.
     pub name: Option<String>,
-    /// The processing status of this Raster.    
+    /// The processing status of this Raster.
     #[serde(alias="processingStatus")]
     pub processing_status: Option<String>,
-    /// The ID of the project that this Raster is in.    
+    /// The ID of the project that this Raster is in.
     #[serde(alias="projectId")]
     pub project_id: Option<String>,
-    /// The creation time of this raster. The value is an RFC 3339 formatted date-time value (e.g. 1970-01-01T00:00:00Z).    
+    /// The creation time of this raster. The value is an RFC 3339 formatted date-time value (e.g. 1970-01-01T00:00:00Z).
     #[serde(alias="creationTime")]
     pub creation_time: Option<String>,
-    /// The ETag, used to refer to the current version of the asset.    
+    /// The ETag, used to refer to the current version of the asset.
     pub etag: Option<String>,
-    /// The acquisition time of this Raster.    
+    /// The acquisition time of this Raster.
     #[serde(alias="acquisitionTime")]
     pub acquisition_time: Option<AcquisitionTime>,
-    /// The mask processing type of this Raster.    
+    /// The mask processing type of this Raster.
     #[serde(alias="maskType")]
     pub mask_type: Option<String>,
-    /// The type of this Raster. Always "image" today.    
+    /// The type of this Raster. Always "image" today.
     #[serde(alias="rasterType")]
     pub raster_type: Option<String>,
 }
@@ -884,21 +893,21 @@ impl ResponseResult for Raster {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct MapFolder {
-    /// A user defined alias for this MapFolder, specific to this Map.    
+    /// A user defined alias for this MapFolder, specific to this Map.
     pub key: String,
-    /// The name of this MapFolder.    
+    /// The name of this MapFolder.
     pub name: String,
-    /// An array of four numbers (west, south, east, north) which defines the rectangular bounding box of the default viewport. The numbers represent latitude and longitude in decimal degrees.    
+    /// An array of four numbers (west, south, east, north) which defines the rectangular bounding box of the default viewport. The numbers represent latitude and longitude in decimal degrees.
     #[serde(alias="defaultViewport")]
     pub default_viewport: Vec<f64>,
-    /// no description provided    
+    /// no description provided
     pub contents: Vec<MapItem>,
-    /// The expandability setting of this MapFolder. If true, the folder can be expanded.    
+    /// The expandability setting of this MapFolder. If true, the folder can be expanded.
     pub expandable: bool,
-    /// Identifies this object as a MapFolder.    
+    /// Identifies this object as a MapFolder.
     #[serde(alias="type")]
     pub type_: String,
-    /// The visibility setting of this MapFolder. One of "defaultOn" or "defaultOff".    
+    /// The visibility setting of this MapFolder. One of "defaultOn" or "defaultOff".
     pub visibility: String,
 }
 
@@ -911,10 +920,10 @@ impl Part for MapFolder {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GeoJsonMultiPolygon {
-    /// Identifies this object as a GeoJsonMultiPolygon.    
+    /// Identifies this object as a GeoJsonMultiPolygon.
     #[serde(alias="type")]
     pub type_: String,
-    /// An array of at least two GeoJsonPolygon coordinate arrays.    
+    /// An array of at least two GeoJsonPolygon coordinate arrays.
     pub coordinates: Vec<Vec<Vec<GeoJsonPosition>>>,
 }
 
@@ -937,7 +946,7 @@ impl Part for GeoJsonMultiPolygon {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct PermissionsListResponse {
-    /// The set of permissions associated with this asset.    
+    /// The set of permissions associated with this asset.
     pub permissions: Vec<Permission>,
 }
 
@@ -950,19 +959,19 @@ impl ResponseResult for PermissionsListResponse {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct MapLayer {
-    /// A user defined alias for this MapLayer, specific to this Map.    
+    /// A user defined alias for this MapLayer, specific to this Map.
     pub key: String,
-    /// The name of this MapLayer.    
+    /// The name of this MapLayer.
     pub name: String,
-    /// An array of four numbers (west, south, east, north) which defines the rectangular bounding box of the default viewport. The numbers represent latitude and longitude in decimal degrees.    
+    /// An array of four numbers (west, south, east, north) which defines the rectangular bounding box of the default viewport. The numbers represent latitude and longitude in decimal degrees.
     #[serde(alias="defaultViewport")]
     pub default_viewport: Vec<f64>,
-    /// Identifies this object as a MapLayer.    
+    /// Identifies this object as a MapLayer.
     #[serde(alias="type")]
     pub type_: String,
-    /// The ID of this MapLayer. This ID can be used to request more details about the layer.    
+    /// The ID of this MapLayer. This ID can be used to request more details about the layer.
     pub id: String,
-    /// The visibility setting of this MapLayer. One of "defaultOn" or "defaultOff".    
+    /// The visibility setting of this MapLayer. One of "defaultOn" or "defaultOff".
     pub visibility: String,
 }
 
@@ -993,47 +1002,47 @@ impl Part for MapLayer {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct RasterCollection {
-    /// The name of the attribution to be used for this RasterCollection. Note: Attribution is returned in response to a get request but not a list request. After requesting a list of raster collections, you'll need to send a get request to retrieve the attribution for each raster collection.    
+    /// The name of the attribution to be used for this RasterCollection. Note: Attribution is returned in response to a get request but not a list request. After requesting a list of raster collections, you'll need to send a get request to retrieve the attribution for each raster collection.
     pub attribution: Option<String>,
-    /// The description of this RasterCollection, supplied by the author.    
+    /// The description of this RasterCollection, supplied by the author.
     pub description: Option<String>,
-    /// Tags of this RasterCollection.    
+    /// Tags of this RasterCollection.
     pub tags: Option<Tags>,
-    /// Deprecated: The name of an access list of the Map Editor type. The user on whose behalf the request is being sent must be an editor on that access list. Note: Google Maps Engine no longer uses access lists. Instead, each asset has its own list of permissions. For backward compatibility, the API still accepts access lists for projects that are already using access lists. If you created a GME account/project after July 14th, 2014, you will not be able to send API requests that include access lists. Note: This is an input field only. It is not returned in response to a list or get request.    
+    /// Deprecated: The name of an access list of the Map Editor type. The user on whose behalf the request is being sent must be an editor on that access list. Note: Google Maps Engine no longer uses access lists. Instead, each asset has its own list of permissions. For backward compatibility, the API still accepts access lists for projects that are already using access lists. If you created a GME account/project after July 14th, 2014, you will not be able to send API requests that include access lists. Note: This is an input field only. It is not returned in response to a list or get request.
     #[serde(alias="draftAccessList")]
     pub draft_access_list: Option<String>,
-    /// If true, WRITERs of the asset are able to edit the asset permissions.    
+    /// If true, WRITERs of the asset are able to edit the asset permissions.
     #[serde(alias="writersCanEditPermissions")]
     pub writers_can_edit_permissions: Option<bool>,
-    /// The email address of the creator of this raster collection. This is only returned on GET requests and not LIST requests.    
+    /// The email address of the creator of this raster collection. This is only returned on GET requests and not LIST requests.
     #[serde(alias="creatorEmail")]
     pub creator_email: Option<String>,
-    /// A rectangular bounding box which contains all of the data in this RasterCollection. The box is expressed as \"west, south, east, north\". The numbers represent latitude and longitude in decimal degrees.    
+    /// A rectangular bounding box which contains all of the data in this RasterCollection. The box is expressed as \"west, south, east, north\". The numbers represent latitude and longitude in decimal degrees.
     pub bbox: Option<Vec<f64>>,
-    /// The email address of the last modifier of this raster collection. This is only returned on GET requests and not LIST requests.    
+    /// The email address of the last modifier of this raster collection. This is only returned on GET requests and not LIST requests.
     #[serde(alias="lastModifierEmail")]
     pub last_modifier_email: Option<String>,
-    /// The last modified time of this RasterCollection. The value is an RFC 3339 formatted date-time value (e.g. 1970-01-01T00:00:00Z).    
+    /// The last modified time of this RasterCollection. The value is an RFC 3339 formatted date-time value (e.g. 1970-01-01T00:00:00Z).
     #[serde(alias="lastModifiedTime")]
     pub last_modified_time: Option<String>,
-    /// A globally unique ID, used to refer to this RasterCollection.    
+    /// A globally unique ID, used to refer to this RasterCollection.
     pub id: Option<String>,
-    /// True if this RasterCollection is a mosaic.    
+    /// True if this RasterCollection is a mosaic.
     pub mosaic: Option<bool>,
-    /// The name of this RasterCollection, supplied by the author.    
+    /// The name of this RasterCollection, supplied by the author.
     pub name: Option<String>,
-    /// The processing status of this RasterCollection.    
+    /// The processing status of this RasterCollection.
     #[serde(alias="processingStatus")]
     pub processing_status: Option<String>,
-    /// The ID of the project that this RasterCollection is in.    
+    /// The ID of the project that this RasterCollection is in.
     #[serde(alias="projectId")]
     pub project_id: Option<String>,
-    /// The creation time of this RasterCollection. The value is an RFC 3339 formatted date-time value (e.g. 1970-01-01T00:00:00Z).    
+    /// The creation time of this RasterCollection. The value is an RFC 3339 formatted date-time value (e.g. 1970-01-01T00:00:00Z).
     #[serde(alias="creationTime")]
     pub creation_time: Option<String>,
-    /// The ETag, used to refer to the current version of the asset.    
+    /// The ETag, used to refer to the current version of the asset.
     pub etag: Option<String>,
-    /// The type of rasters contained within this RasterCollection.    
+    /// The type of rasters contained within this RasterCollection.
     #[serde(alias="rasterType")]
     pub raster_type: Option<String>,
 }
@@ -1049,10 +1058,10 @@ impl ResponseResult for RasterCollection {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GeoJsonPolygon {
-    /// Identifies this object as a GeoJsonPolygon.    
+    /// Identifies this object as a GeoJsonPolygon.
     #[serde(alias="type")]
     pub type_: String,
-    /// An array of LinearRings. A LinearRing is a GeoJsonLineString which is closed (that is, the first and last GeoJsonPositions are equal), and which contains at least four GeoJsonPositions. For polygons with multiple rings, the first LinearRing is the exterior ring, and any subsequent rings are interior rings (that is, holes).    
+    /// An array of LinearRings. A LinearRing is a GeoJsonLineString which is closed (that is, the first and last GeoJsonPositions are equal), and which contains at least four GeoJsonPositions. For polygons with multiple rings, the first LinearRing is the exterior ring, and any subsequent rings are interior rings (that is, holes).
     pub coordinates: Vec<Vec<GeoJsonPosition>>,
 }
 
@@ -1065,19 +1074,19 @@ impl Part for GeoJsonPolygon {}
 /// 
 #[derive(Clone, Debug, Serialize, Deserialize)]
 pub enum GeoJsonGeometry {
-    /// no description provided    
+    /// no description provided
     GeometryCollection(GeoJsonGeometryCollection),
-    /// no description provided    
+    /// no description provided
     LineString(GeoJsonLineString),
-    /// no description provided    
+    /// no description provided
     MultiLineString(GeoJsonMultiLineString),
-    /// no description provided    
+    /// no description provided
     MultiPoint(GeoJsonMultiPoint),
-    /// no description provided    
+    /// no description provided
     MultiPolygon(GeoJsonMultiPolygon),
-    /// no description provided    
+    /// no description provided
     Point(GeoJsonPoint),
-    /// no description provided    
+    /// no description provided
     Polygon(GeoJsonPolygon),
 }
 
@@ -1101,12 +1110,12 @@ impl Part for GeoJsonGeometry {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Feature {
-    /// The geometry member of this Feature.    
+    /// The geometry member of this Feature.
     pub geometry: GeoJsonGeometry,
-    /// Identifies this object as a feature.    
+    /// Identifies this object as a feature.
     #[serde(alias="type")]
     pub type_: String,
-    /// Key/value pairs of this Feature.    
+    /// Key/value pairs of this Feature.
     pub properties: GeoJsonProperties,
 }
 
@@ -1119,11 +1128,11 @@ impl ResponseResult for Feature {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Filter {
-    /// The column name to filter on.    
+    /// The column name to filter on.
     pub column: String,
-    /// Operation used to evaluate the filter.    
+    /// Operation used to evaluate the filter.
     pub operator: String,
-    /// Value to be evaluated against attribute.    
+    /// Value to be evaluated against attribute.
     pub value: String,
 }
 
@@ -1136,11 +1145,11 @@ impl Part for Filter {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct AcquisitionTime {
-    /// The acquisition time, or start time if acquisition time is a range. The value is an RFC 3339 formatted date-time value (1970-01-01T00:00:00Z).    
+    /// The acquisition time, or start time if acquisition time is a range. The value is an RFC 3339 formatted date-time value (1970-01-01T00:00:00Z).
     pub start: String,
-    /// The end time if acquisition time is a range. The value is an RFC 3339 formatted date-time value (1970-01-01T00:00:00Z).    
+    /// The end time if acquisition time is a range. The value is an RFC 3339 formatted date-time value (1970-01-01T00:00:00Z).
     pub end: String,
-    /// The precision of acquisition time.    
+    /// The precision of acquisition time.
     pub precision: String,
 }
 
@@ -1170,9 +1179,9 @@ impl Part for GeoJsonPosition {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct LayersListResponse {
-    /// Resources returned.    
+    /// Resources returned.
     pub layers: Vec<Layer>,
-    /// Next page token.    
+    /// Next page token.
     #[serde(alias="nextPageToken")]
     pub next_page_token: String,
 }
@@ -1186,10 +1195,10 @@ impl ResponseResult for LayersListResponse {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GeoJsonGeometryCollection {
-    /// Identifies this object as a GeoJsonGeometryCollection.    
+    /// Identifies this object as a GeoJsonGeometryCollection.
     #[serde(alias="type")]
     pub type_: String,
-    /// An array of geometry objects. There must be at least 2 different types of geometries in the array.    
+    /// An array of geometry objects. There must be at least 2 different types of geometries in the array.
     pub geometries: Vec<GeoJsonGeometry>,
 }
 
@@ -1202,18 +1211,18 @@ impl Part for GeoJsonGeometryCollection {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct MapKmlLink {
-    /// An array of four numbers (west, south, east, north) which defines the rectangular bounding box of the default viewport. The numbers represent latitude and longitude in decimal degrees.    
+    /// An array of four numbers (west, south, east, north) which defines the rectangular bounding box of the default viewport. The numbers represent latitude and longitude in decimal degrees.
     #[serde(alias="defaultViewport")]
     pub default_viewport: Vec<f64>,
-    /// Identifies this object as a MapKmlLink.    
+    /// Identifies this object as a MapKmlLink.
     #[serde(alias="type")]
     pub type_: String,
-    /// The URL to the KML file represented by this MapKmlLink.    
+    /// The URL to the KML file represented by this MapKmlLink.
     #[serde(alias="kmlUrl")]
     pub kml_url: String,
-    /// The visibility setting of this MapKmlLink. One of "defaultOn" or "defaultOff".    
+    /// The visibility setting of this MapKmlLink. One of "defaultOn" or "defaultOff".
     pub visibility: String,
-    /// The name of this MapKmlLink.    
+    /// The name of this MapKmlLink.
     pub name: String,
 }
 
@@ -1245,56 +1254,56 @@ impl Part for MapKmlLink {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Layer {
-    /// An array of datasources used to build this layer. If layerType is "image", or layerType is not specified and datasourceType is "image", then each element in this array is a reference to an Image or RasterCollection. If layerType is "vector", or layerType is not specified and datasourceType is "table" then each element in this array is a reference to a Vector Table.    
+    /// An array of datasources used to build this layer. If layerType is "image", or layerType is not specified and datasourceType is "image", then each element in this array is a reference to an Image or RasterCollection. If layerType is "vector", or layerType is not specified and datasourceType is "table" then each element in this array is a reference to a Vector Table.
     pub datasources: Option<Datasources>,
-    /// Tags of this Layer.    
+    /// Tags of this Layer.
     pub tags: Option<Tags>,
-    /// Deprecated: The name of an access list of the Map Editor type. The user on whose behalf the request is being sent must be an editor on that access list. Note: Google Maps Engine no longer uses access lists. Instead, each asset has its own list of permissions. For backward compatibility, the API still accepts access lists for projects that are already using access lists. If you created a GME account/project after July 14th, 2014, you will not be able to send API requests that include access lists. Note: This is an input field only. It is not returned in response to a list or get request.    
+    /// Deprecated: The name of an access list of the Map Editor type. The user on whose behalf the request is being sent must be an editor on that access list. Note: Google Maps Engine no longer uses access lists. Instead, each asset has its own list of permissions. For backward compatibility, the API still accepts access lists for projects that are already using access lists. If you created a GME account/project after July 14th, 2014, you will not be able to send API requests that include access lists. Note: This is an input field only. It is not returned in response to a list or get request.
     #[serde(alias="draftAccessList")]
     pub draft_access_list: Option<String>,
-    /// Deprecated: The type of the datasources used to build this Layer. Note: This has been replaced by layerType, but is still available for now to maintain backward compatibility.    
+    /// Deprecated: The type of the datasources used to build this Layer. Note: This has been replaced by layerType, but is still available for now to maintain backward compatibility.
     #[serde(alias="datasourceType")]
     pub datasource_type: Option<String>,
-    /// If true, WRITERs of the asset are able to edit the asset permissions.    
+    /// If true, WRITERs of the asset are able to edit the asset permissions.
     #[serde(alias="writersCanEditPermissions")]
     pub writers_can_edit_permissions: Option<bool>,
-    /// The email address of the creator of this layer. This is only returned on GET requests and not LIST requests.    
+    /// The email address of the creator of this layer. This is only returned on GET requests and not LIST requests.
     #[serde(alias="creatorEmail")]
     pub creator_email: Option<String>,
-    /// A rectangular bounding box which contains all of the data in this Layer. The box is expressed as \"west, south, east, north\". The numbers represent latitude and longitude in decimal degrees.    
+    /// A rectangular bounding box which contains all of the data in this Layer. The box is expressed as \"west, south, east, north\". The numbers represent latitude and longitude in decimal degrees.
     pub bbox: Option<Vec<f64>>,
-    /// The email address of the last modifier of this layer. This is only returned on GET requests and not LIST requests.    
+    /// The email address of the last modifier of this layer. This is only returned on GET requests and not LIST requests.
     #[serde(alias="lastModifierEmail")]
     pub last_modifier_email: Option<String>,
-    /// The last modified time of this layer. The value is an RFC 3339 formatted date-time value (e.g. 1970-01-01T00:00:00Z).    
+    /// The last modified time of this layer. The value is an RFC 3339 formatted date-time value (e.g. 1970-01-01T00:00:00Z).
     #[serde(alias="lastModifiedTime")]
     pub last_modified_time: Option<String>,
-    /// A globally unique ID, used to refer to this Layer.    
+    /// A globally unique ID, used to refer to this Layer.
     pub id: Option<String>,
-    /// The description of this Layer, supplied by the author.    
+    /// The description of this Layer, supplied by the author.
     pub description: Option<String>,
-    /// The styling information for a vector layer. Note: Style information is returned in response to a get request but not a list request. After requesting a list of layers, you'll need to send a get request to retrieve the VectorStyles for each layer.    
+    /// The styling information for a vector layer. Note: Style information is returned in response to a get request but not a list request. After requesting a list of layers, you'll need to send a get request to retrieve the VectorStyles for each layer.
     pub style: Option<VectorStyle>,
-    /// The name of this Layer, supplied by the author.    
+    /// The name of this Layer, supplied by the author.
     pub name: Option<String>,
-    /// The processing status of this layer.    
+    /// The processing status of this layer.
     #[serde(alias="processingStatus")]
     pub processing_status: Option<String>,
-    /// The ID of the project that this Layer is in.    
+    /// The ID of the project that this Layer is in.
     #[serde(alias="projectId")]
     pub project_id: Option<String>,
-    /// The creation time of this layer. The value is an RFC 3339 formatted date-time value (e.g. 1970-01-01T00:00:00Z).    
+    /// The creation time of this layer. The value is an RFC 3339 formatted date-time value (e.g. 1970-01-01T00:00:00Z).
     #[serde(alias="creationTime")]
     pub creation_time: Option<String>,
-    /// The publishing status of this layer.    
+    /// The publishing status of this layer.
     #[serde(alias="publishingStatus")]
     pub publishing_status: Option<String>,
-    /// The ETag, used to refer to the current version of the asset.    
+    /// The ETag, used to refer to the current version of the asset.
     pub etag: Option<String>,
-    /// The type of the datasources used to build this Layer. This should be used instead of datasourceType. At least one of layerType and datasourceType and must be specified, but layerType takes precedence.    
+    /// The type of the datasources used to build this Layer. This should be used instead of datasourceType. At least one of layerType and datasourceType and must be specified, but layerType takes precedence.
     #[serde(alias="layerType")]
     pub layer_type: Option<String>,
-    /// Deprecated: The access list to whom view permissions are granted. The value must be the name of a Maps Engine access list of the Map Viewer type, and the user must be a viewer on that list. Note: Google Maps Engine no longer uses access lists. Instead, each asset has its own list of permissions. For backward compatibility, the API still accepts access lists for projects that are already using access lists. If you created a GME account/project after July 14th, 2014, you will not be able to send API requests that include access lists. Note: This is an input field only. It is not returned in response to a list or get request.    
+    /// Deprecated: The access list to whom view permissions are granted. The value must be the name of a Maps Engine access list of the Map Viewer type, and the user must be a viewer on that list. Note: Google Maps Engine no longer uses access lists. Instead, each asset has its own list of permissions. For backward compatibility, the API still accepts access lists for projects that are already using access lists. If you created a GME account/project after July 14th, 2014, you will not be able to send API requests that include access lists. Note: This is an input field only. It is not returned in response to a list or get request.
     #[serde(alias="publishedAccessList")]
     pub published_access_list: Option<String>,
 }
@@ -1319,10 +1328,10 @@ impl ResponseResult for Layer {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct ParentsListResponse {
-    /// Next page token.    
+    /// Next page token.
     #[serde(alias="nextPageToken")]
     pub next_page_token: String,
-    /// The parent assets.    
+    /// The parent assets.
     pub parents: Vec<Parent>,
 }
 
@@ -1335,13 +1344,13 @@ impl ResponseResult for ParentsListResponse {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct VectorStyle {
-    /// Individual feature info, this is called Info Window in Maps Engine UI. If not provided, a default template with all attributes will be generated.    
+    /// Individual feature info, this is called Info Window in Maps Engine UI. If not provided, a default template with all attributes will be generated.
     #[serde(alias="featureInfo")]
     pub feature_info: FeatureInfo,
-    /// The type of the vector style. Currently, only displayRule is supported.    
+    /// The type of the vector style. Currently, only displayRule is supported.
     #[serde(alias="type")]
     pub type_: String,
-    /// no description provided    
+    /// no description provided
     #[serde(alias="displayRules")]
     pub display_rules: Vec<DisplayRule>,
 }
@@ -1360,10 +1369,10 @@ impl Part for VectorStyle {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct RasterCollectionsRastersListResponse {
-    /// Next page token.    
+    /// Next page token.
     #[serde(alias="nextPageToken")]
     pub next_page_token: String,
-    /// Resources returned.    
+    /// Resources returned.
     pub rasters: Vec<RasterCollectionsRaster>,
 }
 
@@ -1399,10 +1408,10 @@ impl ResponseResult for PublishResponse {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct AssetsListResponse {
-    /// Next page token.    
+    /// Next page token.
     #[serde(alias="nextPageToken")]
     pub next_page_token: String,
-    /// Assets returned.    
+    /// Assets returned.
     pub assets: Vec<Asset>,
 }
 
@@ -1440,11 +1449,11 @@ impl ResponseResult for PermissionsBatchDeleteResponse {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Icon {
-    /// The description of this Icon, supplied by the author.    
+    /// The description of this Icon, supplied by the author.
     pub description: Option<String>,
-    /// An ID used to refer to this Icon.    
+    /// An ID used to refer to this Icon.
     pub id: Option<String>,
-    /// The name of this Icon, supplied by the author.    
+    /// The name of this Icon, supplied by the author.
     pub name: Option<String>,
 }
 
@@ -1506,7 +1515,7 @@ impl Part for Tags {}
 /// 
 #[derive(Default, Clone, Debug, Serialize)]
 pub struct PermissionsBatchDeleteRequest {
-    /// An array of permission ids to be removed. This could be the email address of the user or group this permission refers to, or the string "anyone" for public permissions.    
+    /// An array of permission ids to be removed. This could be the email address of the user or group this permission refers to, or the string "anyone" for public permissions.
     pub ids: Option<Vec<String>>,
 }
 
@@ -1544,19 +1553,19 @@ impl ResponseResult for ProcessResponse {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct PublishedMap {
-    /// The description of this Map, supplied by the author.    
+    /// The description of this Map, supplied by the author.
     pub description: String,
-    /// An array of four numbers (west, south, east, north) which defines the rectangular bounding box of the default viewport. The numbers represent latitude and longitude in decimal degrees.    
+    /// An array of four numbers (west, south, east, north) which defines the rectangular bounding box of the default viewport. The numbers represent latitude and longitude in decimal degrees.
     #[serde(alias="defaultViewport")]
     pub default_viewport: LatLngBox,
-    /// The ID of the project that this Map is in.    
+    /// The ID of the project that this Map is in.
     #[serde(alias="projectId")]
     pub project_id: String,
-    /// A globally unique ID, used to refer to this Map.    
+    /// A globally unique ID, used to refer to this Map.
     pub id: String,
-    /// The contents of this Map.    
+    /// The contents of this Map.
     pub contents: MapContents,
-    /// The name of this Map, supplied by the author.    
+    /// The name of this Map, supplied by the author.
     pub name: String,
 }
 
@@ -1574,17 +1583,17 @@ impl ResponseResult for PublishedMap {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct PublishedLayer {
-    /// The ID of the project that this Layer is in.    
+    /// The ID of the project that this Layer is in.
     #[serde(alias="projectId")]
     pub project_id: String,
-    /// The name of this Layer, supplied by the author.    
+    /// The name of this Layer, supplied by the author.
     pub name: String,
-    /// The description of this Layer, supplied by the author.    
+    /// The description of this Layer, supplied by the author.
     pub description: String,
-    /// The type of the datasources used to build this Layer. This should be used instead of datasourceType. At least one of layerType and datasourceType and must be specified, but layerType takes precedence.    
+    /// The type of the datasources used to build this Layer. This should be used instead of datasourceType. At least one of layerType and datasourceType and must be specified, but layerType takes precedence.
     #[serde(alias="layerType")]
     pub layer_type: String,
-    /// A globally unique ID, used to refer to this Layer.    
+    /// A globally unique ID, used to refer to this Layer.
     pub id: String,
 }
 
@@ -1612,10 +1621,10 @@ impl Part for GeoJsonProperties {}
 /// 
 #[derive(Default, Clone, Debug, Serialize)]
 pub struct FeaturesBatchPatchRequest {
-    /// If true, the server will normalize feature geometries. It is assumed that the South Pole is exterior to any polygons given. See here for a list of normalizations. If false, all feature geometries must be given already normalized. The points in all LinearRings must be listed in counter-clockwise order, and LinearRings may not intersect.    
+    /// If true, the server will normalize feature geometries. It is assumed that the South Pole is exterior to any polygons given. See here for a list of normalizations. If false, all feature geometries must be given already normalized. The points in all LinearRings must be listed in counter-clockwise order, and LinearRings may not intersect.
     #[serde(alias="normalizeGeometries")]
     pub normalize_geometries: Option<bool>,
-    /// no description provided    
+    /// no description provided
     pub features: Option<Vec<Feature>>,
 }
 
@@ -1628,13 +1637,13 @@ impl RequestValue for FeaturesBatchPatchRequest {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct LineStyle {
-    /// Dash defines the pattern of the line, the values are pixel lengths of alternating dash and gap. If dash is not provided, then it means a solid line. Dash can contain up to 10 values and must contain even number of values.    
+    /// Dash defines the pattern of the line, the values are pixel lengths of alternating dash and gap. If dash is not provided, then it means a solid line. Dash can contain up to 10 values and must contain even number of values.
     pub dash: Vec<f64>,
-    /// Stroke of the line.    
+    /// Stroke of the line.
     pub stroke: LineStyleStroke,
-    /// Border of the line. 0 < border.width <= 5.    
+    /// Border of the line. 0 < border.width <= 5.
     pub border: Border,
-    /// Label style for the line.    
+    /// Label style for the line.
     pub label: LabelStyle,
 }
 
@@ -1647,13 +1656,13 @@ impl Part for LineStyle {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Schema {
-    /// The name of the column that contains a feature's geometry. This field can be omitted during table create; Google Maps Engine supports only a single geometry column, which must be named geometry and be the first object in the columns array.    
+    /// The name of the column that contains a feature's geometry. This field can be omitted during table create; Google Maps Engine supports only a single geometry column, which must be named geometry and be the first object in the columns array.
     #[serde(alias="primaryGeometry")]
     pub primary_geometry: String,
-    /// The name of the column that contains the unique identifier of a Feature.    
+    /// The name of the column that contains the unique identifier of a Feature.
     #[serde(alias="primaryKey")]
     pub primary_key: String,
-    /// An array of TableColumn objects. The first object in the array must be named geometry and be of type points, lineStrings, polygons, or mixedGeometry.    
+    /// An array of TableColumn objects. The first object in the array must be named geometry and be of type points, lineStrings, polygons, or mixedGeometry.
     pub columns: Vec<TableColumn>,
 }
 
@@ -1682,53 +1691,53 @@ impl Part for Schema {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Map {
-    /// The description of this Map, supplied by the author.    
+    /// The description of this Map, supplied by the author.
     pub description: Option<String>,
-    /// An array of four numbers (west, south, east, north) which defines the rectangular bounding box of the default viewport. The numbers represent latitude and longitude in decimal degrees.    
+    /// An array of four numbers (west, south, east, north) which defines the rectangular bounding box of the default viewport. The numbers represent latitude and longitude in decimal degrees.
     #[serde(alias="defaultViewport")]
     pub default_viewport: Option<LatLngBox>,
-    /// Tags of this Map.    
+    /// Tags of this Map.
     pub tags: Option<Tags>,
-    /// Deprecated: The name of an access list of the Map Editor type. The user on whose behalf the request is being sent must be an editor on that access list. Note: Google Maps Engine no longer uses access lists. Instead, each asset has its own list of permissions. For backward compatibility, the API still accepts access lists for projects that are already using access lists. If you created a GME account/project after July 14th, 2014, you will not be able to send API requests that include access lists. Note: This is an input field only. It is not returned in response to a list or get request.    
+    /// Deprecated: The name of an access list of the Map Editor type. The user on whose behalf the request is being sent must be an editor on that access list. Note: Google Maps Engine no longer uses access lists. Instead, each asset has its own list of permissions. For backward compatibility, the API still accepts access lists for projects that are already using access lists. If you created a GME account/project after July 14th, 2014, you will not be able to send API requests that include access lists. Note: This is an input field only. It is not returned in response to a list or get request.
     #[serde(alias="draftAccessList")]
     pub draft_access_list: Option<String>,
-    /// If true, WRITERs of the asset are able to edit the asset permissions.    
+    /// If true, WRITERs of the asset are able to edit the asset permissions.
     #[serde(alias="writersCanEditPermissions")]
     pub writers_can_edit_permissions: Option<bool>,
-    /// The email address of the creator of this map. This is only returned on GET requests and not LIST requests.    
+    /// The email address of the creator of this map. This is only returned on GET requests and not LIST requests.
     #[serde(alias="creatorEmail")]
     pub creator_email: Option<String>,
-    /// A rectangular bounding box which contains all of the data in this Map. The box is expressed as \"west, south, east, north\". The numbers represent latitude and longitude in decimal degrees.    
+    /// A rectangular bounding box which contains all of the data in this Map. The box is expressed as \"west, south, east, north\". The numbers represent latitude and longitude in decimal degrees.
     pub bbox: Option<Vec<f64>>,
-    /// The email address of the last modifier of this map. This is only returned on GET requests and not LIST requests.    
+    /// The email address of the last modifier of this map. This is only returned on GET requests and not LIST requests.
     #[serde(alias="lastModifierEmail")]
     pub last_modifier_email: Option<String>,
-    /// The last modified time of this map. The value is an RFC 3339 formatted date-time value (e.g. 1970-01-01T00:00:00Z).    
+    /// The last modified time of this map. The value is an RFC 3339 formatted date-time value (e.g. 1970-01-01T00:00:00Z).
     #[serde(alias="lastModifiedTime")]
     pub last_modified_time: Option<String>,
-    /// A globally unique ID, used to refer to this Map.    
+    /// A globally unique ID, used to refer to this Map.
     pub id: Option<String>,
-    /// The contents of this Map.    
+    /// The contents of this Map.
     pub contents: Option<MapContents>,
-    /// The name of this Map, supplied by the author.    
+    /// The name of this Map, supplied by the author.
     pub name: Option<String>,
-    /// The processing status of this map. Map processing is automatically started once a map becomes ready for processing.    
+    /// The processing status of this map. Map processing is automatically started once a map becomes ready for processing.
     #[serde(alias="processingStatus")]
     pub processing_status: Option<String>,
-    /// The ID of the project that this Map is in.    
+    /// The ID of the project that this Map is in.
     #[serde(alias="projectId")]
     pub project_id: Option<String>,
-    /// Deprecated: An array containing the available versions of this Map. Currently may only contain "published". The publishingStatus field should be used instead.    
+    /// Deprecated: An array containing the available versions of this Map. Currently may only contain "published". The publishingStatus field should be used instead.
     pub versions: Option<Vec<String>>,
-    /// The creation time of this map. The value is an RFC 3339 formatted date-time value (e.g. 1970-01-01T00:00:00Z).    
+    /// The creation time of this map. The value is an RFC 3339 formatted date-time value (e.g. 1970-01-01T00:00:00Z).
     #[serde(alias="creationTime")]
     pub creation_time: Option<String>,
-    /// The publishing status of this map.    
+    /// The publishing status of this map.
     #[serde(alias="publishingStatus")]
     pub publishing_status: Option<String>,
-    /// The ETag, used to refer to the current version of the asset.    
+    /// The ETag, used to refer to the current version of the asset.
     pub etag: Option<String>,
-    /// Deprecated: The access list to whom view permissions are granted. The value must be the name of a Maps Engine access list of the Map Viewer type, and the user must be a viewer on that list. Note: Google Maps Engine no longer uses access lists. Instead, each asset has its own list of permissions. For backward compatibility, the API still accepts access lists for projects that are already using access lists. If you created a GME account/project after July 14th, 2014, you will not be able to send API requests that include access lists. This is an input field only. It is not returned in response to a list or get request.    
+    /// Deprecated: The access list to whom view permissions are granted. The value must be the name of a Maps Engine access list of the Map Viewer type, and the user must be a viewer on that list. Note: Google Maps Engine no longer uses access lists. Instead, each asset has its own list of permissions. For backward compatibility, the API still accepts access lists for projects that are already using access lists. If you created a GME account/project after July 14th, 2014, you will not be able to send API requests that include access lists. This is an input field only. It is not returned in response to a list or get request.
     #[serde(alias="publishedAccessList")]
     pub published_access_list: Option<String>,
 }
@@ -1756,14 +1765,14 @@ impl Part for Datasources {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Permission {
-    /// The type of access granted to this user or group.    
+    /// The type of access granted to this user or group.
     pub role: String,
-    /// The account type.    
+    /// The account type.
     #[serde(alias="type")]
     pub type_: String,
-    /// Indicates whether a public asset is listed and can be found via a web search (value true), or is visible only to people who have a link to the asset (value false).    
+    /// Indicates whether a public asset is listed and can be found via a web search (value true), or is visible only to people who have a link to the asset (value false).
     pub discoverable: bool,
-    /// The unique identifier of the permission. This could be the email address of the user or group this permission refers to, or the string "anyone" for public permissions.    
+    /// The unique identifier of the permission. This could be the email address of the user or group this permission refers to, or the string "anyone" for public permissions.
     pub id: String,
 }
 
@@ -1776,11 +1785,11 @@ impl Part for Permission {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ScaledShape {
-    /// Name of the shape.    
+    /// Name of the shape.
     pub shape: String,
-    /// Border color/width of the shape. If not specified the shape won't have a border.    
+    /// Border color/width of the shape. If not specified the shape won't have a border.
     pub border: Border,
-    /// The fill color of the shape. If not specified the shape will be transparent (although the borders may not be).    
+    /// The fill color of the shape. If not specified the shape will be transparent (although the borders may not be).
     pub fill: Color,
 }
 
@@ -1793,9 +1802,9 @@ impl Part for ScaledShape {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ZoomLevels {
-    /// Maximum zoom level.    
+    /// Maximum zoom level.
     pub max: i32,
-    /// Minimum zoom level.    
+    /// Minimum zoom level.
     pub min: i32,
 }
 
@@ -1813,10 +1822,10 @@ impl Part for ZoomLevels {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct IconsListResponse {
-    /// Next page token.    
+    /// Next page token.
     #[serde(alias="nextPageToken")]
     pub next_page_token: String,
-    /// Resources returned.    
+    /// Resources returned.
     pub icons: Vec<Icon>,
 }
 
@@ -1829,15 +1838,15 @@ impl ResponseResult for IconsListResponse {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ScalingFunction {
-    /// Name of the numeric column used to scale a shape.    
+    /// Name of the numeric column used to scale a shape.
     pub column: String,
-    /// The range of values to display across the size range.    
+    /// The range of values to display across the size range.
     #[serde(alias="valueRange")]
     pub value_range: ValueRange,
-    /// The range of shape sizes, in pixels. For circles, the size corresponds to the diameter.    
+    /// The range of shape sizes, in pixels. For circles, the size corresponds to the diameter.
     #[serde(alias="sizeRange")]
     pub size_range: SizeRange,
-    /// The type of scaling function to use. Defaults to SQRT. Currently only linear and square root scaling are supported.    
+    /// The type of scaling function to use. Defaults to SQRT. Currently only linear and square root scaling are supported.
     #[serde(alias="scalingType")]
     pub scaling_type: String,
 }
@@ -1851,11 +1860,11 @@ impl Part for ScalingFunction {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct PolygonStyle {
-    /// Border of the polygon. 0 < border.width <= 10.    
+    /// Border of the polygon. 0 < border.width <= 10.
     pub stroke: Border,
-    /// Fill color of the polygon. If not provided, the polygon will be transparent and not visible if there is no border.    
+    /// Fill color of the polygon. If not provided, the polygon will be transparent and not visible if there is no border.
     pub fill: Color,
-    /// Label style for the polygon.    
+    /// Label style for the polygon.
     pub label: LabelStyle,
 }
 
@@ -1889,7 +1898,7 @@ impl Part for LatLngBox {}
 /// 
 #[derive(Default, Clone, Debug, Serialize)]
 pub struct PermissionsBatchUpdateRequest {
-    /// The permissions to be inserted or updated.    
+    /// The permissions to be inserted or updated.
     pub permissions: Option<Vec<Permission>>,
 }
 
@@ -1907,7 +1916,7 @@ impl RequestValue for PermissionsBatchUpdateRequest {}
 /// 
 #[derive(Default, Clone, Debug, Serialize)]
 pub struct RasterCollectionsRastersBatchInsertRequest {
-    /// An array of Raster asset IDs to be added to this RasterCollection.    
+    /// An array of Raster asset IDs to be added to this RasterCollection.
     pub ids: Option<Vec<String>>,
 }
 
@@ -1920,7 +1929,7 @@ impl RequestValue for RasterCollectionsRastersBatchInsertRequest {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct FeatureInfo {
-    /// HTML template of the info window. If not provided, a default template with all attributes will be generated.    
+    /// HTML template of the info window. If not provided, a default template with all attributes will be generated.
     pub content: String,
 }
 
@@ -1933,9 +1942,9 @@ impl Part for FeatureInfo {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct SizeRange {
-    /// Maximum size, in pixels.    
+    /// Maximum size, in pixels.
     pub max: f64,
-    /// Minimum size, in pixels.    
+    /// Minimum size, in pixels.
     pub min: f64,
 }
 
@@ -1953,10 +1962,10 @@ impl Part for SizeRange {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct TablesListResponse {
-    /// Next page token.    
+    /// Next page token.
     #[serde(alias="nextPageToken")]
     pub next_page_token: String,
-    /// Resources returned.    
+    /// Resources returned.
     pub tables: Vec<Table>,
 }
 
@@ -1969,11 +1978,11 @@ impl ResponseResult for TablesListResponse {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct LineStyleStroke {
-    /// Color of the line.    
+    /// Color of the line.
     pub color: String,
-    /// Opacity of the line.    
+    /// Opacity of the line.
     pub opacity: f64,
-    /// Width of the line, in pixels. 0 <= width <= 10. If width is set to 0, the line will be invisible.    
+    /// Width of the line, in pixels. 0 <= width <= 10. If width is set to 0, the line will be invisible.
     pub width: f64,
 }
 
@@ -1995,9 +2004,9 @@ impl Part for LineStyleStroke {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct Project {
-    /// An ID used to refer to this Maps Engine project.    
+    /// An ID used to refer to this Maps Engine project.
     pub id: Option<String>,
-    /// A user provided name for this Maps Engine project.    
+    /// A user provided name for this Maps Engine project.
     pub name: Option<String>,
 }
 
@@ -2010,9 +2019,9 @@ impl Resource for Project {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct PointStyle {
-    /// Icon for the point; if it isn't null, exactly one of 'name', 'id' or 'scaledShape' must be set.    
+    /// Icon for the point; if it isn't null, exactly one of 'name', 'id' or 'scaledShape' must be set.
     pub icon: IconStyle,
-    /// Label style for the point.    
+    /// Label style for the point.
     pub label: LabelStyle,
 }
 
@@ -2025,9 +2034,9 @@ impl Part for PointStyle {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Color {
-    /// The CSS style color, can be in format of "red" or "#7733EE".    
+    /// The CSS style color, can be in format of "red" or "#7733EE".
     pub color: String,
-    /// Opacity ranges from 0 to 1, inclusive. If not provided, default to 1.    
+    /// Opacity ranges from 0 to 1, inclusive. If not provided, default to 1.
     pub opacity: f64,
 }
 
@@ -2040,11 +2049,11 @@ impl Part for Color {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Border {
-    /// Color of the border.    
+    /// Color of the border.
     pub color: String,
-    /// Opacity of the border.    
+    /// Opacity of the border.
     pub opacity: f64,
-    /// Width of the border, in pixels.    
+    /// Width of the border, in pixels.
     pub width: f64,
 }
 
@@ -2062,9 +2071,9 @@ impl Part for Border {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct PublishedLayersListResponse {
-    /// Resources returned.    
+    /// Resources returned.
     pub layers: Vec<PublishedLayer>,
-    /// Next page token.    
+    /// Next page token.
     #[serde(alias="nextPageToken")]
     pub next_page_token: String,
 }
@@ -2078,21 +2087,21 @@ impl ResponseResult for PublishedLayersListResponse {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct LabelStyle {
-    /// Opacity of the text.    
+    /// Opacity of the text.
     pub opacity: f64,
-    /// Font weight of the label, defaults to 'normal'.    
+    /// Font weight of the label, defaults to 'normal'.
     #[serde(alias="fontWeight")]
     pub font_weight: String,
-    /// Font style of the label, defaults to 'normal'.    
+    /// Font style of the label, defaults to 'normal'.
     #[serde(alias="fontStyle")]
     pub font_style: String,
-    /// Outline color of the text.    
+    /// Outline color of the text.
     pub outline: Color,
-    /// The column value of the feature to be displayed.    
+    /// The column value of the feature to be displayed.
     pub column: String,
-    /// Color of the text. If not provided, default to black.    
+    /// Color of the text. If not provided, default to black.
     pub color: String,
-    /// Font size of the label, in pixels. 8 <= size <= 15. If not provided, a default size will be provided.    
+    /// Font size of the label, in pixels. 8 <= size <= 15. If not provided, a default size will be provided.
     pub size: f64,
 }
 
@@ -2105,10 +2114,10 @@ impl Part for LabelStyle {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GeoJsonPoint {
-    /// Identifies this object as a GeoJsonPoint.    
+    /// Identifies this object as a GeoJsonPoint.
     #[serde(alias="type")]
     pub type_: String,
-    /// A single GeoJsonPosition, specifying the location of the point.    
+    /// A single GeoJsonPosition, specifying the location of the point.
     pub coordinates: GeoJsonPosition,
 }
 
@@ -2121,15 +2130,15 @@ impl Part for GeoJsonPoint {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct IconStyle {
-    /// The function used to scale shapes. Required when a scaledShape is specified.    
+    /// The function used to scale shapes. Required when a scaledShape is specified.
     #[serde(alias="scalingFunction")]
     pub scaling_function: ScalingFunction,
-    /// Custom icon id.    
+    /// Custom icon id.
     pub id: String,
-    /// A scalable shape.    
+    /// A scalable shape.
     #[serde(alias="scaledShape")]
     pub scaled_shape: ScaledShape,
-    /// Stock icon name. To use a stock icon, prefix it with 'gx_'. See Stock icon names for valid icon names. For example, to specify small_red, set name to 'gx_small_red'.    
+    /// Stock icon name. To use a stock icon, prefix it with 'gx_'. See Stock icon names for valid icon names. For example, to specify small_red, set name to 'gx_small_red'.
     pub name: String,
 }
 
@@ -2142,9 +2151,9 @@ impl Part for IconStyle {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ValueRange {
-    /// Maximum value.    
+    /// Maximum value.
     pub max: f64,
-    /// Minimum value.    
+    /// Minimum value.
     pub min: f64,
 }
 
@@ -2157,12 +2166,12 @@ impl Part for ValueRange {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct File {
-    /// The name of the file.    
+    /// The name of the file.
     pub filename: String,
-    /// The upload status of the file.    
+    /// The upload status of the file.
     #[serde(alias="uploadStatus")]
     pub upload_status: String,
-    /// The size of the file in bytes.    
+    /// The size of the file in bytes.
     pub size: String,
 }
 
@@ -2180,10 +2189,10 @@ impl Part for File {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct PublishedMapsListResponse {
-    /// Next page token.    
+    /// Next page token.
     #[serde(alias="nextPageToken")]
     pub next_page_token: String,
-    /// Resources returned.    
+    /// Resources returned.
     pub maps: Vec<PublishedMap>,
 }
 
@@ -2217,51 +2226,51 @@ impl ResponseResult for PublishedMapsListResponse {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Table {
-    /// The files associated with this table.    
+    /// The files associated with this table.
     pub files: Option<Vec<File>>,
-    /// The description of this table, supplied by the author.    
+    /// The description of this table, supplied by the author.
     pub description: Option<String>,
-    /// An array of text strings, with each string representing a tag. More information about tags can be found in the Tagging data article of the Maps Engine help center.    
+    /// An array of text strings, with each string representing a tag. More information about tags can be found in the Tagging data article of the Maps Engine help center.
     pub tags: Option<Tags>,
-    /// Deprecated: The name of an access list of the Map Editor type. The user on whose behalf the request is being sent must be an editor on that access list. Note: Google Maps Engine no longer uses access lists. Instead, each asset has its own list of permissions. For backward compatibility, the API still accepts access lists for projects that are already using access lists. If you created a GME account/project after July 14th, 2014, you will not be able to send API requests that include access lists. Note: This is an input field only. It is not returned in response to a list or get request.    
+    /// Deprecated: The name of an access list of the Map Editor type. The user on whose behalf the request is being sent must be an editor on that access list. Note: Google Maps Engine no longer uses access lists. Instead, each asset has its own list of permissions. For backward compatibility, the API still accepts access lists for projects that are already using access lists. If you created a GME account/project after July 14th, 2014, you will not be able to send API requests that include access lists. Note: This is an input field only. It is not returned in response to a list or get request.
     #[serde(alias="draftAccessList")]
     pub draft_access_list: Option<String>,
-    /// If true, WRITERs of the asset are able to edit the asset permissions.    
+    /// If true, WRITERs of the asset are able to edit the asset permissions.
     #[serde(alias="writersCanEditPermissions")]
     pub writers_can_edit_permissions: Option<bool>,
-    /// The email address of the creator of this table. This is only returned on GET requests and not LIST requests.    
+    /// The email address of the creator of this table. This is only returned on GET requests and not LIST requests.
     #[serde(alias="creatorEmail")]
     pub creator_email: Option<String>,
-    /// A rectangular bounding box which contains all of the data in this Table. The box is expressed as \"west, south, east, north\". The numbers represent latitude and longitude in decimal degrees.    
+    /// A rectangular bounding box which contains all of the data in this Table. The box is expressed as \"west, south, east, north\". The numbers represent latitude and longitude in decimal degrees.
     pub bbox: Option<Vec<f64>>,
-    /// The email address of the last modifier of this table. This is only returned on GET requests and not LIST requests.    
+    /// The email address of the last modifier of this table. This is only returned on GET requests and not LIST requests.
     #[serde(alias="lastModifierEmail")]
     pub last_modifier_email: Option<String>,
-    /// The last modified time of this table. The value is an RFC 3339 formatted date-time value (e.g. 1970-01-01T00:00:00Z).    
+    /// The last modified time of this table. The value is an RFC 3339 formatted date-time value (e.g. 1970-01-01T00:00:00Z).
     #[serde(alias="lastModifiedTime")]
     pub last_modified_time: Option<String>,
-    /// A globally unique ID, used to refer to this table.    
+    /// A globally unique ID, used to refer to this table.
     pub id: Option<String>,
-    /// The name of this table, supplied by the author.    
+    /// The name of this table, supplied by the author.
     pub name: Option<String>,
-    /// The processing status of this table.    
+    /// The processing status of this table.
     #[serde(alias="processingStatus")]
     pub processing_status: Option<String>,
-    /// The ID of the project to which the table belongs.    
+    /// The ID of the project to which the table belongs.
     #[serde(alias="projectId")]
     pub project_id: Option<String>,
-    /// The creation time of this table. The value is an RFC 3339 formatted date-time value (e.g. 1970-01-01T00:00:00Z).    
+    /// The creation time of this table. The value is an RFC 3339 formatted date-time value (e.g. 1970-01-01T00:00:00Z).
     #[serde(alias="creationTime")]
     pub creation_time: Option<String>,
-    /// Encoding of the uploaded files. Valid values include UTF-8, CP1251, ISO 8859-1, and Shift_JIS.    
+    /// Encoding of the uploaded files. Valid values include UTF-8, CP1251, ISO 8859-1, and Shift_JIS.
     #[serde(alias="sourceEncoding")]
     pub source_encoding: Option<String>,
-    /// The ETag, used to refer to the current version of the asset.    
+    /// The ETag, used to refer to the current version of the asset.
     pub etag: Option<String>,
-    /// Deprecated: The access list to whom view permissions are granted. The value must be the name of a Maps Engine access list of the Map Viewer type, and the user must be a viewer on that list. Note: Google Maps Engine no longer uses access lists. Instead, each asset has its own list of permissions. For backward compatibility, the API still accepts access lists for projects that are already using access lists. If you created a GME account/project after July 14th, 2014, you will not be able to send API requests that include access lists. Note: This is an input field only. It is not returned in response to a list or get request.    
+    /// Deprecated: The access list to whom view permissions are granted. The value must be the name of a Maps Engine access list of the Map Viewer type, and the user must be a viewer on that list. Note: Google Maps Engine no longer uses access lists. Instead, each asset has its own list of permissions. For backward compatibility, the API still accepts access lists for projects that are already using access lists. If you created a GME account/project after July 14th, 2014, you will not be able to send API requests that include access lists. Note: This is an input field only. It is not returned in response to a list or get request.
     #[serde(alias="publishedAccessList")]
     pub published_access_list: Option<String>,
-    /// The schema for this table. Note: The schema is returned in response to a get request but not a list request. After requesting a list of tables, you'll need to send a get request to retrieve the schema for each table.    
+    /// The schema for this table. Note: The schema is returned in response to a get request but not a list request. After requesting a list of tables, you'll need to send a get request to retrieve the schema for each table.
     pub schema: Option<Schema>,
 }
 
@@ -2281,10 +2290,10 @@ impl ResponseResult for Table {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct MapsListResponse {
-    /// Next page token.    
+    /// Next page token.
     #[serde(alias="nextPageToken")]
     pub next_page_token: String,
-    /// Resources returned.    
+    /// Resources returned.
     pub maps: Vec<Map>,
 }
 
@@ -2297,7 +2306,7 @@ impl ResponseResult for MapsListResponse {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Datasource {
-    /// The ID of a datasource.    
+    /// The ID of a datasource.
     pub id: String,
 }
 
@@ -2343,13 +2352,17 @@ pub struct LayerMethods<'a, C, NC, A>
     hub: &'a MapsEngine<C, NC, A>,
 }
 
-impl<'a, C, NC, A> ResourceMethodsBuilder for LayerMethods<'a, C, NC, A> {}
+impl<'a, C, NC, A> MethodsBuilder for LayerMethods<'a, C, NC, A> {}
 
 impl<'a, C, NC, A> LayerMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Unpublish a layer asset.    
+    /// Unpublish a layer asset.
+    /// 
+    /// # Arguments
+    ///
+    /// * `id` - The ID of the layer.
     pub fn unpublish(&self, id: &str) -> LayerUnpublishCall<'a, C, NC, A> {
         LayerUnpublishCall {
             hub: self.hub,
@@ -2362,7 +2375,11 @@ impl<'a, C, NC, A> LayerMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Publish a layer asset.    
+    /// Publish a layer asset.
+    /// 
+    /// # Arguments
+    ///
+    /// * `id` - The ID of the layer.
     pub fn publish(&self, id: &str) -> LayerPublishCall<'a, C, NC, A> {
         LayerPublishCall {
             hub: self.hub,
@@ -2376,7 +2393,7 @@ impl<'a, C, NC, A> LayerMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Return all published layers readable by the current user.    
+    /// Return all published layers readable by the current user.
     pub fn list_published(&self) -> LayerListPublishedCall<'a, C, NC, A> {
         LayerListPublishedCall {
             hub: self.hub,
@@ -2391,7 +2408,11 @@ impl<'a, C, NC, A> LayerMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Create a layer asset.    
+    /// Create a layer asset.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
     pub fn create(&self, request: &Layer) -> LayerCreateCall<'a, C, NC, A> {
         LayerCreateCall {
             hub: self.hub,
@@ -2405,7 +2426,11 @@ impl<'a, C, NC, A> LayerMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Return the published metadata for a particular layer.    
+    /// Return the published metadata for a particular layer.
+    /// 
+    /// # Arguments
+    ///
+    /// * `id` - The ID of the layer.
     pub fn get_published(&self, id: &str) -> LayerGetPublishedCall<'a, C, NC, A> {
         LayerGetPublishedCall {
             hub: self.hub,
@@ -2418,7 +2443,11 @@ impl<'a, C, NC, A> LayerMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Delete a layer.    
+    /// Delete a layer.
+    /// 
+    /// # Arguments
+    ///
+    /// * `id` - The ID of the layer. Only the layer creator or project owner are permitted to delete. If the layer is published, or included in a map, the request will fail. Unpublish the layer, and remove it from all maps prior to deleting.
     pub fn delete(&self, id: &str) -> LayerDeleteCall<'a, C, NC, A> {
         LayerDeleteCall {
             hub: self.hub,
@@ -2431,7 +2460,11 @@ impl<'a, C, NC, A> LayerMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Return metadata for a particular layer.    
+    /// Return metadata for a particular layer.
+    /// 
+    /// # Arguments
+    ///
+    /// * `id` - The ID of the layer.
     pub fn get(&self, id: &str) -> LayerGetCall<'a, C, NC, A> {
         LayerGetCall {
             hub: self.hub,
@@ -2445,7 +2478,12 @@ impl<'a, C, NC, A> LayerMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Remove permission entries from an already existing asset.    
+    /// Remove permission entries from an already existing asset.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `id` - The ID of the asset from which permissions will be removed.
     pub fn permissions_batch_delete(&self, request: &PermissionsBatchDeleteRequest, id: &str) -> LayerPermissionBatchDeleteCall<'a, C, NC, A> {
         LayerPermissionBatchDeleteCall {
             hub: self.hub,
@@ -2462,6 +2500,11 @@ impl<'a, C, NC, A> LayerMethods<'a, C, NC, A> {
     /// Add or update permission entries to an already existing asset.
     /// 
     /// An asset can hold up to 20 different permission entries. Each batchInsert request is atomic.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `id` - The ID of the asset to which permissions will be added.
     pub fn permissions_batch_update(&self, request: &PermissionsBatchUpdateRequest, id: &str) -> LayerPermissionBatchUpdateCall<'a, C, NC, A> {
         LayerPermissionBatchUpdateCall {
             hub: self.hub,
@@ -2475,7 +2518,7 @@ impl<'a, C, NC, A> LayerMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Return all layers readable by the current user.    
+    /// Return all layers readable by the current user.
     pub fn list(&self) -> LayerListCall<'a, C, NC, A> {
         LayerListCall {
             hub: self.hub,
@@ -2500,7 +2543,11 @@ impl<'a, C, NC, A> LayerMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Return all parent ids of the specified layer.    
+    /// Return all parent ids of the specified layer.
+    /// 
+    /// # Arguments
+    ///
+    /// * `id` - The ID of the layer whose parents will be listed.
     pub fn parents_list(&self, id: &str) -> LayerParentListCall<'a, C, NC, A> {
         LayerParentListCall {
             hub: self.hub,
@@ -2515,7 +2562,11 @@ impl<'a, C, NC, A> LayerMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Cancel processing on a layer asset.    
+    /// Cancel processing on a layer asset.
+    /// 
+    /// # Arguments
+    ///
+    /// * `id` - The ID of the layer.
     pub fn cancel_processing(&self, id: &str) -> LayerCancelProcessingCall<'a, C, NC, A> {
         LayerCancelProcessingCall {
             hub: self.hub,
@@ -2528,7 +2579,12 @@ impl<'a, C, NC, A> LayerMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Mutate a layer asset.    
+    /// Mutate a layer asset.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `id` - The ID of the layer.
     pub fn patch(&self, request: &Layer, id: &str) -> LayerPatchCall<'a, C, NC, A> {
         LayerPatchCall {
             hub: self.hub,
@@ -2542,7 +2598,11 @@ impl<'a, C, NC, A> LayerMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Return all of the permissions for the specified asset.    
+    /// Return all of the permissions for the specified asset.
+    /// 
+    /// # Arguments
+    ///
+    /// * `id` - The ID of the asset whose permissions will be listed.
     pub fn permissions_list(&self, id: &str) -> LayerPermissionListCall<'a, C, NC, A> {
         LayerPermissionListCall {
             hub: self.hub,
@@ -2555,7 +2615,11 @@ impl<'a, C, NC, A> LayerMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Process a layer asset.    
+    /// Process a layer asset.
+    /// 
+    /// # Arguments
+    ///
+    /// * `id` - The ID of the layer.
     pub fn process(&self, id: &str) -> LayerProcesCall<'a, C, NC, A> {
         LayerProcesCall {
             hub: self.hub,
@@ -2603,7 +2667,7 @@ pub struct RasterMethods<'a, C, NC, A>
     hub: &'a MapsEngine<C, NC, A>,
 }
 
-impl<'a, C, NC, A> ResourceMethodsBuilder for RasterMethods<'a, C, NC, A> {}
+impl<'a, C, NC, A> MethodsBuilder for RasterMethods<'a, C, NC, A> {}
 
 impl<'a, C, NC, A> RasterMethods<'a, C, NC, A> {
     
@@ -2612,6 +2676,11 @@ impl<'a, C, NC, A> RasterMethods<'a, C, NC, A> {
     /// Add or update permission entries to an already existing asset.
     /// 
     /// An asset can hold up to 20 different permission entries. Each batchInsert request is atomic.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `id` - The ID of the asset to which permissions will be added.
     pub fn permissions_batch_update(&self, request: &PermissionsBatchUpdateRequest, id: &str) -> RasterPermissionBatchUpdateCall<'a, C, NC, A> {
         RasterPermissionBatchUpdateCall {
             hub: self.hub,
@@ -2625,7 +2694,12 @@ impl<'a, C, NC, A> RasterMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Mutate a raster asset.    
+    /// Mutate a raster asset.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `id` - The ID of the raster.
     pub fn patch(&self, request: &Raster, id: &str) -> RasterPatchCall<'a, C, NC, A> {
         RasterPatchCall {
             hub: self.hub,
@@ -2639,7 +2713,11 @@ impl<'a, C, NC, A> RasterMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Return all of the permissions for the specified asset.    
+    /// Return all of the permissions for the specified asset.
+    /// 
+    /// # Arguments
+    ///
+    /// * `id` - The ID of the asset whose permissions will be listed.
     pub fn permissions_list(&self, id: &str) -> RasterPermissionListCall<'a, C, NC, A> {
         RasterPermissionListCall {
             hub: self.hub,
@@ -2652,7 +2730,11 @@ impl<'a, C, NC, A> RasterMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Delete a raster.    
+    /// Delete a raster.
+    /// 
+    /// # Arguments
+    ///
+    /// * `id` - The ID of the raster. Only the raster creator or project owner are permitted to delete. If the raster is included in a layer or mosaic, the request will fail. Remove it from all parents prior to deleting.
     pub fn delete(&self, id: &str) -> RasterDeleteCall<'a, C, NC, A> {
         RasterDeleteCall {
             hub: self.hub,
@@ -2665,7 +2747,12 @@ impl<'a, C, NC, A> RasterMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Remove permission entries from an already existing asset.    
+    /// Remove permission entries from an already existing asset.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `id` - The ID of the asset from which permissions will be removed.
     pub fn permissions_batch_delete(&self, request: &PermissionsBatchDeleteRequest, id: &str) -> RasterPermissionBatchDeleteCall<'a, C, NC, A> {
         RasterPermissionBatchDeleteCall {
             hub: self.hub,
@@ -2679,7 +2766,12 @@ impl<'a, C, NC, A> RasterMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Upload a file to a raster asset.    
+    /// Upload a file to a raster asset.
+    /// 
+    /// # Arguments
+    ///
+    /// * `id` - The ID of the raster asset.
+    /// * `filename` - The file name of this uploaded file.
     pub fn files_insert(&self, id: &str, filename: &str) -> RasterFileInsertCall<'a, C, NC, A> {
         RasterFileInsertCall {
             hub: self.hub,
@@ -2693,7 +2785,11 @@ impl<'a, C, NC, A> RasterMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Process a raster asset.    
+    /// Process a raster asset.
+    /// 
+    /// # Arguments
+    ///
+    /// * `id` - The ID of the raster.
     pub fn process(&self, id: &str) -> RasterProcesCall<'a, C, NC, A> {
         RasterProcesCall {
             hub: self.hub,
@@ -2706,7 +2802,11 @@ impl<'a, C, NC, A> RasterMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Return metadata for a single raster.    
+    /// Return metadata for a single raster.
+    /// 
+    /// # Arguments
+    ///
+    /// * `id` - The ID of the raster.
     pub fn get(&self, id: &str) -> RasterGetCall<'a, C, NC, A> {
         RasterGetCall {
             hub: self.hub,
@@ -2719,7 +2819,11 @@ impl<'a, C, NC, A> RasterMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Return all rasters readable by the current user.    
+    /// Return all rasters readable by the current user.
+    /// 
+    /// # Arguments
+    ///
+    /// * `projectId` - The ID of a Maps Engine project, used to filter the response. To list all available projects with their IDs, send a Projects: list request. You can also find your project ID as the value of the DashboardPlace:cid URL parameter when signed in to mapsengine.google.com.
     pub fn list(&self, project_id: &str) -> RasterListCall<'a, C, NC, A> {
         RasterListCall {
             hub: self.hub,
@@ -2744,7 +2848,11 @@ impl<'a, C, NC, A> RasterMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Create a skeleton raster asset for upload.    
+    /// Create a skeleton raster asset for upload.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
     pub fn upload(&self, request: &Raster) -> RasterUploadCall<'a, C, NC, A> {
         RasterUploadCall {
             hub: self.hub,
@@ -2757,7 +2865,11 @@ impl<'a, C, NC, A> RasterMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Return all parent ids of the specified rasters.    
+    /// Return all parent ids of the specified rasters.
+    /// 
+    /// # Arguments
+    ///
+    /// * `id` - The ID of the rasters whose parents will be listed.
     pub fn parents_list(&self, id: &str) -> RasterParentListCall<'a, C, NC, A> {
         RasterParentListCall {
             hub: self.hub,
@@ -2807,13 +2919,17 @@ pub struct AssetMethods<'a, C, NC, A>
     hub: &'a MapsEngine<C, NC, A>,
 }
 
-impl<'a, C, NC, A> ResourceMethodsBuilder for AssetMethods<'a, C, NC, A> {}
+impl<'a, C, NC, A> MethodsBuilder for AssetMethods<'a, C, NC, A> {}
 
 impl<'a, C, NC, A> AssetMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Return all of the permissions for the specified asset.    
+    /// Return all of the permissions for the specified asset.
+    /// 
+    /// # Arguments
+    ///
+    /// * `id` - The ID of the asset whose permissions will be listed.
     pub fn permissions_list(&self, id: &str) -> AssetPermissionListCall<'a, C, NC, A> {
         AssetPermissionListCall {
             hub: self.hub,
@@ -2826,7 +2942,7 @@ impl<'a, C, NC, A> AssetMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Return all assets readable by the current user.    
+    /// Return all assets readable by the current user.
     pub fn list(&self) -> AssetListCall<'a, C, NC, A> {
         AssetListCall {
             hub: self.hub,
@@ -2851,7 +2967,11 @@ impl<'a, C, NC, A> AssetMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Return metadata for a particular asset.    
+    /// Return metadata for a particular asset.
+    /// 
+    /// # Arguments
+    ///
+    /// * `id` - The ID of the asset.
     pub fn get(&self, id: &str) -> AssetGetCall<'a, C, NC, A> {
         AssetGetCall {
             hub: self.hub,
@@ -2864,7 +2984,11 @@ impl<'a, C, NC, A> AssetMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Return all parent ids of the specified asset.    
+    /// Return all parent ids of the specified asset.
+    /// 
+    /// # Arguments
+    ///
+    /// * `id` - The ID of the asset whose parents will be listed.
     pub fn parents_list(&self, id: &str) -> AssetParentListCall<'a, C, NC, A> {
         AssetParentListCall {
             hub: self.hub,
@@ -2914,13 +3038,17 @@ pub struct TableMethods<'a, C, NC, A>
     hub: &'a MapsEngine<C, NC, A>,
 }
 
-impl<'a, C, NC, A> ResourceMethodsBuilder for TableMethods<'a, C, NC, A> {}
+impl<'a, C, NC, A> MethodsBuilder for TableMethods<'a, C, NC, A> {}
 
 impl<'a, C, NC, A> TableMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Delete a table.    
+    /// Delete a table.
+    /// 
+    /// # Arguments
+    ///
+    /// * `id` - The ID of the table. Only the table creator or project owner are permitted to delete. If the table is included in a layer, the request will fail. Remove it from all layers prior to deleting.
     pub fn delete(&self, id: &str) -> TableDeleteCall<'a, C, NC, A> {
         TableDeleteCall {
             hub: self.hub,
@@ -2935,6 +3063,11 @@ impl<'a, C, NC, A> TableMethods<'a, C, NC, A> {
     ///
     /// Upload a file to a placeholder table asset. See Table Upload in the Developer's Guide for more information.
     /// Supported file types are listed in the Supported data formats and limits article of the Google Maps Engine help center.
+    /// 
+    /// # Arguments
+    ///
+    /// * `id` - The ID of the table asset.
+    /// * `filename` - The file name of this uploaded file.
     pub fn files_insert(&self, id: &str, filename: &str) -> TableFileInsertCall<'a, C, NC, A> {
         TableFileInsertCall {
             hub: self.hub,
@@ -2957,6 +3090,11 @@ impl<'a, C, NC, A> TableMethods<'a, C, NC, A> {
     /// Feature limits are documented in the Supported data formats and limits article of the Google Maps Engine help center. Note that free and paid accounts have different limits.
     /// 
     /// For more information about inserting features, read Creating features in the Google Maps Engine developer's guide.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `id` - The ID of the table to append the features to.
     pub fn features_batch_insert(&self, request: &FeaturesBatchInsertRequest, id: &str) -> TableFeatureBatchInsertCall<'a, C, NC, A> {
         TableFeatureBatchInsertCall {
             hub: self.hub,
@@ -2970,7 +3108,7 @@ impl<'a, C, NC, A> TableMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Return all tables readable by the current user.    
+    /// Return all tables readable by the current user.
     pub fn list(&self) -> TableListCall<'a, C, NC, A> {
         TableListCall {
             hub: self.hub,
@@ -2995,7 +3133,11 @@ impl<'a, C, NC, A> TableMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Return metadata for a particular table, including the schema.    
+    /// Return metadata for a particular table, including the schema.
+    /// 
+    /// # Arguments
+    ///
+    /// * `id` - The ID of the table.
     pub fn get(&self, id: &str) -> TableGetCall<'a, C, NC, A> {
         TableGetCall {
             hub: self.hub,
@@ -3009,7 +3151,12 @@ impl<'a, C, NC, A> TableMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Delete all features matching the given IDs.    
+    /// Delete all features matching the given IDs.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `id` - The ID of the table that contains the features to be deleted.
     pub fn features_batch_delete(&self, request: &FeaturesBatchDeleteRequest, id: &str) -> TableFeatureBatchDeleteCall<'a, C, NC, A> {
         TableFeatureBatchDeleteCall {
             hub: self.hub,
@@ -3023,7 +3170,11 @@ impl<'a, C, NC, A> TableMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Return all features readable by the current user.    
+    /// Return all features readable by the current user.
+    /// 
+    /// # Arguments
+    ///
+    /// * `id` - The ID of the table to which these features belong.
     pub fn features_list(&self, id: &str) -> TableFeatureListCall<'a, C, NC, A> {
         TableFeatureListCall {
             hub: self.hub,
@@ -3045,7 +3196,11 @@ impl<'a, C, NC, A> TableMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Process a table asset.    
+    /// Process a table asset.
+    /// 
+    /// # Arguments
+    ///
+    /// * `id` - The ID of the table.
     pub fn process(&self, id: &str) -> TableProcesCall<'a, C, NC, A> {
         TableProcesCall {
             hub: self.hub,
@@ -3058,7 +3213,11 @@ impl<'a, C, NC, A> TableMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Return all parent ids of the specified table.    
+    /// Return all parent ids of the specified table.
+    /// 
+    /// # Arguments
+    ///
+    /// * `id` - The ID of the table whose parents will be listed.
     pub fn parents_list(&self, id: &str) -> TableParentListCall<'a, C, NC, A> {
         TableParentListCall {
             hub: self.hub,
@@ -3076,6 +3235,11 @@ impl<'a, C, NC, A> TableMethods<'a, C, NC, A> {
     /// Add or update permission entries to an already existing asset.
     /// 
     /// An asset can hold up to 20 different permission entries. Each batchInsert request is atomic.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `id` - The ID of the asset to which permissions will be added.
     pub fn permissions_batch_update(&self, request: &PermissionsBatchUpdateRequest, id: &str) -> TablePermissionBatchUpdateCall<'a, C, NC, A> {
         TablePermissionBatchUpdateCall {
             hub: self.hub,
@@ -3092,6 +3256,10 @@ impl<'a, C, NC, A> TableMethods<'a, C, NC, A> {
     /// Create a placeholder table asset to which table files can be uploaded.
     /// Once the placeholder has been created, files are uploaded to the https://www.googleapis.com/upload/mapsengine/v1/tables/table_id/files endpoint.
     /// See Table Upload in the Developer's Guide or Table.files: insert in the reference documentation for more information.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
     pub fn upload(&self, request: &Table) -> TableUploadCall<'a, C, NC, A> {
         TableUploadCall {
             hub: self.hub,
@@ -3119,6 +3287,11 @@ impl<'a, C, NC, A> TableMethods<'a, C, NC, A> {
     /// - Complex values in geometries and properties must be replaced as atomic units. For example, providing just the coordinates of a geometry is not allowed; the complete geometry, including type, must be supplied.
     /// - Setting a property's value to null deletes that property.
     /// For more information about updating features, read Updating features in the Google Maps Engine developer's guide.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `id` - The ID of the table containing the features to be patched.
     pub fn features_batch_patch(&self, request: &FeaturesBatchPatchRequest, id: &str) -> TableFeatureBatchPatchCall<'a, C, NC, A> {
         TableFeatureBatchPatchCall {
             hub: self.hub,
@@ -3132,7 +3305,12 @@ impl<'a, C, NC, A> TableMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Mutate a table asset.    
+    /// Mutate a table asset.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `id` - The ID of the table.
     pub fn patch(&self, request: &Table, id: &str) -> TablePatchCall<'a, C, NC, A> {
         TablePatchCall {
             hub: self.hub,
@@ -3146,7 +3324,12 @@ impl<'a, C, NC, A> TableMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Remove permission entries from an already existing asset.    
+    /// Remove permission entries from an already existing asset.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `id` - The ID of the asset from which permissions will be removed.
     pub fn permissions_batch_delete(&self, request: &PermissionsBatchDeleteRequest, id: &str) -> TablePermissionBatchDeleteCall<'a, C, NC, A> {
         TablePermissionBatchDeleteCall {
             hub: self.hub,
@@ -3160,7 +3343,11 @@ impl<'a, C, NC, A> TableMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Create a table asset.    
+    /// Create a table asset.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
     pub fn create(&self, request: &Table) -> TableCreateCall<'a, C, NC, A> {
         TableCreateCall {
             hub: self.hub,
@@ -3173,7 +3360,11 @@ impl<'a, C, NC, A> TableMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Return all of the permissions for the specified asset.    
+    /// Return all of the permissions for the specified asset.
+    /// 
+    /// # Arguments
+    ///
+    /// * `id` - The ID of the asset whose permissions will be listed.
     pub fn permissions_list(&self, id: &str) -> TablePermissionListCall<'a, C, NC, A> {
         TablePermissionListCall {
             hub: self.hub,
@@ -3186,7 +3377,12 @@ impl<'a, C, NC, A> TableMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Return a single feature, given its ID.    
+    /// Return a single feature, given its ID.
+    /// 
+    /// # Arguments
+    ///
+    /// * `tableId` - The ID of the table.
+    /// * `id` - The ID of the feature to get.
     pub fn features_get(&self, table_id: &str, id: &str) -> TableFeatureGetCall<'a, C, NC, A> {
         TableFeatureGetCall {
             hub: self.hub,
@@ -3237,13 +3433,13 @@ pub struct MapMethods<'a, C, NC, A>
     hub: &'a MapsEngine<C, NC, A>,
 }
 
-impl<'a, C, NC, A> ResourceMethodsBuilder for MapMethods<'a, C, NC, A> {}
+impl<'a, C, NC, A> MethodsBuilder for MapMethods<'a, C, NC, A> {}
 
 impl<'a, C, NC, A> MapMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Return all maps readable by the current user.    
+    /// Return all maps readable by the current user.
     pub fn list(&self) -> MapListCall<'a, C, NC, A> {
         MapListCall {
             hub: self.hub,
@@ -3268,7 +3464,7 @@ impl<'a, C, NC, A> MapMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Return all published maps readable by the current user.    
+    /// Return all published maps readable by the current user.
     pub fn list_published(&self) -> MapListPublishedCall<'a, C, NC, A> {
         MapListPublishedCall {
             hub: self.hub,
@@ -3283,7 +3479,12 @@ impl<'a, C, NC, A> MapMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Mutate a map asset.    
+    /// Mutate a map asset.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `id` - The ID of the map.
     pub fn patch(&self, request: &Map, id: &str) -> MapPatchCall<'a, C, NC, A> {
         MapPatchCall {
             hub: self.hub,
@@ -3300,6 +3501,11 @@ impl<'a, C, NC, A> MapMethods<'a, C, NC, A> {
     /// Add or update permission entries to an already existing asset.
     /// 
     /// An asset can hold up to 20 different permission entries. Each batchInsert request is atomic.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `id` - The ID of the asset to which permissions will be added.
     pub fn permissions_batch_update(&self, request: &PermissionsBatchUpdateRequest, id: &str) -> MapPermissionBatchUpdateCall<'a, C, NC, A> {
         MapPermissionBatchUpdateCall {
             hub: self.hub,
@@ -3313,7 +3519,11 @@ impl<'a, C, NC, A> MapMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Delete a map.    
+    /// Delete a map.
+    /// 
+    /// # Arguments
+    ///
+    /// * `id` - The ID of the map. Only the map creator or project owner are permitted to delete. If the map is published the request will fail. Unpublish the map prior to deleting.
     pub fn delete(&self, id: &str) -> MapDeleteCall<'a, C, NC, A> {
         MapDeleteCall {
             hub: self.hub,
@@ -3326,7 +3536,11 @@ impl<'a, C, NC, A> MapMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Unpublish a map asset.    
+    /// Unpublish a map asset.
+    /// 
+    /// # Arguments
+    ///
+    /// * `id` - The ID of the map.
     pub fn unpublish(&self, id: &str) -> MapUnpublishCall<'a, C, NC, A> {
         MapUnpublishCall {
             hub: self.hub,
@@ -3339,7 +3553,11 @@ impl<'a, C, NC, A> MapMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Publish a map asset.    
+    /// Publish a map asset.
+    /// 
+    /// # Arguments
+    ///
+    /// * `id` - The ID of the map.
     pub fn publish(&self, id: &str) -> MapPublishCall<'a, C, NC, A> {
         MapPublishCall {
             hub: self.hub,
@@ -3353,7 +3571,11 @@ impl<'a, C, NC, A> MapMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Return all of the permissions for the specified asset.    
+    /// Return all of the permissions for the specified asset.
+    /// 
+    /// # Arguments
+    ///
+    /// * `id` - The ID of the asset whose permissions will be listed.
     pub fn permissions_list(&self, id: &str) -> MapPermissionListCall<'a, C, NC, A> {
         MapPermissionListCall {
             hub: self.hub,
@@ -3366,7 +3588,11 @@ impl<'a, C, NC, A> MapMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Create a map asset.    
+    /// Create a map asset.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
     pub fn create(&self, request: &Map) -> MapCreateCall<'a, C, NC, A> {
         MapCreateCall {
             hub: self.hub,
@@ -3379,7 +3605,11 @@ impl<'a, C, NC, A> MapMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Return the published metadata for a particular map.    
+    /// Return the published metadata for a particular map.
+    /// 
+    /// # Arguments
+    ///
+    /// * `id` - The ID of the map.
     pub fn get_published(&self, id: &str) -> MapGetPublishedCall<'a, C, NC, A> {
         MapGetPublishedCall {
             hub: self.hub,
@@ -3392,7 +3622,11 @@ impl<'a, C, NC, A> MapMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Return metadata for a particular map.    
+    /// Return metadata for a particular map.
+    /// 
+    /// # Arguments
+    ///
+    /// * `id` - The ID of the map.
     pub fn get(&self, id: &str) -> MapGetCall<'a, C, NC, A> {
         MapGetCall {
             hub: self.hub,
@@ -3406,7 +3640,12 @@ impl<'a, C, NC, A> MapMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Remove permission entries from an already existing asset.    
+    /// Remove permission entries from an already existing asset.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `id` - The ID of the asset from which permissions will be removed.
     pub fn permissions_batch_delete(&self, request: &PermissionsBatchDeleteRequest, id: &str) -> MapPermissionBatchDeleteCall<'a, C, NC, A> {
         MapPermissionBatchDeleteCall {
             hub: self.hub,
@@ -3455,13 +3694,17 @@ pub struct RasterCollectionMethods<'a, C, NC, A>
     hub: &'a MapsEngine<C, NC, A>,
 }
 
-impl<'a, C, NC, A> ResourceMethodsBuilder for RasterCollectionMethods<'a, C, NC, A> {}
+impl<'a, C, NC, A> MethodsBuilder for RasterCollectionMethods<'a, C, NC, A> {}
 
 impl<'a, C, NC, A> RasterCollectionMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Create a raster collection asset.    
+    /// Create a raster collection asset.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
     pub fn create(&self, request: &RasterCollection) -> RasterCollectionCreateCall<'a, C, NC, A> {
         RasterCollectionCreateCall {
             hub: self.hub,
@@ -3474,7 +3717,12 @@ impl<'a, C, NC, A> RasterCollectionMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Remove permission entries from an already existing asset.    
+    /// Remove permission entries from an already existing asset.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `id` - The ID of the asset from which permissions will be removed.
     pub fn permissions_batch_delete(&self, request: &PermissionsBatchDeleteRequest, id: &str) -> RasterCollectionPermissionBatchDeleteCall<'a, C, NC, A> {
         RasterCollectionPermissionBatchDeleteCall {
             hub: self.hub,
@@ -3488,7 +3736,12 @@ impl<'a, C, NC, A> RasterCollectionMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Mutate a raster collection asset.    
+    /// Mutate a raster collection asset.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `id` - The ID of the raster collection.
     pub fn patch(&self, request: &RasterCollection, id: &str) -> RasterCollectionPatchCall<'a, C, NC, A> {
         RasterCollectionPatchCall {
             hub: self.hub,
@@ -3502,7 +3755,11 @@ impl<'a, C, NC, A> RasterCollectionMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Cancel processing on a raster collection asset.    
+    /// Cancel processing on a raster collection asset.
+    /// 
+    /// # Arguments
+    ///
+    /// * `id` - The ID of the raster collection.
     pub fn cancel_processing(&self, id: &str) -> RasterCollectionCancelProcessingCall<'a, C, NC, A> {
         RasterCollectionCancelProcessingCall {
             hub: self.hub,
@@ -3515,7 +3772,11 @@ impl<'a, C, NC, A> RasterCollectionMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Process a raster collection asset.    
+    /// Process a raster collection asset.
+    /// 
+    /// # Arguments
+    ///
+    /// * `id` - The ID of the raster collection.
     pub fn process(&self, id: &str) -> RasterCollectionProcesCall<'a, C, NC, A> {
         RasterCollectionProcesCall {
             hub: self.hub,
@@ -3531,6 +3792,11 @@ impl<'a, C, NC, A> RasterCollectionMethods<'a, C, NC, A> {
     /// Add or update permission entries to an already existing asset.
     /// 
     /// An asset can hold up to 20 different permission entries. Each batchInsert request is atomic.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `id` - The ID of the asset to which permissions will be added.
     pub fn permissions_batch_update(&self, request: &PermissionsBatchUpdateRequest, id: &str) -> RasterCollectionPermissionBatchUpdateCall<'a, C, NC, A> {
         RasterCollectionPermissionBatchUpdateCall {
             hub: self.hub,
@@ -3544,7 +3810,11 @@ impl<'a, C, NC, A> RasterCollectionMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Delete a raster collection.    
+    /// Delete a raster collection.
+    /// 
+    /// # Arguments
+    ///
+    /// * `id` - The ID of the raster collection. Only the raster collection creator or project owner are permitted to delete. If the rastor collection is included in a layer, the request will fail. Remove the raster collection from all layers prior to deleting.
     pub fn delete(&self, id: &str) -> RasterCollectionDeleteCall<'a, C, NC, A> {
         RasterCollectionDeleteCall {
             hub: self.hub,
@@ -3557,7 +3827,11 @@ impl<'a, C, NC, A> RasterCollectionMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Return all parent ids of the specified raster collection.    
+    /// Return all parent ids of the specified raster collection.
+    /// 
+    /// # Arguments
+    ///
+    /// * `id` - The ID of the raster collection whose parents will be listed.
     pub fn parents_list(&self, id: &str) -> RasterCollectionParentListCall<'a, C, NC, A> {
         RasterCollectionParentListCall {
             hub: self.hub,
@@ -3572,7 +3846,7 @@ impl<'a, C, NC, A> RasterCollectionMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Return all raster collections readable by the current user.    
+    /// Return all raster collections readable by the current user.
     pub fn list(&self) -> RasterCollectionListCall<'a, C, NC, A> {
         RasterCollectionListCall {
             hub: self.hub,
@@ -3600,6 +3874,11 @@ impl<'a, C, NC, A> RasterCollectionMethods<'a, C, NC, A> {
     /// Add rasters to an existing raster collection. Rasters must be successfully processed in order to be added to a raster collection.
     /// 
     /// Up to 50 rasters can be included in a single batchInsert request. Each batchInsert request is atomic.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `id` - The ID of the raster collection to which these rasters belong.
     pub fn rasters_batch_insert(&self, request: &RasterCollectionsRastersBatchInsertRequest, id: &str) -> RasterCollectionRasterBatchInsertCall<'a, C, NC, A> {
         RasterCollectionRasterBatchInsertCall {
             hub: self.hub,
@@ -3616,6 +3895,11 @@ impl<'a, C, NC, A> RasterCollectionMethods<'a, C, NC, A> {
     /// Remove rasters from an existing raster collection.
     /// 
     /// Up to 50 rasters can be included in a single batchDelete request. Each batchDelete request is atomic.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `id` - The ID of the raster collection to which these rasters belong.
     pub fn rasters_batch_delete(&self, request: &RasterCollectionsRasterBatchDeleteRequest, id: &str) -> RasterCollectionRasterBatchDeleteCall<'a, C, NC, A> {
         RasterCollectionRasterBatchDeleteCall {
             hub: self.hub,
@@ -3629,7 +3913,11 @@ impl<'a, C, NC, A> RasterCollectionMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Return all of the permissions for the specified asset.    
+    /// Return all of the permissions for the specified asset.
+    /// 
+    /// # Arguments
+    ///
+    /// * `id` - The ID of the asset whose permissions will be listed.
     pub fn permissions_list(&self, id: &str) -> RasterCollectionPermissionListCall<'a, C, NC, A> {
         RasterCollectionPermissionListCall {
             hub: self.hub,
@@ -3642,7 +3930,11 @@ impl<'a, C, NC, A> RasterCollectionMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Return metadata for a particular raster collection.    
+    /// Return metadata for a particular raster collection.
+    /// 
+    /// # Arguments
+    ///
+    /// * `id` - The ID of the raster collection.
     pub fn get(&self, id: &str) -> RasterCollectionGetCall<'a, C, NC, A> {
         RasterCollectionGetCall {
             hub: self.hub,
@@ -3655,7 +3947,11 @@ impl<'a, C, NC, A> RasterCollectionMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Return all rasters within a raster collection.    
+    /// Return all rasters within a raster collection.
+    /// 
+    /// # Arguments
+    ///
+    /// * `id` - The ID of the raster collection to which these rasters belong.
     pub fn rasters_list(&self, id: &str) -> RasterCollectionRasterListCall<'a, C, NC, A> {
         RasterCollectionRasterListCall {
             hub: self.hub,
@@ -3714,13 +4010,18 @@ pub struct ProjectMethods<'a, C, NC, A>
     hub: &'a MapsEngine<C, NC, A>,
 }
 
-impl<'a, C, NC, A> ResourceMethodsBuilder for ProjectMethods<'a, C, NC, A> {}
+impl<'a, C, NC, A> MethodsBuilder for ProjectMethods<'a, C, NC, A> {}
 
 impl<'a, C, NC, A> ProjectMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Return an icon or its associated metadata    
+    /// Return an icon or its associated metadata
+    /// 
+    /// # Arguments
+    ///
+    /// * `projectId` - The ID of the project.
+    /// * `id` - The ID of the icon.
     pub fn icons_get(&self, project_id: &str, id: &str) -> ProjectIconGetCall<'a, C, NC, A> {
         ProjectIconGetCall {
             hub: self.hub,
@@ -3734,7 +4035,12 @@ impl<'a, C, NC, A> ProjectMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Create an icon.    
+    /// Create an icon.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `projectId` - The ID of the project.
     pub fn icons_create(&self, request: &Icon, project_id: &str) -> ProjectIconCreateCall<'a, C, NC, A> {
         ProjectIconCreateCall {
             hub: self.hub,
@@ -3748,7 +4054,7 @@ impl<'a, C, NC, A> ProjectMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Return all projects readable by the current user.    
+    /// Return all projects readable by the current user.
     pub fn list(&self) -> ProjectListCall<'a, C, NC, A> {
         ProjectListCall {
             hub: self.hub,
@@ -3760,7 +4066,11 @@ impl<'a, C, NC, A> ProjectMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Return all icons in the current project    
+    /// Return all icons in the current project
+    /// 
+    /// # Arguments
+    ///
+    /// * `projectId` - The ID of the project.
     pub fn icons_list(&self, project_id: &str) -> ProjectIconListCall<'a, C, NC, A> {
         ProjectIconListCall {
             hub: self.hub,
@@ -3785,7 +4095,7 @@ impl<'a, C, NC, A> ProjectMethods<'a, C, NC, A> {
 /// Unpublish a layer asset.
 ///
 /// A builder for the *unpublish* method supported by a *layer* resource.
-/// It is not used directly, but through a `LayerMethods`.
+/// It is not used directly, but through a `LayerMethods` instance.
 ///
 /// # Example
 ///
@@ -3843,7 +4153,7 @@ impl<'a, C, NC, A> LayerUnpublishCall<'a, C, NC, A> where NC: hyper::net::Networ
         for &field in ["alt", "id"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -3896,7 +4206,7 @@ impl<'a, C, NC, A> LayerUnpublishCall<'a, C, NC, A> where NC: hyper::net::Networ
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -3908,7 +4218,6 @@ impl<'a, C, NC, A> LayerUnpublishCall<'a, C, NC, A> where NC: hyper::net::Networ
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -3918,7 +4227,7 @@ impl<'a, C, NC, A> LayerUnpublishCall<'a, C, NC, A> where NC: hyper::net::Networ
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -3929,7 +4238,7 @@ impl<'a, C, NC, A> LayerUnpublishCall<'a, C, NC, A> where NC: hyper::net::Networ
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -3938,13 +4247,13 @@ impl<'a, C, NC, A> LayerUnpublishCall<'a, C, NC, A> where NC: hyper::net::Networ
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -3956,7 +4265,7 @@ impl<'a, C, NC, A> LayerUnpublishCall<'a, C, NC, A> where NC: hyper::net::Networ
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The ID of the layer.    
+    /// The ID of the layer.
     pub fn id(mut self, new_value: &str) -> LayerUnpublishCall<'a, C, NC, A> {
         self._id = new_value.to_string();
         self
@@ -4017,7 +4326,7 @@ impl<'a, C, NC, A> LayerUnpublishCall<'a, C, NC, A> where NC: hyper::net::Networ
 /// Publish a layer asset.
 ///
 /// A builder for the *publish* method supported by a *layer* resource.
-/// It is not used directly, but through a `LayerMethods`.
+/// It is not used directly, but through a `LayerMethods` instance.
 ///
 /// # Example
 ///
@@ -4080,7 +4389,7 @@ impl<'a, C, NC, A> LayerPublishCall<'a, C, NC, A> where NC: hyper::net::NetworkC
         for &field in ["alt", "id", "force"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -4133,7 +4442,7 @@ impl<'a, C, NC, A> LayerPublishCall<'a, C, NC, A> where NC: hyper::net::NetworkC
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -4145,7 +4454,6 @@ impl<'a, C, NC, A> LayerPublishCall<'a, C, NC, A> where NC: hyper::net::NetworkC
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -4155,7 +4463,7 @@ impl<'a, C, NC, A> LayerPublishCall<'a, C, NC, A> where NC: hyper::net::NetworkC
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -4166,7 +4474,7 @@ impl<'a, C, NC, A> LayerPublishCall<'a, C, NC, A> where NC: hyper::net::NetworkC
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -4175,13 +4483,13 @@ impl<'a, C, NC, A> LayerPublishCall<'a, C, NC, A> where NC: hyper::net::NetworkC
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -4193,7 +4501,7 @@ impl<'a, C, NC, A> LayerPublishCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The ID of the layer.    
+    /// The ID of the layer.
     pub fn id(mut self, new_value: &str) -> LayerPublishCall<'a, C, NC, A> {
         self._id = new_value.to_string();
         self
@@ -4201,7 +4509,7 @@ impl<'a, C, NC, A> LayerPublishCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// Sets the *force* query property to the given value.
     ///
     /// 
-    /// If set to true, the API will allow publication of the layer even if it's out of date. If not true, you'll need to reprocess any out-of-date layer before publishing.    
+    /// If set to true, the API will allow publication of the layer even if it's out of date. If not true, you'll need to reprocess any out-of-date layer before publishing.
     pub fn force(mut self, new_value: bool) -> LayerPublishCall<'a, C, NC, A> {
         self._force = Some(new_value);
         self
@@ -4262,7 +4570,7 @@ impl<'a, C, NC, A> LayerPublishCall<'a, C, NC, A> where NC: hyper::net::NetworkC
 /// Return all published layers readable by the current user.
 ///
 /// A builder for the *listPublished* method supported by a *layer* resource.
-/// It is not used directly, but through a `LayerMethods`.
+/// It is not used directly, but through a `LayerMethods` instance.
 ///
 /// # Example
 ///
@@ -4333,7 +4641,7 @@ impl<'a, C, NC, A> LayerListPublishedCall<'a, C, NC, A> where NC: hyper::net::Ne
         for &field in ["alt", "projectId", "pageToken", "maxResults"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -4362,7 +4670,7 @@ impl<'a, C, NC, A> LayerListPublishedCall<'a, C, NC, A> where NC: hyper::net::Ne
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -4374,7 +4682,6 @@ impl<'a, C, NC, A> LayerListPublishedCall<'a, C, NC, A> where NC: hyper::net::Ne
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -4384,7 +4691,7 @@ impl<'a, C, NC, A> LayerListPublishedCall<'a, C, NC, A> where NC: hyper::net::Ne
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -4395,7 +4702,7 @@ impl<'a, C, NC, A> LayerListPublishedCall<'a, C, NC, A> where NC: hyper::net::Ne
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -4404,13 +4711,13 @@ impl<'a, C, NC, A> LayerListPublishedCall<'a, C, NC, A> where NC: hyper::net::Ne
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -4420,7 +4727,7 @@ impl<'a, C, NC, A> LayerListPublishedCall<'a, C, NC, A> where NC: hyper::net::Ne
     /// Sets the *project id* query property to the given value.
     ///
     /// 
-    /// The ID of a Maps Engine project, used to filter the response. To list all available projects with their IDs, send a Projects: list request. You can also find your project ID as the value of the DashboardPlace:cid URL parameter when signed in to mapsengine.google.com.    
+    /// The ID of a Maps Engine project, used to filter the response. To list all available projects with their IDs, send a Projects: list request. You can also find your project ID as the value of the DashboardPlace:cid URL parameter when signed in to mapsengine.google.com.
     pub fn project_id(mut self, new_value: &str) -> LayerListPublishedCall<'a, C, NC, A> {
         self._project_id = Some(new_value.to_string());
         self
@@ -4428,7 +4735,7 @@ impl<'a, C, NC, A> LayerListPublishedCall<'a, C, NC, A> where NC: hyper::net::Ne
     /// Sets the *page token* query property to the given value.
     ///
     /// 
-    /// The continuation token, used to page through large result sets. To get the next page of results, set this parameter to the value of nextPageToken from the previous response.    
+    /// The continuation token, used to page through large result sets. To get the next page of results, set this parameter to the value of nextPageToken from the previous response.
     pub fn page_token(mut self, new_value: &str) -> LayerListPublishedCall<'a, C, NC, A> {
         self._page_token = Some(new_value.to_string());
         self
@@ -4436,7 +4743,7 @@ impl<'a, C, NC, A> LayerListPublishedCall<'a, C, NC, A> where NC: hyper::net::Ne
     /// Sets the *max results* query property to the given value.
     ///
     /// 
-    /// The maximum number of items to include in a single response page. The maximum supported value is 100.    
+    /// The maximum number of items to include in a single response page. The maximum supported value is 100.
     pub fn max_results(mut self, new_value: u32) -> LayerListPublishedCall<'a, C, NC, A> {
         self._max_results = Some(new_value);
         self
@@ -4497,7 +4804,7 @@ impl<'a, C, NC, A> LayerListPublishedCall<'a, C, NC, A> where NC: hyper::net::Ne
 /// Create a layer asset.
 ///
 /// A builder for the *create* method supported by a *layer* resource.
-/// It is not used directly, but through a `LayerMethods`.
+/// It is not used directly, but through a `LayerMethods` instance.
 ///
 /// # Example
 ///
@@ -4565,7 +4872,7 @@ impl<'a, C, NC, A> LayerCreateCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
         for &field in ["alt", "process"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -4598,7 +4905,7 @@ impl<'a, C, NC, A> LayerCreateCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -4614,7 +4921,6 @@ impl<'a, C, NC, A> LayerCreateCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -4624,7 +4930,7 @@ impl<'a, C, NC, A> LayerCreateCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -4635,7 +4941,7 @@ impl<'a, C, NC, A> LayerCreateCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -4644,13 +4950,13 @@ impl<'a, C, NC, A> LayerCreateCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -4669,7 +4975,7 @@ impl<'a, C, NC, A> LayerCreateCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// Sets the *process* query property to the given value.
     ///
     /// 
-    /// Whether to queue the created layer for processing.    
+    /// Whether to queue the created layer for processing.
     pub fn process(mut self, new_value: bool) -> LayerCreateCall<'a, C, NC, A> {
         self._process = Some(new_value);
         self
@@ -4730,7 +5036,7 @@ impl<'a, C, NC, A> LayerCreateCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
 /// Return the published metadata for a particular layer.
 ///
 /// A builder for the *getPublished* method supported by a *layer* resource.
-/// It is not used directly, but through a `LayerMethods`.
+/// It is not used directly, but through a `LayerMethods` instance.
 ///
 /// # Example
 ///
@@ -4788,7 +5094,7 @@ impl<'a, C, NC, A> LayerGetPublishedCall<'a, C, NC, A> where NC: hyper::net::Net
         for &field in ["alt", "id"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -4841,7 +5147,7 @@ impl<'a, C, NC, A> LayerGetPublishedCall<'a, C, NC, A> where NC: hyper::net::Net
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -4853,7 +5159,6 @@ impl<'a, C, NC, A> LayerGetPublishedCall<'a, C, NC, A> where NC: hyper::net::Net
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -4863,7 +5168,7 @@ impl<'a, C, NC, A> LayerGetPublishedCall<'a, C, NC, A> where NC: hyper::net::Net
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -4874,7 +5179,7 @@ impl<'a, C, NC, A> LayerGetPublishedCall<'a, C, NC, A> where NC: hyper::net::Net
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -4883,13 +5188,13 @@ impl<'a, C, NC, A> LayerGetPublishedCall<'a, C, NC, A> where NC: hyper::net::Net
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -4901,7 +5206,7 @@ impl<'a, C, NC, A> LayerGetPublishedCall<'a, C, NC, A> where NC: hyper::net::Net
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The ID of the layer.    
+    /// The ID of the layer.
     pub fn id(mut self, new_value: &str) -> LayerGetPublishedCall<'a, C, NC, A> {
         self._id = new_value.to_string();
         self
@@ -4962,7 +5267,7 @@ impl<'a, C, NC, A> LayerGetPublishedCall<'a, C, NC, A> where NC: hyper::net::Net
 /// Delete a layer.
 ///
 /// A builder for the *delete* method supported by a *layer* resource.
-/// It is not used directly, but through a `LayerMethods`.
+/// It is not used directly, but through a `LayerMethods` instance.
 ///
 /// # Example
 ///
@@ -5020,7 +5325,7 @@ impl<'a, C, NC, A> LayerDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
         for &field in ["id"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -5072,7 +5377,7 @@ impl<'a, C, NC, A> LayerDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -5084,7 +5389,6 @@ impl<'a, C, NC, A> LayerDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -5094,7 +5398,7 @@ impl<'a, C, NC, A> LayerDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -5105,12 +5409,12 @@ impl<'a, C, NC, A> LayerDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = res;
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -5122,7 +5426,7 @@ impl<'a, C, NC, A> LayerDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The ID of the layer. Only the layer creator or project owner are permitted to delete. If the layer is published, or included in a map, the request will fail. Unpublish the layer, and remove it from all maps prior to deleting.    
+    /// The ID of the layer. Only the layer creator or project owner are permitted to delete. If the layer is published, or included in a map, the request will fail. Unpublish the layer, and remove it from all maps prior to deleting.
     pub fn id(mut self, new_value: &str) -> LayerDeleteCall<'a, C, NC, A> {
         self._id = new_value.to_string();
         self
@@ -5183,7 +5487,7 @@ impl<'a, C, NC, A> LayerDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
 /// Return metadata for a particular layer.
 ///
 /// A builder for the *get* method supported by a *layer* resource.
-/// It is not used directly, but through a `LayerMethods`.
+/// It is not used directly, but through a `LayerMethods` instance.
 ///
 /// # Example
 ///
@@ -5246,7 +5550,7 @@ impl<'a, C, NC, A> LayerGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
         for &field in ["alt", "id", "version"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -5299,7 +5603,7 @@ impl<'a, C, NC, A> LayerGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -5311,7 +5615,6 @@ impl<'a, C, NC, A> LayerGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -5321,7 +5624,7 @@ impl<'a, C, NC, A> LayerGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -5332,7 +5635,7 @@ impl<'a, C, NC, A> LayerGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -5341,13 +5644,13 @@ impl<'a, C, NC, A> LayerGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -5359,7 +5662,7 @@ impl<'a, C, NC, A> LayerGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The ID of the layer.    
+    /// The ID of the layer.
     pub fn id(mut self, new_value: &str) -> LayerGetCall<'a, C, NC, A> {
         self._id = new_value.to_string();
         self
@@ -5367,7 +5670,7 @@ impl<'a, C, NC, A> LayerGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
     /// Sets the *version* query property to the given value.
     ///
     /// 
-    /// Deprecated: The version parameter indicates which version of the layer should be returned. When version is set to published, the published version of the layer will be returned. Please use the layers.getPublished endpoint instead.    
+    /// Deprecated: The version parameter indicates which version of the layer should be returned. When version is set to published, the published version of the layer will be returned. Please use the layers.getPublished endpoint instead.
     pub fn version(mut self, new_value: &str) -> LayerGetCall<'a, C, NC, A> {
         self._version = Some(new_value.to_string());
         self
@@ -5428,7 +5731,7 @@ impl<'a, C, NC, A> LayerGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
 /// Remove permission entries from an already existing asset.
 ///
 /// A builder for the *permissions.batchDelete* method supported by a *layer* resource.
-/// It is not used directly, but through a `LayerMethods`.
+/// It is not used directly, but through a `LayerMethods` instance.
 ///
 /// # Example
 ///
@@ -5493,7 +5796,7 @@ impl<'a, C, NC, A> LayerPermissionBatchDeleteCall<'a, C, NC, A> where NC: hyper:
         for &field in ["alt", "id"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -5550,7 +5853,7 @@ impl<'a, C, NC, A> LayerPermissionBatchDeleteCall<'a, C, NC, A> where NC: hyper:
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -5566,7 +5869,6 @@ impl<'a, C, NC, A> LayerPermissionBatchDeleteCall<'a, C, NC, A> where NC: hyper:
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -5576,7 +5878,7 @@ impl<'a, C, NC, A> LayerPermissionBatchDeleteCall<'a, C, NC, A> where NC: hyper:
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -5587,7 +5889,7 @@ impl<'a, C, NC, A> LayerPermissionBatchDeleteCall<'a, C, NC, A> where NC: hyper:
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -5596,13 +5898,13 @@ impl<'a, C, NC, A> LayerPermissionBatchDeleteCall<'a, C, NC, A> where NC: hyper:
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -5623,7 +5925,7 @@ impl<'a, C, NC, A> LayerPermissionBatchDeleteCall<'a, C, NC, A> where NC: hyper:
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The ID of the asset from which permissions will be removed.    
+    /// The ID of the asset from which permissions will be removed.
     pub fn id(mut self, new_value: &str) -> LayerPermissionBatchDeleteCall<'a, C, NC, A> {
         self._id = new_value.to_string();
         self
@@ -5686,7 +5988,7 @@ impl<'a, C, NC, A> LayerPermissionBatchDeleteCall<'a, C, NC, A> where NC: hyper:
 /// An asset can hold up to 20 different permission entries. Each batchInsert request is atomic.
 ///
 /// A builder for the *permissions.batchUpdate* method supported by a *layer* resource.
-/// It is not used directly, but through a `LayerMethods`.
+/// It is not used directly, but through a `LayerMethods` instance.
 ///
 /// # Example
 ///
@@ -5751,7 +6053,7 @@ impl<'a, C, NC, A> LayerPermissionBatchUpdateCall<'a, C, NC, A> where NC: hyper:
         for &field in ["alt", "id"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -5808,7 +6110,7 @@ impl<'a, C, NC, A> LayerPermissionBatchUpdateCall<'a, C, NC, A> where NC: hyper:
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -5824,7 +6126,6 @@ impl<'a, C, NC, A> LayerPermissionBatchUpdateCall<'a, C, NC, A> where NC: hyper:
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -5834,7 +6135,7 @@ impl<'a, C, NC, A> LayerPermissionBatchUpdateCall<'a, C, NC, A> where NC: hyper:
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -5845,7 +6146,7 @@ impl<'a, C, NC, A> LayerPermissionBatchUpdateCall<'a, C, NC, A> where NC: hyper:
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -5854,13 +6155,13 @@ impl<'a, C, NC, A> LayerPermissionBatchUpdateCall<'a, C, NC, A> where NC: hyper:
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -5881,7 +6182,7 @@ impl<'a, C, NC, A> LayerPermissionBatchUpdateCall<'a, C, NC, A> where NC: hyper:
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The ID of the asset to which permissions will be added.    
+    /// The ID of the asset to which permissions will be added.
     pub fn id(mut self, new_value: &str) -> LayerPermissionBatchUpdateCall<'a, C, NC, A> {
         self._id = new_value.to_string();
         self
@@ -5942,7 +6243,7 @@ impl<'a, C, NC, A> LayerPermissionBatchUpdateCall<'a, C, NC, A> where NC: hyper:
 /// Return all layers readable by the current user.
 ///
 /// A builder for the *list* method supported by a *layer* resource.
-/// It is not used directly, but through a `LayerMethods`.
+/// It is not used directly, but through a `LayerMethods` instance.
 ///
 /// # Example
 ///
@@ -6063,7 +6364,7 @@ impl<'a, C, NC, A> LayerListCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
         for &field in ["alt", "tags", "search", "role", "projectId", "processingStatus", "pageToken", "modifiedBefore", "modifiedAfter", "maxResults", "creatorEmail", "createdBefore", "createdAfter", "bbox"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -6092,7 +6393,7 @@ impl<'a, C, NC, A> LayerListCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -6104,7 +6405,6 @@ impl<'a, C, NC, A> LayerListCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -6114,7 +6414,7 @@ impl<'a, C, NC, A> LayerListCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -6125,7 +6425,7 @@ impl<'a, C, NC, A> LayerListCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -6134,13 +6434,13 @@ impl<'a, C, NC, A> LayerListCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -6150,7 +6450,7 @@ impl<'a, C, NC, A> LayerListCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     /// Sets the *tags* query property to the given value.
     ///
     /// 
-    /// A comma separated list of tags. Returned assets will contain all the tags from the list.    
+    /// A comma separated list of tags. Returned assets will contain all the tags from the list.
     pub fn tags(mut self, new_value: &str) -> LayerListCall<'a, C, NC, A> {
         self._tags = Some(new_value.to_string());
         self
@@ -6158,7 +6458,7 @@ impl<'a, C, NC, A> LayerListCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     /// Sets the *search* query property to the given value.
     ///
     /// 
-    /// An unstructured search string used to filter the set of results based on asset metadata.    
+    /// An unstructured search string used to filter the set of results based on asset metadata.
     pub fn search(mut self, new_value: &str) -> LayerListCall<'a, C, NC, A> {
         self._search = Some(new_value.to_string());
         self
@@ -6166,7 +6466,7 @@ impl<'a, C, NC, A> LayerListCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     /// Sets the *role* query property to the given value.
     ///
     /// 
-    /// The role parameter indicates that the response should only contain assets where the current user has the specified level of access.    
+    /// The role parameter indicates that the response should only contain assets where the current user has the specified level of access.
     pub fn role(mut self, new_value: &str) -> LayerListCall<'a, C, NC, A> {
         self._role = Some(new_value.to_string());
         self
@@ -6174,7 +6474,7 @@ impl<'a, C, NC, A> LayerListCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     /// Sets the *project id* query property to the given value.
     ///
     /// 
-    /// The ID of a Maps Engine project, used to filter the response. To list all available projects with their IDs, send a Projects: list request. You can also find your project ID as the value of the DashboardPlace:cid URL parameter when signed in to mapsengine.google.com.    
+    /// The ID of a Maps Engine project, used to filter the response. To list all available projects with their IDs, send a Projects: list request. You can also find your project ID as the value of the DashboardPlace:cid URL parameter when signed in to mapsengine.google.com.
     pub fn project_id(mut self, new_value: &str) -> LayerListCall<'a, C, NC, A> {
         self._project_id = Some(new_value.to_string());
         self
@@ -6189,7 +6489,7 @@ impl<'a, C, NC, A> LayerListCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     /// Sets the *page token* query property to the given value.
     ///
     /// 
-    /// The continuation token, used to page through large result sets. To get the next page of results, set this parameter to the value of nextPageToken from the previous response.    
+    /// The continuation token, used to page through large result sets. To get the next page of results, set this parameter to the value of nextPageToken from the previous response.
     pub fn page_token(mut self, new_value: &str) -> LayerListCall<'a, C, NC, A> {
         self._page_token = Some(new_value.to_string());
         self
@@ -6197,7 +6497,7 @@ impl<'a, C, NC, A> LayerListCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     /// Sets the *modified before* query property to the given value.
     ///
     /// 
-    /// An RFC 3339 formatted date-time value (e.g. 1970-01-01T00:00:00Z). Returned assets will have been modified at or before this time.    
+    /// An RFC 3339 formatted date-time value (e.g. 1970-01-01T00:00:00Z). Returned assets will have been modified at or before this time.
     pub fn modified_before(mut self, new_value: &str) -> LayerListCall<'a, C, NC, A> {
         self._modified_before = Some(new_value.to_string());
         self
@@ -6205,7 +6505,7 @@ impl<'a, C, NC, A> LayerListCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     /// Sets the *modified after* query property to the given value.
     ///
     /// 
-    /// An RFC 3339 formatted date-time value (e.g. 1970-01-01T00:00:00Z). Returned assets will have been modified at or after this time.    
+    /// An RFC 3339 formatted date-time value (e.g. 1970-01-01T00:00:00Z). Returned assets will have been modified at or after this time.
     pub fn modified_after(mut self, new_value: &str) -> LayerListCall<'a, C, NC, A> {
         self._modified_after = Some(new_value.to_string());
         self
@@ -6213,7 +6513,7 @@ impl<'a, C, NC, A> LayerListCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     /// Sets the *max results* query property to the given value.
     ///
     /// 
-    /// The maximum number of items to include in a single response page. The maximum supported value is 100.    
+    /// The maximum number of items to include in a single response page. The maximum supported value is 100.
     pub fn max_results(mut self, new_value: u32) -> LayerListCall<'a, C, NC, A> {
         self._max_results = Some(new_value);
         self
@@ -6221,7 +6521,7 @@ impl<'a, C, NC, A> LayerListCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     /// Sets the *creator email* query property to the given value.
     ///
     /// 
-    /// An email address representing a user. Returned assets that have been created by the user associated with the provided email address.    
+    /// An email address representing a user. Returned assets that have been created by the user associated with the provided email address.
     pub fn creator_email(mut self, new_value: &str) -> LayerListCall<'a, C, NC, A> {
         self._creator_email = Some(new_value.to_string());
         self
@@ -6229,7 +6529,7 @@ impl<'a, C, NC, A> LayerListCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     /// Sets the *created before* query property to the given value.
     ///
     /// 
-    /// An RFC 3339 formatted date-time value (e.g. 1970-01-01T00:00:00Z). Returned assets will have been created at or before this time.    
+    /// An RFC 3339 formatted date-time value (e.g. 1970-01-01T00:00:00Z). Returned assets will have been created at or before this time.
     pub fn created_before(mut self, new_value: &str) -> LayerListCall<'a, C, NC, A> {
         self._created_before = Some(new_value.to_string());
         self
@@ -6237,7 +6537,7 @@ impl<'a, C, NC, A> LayerListCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     /// Sets the *created after* query property to the given value.
     ///
     /// 
-    /// An RFC 3339 formatted date-time value (e.g. 1970-01-01T00:00:00Z). Returned assets will have been created at or after this time.    
+    /// An RFC 3339 formatted date-time value (e.g. 1970-01-01T00:00:00Z). Returned assets will have been created at or after this time.
     pub fn created_after(mut self, new_value: &str) -> LayerListCall<'a, C, NC, A> {
         self._created_after = Some(new_value.to_string());
         self
@@ -6245,7 +6545,7 @@ impl<'a, C, NC, A> LayerListCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     /// Sets the *bbox* query property to the given value.
     ///
     /// 
-    /// A bounding box, expressed as "west,south,east,north". If set, only assets which intersect this bounding box will be returned.    
+    /// A bounding box, expressed as "west,south,east,north". If set, only assets which intersect this bounding box will be returned.
     pub fn bbox(mut self, new_value: &str) -> LayerListCall<'a, C, NC, A> {
         self._bbox = Some(new_value.to_string());
         self
@@ -6306,7 +6606,7 @@ impl<'a, C, NC, A> LayerListCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
 /// Return all parent ids of the specified layer.
 ///
 /// A builder for the *parents.list* method supported by a *layer* resource.
-/// It is not used directly, but through a `LayerMethods`.
+/// It is not used directly, but through a `LayerMethods` instance.
 ///
 /// # Example
 ///
@@ -6374,7 +6674,7 @@ impl<'a, C, NC, A> LayerParentListCall<'a, C, NC, A> where NC: hyper::net::Netwo
         for &field in ["alt", "id", "pageToken", "maxResults"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -6427,7 +6727,7 @@ impl<'a, C, NC, A> LayerParentListCall<'a, C, NC, A> where NC: hyper::net::Netwo
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -6439,7 +6739,6 @@ impl<'a, C, NC, A> LayerParentListCall<'a, C, NC, A> where NC: hyper::net::Netwo
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -6449,7 +6748,7 @@ impl<'a, C, NC, A> LayerParentListCall<'a, C, NC, A> where NC: hyper::net::Netwo
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -6460,7 +6759,7 @@ impl<'a, C, NC, A> LayerParentListCall<'a, C, NC, A> where NC: hyper::net::Netwo
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -6469,13 +6768,13 @@ impl<'a, C, NC, A> LayerParentListCall<'a, C, NC, A> where NC: hyper::net::Netwo
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -6487,7 +6786,7 @@ impl<'a, C, NC, A> LayerParentListCall<'a, C, NC, A> where NC: hyper::net::Netwo
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The ID of the layer whose parents will be listed.    
+    /// The ID of the layer whose parents will be listed.
     pub fn id(mut self, new_value: &str) -> LayerParentListCall<'a, C, NC, A> {
         self._id = new_value.to_string();
         self
@@ -6495,7 +6794,7 @@ impl<'a, C, NC, A> LayerParentListCall<'a, C, NC, A> where NC: hyper::net::Netwo
     /// Sets the *page token* query property to the given value.
     ///
     /// 
-    /// The continuation token, used to page through large result sets. To get the next page of results, set this parameter to the value of nextPageToken from the previous response.    
+    /// The continuation token, used to page through large result sets. To get the next page of results, set this parameter to the value of nextPageToken from the previous response.
     pub fn page_token(mut self, new_value: &str) -> LayerParentListCall<'a, C, NC, A> {
         self._page_token = Some(new_value.to_string());
         self
@@ -6503,7 +6802,7 @@ impl<'a, C, NC, A> LayerParentListCall<'a, C, NC, A> where NC: hyper::net::Netwo
     /// Sets the *max results* query property to the given value.
     ///
     /// 
-    /// The maximum number of items to include in a single response page. The maximum supported value is 50.    
+    /// The maximum number of items to include in a single response page. The maximum supported value is 50.
     pub fn max_results(mut self, new_value: u32) -> LayerParentListCall<'a, C, NC, A> {
         self._max_results = Some(new_value);
         self
@@ -6564,7 +6863,7 @@ impl<'a, C, NC, A> LayerParentListCall<'a, C, NC, A> where NC: hyper::net::Netwo
 /// Cancel processing on a layer asset.
 ///
 /// A builder for the *cancelProcessing* method supported by a *layer* resource.
-/// It is not used directly, but through a `LayerMethods`.
+/// It is not used directly, but through a `LayerMethods` instance.
 ///
 /// # Example
 ///
@@ -6622,7 +6921,7 @@ impl<'a, C, NC, A> LayerCancelProcessingCall<'a, C, NC, A> where NC: hyper::net:
         for &field in ["alt", "id"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -6675,7 +6974,7 @@ impl<'a, C, NC, A> LayerCancelProcessingCall<'a, C, NC, A> where NC: hyper::net:
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -6687,7 +6986,6 @@ impl<'a, C, NC, A> LayerCancelProcessingCall<'a, C, NC, A> where NC: hyper::net:
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -6697,7 +6995,7 @@ impl<'a, C, NC, A> LayerCancelProcessingCall<'a, C, NC, A> where NC: hyper::net:
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -6708,7 +7006,7 @@ impl<'a, C, NC, A> LayerCancelProcessingCall<'a, C, NC, A> where NC: hyper::net:
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -6717,13 +7015,13 @@ impl<'a, C, NC, A> LayerCancelProcessingCall<'a, C, NC, A> where NC: hyper::net:
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -6735,7 +7033,7 @@ impl<'a, C, NC, A> LayerCancelProcessingCall<'a, C, NC, A> where NC: hyper::net:
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The ID of the layer.    
+    /// The ID of the layer.
     pub fn id(mut self, new_value: &str) -> LayerCancelProcessingCall<'a, C, NC, A> {
         self._id = new_value.to_string();
         self
@@ -6796,7 +7094,7 @@ impl<'a, C, NC, A> LayerCancelProcessingCall<'a, C, NC, A> where NC: hyper::net:
 /// Mutate a layer asset.
 ///
 /// A builder for the *patch* method supported by a *layer* resource.
-/// It is not used directly, but through a `LayerMethods`.
+/// It is not used directly, but through a `LayerMethods` instance.
 ///
 /// # Example
 ///
@@ -6861,7 +7159,7 @@ impl<'a, C, NC, A> LayerPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
         for &field in ["id"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -6917,7 +7215,7 @@ impl<'a, C, NC, A> LayerPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -6933,7 +7231,6 @@ impl<'a, C, NC, A> LayerPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -6943,7 +7240,7 @@ impl<'a, C, NC, A> LayerPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -6954,12 +7251,12 @@ impl<'a, C, NC, A> LayerPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = res;
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -6980,7 +7277,7 @@ impl<'a, C, NC, A> LayerPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The ID of the layer.    
+    /// The ID of the layer.
     pub fn id(mut self, new_value: &str) -> LayerPatchCall<'a, C, NC, A> {
         self._id = new_value.to_string();
         self
@@ -7041,7 +7338,7 @@ impl<'a, C, NC, A> LayerPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
 /// Return all of the permissions for the specified asset.
 ///
 /// A builder for the *permissions.list* method supported by a *layer* resource.
-/// It is not used directly, but through a `LayerMethods`.
+/// It is not used directly, but through a `LayerMethods` instance.
 ///
 /// # Example
 ///
@@ -7099,7 +7396,7 @@ impl<'a, C, NC, A> LayerPermissionListCall<'a, C, NC, A> where NC: hyper::net::N
         for &field in ["alt", "id"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -7152,7 +7449,7 @@ impl<'a, C, NC, A> LayerPermissionListCall<'a, C, NC, A> where NC: hyper::net::N
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -7164,7 +7461,6 @@ impl<'a, C, NC, A> LayerPermissionListCall<'a, C, NC, A> where NC: hyper::net::N
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -7174,7 +7470,7 @@ impl<'a, C, NC, A> LayerPermissionListCall<'a, C, NC, A> where NC: hyper::net::N
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -7185,7 +7481,7 @@ impl<'a, C, NC, A> LayerPermissionListCall<'a, C, NC, A> where NC: hyper::net::N
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -7194,13 +7490,13 @@ impl<'a, C, NC, A> LayerPermissionListCall<'a, C, NC, A> where NC: hyper::net::N
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -7212,7 +7508,7 @@ impl<'a, C, NC, A> LayerPermissionListCall<'a, C, NC, A> where NC: hyper::net::N
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The ID of the asset whose permissions will be listed.    
+    /// The ID of the asset whose permissions will be listed.
     pub fn id(mut self, new_value: &str) -> LayerPermissionListCall<'a, C, NC, A> {
         self._id = new_value.to_string();
         self
@@ -7273,7 +7569,7 @@ impl<'a, C, NC, A> LayerPermissionListCall<'a, C, NC, A> where NC: hyper::net::N
 /// Process a layer asset.
 ///
 /// A builder for the *process* method supported by a *layer* resource.
-/// It is not used directly, but through a `LayerMethods`.
+/// It is not used directly, but through a `LayerMethods` instance.
 ///
 /// # Example
 ///
@@ -7331,7 +7627,7 @@ impl<'a, C, NC, A> LayerProcesCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
         for &field in ["alt", "id"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -7384,7 +7680,7 @@ impl<'a, C, NC, A> LayerProcesCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -7396,7 +7692,6 @@ impl<'a, C, NC, A> LayerProcesCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -7406,7 +7701,7 @@ impl<'a, C, NC, A> LayerProcesCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -7417,7 +7712,7 @@ impl<'a, C, NC, A> LayerProcesCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -7426,13 +7721,13 @@ impl<'a, C, NC, A> LayerProcesCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -7444,7 +7739,7 @@ impl<'a, C, NC, A> LayerProcesCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The ID of the layer.    
+    /// The ID of the layer.
     pub fn id(mut self, new_value: &str) -> LayerProcesCall<'a, C, NC, A> {
         self._id = new_value.to_string();
         self
@@ -7507,7 +7802,7 @@ impl<'a, C, NC, A> LayerProcesCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
 /// An asset can hold up to 20 different permission entries. Each batchInsert request is atomic.
 ///
 /// A builder for the *permissions.batchUpdate* method supported by a *raster* resource.
-/// It is not used directly, but through a `RasterMethods`.
+/// It is not used directly, but through a `RasterMethods` instance.
 ///
 /// # Example
 ///
@@ -7572,7 +7867,7 @@ impl<'a, C, NC, A> RasterPermissionBatchUpdateCall<'a, C, NC, A> where NC: hyper
         for &field in ["alt", "id"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -7629,7 +7924,7 @@ impl<'a, C, NC, A> RasterPermissionBatchUpdateCall<'a, C, NC, A> where NC: hyper
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -7645,7 +7940,6 @@ impl<'a, C, NC, A> RasterPermissionBatchUpdateCall<'a, C, NC, A> where NC: hyper
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -7655,7 +7949,7 @@ impl<'a, C, NC, A> RasterPermissionBatchUpdateCall<'a, C, NC, A> where NC: hyper
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -7666,7 +7960,7 @@ impl<'a, C, NC, A> RasterPermissionBatchUpdateCall<'a, C, NC, A> where NC: hyper
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -7675,13 +7969,13 @@ impl<'a, C, NC, A> RasterPermissionBatchUpdateCall<'a, C, NC, A> where NC: hyper
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -7702,7 +7996,7 @@ impl<'a, C, NC, A> RasterPermissionBatchUpdateCall<'a, C, NC, A> where NC: hyper
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The ID of the asset to which permissions will be added.    
+    /// The ID of the asset to which permissions will be added.
     pub fn id(mut self, new_value: &str) -> RasterPermissionBatchUpdateCall<'a, C, NC, A> {
         self._id = new_value.to_string();
         self
@@ -7763,7 +8057,7 @@ impl<'a, C, NC, A> RasterPermissionBatchUpdateCall<'a, C, NC, A> where NC: hyper
 /// Mutate a raster asset.
 ///
 /// A builder for the *patch* method supported by a *raster* resource.
-/// It is not used directly, but through a `RasterMethods`.
+/// It is not used directly, but through a `RasterMethods` instance.
 ///
 /// # Example
 ///
@@ -7828,7 +8122,7 @@ impl<'a, C, NC, A> RasterPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
         for &field in ["id"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -7884,7 +8178,7 @@ impl<'a, C, NC, A> RasterPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -7900,7 +8194,6 @@ impl<'a, C, NC, A> RasterPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -7910,7 +8203,7 @@ impl<'a, C, NC, A> RasterPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -7921,12 +8214,12 @@ impl<'a, C, NC, A> RasterPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = res;
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -7947,7 +8240,7 @@ impl<'a, C, NC, A> RasterPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The ID of the raster.    
+    /// The ID of the raster.
     pub fn id(mut self, new_value: &str) -> RasterPatchCall<'a, C, NC, A> {
         self._id = new_value.to_string();
         self
@@ -8008,7 +8301,7 @@ impl<'a, C, NC, A> RasterPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
 /// Return all of the permissions for the specified asset.
 ///
 /// A builder for the *permissions.list* method supported by a *raster* resource.
-/// It is not used directly, but through a `RasterMethods`.
+/// It is not used directly, but through a `RasterMethods` instance.
 ///
 /// # Example
 ///
@@ -8066,7 +8359,7 @@ impl<'a, C, NC, A> RasterPermissionListCall<'a, C, NC, A> where NC: hyper::net::
         for &field in ["alt", "id"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -8119,7 +8412,7 @@ impl<'a, C, NC, A> RasterPermissionListCall<'a, C, NC, A> where NC: hyper::net::
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -8131,7 +8424,6 @@ impl<'a, C, NC, A> RasterPermissionListCall<'a, C, NC, A> where NC: hyper::net::
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -8141,7 +8433,7 @@ impl<'a, C, NC, A> RasterPermissionListCall<'a, C, NC, A> where NC: hyper::net::
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -8152,7 +8444,7 @@ impl<'a, C, NC, A> RasterPermissionListCall<'a, C, NC, A> where NC: hyper::net::
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -8161,13 +8453,13 @@ impl<'a, C, NC, A> RasterPermissionListCall<'a, C, NC, A> where NC: hyper::net::
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -8179,7 +8471,7 @@ impl<'a, C, NC, A> RasterPermissionListCall<'a, C, NC, A> where NC: hyper::net::
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The ID of the asset whose permissions will be listed.    
+    /// The ID of the asset whose permissions will be listed.
     pub fn id(mut self, new_value: &str) -> RasterPermissionListCall<'a, C, NC, A> {
         self._id = new_value.to_string();
         self
@@ -8240,7 +8532,7 @@ impl<'a, C, NC, A> RasterPermissionListCall<'a, C, NC, A> where NC: hyper::net::
 /// Delete a raster.
 ///
 /// A builder for the *delete* method supported by a *raster* resource.
-/// It is not used directly, but through a `RasterMethods`.
+/// It is not used directly, but through a `RasterMethods` instance.
 ///
 /// # Example
 ///
@@ -8298,7 +8590,7 @@ impl<'a, C, NC, A> RasterDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkC
         for &field in ["id"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -8350,7 +8642,7 @@ impl<'a, C, NC, A> RasterDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkC
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -8362,7 +8654,6 @@ impl<'a, C, NC, A> RasterDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkC
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -8372,7 +8663,7 @@ impl<'a, C, NC, A> RasterDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkC
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -8383,12 +8674,12 @@ impl<'a, C, NC, A> RasterDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkC
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = res;
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -8400,7 +8691,7 @@ impl<'a, C, NC, A> RasterDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The ID of the raster. Only the raster creator or project owner are permitted to delete. If the raster is included in a layer or mosaic, the request will fail. Remove it from all parents prior to deleting.    
+    /// The ID of the raster. Only the raster creator or project owner are permitted to delete. If the raster is included in a layer or mosaic, the request will fail. Remove it from all parents prior to deleting.
     pub fn id(mut self, new_value: &str) -> RasterDeleteCall<'a, C, NC, A> {
         self._id = new_value.to_string();
         self
@@ -8461,7 +8752,7 @@ impl<'a, C, NC, A> RasterDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkC
 /// Remove permission entries from an already existing asset.
 ///
 /// A builder for the *permissions.batchDelete* method supported by a *raster* resource.
-/// It is not used directly, but through a `RasterMethods`.
+/// It is not used directly, but through a `RasterMethods` instance.
 ///
 /// # Example
 ///
@@ -8526,7 +8817,7 @@ impl<'a, C, NC, A> RasterPermissionBatchDeleteCall<'a, C, NC, A> where NC: hyper
         for &field in ["alt", "id"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -8583,7 +8874,7 @@ impl<'a, C, NC, A> RasterPermissionBatchDeleteCall<'a, C, NC, A> where NC: hyper
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -8599,7 +8890,6 @@ impl<'a, C, NC, A> RasterPermissionBatchDeleteCall<'a, C, NC, A> where NC: hyper
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -8609,7 +8899,7 @@ impl<'a, C, NC, A> RasterPermissionBatchDeleteCall<'a, C, NC, A> where NC: hyper
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -8620,7 +8910,7 @@ impl<'a, C, NC, A> RasterPermissionBatchDeleteCall<'a, C, NC, A> where NC: hyper
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -8629,13 +8919,13 @@ impl<'a, C, NC, A> RasterPermissionBatchDeleteCall<'a, C, NC, A> where NC: hyper
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -8656,7 +8946,7 @@ impl<'a, C, NC, A> RasterPermissionBatchDeleteCall<'a, C, NC, A> where NC: hyper
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The ID of the asset from which permissions will be removed.    
+    /// The ID of the asset from which permissions will be removed.
     pub fn id(mut self, new_value: &str) -> RasterPermissionBatchDeleteCall<'a, C, NC, A> {
         self._id = new_value.to_string();
         self
@@ -8717,7 +9007,7 @@ impl<'a, C, NC, A> RasterPermissionBatchDeleteCall<'a, C, NC, A> where NC: hyper
 /// Upload a file to a raster asset.
 ///
 /// A builder for the *files.insert* method supported by a *raster* resource.
-/// It is not used directly, but through a `RasterMethods`.
+/// It is not used directly, but through a `RasterMethods` instance.
 ///
 /// # Example
 ///
@@ -8779,7 +9069,7 @@ impl<'a, C, NC, A> RasterFileInsertCall<'a, C, NC, A> where NC: hyper::net::Netw
         for &field in ["id", "filename"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -8841,7 +9131,7 @@ impl<'a, C, NC, A> RasterFileInsertCall<'a, C, NC, A> where NC: hyper::net::Netw
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -8867,7 +9157,7 @@ impl<'a, C, NC, A> RasterFileInsertCall<'a, C, NC, A> where NC: hyper::net::Netw
                         let size = reader.seek(io::SeekFrom::End(0)).unwrap();
                     reader.seek(io::SeekFrom::Start(0)).unwrap();
                     if size > 10737418240 {
-                    	return Result::UploadSizeLimitExceeded(size, 10737418240)
+                    	return Err(Error::UploadSizeLimitExceeded(size, 10737418240))
                     }
                         req = req.header(ContentType(reader_mime_type.clone()))
                                  .header(ContentLength(size))
@@ -8880,7 +9170,6 @@ impl<'a, C, NC, A> RasterFileInsertCall<'a, C, NC, A> where NC: hyper::net::Netw
     
                     dlg.pre_request();
                     req.send()
-    
                 }
             };
 
@@ -8891,7 +9180,7 @@ impl<'a, C, NC, A> RasterFileInsertCall<'a, C, NC, A> where NC: hyper::net::Netw
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -8902,13 +9191,13 @@ impl<'a, C, NC, A> RasterFileInsertCall<'a, C, NC, A> where NC: hyper::net::Netw
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     if protocol == "resumable" {
                         let size = reader.seek(io::SeekFrom::End(0)).unwrap();
                         reader.seek(io::SeekFrom::Start(0)).unwrap();
                         if size > 10737418240 {
-                        	return Result::UploadSizeLimitExceeded(size, 10737418240)
+                        	return Err(Error::UploadSizeLimitExceeded(size, 10737418240))
                         }
                         let mut client = &mut *self.hub.client.borrow_mut();
                         let upload_result = {
@@ -8933,17 +9222,17 @@ impl<'a, C, NC, A> RasterFileInsertCall<'a, C, NC, A> where NC: hyper::net::Netw
                         match upload_result {
                             None => {
                                 dlg.finished(false);
-                                return Result::Cancelled
+                                return Err(Error::Cancelled)
                             }
                             Some(Err(err)) => {
                                 dlg.finished(false);
-                                return Result::HttpError(err)
+                                return Err(Error::HttpError(err))
                             }
                             Some(Ok(upload_result)) => {
                                 res = upload_result;
                                 if !res.status.is_success() {
                                     dlg.finished(false);
-                                    return Result::Failure(res)
+                                    return Err(Error::Failure(res))
                                 }
                             }
                         }
@@ -8951,7 +9240,7 @@ impl<'a, C, NC, A> RasterFileInsertCall<'a, C, NC, A> where NC: hyper::net::Netw
                     let result_value = res;
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -8967,11 +9256,14 @@ impl<'a, C, NC, A> RasterFileInsertCall<'a, C, NC, A> where NC: hyper::net::Netw
                 where RS: ReadSeek {
         self.doit(stream, mime_type, "simple")
     }
-    /// Upload media in a resumeable fashion.
+    /// Upload media in a resumable fashion.
     /// Even if the upload fails or is interrupted, it can be resumed for a 
     /// certain amount of time as the server maintains state temporarily.
     /// 
-    /// TODO: Write more about how delegation works in this particular case.
+    /// The delegate will be asked for an `upload_url()`, and if not provided, will be asked to store an upload URL 
+    /// that was provided by the server, using `store_upload_url(...)`. The upload will be done in chunks, the delegate
+    /// may specify the `chunk_size()` and may cancel the operation before each chunk is uploaded, using
+    /// `cancel_chunk_upload(...)`.
     ///
     /// * *max size*: 10GB
     /// * *multipart*: yes
@@ -8986,7 +9278,7 @@ impl<'a, C, NC, A> RasterFileInsertCall<'a, C, NC, A> where NC: hyper::net::Netw
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The ID of the raster asset.    
+    /// The ID of the raster asset.
     pub fn id(mut self, new_value: &str) -> RasterFileInsertCall<'a, C, NC, A> {
         self._id = new_value.to_string();
         self
@@ -8996,7 +9288,7 @@ impl<'a, C, NC, A> RasterFileInsertCall<'a, C, NC, A> where NC: hyper::net::Netw
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The file name of this uploaded file.    
+    /// The file name of this uploaded file.
     pub fn filename(mut self, new_value: &str) -> RasterFileInsertCall<'a, C, NC, A> {
         self._filename = new_value.to_string();
         self
@@ -9057,7 +9349,7 @@ impl<'a, C, NC, A> RasterFileInsertCall<'a, C, NC, A> where NC: hyper::net::Netw
 /// Process a raster asset.
 ///
 /// A builder for the *process* method supported by a *raster* resource.
-/// It is not used directly, but through a `RasterMethods`.
+/// It is not used directly, but through a `RasterMethods` instance.
 ///
 /// # Example
 ///
@@ -9115,7 +9407,7 @@ impl<'a, C, NC, A> RasterProcesCall<'a, C, NC, A> where NC: hyper::net::NetworkC
         for &field in ["alt", "id"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -9168,7 +9460,7 @@ impl<'a, C, NC, A> RasterProcesCall<'a, C, NC, A> where NC: hyper::net::NetworkC
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -9180,7 +9472,6 @@ impl<'a, C, NC, A> RasterProcesCall<'a, C, NC, A> where NC: hyper::net::NetworkC
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -9190,7 +9481,7 @@ impl<'a, C, NC, A> RasterProcesCall<'a, C, NC, A> where NC: hyper::net::NetworkC
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -9201,7 +9492,7 @@ impl<'a, C, NC, A> RasterProcesCall<'a, C, NC, A> where NC: hyper::net::NetworkC
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -9210,13 +9501,13 @@ impl<'a, C, NC, A> RasterProcesCall<'a, C, NC, A> where NC: hyper::net::NetworkC
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -9228,7 +9519,7 @@ impl<'a, C, NC, A> RasterProcesCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The ID of the raster.    
+    /// The ID of the raster.
     pub fn id(mut self, new_value: &str) -> RasterProcesCall<'a, C, NC, A> {
         self._id = new_value.to_string();
         self
@@ -9289,7 +9580,7 @@ impl<'a, C, NC, A> RasterProcesCall<'a, C, NC, A> where NC: hyper::net::NetworkC
 /// Return metadata for a single raster.
 ///
 /// A builder for the *get* method supported by a *raster* resource.
-/// It is not used directly, but through a `RasterMethods`.
+/// It is not used directly, but through a `RasterMethods` instance.
 ///
 /// # Example
 ///
@@ -9347,7 +9638,7 @@ impl<'a, C, NC, A> RasterGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
         for &field in ["alt", "id"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -9400,7 +9691,7 @@ impl<'a, C, NC, A> RasterGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -9412,7 +9703,6 @@ impl<'a, C, NC, A> RasterGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -9422,7 +9712,7 @@ impl<'a, C, NC, A> RasterGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -9433,7 +9723,7 @@ impl<'a, C, NC, A> RasterGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -9442,13 +9732,13 @@ impl<'a, C, NC, A> RasterGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -9460,7 +9750,7 @@ impl<'a, C, NC, A> RasterGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The ID of the raster.    
+    /// The ID of the raster.
     pub fn id(mut self, new_value: &str) -> RasterGetCall<'a, C, NC, A> {
         self._id = new_value.to_string();
         self
@@ -9521,7 +9811,7 @@ impl<'a, C, NC, A> RasterGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
 /// Return all rasters readable by the current user.
 ///
 /// A builder for the *list* method supported by a *raster* resource.
-/// It is not used directly, but through a `RasterMethods`.
+/// It is not used directly, but through a `RasterMethods` instance.
 ///
 /// # Example
 ///
@@ -9639,7 +9929,7 @@ impl<'a, C, NC, A> RasterListCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
         for &field in ["alt", "projectId", "tags", "search", "role", "processingStatus", "pageToken", "modifiedBefore", "modifiedAfter", "maxResults", "creatorEmail", "createdBefore", "createdAfter", "bbox"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -9668,7 +9958,7 @@ impl<'a, C, NC, A> RasterListCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -9680,7 +9970,6 @@ impl<'a, C, NC, A> RasterListCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -9690,7 +9979,7 @@ impl<'a, C, NC, A> RasterListCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -9701,7 +9990,7 @@ impl<'a, C, NC, A> RasterListCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -9710,13 +9999,13 @@ impl<'a, C, NC, A> RasterListCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -9728,7 +10017,7 @@ impl<'a, C, NC, A> RasterListCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The ID of a Maps Engine project, used to filter the response. To list all available projects with their IDs, send a Projects: list request. You can also find your project ID as the value of the DashboardPlace:cid URL parameter when signed in to mapsengine.google.com.    
+    /// The ID of a Maps Engine project, used to filter the response. To list all available projects with their IDs, send a Projects: list request. You can also find your project ID as the value of the DashboardPlace:cid URL parameter when signed in to mapsengine.google.com.
     pub fn project_id(mut self, new_value: &str) -> RasterListCall<'a, C, NC, A> {
         self._project_id = new_value.to_string();
         self
@@ -9736,7 +10025,7 @@ impl<'a, C, NC, A> RasterListCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// Sets the *tags* query property to the given value.
     ///
     /// 
-    /// A comma separated list of tags. Returned assets will contain all the tags from the list.    
+    /// A comma separated list of tags. Returned assets will contain all the tags from the list.
     pub fn tags(mut self, new_value: &str) -> RasterListCall<'a, C, NC, A> {
         self._tags = Some(new_value.to_string());
         self
@@ -9744,7 +10033,7 @@ impl<'a, C, NC, A> RasterListCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// Sets the *search* query property to the given value.
     ///
     /// 
-    /// An unstructured search string used to filter the set of results based on asset metadata.    
+    /// An unstructured search string used to filter the set of results based on asset metadata.
     pub fn search(mut self, new_value: &str) -> RasterListCall<'a, C, NC, A> {
         self._search = Some(new_value.to_string());
         self
@@ -9752,7 +10041,7 @@ impl<'a, C, NC, A> RasterListCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// Sets the *role* query property to the given value.
     ///
     /// 
-    /// The role parameter indicates that the response should only contain assets where the current user has the specified level of access.    
+    /// The role parameter indicates that the response should only contain assets where the current user has the specified level of access.
     pub fn role(mut self, new_value: &str) -> RasterListCall<'a, C, NC, A> {
         self._role = Some(new_value.to_string());
         self
@@ -9767,7 +10056,7 @@ impl<'a, C, NC, A> RasterListCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// Sets the *page token* query property to the given value.
     ///
     /// 
-    /// The continuation token, used to page through large result sets. To get the next page of results, set this parameter to the value of nextPageToken from the previous response.    
+    /// The continuation token, used to page through large result sets. To get the next page of results, set this parameter to the value of nextPageToken from the previous response.
     pub fn page_token(mut self, new_value: &str) -> RasterListCall<'a, C, NC, A> {
         self._page_token = Some(new_value.to_string());
         self
@@ -9775,7 +10064,7 @@ impl<'a, C, NC, A> RasterListCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// Sets the *modified before* query property to the given value.
     ///
     /// 
-    /// An RFC 3339 formatted date-time value (e.g. 1970-01-01T00:00:00Z). Returned assets will have been modified at or before this time.    
+    /// An RFC 3339 formatted date-time value (e.g. 1970-01-01T00:00:00Z). Returned assets will have been modified at or before this time.
     pub fn modified_before(mut self, new_value: &str) -> RasterListCall<'a, C, NC, A> {
         self._modified_before = Some(new_value.to_string());
         self
@@ -9783,7 +10072,7 @@ impl<'a, C, NC, A> RasterListCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// Sets the *modified after* query property to the given value.
     ///
     /// 
-    /// An RFC 3339 formatted date-time value (e.g. 1970-01-01T00:00:00Z). Returned assets will have been modified at or after this time.    
+    /// An RFC 3339 formatted date-time value (e.g. 1970-01-01T00:00:00Z). Returned assets will have been modified at or after this time.
     pub fn modified_after(mut self, new_value: &str) -> RasterListCall<'a, C, NC, A> {
         self._modified_after = Some(new_value.to_string());
         self
@@ -9791,7 +10080,7 @@ impl<'a, C, NC, A> RasterListCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// Sets the *max results* query property to the given value.
     ///
     /// 
-    /// The maximum number of items to include in a single response page. The maximum supported value is 100.    
+    /// The maximum number of items to include in a single response page. The maximum supported value is 100.
     pub fn max_results(mut self, new_value: u32) -> RasterListCall<'a, C, NC, A> {
         self._max_results = Some(new_value);
         self
@@ -9799,7 +10088,7 @@ impl<'a, C, NC, A> RasterListCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// Sets the *creator email* query property to the given value.
     ///
     /// 
-    /// An email address representing a user. Returned assets that have been created by the user associated with the provided email address.    
+    /// An email address representing a user. Returned assets that have been created by the user associated with the provided email address.
     pub fn creator_email(mut self, new_value: &str) -> RasterListCall<'a, C, NC, A> {
         self._creator_email = Some(new_value.to_string());
         self
@@ -9807,7 +10096,7 @@ impl<'a, C, NC, A> RasterListCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// Sets the *created before* query property to the given value.
     ///
     /// 
-    /// An RFC 3339 formatted date-time value (e.g. 1970-01-01T00:00:00Z). Returned assets will have been created at or before this time.    
+    /// An RFC 3339 formatted date-time value (e.g. 1970-01-01T00:00:00Z). Returned assets will have been created at or before this time.
     pub fn created_before(mut self, new_value: &str) -> RasterListCall<'a, C, NC, A> {
         self._created_before = Some(new_value.to_string());
         self
@@ -9815,7 +10104,7 @@ impl<'a, C, NC, A> RasterListCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// Sets the *created after* query property to the given value.
     ///
     /// 
-    /// An RFC 3339 formatted date-time value (e.g. 1970-01-01T00:00:00Z). Returned assets will have been created at or after this time.    
+    /// An RFC 3339 formatted date-time value (e.g. 1970-01-01T00:00:00Z). Returned assets will have been created at or after this time.
     pub fn created_after(mut self, new_value: &str) -> RasterListCall<'a, C, NC, A> {
         self._created_after = Some(new_value.to_string());
         self
@@ -9823,7 +10112,7 @@ impl<'a, C, NC, A> RasterListCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// Sets the *bbox* query property to the given value.
     ///
     /// 
-    /// A bounding box, expressed as "west,south,east,north". If set, only assets which intersect this bounding box will be returned.    
+    /// A bounding box, expressed as "west,south,east,north". If set, only assets which intersect this bounding box will be returned.
     pub fn bbox(mut self, new_value: &str) -> RasterListCall<'a, C, NC, A> {
         self._bbox = Some(new_value.to_string());
         self
@@ -9884,7 +10173,7 @@ impl<'a, C, NC, A> RasterListCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
 /// Create a skeleton raster asset for upload.
 ///
 /// A builder for the *upload* method supported by a *raster* resource.
-/// It is not used directly, but through a `RasterMethods`.
+/// It is not used directly, but through a `RasterMethods` instance.
 ///
 /// # Example
 ///
@@ -9947,7 +10236,7 @@ impl<'a, C, NC, A> RasterUploadCall<'a, C, NC, A> where NC: hyper::net::NetworkC
         for &field in ["alt"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -9980,7 +10269,7 @@ impl<'a, C, NC, A> RasterUploadCall<'a, C, NC, A> where NC: hyper::net::NetworkC
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -9996,7 +10285,6 @@ impl<'a, C, NC, A> RasterUploadCall<'a, C, NC, A> where NC: hyper::net::NetworkC
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -10006,7 +10294,7 @@ impl<'a, C, NC, A> RasterUploadCall<'a, C, NC, A> where NC: hyper::net::NetworkC
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -10017,7 +10305,7 @@ impl<'a, C, NC, A> RasterUploadCall<'a, C, NC, A> where NC: hyper::net::NetworkC
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -10026,13 +10314,13 @@ impl<'a, C, NC, A> RasterUploadCall<'a, C, NC, A> where NC: hyper::net::NetworkC
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -10104,7 +10392,7 @@ impl<'a, C, NC, A> RasterUploadCall<'a, C, NC, A> where NC: hyper::net::NetworkC
 /// Return all parent ids of the specified rasters.
 ///
 /// A builder for the *parents.list* method supported by a *raster* resource.
-/// It is not used directly, but through a `RasterMethods`.
+/// It is not used directly, but through a `RasterMethods` instance.
 ///
 /// # Example
 ///
@@ -10172,7 +10460,7 @@ impl<'a, C, NC, A> RasterParentListCall<'a, C, NC, A> where NC: hyper::net::Netw
         for &field in ["alt", "id", "pageToken", "maxResults"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -10225,7 +10513,7 @@ impl<'a, C, NC, A> RasterParentListCall<'a, C, NC, A> where NC: hyper::net::Netw
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -10237,7 +10525,6 @@ impl<'a, C, NC, A> RasterParentListCall<'a, C, NC, A> where NC: hyper::net::Netw
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -10247,7 +10534,7 @@ impl<'a, C, NC, A> RasterParentListCall<'a, C, NC, A> where NC: hyper::net::Netw
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -10258,7 +10545,7 @@ impl<'a, C, NC, A> RasterParentListCall<'a, C, NC, A> where NC: hyper::net::Netw
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -10267,13 +10554,13 @@ impl<'a, C, NC, A> RasterParentListCall<'a, C, NC, A> where NC: hyper::net::Netw
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -10285,7 +10572,7 @@ impl<'a, C, NC, A> RasterParentListCall<'a, C, NC, A> where NC: hyper::net::Netw
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The ID of the rasters whose parents will be listed.    
+    /// The ID of the rasters whose parents will be listed.
     pub fn id(mut self, new_value: &str) -> RasterParentListCall<'a, C, NC, A> {
         self._id = new_value.to_string();
         self
@@ -10293,7 +10580,7 @@ impl<'a, C, NC, A> RasterParentListCall<'a, C, NC, A> where NC: hyper::net::Netw
     /// Sets the *page token* query property to the given value.
     ///
     /// 
-    /// The continuation token, used to page through large result sets. To get the next page of results, set this parameter to the value of nextPageToken from the previous response.    
+    /// The continuation token, used to page through large result sets. To get the next page of results, set this parameter to the value of nextPageToken from the previous response.
     pub fn page_token(mut self, new_value: &str) -> RasterParentListCall<'a, C, NC, A> {
         self._page_token = Some(new_value.to_string());
         self
@@ -10301,7 +10588,7 @@ impl<'a, C, NC, A> RasterParentListCall<'a, C, NC, A> where NC: hyper::net::Netw
     /// Sets the *max results* query property to the given value.
     ///
     /// 
-    /// The maximum number of items to include in a single response page. The maximum supported value is 50.    
+    /// The maximum number of items to include in a single response page. The maximum supported value is 50.
     pub fn max_results(mut self, new_value: u32) -> RasterParentListCall<'a, C, NC, A> {
         self._max_results = Some(new_value);
         self
@@ -10362,7 +10649,7 @@ impl<'a, C, NC, A> RasterParentListCall<'a, C, NC, A> where NC: hyper::net::Netw
 /// Return all of the permissions for the specified asset.
 ///
 /// A builder for the *permissions.list* method supported by a *asset* resource.
-/// It is not used directly, but through a `AssetMethods`.
+/// It is not used directly, but through a `AssetMethods` instance.
 ///
 /// # Example
 ///
@@ -10420,7 +10707,7 @@ impl<'a, C, NC, A> AssetPermissionListCall<'a, C, NC, A> where NC: hyper::net::N
         for &field in ["alt", "id"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -10473,7 +10760,7 @@ impl<'a, C, NC, A> AssetPermissionListCall<'a, C, NC, A> where NC: hyper::net::N
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -10485,7 +10772,6 @@ impl<'a, C, NC, A> AssetPermissionListCall<'a, C, NC, A> where NC: hyper::net::N
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -10495,7 +10781,7 @@ impl<'a, C, NC, A> AssetPermissionListCall<'a, C, NC, A> where NC: hyper::net::N
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -10506,7 +10792,7 @@ impl<'a, C, NC, A> AssetPermissionListCall<'a, C, NC, A> where NC: hyper::net::N
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -10515,13 +10801,13 @@ impl<'a, C, NC, A> AssetPermissionListCall<'a, C, NC, A> where NC: hyper::net::N
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -10533,7 +10819,7 @@ impl<'a, C, NC, A> AssetPermissionListCall<'a, C, NC, A> where NC: hyper::net::N
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The ID of the asset whose permissions will be listed.    
+    /// The ID of the asset whose permissions will be listed.
     pub fn id(mut self, new_value: &str) -> AssetPermissionListCall<'a, C, NC, A> {
         self._id = new_value.to_string();
         self
@@ -10594,7 +10880,7 @@ impl<'a, C, NC, A> AssetPermissionListCall<'a, C, NC, A> where NC: hyper::net::N
 /// Return all assets readable by the current user.
 ///
 /// A builder for the *list* method supported by a *asset* resource.
-/// It is not used directly, but through a `AssetMethods`.
+/// It is not used directly, but through a `AssetMethods` instance.
 ///
 /// # Example
 ///
@@ -10715,7 +11001,7 @@ impl<'a, C, NC, A> AssetListCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
         for &field in ["alt", "type", "tags", "search", "role", "projectId", "pageToken", "modifiedBefore", "modifiedAfter", "maxResults", "creatorEmail", "createdBefore", "createdAfter", "bbox"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -10744,7 +11030,7 @@ impl<'a, C, NC, A> AssetListCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -10756,7 +11042,6 @@ impl<'a, C, NC, A> AssetListCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -10766,7 +11051,7 @@ impl<'a, C, NC, A> AssetListCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -10777,7 +11062,7 @@ impl<'a, C, NC, A> AssetListCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -10786,13 +11071,13 @@ impl<'a, C, NC, A> AssetListCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -10802,7 +11087,7 @@ impl<'a, C, NC, A> AssetListCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     /// Sets the *type* query property to the given value.
     ///
     /// 
-    /// A comma separated list of asset types. Returned assets will have one of the types from the provided list. Supported values are 'map', 'layer', 'rasterCollection' and 'table'.    
+    /// A comma separated list of asset types. Returned assets will have one of the types from the provided list. Supported values are 'map', 'layer', 'rasterCollection' and 'table'.
     pub fn type_(mut self, new_value: &str) -> AssetListCall<'a, C, NC, A> {
         self._type_ = Some(new_value.to_string());
         self
@@ -10810,7 +11095,7 @@ impl<'a, C, NC, A> AssetListCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     /// Sets the *tags* query property to the given value.
     ///
     /// 
-    /// A comma separated list of tags. Returned assets will contain all the tags from the list.    
+    /// A comma separated list of tags. Returned assets will contain all the tags from the list.
     pub fn tags(mut self, new_value: &str) -> AssetListCall<'a, C, NC, A> {
         self._tags = Some(new_value.to_string());
         self
@@ -10818,7 +11103,7 @@ impl<'a, C, NC, A> AssetListCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     /// Sets the *search* query property to the given value.
     ///
     /// 
-    /// An unstructured search string used to filter the set of results based on asset metadata.    
+    /// An unstructured search string used to filter the set of results based on asset metadata.
     pub fn search(mut self, new_value: &str) -> AssetListCall<'a, C, NC, A> {
         self._search = Some(new_value.to_string());
         self
@@ -10826,7 +11111,7 @@ impl<'a, C, NC, A> AssetListCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     /// Sets the *role* query property to the given value.
     ///
     /// 
-    /// The role parameter indicates that the response should only contain assets where the current user has the specified level of access.    
+    /// The role parameter indicates that the response should only contain assets where the current user has the specified level of access.
     pub fn role(mut self, new_value: &str) -> AssetListCall<'a, C, NC, A> {
         self._role = Some(new_value.to_string());
         self
@@ -10834,7 +11119,7 @@ impl<'a, C, NC, A> AssetListCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     /// Sets the *project id* query property to the given value.
     ///
     /// 
-    /// The ID of a Maps Engine project, used to filter the response. To list all available projects with their IDs, send a Projects: list request. You can also find your project ID as the value of the DashboardPlace:cid URL parameter when signed in to mapsengine.google.com.    
+    /// The ID of a Maps Engine project, used to filter the response. To list all available projects with their IDs, send a Projects: list request. You can also find your project ID as the value of the DashboardPlace:cid URL parameter when signed in to mapsengine.google.com.
     pub fn project_id(mut self, new_value: &str) -> AssetListCall<'a, C, NC, A> {
         self._project_id = Some(new_value.to_string());
         self
@@ -10842,7 +11127,7 @@ impl<'a, C, NC, A> AssetListCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     /// Sets the *page token* query property to the given value.
     ///
     /// 
-    /// The continuation token, used to page through large result sets. To get the next page of results, set this parameter to the value of nextPageToken from the previous response.    
+    /// The continuation token, used to page through large result sets. To get the next page of results, set this parameter to the value of nextPageToken from the previous response.
     pub fn page_token(mut self, new_value: &str) -> AssetListCall<'a, C, NC, A> {
         self._page_token = Some(new_value.to_string());
         self
@@ -10850,7 +11135,7 @@ impl<'a, C, NC, A> AssetListCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     /// Sets the *modified before* query property to the given value.
     ///
     /// 
-    /// An RFC 3339 formatted date-time value (e.g. 1970-01-01T00:00:00Z). Returned assets will have been modified at or before this time.    
+    /// An RFC 3339 formatted date-time value (e.g. 1970-01-01T00:00:00Z). Returned assets will have been modified at or before this time.
     pub fn modified_before(mut self, new_value: &str) -> AssetListCall<'a, C, NC, A> {
         self._modified_before = Some(new_value.to_string());
         self
@@ -10858,7 +11143,7 @@ impl<'a, C, NC, A> AssetListCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     /// Sets the *modified after* query property to the given value.
     ///
     /// 
-    /// An RFC 3339 formatted date-time value (e.g. 1970-01-01T00:00:00Z). Returned assets will have been modified at or after this time.    
+    /// An RFC 3339 formatted date-time value (e.g. 1970-01-01T00:00:00Z). Returned assets will have been modified at or after this time.
     pub fn modified_after(mut self, new_value: &str) -> AssetListCall<'a, C, NC, A> {
         self._modified_after = Some(new_value.to_string());
         self
@@ -10866,7 +11151,7 @@ impl<'a, C, NC, A> AssetListCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     /// Sets the *max results* query property to the given value.
     ///
     /// 
-    /// The maximum number of items to include in a single response page. The maximum supported value is 100.    
+    /// The maximum number of items to include in a single response page. The maximum supported value is 100.
     pub fn max_results(mut self, new_value: u32) -> AssetListCall<'a, C, NC, A> {
         self._max_results = Some(new_value);
         self
@@ -10874,7 +11159,7 @@ impl<'a, C, NC, A> AssetListCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     /// Sets the *creator email* query property to the given value.
     ///
     /// 
-    /// An email address representing a user. Returned assets that have been created by the user associated with the provided email address.    
+    /// An email address representing a user. Returned assets that have been created by the user associated with the provided email address.
     pub fn creator_email(mut self, new_value: &str) -> AssetListCall<'a, C, NC, A> {
         self._creator_email = Some(new_value.to_string());
         self
@@ -10882,7 +11167,7 @@ impl<'a, C, NC, A> AssetListCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     /// Sets the *created before* query property to the given value.
     ///
     /// 
-    /// An RFC 3339 formatted date-time value (e.g. 1970-01-01T00:00:00Z). Returned assets will have been created at or before this time.    
+    /// An RFC 3339 formatted date-time value (e.g. 1970-01-01T00:00:00Z). Returned assets will have been created at or before this time.
     pub fn created_before(mut self, new_value: &str) -> AssetListCall<'a, C, NC, A> {
         self._created_before = Some(new_value.to_string());
         self
@@ -10890,7 +11175,7 @@ impl<'a, C, NC, A> AssetListCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     /// Sets the *created after* query property to the given value.
     ///
     /// 
-    /// An RFC 3339 formatted date-time value (e.g. 1970-01-01T00:00:00Z). Returned assets will have been created at or after this time.    
+    /// An RFC 3339 formatted date-time value (e.g. 1970-01-01T00:00:00Z). Returned assets will have been created at or after this time.
     pub fn created_after(mut self, new_value: &str) -> AssetListCall<'a, C, NC, A> {
         self._created_after = Some(new_value.to_string());
         self
@@ -10898,7 +11183,7 @@ impl<'a, C, NC, A> AssetListCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     /// Sets the *bbox* query property to the given value.
     ///
     /// 
-    /// A bounding box, expressed as "west,south,east,north". If set, only assets which intersect this bounding box will be returned.    
+    /// A bounding box, expressed as "west,south,east,north". If set, only assets which intersect this bounding box will be returned.
     pub fn bbox(mut self, new_value: &str) -> AssetListCall<'a, C, NC, A> {
         self._bbox = Some(new_value.to_string());
         self
@@ -10959,7 +11244,7 @@ impl<'a, C, NC, A> AssetListCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
 /// Return metadata for a particular asset.
 ///
 /// A builder for the *get* method supported by a *asset* resource.
-/// It is not used directly, but through a `AssetMethods`.
+/// It is not used directly, but through a `AssetMethods` instance.
 ///
 /// # Example
 ///
@@ -11017,7 +11302,7 @@ impl<'a, C, NC, A> AssetGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
         for &field in ["alt", "id"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -11070,7 +11355,7 @@ impl<'a, C, NC, A> AssetGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -11082,7 +11367,6 @@ impl<'a, C, NC, A> AssetGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -11092,7 +11376,7 @@ impl<'a, C, NC, A> AssetGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -11103,7 +11387,7 @@ impl<'a, C, NC, A> AssetGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -11112,13 +11396,13 @@ impl<'a, C, NC, A> AssetGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -11130,7 +11414,7 @@ impl<'a, C, NC, A> AssetGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The ID of the asset.    
+    /// The ID of the asset.
     pub fn id(mut self, new_value: &str) -> AssetGetCall<'a, C, NC, A> {
         self._id = new_value.to_string();
         self
@@ -11191,7 +11475,7 @@ impl<'a, C, NC, A> AssetGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
 /// Return all parent ids of the specified asset.
 ///
 /// A builder for the *parents.list* method supported by a *asset* resource.
-/// It is not used directly, but through a `AssetMethods`.
+/// It is not used directly, but through a `AssetMethods` instance.
 ///
 /// # Example
 ///
@@ -11259,7 +11543,7 @@ impl<'a, C, NC, A> AssetParentListCall<'a, C, NC, A> where NC: hyper::net::Netwo
         for &field in ["alt", "id", "pageToken", "maxResults"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -11312,7 +11596,7 @@ impl<'a, C, NC, A> AssetParentListCall<'a, C, NC, A> where NC: hyper::net::Netwo
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -11324,7 +11608,6 @@ impl<'a, C, NC, A> AssetParentListCall<'a, C, NC, A> where NC: hyper::net::Netwo
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -11334,7 +11617,7 @@ impl<'a, C, NC, A> AssetParentListCall<'a, C, NC, A> where NC: hyper::net::Netwo
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -11345,7 +11628,7 @@ impl<'a, C, NC, A> AssetParentListCall<'a, C, NC, A> where NC: hyper::net::Netwo
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -11354,13 +11637,13 @@ impl<'a, C, NC, A> AssetParentListCall<'a, C, NC, A> where NC: hyper::net::Netwo
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -11372,7 +11655,7 @@ impl<'a, C, NC, A> AssetParentListCall<'a, C, NC, A> where NC: hyper::net::Netwo
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The ID of the asset whose parents will be listed.    
+    /// The ID of the asset whose parents will be listed.
     pub fn id(mut self, new_value: &str) -> AssetParentListCall<'a, C, NC, A> {
         self._id = new_value.to_string();
         self
@@ -11380,7 +11663,7 @@ impl<'a, C, NC, A> AssetParentListCall<'a, C, NC, A> where NC: hyper::net::Netwo
     /// Sets the *page token* query property to the given value.
     ///
     /// 
-    /// The continuation token, used to page through large result sets. To get the next page of results, set this parameter to the value of nextPageToken from the previous response.    
+    /// The continuation token, used to page through large result sets. To get the next page of results, set this parameter to the value of nextPageToken from the previous response.
     pub fn page_token(mut self, new_value: &str) -> AssetParentListCall<'a, C, NC, A> {
         self._page_token = Some(new_value.to_string());
         self
@@ -11388,7 +11671,7 @@ impl<'a, C, NC, A> AssetParentListCall<'a, C, NC, A> where NC: hyper::net::Netwo
     /// Sets the *max results* query property to the given value.
     ///
     /// 
-    /// The maximum number of items to include in a single response page. The maximum supported value is 50.    
+    /// The maximum number of items to include in a single response page. The maximum supported value is 50.
     pub fn max_results(mut self, new_value: u32) -> AssetParentListCall<'a, C, NC, A> {
         self._max_results = Some(new_value);
         self
@@ -11449,7 +11732,7 @@ impl<'a, C, NC, A> AssetParentListCall<'a, C, NC, A> where NC: hyper::net::Netwo
 /// Delete a table.
 ///
 /// A builder for the *delete* method supported by a *table* resource.
-/// It is not used directly, but through a `TableMethods`.
+/// It is not used directly, but through a `TableMethods` instance.
 ///
 /// # Example
 ///
@@ -11507,7 +11790,7 @@ impl<'a, C, NC, A> TableDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
         for &field in ["id"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -11559,7 +11842,7 @@ impl<'a, C, NC, A> TableDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -11571,7 +11854,6 @@ impl<'a, C, NC, A> TableDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -11581,7 +11863,7 @@ impl<'a, C, NC, A> TableDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -11592,12 +11874,12 @@ impl<'a, C, NC, A> TableDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = res;
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -11609,7 +11891,7 @@ impl<'a, C, NC, A> TableDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The ID of the table. Only the table creator or project owner are permitted to delete. If the table is included in a layer, the request will fail. Remove it from all layers prior to deleting.    
+    /// The ID of the table. Only the table creator or project owner are permitted to delete. If the table is included in a layer, the request will fail. Remove it from all layers prior to deleting.
     pub fn id(mut self, new_value: &str) -> TableDeleteCall<'a, C, NC, A> {
         self._id = new_value.to_string();
         self
@@ -11671,7 +11953,7 @@ impl<'a, C, NC, A> TableDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
 /// Supported file types are listed in the Supported data formats and limits article of the Google Maps Engine help center.
 ///
 /// A builder for the *files.insert* method supported by a *table* resource.
-/// It is not used directly, but through a `TableMethods`.
+/// It is not used directly, but through a `TableMethods` instance.
 ///
 /// # Example
 ///
@@ -11733,7 +12015,7 @@ impl<'a, C, NC, A> TableFileInsertCall<'a, C, NC, A> where NC: hyper::net::Netwo
         for &field in ["id", "filename"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -11795,7 +12077,7 @@ impl<'a, C, NC, A> TableFileInsertCall<'a, C, NC, A> where NC: hyper::net::Netwo
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -11821,7 +12103,7 @@ impl<'a, C, NC, A> TableFileInsertCall<'a, C, NC, A> where NC: hyper::net::Netwo
                         let size = reader.seek(io::SeekFrom::End(0)).unwrap();
                     reader.seek(io::SeekFrom::Start(0)).unwrap();
                     if size > 1073741824 {
-                    	return Result::UploadSizeLimitExceeded(size, 1073741824)
+                    	return Err(Error::UploadSizeLimitExceeded(size, 1073741824))
                     }
                         req = req.header(ContentType(reader_mime_type.clone()))
                                  .header(ContentLength(size))
@@ -11834,7 +12116,6 @@ impl<'a, C, NC, A> TableFileInsertCall<'a, C, NC, A> where NC: hyper::net::Netwo
     
                     dlg.pre_request();
                     req.send()
-    
                 }
             };
 
@@ -11845,7 +12126,7 @@ impl<'a, C, NC, A> TableFileInsertCall<'a, C, NC, A> where NC: hyper::net::Netwo
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -11856,13 +12137,13 @@ impl<'a, C, NC, A> TableFileInsertCall<'a, C, NC, A> where NC: hyper::net::Netwo
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     if protocol == "resumable" {
                         let size = reader.seek(io::SeekFrom::End(0)).unwrap();
                         reader.seek(io::SeekFrom::Start(0)).unwrap();
                         if size > 1073741824 {
-                        	return Result::UploadSizeLimitExceeded(size, 1073741824)
+                        	return Err(Error::UploadSizeLimitExceeded(size, 1073741824))
                         }
                         let mut client = &mut *self.hub.client.borrow_mut();
                         let upload_result = {
@@ -11887,17 +12168,17 @@ impl<'a, C, NC, A> TableFileInsertCall<'a, C, NC, A> where NC: hyper::net::Netwo
                         match upload_result {
                             None => {
                                 dlg.finished(false);
-                                return Result::Cancelled
+                                return Err(Error::Cancelled)
                             }
                             Some(Err(err)) => {
                                 dlg.finished(false);
-                                return Result::HttpError(err)
+                                return Err(Error::HttpError(err))
                             }
                             Some(Ok(upload_result)) => {
                                 res = upload_result;
                                 if !res.status.is_success() {
                                     dlg.finished(false);
-                                    return Result::Failure(res)
+                                    return Err(Error::Failure(res))
                                 }
                             }
                         }
@@ -11905,7 +12186,7 @@ impl<'a, C, NC, A> TableFileInsertCall<'a, C, NC, A> where NC: hyper::net::Netwo
                     let result_value = res;
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -11921,11 +12202,14 @@ impl<'a, C, NC, A> TableFileInsertCall<'a, C, NC, A> where NC: hyper::net::Netwo
                 where RS: ReadSeek {
         self.doit(stream, mime_type, "simple")
     }
-    /// Upload media in a resumeable fashion.
+    /// Upload media in a resumable fashion.
     /// Even if the upload fails or is interrupted, it can be resumed for a 
     /// certain amount of time as the server maintains state temporarily.
     /// 
-    /// TODO: Write more about how delegation works in this particular case.
+    /// The delegate will be asked for an `upload_url()`, and if not provided, will be asked to store an upload URL 
+    /// that was provided by the server, using `store_upload_url(...)`. The upload will be done in chunks, the delegate
+    /// may specify the `chunk_size()` and may cancel the operation before each chunk is uploaded, using
+    /// `cancel_chunk_upload(...)`.
     ///
     /// * *max size*: 1GB
     /// * *multipart*: yes
@@ -11940,7 +12224,7 @@ impl<'a, C, NC, A> TableFileInsertCall<'a, C, NC, A> where NC: hyper::net::Netwo
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The ID of the table asset.    
+    /// The ID of the table asset.
     pub fn id(mut self, new_value: &str) -> TableFileInsertCall<'a, C, NC, A> {
         self._id = new_value.to_string();
         self
@@ -11950,7 +12234,7 @@ impl<'a, C, NC, A> TableFileInsertCall<'a, C, NC, A> where NC: hyper::net::Netwo
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The file name of this uploaded file.    
+    /// The file name of this uploaded file.
     pub fn filename(mut self, new_value: &str) -> TableFileInsertCall<'a, C, NC, A> {
         self._filename = new_value.to_string();
         self
@@ -12019,7 +12303,7 @@ impl<'a, C, NC, A> TableFileInsertCall<'a, C, NC, A> where NC: hyper::net::Netwo
 /// For more information about inserting features, read Creating features in the Google Maps Engine developer's guide.
 ///
 /// A builder for the *features.batchInsert* method supported by a *table* resource.
-/// It is not used directly, but through a `TableMethods`.
+/// It is not used directly, but through a `TableMethods` instance.
 ///
 /// # Example
 ///
@@ -12084,7 +12368,7 @@ impl<'a, C, NC, A> TableFeatureBatchInsertCall<'a, C, NC, A> where NC: hyper::ne
         for &field in ["id"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -12140,7 +12424,7 @@ impl<'a, C, NC, A> TableFeatureBatchInsertCall<'a, C, NC, A> where NC: hyper::ne
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -12156,7 +12440,6 @@ impl<'a, C, NC, A> TableFeatureBatchInsertCall<'a, C, NC, A> where NC: hyper::ne
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -12166,7 +12449,7 @@ impl<'a, C, NC, A> TableFeatureBatchInsertCall<'a, C, NC, A> where NC: hyper::ne
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -12177,12 +12460,12 @@ impl<'a, C, NC, A> TableFeatureBatchInsertCall<'a, C, NC, A> where NC: hyper::ne
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = res;
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -12203,7 +12486,7 @@ impl<'a, C, NC, A> TableFeatureBatchInsertCall<'a, C, NC, A> where NC: hyper::ne
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The ID of the table to append the features to.    
+    /// The ID of the table to append the features to.
     pub fn id(mut self, new_value: &str) -> TableFeatureBatchInsertCall<'a, C, NC, A> {
         self._id = new_value.to_string();
         self
@@ -12264,7 +12547,7 @@ impl<'a, C, NC, A> TableFeatureBatchInsertCall<'a, C, NC, A> where NC: hyper::ne
 /// Return all tables readable by the current user.
 ///
 /// A builder for the *list* method supported by a *table* resource.
-/// It is not used directly, but through a `TableMethods`.
+/// It is not used directly, but through a `TableMethods` instance.
 ///
 /// # Example
 ///
@@ -12385,7 +12668,7 @@ impl<'a, C, NC, A> TableListCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
         for &field in ["alt", "tags", "search", "role", "projectId", "processingStatus", "pageToken", "modifiedBefore", "modifiedAfter", "maxResults", "creatorEmail", "createdBefore", "createdAfter", "bbox"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -12414,7 +12697,7 @@ impl<'a, C, NC, A> TableListCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -12426,7 +12709,6 @@ impl<'a, C, NC, A> TableListCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -12436,7 +12718,7 @@ impl<'a, C, NC, A> TableListCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -12447,7 +12729,7 @@ impl<'a, C, NC, A> TableListCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -12456,13 +12738,13 @@ impl<'a, C, NC, A> TableListCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -12472,7 +12754,7 @@ impl<'a, C, NC, A> TableListCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     /// Sets the *tags* query property to the given value.
     ///
     /// 
-    /// A comma separated list of tags. Returned assets will contain all the tags from the list.    
+    /// A comma separated list of tags. Returned assets will contain all the tags from the list.
     pub fn tags(mut self, new_value: &str) -> TableListCall<'a, C, NC, A> {
         self._tags = Some(new_value.to_string());
         self
@@ -12480,7 +12762,7 @@ impl<'a, C, NC, A> TableListCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     /// Sets the *search* query property to the given value.
     ///
     /// 
-    /// An unstructured search string used to filter the set of results based on asset metadata.    
+    /// An unstructured search string used to filter the set of results based on asset metadata.
     pub fn search(mut self, new_value: &str) -> TableListCall<'a, C, NC, A> {
         self._search = Some(new_value.to_string());
         self
@@ -12488,7 +12770,7 @@ impl<'a, C, NC, A> TableListCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     /// Sets the *role* query property to the given value.
     ///
     /// 
-    /// The role parameter indicates that the response should only contain assets where the current user has the specified level of access.    
+    /// The role parameter indicates that the response should only contain assets where the current user has the specified level of access.
     pub fn role(mut self, new_value: &str) -> TableListCall<'a, C, NC, A> {
         self._role = Some(new_value.to_string());
         self
@@ -12496,7 +12778,7 @@ impl<'a, C, NC, A> TableListCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     /// Sets the *project id* query property to the given value.
     ///
     /// 
-    /// The ID of a Maps Engine project, used to filter the response. To list all available projects with their IDs, send a Projects: list request. You can also find your project ID as the value of the DashboardPlace:cid URL parameter when signed in to mapsengine.google.com.    
+    /// The ID of a Maps Engine project, used to filter the response. To list all available projects with their IDs, send a Projects: list request. You can also find your project ID as the value of the DashboardPlace:cid URL parameter when signed in to mapsengine.google.com.
     pub fn project_id(mut self, new_value: &str) -> TableListCall<'a, C, NC, A> {
         self._project_id = Some(new_value.to_string());
         self
@@ -12511,7 +12793,7 @@ impl<'a, C, NC, A> TableListCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     /// Sets the *page token* query property to the given value.
     ///
     /// 
-    /// The continuation token, used to page through large result sets. To get the next page of results, set this parameter to the value of nextPageToken from the previous response.    
+    /// The continuation token, used to page through large result sets. To get the next page of results, set this parameter to the value of nextPageToken from the previous response.
     pub fn page_token(mut self, new_value: &str) -> TableListCall<'a, C, NC, A> {
         self._page_token = Some(new_value.to_string());
         self
@@ -12519,7 +12801,7 @@ impl<'a, C, NC, A> TableListCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     /// Sets the *modified before* query property to the given value.
     ///
     /// 
-    /// An RFC 3339 formatted date-time value (e.g. 1970-01-01T00:00:00Z). Returned assets will have been modified at or before this time.    
+    /// An RFC 3339 formatted date-time value (e.g. 1970-01-01T00:00:00Z). Returned assets will have been modified at or before this time.
     pub fn modified_before(mut self, new_value: &str) -> TableListCall<'a, C, NC, A> {
         self._modified_before = Some(new_value.to_string());
         self
@@ -12527,7 +12809,7 @@ impl<'a, C, NC, A> TableListCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     /// Sets the *modified after* query property to the given value.
     ///
     /// 
-    /// An RFC 3339 formatted date-time value (e.g. 1970-01-01T00:00:00Z). Returned assets will have been modified at or after this time.    
+    /// An RFC 3339 formatted date-time value (e.g. 1970-01-01T00:00:00Z). Returned assets will have been modified at or after this time.
     pub fn modified_after(mut self, new_value: &str) -> TableListCall<'a, C, NC, A> {
         self._modified_after = Some(new_value.to_string());
         self
@@ -12535,7 +12817,7 @@ impl<'a, C, NC, A> TableListCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     /// Sets the *max results* query property to the given value.
     ///
     /// 
-    /// The maximum number of items to include in a single response page. The maximum supported value is 100.    
+    /// The maximum number of items to include in a single response page. The maximum supported value is 100.
     pub fn max_results(mut self, new_value: u32) -> TableListCall<'a, C, NC, A> {
         self._max_results = Some(new_value);
         self
@@ -12543,7 +12825,7 @@ impl<'a, C, NC, A> TableListCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     /// Sets the *creator email* query property to the given value.
     ///
     /// 
-    /// An email address representing a user. Returned assets that have been created by the user associated with the provided email address.    
+    /// An email address representing a user. Returned assets that have been created by the user associated with the provided email address.
     pub fn creator_email(mut self, new_value: &str) -> TableListCall<'a, C, NC, A> {
         self._creator_email = Some(new_value.to_string());
         self
@@ -12551,7 +12833,7 @@ impl<'a, C, NC, A> TableListCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     /// Sets the *created before* query property to the given value.
     ///
     /// 
-    /// An RFC 3339 formatted date-time value (e.g. 1970-01-01T00:00:00Z). Returned assets will have been created at or before this time.    
+    /// An RFC 3339 formatted date-time value (e.g. 1970-01-01T00:00:00Z). Returned assets will have been created at or before this time.
     pub fn created_before(mut self, new_value: &str) -> TableListCall<'a, C, NC, A> {
         self._created_before = Some(new_value.to_string());
         self
@@ -12559,7 +12841,7 @@ impl<'a, C, NC, A> TableListCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     /// Sets the *created after* query property to the given value.
     ///
     /// 
-    /// An RFC 3339 formatted date-time value (e.g. 1970-01-01T00:00:00Z). Returned assets will have been created at or after this time.    
+    /// An RFC 3339 formatted date-time value (e.g. 1970-01-01T00:00:00Z). Returned assets will have been created at or after this time.
     pub fn created_after(mut self, new_value: &str) -> TableListCall<'a, C, NC, A> {
         self._created_after = Some(new_value.to_string());
         self
@@ -12567,7 +12849,7 @@ impl<'a, C, NC, A> TableListCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     /// Sets the *bbox* query property to the given value.
     ///
     /// 
-    /// A bounding box, expressed as "west,south,east,north". If set, only assets which intersect this bounding box will be returned.    
+    /// A bounding box, expressed as "west,south,east,north". If set, only assets which intersect this bounding box will be returned.
     pub fn bbox(mut self, new_value: &str) -> TableListCall<'a, C, NC, A> {
         self._bbox = Some(new_value.to_string());
         self
@@ -12628,7 +12910,7 @@ impl<'a, C, NC, A> TableListCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
 /// Return metadata for a particular table, including the schema.
 ///
 /// A builder for the *get* method supported by a *table* resource.
-/// It is not used directly, but through a `TableMethods`.
+/// It is not used directly, but through a `TableMethods` instance.
 ///
 /// # Example
 ///
@@ -12691,7 +12973,7 @@ impl<'a, C, NC, A> TableGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
         for &field in ["alt", "id", "version"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -12744,7 +13026,7 @@ impl<'a, C, NC, A> TableGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -12756,7 +13038,6 @@ impl<'a, C, NC, A> TableGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -12766,7 +13047,7 @@ impl<'a, C, NC, A> TableGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -12777,7 +13058,7 @@ impl<'a, C, NC, A> TableGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -12786,13 +13067,13 @@ impl<'a, C, NC, A> TableGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -12804,7 +13085,7 @@ impl<'a, C, NC, A> TableGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The ID of the table.    
+    /// The ID of the table.
     pub fn id(mut self, new_value: &str) -> TableGetCall<'a, C, NC, A> {
         self._id = new_value.to_string();
         self
@@ -12872,7 +13153,7 @@ impl<'a, C, NC, A> TableGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
 /// Delete all features matching the given IDs.
 ///
 /// A builder for the *features.batchDelete* method supported by a *table* resource.
-/// It is not used directly, but through a `TableMethods`.
+/// It is not used directly, but through a `TableMethods` instance.
 ///
 /// # Example
 ///
@@ -12937,7 +13218,7 @@ impl<'a, C, NC, A> TableFeatureBatchDeleteCall<'a, C, NC, A> where NC: hyper::ne
         for &field in ["id"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -12993,7 +13274,7 @@ impl<'a, C, NC, A> TableFeatureBatchDeleteCall<'a, C, NC, A> where NC: hyper::ne
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -13009,7 +13290,6 @@ impl<'a, C, NC, A> TableFeatureBatchDeleteCall<'a, C, NC, A> where NC: hyper::ne
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -13019,7 +13299,7 @@ impl<'a, C, NC, A> TableFeatureBatchDeleteCall<'a, C, NC, A> where NC: hyper::ne
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -13030,12 +13310,12 @@ impl<'a, C, NC, A> TableFeatureBatchDeleteCall<'a, C, NC, A> where NC: hyper::ne
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = res;
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -13056,7 +13336,7 @@ impl<'a, C, NC, A> TableFeatureBatchDeleteCall<'a, C, NC, A> where NC: hyper::ne
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The ID of the table that contains the features to be deleted.    
+    /// The ID of the table that contains the features to be deleted.
     pub fn id(mut self, new_value: &str) -> TableFeatureBatchDeleteCall<'a, C, NC, A> {
         self._id = new_value.to_string();
         self
@@ -13117,7 +13397,7 @@ impl<'a, C, NC, A> TableFeatureBatchDeleteCall<'a, C, NC, A> where NC: hyper::ne
 /// Return all features readable by the current user.
 ///
 /// A builder for the *features.list* method supported by a *table* resource.
-/// It is not used directly, but through a `TableMethods`.
+/// It is not used directly, but through a `TableMethods` instance.
 ///
 /// # Example
 ///
@@ -13220,7 +13500,7 @@ impl<'a, C, NC, A> TableFeatureListCall<'a, C, NC, A> where NC: hyper::net::Netw
         for &field in ["alt", "id", "where", "version", "select", "pageToken", "orderBy", "maxResults", "limit", "intersects", "include"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -13273,7 +13553,7 @@ impl<'a, C, NC, A> TableFeatureListCall<'a, C, NC, A> where NC: hyper::net::Netw
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -13285,7 +13565,6 @@ impl<'a, C, NC, A> TableFeatureListCall<'a, C, NC, A> where NC: hyper::net::Netw
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -13295,7 +13574,7 @@ impl<'a, C, NC, A> TableFeatureListCall<'a, C, NC, A> where NC: hyper::net::Netw
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -13306,7 +13585,7 @@ impl<'a, C, NC, A> TableFeatureListCall<'a, C, NC, A> where NC: hyper::net::Netw
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -13315,13 +13594,13 @@ impl<'a, C, NC, A> TableFeatureListCall<'a, C, NC, A> where NC: hyper::net::Netw
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -13333,7 +13612,7 @@ impl<'a, C, NC, A> TableFeatureListCall<'a, C, NC, A> where NC: hyper::net::Netw
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The ID of the table to which these features belong.    
+    /// The ID of the table to which these features belong.
     pub fn id(mut self, new_value: &str) -> TableFeatureListCall<'a, C, NC, A> {
         self._id = new_value.to_string();
         self
@@ -13341,7 +13620,7 @@ impl<'a, C, NC, A> TableFeatureListCall<'a, C, NC, A> where NC: hyper::net::Netw
     /// Sets the *where* query property to the given value.
     ///
     /// 
-    /// An SQL-like predicate used to filter results.    
+    /// An SQL-like predicate used to filter results.
     pub fn where_(mut self, new_value: &str) -> TableFeatureListCall<'a, C, NC, A> {
         self._where_ = Some(new_value.to_string());
         self
@@ -13349,7 +13628,7 @@ impl<'a, C, NC, A> TableFeatureListCall<'a, C, NC, A> where NC: hyper::net::Netw
     /// Sets the *version* query property to the given value.
     ///
     /// 
-    /// The table version to access. See Accessing Public Data for information.    
+    /// The table version to access. See Accessing Public Data for information.
     pub fn version(mut self, new_value: &str) -> TableFeatureListCall<'a, C, NC, A> {
         self._version = Some(new_value.to_string());
         self
@@ -13357,7 +13636,7 @@ impl<'a, C, NC, A> TableFeatureListCall<'a, C, NC, A> where NC: hyper::net::Netw
     /// Sets the *select* query property to the given value.
     ///
     /// 
-    /// A SQL-like projection clause used to specify returned properties. If this parameter is not included, all properties are returned.    
+    /// A SQL-like projection clause used to specify returned properties. If this parameter is not included, all properties are returned.
     pub fn select(mut self, new_value: &str) -> TableFeatureListCall<'a, C, NC, A> {
         self._select = Some(new_value.to_string());
         self
@@ -13365,7 +13644,7 @@ impl<'a, C, NC, A> TableFeatureListCall<'a, C, NC, A> where NC: hyper::net::Netw
     /// Sets the *page token* query property to the given value.
     ///
     /// 
-    /// The continuation token, used to page through large result sets. To get the next page of results, set this parameter to the value of nextPageToken from the previous response.    
+    /// The continuation token, used to page through large result sets. To get the next page of results, set this parameter to the value of nextPageToken from the previous response.
     pub fn page_token(mut self, new_value: &str) -> TableFeatureListCall<'a, C, NC, A> {
         self._page_token = Some(new_value.to_string());
         self
@@ -13373,7 +13652,7 @@ impl<'a, C, NC, A> TableFeatureListCall<'a, C, NC, A> where NC: hyper::net::Netw
     /// Sets the *order by* query property to the given value.
     ///
     /// 
-    /// An SQL-like order by clause used to sort results. If this parameter is not included, the order of features is undefined.    
+    /// An SQL-like order by clause used to sort results. If this parameter is not included, the order of features is undefined.
     pub fn order_by(mut self, new_value: &str) -> TableFeatureListCall<'a, C, NC, A> {
         self._order_by = Some(new_value.to_string());
         self
@@ -13381,7 +13660,7 @@ impl<'a, C, NC, A> TableFeatureListCall<'a, C, NC, A> where NC: hyper::net::Netw
     /// Sets the *max results* query property to the given value.
     ///
     /// 
-    /// The maximum number of items to include in the response, used for paging. The maximum supported value is 1000.    
+    /// The maximum number of items to include in the response, used for paging. The maximum supported value is 1000.
     pub fn max_results(mut self, new_value: u32) -> TableFeatureListCall<'a, C, NC, A> {
         self._max_results = Some(new_value);
         self
@@ -13389,7 +13668,7 @@ impl<'a, C, NC, A> TableFeatureListCall<'a, C, NC, A> where NC: hyper::net::Netw
     /// Sets the *limit* query property to the given value.
     ///
     /// 
-    /// The total number of features to return from the query, irrespective of the number of pages.    
+    /// The total number of features to return from the query, irrespective of the number of pages.
     pub fn limit(mut self, new_value: u32) -> TableFeatureListCall<'a, C, NC, A> {
         self._limit = Some(new_value);
         self
@@ -13397,7 +13676,7 @@ impl<'a, C, NC, A> TableFeatureListCall<'a, C, NC, A> where NC: hyper::net::Netw
     /// Sets the *intersects* query property to the given value.
     ///
     /// 
-    /// A geometry literal that specifies the spatial restriction of the query.    
+    /// A geometry literal that specifies the spatial restriction of the query.
     pub fn intersects(mut self, new_value: &str) -> TableFeatureListCall<'a, C, NC, A> {
         self._intersects = Some(new_value.to_string());
         self
@@ -13405,7 +13684,7 @@ impl<'a, C, NC, A> TableFeatureListCall<'a, C, NC, A> where NC: hyper::net::Netw
     /// Sets the *include* query property to the given value.
     ///
     /// 
-    /// A comma separated list of optional data to include. Optional data available: schema.    
+    /// A comma separated list of optional data to include. Optional data available: schema.
     pub fn include(mut self, new_value: &str) -> TableFeatureListCall<'a, C, NC, A> {
         self._include = Some(new_value.to_string());
         self
@@ -13466,7 +13745,7 @@ impl<'a, C, NC, A> TableFeatureListCall<'a, C, NC, A> where NC: hyper::net::Netw
 /// Process a table asset.
 ///
 /// A builder for the *process* method supported by a *table* resource.
-/// It is not used directly, but through a `TableMethods`.
+/// It is not used directly, but through a `TableMethods` instance.
 ///
 /// # Example
 ///
@@ -13524,7 +13803,7 @@ impl<'a, C, NC, A> TableProcesCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
         for &field in ["alt", "id"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -13577,7 +13856,7 @@ impl<'a, C, NC, A> TableProcesCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -13589,7 +13868,6 @@ impl<'a, C, NC, A> TableProcesCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -13599,7 +13877,7 @@ impl<'a, C, NC, A> TableProcesCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -13610,7 +13888,7 @@ impl<'a, C, NC, A> TableProcesCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -13619,13 +13897,13 @@ impl<'a, C, NC, A> TableProcesCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -13637,7 +13915,7 @@ impl<'a, C, NC, A> TableProcesCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The ID of the table.    
+    /// The ID of the table.
     pub fn id(mut self, new_value: &str) -> TableProcesCall<'a, C, NC, A> {
         self._id = new_value.to_string();
         self
@@ -13698,7 +13976,7 @@ impl<'a, C, NC, A> TableProcesCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
 /// Return all parent ids of the specified table.
 ///
 /// A builder for the *parents.list* method supported by a *table* resource.
-/// It is not used directly, but through a `TableMethods`.
+/// It is not used directly, but through a `TableMethods` instance.
 ///
 /// # Example
 ///
@@ -13766,7 +14044,7 @@ impl<'a, C, NC, A> TableParentListCall<'a, C, NC, A> where NC: hyper::net::Netwo
         for &field in ["alt", "id", "pageToken", "maxResults"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -13819,7 +14097,7 @@ impl<'a, C, NC, A> TableParentListCall<'a, C, NC, A> where NC: hyper::net::Netwo
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -13831,7 +14109,6 @@ impl<'a, C, NC, A> TableParentListCall<'a, C, NC, A> where NC: hyper::net::Netwo
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -13841,7 +14118,7 @@ impl<'a, C, NC, A> TableParentListCall<'a, C, NC, A> where NC: hyper::net::Netwo
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -13852,7 +14129,7 @@ impl<'a, C, NC, A> TableParentListCall<'a, C, NC, A> where NC: hyper::net::Netwo
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -13861,13 +14138,13 @@ impl<'a, C, NC, A> TableParentListCall<'a, C, NC, A> where NC: hyper::net::Netwo
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -13879,7 +14156,7 @@ impl<'a, C, NC, A> TableParentListCall<'a, C, NC, A> where NC: hyper::net::Netwo
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The ID of the table whose parents will be listed.    
+    /// The ID of the table whose parents will be listed.
     pub fn id(mut self, new_value: &str) -> TableParentListCall<'a, C, NC, A> {
         self._id = new_value.to_string();
         self
@@ -13887,7 +14164,7 @@ impl<'a, C, NC, A> TableParentListCall<'a, C, NC, A> where NC: hyper::net::Netwo
     /// Sets the *page token* query property to the given value.
     ///
     /// 
-    /// The continuation token, used to page through large result sets. To get the next page of results, set this parameter to the value of nextPageToken from the previous response.    
+    /// The continuation token, used to page through large result sets. To get the next page of results, set this parameter to the value of nextPageToken from the previous response.
     pub fn page_token(mut self, new_value: &str) -> TableParentListCall<'a, C, NC, A> {
         self._page_token = Some(new_value.to_string());
         self
@@ -13895,7 +14172,7 @@ impl<'a, C, NC, A> TableParentListCall<'a, C, NC, A> where NC: hyper::net::Netwo
     /// Sets the *max results* query property to the given value.
     ///
     /// 
-    /// The maximum number of items to include in a single response page. The maximum supported value is 50.    
+    /// The maximum number of items to include in a single response page. The maximum supported value is 50.
     pub fn max_results(mut self, new_value: u32) -> TableParentListCall<'a, C, NC, A> {
         self._max_results = Some(new_value);
         self
@@ -13958,7 +14235,7 @@ impl<'a, C, NC, A> TableParentListCall<'a, C, NC, A> where NC: hyper::net::Netwo
 /// An asset can hold up to 20 different permission entries. Each batchInsert request is atomic.
 ///
 /// A builder for the *permissions.batchUpdate* method supported by a *table* resource.
-/// It is not used directly, but through a `TableMethods`.
+/// It is not used directly, but through a `TableMethods` instance.
 ///
 /// # Example
 ///
@@ -14023,7 +14300,7 @@ impl<'a, C, NC, A> TablePermissionBatchUpdateCall<'a, C, NC, A> where NC: hyper:
         for &field in ["alt", "id"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -14080,7 +14357,7 @@ impl<'a, C, NC, A> TablePermissionBatchUpdateCall<'a, C, NC, A> where NC: hyper:
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -14096,7 +14373,6 @@ impl<'a, C, NC, A> TablePermissionBatchUpdateCall<'a, C, NC, A> where NC: hyper:
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -14106,7 +14382,7 @@ impl<'a, C, NC, A> TablePermissionBatchUpdateCall<'a, C, NC, A> where NC: hyper:
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -14117,7 +14393,7 @@ impl<'a, C, NC, A> TablePermissionBatchUpdateCall<'a, C, NC, A> where NC: hyper:
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -14126,13 +14402,13 @@ impl<'a, C, NC, A> TablePermissionBatchUpdateCall<'a, C, NC, A> where NC: hyper:
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -14153,7 +14429,7 @@ impl<'a, C, NC, A> TablePermissionBatchUpdateCall<'a, C, NC, A> where NC: hyper:
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The ID of the asset to which permissions will be added.    
+    /// The ID of the asset to which permissions will be added.
     pub fn id(mut self, new_value: &str) -> TablePermissionBatchUpdateCall<'a, C, NC, A> {
         self._id = new_value.to_string();
         self
@@ -14216,7 +14492,7 @@ impl<'a, C, NC, A> TablePermissionBatchUpdateCall<'a, C, NC, A> where NC: hyper:
 /// See Table Upload in the Developer's Guide or Table.files: insert in the reference documentation for more information.
 ///
 /// A builder for the *upload* method supported by a *table* resource.
-/// It is not used directly, but through a `TableMethods`.
+/// It is not used directly, but through a `TableMethods` instance.
 ///
 /// # Example
 ///
@@ -14279,7 +14555,7 @@ impl<'a, C, NC, A> TableUploadCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
         for &field in ["alt"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -14312,7 +14588,7 @@ impl<'a, C, NC, A> TableUploadCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -14328,7 +14604,6 @@ impl<'a, C, NC, A> TableUploadCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -14338,7 +14613,7 @@ impl<'a, C, NC, A> TableUploadCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -14349,7 +14624,7 @@ impl<'a, C, NC, A> TableUploadCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -14358,13 +14633,13 @@ impl<'a, C, NC, A> TableUploadCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -14450,7 +14725,7 @@ impl<'a, C, NC, A> TableUploadCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
 /// For more information about updating features, read Updating features in the Google Maps Engine developer's guide.
 ///
 /// A builder for the *features.batchPatch* method supported by a *table* resource.
-/// It is not used directly, but through a `TableMethods`.
+/// It is not used directly, but through a `TableMethods` instance.
 ///
 /// # Example
 ///
@@ -14515,7 +14790,7 @@ impl<'a, C, NC, A> TableFeatureBatchPatchCall<'a, C, NC, A> where NC: hyper::net
         for &field in ["id"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -14571,7 +14846,7 @@ impl<'a, C, NC, A> TableFeatureBatchPatchCall<'a, C, NC, A> where NC: hyper::net
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -14587,7 +14862,6 @@ impl<'a, C, NC, A> TableFeatureBatchPatchCall<'a, C, NC, A> where NC: hyper::net
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -14597,7 +14871,7 @@ impl<'a, C, NC, A> TableFeatureBatchPatchCall<'a, C, NC, A> where NC: hyper::net
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -14608,12 +14882,12 @@ impl<'a, C, NC, A> TableFeatureBatchPatchCall<'a, C, NC, A> where NC: hyper::net
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = res;
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -14634,7 +14908,7 @@ impl<'a, C, NC, A> TableFeatureBatchPatchCall<'a, C, NC, A> where NC: hyper::net
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The ID of the table containing the features to be patched.    
+    /// The ID of the table containing the features to be patched.
     pub fn id(mut self, new_value: &str) -> TableFeatureBatchPatchCall<'a, C, NC, A> {
         self._id = new_value.to_string();
         self
@@ -14695,7 +14969,7 @@ impl<'a, C, NC, A> TableFeatureBatchPatchCall<'a, C, NC, A> where NC: hyper::net
 /// Mutate a table asset.
 ///
 /// A builder for the *patch* method supported by a *table* resource.
-/// It is not used directly, but through a `TableMethods`.
+/// It is not used directly, but through a `TableMethods` instance.
 ///
 /// # Example
 ///
@@ -14760,7 +15034,7 @@ impl<'a, C, NC, A> TablePatchCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
         for &field in ["id"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -14816,7 +15090,7 @@ impl<'a, C, NC, A> TablePatchCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -14832,7 +15106,6 @@ impl<'a, C, NC, A> TablePatchCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -14842,7 +15115,7 @@ impl<'a, C, NC, A> TablePatchCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -14853,12 +15126,12 @@ impl<'a, C, NC, A> TablePatchCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = res;
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -14879,7 +15152,7 @@ impl<'a, C, NC, A> TablePatchCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The ID of the table.    
+    /// The ID of the table.
     pub fn id(mut self, new_value: &str) -> TablePatchCall<'a, C, NC, A> {
         self._id = new_value.to_string();
         self
@@ -14940,7 +15213,7 @@ impl<'a, C, NC, A> TablePatchCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
 /// Remove permission entries from an already existing asset.
 ///
 /// A builder for the *permissions.batchDelete* method supported by a *table* resource.
-/// It is not used directly, but through a `TableMethods`.
+/// It is not used directly, but through a `TableMethods` instance.
 ///
 /// # Example
 ///
@@ -15005,7 +15278,7 @@ impl<'a, C, NC, A> TablePermissionBatchDeleteCall<'a, C, NC, A> where NC: hyper:
         for &field in ["alt", "id"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -15062,7 +15335,7 @@ impl<'a, C, NC, A> TablePermissionBatchDeleteCall<'a, C, NC, A> where NC: hyper:
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -15078,7 +15351,6 @@ impl<'a, C, NC, A> TablePermissionBatchDeleteCall<'a, C, NC, A> where NC: hyper:
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -15088,7 +15360,7 @@ impl<'a, C, NC, A> TablePermissionBatchDeleteCall<'a, C, NC, A> where NC: hyper:
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -15099,7 +15371,7 @@ impl<'a, C, NC, A> TablePermissionBatchDeleteCall<'a, C, NC, A> where NC: hyper:
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -15108,13 +15380,13 @@ impl<'a, C, NC, A> TablePermissionBatchDeleteCall<'a, C, NC, A> where NC: hyper:
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -15135,7 +15407,7 @@ impl<'a, C, NC, A> TablePermissionBatchDeleteCall<'a, C, NC, A> where NC: hyper:
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The ID of the asset from which permissions will be removed.    
+    /// The ID of the asset from which permissions will be removed.
     pub fn id(mut self, new_value: &str) -> TablePermissionBatchDeleteCall<'a, C, NC, A> {
         self._id = new_value.to_string();
         self
@@ -15196,7 +15468,7 @@ impl<'a, C, NC, A> TablePermissionBatchDeleteCall<'a, C, NC, A> where NC: hyper:
 /// Create a table asset.
 ///
 /// A builder for the *create* method supported by a *table* resource.
-/// It is not used directly, but through a `TableMethods`.
+/// It is not used directly, but through a `TableMethods` instance.
 ///
 /// # Example
 ///
@@ -15259,7 +15531,7 @@ impl<'a, C, NC, A> TableCreateCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
         for &field in ["alt"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -15292,7 +15564,7 @@ impl<'a, C, NC, A> TableCreateCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -15308,7 +15580,6 @@ impl<'a, C, NC, A> TableCreateCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -15318,7 +15589,7 @@ impl<'a, C, NC, A> TableCreateCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -15329,7 +15600,7 @@ impl<'a, C, NC, A> TableCreateCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -15338,13 +15609,13 @@ impl<'a, C, NC, A> TableCreateCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -15416,7 +15687,7 @@ impl<'a, C, NC, A> TableCreateCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
 /// Return all of the permissions for the specified asset.
 ///
 /// A builder for the *permissions.list* method supported by a *table* resource.
-/// It is not used directly, but through a `TableMethods`.
+/// It is not used directly, but through a `TableMethods` instance.
 ///
 /// # Example
 ///
@@ -15474,7 +15745,7 @@ impl<'a, C, NC, A> TablePermissionListCall<'a, C, NC, A> where NC: hyper::net::N
         for &field in ["alt", "id"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -15527,7 +15798,7 @@ impl<'a, C, NC, A> TablePermissionListCall<'a, C, NC, A> where NC: hyper::net::N
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -15539,7 +15810,6 @@ impl<'a, C, NC, A> TablePermissionListCall<'a, C, NC, A> where NC: hyper::net::N
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -15549,7 +15819,7 @@ impl<'a, C, NC, A> TablePermissionListCall<'a, C, NC, A> where NC: hyper::net::N
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -15560,7 +15830,7 @@ impl<'a, C, NC, A> TablePermissionListCall<'a, C, NC, A> where NC: hyper::net::N
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -15569,13 +15839,13 @@ impl<'a, C, NC, A> TablePermissionListCall<'a, C, NC, A> where NC: hyper::net::N
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -15587,7 +15857,7 @@ impl<'a, C, NC, A> TablePermissionListCall<'a, C, NC, A> where NC: hyper::net::N
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The ID of the asset whose permissions will be listed.    
+    /// The ID of the asset whose permissions will be listed.
     pub fn id(mut self, new_value: &str) -> TablePermissionListCall<'a, C, NC, A> {
         self._id = new_value.to_string();
         self
@@ -15648,7 +15918,7 @@ impl<'a, C, NC, A> TablePermissionListCall<'a, C, NC, A> where NC: hyper::net::N
 /// Return a single feature, given its ID.
 ///
 /// A builder for the *features.get* method supported by a *table* resource.
-/// It is not used directly, but through a `TableMethods`.
+/// It is not used directly, but through a `TableMethods` instance.
 ///
 /// # Example
 ///
@@ -15718,7 +15988,7 @@ impl<'a, C, NC, A> TableFeatureGetCall<'a, C, NC, A> where NC: hyper::net::Netwo
         for &field in ["alt", "tableId", "id", "version", "select"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -15771,7 +16041,7 @@ impl<'a, C, NC, A> TableFeatureGetCall<'a, C, NC, A> where NC: hyper::net::Netwo
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -15783,7 +16053,6 @@ impl<'a, C, NC, A> TableFeatureGetCall<'a, C, NC, A> where NC: hyper::net::Netwo
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -15793,7 +16062,7 @@ impl<'a, C, NC, A> TableFeatureGetCall<'a, C, NC, A> where NC: hyper::net::Netwo
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -15804,7 +16073,7 @@ impl<'a, C, NC, A> TableFeatureGetCall<'a, C, NC, A> where NC: hyper::net::Netwo
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -15813,13 +16082,13 @@ impl<'a, C, NC, A> TableFeatureGetCall<'a, C, NC, A> where NC: hyper::net::Netwo
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -15831,7 +16100,7 @@ impl<'a, C, NC, A> TableFeatureGetCall<'a, C, NC, A> where NC: hyper::net::Netwo
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The ID of the table.    
+    /// The ID of the table.
     pub fn table_id(mut self, new_value: &str) -> TableFeatureGetCall<'a, C, NC, A> {
         self._table_id = new_value.to_string();
         self
@@ -15841,7 +16110,7 @@ impl<'a, C, NC, A> TableFeatureGetCall<'a, C, NC, A> where NC: hyper::net::Netwo
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The ID of the feature to get.    
+    /// The ID of the feature to get.
     pub fn id(mut self, new_value: &str) -> TableFeatureGetCall<'a, C, NC, A> {
         self._id = new_value.to_string();
         self
@@ -15849,7 +16118,7 @@ impl<'a, C, NC, A> TableFeatureGetCall<'a, C, NC, A> where NC: hyper::net::Netwo
     /// Sets the *version* query property to the given value.
     ///
     /// 
-    /// The table version to access. See Accessing Public Data for information.    
+    /// The table version to access. See Accessing Public Data for information.
     pub fn version(mut self, new_value: &str) -> TableFeatureGetCall<'a, C, NC, A> {
         self._version = Some(new_value.to_string());
         self
@@ -15857,7 +16126,7 @@ impl<'a, C, NC, A> TableFeatureGetCall<'a, C, NC, A> where NC: hyper::net::Netwo
     /// Sets the *select* query property to the given value.
     ///
     /// 
-    /// A SQL-like projection clause used to specify returned properties. If this parameter is not included, all properties are returned.    
+    /// A SQL-like projection clause used to specify returned properties. If this parameter is not included, all properties are returned.
     pub fn select(mut self, new_value: &str) -> TableFeatureGetCall<'a, C, NC, A> {
         self._select = Some(new_value.to_string());
         self
@@ -15918,7 +16187,7 @@ impl<'a, C, NC, A> TableFeatureGetCall<'a, C, NC, A> where NC: hyper::net::Netwo
 /// Return all maps readable by the current user.
 ///
 /// A builder for the *list* method supported by a *map* resource.
-/// It is not used directly, but through a `MapMethods`.
+/// It is not used directly, but through a `MapMethods` instance.
 ///
 /// # Example
 ///
@@ -16039,7 +16308,7 @@ impl<'a, C, NC, A> MapListCall<'a, C, NC, A> where NC: hyper::net::NetworkConnec
         for &field in ["alt", "tags", "search", "role", "projectId", "processingStatus", "pageToken", "modifiedBefore", "modifiedAfter", "maxResults", "creatorEmail", "createdBefore", "createdAfter", "bbox"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -16068,7 +16337,7 @@ impl<'a, C, NC, A> MapListCall<'a, C, NC, A> where NC: hyper::net::NetworkConnec
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -16080,7 +16349,6 @@ impl<'a, C, NC, A> MapListCall<'a, C, NC, A> where NC: hyper::net::NetworkConnec
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -16090,7 +16358,7 @@ impl<'a, C, NC, A> MapListCall<'a, C, NC, A> where NC: hyper::net::NetworkConnec
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -16101,7 +16369,7 @@ impl<'a, C, NC, A> MapListCall<'a, C, NC, A> where NC: hyper::net::NetworkConnec
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -16110,13 +16378,13 @@ impl<'a, C, NC, A> MapListCall<'a, C, NC, A> where NC: hyper::net::NetworkConnec
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -16126,7 +16394,7 @@ impl<'a, C, NC, A> MapListCall<'a, C, NC, A> where NC: hyper::net::NetworkConnec
     /// Sets the *tags* query property to the given value.
     ///
     /// 
-    /// A comma separated list of tags. Returned assets will contain all the tags from the list.    
+    /// A comma separated list of tags. Returned assets will contain all the tags from the list.
     pub fn tags(mut self, new_value: &str) -> MapListCall<'a, C, NC, A> {
         self._tags = Some(new_value.to_string());
         self
@@ -16134,7 +16402,7 @@ impl<'a, C, NC, A> MapListCall<'a, C, NC, A> where NC: hyper::net::NetworkConnec
     /// Sets the *search* query property to the given value.
     ///
     /// 
-    /// An unstructured search string used to filter the set of results based on asset metadata.    
+    /// An unstructured search string used to filter the set of results based on asset metadata.
     pub fn search(mut self, new_value: &str) -> MapListCall<'a, C, NC, A> {
         self._search = Some(new_value.to_string());
         self
@@ -16142,7 +16410,7 @@ impl<'a, C, NC, A> MapListCall<'a, C, NC, A> where NC: hyper::net::NetworkConnec
     /// Sets the *role* query property to the given value.
     ///
     /// 
-    /// The role parameter indicates that the response should only contain assets where the current user has the specified level of access.    
+    /// The role parameter indicates that the response should only contain assets where the current user has the specified level of access.
     pub fn role(mut self, new_value: &str) -> MapListCall<'a, C, NC, A> {
         self._role = Some(new_value.to_string());
         self
@@ -16150,7 +16418,7 @@ impl<'a, C, NC, A> MapListCall<'a, C, NC, A> where NC: hyper::net::NetworkConnec
     /// Sets the *project id* query property to the given value.
     ///
     /// 
-    /// The ID of a Maps Engine project, used to filter the response. To list all available projects with their IDs, send a Projects: list request. You can also find your project ID as the value of the DashboardPlace:cid URL parameter when signed in to mapsengine.google.com.    
+    /// The ID of a Maps Engine project, used to filter the response. To list all available projects with their IDs, send a Projects: list request. You can also find your project ID as the value of the DashboardPlace:cid URL parameter when signed in to mapsengine.google.com.
     pub fn project_id(mut self, new_value: &str) -> MapListCall<'a, C, NC, A> {
         self._project_id = Some(new_value.to_string());
         self
@@ -16165,7 +16433,7 @@ impl<'a, C, NC, A> MapListCall<'a, C, NC, A> where NC: hyper::net::NetworkConnec
     /// Sets the *page token* query property to the given value.
     ///
     /// 
-    /// The continuation token, used to page through large result sets. To get the next page of results, set this parameter to the value of nextPageToken from the previous response.    
+    /// The continuation token, used to page through large result sets. To get the next page of results, set this parameter to the value of nextPageToken from the previous response.
     pub fn page_token(mut self, new_value: &str) -> MapListCall<'a, C, NC, A> {
         self._page_token = Some(new_value.to_string());
         self
@@ -16173,7 +16441,7 @@ impl<'a, C, NC, A> MapListCall<'a, C, NC, A> where NC: hyper::net::NetworkConnec
     /// Sets the *modified before* query property to the given value.
     ///
     /// 
-    /// An RFC 3339 formatted date-time value (e.g. 1970-01-01T00:00:00Z). Returned assets will have been modified at or before this time.    
+    /// An RFC 3339 formatted date-time value (e.g. 1970-01-01T00:00:00Z). Returned assets will have been modified at or before this time.
     pub fn modified_before(mut self, new_value: &str) -> MapListCall<'a, C, NC, A> {
         self._modified_before = Some(new_value.to_string());
         self
@@ -16181,7 +16449,7 @@ impl<'a, C, NC, A> MapListCall<'a, C, NC, A> where NC: hyper::net::NetworkConnec
     /// Sets the *modified after* query property to the given value.
     ///
     /// 
-    /// An RFC 3339 formatted date-time value (e.g. 1970-01-01T00:00:00Z). Returned assets will have been modified at or after this time.    
+    /// An RFC 3339 formatted date-time value (e.g. 1970-01-01T00:00:00Z). Returned assets will have been modified at or after this time.
     pub fn modified_after(mut self, new_value: &str) -> MapListCall<'a, C, NC, A> {
         self._modified_after = Some(new_value.to_string());
         self
@@ -16189,7 +16457,7 @@ impl<'a, C, NC, A> MapListCall<'a, C, NC, A> where NC: hyper::net::NetworkConnec
     /// Sets the *max results* query property to the given value.
     ///
     /// 
-    /// The maximum number of items to include in a single response page. The maximum supported value is 100.    
+    /// The maximum number of items to include in a single response page. The maximum supported value is 100.
     pub fn max_results(mut self, new_value: u32) -> MapListCall<'a, C, NC, A> {
         self._max_results = Some(new_value);
         self
@@ -16197,7 +16465,7 @@ impl<'a, C, NC, A> MapListCall<'a, C, NC, A> where NC: hyper::net::NetworkConnec
     /// Sets the *creator email* query property to the given value.
     ///
     /// 
-    /// An email address representing a user. Returned assets that have been created by the user associated with the provided email address.    
+    /// An email address representing a user. Returned assets that have been created by the user associated with the provided email address.
     pub fn creator_email(mut self, new_value: &str) -> MapListCall<'a, C, NC, A> {
         self._creator_email = Some(new_value.to_string());
         self
@@ -16205,7 +16473,7 @@ impl<'a, C, NC, A> MapListCall<'a, C, NC, A> where NC: hyper::net::NetworkConnec
     /// Sets the *created before* query property to the given value.
     ///
     /// 
-    /// An RFC 3339 formatted date-time value (e.g. 1970-01-01T00:00:00Z). Returned assets will have been created at or before this time.    
+    /// An RFC 3339 formatted date-time value (e.g. 1970-01-01T00:00:00Z). Returned assets will have been created at or before this time.
     pub fn created_before(mut self, new_value: &str) -> MapListCall<'a, C, NC, A> {
         self._created_before = Some(new_value.to_string());
         self
@@ -16213,7 +16481,7 @@ impl<'a, C, NC, A> MapListCall<'a, C, NC, A> where NC: hyper::net::NetworkConnec
     /// Sets the *created after* query property to the given value.
     ///
     /// 
-    /// An RFC 3339 formatted date-time value (e.g. 1970-01-01T00:00:00Z). Returned assets will have been created at or after this time.    
+    /// An RFC 3339 formatted date-time value (e.g. 1970-01-01T00:00:00Z). Returned assets will have been created at or after this time.
     pub fn created_after(mut self, new_value: &str) -> MapListCall<'a, C, NC, A> {
         self._created_after = Some(new_value.to_string());
         self
@@ -16221,7 +16489,7 @@ impl<'a, C, NC, A> MapListCall<'a, C, NC, A> where NC: hyper::net::NetworkConnec
     /// Sets the *bbox* query property to the given value.
     ///
     /// 
-    /// A bounding box, expressed as "west,south,east,north". If set, only assets which intersect this bounding box will be returned.    
+    /// A bounding box, expressed as "west,south,east,north". If set, only assets which intersect this bounding box will be returned.
     pub fn bbox(mut self, new_value: &str) -> MapListCall<'a, C, NC, A> {
         self._bbox = Some(new_value.to_string());
         self
@@ -16282,7 +16550,7 @@ impl<'a, C, NC, A> MapListCall<'a, C, NC, A> where NC: hyper::net::NetworkConnec
 /// Return all published maps readable by the current user.
 ///
 /// A builder for the *listPublished* method supported by a *map* resource.
-/// It is not used directly, but through a `MapMethods`.
+/// It is not used directly, but through a `MapMethods` instance.
 ///
 /// # Example
 ///
@@ -16353,7 +16621,7 @@ impl<'a, C, NC, A> MapListPublishedCall<'a, C, NC, A> where NC: hyper::net::Netw
         for &field in ["alt", "projectId", "pageToken", "maxResults"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -16382,7 +16650,7 @@ impl<'a, C, NC, A> MapListPublishedCall<'a, C, NC, A> where NC: hyper::net::Netw
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -16394,7 +16662,6 @@ impl<'a, C, NC, A> MapListPublishedCall<'a, C, NC, A> where NC: hyper::net::Netw
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -16404,7 +16671,7 @@ impl<'a, C, NC, A> MapListPublishedCall<'a, C, NC, A> where NC: hyper::net::Netw
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -16415,7 +16682,7 @@ impl<'a, C, NC, A> MapListPublishedCall<'a, C, NC, A> where NC: hyper::net::Netw
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -16424,13 +16691,13 @@ impl<'a, C, NC, A> MapListPublishedCall<'a, C, NC, A> where NC: hyper::net::Netw
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -16440,7 +16707,7 @@ impl<'a, C, NC, A> MapListPublishedCall<'a, C, NC, A> where NC: hyper::net::Netw
     /// Sets the *project id* query property to the given value.
     ///
     /// 
-    /// The ID of a Maps Engine project, used to filter the response. To list all available projects with their IDs, send a Projects: list request. You can also find your project ID as the value of the DashboardPlace:cid URL parameter when signed in to mapsengine.google.com.    
+    /// The ID of a Maps Engine project, used to filter the response. To list all available projects with their IDs, send a Projects: list request. You can also find your project ID as the value of the DashboardPlace:cid URL parameter when signed in to mapsengine.google.com.
     pub fn project_id(mut self, new_value: &str) -> MapListPublishedCall<'a, C, NC, A> {
         self._project_id = Some(new_value.to_string());
         self
@@ -16448,7 +16715,7 @@ impl<'a, C, NC, A> MapListPublishedCall<'a, C, NC, A> where NC: hyper::net::Netw
     /// Sets the *page token* query property to the given value.
     ///
     /// 
-    /// The continuation token, used to page through large result sets. To get the next page of results, set this parameter to the value of nextPageToken from the previous response.    
+    /// The continuation token, used to page through large result sets. To get the next page of results, set this parameter to the value of nextPageToken from the previous response.
     pub fn page_token(mut self, new_value: &str) -> MapListPublishedCall<'a, C, NC, A> {
         self._page_token = Some(new_value.to_string());
         self
@@ -16456,7 +16723,7 @@ impl<'a, C, NC, A> MapListPublishedCall<'a, C, NC, A> where NC: hyper::net::Netw
     /// Sets the *max results* query property to the given value.
     ///
     /// 
-    /// The maximum number of items to include in a single response page. The maximum supported value is 100.    
+    /// The maximum number of items to include in a single response page. The maximum supported value is 100.
     pub fn max_results(mut self, new_value: u32) -> MapListPublishedCall<'a, C, NC, A> {
         self._max_results = Some(new_value);
         self
@@ -16517,7 +16784,7 @@ impl<'a, C, NC, A> MapListPublishedCall<'a, C, NC, A> where NC: hyper::net::Netw
 /// Mutate a map asset.
 ///
 /// A builder for the *patch* method supported by a *map* resource.
-/// It is not used directly, but through a `MapMethods`.
+/// It is not used directly, but through a `MapMethods` instance.
 ///
 /// # Example
 ///
@@ -16582,7 +16849,7 @@ impl<'a, C, NC, A> MapPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
         for &field in ["id"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -16638,7 +16905,7 @@ impl<'a, C, NC, A> MapPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -16654,7 +16921,6 @@ impl<'a, C, NC, A> MapPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -16664,7 +16930,7 @@ impl<'a, C, NC, A> MapPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -16675,12 +16941,12 @@ impl<'a, C, NC, A> MapPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = res;
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -16701,7 +16967,7 @@ impl<'a, C, NC, A> MapPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The ID of the map.    
+    /// The ID of the map.
     pub fn id(mut self, new_value: &str) -> MapPatchCall<'a, C, NC, A> {
         self._id = new_value.to_string();
         self
@@ -16764,7 +17030,7 @@ impl<'a, C, NC, A> MapPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
 /// An asset can hold up to 20 different permission entries. Each batchInsert request is atomic.
 ///
 /// A builder for the *permissions.batchUpdate* method supported by a *map* resource.
-/// It is not used directly, but through a `MapMethods`.
+/// It is not used directly, but through a `MapMethods` instance.
 ///
 /// # Example
 ///
@@ -16829,7 +17095,7 @@ impl<'a, C, NC, A> MapPermissionBatchUpdateCall<'a, C, NC, A> where NC: hyper::n
         for &field in ["alt", "id"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -16886,7 +17152,7 @@ impl<'a, C, NC, A> MapPermissionBatchUpdateCall<'a, C, NC, A> where NC: hyper::n
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -16902,7 +17168,6 @@ impl<'a, C, NC, A> MapPermissionBatchUpdateCall<'a, C, NC, A> where NC: hyper::n
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -16912,7 +17177,7 @@ impl<'a, C, NC, A> MapPermissionBatchUpdateCall<'a, C, NC, A> where NC: hyper::n
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -16923,7 +17188,7 @@ impl<'a, C, NC, A> MapPermissionBatchUpdateCall<'a, C, NC, A> where NC: hyper::n
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -16932,13 +17197,13 @@ impl<'a, C, NC, A> MapPermissionBatchUpdateCall<'a, C, NC, A> where NC: hyper::n
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -16959,7 +17224,7 @@ impl<'a, C, NC, A> MapPermissionBatchUpdateCall<'a, C, NC, A> where NC: hyper::n
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The ID of the asset to which permissions will be added.    
+    /// The ID of the asset to which permissions will be added.
     pub fn id(mut self, new_value: &str) -> MapPermissionBatchUpdateCall<'a, C, NC, A> {
         self._id = new_value.to_string();
         self
@@ -17020,7 +17285,7 @@ impl<'a, C, NC, A> MapPermissionBatchUpdateCall<'a, C, NC, A> where NC: hyper::n
 /// Delete a map.
 ///
 /// A builder for the *delete* method supported by a *map* resource.
-/// It is not used directly, but through a `MapMethods`.
+/// It is not used directly, but through a `MapMethods` instance.
 ///
 /// # Example
 ///
@@ -17078,7 +17343,7 @@ impl<'a, C, NC, A> MapDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
         for &field in ["id"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -17130,7 +17395,7 @@ impl<'a, C, NC, A> MapDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -17142,7 +17407,6 @@ impl<'a, C, NC, A> MapDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -17152,7 +17416,7 @@ impl<'a, C, NC, A> MapDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -17163,12 +17427,12 @@ impl<'a, C, NC, A> MapDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = res;
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -17180,7 +17444,7 @@ impl<'a, C, NC, A> MapDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The ID of the map. Only the map creator or project owner are permitted to delete. If the map is published the request will fail. Unpublish the map prior to deleting.    
+    /// The ID of the map. Only the map creator or project owner are permitted to delete. If the map is published the request will fail. Unpublish the map prior to deleting.
     pub fn id(mut self, new_value: &str) -> MapDeleteCall<'a, C, NC, A> {
         self._id = new_value.to_string();
         self
@@ -17241,7 +17505,7 @@ impl<'a, C, NC, A> MapDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
 /// Unpublish a map asset.
 ///
 /// A builder for the *unpublish* method supported by a *map* resource.
-/// It is not used directly, but through a `MapMethods`.
+/// It is not used directly, but through a `MapMethods` instance.
 ///
 /// # Example
 ///
@@ -17299,7 +17563,7 @@ impl<'a, C, NC, A> MapUnpublishCall<'a, C, NC, A> where NC: hyper::net::NetworkC
         for &field in ["alt", "id"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -17352,7 +17616,7 @@ impl<'a, C, NC, A> MapUnpublishCall<'a, C, NC, A> where NC: hyper::net::NetworkC
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -17364,7 +17628,6 @@ impl<'a, C, NC, A> MapUnpublishCall<'a, C, NC, A> where NC: hyper::net::NetworkC
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -17374,7 +17637,7 @@ impl<'a, C, NC, A> MapUnpublishCall<'a, C, NC, A> where NC: hyper::net::NetworkC
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -17385,7 +17648,7 @@ impl<'a, C, NC, A> MapUnpublishCall<'a, C, NC, A> where NC: hyper::net::NetworkC
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -17394,13 +17657,13 @@ impl<'a, C, NC, A> MapUnpublishCall<'a, C, NC, A> where NC: hyper::net::NetworkC
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -17412,7 +17675,7 @@ impl<'a, C, NC, A> MapUnpublishCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The ID of the map.    
+    /// The ID of the map.
     pub fn id(mut self, new_value: &str) -> MapUnpublishCall<'a, C, NC, A> {
         self._id = new_value.to_string();
         self
@@ -17473,7 +17736,7 @@ impl<'a, C, NC, A> MapUnpublishCall<'a, C, NC, A> where NC: hyper::net::NetworkC
 /// Publish a map asset.
 ///
 /// A builder for the *publish* method supported by a *map* resource.
-/// It is not used directly, but through a `MapMethods`.
+/// It is not used directly, but through a `MapMethods` instance.
 ///
 /// # Example
 ///
@@ -17536,7 +17799,7 @@ impl<'a, C, NC, A> MapPublishCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
         for &field in ["alt", "id", "force"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -17589,7 +17852,7 @@ impl<'a, C, NC, A> MapPublishCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -17601,7 +17864,6 @@ impl<'a, C, NC, A> MapPublishCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -17611,7 +17873,7 @@ impl<'a, C, NC, A> MapPublishCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -17622,7 +17884,7 @@ impl<'a, C, NC, A> MapPublishCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -17631,13 +17893,13 @@ impl<'a, C, NC, A> MapPublishCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -17649,7 +17911,7 @@ impl<'a, C, NC, A> MapPublishCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The ID of the map.    
+    /// The ID of the map.
     pub fn id(mut self, new_value: &str) -> MapPublishCall<'a, C, NC, A> {
         self._id = new_value.to_string();
         self
@@ -17657,7 +17919,7 @@ impl<'a, C, NC, A> MapPublishCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// Sets the *force* query property to the given value.
     ///
     /// 
-    /// If set to true, the API will allow publication of the map even if it's out of date. If false, the map must have a processingStatus of complete before publishing.    
+    /// If set to true, the API will allow publication of the map even if it's out of date. If false, the map must have a processingStatus of complete before publishing.
     pub fn force(mut self, new_value: bool) -> MapPublishCall<'a, C, NC, A> {
         self._force = Some(new_value);
         self
@@ -17718,7 +17980,7 @@ impl<'a, C, NC, A> MapPublishCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
 /// Return all of the permissions for the specified asset.
 ///
 /// A builder for the *permissions.list* method supported by a *map* resource.
-/// It is not used directly, but through a `MapMethods`.
+/// It is not used directly, but through a `MapMethods` instance.
 ///
 /// # Example
 ///
@@ -17776,7 +18038,7 @@ impl<'a, C, NC, A> MapPermissionListCall<'a, C, NC, A> where NC: hyper::net::Net
         for &field in ["alt", "id"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -17829,7 +18091,7 @@ impl<'a, C, NC, A> MapPermissionListCall<'a, C, NC, A> where NC: hyper::net::Net
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -17841,7 +18103,6 @@ impl<'a, C, NC, A> MapPermissionListCall<'a, C, NC, A> where NC: hyper::net::Net
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -17851,7 +18112,7 @@ impl<'a, C, NC, A> MapPermissionListCall<'a, C, NC, A> where NC: hyper::net::Net
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -17862,7 +18123,7 @@ impl<'a, C, NC, A> MapPermissionListCall<'a, C, NC, A> where NC: hyper::net::Net
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -17871,13 +18132,13 @@ impl<'a, C, NC, A> MapPermissionListCall<'a, C, NC, A> where NC: hyper::net::Net
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -17889,7 +18150,7 @@ impl<'a, C, NC, A> MapPermissionListCall<'a, C, NC, A> where NC: hyper::net::Net
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The ID of the asset whose permissions will be listed.    
+    /// The ID of the asset whose permissions will be listed.
     pub fn id(mut self, new_value: &str) -> MapPermissionListCall<'a, C, NC, A> {
         self._id = new_value.to_string();
         self
@@ -17950,7 +18211,7 @@ impl<'a, C, NC, A> MapPermissionListCall<'a, C, NC, A> where NC: hyper::net::Net
 /// Create a map asset.
 ///
 /// A builder for the *create* method supported by a *map* resource.
-/// It is not used directly, but through a `MapMethods`.
+/// It is not used directly, but through a `MapMethods` instance.
 ///
 /// # Example
 ///
@@ -18013,7 +18274,7 @@ impl<'a, C, NC, A> MapCreateCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
         for &field in ["alt"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -18046,7 +18307,7 @@ impl<'a, C, NC, A> MapCreateCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -18062,7 +18323,6 @@ impl<'a, C, NC, A> MapCreateCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -18072,7 +18332,7 @@ impl<'a, C, NC, A> MapCreateCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -18083,7 +18343,7 @@ impl<'a, C, NC, A> MapCreateCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -18092,13 +18352,13 @@ impl<'a, C, NC, A> MapCreateCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -18170,7 +18430,7 @@ impl<'a, C, NC, A> MapCreateCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
 /// Return the published metadata for a particular map.
 ///
 /// A builder for the *getPublished* method supported by a *map* resource.
-/// It is not used directly, but through a `MapMethods`.
+/// It is not used directly, but through a `MapMethods` instance.
 ///
 /// # Example
 ///
@@ -18228,7 +18488,7 @@ impl<'a, C, NC, A> MapGetPublishedCall<'a, C, NC, A> where NC: hyper::net::Netwo
         for &field in ["alt", "id"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -18281,7 +18541,7 @@ impl<'a, C, NC, A> MapGetPublishedCall<'a, C, NC, A> where NC: hyper::net::Netwo
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -18293,7 +18553,6 @@ impl<'a, C, NC, A> MapGetPublishedCall<'a, C, NC, A> where NC: hyper::net::Netwo
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -18303,7 +18562,7 @@ impl<'a, C, NC, A> MapGetPublishedCall<'a, C, NC, A> where NC: hyper::net::Netwo
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -18314,7 +18573,7 @@ impl<'a, C, NC, A> MapGetPublishedCall<'a, C, NC, A> where NC: hyper::net::Netwo
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -18323,13 +18582,13 @@ impl<'a, C, NC, A> MapGetPublishedCall<'a, C, NC, A> where NC: hyper::net::Netwo
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -18341,7 +18600,7 @@ impl<'a, C, NC, A> MapGetPublishedCall<'a, C, NC, A> where NC: hyper::net::Netwo
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The ID of the map.    
+    /// The ID of the map.
     pub fn id(mut self, new_value: &str) -> MapGetPublishedCall<'a, C, NC, A> {
         self._id = new_value.to_string();
         self
@@ -18402,7 +18661,7 @@ impl<'a, C, NC, A> MapGetPublishedCall<'a, C, NC, A> where NC: hyper::net::Netwo
 /// Return metadata for a particular map.
 ///
 /// A builder for the *get* method supported by a *map* resource.
-/// It is not used directly, but through a `MapMethods`.
+/// It is not used directly, but through a `MapMethods` instance.
 ///
 /// # Example
 ///
@@ -18465,7 +18724,7 @@ impl<'a, C, NC, A> MapGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnect
         for &field in ["alt", "id", "version"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -18518,7 +18777,7 @@ impl<'a, C, NC, A> MapGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnect
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -18530,7 +18789,6 @@ impl<'a, C, NC, A> MapGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnect
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -18540,7 +18798,7 @@ impl<'a, C, NC, A> MapGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnect
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -18551,7 +18809,7 @@ impl<'a, C, NC, A> MapGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnect
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -18560,13 +18818,13 @@ impl<'a, C, NC, A> MapGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnect
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -18578,7 +18836,7 @@ impl<'a, C, NC, A> MapGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnect
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The ID of the map.    
+    /// The ID of the map.
     pub fn id(mut self, new_value: &str) -> MapGetCall<'a, C, NC, A> {
         self._id = new_value.to_string();
         self
@@ -18586,7 +18844,7 @@ impl<'a, C, NC, A> MapGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnect
     /// Sets the *version* query property to the given value.
     ///
     /// 
-    /// Deprecated: The version parameter indicates which version of the map should be returned. When version is set to published, the published version of the map will be returned. Please use the maps.getPublished endpoint instead.    
+    /// Deprecated: The version parameter indicates which version of the map should be returned. When version is set to published, the published version of the map will be returned. Please use the maps.getPublished endpoint instead.
     pub fn version(mut self, new_value: &str) -> MapGetCall<'a, C, NC, A> {
         self._version = Some(new_value.to_string());
         self
@@ -18647,7 +18905,7 @@ impl<'a, C, NC, A> MapGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnect
 /// Remove permission entries from an already existing asset.
 ///
 /// A builder for the *permissions.batchDelete* method supported by a *map* resource.
-/// It is not used directly, but through a `MapMethods`.
+/// It is not used directly, but through a `MapMethods` instance.
 ///
 /// # Example
 ///
@@ -18712,7 +18970,7 @@ impl<'a, C, NC, A> MapPermissionBatchDeleteCall<'a, C, NC, A> where NC: hyper::n
         for &field in ["alt", "id"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -18769,7 +19027,7 @@ impl<'a, C, NC, A> MapPermissionBatchDeleteCall<'a, C, NC, A> where NC: hyper::n
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -18785,7 +19043,6 @@ impl<'a, C, NC, A> MapPermissionBatchDeleteCall<'a, C, NC, A> where NC: hyper::n
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -18795,7 +19052,7 @@ impl<'a, C, NC, A> MapPermissionBatchDeleteCall<'a, C, NC, A> where NC: hyper::n
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -18806,7 +19063,7 @@ impl<'a, C, NC, A> MapPermissionBatchDeleteCall<'a, C, NC, A> where NC: hyper::n
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -18815,13 +19072,13 @@ impl<'a, C, NC, A> MapPermissionBatchDeleteCall<'a, C, NC, A> where NC: hyper::n
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -18842,7 +19099,7 @@ impl<'a, C, NC, A> MapPermissionBatchDeleteCall<'a, C, NC, A> where NC: hyper::n
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The ID of the asset from which permissions will be removed.    
+    /// The ID of the asset from which permissions will be removed.
     pub fn id(mut self, new_value: &str) -> MapPermissionBatchDeleteCall<'a, C, NC, A> {
         self._id = new_value.to_string();
         self
@@ -18903,7 +19160,7 @@ impl<'a, C, NC, A> MapPermissionBatchDeleteCall<'a, C, NC, A> where NC: hyper::n
 /// Create a raster collection asset.
 ///
 /// A builder for the *create* method supported by a *rasterCollection* resource.
-/// It is not used directly, but through a `RasterCollectionMethods`.
+/// It is not used directly, but through a `RasterCollectionMethods` instance.
 ///
 /// # Example
 ///
@@ -18966,7 +19223,7 @@ impl<'a, C, NC, A> RasterCollectionCreateCall<'a, C, NC, A> where NC: hyper::net
         for &field in ["alt"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -18999,7 +19256,7 @@ impl<'a, C, NC, A> RasterCollectionCreateCall<'a, C, NC, A> where NC: hyper::net
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -19015,7 +19272,6 @@ impl<'a, C, NC, A> RasterCollectionCreateCall<'a, C, NC, A> where NC: hyper::net
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -19025,7 +19281,7 @@ impl<'a, C, NC, A> RasterCollectionCreateCall<'a, C, NC, A> where NC: hyper::net
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -19036,7 +19292,7 @@ impl<'a, C, NC, A> RasterCollectionCreateCall<'a, C, NC, A> where NC: hyper::net
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -19045,13 +19301,13 @@ impl<'a, C, NC, A> RasterCollectionCreateCall<'a, C, NC, A> where NC: hyper::net
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -19123,7 +19379,7 @@ impl<'a, C, NC, A> RasterCollectionCreateCall<'a, C, NC, A> where NC: hyper::net
 /// Remove permission entries from an already existing asset.
 ///
 /// A builder for the *permissions.batchDelete* method supported by a *rasterCollection* resource.
-/// It is not used directly, but through a `RasterCollectionMethods`.
+/// It is not used directly, but through a `RasterCollectionMethods` instance.
 ///
 /// # Example
 ///
@@ -19188,7 +19444,7 @@ impl<'a, C, NC, A> RasterCollectionPermissionBatchDeleteCall<'a, C, NC, A> where
         for &field in ["alt", "id"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -19245,7 +19501,7 @@ impl<'a, C, NC, A> RasterCollectionPermissionBatchDeleteCall<'a, C, NC, A> where
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -19261,7 +19517,6 @@ impl<'a, C, NC, A> RasterCollectionPermissionBatchDeleteCall<'a, C, NC, A> where
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -19271,7 +19526,7 @@ impl<'a, C, NC, A> RasterCollectionPermissionBatchDeleteCall<'a, C, NC, A> where
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -19282,7 +19537,7 @@ impl<'a, C, NC, A> RasterCollectionPermissionBatchDeleteCall<'a, C, NC, A> where
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -19291,13 +19546,13 @@ impl<'a, C, NC, A> RasterCollectionPermissionBatchDeleteCall<'a, C, NC, A> where
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -19318,7 +19573,7 @@ impl<'a, C, NC, A> RasterCollectionPermissionBatchDeleteCall<'a, C, NC, A> where
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The ID of the asset from which permissions will be removed.    
+    /// The ID of the asset from which permissions will be removed.
     pub fn id(mut self, new_value: &str) -> RasterCollectionPermissionBatchDeleteCall<'a, C, NC, A> {
         self._id = new_value.to_string();
         self
@@ -19379,7 +19634,7 @@ impl<'a, C, NC, A> RasterCollectionPermissionBatchDeleteCall<'a, C, NC, A> where
 /// Mutate a raster collection asset.
 ///
 /// A builder for the *patch* method supported by a *rasterCollection* resource.
-/// It is not used directly, but through a `RasterCollectionMethods`.
+/// It is not used directly, but through a `RasterCollectionMethods` instance.
 ///
 /// # Example
 ///
@@ -19444,7 +19699,7 @@ impl<'a, C, NC, A> RasterCollectionPatchCall<'a, C, NC, A> where NC: hyper::net:
         for &field in ["id"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -19500,7 +19755,7 @@ impl<'a, C, NC, A> RasterCollectionPatchCall<'a, C, NC, A> where NC: hyper::net:
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -19516,7 +19771,6 @@ impl<'a, C, NC, A> RasterCollectionPatchCall<'a, C, NC, A> where NC: hyper::net:
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -19526,7 +19780,7 @@ impl<'a, C, NC, A> RasterCollectionPatchCall<'a, C, NC, A> where NC: hyper::net:
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -19537,12 +19791,12 @@ impl<'a, C, NC, A> RasterCollectionPatchCall<'a, C, NC, A> where NC: hyper::net:
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = res;
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -19563,7 +19817,7 @@ impl<'a, C, NC, A> RasterCollectionPatchCall<'a, C, NC, A> where NC: hyper::net:
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The ID of the raster collection.    
+    /// The ID of the raster collection.
     pub fn id(mut self, new_value: &str) -> RasterCollectionPatchCall<'a, C, NC, A> {
         self._id = new_value.to_string();
         self
@@ -19624,7 +19878,7 @@ impl<'a, C, NC, A> RasterCollectionPatchCall<'a, C, NC, A> where NC: hyper::net:
 /// Cancel processing on a raster collection asset.
 ///
 /// A builder for the *cancelProcessing* method supported by a *rasterCollection* resource.
-/// It is not used directly, but through a `RasterCollectionMethods`.
+/// It is not used directly, but through a `RasterCollectionMethods` instance.
 ///
 /// # Example
 ///
@@ -19682,7 +19936,7 @@ impl<'a, C, NC, A> RasterCollectionCancelProcessingCall<'a, C, NC, A> where NC: 
         for &field in ["alt", "id"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -19735,7 +19989,7 @@ impl<'a, C, NC, A> RasterCollectionCancelProcessingCall<'a, C, NC, A> where NC: 
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -19747,7 +20001,6 @@ impl<'a, C, NC, A> RasterCollectionCancelProcessingCall<'a, C, NC, A> where NC: 
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -19757,7 +20010,7 @@ impl<'a, C, NC, A> RasterCollectionCancelProcessingCall<'a, C, NC, A> where NC: 
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -19768,7 +20021,7 @@ impl<'a, C, NC, A> RasterCollectionCancelProcessingCall<'a, C, NC, A> where NC: 
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -19777,13 +20030,13 @@ impl<'a, C, NC, A> RasterCollectionCancelProcessingCall<'a, C, NC, A> where NC: 
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -19795,7 +20048,7 @@ impl<'a, C, NC, A> RasterCollectionCancelProcessingCall<'a, C, NC, A> where NC: 
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The ID of the raster collection.    
+    /// The ID of the raster collection.
     pub fn id(mut self, new_value: &str) -> RasterCollectionCancelProcessingCall<'a, C, NC, A> {
         self._id = new_value.to_string();
         self
@@ -19856,7 +20109,7 @@ impl<'a, C, NC, A> RasterCollectionCancelProcessingCall<'a, C, NC, A> where NC: 
 /// Process a raster collection asset.
 ///
 /// A builder for the *process* method supported by a *rasterCollection* resource.
-/// It is not used directly, but through a `RasterCollectionMethods`.
+/// It is not used directly, but through a `RasterCollectionMethods` instance.
 ///
 /// # Example
 ///
@@ -19914,7 +20167,7 @@ impl<'a, C, NC, A> RasterCollectionProcesCall<'a, C, NC, A> where NC: hyper::net
         for &field in ["alt", "id"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -19967,7 +20220,7 @@ impl<'a, C, NC, A> RasterCollectionProcesCall<'a, C, NC, A> where NC: hyper::net
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -19979,7 +20232,6 @@ impl<'a, C, NC, A> RasterCollectionProcesCall<'a, C, NC, A> where NC: hyper::net
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -19989,7 +20241,7 @@ impl<'a, C, NC, A> RasterCollectionProcesCall<'a, C, NC, A> where NC: hyper::net
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -20000,7 +20252,7 @@ impl<'a, C, NC, A> RasterCollectionProcesCall<'a, C, NC, A> where NC: hyper::net
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -20009,13 +20261,13 @@ impl<'a, C, NC, A> RasterCollectionProcesCall<'a, C, NC, A> where NC: hyper::net
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -20027,7 +20279,7 @@ impl<'a, C, NC, A> RasterCollectionProcesCall<'a, C, NC, A> where NC: hyper::net
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The ID of the raster collection.    
+    /// The ID of the raster collection.
     pub fn id(mut self, new_value: &str) -> RasterCollectionProcesCall<'a, C, NC, A> {
         self._id = new_value.to_string();
         self
@@ -20090,7 +20342,7 @@ impl<'a, C, NC, A> RasterCollectionProcesCall<'a, C, NC, A> where NC: hyper::net
 /// An asset can hold up to 20 different permission entries. Each batchInsert request is atomic.
 ///
 /// A builder for the *permissions.batchUpdate* method supported by a *rasterCollection* resource.
-/// It is not used directly, but through a `RasterCollectionMethods`.
+/// It is not used directly, but through a `RasterCollectionMethods` instance.
 ///
 /// # Example
 ///
@@ -20155,7 +20407,7 @@ impl<'a, C, NC, A> RasterCollectionPermissionBatchUpdateCall<'a, C, NC, A> where
         for &field in ["alt", "id"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -20212,7 +20464,7 @@ impl<'a, C, NC, A> RasterCollectionPermissionBatchUpdateCall<'a, C, NC, A> where
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -20228,7 +20480,6 @@ impl<'a, C, NC, A> RasterCollectionPermissionBatchUpdateCall<'a, C, NC, A> where
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -20238,7 +20489,7 @@ impl<'a, C, NC, A> RasterCollectionPermissionBatchUpdateCall<'a, C, NC, A> where
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -20249,7 +20500,7 @@ impl<'a, C, NC, A> RasterCollectionPermissionBatchUpdateCall<'a, C, NC, A> where
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -20258,13 +20509,13 @@ impl<'a, C, NC, A> RasterCollectionPermissionBatchUpdateCall<'a, C, NC, A> where
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -20285,7 +20536,7 @@ impl<'a, C, NC, A> RasterCollectionPermissionBatchUpdateCall<'a, C, NC, A> where
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The ID of the asset to which permissions will be added.    
+    /// The ID of the asset to which permissions will be added.
     pub fn id(mut self, new_value: &str) -> RasterCollectionPermissionBatchUpdateCall<'a, C, NC, A> {
         self._id = new_value.to_string();
         self
@@ -20346,7 +20597,7 @@ impl<'a, C, NC, A> RasterCollectionPermissionBatchUpdateCall<'a, C, NC, A> where
 /// Delete a raster collection.
 ///
 /// A builder for the *delete* method supported by a *rasterCollection* resource.
-/// It is not used directly, but through a `RasterCollectionMethods`.
+/// It is not used directly, but through a `RasterCollectionMethods` instance.
 ///
 /// # Example
 ///
@@ -20404,7 +20655,7 @@ impl<'a, C, NC, A> RasterCollectionDeleteCall<'a, C, NC, A> where NC: hyper::net
         for &field in ["id"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -20456,7 +20707,7 @@ impl<'a, C, NC, A> RasterCollectionDeleteCall<'a, C, NC, A> where NC: hyper::net
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -20468,7 +20719,6 @@ impl<'a, C, NC, A> RasterCollectionDeleteCall<'a, C, NC, A> where NC: hyper::net
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -20478,7 +20728,7 @@ impl<'a, C, NC, A> RasterCollectionDeleteCall<'a, C, NC, A> where NC: hyper::net
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -20489,12 +20739,12 @@ impl<'a, C, NC, A> RasterCollectionDeleteCall<'a, C, NC, A> where NC: hyper::net
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = res;
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -20506,7 +20756,7 @@ impl<'a, C, NC, A> RasterCollectionDeleteCall<'a, C, NC, A> where NC: hyper::net
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The ID of the raster collection. Only the raster collection creator or project owner are permitted to delete. If the rastor collection is included in a layer, the request will fail. Remove the raster collection from all layers prior to deleting.    
+    /// The ID of the raster collection. Only the raster collection creator or project owner are permitted to delete. If the rastor collection is included in a layer, the request will fail. Remove the raster collection from all layers prior to deleting.
     pub fn id(mut self, new_value: &str) -> RasterCollectionDeleteCall<'a, C, NC, A> {
         self._id = new_value.to_string();
         self
@@ -20567,7 +20817,7 @@ impl<'a, C, NC, A> RasterCollectionDeleteCall<'a, C, NC, A> where NC: hyper::net
 /// Return all parent ids of the specified raster collection.
 ///
 /// A builder for the *parents.list* method supported by a *rasterCollection* resource.
-/// It is not used directly, but through a `RasterCollectionMethods`.
+/// It is not used directly, but through a `RasterCollectionMethods` instance.
 ///
 /// # Example
 ///
@@ -20635,7 +20885,7 @@ impl<'a, C, NC, A> RasterCollectionParentListCall<'a, C, NC, A> where NC: hyper:
         for &field in ["alt", "id", "pageToken", "maxResults"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -20688,7 +20938,7 @@ impl<'a, C, NC, A> RasterCollectionParentListCall<'a, C, NC, A> where NC: hyper:
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -20700,7 +20950,6 @@ impl<'a, C, NC, A> RasterCollectionParentListCall<'a, C, NC, A> where NC: hyper:
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -20710,7 +20959,7 @@ impl<'a, C, NC, A> RasterCollectionParentListCall<'a, C, NC, A> where NC: hyper:
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -20721,7 +20970,7 @@ impl<'a, C, NC, A> RasterCollectionParentListCall<'a, C, NC, A> where NC: hyper:
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -20730,13 +20979,13 @@ impl<'a, C, NC, A> RasterCollectionParentListCall<'a, C, NC, A> where NC: hyper:
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -20748,7 +20997,7 @@ impl<'a, C, NC, A> RasterCollectionParentListCall<'a, C, NC, A> where NC: hyper:
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The ID of the raster collection whose parents will be listed.    
+    /// The ID of the raster collection whose parents will be listed.
     pub fn id(mut self, new_value: &str) -> RasterCollectionParentListCall<'a, C, NC, A> {
         self._id = new_value.to_string();
         self
@@ -20756,7 +21005,7 @@ impl<'a, C, NC, A> RasterCollectionParentListCall<'a, C, NC, A> where NC: hyper:
     /// Sets the *page token* query property to the given value.
     ///
     /// 
-    /// The continuation token, used to page through large result sets. To get the next page of results, set this parameter to the value of nextPageToken from the previous response.    
+    /// The continuation token, used to page through large result sets. To get the next page of results, set this parameter to the value of nextPageToken from the previous response.
     pub fn page_token(mut self, new_value: &str) -> RasterCollectionParentListCall<'a, C, NC, A> {
         self._page_token = Some(new_value.to_string());
         self
@@ -20764,7 +21013,7 @@ impl<'a, C, NC, A> RasterCollectionParentListCall<'a, C, NC, A> where NC: hyper:
     /// Sets the *max results* query property to the given value.
     ///
     /// 
-    /// The maximum number of items to include in a single response page. The maximum supported value is 50.    
+    /// The maximum number of items to include in a single response page. The maximum supported value is 50.
     pub fn max_results(mut self, new_value: u32) -> RasterCollectionParentListCall<'a, C, NC, A> {
         self._max_results = Some(new_value);
         self
@@ -20825,7 +21074,7 @@ impl<'a, C, NC, A> RasterCollectionParentListCall<'a, C, NC, A> where NC: hyper:
 /// Return all raster collections readable by the current user.
 ///
 /// A builder for the *list* method supported by a *rasterCollection* resource.
-/// It is not used directly, but through a `RasterCollectionMethods`.
+/// It is not used directly, but through a `RasterCollectionMethods` instance.
 ///
 /// # Example
 ///
@@ -20946,7 +21195,7 @@ impl<'a, C, NC, A> RasterCollectionListCall<'a, C, NC, A> where NC: hyper::net::
         for &field in ["alt", "tags", "search", "role", "projectId", "processingStatus", "pageToken", "modifiedBefore", "modifiedAfter", "maxResults", "creatorEmail", "createdBefore", "createdAfter", "bbox"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -20975,7 +21224,7 @@ impl<'a, C, NC, A> RasterCollectionListCall<'a, C, NC, A> where NC: hyper::net::
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -20987,7 +21236,6 @@ impl<'a, C, NC, A> RasterCollectionListCall<'a, C, NC, A> where NC: hyper::net::
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -20997,7 +21245,7 @@ impl<'a, C, NC, A> RasterCollectionListCall<'a, C, NC, A> where NC: hyper::net::
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -21008,7 +21256,7 @@ impl<'a, C, NC, A> RasterCollectionListCall<'a, C, NC, A> where NC: hyper::net::
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -21017,13 +21265,13 @@ impl<'a, C, NC, A> RasterCollectionListCall<'a, C, NC, A> where NC: hyper::net::
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -21033,7 +21281,7 @@ impl<'a, C, NC, A> RasterCollectionListCall<'a, C, NC, A> where NC: hyper::net::
     /// Sets the *tags* query property to the given value.
     ///
     /// 
-    /// A comma separated list of tags. Returned assets will contain all the tags from the list.    
+    /// A comma separated list of tags. Returned assets will contain all the tags from the list.
     pub fn tags(mut self, new_value: &str) -> RasterCollectionListCall<'a, C, NC, A> {
         self._tags = Some(new_value.to_string());
         self
@@ -21041,7 +21289,7 @@ impl<'a, C, NC, A> RasterCollectionListCall<'a, C, NC, A> where NC: hyper::net::
     /// Sets the *search* query property to the given value.
     ///
     /// 
-    /// An unstructured search string used to filter the set of results based on asset metadata.    
+    /// An unstructured search string used to filter the set of results based on asset metadata.
     pub fn search(mut self, new_value: &str) -> RasterCollectionListCall<'a, C, NC, A> {
         self._search = Some(new_value.to_string());
         self
@@ -21049,7 +21297,7 @@ impl<'a, C, NC, A> RasterCollectionListCall<'a, C, NC, A> where NC: hyper::net::
     /// Sets the *role* query property to the given value.
     ///
     /// 
-    /// The role parameter indicates that the response should only contain assets where the current user has the specified level of access.    
+    /// The role parameter indicates that the response should only contain assets where the current user has the specified level of access.
     pub fn role(mut self, new_value: &str) -> RasterCollectionListCall<'a, C, NC, A> {
         self._role = Some(new_value.to_string());
         self
@@ -21057,7 +21305,7 @@ impl<'a, C, NC, A> RasterCollectionListCall<'a, C, NC, A> where NC: hyper::net::
     /// Sets the *project id* query property to the given value.
     ///
     /// 
-    /// The ID of a Maps Engine project, used to filter the response. To list all available projects with their IDs, send a Projects: list request. You can also find your project ID as the value of the DashboardPlace:cid URL parameter when signed in to mapsengine.google.com.    
+    /// The ID of a Maps Engine project, used to filter the response. To list all available projects with their IDs, send a Projects: list request. You can also find your project ID as the value of the DashboardPlace:cid URL parameter when signed in to mapsengine.google.com.
     pub fn project_id(mut self, new_value: &str) -> RasterCollectionListCall<'a, C, NC, A> {
         self._project_id = Some(new_value.to_string());
         self
@@ -21072,7 +21320,7 @@ impl<'a, C, NC, A> RasterCollectionListCall<'a, C, NC, A> where NC: hyper::net::
     /// Sets the *page token* query property to the given value.
     ///
     /// 
-    /// The continuation token, used to page through large result sets. To get the next page of results, set this parameter to the value of nextPageToken from the previous response.    
+    /// The continuation token, used to page through large result sets. To get the next page of results, set this parameter to the value of nextPageToken from the previous response.
     pub fn page_token(mut self, new_value: &str) -> RasterCollectionListCall<'a, C, NC, A> {
         self._page_token = Some(new_value.to_string());
         self
@@ -21080,7 +21328,7 @@ impl<'a, C, NC, A> RasterCollectionListCall<'a, C, NC, A> where NC: hyper::net::
     /// Sets the *modified before* query property to the given value.
     ///
     /// 
-    /// An RFC 3339 formatted date-time value (e.g. 1970-01-01T00:00:00Z). Returned assets will have been modified at or before this time.    
+    /// An RFC 3339 formatted date-time value (e.g. 1970-01-01T00:00:00Z). Returned assets will have been modified at or before this time.
     pub fn modified_before(mut self, new_value: &str) -> RasterCollectionListCall<'a, C, NC, A> {
         self._modified_before = Some(new_value.to_string());
         self
@@ -21088,7 +21336,7 @@ impl<'a, C, NC, A> RasterCollectionListCall<'a, C, NC, A> where NC: hyper::net::
     /// Sets the *modified after* query property to the given value.
     ///
     /// 
-    /// An RFC 3339 formatted date-time value (e.g. 1970-01-01T00:00:00Z). Returned assets will have been modified at or after this time.    
+    /// An RFC 3339 formatted date-time value (e.g. 1970-01-01T00:00:00Z). Returned assets will have been modified at or after this time.
     pub fn modified_after(mut self, new_value: &str) -> RasterCollectionListCall<'a, C, NC, A> {
         self._modified_after = Some(new_value.to_string());
         self
@@ -21096,7 +21344,7 @@ impl<'a, C, NC, A> RasterCollectionListCall<'a, C, NC, A> where NC: hyper::net::
     /// Sets the *max results* query property to the given value.
     ///
     /// 
-    /// The maximum number of items to include in a single response page. The maximum supported value is 100.    
+    /// The maximum number of items to include in a single response page. The maximum supported value is 100.
     pub fn max_results(mut self, new_value: u32) -> RasterCollectionListCall<'a, C, NC, A> {
         self._max_results = Some(new_value);
         self
@@ -21104,7 +21352,7 @@ impl<'a, C, NC, A> RasterCollectionListCall<'a, C, NC, A> where NC: hyper::net::
     /// Sets the *creator email* query property to the given value.
     ///
     /// 
-    /// An email address representing a user. Returned assets that have been created by the user associated with the provided email address.    
+    /// An email address representing a user. Returned assets that have been created by the user associated with the provided email address.
     pub fn creator_email(mut self, new_value: &str) -> RasterCollectionListCall<'a, C, NC, A> {
         self._creator_email = Some(new_value.to_string());
         self
@@ -21112,7 +21360,7 @@ impl<'a, C, NC, A> RasterCollectionListCall<'a, C, NC, A> where NC: hyper::net::
     /// Sets the *created before* query property to the given value.
     ///
     /// 
-    /// An RFC 3339 formatted date-time value (e.g. 1970-01-01T00:00:00Z). Returned assets will have been created at or before this time.    
+    /// An RFC 3339 formatted date-time value (e.g. 1970-01-01T00:00:00Z). Returned assets will have been created at or before this time.
     pub fn created_before(mut self, new_value: &str) -> RasterCollectionListCall<'a, C, NC, A> {
         self._created_before = Some(new_value.to_string());
         self
@@ -21120,7 +21368,7 @@ impl<'a, C, NC, A> RasterCollectionListCall<'a, C, NC, A> where NC: hyper::net::
     /// Sets the *created after* query property to the given value.
     ///
     /// 
-    /// An RFC 3339 formatted date-time value (e.g. 1970-01-01T00:00:00Z). Returned assets will have been created at or after this time.    
+    /// An RFC 3339 formatted date-time value (e.g. 1970-01-01T00:00:00Z). Returned assets will have been created at or after this time.
     pub fn created_after(mut self, new_value: &str) -> RasterCollectionListCall<'a, C, NC, A> {
         self._created_after = Some(new_value.to_string());
         self
@@ -21128,7 +21376,7 @@ impl<'a, C, NC, A> RasterCollectionListCall<'a, C, NC, A> where NC: hyper::net::
     /// Sets the *bbox* query property to the given value.
     ///
     /// 
-    /// A bounding box, expressed as "west,south,east,north". If set, only assets which intersect this bounding box will be returned.    
+    /// A bounding box, expressed as "west,south,east,north". If set, only assets which intersect this bounding box will be returned.
     pub fn bbox(mut self, new_value: &str) -> RasterCollectionListCall<'a, C, NC, A> {
         self._bbox = Some(new_value.to_string());
         self
@@ -21191,7 +21439,7 @@ impl<'a, C, NC, A> RasterCollectionListCall<'a, C, NC, A> where NC: hyper::net::
 /// Up to 50 rasters can be included in a single batchInsert request. Each batchInsert request is atomic.
 ///
 /// A builder for the *rasters.batchInsert* method supported by a *rasterCollection* resource.
-/// It is not used directly, but through a `RasterCollectionMethods`.
+/// It is not used directly, but through a `RasterCollectionMethods` instance.
 ///
 /// # Example
 ///
@@ -21256,7 +21504,7 @@ impl<'a, C, NC, A> RasterCollectionRasterBatchInsertCall<'a, C, NC, A> where NC:
         for &field in ["alt", "id"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -21313,7 +21561,7 @@ impl<'a, C, NC, A> RasterCollectionRasterBatchInsertCall<'a, C, NC, A> where NC:
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -21329,7 +21577,6 @@ impl<'a, C, NC, A> RasterCollectionRasterBatchInsertCall<'a, C, NC, A> where NC:
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -21339,7 +21586,7 @@ impl<'a, C, NC, A> RasterCollectionRasterBatchInsertCall<'a, C, NC, A> where NC:
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -21350,7 +21597,7 @@ impl<'a, C, NC, A> RasterCollectionRasterBatchInsertCall<'a, C, NC, A> where NC:
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -21359,13 +21606,13 @@ impl<'a, C, NC, A> RasterCollectionRasterBatchInsertCall<'a, C, NC, A> where NC:
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -21386,7 +21633,7 @@ impl<'a, C, NC, A> RasterCollectionRasterBatchInsertCall<'a, C, NC, A> where NC:
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The ID of the raster collection to which these rasters belong.    
+    /// The ID of the raster collection to which these rasters belong.
     pub fn id(mut self, new_value: &str) -> RasterCollectionRasterBatchInsertCall<'a, C, NC, A> {
         self._id = new_value.to_string();
         self
@@ -21449,7 +21696,7 @@ impl<'a, C, NC, A> RasterCollectionRasterBatchInsertCall<'a, C, NC, A> where NC:
 /// Up to 50 rasters can be included in a single batchDelete request. Each batchDelete request is atomic.
 ///
 /// A builder for the *rasters.batchDelete* method supported by a *rasterCollection* resource.
-/// It is not used directly, but through a `RasterCollectionMethods`.
+/// It is not used directly, but through a `RasterCollectionMethods` instance.
 ///
 /// # Example
 ///
@@ -21514,7 +21761,7 @@ impl<'a, C, NC, A> RasterCollectionRasterBatchDeleteCall<'a, C, NC, A> where NC:
         for &field in ["alt", "id"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -21571,7 +21818,7 @@ impl<'a, C, NC, A> RasterCollectionRasterBatchDeleteCall<'a, C, NC, A> where NC:
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -21587,7 +21834,6 @@ impl<'a, C, NC, A> RasterCollectionRasterBatchDeleteCall<'a, C, NC, A> where NC:
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -21597,7 +21843,7 @@ impl<'a, C, NC, A> RasterCollectionRasterBatchDeleteCall<'a, C, NC, A> where NC:
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -21608,7 +21854,7 @@ impl<'a, C, NC, A> RasterCollectionRasterBatchDeleteCall<'a, C, NC, A> where NC:
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -21617,13 +21863,13 @@ impl<'a, C, NC, A> RasterCollectionRasterBatchDeleteCall<'a, C, NC, A> where NC:
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -21644,7 +21890,7 @@ impl<'a, C, NC, A> RasterCollectionRasterBatchDeleteCall<'a, C, NC, A> where NC:
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The ID of the raster collection to which these rasters belong.    
+    /// The ID of the raster collection to which these rasters belong.
     pub fn id(mut self, new_value: &str) -> RasterCollectionRasterBatchDeleteCall<'a, C, NC, A> {
         self._id = new_value.to_string();
         self
@@ -21705,7 +21951,7 @@ impl<'a, C, NC, A> RasterCollectionRasterBatchDeleteCall<'a, C, NC, A> where NC:
 /// Return all of the permissions for the specified asset.
 ///
 /// A builder for the *permissions.list* method supported by a *rasterCollection* resource.
-/// It is not used directly, but through a `RasterCollectionMethods`.
+/// It is not used directly, but through a `RasterCollectionMethods` instance.
 ///
 /// # Example
 ///
@@ -21763,7 +22009,7 @@ impl<'a, C, NC, A> RasterCollectionPermissionListCall<'a, C, NC, A> where NC: hy
         for &field in ["alt", "id"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -21816,7 +22062,7 @@ impl<'a, C, NC, A> RasterCollectionPermissionListCall<'a, C, NC, A> where NC: hy
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -21828,7 +22074,6 @@ impl<'a, C, NC, A> RasterCollectionPermissionListCall<'a, C, NC, A> where NC: hy
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -21838,7 +22083,7 @@ impl<'a, C, NC, A> RasterCollectionPermissionListCall<'a, C, NC, A> where NC: hy
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -21849,7 +22094,7 @@ impl<'a, C, NC, A> RasterCollectionPermissionListCall<'a, C, NC, A> where NC: hy
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -21858,13 +22103,13 @@ impl<'a, C, NC, A> RasterCollectionPermissionListCall<'a, C, NC, A> where NC: hy
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -21876,7 +22121,7 @@ impl<'a, C, NC, A> RasterCollectionPermissionListCall<'a, C, NC, A> where NC: hy
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The ID of the asset whose permissions will be listed.    
+    /// The ID of the asset whose permissions will be listed.
     pub fn id(mut self, new_value: &str) -> RasterCollectionPermissionListCall<'a, C, NC, A> {
         self._id = new_value.to_string();
         self
@@ -21937,7 +22182,7 @@ impl<'a, C, NC, A> RasterCollectionPermissionListCall<'a, C, NC, A> where NC: hy
 /// Return metadata for a particular raster collection.
 ///
 /// A builder for the *get* method supported by a *rasterCollection* resource.
-/// It is not used directly, but through a `RasterCollectionMethods`.
+/// It is not used directly, but through a `RasterCollectionMethods` instance.
 ///
 /// # Example
 ///
@@ -21995,7 +22240,7 @@ impl<'a, C, NC, A> RasterCollectionGetCall<'a, C, NC, A> where NC: hyper::net::N
         for &field in ["alt", "id"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -22048,7 +22293,7 @@ impl<'a, C, NC, A> RasterCollectionGetCall<'a, C, NC, A> where NC: hyper::net::N
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -22060,7 +22305,6 @@ impl<'a, C, NC, A> RasterCollectionGetCall<'a, C, NC, A> where NC: hyper::net::N
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -22070,7 +22314,7 @@ impl<'a, C, NC, A> RasterCollectionGetCall<'a, C, NC, A> where NC: hyper::net::N
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -22081,7 +22325,7 @@ impl<'a, C, NC, A> RasterCollectionGetCall<'a, C, NC, A> where NC: hyper::net::N
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -22090,13 +22334,13 @@ impl<'a, C, NC, A> RasterCollectionGetCall<'a, C, NC, A> where NC: hyper::net::N
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -22108,7 +22352,7 @@ impl<'a, C, NC, A> RasterCollectionGetCall<'a, C, NC, A> where NC: hyper::net::N
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The ID of the raster collection.    
+    /// The ID of the raster collection.
     pub fn id(mut self, new_value: &str) -> RasterCollectionGetCall<'a, C, NC, A> {
         self._id = new_value.to_string();
         self
@@ -22169,7 +22413,7 @@ impl<'a, C, NC, A> RasterCollectionGetCall<'a, C, NC, A> where NC: hyper::net::N
 /// Return all rasters within a raster collection.
 ///
 /// A builder for the *rasters.list* method supported by a *rasterCollection* resource.
-/// It is not used directly, but through a `RasterCollectionMethods`.
+/// It is not used directly, but through a `RasterCollectionMethods` instance.
 ///
 /// # Example
 ///
@@ -22282,7 +22526,7 @@ impl<'a, C, NC, A> RasterCollectionRasterListCall<'a, C, NC, A> where NC: hyper:
         for &field in ["alt", "id", "tags", "search", "role", "pageToken", "modifiedBefore", "modifiedAfter", "maxResults", "creatorEmail", "createdBefore", "createdAfter", "bbox"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -22335,7 +22579,7 @@ impl<'a, C, NC, A> RasterCollectionRasterListCall<'a, C, NC, A> where NC: hyper:
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -22347,7 +22591,6 @@ impl<'a, C, NC, A> RasterCollectionRasterListCall<'a, C, NC, A> where NC: hyper:
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -22357,7 +22600,7 @@ impl<'a, C, NC, A> RasterCollectionRasterListCall<'a, C, NC, A> where NC: hyper:
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -22368,7 +22611,7 @@ impl<'a, C, NC, A> RasterCollectionRasterListCall<'a, C, NC, A> where NC: hyper:
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -22377,13 +22620,13 @@ impl<'a, C, NC, A> RasterCollectionRasterListCall<'a, C, NC, A> where NC: hyper:
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -22395,7 +22638,7 @@ impl<'a, C, NC, A> RasterCollectionRasterListCall<'a, C, NC, A> where NC: hyper:
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The ID of the raster collection to which these rasters belong.    
+    /// The ID of the raster collection to which these rasters belong.
     pub fn id(mut self, new_value: &str) -> RasterCollectionRasterListCall<'a, C, NC, A> {
         self._id = new_value.to_string();
         self
@@ -22403,7 +22646,7 @@ impl<'a, C, NC, A> RasterCollectionRasterListCall<'a, C, NC, A> where NC: hyper:
     /// Sets the *tags* query property to the given value.
     ///
     /// 
-    /// A comma separated list of tags. Returned assets will contain all the tags from the list.    
+    /// A comma separated list of tags. Returned assets will contain all the tags from the list.
     pub fn tags(mut self, new_value: &str) -> RasterCollectionRasterListCall<'a, C, NC, A> {
         self._tags = Some(new_value.to_string());
         self
@@ -22411,7 +22654,7 @@ impl<'a, C, NC, A> RasterCollectionRasterListCall<'a, C, NC, A> where NC: hyper:
     /// Sets the *search* query property to the given value.
     ///
     /// 
-    /// An unstructured search string used to filter the set of results based on asset metadata.    
+    /// An unstructured search string used to filter the set of results based on asset metadata.
     pub fn search(mut self, new_value: &str) -> RasterCollectionRasterListCall<'a, C, NC, A> {
         self._search = Some(new_value.to_string());
         self
@@ -22419,7 +22662,7 @@ impl<'a, C, NC, A> RasterCollectionRasterListCall<'a, C, NC, A> where NC: hyper:
     /// Sets the *role* query property to the given value.
     ///
     /// 
-    /// The role parameter indicates that the response should only contain assets where the current user has the specified level of access.    
+    /// The role parameter indicates that the response should only contain assets where the current user has the specified level of access.
     pub fn role(mut self, new_value: &str) -> RasterCollectionRasterListCall<'a, C, NC, A> {
         self._role = Some(new_value.to_string());
         self
@@ -22427,7 +22670,7 @@ impl<'a, C, NC, A> RasterCollectionRasterListCall<'a, C, NC, A> where NC: hyper:
     /// Sets the *page token* query property to the given value.
     ///
     /// 
-    /// The continuation token, used to page through large result sets. To get the next page of results, set this parameter to the value of nextPageToken from the previous response.    
+    /// The continuation token, used to page through large result sets. To get the next page of results, set this parameter to the value of nextPageToken from the previous response.
     pub fn page_token(mut self, new_value: &str) -> RasterCollectionRasterListCall<'a, C, NC, A> {
         self._page_token = Some(new_value.to_string());
         self
@@ -22435,7 +22678,7 @@ impl<'a, C, NC, A> RasterCollectionRasterListCall<'a, C, NC, A> where NC: hyper:
     /// Sets the *modified before* query property to the given value.
     ///
     /// 
-    /// An RFC 3339 formatted date-time value (e.g. 1970-01-01T00:00:00Z). Returned assets will have been modified at or before this time.    
+    /// An RFC 3339 formatted date-time value (e.g. 1970-01-01T00:00:00Z). Returned assets will have been modified at or before this time.
     pub fn modified_before(mut self, new_value: &str) -> RasterCollectionRasterListCall<'a, C, NC, A> {
         self._modified_before = Some(new_value.to_string());
         self
@@ -22443,7 +22686,7 @@ impl<'a, C, NC, A> RasterCollectionRasterListCall<'a, C, NC, A> where NC: hyper:
     /// Sets the *modified after* query property to the given value.
     ///
     /// 
-    /// An RFC 3339 formatted date-time value (e.g. 1970-01-01T00:00:00Z). Returned assets will have been modified at or after this time.    
+    /// An RFC 3339 formatted date-time value (e.g. 1970-01-01T00:00:00Z). Returned assets will have been modified at or after this time.
     pub fn modified_after(mut self, new_value: &str) -> RasterCollectionRasterListCall<'a, C, NC, A> {
         self._modified_after = Some(new_value.to_string());
         self
@@ -22451,7 +22694,7 @@ impl<'a, C, NC, A> RasterCollectionRasterListCall<'a, C, NC, A> where NC: hyper:
     /// Sets the *max results* query property to the given value.
     ///
     /// 
-    /// The maximum number of items to include in a single response page. The maximum supported value is 100.    
+    /// The maximum number of items to include in a single response page. The maximum supported value is 100.
     pub fn max_results(mut self, new_value: u32) -> RasterCollectionRasterListCall<'a, C, NC, A> {
         self._max_results = Some(new_value);
         self
@@ -22459,7 +22702,7 @@ impl<'a, C, NC, A> RasterCollectionRasterListCall<'a, C, NC, A> where NC: hyper:
     /// Sets the *creator email* query property to the given value.
     ///
     /// 
-    /// An email address representing a user. Returned assets that have been created by the user associated with the provided email address.    
+    /// An email address representing a user. Returned assets that have been created by the user associated with the provided email address.
     pub fn creator_email(mut self, new_value: &str) -> RasterCollectionRasterListCall<'a, C, NC, A> {
         self._creator_email = Some(new_value.to_string());
         self
@@ -22467,7 +22710,7 @@ impl<'a, C, NC, A> RasterCollectionRasterListCall<'a, C, NC, A> where NC: hyper:
     /// Sets the *created before* query property to the given value.
     ///
     /// 
-    /// An RFC 3339 formatted date-time value (e.g. 1970-01-01T00:00:00Z). Returned assets will have been created at or before this time.    
+    /// An RFC 3339 formatted date-time value (e.g. 1970-01-01T00:00:00Z). Returned assets will have been created at or before this time.
     pub fn created_before(mut self, new_value: &str) -> RasterCollectionRasterListCall<'a, C, NC, A> {
         self._created_before = Some(new_value.to_string());
         self
@@ -22475,7 +22718,7 @@ impl<'a, C, NC, A> RasterCollectionRasterListCall<'a, C, NC, A> where NC: hyper:
     /// Sets the *created after* query property to the given value.
     ///
     /// 
-    /// An RFC 3339 formatted date-time value (e.g. 1970-01-01T00:00:00Z). Returned assets will have been created at or after this time.    
+    /// An RFC 3339 formatted date-time value (e.g. 1970-01-01T00:00:00Z). Returned assets will have been created at or after this time.
     pub fn created_after(mut self, new_value: &str) -> RasterCollectionRasterListCall<'a, C, NC, A> {
         self._created_after = Some(new_value.to_string());
         self
@@ -22483,7 +22726,7 @@ impl<'a, C, NC, A> RasterCollectionRasterListCall<'a, C, NC, A> where NC: hyper:
     /// Sets the *bbox* query property to the given value.
     ///
     /// 
-    /// A bounding box, expressed as "west,south,east,north". If set, only assets which intersect this bounding box will be returned.    
+    /// A bounding box, expressed as "west,south,east,north". If set, only assets which intersect this bounding box will be returned.
     pub fn bbox(mut self, new_value: &str) -> RasterCollectionRasterListCall<'a, C, NC, A> {
         self._bbox = Some(new_value.to_string());
         self
@@ -22549,7 +22792,7 @@ impl<'a, C, NC, A> RasterCollectionRasterListCall<'a, C, NC, A> where NC: hyper:
 /// but not the `Icon` structure that you would usually get. The latter will be a default value.
 ///
 /// A builder for the *icons.get* method supported by a *project* resource.
-/// It is not used directly, but through a `ProjectMethods`.
+/// It is not used directly, but through a `ProjectMethods` instance.
 ///
 /// # Example
 ///
@@ -22609,7 +22852,7 @@ impl<'a, C, NC, A> ProjectIconGetCall<'a, C, NC, A> where NC: hyper::net::Networ
         for &field in ["projectId", "id"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -22678,7 +22921,7 @@ impl<'a, C, NC, A> ProjectIconGetCall<'a, C, NC, A> where NC: hyper::net::Networ
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -22690,7 +22933,6 @@ impl<'a, C, NC, A> ProjectIconGetCall<'a, C, NC, A> where NC: hyper::net::Networ
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -22700,7 +22942,7 @@ impl<'a, C, NC, A> ProjectIconGetCall<'a, C, NC, A> where NC: hyper::net::Networ
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -22711,7 +22953,7 @@ impl<'a, C, NC, A> ProjectIconGetCall<'a, C, NC, A> where NC: hyper::net::Networ
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = if enable_resource_parsing {
                         let mut json_response = String::new();
@@ -22720,13 +22962,13 @@ impl<'a, C, NC, A> ProjectIconGetCall<'a, C, NC, A> where NC: hyper::net::Networ
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     } else { (res, Default::default()) };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -22738,7 +22980,7 @@ impl<'a, C, NC, A> ProjectIconGetCall<'a, C, NC, A> where NC: hyper::net::Networ
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The ID of the project.    
+    /// The ID of the project.
     pub fn project_id(mut self, new_value: &str) -> ProjectIconGetCall<'a, C, NC, A> {
         self._project_id = new_value.to_string();
         self
@@ -22748,7 +22990,7 @@ impl<'a, C, NC, A> ProjectIconGetCall<'a, C, NC, A> where NC: hyper::net::Networ
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The ID of the icon.    
+    /// The ID of the icon.
     pub fn id(mut self, new_value: &str) -> ProjectIconGetCall<'a, C, NC, A> {
         self._id = new_value.to_string();
         self
@@ -22809,7 +23051,7 @@ impl<'a, C, NC, A> ProjectIconGetCall<'a, C, NC, A> where NC: hyper::net::Networ
 /// Create an icon.
 ///
 /// A builder for the *icons.create* method supported by a *project* resource.
-/// It is not used directly, but through a `ProjectMethods`.
+/// It is not used directly, but through a `ProjectMethods` instance.
 ///
 /// # Example
 ///
@@ -22876,7 +23118,7 @@ impl<'a, C, NC, A> ProjectIconCreateCall<'a, C, NC, A> where NC: hyper::net::Net
         for &field in ["alt", "projectId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -22943,7 +23185,7 @@ impl<'a, C, NC, A> ProjectIconCreateCall<'a, C, NC, A> where NC: hyper::net::Net
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -22969,7 +23211,7 @@ impl<'a, C, NC, A> ProjectIconCreateCall<'a, C, NC, A> where NC: hyper::net::Net
                             let size = reader.seek(io::SeekFrom::End(0)).unwrap();
                         reader.seek(io::SeekFrom::Start(0)).unwrap();
                         if size > 102400 {
-                        	return Result::UploadSizeLimitExceeded(size, 102400)
+                        	return Err(Error::UploadSizeLimitExceeded(size, 102400))
                         }
                             mp_reader.add_part(&mut request_value_reader, request_size, json_mime_type.clone())
                                      .add_part(&mut reader, size, reader_mime_type.clone());
@@ -22991,7 +23233,6 @@ impl<'a, C, NC, A> ProjectIconCreateCall<'a, C, NC, A> where NC: hyper::net::Net
     
                     dlg.pre_request();
                     req.send()
-    
                 }
             };
 
@@ -23002,7 +23243,7 @@ impl<'a, C, NC, A> ProjectIconCreateCall<'a, C, NC, A> where NC: hyper::net::Net
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -23013,13 +23254,13 @@ impl<'a, C, NC, A> ProjectIconCreateCall<'a, C, NC, A> where NC: hyper::net::Net
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     if protocol == "resumable" {
                         let size = reader.seek(io::SeekFrom::End(0)).unwrap();
                         reader.seek(io::SeekFrom::Start(0)).unwrap();
                         if size > 102400 {
-                        	return Result::UploadSizeLimitExceeded(size, 102400)
+                        	return Err(Error::UploadSizeLimitExceeded(size, 102400))
                         }
                         let mut client = &mut *self.hub.client.borrow_mut();
                         let upload_result = {
@@ -23044,17 +23285,17 @@ impl<'a, C, NC, A> ProjectIconCreateCall<'a, C, NC, A> where NC: hyper::net::Net
                         match upload_result {
                             None => {
                                 dlg.finished(false);
-                                return Result::Cancelled
+                                return Err(Error::Cancelled)
                             }
                             Some(Err(err)) => {
                                 dlg.finished(false);
-                                return Result::HttpError(err)
+                                return Err(Error::HttpError(err))
                             }
                             Some(Ok(upload_result)) => {
                                 res = upload_result;
                                 if !res.status.is_success() {
                                     dlg.finished(false);
-                                    return Result::Failure(res)
+                                    return Err(Error::Failure(res))
                                 }
                             }
                         }
@@ -23066,13 +23307,13 @@ impl<'a, C, NC, A> ProjectIconCreateCall<'a, C, NC, A> where NC: hyper::net::Net
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -23088,11 +23329,14 @@ impl<'a, C, NC, A> ProjectIconCreateCall<'a, C, NC, A> where NC: hyper::net::Net
                 where RS: ReadSeek {
         self.doit(stream, mime_type, "simple")
     }
-    /// Upload media in a resumeable fashion.
+    /// Upload media in a resumable fashion.
     /// Even if the upload fails or is interrupted, it can be resumed for a 
     /// certain amount of time as the server maintains state temporarily.
     /// 
-    /// TODO: Write more about how delegation works in this particular case.
+    /// The delegate will be asked for an `upload_url()`, and if not provided, will be asked to store an upload URL 
+    /// that was provided by the server, using `store_upload_url(...)`. The upload will be done in chunks, the delegate
+    /// may specify the `chunk_size()` and may cancel the operation before each chunk is uploaded, using
+    /// `cancel_chunk_upload(...)`.
     ///
     /// * *max size*: 100KB
     /// * *multipart*: yes
@@ -23116,7 +23360,7 @@ impl<'a, C, NC, A> ProjectIconCreateCall<'a, C, NC, A> where NC: hyper::net::Net
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The ID of the project.    
+    /// The ID of the project.
     pub fn project_id(mut self, new_value: &str) -> ProjectIconCreateCall<'a, C, NC, A> {
         self._project_id = new_value.to_string();
         self
@@ -23177,7 +23421,7 @@ impl<'a, C, NC, A> ProjectIconCreateCall<'a, C, NC, A> where NC: hyper::net::Net
 /// Return all projects readable by the current user.
 ///
 /// A builder for the *list* method supported by a *project* resource.
-/// It is not used directly, but through a `ProjectMethods`.
+/// It is not used directly, but through a `ProjectMethods` instance.
 ///
 /// # Example
 ///
@@ -23233,7 +23477,7 @@ impl<'a, C, NC, A> ProjectListCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
         for &field in ["alt"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -23262,7 +23506,7 @@ impl<'a, C, NC, A> ProjectListCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -23274,7 +23518,6 @@ impl<'a, C, NC, A> ProjectListCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -23284,7 +23527,7 @@ impl<'a, C, NC, A> ProjectListCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -23295,7 +23538,7 @@ impl<'a, C, NC, A> ProjectListCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -23304,13 +23547,13 @@ impl<'a, C, NC, A> ProjectListCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -23373,7 +23616,7 @@ impl<'a, C, NC, A> ProjectListCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
 /// Return all icons in the current project
 ///
 /// A builder for the *icons.list* method supported by a *project* resource.
-/// It is not used directly, but through a `ProjectMethods`.
+/// It is not used directly, but through a `ProjectMethods` instance.
 ///
 /// # Example
 ///
@@ -23441,7 +23684,7 @@ impl<'a, C, NC, A> ProjectIconListCall<'a, C, NC, A> where NC: hyper::net::Netwo
         for &field in ["alt", "projectId", "pageToken", "maxResults"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -23494,7 +23737,7 @@ impl<'a, C, NC, A> ProjectIconListCall<'a, C, NC, A> where NC: hyper::net::Netwo
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -23506,7 +23749,6 @@ impl<'a, C, NC, A> ProjectIconListCall<'a, C, NC, A> where NC: hyper::net::Netwo
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -23516,7 +23758,7 @@ impl<'a, C, NC, A> ProjectIconListCall<'a, C, NC, A> where NC: hyper::net::Netwo
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -23527,7 +23769,7 @@ impl<'a, C, NC, A> ProjectIconListCall<'a, C, NC, A> where NC: hyper::net::Netwo
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -23536,13 +23778,13 @@ impl<'a, C, NC, A> ProjectIconListCall<'a, C, NC, A> where NC: hyper::net::Netwo
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -23554,7 +23796,7 @@ impl<'a, C, NC, A> ProjectIconListCall<'a, C, NC, A> where NC: hyper::net::Netwo
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The ID of the project.    
+    /// The ID of the project.
     pub fn project_id(mut self, new_value: &str) -> ProjectIconListCall<'a, C, NC, A> {
         self._project_id = new_value.to_string();
         self
@@ -23562,7 +23804,7 @@ impl<'a, C, NC, A> ProjectIconListCall<'a, C, NC, A> where NC: hyper::net::Netwo
     /// Sets the *page token* query property to the given value.
     ///
     /// 
-    /// The continuation token, used to page through large result sets. To get the next page of results, set this parameter to the value of nextPageToken from the previous response.    
+    /// The continuation token, used to page through large result sets. To get the next page of results, set this parameter to the value of nextPageToken from the previous response.
     pub fn page_token(mut self, new_value: &str) -> ProjectIconListCall<'a, C, NC, A> {
         self._page_token = Some(new_value.to_string());
         self
@@ -23570,7 +23812,7 @@ impl<'a, C, NC, A> ProjectIconListCall<'a, C, NC, A> where NC: hyper::net::Netwo
     /// Sets the *max results* query property to the given value.
     ///
     /// 
-    /// The maximum number of items to include in a single response page. The maximum supported value is 50.    
+    /// The maximum number of items to include in a single response page. The maximum supported value is 50.
     pub fn max_results(mut self, new_value: u32) -> ProjectIconListCall<'a, C, NC, A> {
         self._max_results = Some(new_value);
         self

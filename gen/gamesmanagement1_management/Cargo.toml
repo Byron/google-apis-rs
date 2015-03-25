@@ -4,7 +4,7 @@
 [package]
 
 name = "google-gamesmanagement1_management"
-version = "0.1.1+20150309"
+version = "0.1.2+20150316"
 authors = ["Sebastian Thiel <byronimo@gmail>"]
 description = "A complete library to interact with Games Management (protocol v1management)"
 repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/gamesmanagement1_management"
@@ -16,7 +16,7 @@ keywords = ["gamesManagement", "google", "protocol", "web", "api"]
 [dependencies]
 hyper = "*"
 mime = "*"
+yup-oauth2 = "*"
 url = "*"
 serde = "*"
 serde_macros = "*"
-yup-oauth2 = "*"

@@ -1,11 +1,8 @@
 // DO NOT EDIT !
-// This file was generated automatically from 'src/mako/lib.rs.mako'
+// This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *Android Enterprise* crate version *0.1.1+20150218*, where *20150218* is the exact revision of the *androidenterprise:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.1*.
-//! 
-//! Everything else about the *Android Enterprise* *v1* API can be found at the
-//! [official documentation site](https://developers.google.com/play/enterprise).
+//! This documentation was generated from *Android Enterprise* crate version *0.1.2+20141112*, where *20141112* is the exact revision of the *androidenterprise:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.2*.
 //! The original source code is [on github](https://github.com/Byron/google-apis-rs/tree/master/gen/androidenterprise1).
 //! # Features
 //! 
@@ -45,6 +42,8 @@
 //! 
 //! * **[Hub](struct.AndroidEnterprise.html)**
 //!     * a central object to maintain state and allow accessing all *Activities*
+//!     * creates [*Method Builders*](trait.MethodsBuilder.html) which in turn
+//!       allow access to individual [*Call Builders*](trait.CallBuilder.html)
 //! * **[Resources](trait.Resource.html)**
 //!     * primary types that you can apply *Activities* to
 //!     * a collection of properties and *Parts*
@@ -53,6 +52,8 @@
 //!         * never directly used in *Activities*
 //! * **[Activities](trait.CallBuilder.html)**
 //!     * operations to apply to *Resources*
+//! 
+//! All *structures* are marked with applicable traits to further categorize them and ease browsing.
 //! 
 //! Generally speaking, you can invoke *Activities* like this:
 //! 
@@ -95,7 +96,7 @@
 //! extern crate "yup-oauth2" as oauth2;
 //! extern crate "google-androidenterprise1" as androidenterprise1;
 //! use androidenterprise1::Enterprise;
-//! use androidenterprise1::Result;
+//! use androidenterprise1::{Result, Error};
 //! # #[test] fn egal() {
 //! use std::default::Default;
 //! use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -125,15 +126,17 @@
 //!              .doit();
 //! 
 //! match result {
-//!     Result::HttpError(err) => println!("HTTPERROR: {:?}", err),
-//!     Result::MissingAPIKey => println!("Auth: Missing API Key - used if there are no scopes"),
-//!     Result::MissingToken => println!("OAuth2: Missing Token"),
-//!     Result::Cancelled => println!("Operation cancelled by user"),
-//!     Result::UploadSizeLimitExceeded(size, max_size) => println!("Upload size too big: {} of {}", size, max_size),
-//!     Result::Failure(_) => println!("General Failure (hyper::client::Response doesn't print)"),
-//!     Result::FieldClash(clashed_field) => println!("You added custom parameter which is part of builder: {:?}", clashed_field),
-//!     Result::JsonDecodeError(err) => println!("Couldn't understand server reply - maybe API needs update: {:?}", err),
-//!     Result::Success(_) => println!("Success (value doesn't print)"),
+//!     Err(e) => match e {
+//!         Error::HttpError(err) => println!("HTTPERROR: {:?}", err),
+//!         Error::MissingAPIKey => println!("Auth: Missing API Key - used if there are no scopes"),
+//!         Error::MissingToken => println!("OAuth2: Missing Token"),
+//!         Error::Cancelled => println!("Operation canceled by user"),
+//!         Error::UploadSizeLimitExceeded(size, max_size) => println!("Upload size too big: {} of {}", size, max_size),
+//!         Error::Failure(_) => println!("General Failure (hyper::client::Response doesn't print)"),
+//!         Error::FieldClash(clashed_field) => println!("You added custom parameter which is part of builder: {:?}", clashed_field),
+//!         Error::JsonDecodeError(err) => println!("Couldn't understand server reply - maybe API needs update: {:?}", err),
+//!     },
+//!     Ok(_) => println!("Success (value doesn't print)"),
 //! }
 //! # }
 //! ```
@@ -146,7 +149,7 @@
 //! When delegates handle errors or intermediate values, they may have a chance to instruct the system to retry. This 
 //! makes the system potentially resilient to all kinds of errors.
 //! 
-//! ## Uploads and Downlods
+//! ## Uploads and Downloads
 //! If a method supports downloads, the response body, which is part of the [Result](enum.Result.html), should be
 //! read by you to obtain the media.
 //! If such a method also supports a [Response Result](trait.ResponseResult.html), it will return that by default.
@@ -169,8 +172,9 @@
 //! ## Optional Parts in Server-Requests
 //! 
 //! All structures provided by this library are made to be [enocodable](trait.RequestValue.html) and 
-//! [decodable](trait.ResponseResult.html) via json. Optionals are used to indicate that partial requests are responses are valid.
-//! Most optionals are are considered [Parts](trait.Part.html) which are identifyable by name, which will be sent to 
+//! [decodable](trait.ResponseResult.html) via *json*. Optionals are used to indicate that partial requests are responses 
+//! are valid.
+//! Most optionals are are considered [Parts](trait.Part.html) which are identifiable by name, which will be sent to 
 //! the server to indicate either the set parts of the request or the desired parts in the response.
 //! 
 //! ## Builder Arguments
@@ -219,7 +223,7 @@ use std::io;
 use std::fs;
 use std::thread::sleep;
 
-pub use cmn::{MultiPartReader, ToParts, MethodInfo, Result, CallBuilder, Hub, ReadSeek, Part, ResponseResult, RequestValue, NestedType, Delegate, DefaultDelegate, ResourceMethodsBuilder, Resource, JsonServerError};
+pub use cmn::{MultiPartReader, ToParts, MethodInfo, Result, Error, CallBuilder, Hub, ReadSeek, Part, ResponseResult, RequestValue, NestedType, Delegate, DefaultDelegate, MethodsBuilder, Resource, JsonServerError};
 
 
 // ##############
@@ -266,7 +270,7 @@ impl Default for Scope {
 /// extern crate "yup-oauth2" as oauth2;
 /// extern crate "google-androidenterprise1" as androidenterprise1;
 /// use androidenterprise1::Enterprise;
-/// use androidenterprise1::Result;
+/// use androidenterprise1::{Result, Error};
 /// # #[test] fn egal() {
 /// use std::default::Default;
 /// use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -296,15 +300,17 @@ impl Default for Scope {
 ///              .doit();
 /// 
 /// match result {
-///     Result::HttpError(err) => println!("HTTPERROR: {:?}", err),
-///     Result::MissingAPIKey => println!("Auth: Missing API Key - used if there are no scopes"),
-///     Result::MissingToken => println!("OAuth2: Missing Token"),
-///     Result::Cancelled => println!("Operation cancelled by user"),
-///     Result::UploadSizeLimitExceeded(size, max_size) => println!("Upload size too big: {} of {}", size, max_size),
-///     Result::Failure(_) => println!("General Failure (hyper::client::Response doesn't print)"),
-///     Result::FieldClash(clashed_field) => println!("You added custom parameter which is part of builder: {:?}", clashed_field),
-///     Result::JsonDecodeError(err) => println!("Couldn't understand server reply - maybe API needs update: {:?}", err),
-///     Result::Success(_) => println!("Success (value doesn't print)"),
+///     Err(e) => match e {
+///         Error::HttpError(err) => println!("HTTPERROR: {:?}", err),
+///         Error::MissingAPIKey => println!("Auth: Missing API Key - used if there are no scopes"),
+///         Error::MissingToken => println!("OAuth2: Missing Token"),
+///         Error::Cancelled => println!("Operation canceled by user"),
+///         Error::UploadSizeLimitExceeded(size, max_size) => println!("Upload size too big: {} of {}", size, max_size),
+///         Error::Failure(_) => println!("General Failure (hyper::client::Response doesn't print)"),
+///         Error::FieldClash(clashed_field) => println!("You added custom parameter which is part of builder: {:?}", clashed_field),
+///         Error::JsonDecodeError(err) => println!("Couldn't understand server reply - maybe API needs update: {:?}", err),
+///     },
+///     Ok(_) => println!("Success (value doesn't print)"),
 /// }
 /// # }
 /// ```
@@ -325,7 +331,7 @@ impl<'a, C, NC, A> AndroidEnterprise<C, NC, A>
         AndroidEnterprise {
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/0.1.1".to_string(),
+            _user_agent: "google-api-rust-client/0.1.2".to_string(),
             _m: PhantomData
         }
     }
@@ -365,7 +371,7 @@ impl<'a, C, NC, A> AndroidEnterprise<C, NC, A>
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/0.1.1`.
+    /// It defaults to `google-api-rust-client/0.1.2`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -390,7 +396,7 @@ impl<'a, C, NC, A> AndroidEnterprise<C, NC, A>
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct AppRestrictionsSchema {
-    /// The set of restrictions that make up this schema.    
+    /// The set of restrictions that make up this schema.
     pub restrictions: Vec<AppRestrictionsSchemaRestriction>,
 }
 
@@ -403,21 +409,21 @@ impl ResponseResult for AppRestrictionsSchema {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct AppRestrictionsSchemaRestriction {
-    /// The type of the restriction.    
+    /// The type of the restriction.
     #[serde(alias="restrictionType")]
     pub restriction_type: String,
-    /// A longer description of the restriction, giving more detail of what it affects.    
+    /// A longer description of the restriction, giving more detail of what it affects.
     pub description: String,
-    /// The unique key that the product uses to identify the restriction, e.g. "com.google.android.gm.fieldname".    
+    /// The unique key that the product uses to identify the restriction, e.g. "com.google.android.gm.fieldname".
     pub key: String,
-    /// The name of the restriction.    
+    /// The name of the restriction.
     pub title: String,
-    /// For choice or multiselect restrictions, the list of possible entries' human-readable names.    
+    /// For choice or multiselect restrictions, the list of possible entries' human-readable names.
     pub entry: Vec<String>,
-    /// The default value of the restriction.    
+    /// The default value of the restriction.
     #[serde(alias="defaultValue")]
     pub default_value: AppRestrictionsSchemaRestrictionRestrictionValue,
-    /// For choice or multiselect restrictions, the list of possible entries' machine-readable values.    
+    /// For choice or multiselect restrictions, the list of possible entries' machine-readable values.
     #[serde(alias="entryValue")]
     pub entry_value: Vec<String>,
 }
@@ -431,19 +437,19 @@ impl Part for AppRestrictionsSchemaRestriction {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct AppRestrictionsSchemaRestrictionRestrictionValue {
-    /// The boolean value - this will only be present if type is bool.    
+    /// The boolean value - this will only be present if type is bool.
     #[serde(alias="valueBool")]
     pub value_bool: bool,
-    /// The integer value - this will only be present if type is integer.    
+    /// The integer value - this will only be present if type is integer.
     #[serde(alias="valueInteger")]
     pub value_integer: i32,
-    /// The type of the value being provided.    
+    /// The type of the value being provided.
     #[serde(alias="type")]
     pub type_: String,
-    /// The list of string values - this will only be present if type is multiselect.    
+    /// The list of string values - this will only be present if type is multiselect.
     #[serde(alias="valueMultiselect")]
     pub value_multiselect: Vec<String>,
-    /// The string value - this will be present for types string, choice and hidden.    
+    /// The string value - this will be present for types string, choice and hidden.
     #[serde(alias="valueString")]
     pub value_string: String,
 }
@@ -462,9 +468,9 @@ impl Part for AppRestrictionsSchemaRestrictionRestrictionValue {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct EnterprisesListResponse {
-    /// Identifies what kind of resource this is. Value: the fixed string "androidenterprise#enterprisesListResponse".    
+    /// Identifies what kind of resource this is. Value: the fixed string "androidenterprise#enterprisesListResponse".
     pub kind: String,
-    /// An enterprise.    
+    /// An enterprise.
     pub enterprise: Vec<Enterprise>,
 }
 
@@ -494,11 +500,11 @@ impl ResponseResult for EnterprisesListResponse {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Entitlement {
-    /// Identifies what kind of resource this is. Value: the fixed string "androidenterprise#entitlement".    
+    /// Identifies what kind of resource this is. Value: the fixed string "androidenterprise#entitlement".
     pub kind: Option<String>,
-    /// The reason for the entitlement, e.g. "free" for free apps. This is temporary, it will be replaced by the acquisition kind field of group licenses.    
+    /// The reason for the entitlement, e.g. "free" for free apps. This is temporary, it will be replaced by the acquisition kind field of group licenses.
     pub reason: Option<String>,
-    /// The ID of the product that the entitlement is for, e.g. "app:com.google.android.gm".    
+    /// The ID of the product that the entitlement is for, e.g. "app:com.google.android.gm".
     #[serde(alias="productId")]
     pub product_id: Option<String>,
 }
@@ -519,9 +525,9 @@ impl ResponseResult for Entitlement {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct InstallsListResponse {
-    /// Identifies what kind of resource this is. Value: the fixed string "androidenterprise#installsListResponse".    
+    /// Identifies what kind of resource this is. Value: the fixed string "androidenterprise#installsListResponse".
     pub kind: String,
-    /// An installation of an app for a user on a specific device. The existence of an install implies that the user must have an entitlement to the app.    
+    /// An installation of an app for a user on a specific device. The existence of an install implies that the user must have an entitlement to the app.
     pub install: Vec<Install>,
 }
 
@@ -539,9 +545,9 @@ impl ResponseResult for InstallsListResponse {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct CollectionViewersListResponse {
-    /// Identifies what kind of resource this is. Value: the fixed string "androidenterprise#collectionViewersListResponse".    
+    /// Identifies what kind of resource this is. Value: the fixed string "androidenterprise#collectionViewersListResponse".
     pub kind: String,
-    /// A user of an enterprise.    
+    /// A user of an enterprise.
     pub user: Vec<User>,
 }
 
@@ -559,9 +565,9 @@ impl ResponseResult for CollectionViewersListResponse {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct DevicesListResponse {
-    /// A managed device.    
+    /// A managed device.
     pub device: Vec<Device>,
-    /// Identifies what kind of resource this is. Value: the fixed string "androidenterprise#devicesListResponse".    
+    /// Identifies what kind of resource this is. Value: the fixed string "androidenterprise#devicesListResponse".
     pub kind: String,
 }
 
@@ -593,15 +599,15 @@ impl ResponseResult for DevicesListResponse {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Install {
-    /// Install state. The state "installPending" means that an install request has recently been made and download to the device is in progress. The state "installed" means that the app has been installed. This field is read-only.    
+    /// Install state. The state "installPending" means that an install request has recently been made and download to the device is in progress. The state "installed" means that the app has been installed. This field is read-only.
     #[serde(alias="installState")]
     pub install_state: Option<String>,
-    /// The version of the installed product. Guaranteed to be set only if the install state is "installed".    
+    /// The version of the installed product. Guaranteed to be set only if the install state is "installed".
     #[serde(alias="versionCode")]
     pub version_code: Option<i32>,
-    /// Identifies what kind of resource this is. Value: the fixed string "androidenterprise#install".    
+    /// Identifies what kind of resource this is. Value: the fixed string "androidenterprise#install".
     pub kind: Option<String>,
-    /// The ID of the product that the install is for, e.g. "app:com.google.android.gm".    
+    /// The ID of the product that the install is for, e.g. "app:com.google.android.gm".
     #[serde(alias="productId")]
     pub product_id: Option<String>,
 }
@@ -636,14 +642,14 @@ impl ResponseResult for Install {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Enterprise {
-    /// Identifies what kind of resource this is. Value: the fixed string "androidenterprise#enterprise".    
+    /// Identifies what kind of resource this is. Value: the fixed string "androidenterprise#enterprise".
     pub kind: Option<String>,
-    /// The enterprise's primary domain, e.g. "example.com".    
+    /// The enterprise's primary domain, e.g. "example.com".
     #[serde(alias="primaryDomain")]
     pub primary_domain: Option<String>,
-    /// The unique ID for the enterprise.    
+    /// The unique ID for the enterprise.
     pub id: Option<String>,
-    /// The name of the enterprise, e.g. "Example Inc".    
+    /// The name of the enterprise, e.g. "Example Inc".
     pub name: Option<String>,
 }
 
@@ -663,12 +669,12 @@ impl ResponseResult for Enterprise {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct UserToken {
-    /// Identifies what kind of resource this is. Value: the fixed string "androidenterprise#userToken".    
+    /// Identifies what kind of resource this is. Value: the fixed string "androidenterprise#userToken".
     pub kind: String,
-    /// The unique ID for the user.    
+    /// The unique ID for the user.
     #[serde(alias="userId")]
     pub user_id: String,
-    /// The token (activation code) to be entered by the user. This consists of a sequence of decimal digits. Note that the leading digit may be 0.    
+    /// The token (activation code) to be entered by the user. This consists of a sequence of decimal digits. Note that the leading digit may be 0.
     pub token: String,
 }
 
@@ -687,11 +693,11 @@ impl ResponseResult for UserToken {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ProductPermissions {
-    /// Identifies what kind of resource this is. Value: the fixed string "androidenterprise#productPermissions".    
+    /// Identifies what kind of resource this is. Value: the fixed string "androidenterprise#productPermissions".
     pub kind: Option<String>,
-    /// The permissions required by the app.    
+    /// The permissions required by the app.
     pub permission: Option<Vec<ProductPermission>>,
-    /// The ID of the app that the permissions relate to, e.g. "app:com.google.android.gm".    
+    /// The ID of the app that the permissions relate to, e.g. "app:com.google.android.gm".
     #[serde(alias="productId")]
     pub product_id: Option<String>,
 }
@@ -712,9 +718,9 @@ impl ResponseResult for ProductPermissions {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct DeviceState {
-    /// Identifies what kind of resource this is. Value: the fixed string "androidenterprise#deviceState".    
+    /// Identifies what kind of resource this is. Value: the fixed string "androidenterprise#deviceState".
     pub kind: Option<String>,
-    /// The state of the Google account on the device. "enabled" indicates that the Google account on the device can be used to access Google services (including Google Play), while "disabled" means that it cannot. A new device is initially in the "disabled" state.    
+    /// The state of the Google account on the device. "enabled" indicates that the Google account on the device can be used to access Google services (including Google Play), while "disabled" means that it cannot. A new device is initially in the "disabled" state.
     #[serde(alias="accountState")]
     pub account_state: Option<String>,
 }
@@ -731,10 +737,10 @@ impl ResponseResult for DeviceState {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ProductPermission {
-    /// An opaque string uniquely identifying the permission.    
+    /// An opaque string uniquely identifying the permission.
     #[serde(alias="permissionId")]
     pub permission_id: String,
-    /// Whether the permission has been accepted or not.    
+    /// Whether the permission has been accepted or not.
     pub state: String,
 }
 
@@ -757,20 +763,20 @@ impl Part for ProductPermission {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct Product {
-    /// A link to an image that can be used as an icon for the product.    
+    /// A link to an image that can be used as an icon for the product.
     #[serde(alias="iconUrl")]
     pub icon_url: String,
-    /// Identifies what kind of resource this is. Value: the fixed string "androidenterprise#product".    
+    /// Identifies what kind of resource this is. Value: the fixed string "androidenterprise#product".
     pub kind: String,
-    /// The name of the product.    
+    /// The name of the product.
     pub title: String,
-    /// A link to the (consumer) Google Play details page for the product.    
+    /// A link to the (consumer) Google Play details page for the product.
     #[serde(alias="detailsUrl")]
     pub details_url: String,
-    /// A link to the Google Play for Work details page for the product, for use by an Enterprise administrator.    
+    /// A link to the Google Play for Work details page for the product, for use by an Enterprise administrator.
     #[serde(alias="workDetailsUrl")]
     pub work_details_url: String,
-    /// The name of the author of the product (e.g. the app developer).    
+    /// The name of the author of the product (e.g. the app developer).
     #[serde(alias="authorName")]
     pub author_name: String,
     /// A string of the form "app:
@@ -796,14 +802,14 @@ impl ResponseResult for Product {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct Permission {
-    /// An opaque string uniquely identifying the permission.    
+    /// An opaque string uniquely identifying the permission.
     #[serde(alias="permissionId")]
     pub permission_id: String,
-    /// A longer description of the permissions giving more details of what it affects.    
+    /// A longer description of the permissions giving more details of what it affects.
     pub description: String,
-    /// Identifies what kind of resource this is. Value: the fixed string "androidenterprise#permission".    
+    /// Identifies what kind of resource this is. Value: the fixed string "androidenterprise#permission".
     pub kind: String,
-    /// The name of the permission.    
+    /// The name of the permission.
     pub name: String,
 }
 
@@ -822,9 +828,9 @@ impl ResponseResult for Permission {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct EntitlementsListResponse {
-    /// Identifies what kind of resource this is. Value: the fixed string "androidenterprise#entitlementsListResponse".    
+    /// Identifies what kind of resource this is. Value: the fixed string "androidenterprise#entitlementsListResponse".
     pub kind: String,
-    /// An entitlement of a user to a product (e.g. an app). For example, a free app that they have installed, or a paid app that they have been allocated a license to.    
+    /// An entitlement of a user to a product (e.g. an app). For example, a free app that they have installed, or a paid app that they have been allocated a license to.
     pub entitlement: Vec<Entitlement>,
 }
 
@@ -842,9 +848,9 @@ impl ResponseResult for EntitlementsListResponse {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct UsersListResponse {
-    /// Identifies what kind of resource this is. Value: the fixed string "androidenterprise#usersListResponse".    
+    /// Identifies what kind of resource this is. Value: the fixed string "androidenterprise#usersListResponse".
     pub kind: String,
-    /// A user of an enterprise.    
+    /// A user of an enterprise.
     pub user: Vec<User>,
 }
 
@@ -869,16 +875,16 @@ impl ResponseResult for UsersListResponse {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Collection {
-    /// Identifies what kind of resource this is. Value: the fixed string "androidenterprise#collection".    
+    /// Identifies what kind of resource this is. Value: the fixed string "androidenterprise#collection".
     pub kind: Option<String>,
-    /// Arbitrary unique ID, allocated by the API on creation.    
+    /// Arbitrary unique ID, allocated by the API on creation.
     #[serde(alias="collectionId")]
     pub collection_id: Option<String>,
-    /// A user-friendly name for the collection (should be unique), e.g. "Accounting apps".    
+    /// A user-friendly name for the collection (should be unique), e.g. "Accounting apps".
     pub name: Option<String>,
-    /// Whether this collection is visible to all users, or only to the users that have been granted access through the collection_viewers api. Even if a collection is visible to allUsers, it is possible to add and remove viewers, but this will have no effect until the collection's visibility changes to viewersOnly.    
+    /// Whether this collection is visible to all users, or only to the users that have been granted access through the collection_viewers api. Even if a collection is visible to allUsers, it is possible to add and remove viewers, but this will have no effect until the collection's visibility changes to viewersOnly.
     pub visibility: Option<String>,
-    /// The IDs of the products in the collection, in the order in which they should be displayed.    
+    /// The IDs of the products in the collection, in the order in which they should be displayed.
     #[serde(alias="productId")]
     pub product_id: Option<Vec<String>>,
 }
@@ -899,9 +905,9 @@ impl ResponseResult for Collection {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct CollectionsListResponse {
-    /// Identifies what kind of resource this is. Value: the fixed string "androidenterprise#collectionsListResponse".    
+    /// Identifies what kind of resource this is. Value: the fixed string "androidenterprise#collectionsListResponse".
     pub kind: String,
-    /// An ordered collection of products which can be made visible on the Google Play Store app to a selected group of users.    
+    /// An ordered collection of products which can be made visible on the Google Play Store app to a selected group of users.
     pub collection: Vec<Collection>,
 }
 
@@ -929,12 +935,12 @@ impl ResponseResult for CollectionsListResponse {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct User {
-    /// Identifies what kind of resource this is. Value: the fixed string "androidenterprise#user".    
+    /// Identifies what kind of resource this is. Value: the fixed string "androidenterprise#user".
     pub kind: Option<String>,
-    /// The user's primary email, e.g. "jsmith@example.com".    
+    /// The user's primary email, e.g. "jsmith@example.com".
     #[serde(alias="primaryEmail")]
     pub primary_email: Option<String>,
-    /// The unique ID for the user.    
+    /// The unique ID for the user.
     pub id: Option<String>,
 }
 
@@ -954,9 +960,9 @@ impl ResponseResult for User {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct GroupLicenseUsersListResponse {
-    /// Identifies what kind of resource this is. Value: the fixed string "androidenterprise#groupLicenseUsersListResponse".    
+    /// Identifies what kind of resource this is. Value: the fixed string "androidenterprise#groupLicenseUsersListResponse".
     pub kind: String,
-    /// A user of an enterprise.    
+    /// A user of an enterprise.
     pub user: Vec<User>,
 }
 
@@ -974,9 +980,9 @@ impl ResponseResult for GroupLicenseUsersListResponse {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct EnterpriseAccount {
-    /// Identifies what kind of resource this is. Value: the fixed string "androidenterprise#enterpriseAccount".    
+    /// Identifies what kind of resource this is. Value: the fixed string "androidenterprise#enterpriseAccount".
     pub kind: Option<String>,
-    /// The email address of the service account.    
+    /// The email address of the service account.
     #[serde(alias="accountEmail")]
     pub account_email: Option<String>,
 }
@@ -1001,9 +1007,9 @@ impl ResponseResult for EnterpriseAccount {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct Device {
-    /// Identifies what kind of resource this is. Value: the fixed string "androidenterprise#device".    
+    /// Identifies what kind of resource this is. Value: the fixed string "androidenterprise#device".
     pub kind: String,
-    /// The Google Play Services Android ID for the device encoded as a lowercase hex string, e.g. "123456789abcdef0".    
+    /// The Google Play Services Android ID for the device encoded as a lowercase hex string, e.g. "123456789abcdef0".
     #[serde(alias="androidId")]
     pub android_id: String,
 }
@@ -1027,20 +1033,20 @@ impl ResponseResult for Device {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct GroupLicense {
-    /// Identifies what kind of resource this is. Value: the fixed string "androidenterprise#groupLicense".    
+    /// Identifies what kind of resource this is. Value: the fixed string "androidenterprise#groupLicense".
     pub kind: String,
-    /// The number of purchased licenses (possibly in multiple purchases). If this field is omitted then there is no limit on the number of licenses that can be provisioned (e.g. if the acquisition kind is "free").    
+    /// The number of purchased licenses (possibly in multiple purchases). If this field is omitted then there is no limit on the number of licenses that can be provisioned (e.g. if the acquisition kind is "free").
     #[serde(alias="numPurchased")]
     pub num_purchased: i32,
-    /// The total number of provisioned licenses for this product. Returned by read operations, but ignored in write operations.    
+    /// The total number of provisioned licenses for this product. Returned by read operations, but ignored in write operations.
     #[serde(alias="numProvisioned")]
     pub num_provisioned: i32,
-    /// How this group license was acquired. "bulkPurchase" means that this group license object was created because the enterprise purchased licenses for this product; this is "free" otherwise (for free products).    
+    /// How this group license was acquired. "bulkPurchase" means that this group license object was created because the enterprise purchased licenses for this product; this is "free" otherwise (for free products).
     #[serde(alias="acquisitionKind")]
     pub acquisition_kind: String,
-    /// Whether the product to which this group license relates is currently approved by the enterprise, as either "approved" or "unapproved". Products are approved when a group license is first created, but this approval may be revoked by an enterprise admin via Google Play. Unapproved products will not be visible to end users in collections and new entitlements to them should not normally be created.    
+    /// Whether the product to which this group license relates is currently approved by the enterprise, as either "approved" or "unapproved". Products are approved when a group license is first created, but this approval may be revoked by an enterprise admin via Google Play. Unapproved products will not be visible to end users in collections and new entitlements to them should not normally be created.
     pub approval: String,
-    /// The ID of the product that the license is for, e.g. "app:com.google.android.gm".    
+    /// The ID of the product that the license is for, e.g. "app:com.google.android.gm".
     #[serde(alias="productId")]
     pub product_id: String,
 }
@@ -1060,10 +1066,10 @@ impl ResponseResult for GroupLicense {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct GroupLicensesListResponse {
-    /// A group license for a product approved for use in the enterprise.    
+    /// A group license for a product approved for use in the enterprise.
     #[serde(alias="groupLicense")]
     pub group_license: Vec<GroupLicense>,
-    /// Identifies what kind of resource this is. Value: the fixed string "androidenterprise#groupLicensesListResponse".    
+    /// Identifies what kind of resource this is. Value: the fixed string "androidenterprise#groupLicensesListResponse".
     pub kind: String,
 }
 
@@ -1109,13 +1115,19 @@ pub struct CollectionviewerMethods<'a, C, NC, A>
     hub: &'a AndroidEnterprise<C, NC, A>,
 }
 
-impl<'a, C, NC, A> ResourceMethodsBuilder for CollectionviewerMethods<'a, C, NC, A> {}
+impl<'a, C, NC, A> MethodsBuilder for CollectionviewerMethods<'a, C, NC, A> {}
 
 impl<'a, C, NC, A> CollectionviewerMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Removes the user from the list of those specifically allowed to see the collection. If the collection's visibility is set to viewersOnly then only such users will see the collection.    
+    /// Removes the user from the list of those specifically allowed to see the collection. If the collection's visibility is set to viewersOnly then only such users will see the collection.
+    /// 
+    /// # Arguments
+    ///
+    /// * `enterpriseId` - The ID of the enterprise.
+    /// * `collectionId` - The ID of the collection.
+    /// * `userId` - The ID of the user.
     pub fn delete(&self, enterprise_id: &str, collection_id: &str, user_id: &str) -> CollectionviewerDeleteCall<'a, C, NC, A> {
         CollectionviewerDeleteCall {
             hub: self.hub,
@@ -1130,7 +1142,14 @@ impl<'a, C, NC, A> CollectionviewerMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Adds the user to the list of those specifically allowed to see the collection. If the collection's visibility is set to viewersOnly then only such users will see the collection. This method supports patch semantics.    
+    /// Adds the user to the list of those specifically allowed to see the collection. If the collection's visibility is set to viewersOnly then only such users will see the collection. This method supports patch semantics.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `enterpriseId` - The ID of the enterprise.
+    /// * `collectionId` - The ID of the collection.
+    /// * `userId` - The ID of the user.
     pub fn patch(&self, request: &User, enterprise_id: &str, collection_id: &str, user_id: &str) -> CollectionviewerPatchCall<'a, C, NC, A> {
         CollectionviewerPatchCall {
             hub: self.hub,
@@ -1146,7 +1165,13 @@ impl<'a, C, NC, A> CollectionviewerMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Retrieves the ID of the user if they have been specifically allowed to see the collection. If the collection's visibility is set to viewersOnly then only these users will see the collection.    
+    /// Retrieves the ID of the user if they have been specifically allowed to see the collection. If the collection's visibility is set to viewersOnly then only these users will see the collection.
+    /// 
+    /// # Arguments
+    ///
+    /// * `enterpriseId` - The ID of the enterprise.
+    /// * `collectionId` - The ID of the collection.
+    /// * `userId` - The ID of the user.
     pub fn get(&self, enterprise_id: &str, collection_id: &str, user_id: &str) -> CollectionviewerGetCall<'a, C, NC, A> {
         CollectionviewerGetCall {
             hub: self.hub,
@@ -1161,7 +1186,12 @@ impl<'a, C, NC, A> CollectionviewerMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Retrieves the IDs of the users who have been specifically allowed to see the collection. If the collection's visibility is set to viewersOnly then only these users will see the collection.    
+    /// Retrieves the IDs of the users who have been specifically allowed to see the collection. If the collection's visibility is set to viewersOnly then only these users will see the collection.
+    /// 
+    /// # Arguments
+    ///
+    /// * `enterpriseId` - The ID of the enterprise.
+    /// * `collectionId` - The ID of the collection.
     pub fn list(&self, enterprise_id: &str, collection_id: &str) -> CollectionviewerListCall<'a, C, NC, A> {
         CollectionviewerListCall {
             hub: self.hub,
@@ -1175,7 +1205,14 @@ impl<'a, C, NC, A> CollectionviewerMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Adds the user to the list of those specifically allowed to see the collection. If the collection's visibility is set to viewersOnly then only such users will see the collection.    
+    /// Adds the user to the list of those specifically allowed to see the collection. If the collection's visibility is set to viewersOnly then only such users will see the collection.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `enterpriseId` - The ID of the enterprise.
+    /// * `collectionId` - The ID of the collection.
+    /// * `userId` - The ID of the user.
     pub fn update(&self, request: &User, enterprise_id: &str, collection_id: &str, user_id: &str) -> CollectionviewerUpdateCall<'a, C, NC, A> {
         CollectionviewerUpdateCall {
             hub: self.hub,
@@ -1226,13 +1263,18 @@ pub struct UserMethods<'a, C, NC, A>
     hub: &'a AndroidEnterprise<C, NC, A>,
 }
 
-impl<'a, C, NC, A> ResourceMethodsBuilder for UserMethods<'a, C, NC, A> {}
+impl<'a, C, NC, A> MethodsBuilder for UserMethods<'a, C, NC, A> {}
 
 impl<'a, C, NC, A> UserMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Revokes a previously generated token (activation code) for the user.    
+    /// Revokes a previously generated token (activation code) for the user.
+    /// 
+    /// # Arguments
+    ///
+    /// * `enterpriseId` - The ID of the enterprise.
+    /// * `userId` - The ID of the user.
     pub fn revoke_token(&self, enterprise_id: &str, user_id: &str) -> UserRevokeTokenCall<'a, C, NC, A> {
         UserRevokeTokenCall {
             hub: self.hub,
@@ -1246,7 +1288,12 @@ impl<'a, C, NC, A> UserMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Retrieves a user's details.    
+    /// Retrieves a user's details.
+    /// 
+    /// # Arguments
+    ///
+    /// * `enterpriseId` - The ID of the enterprise.
+    /// * `userId` - The ID of the user.
     pub fn get(&self, enterprise_id: &str, user_id: &str) -> UserGetCall<'a, C, NC, A> {
         UserGetCall {
             hub: self.hub,
@@ -1260,7 +1307,12 @@ impl<'a, C, NC, A> UserMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Looks up a user by email address.    
+    /// Looks up a user by email address.
+    /// 
+    /// # Arguments
+    ///
+    /// * `enterpriseId` - The ID of the enterprise.
+    /// * `email` - The exact primary email address of the user to look up.
     pub fn list(&self, enterprise_id: &str, email: &str) -> UserListCall<'a, C, NC, A> {
         UserListCall {
             hub: self.hub,
@@ -1274,7 +1326,12 @@ impl<'a, C, NC, A> UserMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Generates a token (activation code) to allow this user to configure their work account in the Android Setup Wizard. Revokes any previously generated token.    
+    /// Generates a token (activation code) to allow this user to configure their work account in the Android Setup Wizard. Revokes any previously generated token.
+    /// 
+    /// # Arguments
+    ///
+    /// * `enterpriseId` - The ID of the enterprise.
+    /// * `userId` - The ID of the user.
     pub fn generate_token(&self, enterprise_id: &str, user_id: &str) -> UserGenerateTokenCall<'a, C, NC, A> {
         UserGenerateTokenCall {
             hub: self.hub,
@@ -1323,13 +1380,21 @@ pub struct InstallMethods<'a, C, NC, A>
     hub: &'a AndroidEnterprise<C, NC, A>,
 }
 
-impl<'a, C, NC, A> ResourceMethodsBuilder for InstallMethods<'a, C, NC, A> {}
+impl<'a, C, NC, A> MethodsBuilder for InstallMethods<'a, C, NC, A> {}
 
 impl<'a, C, NC, A> InstallMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Requests to install the latest version of an app to a device. If the app is already installed then it is updated to the latest version if necessary. This method supports patch semantics.    
+    /// Requests to install the latest version of an app to a device. If the app is already installed then it is updated to the latest version if necessary. This method supports patch semantics.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `enterpriseId` - The ID of the enterprise.
+    /// * `userId` - The ID of the user.
+    /// * `deviceId` - The Android ID of the device.
+    /// * `installId` - The ID of the product represented by the install, e.g. "app:com.google.android.gm".
     pub fn patch(&self, request: &Install, enterprise_id: &str, user_id: &str, device_id: &str, install_id: &str) -> InstallPatchCall<'a, C, NC, A> {
         InstallPatchCall {
             hub: self.hub,
@@ -1346,7 +1411,14 @@ impl<'a, C, NC, A> InstallMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Retrieves details of an installation of an app on a device.    
+    /// Retrieves details of an installation of an app on a device.
+    /// 
+    /// # Arguments
+    ///
+    /// * `enterpriseId` - The ID of the enterprise.
+    /// * `userId` - The ID of the user.
+    /// * `deviceId` - The Android ID of the device.
+    /// * `installId` - The ID of the product represented by the install, e.g. "app:com.google.android.gm".
     pub fn get(&self, enterprise_id: &str, user_id: &str, device_id: &str, install_id: &str) -> InstallGetCall<'a, C, NC, A> {
         InstallGetCall {
             hub: self.hub,
@@ -1362,7 +1434,13 @@ impl<'a, C, NC, A> InstallMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Retrieves the details of all apps installed on the specified device.    
+    /// Retrieves the details of all apps installed on the specified device.
+    /// 
+    /// # Arguments
+    ///
+    /// * `enterpriseId` - The ID of the enterprise.
+    /// * `userId` - The ID of the user.
+    /// * `deviceId` - The Android ID of the device.
     pub fn list(&self, enterprise_id: &str, user_id: &str, device_id: &str) -> InstallListCall<'a, C, NC, A> {
         InstallListCall {
             hub: self.hub,
@@ -1377,7 +1455,14 @@ impl<'a, C, NC, A> InstallMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Requests to remove an app from a device. A call to get or list will still show the app as installed on the device until it is actually removed.    
+    /// Requests to remove an app from a device. A call to get or list will still show the app as installed on the device until it is actually removed.
+    /// 
+    /// # Arguments
+    ///
+    /// * `enterpriseId` - The ID of the enterprise.
+    /// * `userId` - The ID of the user.
+    /// * `deviceId` - The Android ID of the device.
+    /// * `installId` - The ID of the product represented by the install, e.g. "app:com.google.android.gm".
     pub fn delete(&self, enterprise_id: &str, user_id: &str, device_id: &str, install_id: &str) -> InstallDeleteCall<'a, C, NC, A> {
         InstallDeleteCall {
             hub: self.hub,
@@ -1393,7 +1478,15 @@ impl<'a, C, NC, A> InstallMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Requests to install the latest version of an app to a device. If the app is already installed then it is updated to the latest version if necessary.    
+    /// Requests to install the latest version of an app to a device. If the app is already installed then it is updated to the latest version if necessary.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `enterpriseId` - The ID of the enterprise.
+    /// * `userId` - The ID of the user.
+    /// * `deviceId` - The Android ID of the device.
+    /// * `installId` - The ID of the product represented by the install, e.g. "app:com.google.android.gm".
     pub fn update(&self, request: &Install, enterprise_id: &str, user_id: &str, device_id: &str, install_id: &str) -> InstallUpdateCall<'a, C, NC, A> {
         InstallUpdateCall {
             hub: self.hub,
@@ -1445,13 +1538,20 @@ pub struct DeviceMethods<'a, C, NC, A>
     hub: &'a AndroidEnterprise<C, NC, A>,
 }
 
-impl<'a, C, NC, A> ResourceMethodsBuilder for DeviceMethods<'a, C, NC, A> {}
+impl<'a, C, NC, A> MethodsBuilder for DeviceMethods<'a, C, NC, A> {}
 
 impl<'a, C, NC, A> DeviceMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Sets whether a device is enabled or disabled for access by the user to Google services. The device state takes effect only if enforcing EMM policies on Android devices is enabled in the Google Admin Console. Otherwise, the device state is ignored and all devices are allowed access to Google services.    
+    /// Sets whether a device is enabled or disabled for access by the user to Google services. The device state takes effect only if enforcing EMM policies on Android devices is enabled in the Google Admin Console. Otherwise, the device state is ignored and all devices are allowed access to Google services.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `enterpriseId` - The ID of the enterprise.
+    /// * `userId` - The ID of the user.
+    /// * `deviceId` - The ID of the device.
     pub fn set_state(&self, request: &DeviceState, enterprise_id: &str, user_id: &str, device_id: &str) -> DeviceSetStateCall<'a, C, NC, A> {
         DeviceSetStateCall {
             hub: self.hub,
@@ -1467,7 +1567,13 @@ impl<'a, C, NC, A> DeviceMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Retrieves whether a device is enabled or disabled for access by the user to Google services. The device state takes effect only if enforcing EMM policies on Android devices is enabled in the Google Admin Console. Otherwise, the device state is ignored and all devices are allowed access to Google services.    
+    /// Retrieves whether a device is enabled or disabled for access by the user to Google services. The device state takes effect only if enforcing EMM policies on Android devices is enabled in the Google Admin Console. Otherwise, the device state is ignored and all devices are allowed access to Google services.
+    /// 
+    /// # Arguments
+    ///
+    /// * `enterpriseId` - The ID of the enterprise.
+    /// * `userId` - The ID of the user.
+    /// * `deviceId` - The ID of the device.
     pub fn get_state(&self, enterprise_id: &str, user_id: &str, device_id: &str) -> DeviceGetStateCall<'a, C, NC, A> {
         DeviceGetStateCall {
             hub: self.hub,
@@ -1482,7 +1588,12 @@ impl<'a, C, NC, A> DeviceMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Retrieves the IDs of all of a user's devices.    
+    /// Retrieves the IDs of all of a user's devices.
+    /// 
+    /// # Arguments
+    ///
+    /// * `enterpriseId` - The ID of the enterprise.
+    /// * `userId` - The ID of the user.
     pub fn list(&self, enterprise_id: &str, user_id: &str) -> DeviceListCall<'a, C, NC, A> {
         DeviceListCall {
             hub: self.hub,
@@ -1496,7 +1607,13 @@ impl<'a, C, NC, A> DeviceMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Retrieves the details of a device.    
+    /// Retrieves the details of a device.
+    /// 
+    /// # Arguments
+    ///
+    /// * `enterpriseId` - The ID of the enterprise.
+    /// * `userId` - The ID of the user.
+    /// * `deviceId` - The ID of the device.
     pub fn get(&self, enterprise_id: &str, user_id: &str, device_id: &str) -> DeviceGetCall<'a, C, NC, A> {
         DeviceGetCall {
             hub: self.hub,
@@ -1546,13 +1663,17 @@ pub struct EnterpriseMethods<'a, C, NC, A>
     hub: &'a AndroidEnterprise<C, NC, A>,
 }
 
-impl<'a, C, NC, A> ResourceMethodsBuilder for EnterpriseMethods<'a, C, NC, A> {}
+impl<'a, C, NC, A> MethodsBuilder for EnterpriseMethods<'a, C, NC, A> {}
 
 impl<'a, C, NC, A> EnterpriseMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Unenrolls an enterprise from the calling MDM.    
+    /// Unenrolls an enterprise from the calling MDM.
+    /// 
+    /// # Arguments
+    ///
+    /// * `enterpriseId` - The ID of the enterprise.
     pub fn unenroll(&self, enterprise_id: &str) -> EnterpriseUnenrollCall<'a, C, NC, A> {
         EnterpriseUnenrollCall {
             hub: self.hub,
@@ -1565,7 +1686,12 @@ impl<'a, C, NC, A> EnterpriseMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Establishes the binding between the MDM and an enterprise. This is now deprecated; use enroll instead.    
+    /// Establishes the binding between the MDM and an enterprise. This is now deprecated; use enroll instead.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `token` - The token provided by the enterprise to register the MDM.
     pub fn insert(&self, request: &Enterprise, token: &str) -> EnterpriseInsertCall<'a, C, NC, A> {
         EnterpriseInsertCall {
             hub: self.hub,
@@ -1579,7 +1705,11 @@ impl<'a, C, NC, A> EnterpriseMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Looks up an enterprise by domain name.    
+    /// Looks up an enterprise by domain name.
+    /// 
+    /// # Arguments
+    ///
+    /// * `domain` - The exact primary domain name of the enterprise to look up.
     pub fn list(&self, domain: &str) -> EnterpriseListCall<'a, C, NC, A> {
         EnterpriseListCall {
             hub: self.hub,
@@ -1592,7 +1722,11 @@ impl<'a, C, NC, A> EnterpriseMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Retrieves the name and domain of an enterprise.    
+    /// Retrieves the name and domain of an enterprise.
+    /// 
+    /// # Arguments
+    ///
+    /// * `enterpriseId` - The ID of the enterprise.
     pub fn get(&self, enterprise_id: &str) -> EnterpriseGetCall<'a, C, NC, A> {
         EnterpriseGetCall {
             hub: self.hub,
@@ -1605,7 +1739,12 @@ impl<'a, C, NC, A> EnterpriseMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Enrolls an enterprise with the calling MDM.    
+    /// Enrolls an enterprise with the calling MDM.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `token` - The token provided by the enterprise to register the MDM.
     pub fn enroll(&self, request: &Enterprise, token: &str) -> EnterpriseEnrollCall<'a, C, NC, A> {
         EnterpriseEnrollCall {
             hub: self.hub,
@@ -1619,7 +1758,12 @@ impl<'a, C, NC, A> EnterpriseMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Set the account that will be used to authenticate to the API as the enterprise.    
+    /// Set the account that will be used to authenticate to the API as the enterprise.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `enterpriseId` - The ID of the enterprise.
     pub fn set_account(&self, request: &EnterpriseAccount, enterprise_id: &str) -> EnterpriseSetAccountCall<'a, C, NC, A> {
         EnterpriseSetAccountCall {
             hub: self.hub,
@@ -1633,7 +1777,11 @@ impl<'a, C, NC, A> EnterpriseMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Deletes the binding between the MDM and enterprise. This is now deprecated; use this to unenroll customers that were previously enrolled with the 'insert' call, then enroll them again with the 'enroll' call.    
+    /// Deletes the binding between the MDM and enterprise. This is now deprecated; use this to unenroll customers that were previously enrolled with the 'insert' call, then enroll them again with the 'enroll' call.
+    /// 
+    /// # Arguments
+    ///
+    /// * `enterpriseId` - The ID of the enterprise.
     pub fn delete(&self, enterprise_id: &str) -> EnterpriseDeleteCall<'a, C, NC, A> {
         EnterpriseDeleteCall {
             hub: self.hub,
@@ -1681,13 +1829,18 @@ pub struct CollectionMethods<'a, C, NC, A>
     hub: &'a AndroidEnterprise<C, NC, A>,
 }
 
-impl<'a, C, NC, A> ResourceMethodsBuilder for CollectionMethods<'a, C, NC, A> {}
+impl<'a, C, NC, A> MethodsBuilder for CollectionMethods<'a, C, NC, A> {}
 
 impl<'a, C, NC, A> CollectionMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Creates a new collection.    
+    /// Creates a new collection.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `enterpriseId` - The ID of the enterprise.
     pub fn insert(&self, request: &Collection, enterprise_id: &str) -> CollectionInsertCall<'a, C, NC, A> {
         CollectionInsertCall {
             hub: self.hub,
@@ -1701,7 +1854,13 @@ impl<'a, C, NC, A> CollectionMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Updates a collection. This method supports patch semantics.    
+    /// Updates a collection. This method supports patch semantics.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `enterpriseId` - The ID of the enterprise.
+    /// * `collectionId` - The ID of the collection.
     pub fn patch(&self, request: &Collection, enterprise_id: &str, collection_id: &str) -> CollectionPatchCall<'a, C, NC, A> {
         CollectionPatchCall {
             hub: self.hub,
@@ -1716,7 +1875,13 @@ impl<'a, C, NC, A> CollectionMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Updates a collection.    
+    /// Updates a collection.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `enterpriseId` - The ID of the enterprise.
+    /// * `collectionId` - The ID of the collection.
     pub fn update(&self, request: &Collection, enterprise_id: &str, collection_id: &str) -> CollectionUpdateCall<'a, C, NC, A> {
         CollectionUpdateCall {
             hub: self.hub,
@@ -1731,7 +1896,11 @@ impl<'a, C, NC, A> CollectionMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Retrieves the IDs of all the collections for an enterprise.    
+    /// Retrieves the IDs of all the collections for an enterprise.
+    /// 
+    /// # Arguments
+    ///
+    /// * `enterpriseId` - The ID of the enterprise.
     pub fn list(&self, enterprise_id: &str) -> CollectionListCall<'a, C, NC, A> {
         CollectionListCall {
             hub: self.hub,
@@ -1744,7 +1913,12 @@ impl<'a, C, NC, A> CollectionMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Retrieves the details of a collection.    
+    /// Retrieves the details of a collection.
+    /// 
+    /// # Arguments
+    ///
+    /// * `enterpriseId` - The ID of the enterprise.
+    /// * `collectionId` - The ID of the collection.
     pub fn get(&self, enterprise_id: &str, collection_id: &str) -> CollectionGetCall<'a, C, NC, A> {
         CollectionGetCall {
             hub: self.hub,
@@ -1758,7 +1932,12 @@ impl<'a, C, NC, A> CollectionMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Deletes a collection.    
+    /// Deletes a collection.
+    /// 
+    /// # Arguments
+    ///
+    /// * `enterpriseId` - The ID of the enterprise.
+    /// * `collectionId` - The ID of the collection.
     pub fn delete(&self, enterprise_id: &str, collection_id: &str) -> CollectionDeleteCall<'a, C, NC, A> {
         CollectionDeleteCall {
             hub: self.hub,
@@ -1807,13 +1986,18 @@ pub struct GrouplicenseuserMethods<'a, C, NC, A>
     hub: &'a AndroidEnterprise<C, NC, A>,
 }
 
-impl<'a, C, NC, A> ResourceMethodsBuilder for GrouplicenseuserMethods<'a, C, NC, A> {}
+impl<'a, C, NC, A> MethodsBuilder for GrouplicenseuserMethods<'a, C, NC, A> {}
 
 impl<'a, C, NC, A> GrouplicenseuserMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Retrieves the IDs of the users who have been granted entitlements under the license.    
+    /// Retrieves the IDs of the users who have been granted entitlements under the license.
+    /// 
+    /// # Arguments
+    ///
+    /// * `enterpriseId` - The ID of the enterprise.
+    /// * `groupLicenseId` - The ID of the product the group license is for, e.g. "app:com.google.android.gm".
     pub fn list(&self, enterprise_id: &str, group_license_id: &str) -> GrouplicenseuserListCall<'a, C, NC, A> {
         GrouplicenseuserListCall {
             hub: self.hub,
@@ -1862,13 +2046,20 @@ pub struct EntitlementMethods<'a, C, NC, A>
     hub: &'a AndroidEnterprise<C, NC, A>,
 }
 
-impl<'a, C, NC, A> ResourceMethodsBuilder for EntitlementMethods<'a, C, NC, A> {}
+impl<'a, C, NC, A> MethodsBuilder for EntitlementMethods<'a, C, NC, A> {}
 
 impl<'a, C, NC, A> EntitlementMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Adds or updates an entitlement to an app for a user.    
+    /// Adds or updates an entitlement to an app for a user.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `enterpriseId` - The ID of the enterprise.
+    /// * `userId` - The ID of the user.
+    /// * `entitlementId` - The ID of the entitlement, e.g. "app:com.google.android.gm".
     pub fn update(&self, request: &Entitlement, enterprise_id: &str, user_id: &str, entitlement_id: &str) -> EntitlementUpdateCall<'a, C, NC, A> {
         EntitlementUpdateCall {
             hub: self.hub,
@@ -1885,7 +2076,12 @@ impl<'a, C, NC, A> EntitlementMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// List of all entitlements for the specified user. Only the ID is set.    
+    /// List of all entitlements for the specified user. Only the ID is set.
+    /// 
+    /// # Arguments
+    ///
+    /// * `enterpriseId` - The ID of the enterprise.
+    /// * `userId` - The ID of the user.
     pub fn list(&self, enterprise_id: &str, user_id: &str) -> EntitlementListCall<'a, C, NC, A> {
         EntitlementListCall {
             hub: self.hub,
@@ -1899,7 +2095,13 @@ impl<'a, C, NC, A> EntitlementMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Retrieves details of an entitlement.    
+    /// Retrieves details of an entitlement.
+    /// 
+    /// # Arguments
+    ///
+    /// * `enterpriseId` - The ID of the enterprise.
+    /// * `userId` - The ID of the user.
+    /// * `entitlementId` - The ID of the entitlement, e.g. "app:com.google.android.gm".
     pub fn get(&self, enterprise_id: &str, user_id: &str, entitlement_id: &str) -> EntitlementGetCall<'a, C, NC, A> {
         EntitlementGetCall {
             hub: self.hub,
@@ -1914,7 +2116,14 @@ impl<'a, C, NC, A> EntitlementMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Adds or updates an entitlement to an app for a user. This method supports patch semantics.    
+    /// Adds or updates an entitlement to an app for a user. This method supports patch semantics.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `enterpriseId` - The ID of the enterprise.
+    /// * `userId` - The ID of the user.
+    /// * `entitlementId` - The ID of the entitlement, e.g. "app:com.google.android.gm".
     pub fn patch(&self, request: &Entitlement, enterprise_id: &str, user_id: &str, entitlement_id: &str) -> EntitlementPatchCall<'a, C, NC, A> {
         EntitlementPatchCall {
             hub: self.hub,
@@ -1931,7 +2140,13 @@ impl<'a, C, NC, A> EntitlementMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Removes an entitlement to an app for a user and uninstalls it.    
+    /// Removes an entitlement to an app for a user and uninstalls it.
+    /// 
+    /// # Arguments
+    ///
+    /// * `enterpriseId` - The ID of the enterprise.
+    /// * `userId` - The ID of the user.
+    /// * `entitlementId` - The ID of the entitlement, e.g. "app:com.google.android.gm".
     pub fn delete(&self, enterprise_id: &str, user_id: &str, entitlement_id: &str) -> EntitlementDeleteCall<'a, C, NC, A> {
         EntitlementDeleteCall {
             hub: self.hub,
@@ -1981,13 +2196,18 @@ pub struct ProductMethods<'a, C, NC, A>
     hub: &'a AndroidEnterprise<C, NC, A>,
 }
 
-impl<'a, C, NC, A> ResourceMethodsBuilder for ProductMethods<'a, C, NC, A> {}
+impl<'a, C, NC, A> MethodsBuilder for ProductMethods<'a, C, NC, A> {}
 
 impl<'a, C, NC, A> ProductMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Retrieves the Android app permissions required by this app.    
+    /// Retrieves the Android app permissions required by this app.
+    /// 
+    /// # Arguments
+    ///
+    /// * `enterpriseId` - The ID of the enterprise.
+    /// * `productId` - The ID of the product.
     pub fn get_permissions(&self, enterprise_id: &str, product_id: &str) -> ProductGetPermissionCall<'a, C, NC, A> {
         ProductGetPermissionCall {
             hub: self.hub,
@@ -2001,7 +2221,12 @@ impl<'a, C, NC, A> ProductMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Retrieves details of a product for display to an enterprise admin.    
+    /// Retrieves details of a product for display to an enterprise admin.
+    /// 
+    /// # Arguments
+    ///
+    /// * `enterpriseId` - The ID of the enterprise.
+    /// * `productId` - The ID of the product, e.g. "app:com.google.android.gm".
     pub fn get(&self, enterprise_id: &str, product_id: &str) -> ProductGetCall<'a, C, NC, A> {
         ProductGetCall {
             hub: self.hub,
@@ -2016,7 +2241,12 @@ impl<'a, C, NC, A> ProductMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Retrieves the schema defining app restrictions configurable for this product. All products have a schema, but this may be empty if no app restrictions are defined.    
+    /// Retrieves the schema defining app restrictions configurable for this product. All products have a schema, but this may be empty if no app restrictions are defined.
+    /// 
+    /// # Arguments
+    ///
+    /// * `enterpriseId` - The ID of the enterprise.
+    /// * `productId` - The ID of the product.
     pub fn get_app_restrictions_schema(&self, enterprise_id: &str, product_id: &str) -> ProductGetAppRestrictionsSchemaCall<'a, C, NC, A> {
         ProductGetAppRestrictionsSchemaCall {
             hub: self.hub,
@@ -2031,7 +2261,13 @@ impl<'a, C, NC, A> ProductMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Updates the set of Android app permissions for this app that have been accepted by the enterprise.    
+    /// Updates the set of Android app permissions for this app that have been accepted by the enterprise.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `enterpriseId` - The ID of the enterprise.
+    /// * `productId` - The ID of the product.
     pub fn update_permissions(&self, request: &ProductPermissions, enterprise_id: &str, product_id: &str) -> ProductUpdatePermissionCall<'a, C, NC, A> {
         ProductUpdatePermissionCall {
             hub: self.hub,
@@ -2081,13 +2317,18 @@ pub struct GrouplicenseMethods<'a, C, NC, A>
     hub: &'a AndroidEnterprise<C, NC, A>,
 }
 
-impl<'a, C, NC, A> ResourceMethodsBuilder for GrouplicenseMethods<'a, C, NC, A> {}
+impl<'a, C, NC, A> MethodsBuilder for GrouplicenseMethods<'a, C, NC, A> {}
 
 impl<'a, C, NC, A> GrouplicenseMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Retrieves details of an enterprise's group license for a product.    
+    /// Retrieves details of an enterprise's group license for a product.
+    /// 
+    /// # Arguments
+    ///
+    /// * `enterpriseId` - The ID of the enterprise.
+    /// * `groupLicenseId` - The ID of the product the group license is for, e.g. "app:com.google.android.gm".
     pub fn get(&self, enterprise_id: &str, group_license_id: &str) -> GrouplicenseGetCall<'a, C, NC, A> {
         GrouplicenseGetCall {
             hub: self.hub,
@@ -2101,7 +2342,11 @@ impl<'a, C, NC, A> GrouplicenseMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Retrieves IDs of all products for which the enterprise has a group license.    
+    /// Retrieves IDs of all products for which the enterprise has a group license.
+    /// 
+    /// # Arguments
+    ///
+    /// * `enterpriseId` - The ID of the enterprise.
     pub fn list(&self, enterprise_id: &str) -> GrouplicenseListCall<'a, C, NC, A> {
         GrouplicenseListCall {
             hub: self.hub,
@@ -2149,13 +2394,17 @@ pub struct PermissionMethods<'a, C, NC, A>
     hub: &'a AndroidEnterprise<C, NC, A>,
 }
 
-impl<'a, C, NC, A> ResourceMethodsBuilder for PermissionMethods<'a, C, NC, A> {}
+impl<'a, C, NC, A> MethodsBuilder for PermissionMethods<'a, C, NC, A> {}
 
 impl<'a, C, NC, A> PermissionMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Retrieves details of an Android app permission for display to an enterprise admin.    
+    /// Retrieves details of an Android app permission for display to an enterprise admin.
+    /// 
+    /// # Arguments
+    ///
+    /// * `permissionId` - The ID of the permission.
     pub fn get(&self, permission_id: &str) -> PermissionGetCall<'a, C, NC, A> {
         PermissionGetCall {
             hub: self.hub,
@@ -2179,7 +2428,7 @@ impl<'a, C, NC, A> PermissionMethods<'a, C, NC, A> {
 /// Removes the user from the list of those specifically allowed to see the collection. If the collection's visibility is set to viewersOnly then only such users will see the collection.
 ///
 /// A builder for the *delete* method supported by a *collectionviewer* resource.
-/// It is not used directly, but through a `CollectionviewerMethods`.
+/// It is not used directly, but through a `CollectionviewerMethods` instance.
 ///
 /// # Example
 ///
@@ -2241,7 +2490,7 @@ impl<'a, C, NC, A> CollectionviewerDeleteCall<'a, C, NC, A> where NC: hyper::net
         for &field in ["enterpriseId", "collectionId", "userId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -2293,7 +2542,7 @@ impl<'a, C, NC, A> CollectionviewerDeleteCall<'a, C, NC, A> where NC: hyper::net
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -2305,7 +2554,6 @@ impl<'a, C, NC, A> CollectionviewerDeleteCall<'a, C, NC, A> where NC: hyper::net
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -2315,7 +2563,7 @@ impl<'a, C, NC, A> CollectionviewerDeleteCall<'a, C, NC, A> where NC: hyper::net
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -2326,12 +2574,12 @@ impl<'a, C, NC, A> CollectionviewerDeleteCall<'a, C, NC, A> where NC: hyper::net
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = res;
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -2343,7 +2591,7 @@ impl<'a, C, NC, A> CollectionviewerDeleteCall<'a, C, NC, A> where NC: hyper::net
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The ID of the enterprise.    
+    /// The ID of the enterprise.
     pub fn enterprise_id(mut self, new_value: &str) -> CollectionviewerDeleteCall<'a, C, NC, A> {
         self._enterprise_id = new_value.to_string();
         self
@@ -2353,7 +2601,7 @@ impl<'a, C, NC, A> CollectionviewerDeleteCall<'a, C, NC, A> where NC: hyper::net
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The ID of the collection.    
+    /// The ID of the collection.
     pub fn collection_id(mut self, new_value: &str) -> CollectionviewerDeleteCall<'a, C, NC, A> {
         self._collection_id = new_value.to_string();
         self
@@ -2363,7 +2611,7 @@ impl<'a, C, NC, A> CollectionviewerDeleteCall<'a, C, NC, A> where NC: hyper::net
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The ID of the user.    
+    /// The ID of the user.
     pub fn user_id(mut self, new_value: &str) -> CollectionviewerDeleteCall<'a, C, NC, A> {
         self._user_id = new_value.to_string();
         self
@@ -2424,7 +2672,7 @@ impl<'a, C, NC, A> CollectionviewerDeleteCall<'a, C, NC, A> where NC: hyper::net
 /// Adds the user to the list of those specifically allowed to see the collection. If the collection's visibility is set to viewersOnly then only such users will see the collection. This method supports patch semantics.
 ///
 /// A builder for the *patch* method supported by a *collectionviewer* resource.
-/// It is not used directly, but through a `CollectionviewerMethods`.
+/// It is not used directly, but through a `CollectionviewerMethods` instance.
 ///
 /// # Example
 ///
@@ -2493,7 +2741,7 @@ impl<'a, C, NC, A> CollectionviewerPatchCall<'a, C, NC, A> where NC: hyper::net:
         for &field in ["alt", "enterpriseId", "collectionId", "userId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -2550,7 +2798,7 @@ impl<'a, C, NC, A> CollectionviewerPatchCall<'a, C, NC, A> where NC: hyper::net:
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -2566,7 +2814,6 @@ impl<'a, C, NC, A> CollectionviewerPatchCall<'a, C, NC, A> where NC: hyper::net:
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -2576,7 +2823,7 @@ impl<'a, C, NC, A> CollectionviewerPatchCall<'a, C, NC, A> where NC: hyper::net:
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -2587,7 +2834,7 @@ impl<'a, C, NC, A> CollectionviewerPatchCall<'a, C, NC, A> where NC: hyper::net:
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -2596,13 +2843,13 @@ impl<'a, C, NC, A> CollectionviewerPatchCall<'a, C, NC, A> where NC: hyper::net:
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -2623,7 +2870,7 @@ impl<'a, C, NC, A> CollectionviewerPatchCall<'a, C, NC, A> where NC: hyper::net:
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The ID of the enterprise.    
+    /// The ID of the enterprise.
     pub fn enterprise_id(mut self, new_value: &str) -> CollectionviewerPatchCall<'a, C, NC, A> {
         self._enterprise_id = new_value.to_string();
         self
@@ -2633,7 +2880,7 @@ impl<'a, C, NC, A> CollectionviewerPatchCall<'a, C, NC, A> where NC: hyper::net:
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The ID of the collection.    
+    /// The ID of the collection.
     pub fn collection_id(mut self, new_value: &str) -> CollectionviewerPatchCall<'a, C, NC, A> {
         self._collection_id = new_value.to_string();
         self
@@ -2643,7 +2890,7 @@ impl<'a, C, NC, A> CollectionviewerPatchCall<'a, C, NC, A> where NC: hyper::net:
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The ID of the user.    
+    /// The ID of the user.
     pub fn user_id(mut self, new_value: &str) -> CollectionviewerPatchCall<'a, C, NC, A> {
         self._user_id = new_value.to_string();
         self
@@ -2704,7 +2951,7 @@ impl<'a, C, NC, A> CollectionviewerPatchCall<'a, C, NC, A> where NC: hyper::net:
 /// Retrieves the ID of the user if they have been specifically allowed to see the collection. If the collection's visibility is set to viewersOnly then only these users will see the collection.
 ///
 /// A builder for the *get* method supported by a *collectionviewer* resource.
-/// It is not used directly, but through a `CollectionviewerMethods`.
+/// It is not used directly, but through a `CollectionviewerMethods` instance.
 ///
 /// # Example
 ///
@@ -2766,7 +3013,7 @@ impl<'a, C, NC, A> CollectionviewerGetCall<'a, C, NC, A> where NC: hyper::net::N
         for &field in ["alt", "enterpriseId", "collectionId", "userId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -2819,7 +3066,7 @@ impl<'a, C, NC, A> CollectionviewerGetCall<'a, C, NC, A> where NC: hyper::net::N
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -2831,7 +3078,6 @@ impl<'a, C, NC, A> CollectionviewerGetCall<'a, C, NC, A> where NC: hyper::net::N
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -2841,7 +3087,7 @@ impl<'a, C, NC, A> CollectionviewerGetCall<'a, C, NC, A> where NC: hyper::net::N
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -2852,7 +3098,7 @@ impl<'a, C, NC, A> CollectionviewerGetCall<'a, C, NC, A> where NC: hyper::net::N
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -2861,13 +3107,13 @@ impl<'a, C, NC, A> CollectionviewerGetCall<'a, C, NC, A> where NC: hyper::net::N
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -2879,7 +3125,7 @@ impl<'a, C, NC, A> CollectionviewerGetCall<'a, C, NC, A> where NC: hyper::net::N
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The ID of the enterprise.    
+    /// The ID of the enterprise.
     pub fn enterprise_id(mut self, new_value: &str) -> CollectionviewerGetCall<'a, C, NC, A> {
         self._enterprise_id = new_value.to_string();
         self
@@ -2889,7 +3135,7 @@ impl<'a, C, NC, A> CollectionviewerGetCall<'a, C, NC, A> where NC: hyper::net::N
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The ID of the collection.    
+    /// The ID of the collection.
     pub fn collection_id(mut self, new_value: &str) -> CollectionviewerGetCall<'a, C, NC, A> {
         self._collection_id = new_value.to_string();
         self
@@ -2899,7 +3145,7 @@ impl<'a, C, NC, A> CollectionviewerGetCall<'a, C, NC, A> where NC: hyper::net::N
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The ID of the user.    
+    /// The ID of the user.
     pub fn user_id(mut self, new_value: &str) -> CollectionviewerGetCall<'a, C, NC, A> {
         self._user_id = new_value.to_string();
         self
@@ -2960,7 +3206,7 @@ impl<'a, C, NC, A> CollectionviewerGetCall<'a, C, NC, A> where NC: hyper::net::N
 /// Retrieves the IDs of the users who have been specifically allowed to see the collection. If the collection's visibility is set to viewersOnly then only these users will see the collection.
 ///
 /// A builder for the *list* method supported by a *collectionviewer* resource.
-/// It is not used directly, but through a `CollectionviewerMethods`.
+/// It is not used directly, but through a `CollectionviewerMethods` instance.
 ///
 /// # Example
 ///
@@ -3020,7 +3266,7 @@ impl<'a, C, NC, A> CollectionviewerListCall<'a, C, NC, A> where NC: hyper::net::
         for &field in ["alt", "enterpriseId", "collectionId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -3073,7 +3319,7 @@ impl<'a, C, NC, A> CollectionviewerListCall<'a, C, NC, A> where NC: hyper::net::
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -3085,7 +3331,6 @@ impl<'a, C, NC, A> CollectionviewerListCall<'a, C, NC, A> where NC: hyper::net::
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -3095,7 +3340,7 @@ impl<'a, C, NC, A> CollectionviewerListCall<'a, C, NC, A> where NC: hyper::net::
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -3106,7 +3351,7 @@ impl<'a, C, NC, A> CollectionviewerListCall<'a, C, NC, A> where NC: hyper::net::
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -3115,13 +3360,13 @@ impl<'a, C, NC, A> CollectionviewerListCall<'a, C, NC, A> where NC: hyper::net::
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -3133,7 +3378,7 @@ impl<'a, C, NC, A> CollectionviewerListCall<'a, C, NC, A> where NC: hyper::net::
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The ID of the enterprise.    
+    /// The ID of the enterprise.
     pub fn enterprise_id(mut self, new_value: &str) -> CollectionviewerListCall<'a, C, NC, A> {
         self._enterprise_id = new_value.to_string();
         self
@@ -3143,7 +3388,7 @@ impl<'a, C, NC, A> CollectionviewerListCall<'a, C, NC, A> where NC: hyper::net::
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The ID of the collection.    
+    /// The ID of the collection.
     pub fn collection_id(mut self, new_value: &str) -> CollectionviewerListCall<'a, C, NC, A> {
         self._collection_id = new_value.to_string();
         self
@@ -3204,7 +3449,7 @@ impl<'a, C, NC, A> CollectionviewerListCall<'a, C, NC, A> where NC: hyper::net::
 /// Adds the user to the list of those specifically allowed to see the collection. If the collection's visibility is set to viewersOnly then only such users will see the collection.
 ///
 /// A builder for the *update* method supported by a *collectionviewer* resource.
-/// It is not used directly, but through a `CollectionviewerMethods`.
+/// It is not used directly, but through a `CollectionviewerMethods` instance.
 ///
 /// # Example
 ///
@@ -3273,7 +3518,7 @@ impl<'a, C, NC, A> CollectionviewerUpdateCall<'a, C, NC, A> where NC: hyper::net
         for &field in ["alt", "enterpriseId", "collectionId", "userId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -3330,7 +3575,7 @@ impl<'a, C, NC, A> CollectionviewerUpdateCall<'a, C, NC, A> where NC: hyper::net
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -3346,7 +3591,6 @@ impl<'a, C, NC, A> CollectionviewerUpdateCall<'a, C, NC, A> where NC: hyper::net
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -3356,7 +3600,7 @@ impl<'a, C, NC, A> CollectionviewerUpdateCall<'a, C, NC, A> where NC: hyper::net
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -3367,7 +3611,7 @@ impl<'a, C, NC, A> CollectionviewerUpdateCall<'a, C, NC, A> where NC: hyper::net
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -3376,13 +3620,13 @@ impl<'a, C, NC, A> CollectionviewerUpdateCall<'a, C, NC, A> where NC: hyper::net
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -3403,7 +3647,7 @@ impl<'a, C, NC, A> CollectionviewerUpdateCall<'a, C, NC, A> where NC: hyper::net
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The ID of the enterprise.    
+    /// The ID of the enterprise.
     pub fn enterprise_id(mut self, new_value: &str) -> CollectionviewerUpdateCall<'a, C, NC, A> {
         self._enterprise_id = new_value.to_string();
         self
@@ -3413,7 +3657,7 @@ impl<'a, C, NC, A> CollectionviewerUpdateCall<'a, C, NC, A> where NC: hyper::net
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The ID of the collection.    
+    /// The ID of the collection.
     pub fn collection_id(mut self, new_value: &str) -> CollectionviewerUpdateCall<'a, C, NC, A> {
         self._collection_id = new_value.to_string();
         self
@@ -3423,7 +3667,7 @@ impl<'a, C, NC, A> CollectionviewerUpdateCall<'a, C, NC, A> where NC: hyper::net
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The ID of the user.    
+    /// The ID of the user.
     pub fn user_id(mut self, new_value: &str) -> CollectionviewerUpdateCall<'a, C, NC, A> {
         self._user_id = new_value.to_string();
         self
@@ -3484,7 +3728,7 @@ impl<'a, C, NC, A> CollectionviewerUpdateCall<'a, C, NC, A> where NC: hyper::net
 /// Revokes a previously generated token (activation code) for the user.
 ///
 /// A builder for the *revokeToken* method supported by a *user* resource.
-/// It is not used directly, but through a `UserMethods`.
+/// It is not used directly, but through a `UserMethods` instance.
 ///
 /// # Example
 ///
@@ -3544,7 +3788,7 @@ impl<'a, C, NC, A> UserRevokeTokenCall<'a, C, NC, A> where NC: hyper::net::Netwo
         for &field in ["enterpriseId", "userId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -3596,7 +3840,7 @@ impl<'a, C, NC, A> UserRevokeTokenCall<'a, C, NC, A> where NC: hyper::net::Netwo
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -3608,7 +3852,6 @@ impl<'a, C, NC, A> UserRevokeTokenCall<'a, C, NC, A> where NC: hyper::net::Netwo
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -3618,7 +3861,7 @@ impl<'a, C, NC, A> UserRevokeTokenCall<'a, C, NC, A> where NC: hyper::net::Netwo
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -3629,12 +3872,12 @@ impl<'a, C, NC, A> UserRevokeTokenCall<'a, C, NC, A> where NC: hyper::net::Netwo
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = res;
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -3646,7 +3889,7 @@ impl<'a, C, NC, A> UserRevokeTokenCall<'a, C, NC, A> where NC: hyper::net::Netwo
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The ID of the enterprise.    
+    /// The ID of the enterprise.
     pub fn enterprise_id(mut self, new_value: &str) -> UserRevokeTokenCall<'a, C, NC, A> {
         self._enterprise_id = new_value.to_string();
         self
@@ -3656,7 +3899,7 @@ impl<'a, C, NC, A> UserRevokeTokenCall<'a, C, NC, A> where NC: hyper::net::Netwo
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The ID of the user.    
+    /// The ID of the user.
     pub fn user_id(mut self, new_value: &str) -> UserRevokeTokenCall<'a, C, NC, A> {
         self._user_id = new_value.to_string();
         self
@@ -3717,7 +3960,7 @@ impl<'a, C, NC, A> UserRevokeTokenCall<'a, C, NC, A> where NC: hyper::net::Netwo
 /// Retrieves a user's details.
 ///
 /// A builder for the *get* method supported by a *user* resource.
-/// It is not used directly, but through a `UserMethods`.
+/// It is not used directly, but through a `UserMethods` instance.
 ///
 /// # Example
 ///
@@ -3777,7 +4020,7 @@ impl<'a, C, NC, A> UserGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnec
         for &field in ["alt", "enterpriseId", "userId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -3830,7 +4073,7 @@ impl<'a, C, NC, A> UserGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnec
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -3842,7 +4085,6 @@ impl<'a, C, NC, A> UserGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnec
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -3852,7 +4094,7 @@ impl<'a, C, NC, A> UserGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnec
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -3863,7 +4105,7 @@ impl<'a, C, NC, A> UserGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnec
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -3872,13 +4114,13 @@ impl<'a, C, NC, A> UserGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnec
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -3890,7 +4132,7 @@ impl<'a, C, NC, A> UserGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnec
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The ID of the enterprise.    
+    /// The ID of the enterprise.
     pub fn enterprise_id(mut self, new_value: &str) -> UserGetCall<'a, C, NC, A> {
         self._enterprise_id = new_value.to_string();
         self
@@ -3900,7 +4142,7 @@ impl<'a, C, NC, A> UserGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnec
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The ID of the user.    
+    /// The ID of the user.
     pub fn user_id(mut self, new_value: &str) -> UserGetCall<'a, C, NC, A> {
         self._user_id = new_value.to_string();
         self
@@ -3961,7 +4203,7 @@ impl<'a, C, NC, A> UserGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnec
 /// Looks up a user by email address.
 ///
 /// A builder for the *list* method supported by a *user* resource.
-/// It is not used directly, but through a `UserMethods`.
+/// It is not used directly, but through a `UserMethods` instance.
 ///
 /// # Example
 ///
@@ -4021,7 +4263,7 @@ impl<'a, C, NC, A> UserListCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
         for &field in ["alt", "enterpriseId", "email"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -4074,7 +4316,7 @@ impl<'a, C, NC, A> UserListCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -4086,7 +4328,6 @@ impl<'a, C, NC, A> UserListCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -4096,7 +4337,7 @@ impl<'a, C, NC, A> UserListCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -4107,7 +4348,7 @@ impl<'a, C, NC, A> UserListCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -4116,13 +4357,13 @@ impl<'a, C, NC, A> UserListCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -4134,7 +4375,7 @@ impl<'a, C, NC, A> UserListCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The ID of the enterprise.    
+    /// The ID of the enterprise.
     pub fn enterprise_id(mut self, new_value: &str) -> UserListCall<'a, C, NC, A> {
         self._enterprise_id = new_value.to_string();
         self
@@ -4144,7 +4385,7 @@ impl<'a, C, NC, A> UserListCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The exact primary email address of the user to look up.    
+    /// The exact primary email address of the user to look up.
     pub fn email(mut self, new_value: &str) -> UserListCall<'a, C, NC, A> {
         self._email = new_value.to_string();
         self
@@ -4205,7 +4446,7 @@ impl<'a, C, NC, A> UserListCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
 /// Generates a token (activation code) to allow this user to configure their work account in the Android Setup Wizard. Revokes any previously generated token.
 ///
 /// A builder for the *generateToken* method supported by a *user* resource.
-/// It is not used directly, but through a `UserMethods`.
+/// It is not used directly, but through a `UserMethods` instance.
 ///
 /// # Example
 ///
@@ -4265,7 +4506,7 @@ impl<'a, C, NC, A> UserGenerateTokenCall<'a, C, NC, A> where NC: hyper::net::Net
         for &field in ["alt", "enterpriseId", "userId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -4318,7 +4559,7 @@ impl<'a, C, NC, A> UserGenerateTokenCall<'a, C, NC, A> where NC: hyper::net::Net
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -4330,7 +4571,6 @@ impl<'a, C, NC, A> UserGenerateTokenCall<'a, C, NC, A> where NC: hyper::net::Net
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -4340,7 +4580,7 @@ impl<'a, C, NC, A> UserGenerateTokenCall<'a, C, NC, A> where NC: hyper::net::Net
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -4351,7 +4591,7 @@ impl<'a, C, NC, A> UserGenerateTokenCall<'a, C, NC, A> where NC: hyper::net::Net
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -4360,13 +4600,13 @@ impl<'a, C, NC, A> UserGenerateTokenCall<'a, C, NC, A> where NC: hyper::net::Net
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -4378,7 +4618,7 @@ impl<'a, C, NC, A> UserGenerateTokenCall<'a, C, NC, A> where NC: hyper::net::Net
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The ID of the enterprise.    
+    /// The ID of the enterprise.
     pub fn enterprise_id(mut self, new_value: &str) -> UserGenerateTokenCall<'a, C, NC, A> {
         self._enterprise_id = new_value.to_string();
         self
@@ -4388,7 +4628,7 @@ impl<'a, C, NC, A> UserGenerateTokenCall<'a, C, NC, A> where NC: hyper::net::Net
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The ID of the user.    
+    /// The ID of the user.
     pub fn user_id(mut self, new_value: &str) -> UserGenerateTokenCall<'a, C, NC, A> {
         self._user_id = new_value.to_string();
         self
@@ -4449,7 +4689,7 @@ impl<'a, C, NC, A> UserGenerateTokenCall<'a, C, NC, A> where NC: hyper::net::Net
 /// Requests to install the latest version of an app to a device. If the app is already installed then it is updated to the latest version if necessary. This method supports patch semantics.
 ///
 /// A builder for the *patch* method supported by a *install* resource.
-/// It is not used directly, but through a `InstallMethods`.
+/// It is not used directly, but through a `InstallMethods` instance.
 ///
 /// # Example
 ///
@@ -4520,7 +4760,7 @@ impl<'a, C, NC, A> InstallPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkC
         for &field in ["alt", "enterpriseId", "userId", "deviceId", "installId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -4577,7 +4817,7 @@ impl<'a, C, NC, A> InstallPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkC
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -4593,7 +4833,6 @@ impl<'a, C, NC, A> InstallPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkC
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -4603,7 +4842,7 @@ impl<'a, C, NC, A> InstallPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkC
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -4614,7 +4853,7 @@ impl<'a, C, NC, A> InstallPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkC
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -4623,13 +4862,13 @@ impl<'a, C, NC, A> InstallPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkC
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -4650,7 +4889,7 @@ impl<'a, C, NC, A> InstallPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The ID of the enterprise.    
+    /// The ID of the enterprise.
     pub fn enterprise_id(mut self, new_value: &str) -> InstallPatchCall<'a, C, NC, A> {
         self._enterprise_id = new_value.to_string();
         self
@@ -4660,7 +4899,7 @@ impl<'a, C, NC, A> InstallPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The ID of the user.    
+    /// The ID of the user.
     pub fn user_id(mut self, new_value: &str) -> InstallPatchCall<'a, C, NC, A> {
         self._user_id = new_value.to_string();
         self
@@ -4670,7 +4909,7 @@ impl<'a, C, NC, A> InstallPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The Android ID of the device.    
+    /// The Android ID of the device.
     pub fn device_id(mut self, new_value: &str) -> InstallPatchCall<'a, C, NC, A> {
         self._device_id = new_value.to_string();
         self
@@ -4680,7 +4919,7 @@ impl<'a, C, NC, A> InstallPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The ID of the product represented by the install, e.g. "app:com.google.android.gm".    
+    /// The ID of the product represented by the install, e.g. "app:com.google.android.gm".
     pub fn install_id(mut self, new_value: &str) -> InstallPatchCall<'a, C, NC, A> {
         self._install_id = new_value.to_string();
         self
@@ -4741,7 +4980,7 @@ impl<'a, C, NC, A> InstallPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkC
 /// Retrieves details of an installation of an app on a device.
 ///
 /// A builder for the *get* method supported by a *install* resource.
-/// It is not used directly, but through a `InstallMethods`.
+/// It is not used directly, but through a `InstallMethods` instance.
 ///
 /// # Example
 ///
@@ -4805,7 +5044,7 @@ impl<'a, C, NC, A> InstallGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
         for &field in ["alt", "enterpriseId", "userId", "deviceId", "installId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -4858,7 +5097,7 @@ impl<'a, C, NC, A> InstallGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -4870,7 +5109,6 @@ impl<'a, C, NC, A> InstallGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -4880,7 +5118,7 @@ impl<'a, C, NC, A> InstallGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -4891,7 +5129,7 @@ impl<'a, C, NC, A> InstallGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -4900,13 +5138,13 @@ impl<'a, C, NC, A> InstallGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -4918,7 +5156,7 @@ impl<'a, C, NC, A> InstallGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The ID of the enterprise.    
+    /// The ID of the enterprise.
     pub fn enterprise_id(mut self, new_value: &str) -> InstallGetCall<'a, C, NC, A> {
         self._enterprise_id = new_value.to_string();
         self
@@ -4928,7 +5166,7 @@ impl<'a, C, NC, A> InstallGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The ID of the user.    
+    /// The ID of the user.
     pub fn user_id(mut self, new_value: &str) -> InstallGetCall<'a, C, NC, A> {
         self._user_id = new_value.to_string();
         self
@@ -4938,7 +5176,7 @@ impl<'a, C, NC, A> InstallGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The Android ID of the device.    
+    /// The Android ID of the device.
     pub fn device_id(mut self, new_value: &str) -> InstallGetCall<'a, C, NC, A> {
         self._device_id = new_value.to_string();
         self
@@ -4948,7 +5186,7 @@ impl<'a, C, NC, A> InstallGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The ID of the product represented by the install, e.g. "app:com.google.android.gm".    
+    /// The ID of the product represented by the install, e.g. "app:com.google.android.gm".
     pub fn install_id(mut self, new_value: &str) -> InstallGetCall<'a, C, NC, A> {
         self._install_id = new_value.to_string();
         self
@@ -5009,7 +5247,7 @@ impl<'a, C, NC, A> InstallGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
 /// Retrieves the details of all apps installed on the specified device.
 ///
 /// A builder for the *list* method supported by a *install* resource.
-/// It is not used directly, but through a `InstallMethods`.
+/// It is not used directly, but through a `InstallMethods` instance.
 ///
 /// # Example
 ///
@@ -5071,7 +5309,7 @@ impl<'a, C, NC, A> InstallListCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
         for &field in ["alt", "enterpriseId", "userId", "deviceId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -5124,7 +5362,7 @@ impl<'a, C, NC, A> InstallListCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -5136,7 +5374,6 @@ impl<'a, C, NC, A> InstallListCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -5146,7 +5383,7 @@ impl<'a, C, NC, A> InstallListCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -5157,7 +5394,7 @@ impl<'a, C, NC, A> InstallListCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -5166,13 +5403,13 @@ impl<'a, C, NC, A> InstallListCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -5184,7 +5421,7 @@ impl<'a, C, NC, A> InstallListCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The ID of the enterprise.    
+    /// The ID of the enterprise.
     pub fn enterprise_id(mut self, new_value: &str) -> InstallListCall<'a, C, NC, A> {
         self._enterprise_id = new_value.to_string();
         self
@@ -5194,7 +5431,7 @@ impl<'a, C, NC, A> InstallListCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The ID of the user.    
+    /// The ID of the user.
     pub fn user_id(mut self, new_value: &str) -> InstallListCall<'a, C, NC, A> {
         self._user_id = new_value.to_string();
         self
@@ -5204,7 +5441,7 @@ impl<'a, C, NC, A> InstallListCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The Android ID of the device.    
+    /// The Android ID of the device.
     pub fn device_id(mut self, new_value: &str) -> InstallListCall<'a, C, NC, A> {
         self._device_id = new_value.to_string();
         self
@@ -5265,7 +5502,7 @@ impl<'a, C, NC, A> InstallListCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
 /// Requests to remove an app from a device. A call to get or list will still show the app as installed on the device until it is actually removed.
 ///
 /// A builder for the *delete* method supported by a *install* resource.
-/// It is not used directly, but through a `InstallMethods`.
+/// It is not used directly, but through a `InstallMethods` instance.
 ///
 /// # Example
 ///
@@ -5329,7 +5566,7 @@ impl<'a, C, NC, A> InstallDeleteCall<'a, C, NC, A> where NC: hyper::net::Network
         for &field in ["enterpriseId", "userId", "deviceId", "installId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -5381,7 +5618,7 @@ impl<'a, C, NC, A> InstallDeleteCall<'a, C, NC, A> where NC: hyper::net::Network
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -5393,7 +5630,6 @@ impl<'a, C, NC, A> InstallDeleteCall<'a, C, NC, A> where NC: hyper::net::Network
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -5403,7 +5639,7 @@ impl<'a, C, NC, A> InstallDeleteCall<'a, C, NC, A> where NC: hyper::net::Network
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -5414,12 +5650,12 @@ impl<'a, C, NC, A> InstallDeleteCall<'a, C, NC, A> where NC: hyper::net::Network
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = res;
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -5431,7 +5667,7 @@ impl<'a, C, NC, A> InstallDeleteCall<'a, C, NC, A> where NC: hyper::net::Network
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The ID of the enterprise.    
+    /// The ID of the enterprise.
     pub fn enterprise_id(mut self, new_value: &str) -> InstallDeleteCall<'a, C, NC, A> {
         self._enterprise_id = new_value.to_string();
         self
@@ -5441,7 +5677,7 @@ impl<'a, C, NC, A> InstallDeleteCall<'a, C, NC, A> where NC: hyper::net::Network
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The ID of the user.    
+    /// The ID of the user.
     pub fn user_id(mut self, new_value: &str) -> InstallDeleteCall<'a, C, NC, A> {
         self._user_id = new_value.to_string();
         self
@@ -5451,7 +5687,7 @@ impl<'a, C, NC, A> InstallDeleteCall<'a, C, NC, A> where NC: hyper::net::Network
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The Android ID of the device.    
+    /// The Android ID of the device.
     pub fn device_id(mut self, new_value: &str) -> InstallDeleteCall<'a, C, NC, A> {
         self._device_id = new_value.to_string();
         self
@@ -5461,7 +5697,7 @@ impl<'a, C, NC, A> InstallDeleteCall<'a, C, NC, A> where NC: hyper::net::Network
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The ID of the product represented by the install, e.g. "app:com.google.android.gm".    
+    /// The ID of the product represented by the install, e.g. "app:com.google.android.gm".
     pub fn install_id(mut self, new_value: &str) -> InstallDeleteCall<'a, C, NC, A> {
         self._install_id = new_value.to_string();
         self
@@ -5522,7 +5758,7 @@ impl<'a, C, NC, A> InstallDeleteCall<'a, C, NC, A> where NC: hyper::net::Network
 /// Requests to install the latest version of an app to a device. If the app is already installed then it is updated to the latest version if necessary.
 ///
 /// A builder for the *update* method supported by a *install* resource.
-/// It is not used directly, but through a `InstallMethods`.
+/// It is not used directly, but through a `InstallMethods` instance.
 ///
 /// # Example
 ///
@@ -5593,7 +5829,7 @@ impl<'a, C, NC, A> InstallUpdateCall<'a, C, NC, A> where NC: hyper::net::Network
         for &field in ["alt", "enterpriseId", "userId", "deviceId", "installId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -5650,7 +5886,7 @@ impl<'a, C, NC, A> InstallUpdateCall<'a, C, NC, A> where NC: hyper::net::Network
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -5666,7 +5902,6 @@ impl<'a, C, NC, A> InstallUpdateCall<'a, C, NC, A> where NC: hyper::net::Network
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -5676,7 +5911,7 @@ impl<'a, C, NC, A> InstallUpdateCall<'a, C, NC, A> where NC: hyper::net::Network
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -5687,7 +5922,7 @@ impl<'a, C, NC, A> InstallUpdateCall<'a, C, NC, A> where NC: hyper::net::Network
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -5696,13 +5931,13 @@ impl<'a, C, NC, A> InstallUpdateCall<'a, C, NC, A> where NC: hyper::net::Network
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -5723,7 +5958,7 @@ impl<'a, C, NC, A> InstallUpdateCall<'a, C, NC, A> where NC: hyper::net::Network
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The ID of the enterprise.    
+    /// The ID of the enterprise.
     pub fn enterprise_id(mut self, new_value: &str) -> InstallUpdateCall<'a, C, NC, A> {
         self._enterprise_id = new_value.to_string();
         self
@@ -5733,7 +5968,7 @@ impl<'a, C, NC, A> InstallUpdateCall<'a, C, NC, A> where NC: hyper::net::Network
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The ID of the user.    
+    /// The ID of the user.
     pub fn user_id(mut self, new_value: &str) -> InstallUpdateCall<'a, C, NC, A> {
         self._user_id = new_value.to_string();
         self
@@ -5743,7 +5978,7 @@ impl<'a, C, NC, A> InstallUpdateCall<'a, C, NC, A> where NC: hyper::net::Network
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The Android ID of the device.    
+    /// The Android ID of the device.
     pub fn device_id(mut self, new_value: &str) -> InstallUpdateCall<'a, C, NC, A> {
         self._device_id = new_value.to_string();
         self
@@ -5753,7 +5988,7 @@ impl<'a, C, NC, A> InstallUpdateCall<'a, C, NC, A> where NC: hyper::net::Network
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The ID of the product represented by the install, e.g. "app:com.google.android.gm".    
+    /// The ID of the product represented by the install, e.g. "app:com.google.android.gm".
     pub fn install_id(mut self, new_value: &str) -> InstallUpdateCall<'a, C, NC, A> {
         self._install_id = new_value.to_string();
         self
@@ -5814,7 +6049,7 @@ impl<'a, C, NC, A> InstallUpdateCall<'a, C, NC, A> where NC: hyper::net::Network
 /// Sets whether a device is enabled or disabled for access by the user to Google services. The device state takes effect only if enforcing EMM policies on Android devices is enabled in the Google Admin Console. Otherwise, the device state is ignored and all devices are allowed access to Google services.
 ///
 /// A builder for the *setState* method supported by a *device* resource.
-/// It is not used directly, but through a `DeviceMethods`.
+/// It is not used directly, but through a `DeviceMethods` instance.
 ///
 /// # Example
 ///
@@ -5883,7 +6118,7 @@ impl<'a, C, NC, A> DeviceSetStateCall<'a, C, NC, A> where NC: hyper::net::Networ
         for &field in ["alt", "enterpriseId", "userId", "deviceId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -5940,7 +6175,7 @@ impl<'a, C, NC, A> DeviceSetStateCall<'a, C, NC, A> where NC: hyper::net::Networ
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -5956,7 +6191,6 @@ impl<'a, C, NC, A> DeviceSetStateCall<'a, C, NC, A> where NC: hyper::net::Networ
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -5966,7 +6200,7 @@ impl<'a, C, NC, A> DeviceSetStateCall<'a, C, NC, A> where NC: hyper::net::Networ
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -5977,7 +6211,7 @@ impl<'a, C, NC, A> DeviceSetStateCall<'a, C, NC, A> where NC: hyper::net::Networ
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -5986,13 +6220,13 @@ impl<'a, C, NC, A> DeviceSetStateCall<'a, C, NC, A> where NC: hyper::net::Networ
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -6013,7 +6247,7 @@ impl<'a, C, NC, A> DeviceSetStateCall<'a, C, NC, A> where NC: hyper::net::Networ
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The ID of the enterprise.    
+    /// The ID of the enterprise.
     pub fn enterprise_id(mut self, new_value: &str) -> DeviceSetStateCall<'a, C, NC, A> {
         self._enterprise_id = new_value.to_string();
         self
@@ -6023,7 +6257,7 @@ impl<'a, C, NC, A> DeviceSetStateCall<'a, C, NC, A> where NC: hyper::net::Networ
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The ID of the user.    
+    /// The ID of the user.
     pub fn user_id(mut self, new_value: &str) -> DeviceSetStateCall<'a, C, NC, A> {
         self._user_id = new_value.to_string();
         self
@@ -6033,7 +6267,7 @@ impl<'a, C, NC, A> DeviceSetStateCall<'a, C, NC, A> where NC: hyper::net::Networ
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The ID of the device.    
+    /// The ID of the device.
     pub fn device_id(mut self, new_value: &str) -> DeviceSetStateCall<'a, C, NC, A> {
         self._device_id = new_value.to_string();
         self
@@ -6094,7 +6328,7 @@ impl<'a, C, NC, A> DeviceSetStateCall<'a, C, NC, A> where NC: hyper::net::Networ
 /// Retrieves whether a device is enabled or disabled for access by the user to Google services. The device state takes effect only if enforcing EMM policies on Android devices is enabled in the Google Admin Console. Otherwise, the device state is ignored and all devices are allowed access to Google services.
 ///
 /// A builder for the *getState* method supported by a *device* resource.
-/// It is not used directly, but through a `DeviceMethods`.
+/// It is not used directly, but through a `DeviceMethods` instance.
 ///
 /// # Example
 ///
@@ -6156,7 +6390,7 @@ impl<'a, C, NC, A> DeviceGetStateCall<'a, C, NC, A> where NC: hyper::net::Networ
         for &field in ["alt", "enterpriseId", "userId", "deviceId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -6209,7 +6443,7 @@ impl<'a, C, NC, A> DeviceGetStateCall<'a, C, NC, A> where NC: hyper::net::Networ
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -6221,7 +6455,6 @@ impl<'a, C, NC, A> DeviceGetStateCall<'a, C, NC, A> where NC: hyper::net::Networ
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -6231,7 +6464,7 @@ impl<'a, C, NC, A> DeviceGetStateCall<'a, C, NC, A> where NC: hyper::net::Networ
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -6242,7 +6475,7 @@ impl<'a, C, NC, A> DeviceGetStateCall<'a, C, NC, A> where NC: hyper::net::Networ
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -6251,13 +6484,13 @@ impl<'a, C, NC, A> DeviceGetStateCall<'a, C, NC, A> where NC: hyper::net::Networ
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -6269,7 +6502,7 @@ impl<'a, C, NC, A> DeviceGetStateCall<'a, C, NC, A> where NC: hyper::net::Networ
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The ID of the enterprise.    
+    /// The ID of the enterprise.
     pub fn enterprise_id(mut self, new_value: &str) -> DeviceGetStateCall<'a, C, NC, A> {
         self._enterprise_id = new_value.to_string();
         self
@@ -6279,7 +6512,7 @@ impl<'a, C, NC, A> DeviceGetStateCall<'a, C, NC, A> where NC: hyper::net::Networ
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The ID of the user.    
+    /// The ID of the user.
     pub fn user_id(mut self, new_value: &str) -> DeviceGetStateCall<'a, C, NC, A> {
         self._user_id = new_value.to_string();
         self
@@ -6289,7 +6522,7 @@ impl<'a, C, NC, A> DeviceGetStateCall<'a, C, NC, A> where NC: hyper::net::Networ
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The ID of the device.    
+    /// The ID of the device.
     pub fn device_id(mut self, new_value: &str) -> DeviceGetStateCall<'a, C, NC, A> {
         self._device_id = new_value.to_string();
         self
@@ -6350,7 +6583,7 @@ impl<'a, C, NC, A> DeviceGetStateCall<'a, C, NC, A> where NC: hyper::net::Networ
 /// Retrieves the IDs of all of a user's devices.
 ///
 /// A builder for the *list* method supported by a *device* resource.
-/// It is not used directly, but through a `DeviceMethods`.
+/// It is not used directly, but through a `DeviceMethods` instance.
 ///
 /// # Example
 ///
@@ -6410,7 +6643,7 @@ impl<'a, C, NC, A> DeviceListCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
         for &field in ["alt", "enterpriseId", "userId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -6463,7 +6696,7 @@ impl<'a, C, NC, A> DeviceListCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -6475,7 +6708,6 @@ impl<'a, C, NC, A> DeviceListCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -6485,7 +6717,7 @@ impl<'a, C, NC, A> DeviceListCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -6496,7 +6728,7 @@ impl<'a, C, NC, A> DeviceListCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -6505,13 +6737,13 @@ impl<'a, C, NC, A> DeviceListCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -6523,7 +6755,7 @@ impl<'a, C, NC, A> DeviceListCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The ID of the enterprise.    
+    /// The ID of the enterprise.
     pub fn enterprise_id(mut self, new_value: &str) -> DeviceListCall<'a, C, NC, A> {
         self._enterprise_id = new_value.to_string();
         self
@@ -6533,7 +6765,7 @@ impl<'a, C, NC, A> DeviceListCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The ID of the user.    
+    /// The ID of the user.
     pub fn user_id(mut self, new_value: &str) -> DeviceListCall<'a, C, NC, A> {
         self._user_id = new_value.to_string();
         self
@@ -6594,7 +6826,7 @@ impl<'a, C, NC, A> DeviceListCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
 /// Retrieves the details of a device.
 ///
 /// A builder for the *get* method supported by a *device* resource.
-/// It is not used directly, but through a `DeviceMethods`.
+/// It is not used directly, but through a `DeviceMethods` instance.
 ///
 /// # Example
 ///
@@ -6656,7 +6888,7 @@ impl<'a, C, NC, A> DeviceGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
         for &field in ["alt", "enterpriseId", "userId", "deviceId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -6709,7 +6941,7 @@ impl<'a, C, NC, A> DeviceGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -6721,7 +6953,6 @@ impl<'a, C, NC, A> DeviceGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -6731,7 +6962,7 @@ impl<'a, C, NC, A> DeviceGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -6742,7 +6973,7 @@ impl<'a, C, NC, A> DeviceGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -6751,13 +6982,13 @@ impl<'a, C, NC, A> DeviceGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -6769,7 +7000,7 @@ impl<'a, C, NC, A> DeviceGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The ID of the enterprise.    
+    /// The ID of the enterprise.
     pub fn enterprise_id(mut self, new_value: &str) -> DeviceGetCall<'a, C, NC, A> {
         self._enterprise_id = new_value.to_string();
         self
@@ -6779,7 +7010,7 @@ impl<'a, C, NC, A> DeviceGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The ID of the user.    
+    /// The ID of the user.
     pub fn user_id(mut self, new_value: &str) -> DeviceGetCall<'a, C, NC, A> {
         self._user_id = new_value.to_string();
         self
@@ -6789,7 +7020,7 @@ impl<'a, C, NC, A> DeviceGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The ID of the device.    
+    /// The ID of the device.
     pub fn device_id(mut self, new_value: &str) -> DeviceGetCall<'a, C, NC, A> {
         self._device_id = new_value.to_string();
         self
@@ -6850,7 +7081,7 @@ impl<'a, C, NC, A> DeviceGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
 /// Unenrolls an enterprise from the calling MDM.
 ///
 /// A builder for the *unenroll* method supported by a *enterprise* resource.
-/// It is not used directly, but through a `EnterpriseMethods`.
+/// It is not used directly, but through a `EnterpriseMethods` instance.
 ///
 /// # Example
 ///
@@ -6908,7 +7139,7 @@ impl<'a, C, NC, A> EnterpriseUnenrollCall<'a, C, NC, A> where NC: hyper::net::Ne
         for &field in ["enterpriseId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -6960,7 +7191,7 @@ impl<'a, C, NC, A> EnterpriseUnenrollCall<'a, C, NC, A> where NC: hyper::net::Ne
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -6972,7 +7203,6 @@ impl<'a, C, NC, A> EnterpriseUnenrollCall<'a, C, NC, A> where NC: hyper::net::Ne
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -6982,7 +7212,7 @@ impl<'a, C, NC, A> EnterpriseUnenrollCall<'a, C, NC, A> where NC: hyper::net::Ne
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -6993,12 +7223,12 @@ impl<'a, C, NC, A> EnterpriseUnenrollCall<'a, C, NC, A> where NC: hyper::net::Ne
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = res;
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -7010,7 +7240,7 @@ impl<'a, C, NC, A> EnterpriseUnenrollCall<'a, C, NC, A> where NC: hyper::net::Ne
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The ID of the enterprise.    
+    /// The ID of the enterprise.
     pub fn enterprise_id(mut self, new_value: &str) -> EnterpriseUnenrollCall<'a, C, NC, A> {
         self._enterprise_id = new_value.to_string();
         self
@@ -7071,7 +7301,7 @@ impl<'a, C, NC, A> EnterpriseUnenrollCall<'a, C, NC, A> where NC: hyper::net::Ne
 /// Establishes the binding between the MDM and an enterprise. This is now deprecated; use enroll instead.
 ///
 /// A builder for the *insert* method supported by a *enterprise* resource.
-/// It is not used directly, but through a `EnterpriseMethods`.
+/// It is not used directly, but through a `EnterpriseMethods` instance.
 ///
 /// # Example
 ///
@@ -7136,7 +7366,7 @@ impl<'a, C, NC, A> EnterpriseInsertCall<'a, C, NC, A> where NC: hyper::net::Netw
         for &field in ["alt", "token"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -7169,7 +7399,7 @@ impl<'a, C, NC, A> EnterpriseInsertCall<'a, C, NC, A> where NC: hyper::net::Netw
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -7185,7 +7415,6 @@ impl<'a, C, NC, A> EnterpriseInsertCall<'a, C, NC, A> where NC: hyper::net::Netw
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -7195,7 +7424,7 @@ impl<'a, C, NC, A> EnterpriseInsertCall<'a, C, NC, A> where NC: hyper::net::Netw
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -7206,7 +7435,7 @@ impl<'a, C, NC, A> EnterpriseInsertCall<'a, C, NC, A> where NC: hyper::net::Netw
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -7215,13 +7444,13 @@ impl<'a, C, NC, A> EnterpriseInsertCall<'a, C, NC, A> where NC: hyper::net::Netw
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -7242,7 +7471,7 @@ impl<'a, C, NC, A> EnterpriseInsertCall<'a, C, NC, A> where NC: hyper::net::Netw
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The token provided by the enterprise to register the MDM.    
+    /// The token provided by the enterprise to register the MDM.
     pub fn token(mut self, new_value: &str) -> EnterpriseInsertCall<'a, C, NC, A> {
         self._token = new_value.to_string();
         self
@@ -7303,7 +7532,7 @@ impl<'a, C, NC, A> EnterpriseInsertCall<'a, C, NC, A> where NC: hyper::net::Netw
 /// Looks up an enterprise by domain name.
 ///
 /// A builder for the *list* method supported by a *enterprise* resource.
-/// It is not used directly, but through a `EnterpriseMethods`.
+/// It is not used directly, but through a `EnterpriseMethods` instance.
 ///
 /// # Example
 ///
@@ -7361,7 +7590,7 @@ impl<'a, C, NC, A> EnterpriseListCall<'a, C, NC, A> where NC: hyper::net::Networ
         for &field in ["alt", "domain"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -7390,7 +7619,7 @@ impl<'a, C, NC, A> EnterpriseListCall<'a, C, NC, A> where NC: hyper::net::Networ
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -7402,7 +7631,6 @@ impl<'a, C, NC, A> EnterpriseListCall<'a, C, NC, A> where NC: hyper::net::Networ
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -7412,7 +7640,7 @@ impl<'a, C, NC, A> EnterpriseListCall<'a, C, NC, A> where NC: hyper::net::Networ
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -7423,7 +7651,7 @@ impl<'a, C, NC, A> EnterpriseListCall<'a, C, NC, A> where NC: hyper::net::Networ
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -7432,13 +7660,13 @@ impl<'a, C, NC, A> EnterpriseListCall<'a, C, NC, A> where NC: hyper::net::Networ
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -7450,7 +7678,7 @@ impl<'a, C, NC, A> EnterpriseListCall<'a, C, NC, A> where NC: hyper::net::Networ
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The exact primary domain name of the enterprise to look up.    
+    /// The exact primary domain name of the enterprise to look up.
     pub fn domain(mut self, new_value: &str) -> EnterpriseListCall<'a, C, NC, A> {
         self._domain = new_value.to_string();
         self
@@ -7511,7 +7739,7 @@ impl<'a, C, NC, A> EnterpriseListCall<'a, C, NC, A> where NC: hyper::net::Networ
 /// Retrieves the name and domain of an enterprise.
 ///
 /// A builder for the *get* method supported by a *enterprise* resource.
-/// It is not used directly, but through a `EnterpriseMethods`.
+/// It is not used directly, but through a `EnterpriseMethods` instance.
 ///
 /// # Example
 ///
@@ -7569,7 +7797,7 @@ impl<'a, C, NC, A> EnterpriseGetCall<'a, C, NC, A> where NC: hyper::net::Network
         for &field in ["alt", "enterpriseId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -7622,7 +7850,7 @@ impl<'a, C, NC, A> EnterpriseGetCall<'a, C, NC, A> where NC: hyper::net::Network
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -7634,7 +7862,6 @@ impl<'a, C, NC, A> EnterpriseGetCall<'a, C, NC, A> where NC: hyper::net::Network
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -7644,7 +7871,7 @@ impl<'a, C, NC, A> EnterpriseGetCall<'a, C, NC, A> where NC: hyper::net::Network
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -7655,7 +7882,7 @@ impl<'a, C, NC, A> EnterpriseGetCall<'a, C, NC, A> where NC: hyper::net::Network
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -7664,13 +7891,13 @@ impl<'a, C, NC, A> EnterpriseGetCall<'a, C, NC, A> where NC: hyper::net::Network
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -7682,7 +7909,7 @@ impl<'a, C, NC, A> EnterpriseGetCall<'a, C, NC, A> where NC: hyper::net::Network
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The ID of the enterprise.    
+    /// The ID of the enterprise.
     pub fn enterprise_id(mut self, new_value: &str) -> EnterpriseGetCall<'a, C, NC, A> {
         self._enterprise_id = new_value.to_string();
         self
@@ -7743,7 +7970,7 @@ impl<'a, C, NC, A> EnterpriseGetCall<'a, C, NC, A> where NC: hyper::net::Network
 /// Enrolls an enterprise with the calling MDM.
 ///
 /// A builder for the *enroll* method supported by a *enterprise* resource.
-/// It is not used directly, but through a `EnterpriseMethods`.
+/// It is not used directly, but through a `EnterpriseMethods` instance.
 ///
 /// # Example
 ///
@@ -7808,7 +8035,7 @@ impl<'a, C, NC, A> EnterpriseEnrollCall<'a, C, NC, A> where NC: hyper::net::Netw
         for &field in ["alt", "token"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -7841,7 +8068,7 @@ impl<'a, C, NC, A> EnterpriseEnrollCall<'a, C, NC, A> where NC: hyper::net::Netw
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -7857,7 +8084,6 @@ impl<'a, C, NC, A> EnterpriseEnrollCall<'a, C, NC, A> where NC: hyper::net::Netw
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -7867,7 +8093,7 @@ impl<'a, C, NC, A> EnterpriseEnrollCall<'a, C, NC, A> where NC: hyper::net::Netw
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -7878,7 +8104,7 @@ impl<'a, C, NC, A> EnterpriseEnrollCall<'a, C, NC, A> where NC: hyper::net::Netw
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -7887,13 +8113,13 @@ impl<'a, C, NC, A> EnterpriseEnrollCall<'a, C, NC, A> where NC: hyper::net::Netw
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -7914,7 +8140,7 @@ impl<'a, C, NC, A> EnterpriseEnrollCall<'a, C, NC, A> where NC: hyper::net::Netw
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The token provided by the enterprise to register the MDM.    
+    /// The token provided by the enterprise to register the MDM.
     pub fn token(mut self, new_value: &str) -> EnterpriseEnrollCall<'a, C, NC, A> {
         self._token = new_value.to_string();
         self
@@ -7975,7 +8201,7 @@ impl<'a, C, NC, A> EnterpriseEnrollCall<'a, C, NC, A> where NC: hyper::net::Netw
 /// Set the account that will be used to authenticate to the API as the enterprise.
 ///
 /// A builder for the *setAccount* method supported by a *enterprise* resource.
-/// It is not used directly, but through a `EnterpriseMethods`.
+/// It is not used directly, but through a `EnterpriseMethods` instance.
 ///
 /// # Example
 ///
@@ -8040,7 +8266,7 @@ impl<'a, C, NC, A> EnterpriseSetAccountCall<'a, C, NC, A> where NC: hyper::net::
         for &field in ["alt", "enterpriseId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -8097,7 +8323,7 @@ impl<'a, C, NC, A> EnterpriseSetAccountCall<'a, C, NC, A> where NC: hyper::net::
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -8113,7 +8339,6 @@ impl<'a, C, NC, A> EnterpriseSetAccountCall<'a, C, NC, A> where NC: hyper::net::
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -8123,7 +8348,7 @@ impl<'a, C, NC, A> EnterpriseSetAccountCall<'a, C, NC, A> where NC: hyper::net::
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -8134,7 +8359,7 @@ impl<'a, C, NC, A> EnterpriseSetAccountCall<'a, C, NC, A> where NC: hyper::net::
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -8143,13 +8368,13 @@ impl<'a, C, NC, A> EnterpriseSetAccountCall<'a, C, NC, A> where NC: hyper::net::
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -8170,7 +8395,7 @@ impl<'a, C, NC, A> EnterpriseSetAccountCall<'a, C, NC, A> where NC: hyper::net::
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The ID of the enterprise.    
+    /// The ID of the enterprise.
     pub fn enterprise_id(mut self, new_value: &str) -> EnterpriseSetAccountCall<'a, C, NC, A> {
         self._enterprise_id = new_value.to_string();
         self
@@ -8231,7 +8456,7 @@ impl<'a, C, NC, A> EnterpriseSetAccountCall<'a, C, NC, A> where NC: hyper::net::
 /// Deletes the binding between the MDM and enterprise. This is now deprecated; use this to unenroll customers that were previously enrolled with the 'insert' call, then enroll them again with the 'enroll' call.
 ///
 /// A builder for the *delete* method supported by a *enterprise* resource.
-/// It is not used directly, but through a `EnterpriseMethods`.
+/// It is not used directly, but through a `EnterpriseMethods` instance.
 ///
 /// # Example
 ///
@@ -8289,7 +8514,7 @@ impl<'a, C, NC, A> EnterpriseDeleteCall<'a, C, NC, A> where NC: hyper::net::Netw
         for &field in ["enterpriseId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -8341,7 +8566,7 @@ impl<'a, C, NC, A> EnterpriseDeleteCall<'a, C, NC, A> where NC: hyper::net::Netw
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -8353,7 +8578,6 @@ impl<'a, C, NC, A> EnterpriseDeleteCall<'a, C, NC, A> where NC: hyper::net::Netw
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -8363,7 +8587,7 @@ impl<'a, C, NC, A> EnterpriseDeleteCall<'a, C, NC, A> where NC: hyper::net::Netw
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -8374,12 +8598,12 @@ impl<'a, C, NC, A> EnterpriseDeleteCall<'a, C, NC, A> where NC: hyper::net::Netw
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = res;
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -8391,7 +8615,7 @@ impl<'a, C, NC, A> EnterpriseDeleteCall<'a, C, NC, A> where NC: hyper::net::Netw
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The ID of the enterprise.    
+    /// The ID of the enterprise.
     pub fn enterprise_id(mut self, new_value: &str) -> EnterpriseDeleteCall<'a, C, NC, A> {
         self._enterprise_id = new_value.to_string();
         self
@@ -8452,7 +8676,7 @@ impl<'a, C, NC, A> EnterpriseDeleteCall<'a, C, NC, A> where NC: hyper::net::Netw
 /// Creates a new collection.
 ///
 /// A builder for the *insert* method supported by a *collection* resource.
-/// It is not used directly, but through a `CollectionMethods`.
+/// It is not used directly, but through a `CollectionMethods` instance.
 ///
 /// # Example
 ///
@@ -8517,7 +8741,7 @@ impl<'a, C, NC, A> CollectionInsertCall<'a, C, NC, A> where NC: hyper::net::Netw
         for &field in ["alt", "enterpriseId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -8574,7 +8798,7 @@ impl<'a, C, NC, A> CollectionInsertCall<'a, C, NC, A> where NC: hyper::net::Netw
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -8590,7 +8814,6 @@ impl<'a, C, NC, A> CollectionInsertCall<'a, C, NC, A> where NC: hyper::net::Netw
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -8600,7 +8823,7 @@ impl<'a, C, NC, A> CollectionInsertCall<'a, C, NC, A> where NC: hyper::net::Netw
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -8611,7 +8834,7 @@ impl<'a, C, NC, A> CollectionInsertCall<'a, C, NC, A> where NC: hyper::net::Netw
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -8620,13 +8843,13 @@ impl<'a, C, NC, A> CollectionInsertCall<'a, C, NC, A> where NC: hyper::net::Netw
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -8647,7 +8870,7 @@ impl<'a, C, NC, A> CollectionInsertCall<'a, C, NC, A> where NC: hyper::net::Netw
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The ID of the enterprise.    
+    /// The ID of the enterprise.
     pub fn enterprise_id(mut self, new_value: &str) -> CollectionInsertCall<'a, C, NC, A> {
         self._enterprise_id = new_value.to_string();
         self
@@ -8708,7 +8931,7 @@ impl<'a, C, NC, A> CollectionInsertCall<'a, C, NC, A> where NC: hyper::net::Netw
 /// Updates a collection. This method supports patch semantics.
 ///
 /// A builder for the *patch* method supported by a *collection* resource.
-/// It is not used directly, but through a `CollectionMethods`.
+/// It is not used directly, but through a `CollectionMethods` instance.
 ///
 /// # Example
 ///
@@ -8775,7 +8998,7 @@ impl<'a, C, NC, A> CollectionPatchCall<'a, C, NC, A> where NC: hyper::net::Netwo
         for &field in ["alt", "enterpriseId", "collectionId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -8832,7 +9055,7 @@ impl<'a, C, NC, A> CollectionPatchCall<'a, C, NC, A> where NC: hyper::net::Netwo
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -8848,7 +9071,6 @@ impl<'a, C, NC, A> CollectionPatchCall<'a, C, NC, A> where NC: hyper::net::Netwo
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -8858,7 +9080,7 @@ impl<'a, C, NC, A> CollectionPatchCall<'a, C, NC, A> where NC: hyper::net::Netwo
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -8869,7 +9091,7 @@ impl<'a, C, NC, A> CollectionPatchCall<'a, C, NC, A> where NC: hyper::net::Netwo
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -8878,13 +9100,13 @@ impl<'a, C, NC, A> CollectionPatchCall<'a, C, NC, A> where NC: hyper::net::Netwo
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -8905,7 +9127,7 @@ impl<'a, C, NC, A> CollectionPatchCall<'a, C, NC, A> where NC: hyper::net::Netwo
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The ID of the enterprise.    
+    /// The ID of the enterprise.
     pub fn enterprise_id(mut self, new_value: &str) -> CollectionPatchCall<'a, C, NC, A> {
         self._enterprise_id = new_value.to_string();
         self
@@ -8915,7 +9137,7 @@ impl<'a, C, NC, A> CollectionPatchCall<'a, C, NC, A> where NC: hyper::net::Netwo
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The ID of the collection.    
+    /// The ID of the collection.
     pub fn collection_id(mut self, new_value: &str) -> CollectionPatchCall<'a, C, NC, A> {
         self._collection_id = new_value.to_string();
         self
@@ -8976,7 +9198,7 @@ impl<'a, C, NC, A> CollectionPatchCall<'a, C, NC, A> where NC: hyper::net::Netwo
 /// Updates a collection.
 ///
 /// A builder for the *update* method supported by a *collection* resource.
-/// It is not used directly, but through a `CollectionMethods`.
+/// It is not used directly, but through a `CollectionMethods` instance.
 ///
 /// # Example
 ///
@@ -9043,7 +9265,7 @@ impl<'a, C, NC, A> CollectionUpdateCall<'a, C, NC, A> where NC: hyper::net::Netw
         for &field in ["alt", "enterpriseId", "collectionId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -9100,7 +9322,7 @@ impl<'a, C, NC, A> CollectionUpdateCall<'a, C, NC, A> where NC: hyper::net::Netw
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -9116,7 +9338,6 @@ impl<'a, C, NC, A> CollectionUpdateCall<'a, C, NC, A> where NC: hyper::net::Netw
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -9126,7 +9347,7 @@ impl<'a, C, NC, A> CollectionUpdateCall<'a, C, NC, A> where NC: hyper::net::Netw
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -9137,7 +9358,7 @@ impl<'a, C, NC, A> CollectionUpdateCall<'a, C, NC, A> where NC: hyper::net::Netw
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -9146,13 +9367,13 @@ impl<'a, C, NC, A> CollectionUpdateCall<'a, C, NC, A> where NC: hyper::net::Netw
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -9173,7 +9394,7 @@ impl<'a, C, NC, A> CollectionUpdateCall<'a, C, NC, A> where NC: hyper::net::Netw
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The ID of the enterprise.    
+    /// The ID of the enterprise.
     pub fn enterprise_id(mut self, new_value: &str) -> CollectionUpdateCall<'a, C, NC, A> {
         self._enterprise_id = new_value.to_string();
         self
@@ -9183,7 +9404,7 @@ impl<'a, C, NC, A> CollectionUpdateCall<'a, C, NC, A> where NC: hyper::net::Netw
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The ID of the collection.    
+    /// The ID of the collection.
     pub fn collection_id(mut self, new_value: &str) -> CollectionUpdateCall<'a, C, NC, A> {
         self._collection_id = new_value.to_string();
         self
@@ -9244,7 +9465,7 @@ impl<'a, C, NC, A> CollectionUpdateCall<'a, C, NC, A> where NC: hyper::net::Netw
 /// Retrieves the IDs of all the collections for an enterprise.
 ///
 /// A builder for the *list* method supported by a *collection* resource.
-/// It is not used directly, but through a `CollectionMethods`.
+/// It is not used directly, but through a `CollectionMethods` instance.
 ///
 /// # Example
 ///
@@ -9302,7 +9523,7 @@ impl<'a, C, NC, A> CollectionListCall<'a, C, NC, A> where NC: hyper::net::Networ
         for &field in ["alt", "enterpriseId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -9355,7 +9576,7 @@ impl<'a, C, NC, A> CollectionListCall<'a, C, NC, A> where NC: hyper::net::Networ
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -9367,7 +9588,6 @@ impl<'a, C, NC, A> CollectionListCall<'a, C, NC, A> where NC: hyper::net::Networ
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -9377,7 +9597,7 @@ impl<'a, C, NC, A> CollectionListCall<'a, C, NC, A> where NC: hyper::net::Networ
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -9388,7 +9608,7 @@ impl<'a, C, NC, A> CollectionListCall<'a, C, NC, A> where NC: hyper::net::Networ
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -9397,13 +9617,13 @@ impl<'a, C, NC, A> CollectionListCall<'a, C, NC, A> where NC: hyper::net::Networ
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -9415,7 +9635,7 @@ impl<'a, C, NC, A> CollectionListCall<'a, C, NC, A> where NC: hyper::net::Networ
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The ID of the enterprise.    
+    /// The ID of the enterprise.
     pub fn enterprise_id(mut self, new_value: &str) -> CollectionListCall<'a, C, NC, A> {
         self._enterprise_id = new_value.to_string();
         self
@@ -9476,7 +9696,7 @@ impl<'a, C, NC, A> CollectionListCall<'a, C, NC, A> where NC: hyper::net::Networ
 /// Retrieves the details of a collection.
 ///
 /// A builder for the *get* method supported by a *collection* resource.
-/// It is not used directly, but through a `CollectionMethods`.
+/// It is not used directly, but through a `CollectionMethods` instance.
 ///
 /// # Example
 ///
@@ -9536,7 +9756,7 @@ impl<'a, C, NC, A> CollectionGetCall<'a, C, NC, A> where NC: hyper::net::Network
         for &field in ["alt", "enterpriseId", "collectionId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -9589,7 +9809,7 @@ impl<'a, C, NC, A> CollectionGetCall<'a, C, NC, A> where NC: hyper::net::Network
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -9601,7 +9821,6 @@ impl<'a, C, NC, A> CollectionGetCall<'a, C, NC, A> where NC: hyper::net::Network
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -9611,7 +9830,7 @@ impl<'a, C, NC, A> CollectionGetCall<'a, C, NC, A> where NC: hyper::net::Network
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -9622,7 +9841,7 @@ impl<'a, C, NC, A> CollectionGetCall<'a, C, NC, A> where NC: hyper::net::Network
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -9631,13 +9850,13 @@ impl<'a, C, NC, A> CollectionGetCall<'a, C, NC, A> where NC: hyper::net::Network
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -9649,7 +9868,7 @@ impl<'a, C, NC, A> CollectionGetCall<'a, C, NC, A> where NC: hyper::net::Network
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The ID of the enterprise.    
+    /// The ID of the enterprise.
     pub fn enterprise_id(mut self, new_value: &str) -> CollectionGetCall<'a, C, NC, A> {
         self._enterprise_id = new_value.to_string();
         self
@@ -9659,7 +9878,7 @@ impl<'a, C, NC, A> CollectionGetCall<'a, C, NC, A> where NC: hyper::net::Network
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The ID of the collection.    
+    /// The ID of the collection.
     pub fn collection_id(mut self, new_value: &str) -> CollectionGetCall<'a, C, NC, A> {
         self._collection_id = new_value.to_string();
         self
@@ -9720,7 +9939,7 @@ impl<'a, C, NC, A> CollectionGetCall<'a, C, NC, A> where NC: hyper::net::Network
 /// Deletes a collection.
 ///
 /// A builder for the *delete* method supported by a *collection* resource.
-/// It is not used directly, but through a `CollectionMethods`.
+/// It is not used directly, but through a `CollectionMethods` instance.
 ///
 /// # Example
 ///
@@ -9780,7 +9999,7 @@ impl<'a, C, NC, A> CollectionDeleteCall<'a, C, NC, A> where NC: hyper::net::Netw
         for &field in ["enterpriseId", "collectionId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -9832,7 +10051,7 @@ impl<'a, C, NC, A> CollectionDeleteCall<'a, C, NC, A> where NC: hyper::net::Netw
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -9844,7 +10063,6 @@ impl<'a, C, NC, A> CollectionDeleteCall<'a, C, NC, A> where NC: hyper::net::Netw
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -9854,7 +10072,7 @@ impl<'a, C, NC, A> CollectionDeleteCall<'a, C, NC, A> where NC: hyper::net::Netw
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -9865,12 +10083,12 @@ impl<'a, C, NC, A> CollectionDeleteCall<'a, C, NC, A> where NC: hyper::net::Netw
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = res;
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -9882,7 +10100,7 @@ impl<'a, C, NC, A> CollectionDeleteCall<'a, C, NC, A> where NC: hyper::net::Netw
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The ID of the enterprise.    
+    /// The ID of the enterprise.
     pub fn enterprise_id(mut self, new_value: &str) -> CollectionDeleteCall<'a, C, NC, A> {
         self._enterprise_id = new_value.to_string();
         self
@@ -9892,7 +10110,7 @@ impl<'a, C, NC, A> CollectionDeleteCall<'a, C, NC, A> where NC: hyper::net::Netw
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The ID of the collection.    
+    /// The ID of the collection.
     pub fn collection_id(mut self, new_value: &str) -> CollectionDeleteCall<'a, C, NC, A> {
         self._collection_id = new_value.to_string();
         self
@@ -9953,7 +10171,7 @@ impl<'a, C, NC, A> CollectionDeleteCall<'a, C, NC, A> where NC: hyper::net::Netw
 /// Retrieves the IDs of the users who have been granted entitlements under the license.
 ///
 /// A builder for the *list* method supported by a *grouplicenseuser* resource.
-/// It is not used directly, but through a `GrouplicenseuserMethods`.
+/// It is not used directly, but through a `GrouplicenseuserMethods` instance.
 ///
 /// # Example
 ///
@@ -10013,7 +10231,7 @@ impl<'a, C, NC, A> GrouplicenseuserListCall<'a, C, NC, A> where NC: hyper::net::
         for &field in ["alt", "enterpriseId", "groupLicenseId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -10066,7 +10284,7 @@ impl<'a, C, NC, A> GrouplicenseuserListCall<'a, C, NC, A> where NC: hyper::net::
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -10078,7 +10296,6 @@ impl<'a, C, NC, A> GrouplicenseuserListCall<'a, C, NC, A> where NC: hyper::net::
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -10088,7 +10305,7 @@ impl<'a, C, NC, A> GrouplicenseuserListCall<'a, C, NC, A> where NC: hyper::net::
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -10099,7 +10316,7 @@ impl<'a, C, NC, A> GrouplicenseuserListCall<'a, C, NC, A> where NC: hyper::net::
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -10108,13 +10325,13 @@ impl<'a, C, NC, A> GrouplicenseuserListCall<'a, C, NC, A> where NC: hyper::net::
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -10126,7 +10343,7 @@ impl<'a, C, NC, A> GrouplicenseuserListCall<'a, C, NC, A> where NC: hyper::net::
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The ID of the enterprise.    
+    /// The ID of the enterprise.
     pub fn enterprise_id(mut self, new_value: &str) -> GrouplicenseuserListCall<'a, C, NC, A> {
         self._enterprise_id = new_value.to_string();
         self
@@ -10136,7 +10353,7 @@ impl<'a, C, NC, A> GrouplicenseuserListCall<'a, C, NC, A> where NC: hyper::net::
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The ID of the product the group license is for, e.g. "app:com.google.android.gm".    
+    /// The ID of the product the group license is for, e.g. "app:com.google.android.gm".
     pub fn group_license_id(mut self, new_value: &str) -> GrouplicenseuserListCall<'a, C, NC, A> {
         self._group_license_id = new_value.to_string();
         self
@@ -10197,7 +10414,7 @@ impl<'a, C, NC, A> GrouplicenseuserListCall<'a, C, NC, A> where NC: hyper::net::
 /// Adds or updates an entitlement to an app for a user.
 ///
 /// A builder for the *update* method supported by a *entitlement* resource.
-/// It is not used directly, but through a `EntitlementMethods`.
+/// It is not used directly, but through a `EntitlementMethods` instance.
 ///
 /// # Example
 ///
@@ -10271,7 +10488,7 @@ impl<'a, C, NC, A> EntitlementUpdateCall<'a, C, NC, A> where NC: hyper::net::Net
         for &field in ["alt", "enterpriseId", "userId", "entitlementId", "install"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -10328,7 +10545,7 @@ impl<'a, C, NC, A> EntitlementUpdateCall<'a, C, NC, A> where NC: hyper::net::Net
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -10344,7 +10561,6 @@ impl<'a, C, NC, A> EntitlementUpdateCall<'a, C, NC, A> where NC: hyper::net::Net
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -10354,7 +10570,7 @@ impl<'a, C, NC, A> EntitlementUpdateCall<'a, C, NC, A> where NC: hyper::net::Net
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -10365,7 +10581,7 @@ impl<'a, C, NC, A> EntitlementUpdateCall<'a, C, NC, A> where NC: hyper::net::Net
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -10374,13 +10590,13 @@ impl<'a, C, NC, A> EntitlementUpdateCall<'a, C, NC, A> where NC: hyper::net::Net
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -10401,7 +10617,7 @@ impl<'a, C, NC, A> EntitlementUpdateCall<'a, C, NC, A> where NC: hyper::net::Net
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The ID of the enterprise.    
+    /// The ID of the enterprise.
     pub fn enterprise_id(mut self, new_value: &str) -> EntitlementUpdateCall<'a, C, NC, A> {
         self._enterprise_id = new_value.to_string();
         self
@@ -10411,7 +10627,7 @@ impl<'a, C, NC, A> EntitlementUpdateCall<'a, C, NC, A> where NC: hyper::net::Net
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The ID of the user.    
+    /// The ID of the user.
     pub fn user_id(mut self, new_value: &str) -> EntitlementUpdateCall<'a, C, NC, A> {
         self._user_id = new_value.to_string();
         self
@@ -10421,7 +10637,7 @@ impl<'a, C, NC, A> EntitlementUpdateCall<'a, C, NC, A> where NC: hyper::net::Net
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The ID of the entitlement, e.g. "app:com.google.android.gm".    
+    /// The ID of the entitlement, e.g. "app:com.google.android.gm".
     pub fn entitlement_id(mut self, new_value: &str) -> EntitlementUpdateCall<'a, C, NC, A> {
         self._entitlement_id = new_value.to_string();
         self
@@ -10429,7 +10645,7 @@ impl<'a, C, NC, A> EntitlementUpdateCall<'a, C, NC, A> where NC: hyper::net::Net
     /// Sets the *install* query property to the given value.
     ///
     /// 
-    /// Set to true to also install the product on all the user's devices where possible. Failure to install on one or more devices will not prevent this operation from returning successfully, as long as the entitlement was successfully assigned to the user.    
+    /// Set to true to also install the product on all the user's devices where possible. Failure to install on one or more devices will not prevent this operation from returning successfully, as long as the entitlement was successfully assigned to the user.
     pub fn install(mut self, new_value: bool) -> EntitlementUpdateCall<'a, C, NC, A> {
         self._install = Some(new_value);
         self
@@ -10490,7 +10706,7 @@ impl<'a, C, NC, A> EntitlementUpdateCall<'a, C, NC, A> where NC: hyper::net::Net
 /// List of all entitlements for the specified user. Only the ID is set.
 ///
 /// A builder for the *list* method supported by a *entitlement* resource.
-/// It is not used directly, but through a `EntitlementMethods`.
+/// It is not used directly, but through a `EntitlementMethods` instance.
 ///
 /// # Example
 ///
@@ -10550,7 +10766,7 @@ impl<'a, C, NC, A> EntitlementListCall<'a, C, NC, A> where NC: hyper::net::Netwo
         for &field in ["alt", "enterpriseId", "userId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -10603,7 +10819,7 @@ impl<'a, C, NC, A> EntitlementListCall<'a, C, NC, A> where NC: hyper::net::Netwo
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -10615,7 +10831,6 @@ impl<'a, C, NC, A> EntitlementListCall<'a, C, NC, A> where NC: hyper::net::Netwo
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -10625,7 +10840,7 @@ impl<'a, C, NC, A> EntitlementListCall<'a, C, NC, A> where NC: hyper::net::Netwo
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -10636,7 +10851,7 @@ impl<'a, C, NC, A> EntitlementListCall<'a, C, NC, A> where NC: hyper::net::Netwo
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -10645,13 +10860,13 @@ impl<'a, C, NC, A> EntitlementListCall<'a, C, NC, A> where NC: hyper::net::Netwo
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -10663,7 +10878,7 @@ impl<'a, C, NC, A> EntitlementListCall<'a, C, NC, A> where NC: hyper::net::Netwo
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The ID of the enterprise.    
+    /// The ID of the enterprise.
     pub fn enterprise_id(mut self, new_value: &str) -> EntitlementListCall<'a, C, NC, A> {
         self._enterprise_id = new_value.to_string();
         self
@@ -10673,7 +10888,7 @@ impl<'a, C, NC, A> EntitlementListCall<'a, C, NC, A> where NC: hyper::net::Netwo
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The ID of the user.    
+    /// The ID of the user.
     pub fn user_id(mut self, new_value: &str) -> EntitlementListCall<'a, C, NC, A> {
         self._user_id = new_value.to_string();
         self
@@ -10734,7 +10949,7 @@ impl<'a, C, NC, A> EntitlementListCall<'a, C, NC, A> where NC: hyper::net::Netwo
 /// Retrieves details of an entitlement.
 ///
 /// A builder for the *get* method supported by a *entitlement* resource.
-/// It is not used directly, but through a `EntitlementMethods`.
+/// It is not used directly, but through a `EntitlementMethods` instance.
 ///
 /// # Example
 ///
@@ -10796,7 +11011,7 @@ impl<'a, C, NC, A> EntitlementGetCall<'a, C, NC, A> where NC: hyper::net::Networ
         for &field in ["alt", "enterpriseId", "userId", "entitlementId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -10849,7 +11064,7 @@ impl<'a, C, NC, A> EntitlementGetCall<'a, C, NC, A> where NC: hyper::net::Networ
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -10861,7 +11076,6 @@ impl<'a, C, NC, A> EntitlementGetCall<'a, C, NC, A> where NC: hyper::net::Networ
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -10871,7 +11085,7 @@ impl<'a, C, NC, A> EntitlementGetCall<'a, C, NC, A> where NC: hyper::net::Networ
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -10882,7 +11096,7 @@ impl<'a, C, NC, A> EntitlementGetCall<'a, C, NC, A> where NC: hyper::net::Networ
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -10891,13 +11105,13 @@ impl<'a, C, NC, A> EntitlementGetCall<'a, C, NC, A> where NC: hyper::net::Networ
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -10909,7 +11123,7 @@ impl<'a, C, NC, A> EntitlementGetCall<'a, C, NC, A> where NC: hyper::net::Networ
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The ID of the enterprise.    
+    /// The ID of the enterprise.
     pub fn enterprise_id(mut self, new_value: &str) -> EntitlementGetCall<'a, C, NC, A> {
         self._enterprise_id = new_value.to_string();
         self
@@ -10919,7 +11133,7 @@ impl<'a, C, NC, A> EntitlementGetCall<'a, C, NC, A> where NC: hyper::net::Networ
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The ID of the user.    
+    /// The ID of the user.
     pub fn user_id(mut self, new_value: &str) -> EntitlementGetCall<'a, C, NC, A> {
         self._user_id = new_value.to_string();
         self
@@ -10929,7 +11143,7 @@ impl<'a, C, NC, A> EntitlementGetCall<'a, C, NC, A> where NC: hyper::net::Networ
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The ID of the entitlement, e.g. "app:com.google.android.gm".    
+    /// The ID of the entitlement, e.g. "app:com.google.android.gm".
     pub fn entitlement_id(mut self, new_value: &str) -> EntitlementGetCall<'a, C, NC, A> {
         self._entitlement_id = new_value.to_string();
         self
@@ -10990,7 +11204,7 @@ impl<'a, C, NC, A> EntitlementGetCall<'a, C, NC, A> where NC: hyper::net::Networ
 /// Adds or updates an entitlement to an app for a user. This method supports patch semantics.
 ///
 /// A builder for the *patch* method supported by a *entitlement* resource.
-/// It is not used directly, but through a `EntitlementMethods`.
+/// It is not used directly, but through a `EntitlementMethods` instance.
 ///
 /// # Example
 ///
@@ -11064,7 +11278,7 @@ impl<'a, C, NC, A> EntitlementPatchCall<'a, C, NC, A> where NC: hyper::net::Netw
         for &field in ["alt", "enterpriseId", "userId", "entitlementId", "install"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -11121,7 +11335,7 @@ impl<'a, C, NC, A> EntitlementPatchCall<'a, C, NC, A> where NC: hyper::net::Netw
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -11137,7 +11351,6 @@ impl<'a, C, NC, A> EntitlementPatchCall<'a, C, NC, A> where NC: hyper::net::Netw
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -11147,7 +11360,7 @@ impl<'a, C, NC, A> EntitlementPatchCall<'a, C, NC, A> where NC: hyper::net::Netw
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -11158,7 +11371,7 @@ impl<'a, C, NC, A> EntitlementPatchCall<'a, C, NC, A> where NC: hyper::net::Netw
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -11167,13 +11380,13 @@ impl<'a, C, NC, A> EntitlementPatchCall<'a, C, NC, A> where NC: hyper::net::Netw
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -11194,7 +11407,7 @@ impl<'a, C, NC, A> EntitlementPatchCall<'a, C, NC, A> where NC: hyper::net::Netw
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The ID of the enterprise.    
+    /// The ID of the enterprise.
     pub fn enterprise_id(mut self, new_value: &str) -> EntitlementPatchCall<'a, C, NC, A> {
         self._enterprise_id = new_value.to_string();
         self
@@ -11204,7 +11417,7 @@ impl<'a, C, NC, A> EntitlementPatchCall<'a, C, NC, A> where NC: hyper::net::Netw
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The ID of the user.    
+    /// The ID of the user.
     pub fn user_id(mut self, new_value: &str) -> EntitlementPatchCall<'a, C, NC, A> {
         self._user_id = new_value.to_string();
         self
@@ -11214,7 +11427,7 @@ impl<'a, C, NC, A> EntitlementPatchCall<'a, C, NC, A> where NC: hyper::net::Netw
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The ID of the entitlement, e.g. "app:com.google.android.gm".    
+    /// The ID of the entitlement, e.g. "app:com.google.android.gm".
     pub fn entitlement_id(mut self, new_value: &str) -> EntitlementPatchCall<'a, C, NC, A> {
         self._entitlement_id = new_value.to_string();
         self
@@ -11222,7 +11435,7 @@ impl<'a, C, NC, A> EntitlementPatchCall<'a, C, NC, A> where NC: hyper::net::Netw
     /// Sets the *install* query property to the given value.
     ///
     /// 
-    /// Set to true to also install the product on all the user's devices where possible. Failure to install on one or more devices will not prevent this operation from returning successfully, as long as the entitlement was successfully assigned to the user.    
+    /// Set to true to also install the product on all the user's devices where possible. Failure to install on one or more devices will not prevent this operation from returning successfully, as long as the entitlement was successfully assigned to the user.
     pub fn install(mut self, new_value: bool) -> EntitlementPatchCall<'a, C, NC, A> {
         self._install = Some(new_value);
         self
@@ -11283,7 +11496,7 @@ impl<'a, C, NC, A> EntitlementPatchCall<'a, C, NC, A> where NC: hyper::net::Netw
 /// Removes an entitlement to an app for a user and uninstalls it.
 ///
 /// A builder for the *delete* method supported by a *entitlement* resource.
-/// It is not used directly, but through a `EntitlementMethods`.
+/// It is not used directly, but through a `EntitlementMethods` instance.
 ///
 /// # Example
 ///
@@ -11345,7 +11558,7 @@ impl<'a, C, NC, A> EntitlementDeleteCall<'a, C, NC, A> where NC: hyper::net::Net
         for &field in ["enterpriseId", "userId", "entitlementId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -11397,7 +11610,7 @@ impl<'a, C, NC, A> EntitlementDeleteCall<'a, C, NC, A> where NC: hyper::net::Net
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -11409,7 +11622,6 @@ impl<'a, C, NC, A> EntitlementDeleteCall<'a, C, NC, A> where NC: hyper::net::Net
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -11419,7 +11631,7 @@ impl<'a, C, NC, A> EntitlementDeleteCall<'a, C, NC, A> where NC: hyper::net::Net
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -11430,12 +11642,12 @@ impl<'a, C, NC, A> EntitlementDeleteCall<'a, C, NC, A> where NC: hyper::net::Net
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = res;
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -11447,7 +11659,7 @@ impl<'a, C, NC, A> EntitlementDeleteCall<'a, C, NC, A> where NC: hyper::net::Net
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The ID of the enterprise.    
+    /// The ID of the enterprise.
     pub fn enterprise_id(mut self, new_value: &str) -> EntitlementDeleteCall<'a, C, NC, A> {
         self._enterprise_id = new_value.to_string();
         self
@@ -11457,7 +11669,7 @@ impl<'a, C, NC, A> EntitlementDeleteCall<'a, C, NC, A> where NC: hyper::net::Net
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The ID of the user.    
+    /// The ID of the user.
     pub fn user_id(mut self, new_value: &str) -> EntitlementDeleteCall<'a, C, NC, A> {
         self._user_id = new_value.to_string();
         self
@@ -11467,7 +11679,7 @@ impl<'a, C, NC, A> EntitlementDeleteCall<'a, C, NC, A> where NC: hyper::net::Net
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The ID of the entitlement, e.g. "app:com.google.android.gm".    
+    /// The ID of the entitlement, e.g. "app:com.google.android.gm".
     pub fn entitlement_id(mut self, new_value: &str) -> EntitlementDeleteCall<'a, C, NC, A> {
         self._entitlement_id = new_value.to_string();
         self
@@ -11528,7 +11740,7 @@ impl<'a, C, NC, A> EntitlementDeleteCall<'a, C, NC, A> where NC: hyper::net::Net
 /// Retrieves the Android app permissions required by this app.
 ///
 /// A builder for the *getPermissions* method supported by a *product* resource.
-/// It is not used directly, but through a `ProductMethods`.
+/// It is not used directly, but through a `ProductMethods` instance.
 ///
 /// # Example
 ///
@@ -11588,7 +11800,7 @@ impl<'a, C, NC, A> ProductGetPermissionCall<'a, C, NC, A> where NC: hyper::net::
         for &field in ["alt", "enterpriseId", "productId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -11641,7 +11853,7 @@ impl<'a, C, NC, A> ProductGetPermissionCall<'a, C, NC, A> where NC: hyper::net::
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -11653,7 +11865,6 @@ impl<'a, C, NC, A> ProductGetPermissionCall<'a, C, NC, A> where NC: hyper::net::
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -11663,7 +11874,7 @@ impl<'a, C, NC, A> ProductGetPermissionCall<'a, C, NC, A> where NC: hyper::net::
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -11674,7 +11885,7 @@ impl<'a, C, NC, A> ProductGetPermissionCall<'a, C, NC, A> where NC: hyper::net::
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -11683,13 +11894,13 @@ impl<'a, C, NC, A> ProductGetPermissionCall<'a, C, NC, A> where NC: hyper::net::
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -11701,7 +11912,7 @@ impl<'a, C, NC, A> ProductGetPermissionCall<'a, C, NC, A> where NC: hyper::net::
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The ID of the enterprise.    
+    /// The ID of the enterprise.
     pub fn enterprise_id(mut self, new_value: &str) -> ProductGetPermissionCall<'a, C, NC, A> {
         self._enterprise_id = new_value.to_string();
         self
@@ -11711,7 +11922,7 @@ impl<'a, C, NC, A> ProductGetPermissionCall<'a, C, NC, A> where NC: hyper::net::
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The ID of the product.    
+    /// The ID of the product.
     pub fn product_id(mut self, new_value: &str) -> ProductGetPermissionCall<'a, C, NC, A> {
         self._product_id = new_value.to_string();
         self
@@ -11772,7 +11983,7 @@ impl<'a, C, NC, A> ProductGetPermissionCall<'a, C, NC, A> where NC: hyper::net::
 /// Retrieves details of a product for display to an enterprise admin.
 ///
 /// A builder for the *get* method supported by a *product* resource.
-/// It is not used directly, but through a `ProductMethods`.
+/// It is not used directly, but through a `ProductMethods` instance.
 ///
 /// # Example
 ///
@@ -11837,7 +12048,7 @@ impl<'a, C, NC, A> ProductGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
         for &field in ["alt", "enterpriseId", "productId", "language"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -11890,7 +12101,7 @@ impl<'a, C, NC, A> ProductGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -11902,7 +12113,6 @@ impl<'a, C, NC, A> ProductGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -11912,7 +12122,7 @@ impl<'a, C, NC, A> ProductGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -11923,7 +12133,7 @@ impl<'a, C, NC, A> ProductGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -11932,13 +12142,13 @@ impl<'a, C, NC, A> ProductGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -11950,7 +12160,7 @@ impl<'a, C, NC, A> ProductGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The ID of the enterprise.    
+    /// The ID of the enterprise.
     pub fn enterprise_id(mut self, new_value: &str) -> ProductGetCall<'a, C, NC, A> {
         self._enterprise_id = new_value.to_string();
         self
@@ -11960,7 +12170,7 @@ impl<'a, C, NC, A> ProductGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The ID of the product, e.g. "app:com.google.android.gm".    
+    /// The ID of the product, e.g. "app:com.google.android.gm".
     pub fn product_id(mut self, new_value: &str) -> ProductGetCall<'a, C, NC, A> {
         self._product_id = new_value.to_string();
         self
@@ -11968,7 +12178,7 @@ impl<'a, C, NC, A> ProductGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// Sets the *language* query property to the given value.
     ///
     /// 
-    /// The BCP47 tag for the user's preferred language (e.g. "en-US", "de").    
+    /// The BCP47 tag for the user's preferred language (e.g. "en-US", "de").
     pub fn language(mut self, new_value: &str) -> ProductGetCall<'a, C, NC, A> {
         self._language = Some(new_value.to_string());
         self
@@ -12029,7 +12239,7 @@ impl<'a, C, NC, A> ProductGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
 /// Retrieves the schema defining app restrictions configurable for this product. All products have a schema, but this may be empty if no app restrictions are defined.
 ///
 /// A builder for the *getAppRestrictionsSchema* method supported by a *product* resource.
-/// It is not used directly, but through a `ProductMethods`.
+/// It is not used directly, but through a `ProductMethods` instance.
 ///
 /// # Example
 ///
@@ -12094,7 +12304,7 @@ impl<'a, C, NC, A> ProductGetAppRestrictionsSchemaCall<'a, C, NC, A> where NC: h
         for &field in ["alt", "enterpriseId", "productId", "language"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -12147,7 +12357,7 @@ impl<'a, C, NC, A> ProductGetAppRestrictionsSchemaCall<'a, C, NC, A> where NC: h
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -12159,7 +12369,6 @@ impl<'a, C, NC, A> ProductGetAppRestrictionsSchemaCall<'a, C, NC, A> where NC: h
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -12169,7 +12378,7 @@ impl<'a, C, NC, A> ProductGetAppRestrictionsSchemaCall<'a, C, NC, A> where NC: h
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -12180,7 +12389,7 @@ impl<'a, C, NC, A> ProductGetAppRestrictionsSchemaCall<'a, C, NC, A> where NC: h
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -12189,13 +12398,13 @@ impl<'a, C, NC, A> ProductGetAppRestrictionsSchemaCall<'a, C, NC, A> where NC: h
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -12207,7 +12416,7 @@ impl<'a, C, NC, A> ProductGetAppRestrictionsSchemaCall<'a, C, NC, A> where NC: h
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The ID of the enterprise.    
+    /// The ID of the enterprise.
     pub fn enterprise_id(mut self, new_value: &str) -> ProductGetAppRestrictionsSchemaCall<'a, C, NC, A> {
         self._enterprise_id = new_value.to_string();
         self
@@ -12217,7 +12426,7 @@ impl<'a, C, NC, A> ProductGetAppRestrictionsSchemaCall<'a, C, NC, A> where NC: h
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The ID of the product.    
+    /// The ID of the product.
     pub fn product_id(mut self, new_value: &str) -> ProductGetAppRestrictionsSchemaCall<'a, C, NC, A> {
         self._product_id = new_value.to_string();
         self
@@ -12225,7 +12434,7 @@ impl<'a, C, NC, A> ProductGetAppRestrictionsSchemaCall<'a, C, NC, A> where NC: h
     /// Sets the *language* query property to the given value.
     ///
     /// 
-    /// The BCP47 tag for the user's preferred language (e.g. "en-US", "de").    
+    /// The BCP47 tag for the user's preferred language (e.g. "en-US", "de").
     pub fn language(mut self, new_value: &str) -> ProductGetAppRestrictionsSchemaCall<'a, C, NC, A> {
         self._language = Some(new_value.to_string());
         self
@@ -12286,7 +12495,7 @@ impl<'a, C, NC, A> ProductGetAppRestrictionsSchemaCall<'a, C, NC, A> where NC: h
 /// Updates the set of Android app permissions for this app that have been accepted by the enterprise.
 ///
 /// A builder for the *updatePermissions* method supported by a *product* resource.
-/// It is not used directly, but through a `ProductMethods`.
+/// It is not used directly, but through a `ProductMethods` instance.
 ///
 /// # Example
 ///
@@ -12353,7 +12562,7 @@ impl<'a, C, NC, A> ProductUpdatePermissionCall<'a, C, NC, A> where NC: hyper::ne
         for &field in ["alt", "enterpriseId", "productId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -12410,7 +12619,7 @@ impl<'a, C, NC, A> ProductUpdatePermissionCall<'a, C, NC, A> where NC: hyper::ne
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -12426,7 +12635,6 @@ impl<'a, C, NC, A> ProductUpdatePermissionCall<'a, C, NC, A> where NC: hyper::ne
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -12436,7 +12644,7 @@ impl<'a, C, NC, A> ProductUpdatePermissionCall<'a, C, NC, A> where NC: hyper::ne
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -12447,7 +12655,7 @@ impl<'a, C, NC, A> ProductUpdatePermissionCall<'a, C, NC, A> where NC: hyper::ne
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -12456,13 +12664,13 @@ impl<'a, C, NC, A> ProductUpdatePermissionCall<'a, C, NC, A> where NC: hyper::ne
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -12483,7 +12691,7 @@ impl<'a, C, NC, A> ProductUpdatePermissionCall<'a, C, NC, A> where NC: hyper::ne
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The ID of the enterprise.    
+    /// The ID of the enterprise.
     pub fn enterprise_id(mut self, new_value: &str) -> ProductUpdatePermissionCall<'a, C, NC, A> {
         self._enterprise_id = new_value.to_string();
         self
@@ -12493,7 +12701,7 @@ impl<'a, C, NC, A> ProductUpdatePermissionCall<'a, C, NC, A> where NC: hyper::ne
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The ID of the product.    
+    /// The ID of the product.
     pub fn product_id(mut self, new_value: &str) -> ProductUpdatePermissionCall<'a, C, NC, A> {
         self._product_id = new_value.to_string();
         self
@@ -12554,7 +12762,7 @@ impl<'a, C, NC, A> ProductUpdatePermissionCall<'a, C, NC, A> where NC: hyper::ne
 /// Retrieves details of an enterprise's group license for a product.
 ///
 /// A builder for the *get* method supported by a *grouplicense* resource.
-/// It is not used directly, but through a `GrouplicenseMethods`.
+/// It is not used directly, but through a `GrouplicenseMethods` instance.
 ///
 /// # Example
 ///
@@ -12614,7 +12822,7 @@ impl<'a, C, NC, A> GrouplicenseGetCall<'a, C, NC, A> where NC: hyper::net::Netwo
         for &field in ["alt", "enterpriseId", "groupLicenseId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -12667,7 +12875,7 @@ impl<'a, C, NC, A> GrouplicenseGetCall<'a, C, NC, A> where NC: hyper::net::Netwo
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -12679,7 +12887,6 @@ impl<'a, C, NC, A> GrouplicenseGetCall<'a, C, NC, A> where NC: hyper::net::Netwo
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -12689,7 +12896,7 @@ impl<'a, C, NC, A> GrouplicenseGetCall<'a, C, NC, A> where NC: hyper::net::Netwo
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -12700,7 +12907,7 @@ impl<'a, C, NC, A> GrouplicenseGetCall<'a, C, NC, A> where NC: hyper::net::Netwo
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -12709,13 +12916,13 @@ impl<'a, C, NC, A> GrouplicenseGetCall<'a, C, NC, A> where NC: hyper::net::Netwo
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -12727,7 +12934,7 @@ impl<'a, C, NC, A> GrouplicenseGetCall<'a, C, NC, A> where NC: hyper::net::Netwo
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The ID of the enterprise.    
+    /// The ID of the enterprise.
     pub fn enterprise_id(mut self, new_value: &str) -> GrouplicenseGetCall<'a, C, NC, A> {
         self._enterprise_id = new_value.to_string();
         self
@@ -12737,7 +12944,7 @@ impl<'a, C, NC, A> GrouplicenseGetCall<'a, C, NC, A> where NC: hyper::net::Netwo
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The ID of the product the group license is for, e.g. "app:com.google.android.gm".    
+    /// The ID of the product the group license is for, e.g. "app:com.google.android.gm".
     pub fn group_license_id(mut self, new_value: &str) -> GrouplicenseGetCall<'a, C, NC, A> {
         self._group_license_id = new_value.to_string();
         self
@@ -12798,7 +13005,7 @@ impl<'a, C, NC, A> GrouplicenseGetCall<'a, C, NC, A> where NC: hyper::net::Netwo
 /// Retrieves IDs of all products for which the enterprise has a group license.
 ///
 /// A builder for the *list* method supported by a *grouplicense* resource.
-/// It is not used directly, but through a `GrouplicenseMethods`.
+/// It is not used directly, but through a `GrouplicenseMethods` instance.
 ///
 /// # Example
 ///
@@ -12856,7 +13063,7 @@ impl<'a, C, NC, A> GrouplicenseListCall<'a, C, NC, A> where NC: hyper::net::Netw
         for &field in ["alt", "enterpriseId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -12909,7 +13116,7 @@ impl<'a, C, NC, A> GrouplicenseListCall<'a, C, NC, A> where NC: hyper::net::Netw
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -12921,7 +13128,6 @@ impl<'a, C, NC, A> GrouplicenseListCall<'a, C, NC, A> where NC: hyper::net::Netw
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -12931,7 +13137,7 @@ impl<'a, C, NC, A> GrouplicenseListCall<'a, C, NC, A> where NC: hyper::net::Netw
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -12942,7 +13148,7 @@ impl<'a, C, NC, A> GrouplicenseListCall<'a, C, NC, A> where NC: hyper::net::Netw
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -12951,13 +13157,13 @@ impl<'a, C, NC, A> GrouplicenseListCall<'a, C, NC, A> where NC: hyper::net::Netw
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -12969,7 +13175,7 @@ impl<'a, C, NC, A> GrouplicenseListCall<'a, C, NC, A> where NC: hyper::net::Netw
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The ID of the enterprise.    
+    /// The ID of the enterprise.
     pub fn enterprise_id(mut self, new_value: &str) -> GrouplicenseListCall<'a, C, NC, A> {
         self._enterprise_id = new_value.to_string();
         self
@@ -13030,7 +13236,7 @@ impl<'a, C, NC, A> GrouplicenseListCall<'a, C, NC, A> where NC: hyper::net::Netw
 /// Retrieves details of an Android app permission for display to an enterprise admin.
 ///
 /// A builder for the *get* method supported by a *permission* resource.
-/// It is not used directly, but through a `PermissionMethods`.
+/// It is not used directly, but through a `PermissionMethods` instance.
 ///
 /// # Example
 ///
@@ -13093,7 +13299,7 @@ impl<'a, C, NC, A> PermissionGetCall<'a, C, NC, A> where NC: hyper::net::Network
         for &field in ["alt", "permissionId", "language"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -13146,7 +13352,7 @@ impl<'a, C, NC, A> PermissionGetCall<'a, C, NC, A> where NC: hyper::net::Network
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -13158,7 +13364,6 @@ impl<'a, C, NC, A> PermissionGetCall<'a, C, NC, A> where NC: hyper::net::Network
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -13168,7 +13373,7 @@ impl<'a, C, NC, A> PermissionGetCall<'a, C, NC, A> where NC: hyper::net::Network
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -13179,7 +13384,7 @@ impl<'a, C, NC, A> PermissionGetCall<'a, C, NC, A> where NC: hyper::net::Network
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -13188,13 +13393,13 @@ impl<'a, C, NC, A> PermissionGetCall<'a, C, NC, A> where NC: hyper::net::Network
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -13206,7 +13411,7 @@ impl<'a, C, NC, A> PermissionGetCall<'a, C, NC, A> where NC: hyper::net::Network
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The ID of the permission.    
+    /// The ID of the permission.
     pub fn permission_id(mut self, new_value: &str) -> PermissionGetCall<'a, C, NC, A> {
         self._permission_id = new_value.to_string();
         self
@@ -13214,7 +13419,7 @@ impl<'a, C, NC, A> PermissionGetCall<'a, C, NC, A> where NC: hyper::net::Network
     /// Sets the *language* query property to the given value.
     ///
     /// 
-    /// The BCP47 tag for the user's preferred language (e.g. "en-US", "de")    
+    /// The BCP47 tag for the user's preferred language (e.g. "en-US", "de")
     pub fn language(mut self, new_value: &str) -> PermissionGetCall<'a, C, NC, A> {
         self._language = Some(new_value.to_string());
         self

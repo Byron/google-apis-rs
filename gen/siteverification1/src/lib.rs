@@ -1,8 +1,8 @@
 // DO NOT EDIT !
-// This file was generated automatically from 'src/mako/lib.rs.mako'
+// This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *siteVerification* crate version *0.1.1+20131007*, where *20131007* is the exact revision of the *siteVerification:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.1*.
+//! This documentation was generated from *siteVerification* crate version *0.1.2+20131007*, where *20131007* is the exact revision of the *siteVerification:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.2*.
 //! 
 //! Everything else about the *siteVerification* *v1* API can be found at the
 //! [official documentation site](https://developers.google.com/site-verification/).
@@ -25,6 +25,8 @@
 //! 
 //! * **[Hub](struct.SiteVerification.html)**
 //!     * a central object to maintain state and allow accessing all *Activities*
+//!     * creates [*Method Builders*](trait.MethodsBuilder.html) which in turn
+//!       allow access to individual [*Call Builders*](trait.CallBuilder.html)
 //! * **[Resources](trait.Resource.html)**
 //!     * primary types that you can apply *Activities* to
 //!     * a collection of properties and *Parts*
@@ -33,6 +35,8 @@
 //!         * never directly used in *Activities*
 //! * **[Activities](trait.CallBuilder.html)**
 //!     * operations to apply to *Resources*
+//! 
+//! All *structures* are marked with applicable traits to further categorize them and ease browsing.
 //! 
 //! Generally speaking, you can invoke *Activities* like this:
 //! 
@@ -72,7 +76,7 @@
 //! extern crate "yup-oauth2" as oauth2;
 //! extern crate "google-siteverification1" as siteverification1;
 //! use siteverification1::SiteVerificationWebResourceResource;
-//! use siteverification1::Result;
+//! use siteverification1::{Result, Error};
 //! # #[test] fn egal() {
 //! use std::default::Default;
 //! use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -102,15 +106,17 @@
 //!              .doit();
 //! 
 //! match result {
-//!     Result::HttpError(err) => println!("HTTPERROR: {:?}", err),
-//!     Result::MissingAPIKey => println!("Auth: Missing API Key - used if there are no scopes"),
-//!     Result::MissingToken => println!("OAuth2: Missing Token"),
-//!     Result::Cancelled => println!("Operation cancelled by user"),
-//!     Result::UploadSizeLimitExceeded(size, max_size) => println!("Upload size too big: {} of {}", size, max_size),
-//!     Result::Failure(_) => println!("General Failure (hyper::client::Response doesn't print)"),
-//!     Result::FieldClash(clashed_field) => println!("You added custom parameter which is part of builder: {:?}", clashed_field),
-//!     Result::JsonDecodeError(err) => println!("Couldn't understand server reply - maybe API needs update: {:?}", err),
-//!     Result::Success(_) => println!("Success (value doesn't print)"),
+//!     Err(e) => match e {
+//!         Error::HttpError(err) => println!("HTTPERROR: {:?}", err),
+//!         Error::MissingAPIKey => println!("Auth: Missing API Key - used if there are no scopes"),
+//!         Error::MissingToken => println!("OAuth2: Missing Token"),
+//!         Error::Cancelled => println!("Operation canceled by user"),
+//!         Error::UploadSizeLimitExceeded(size, max_size) => println!("Upload size too big: {} of {}", size, max_size),
+//!         Error::Failure(_) => println!("General Failure (hyper::client::Response doesn't print)"),
+//!         Error::FieldClash(clashed_field) => println!("You added custom parameter which is part of builder: {:?}", clashed_field),
+//!         Error::JsonDecodeError(err) => println!("Couldn't understand server reply - maybe API needs update: {:?}", err),
+//!     },
+//!     Ok(_) => println!("Success (value doesn't print)"),
 //! }
 //! # }
 //! ```
@@ -123,7 +129,7 @@
 //! When delegates handle errors or intermediate values, they may have a chance to instruct the system to retry. This 
 //! makes the system potentially resilient to all kinds of errors.
 //! 
-//! ## Uploads and Downlods
+//! ## Uploads and Downloads
 //! If a method supports downloads, the response body, which is part of the [Result](enum.Result.html), should be
 //! read by you to obtain the media.
 //! If such a method also supports a [Response Result](trait.ResponseResult.html), it will return that by default.
@@ -146,8 +152,9 @@
 //! ## Optional Parts in Server-Requests
 //! 
 //! All structures provided by this library are made to be [enocodable](trait.RequestValue.html) and 
-//! [decodable](trait.ResponseResult.html) via json. Optionals are used to indicate that partial requests are responses are valid.
-//! Most optionals are are considered [Parts](trait.Part.html) which are identifyable by name, which will be sent to 
+//! [decodable](trait.ResponseResult.html) via *json*. Optionals are used to indicate that partial requests are responses 
+//! are valid.
+//! Most optionals are are considered [Parts](trait.Part.html) which are identifiable by name, which will be sent to 
 //! the server to indicate either the set parts of the request or the desired parts in the response.
 //! 
 //! ## Builder Arguments
@@ -196,7 +203,7 @@ use std::io;
 use std::fs;
 use std::thread::sleep;
 
-pub use cmn::{MultiPartReader, ToParts, MethodInfo, Result, CallBuilder, Hub, ReadSeek, Part, ResponseResult, RequestValue, NestedType, Delegate, DefaultDelegate, ResourceMethodsBuilder, Resource, JsonServerError};
+pub use cmn::{MultiPartReader, ToParts, MethodInfo, Result, Error, CallBuilder, Hub, ReadSeek, Part, ResponseResult, RequestValue, NestedType, Delegate, DefaultDelegate, MethodsBuilder, Resource, JsonServerError};
 
 
 // ##############
@@ -247,7 +254,7 @@ impl Default for Scope {
 /// extern crate "yup-oauth2" as oauth2;
 /// extern crate "google-siteverification1" as siteverification1;
 /// use siteverification1::SiteVerificationWebResourceResource;
-/// use siteverification1::Result;
+/// use siteverification1::{Result, Error};
 /// # #[test] fn egal() {
 /// use std::default::Default;
 /// use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -277,15 +284,17 @@ impl Default for Scope {
 ///              .doit();
 /// 
 /// match result {
-///     Result::HttpError(err) => println!("HTTPERROR: {:?}", err),
-///     Result::MissingAPIKey => println!("Auth: Missing API Key - used if there are no scopes"),
-///     Result::MissingToken => println!("OAuth2: Missing Token"),
-///     Result::Cancelled => println!("Operation cancelled by user"),
-///     Result::UploadSizeLimitExceeded(size, max_size) => println!("Upload size too big: {} of {}", size, max_size),
-///     Result::Failure(_) => println!("General Failure (hyper::client::Response doesn't print)"),
-///     Result::FieldClash(clashed_field) => println!("You added custom parameter which is part of builder: {:?}", clashed_field),
-///     Result::JsonDecodeError(err) => println!("Couldn't understand server reply - maybe API needs update: {:?}", err),
-///     Result::Success(_) => println!("Success (value doesn't print)"),
+///     Err(e) => match e {
+///         Error::HttpError(err) => println!("HTTPERROR: {:?}", err),
+///         Error::MissingAPIKey => println!("Auth: Missing API Key - used if there are no scopes"),
+///         Error::MissingToken => println!("OAuth2: Missing Token"),
+///         Error::Cancelled => println!("Operation canceled by user"),
+///         Error::UploadSizeLimitExceeded(size, max_size) => println!("Upload size too big: {} of {}", size, max_size),
+///         Error::Failure(_) => println!("General Failure (hyper::client::Response doesn't print)"),
+///         Error::FieldClash(clashed_field) => println!("You added custom parameter which is part of builder: {:?}", clashed_field),
+///         Error::JsonDecodeError(err) => println!("Couldn't understand server reply - maybe API needs update: {:?}", err),
+///     },
+///     Ok(_) => println!("Success (value doesn't print)"),
 /// }
 /// # }
 /// ```
@@ -306,7 +315,7 @@ impl<'a, C, NC, A> SiteVerification<C, NC, A>
         SiteVerification {
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/0.1.1".to_string(),
+            _user_agent: "google-api-rust-client/0.1.2".to_string(),
             _m: PhantomData
         }
     }
@@ -316,7 +325,7 @@ impl<'a, C, NC, A> SiteVerification<C, NC, A>
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/0.1.1`.
+    /// It defaults to `google-api-rust-client/0.1.2`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -341,7 +350,7 @@ impl<'a, C, NC, A> SiteVerification<C, NC, A>
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct SiteVerificationWebResourceListResponse {
-    /// The list of sites that are owned by the authenticated user.    
+    /// The list of sites that are owned by the authenticated user.
     pub items: Vec<SiteVerificationWebResourceResource>,
 }
 
@@ -354,9 +363,9 @@ impl ResponseResult for SiteVerificationWebResourceListResponse {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct SiteVerificationWebResourceResourceSite {
-    /// The site identifier. If the type is set to SITE, the identifier is a URL. If the type is set to INET_DOMAIN, the site identifier is a domain name.    
+    /// The site identifier. If the type is set to SITE, the identifier is a URL. If the type is set to INET_DOMAIN, the site identifier is a domain name.
     pub identifier: String,
-    /// The site type. Can be SITE or INET_DOMAIN (domain name).    
+    /// The site type. Can be SITE or INET_DOMAIN (domain name).
     #[serde(alias="type")]
     pub type_: String,
 }
@@ -376,10 +385,10 @@ impl Part for SiteVerificationWebResourceResourceSite {}
 /// 
 #[derive(Default, Clone, Debug, Serialize)]
 pub struct SiteVerificationWebResourceGettokenRequest {
-    /// The verification method that will be used to verify this site. For sites, 'FILE' or 'META' methods may be used. For domains, only 'DNS' may be used.    
+    /// The verification method that will be used to verify this site. For sites, 'FILE' or 'META' methods may be used. For domains, only 'DNS' may be used.
     #[serde(alias="verificationMethod")]
     pub verification_method: Option<String>,
-    /// The site for which a verification token will be generated.    
+    /// The site for which a verification token will be generated.
     pub site: Option<SiteVerificationWebResourceGettokenRequestSite>,
 }
 
@@ -392,9 +401,9 @@ impl RequestValue for SiteVerificationWebResourceGettokenRequest {}
 /// 
 #[derive(Default, Clone, Debug, Serialize)]
 pub struct SiteVerificationWebResourceGettokenRequestSite {
-    /// The site identifier. If the type is set to SITE, the identifier is a URL. If the type is set to INET_DOMAIN, the site identifier is a domain name.    
+    /// The site identifier. If the type is set to SITE, the identifier is a URL. If the type is set to INET_DOMAIN, the site identifier is a domain name.
     pub identifier: String,
-    /// The type of resource to be verified. Can be SITE or INET_DOMAIN (domain name).    
+    /// The type of resource to be verified. Can be SITE or INET_DOMAIN (domain name).
     #[serde(alias="type")]
     pub type_: String,
 }
@@ -417,11 +426,11 @@ impl Part for SiteVerificationWebResourceGettokenRequestSite {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct SiteVerificationWebResourceResource {
-    /// The email addresses of all verified owners.    
+    /// The email addresses of all verified owners.
     pub owners: Option<Vec<String>>,
-    /// The string used to identify this site. This value should be used in the "id" portion of the REST URL for the Get, Update, and Delete operations.    
+    /// The string used to identify this site. This value should be used in the "id" portion of the REST URL for the Get, Update, and Delete operations.
     pub id: Option<String>,
-    /// The address and type of a site that is verified or will be verified.    
+    /// The address and type of a site that is verified or will be verified.
     pub site: Option<SiteVerificationWebResourceResourceSite>,
 }
 
@@ -440,9 +449,9 @@ impl ResponseResult for SiteVerificationWebResourceResource {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct SiteVerificationWebResourceGettokenResponse {
-    /// The verification token. The token must be placed appropriately in order for verification to succeed.    
+    /// The verification token. The token must be placed appropriately in order for verification to succeed.
     pub token: String,
-    /// The verification method to use in conjunction with this token. For FILE, the token should be placed in the top-level directory of the site, stored inside a file of the same name. For META, the token should be placed in the HEAD tag of the default page that is loaded for the site. For DNS, the token should be placed in a TXT record of the domain.    
+    /// The verification method to use in conjunction with this token. For FILE, the token should be placed in the top-level directory of the site, stored inside a file of the same name. For META, the token should be placed in the HEAD tag of the default page that is loaded for the site. For DNS, the token should be placed in a TXT record of the domain.
     pub method: String,
 }
 
@@ -488,13 +497,17 @@ pub struct WebResourceMethods<'a, C, NC, A>
     hub: &'a SiteVerification<C, NC, A>,
 }
 
-impl<'a, C, NC, A> ResourceMethodsBuilder for WebResourceMethods<'a, C, NC, A> {}
+impl<'a, C, NC, A> MethodsBuilder for WebResourceMethods<'a, C, NC, A> {}
 
 impl<'a, C, NC, A> WebResourceMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Get the most current data for a website or domain.    
+    /// Get the most current data for a website or domain.
+    /// 
+    /// # Arguments
+    ///
+    /// * `id` - The id of a verified site or domain.
     pub fn get(&self, id: &str) -> WebResourceGetCall<'a, C, NC, A> {
         WebResourceGetCall {
             hub: self.hub,
@@ -507,7 +520,12 @@ impl<'a, C, NC, A> WebResourceMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Modify the list of owners for your website or domain. This method supports patch semantics.    
+    /// Modify the list of owners for your website or domain. This method supports patch semantics.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `id` - The id of a verified site or domain.
     pub fn patch(&self, request: &SiteVerificationWebResourceResource, id: &str) -> WebResourcePatchCall<'a, C, NC, A> {
         WebResourcePatchCall {
             hub: self.hub,
@@ -521,7 +539,7 @@ impl<'a, C, NC, A> WebResourceMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Get the list of your verified websites and domains.    
+    /// Get the list of your verified websites and domains.
     pub fn list(&self) -> WebResourceListCall<'a, C, NC, A> {
         WebResourceListCall {
             hub: self.hub,
@@ -533,7 +551,11 @@ impl<'a, C, NC, A> WebResourceMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Relinquish ownership of a website or domain.    
+    /// Relinquish ownership of a website or domain.
+    /// 
+    /// # Arguments
+    ///
+    /// * `id` - The id of a verified site or domain.
     pub fn delete(&self, id: &str) -> WebResourceDeleteCall<'a, C, NC, A> {
         WebResourceDeleteCall {
             hub: self.hub,
@@ -546,7 +568,11 @@ impl<'a, C, NC, A> WebResourceMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Get a verification token for placing on a website or domain.    
+    /// Get a verification token for placing on a website or domain.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
     pub fn get_token(&self, request: &SiteVerificationWebResourceGettokenRequest) -> WebResourceGetTokenCall<'a, C, NC, A> {
         WebResourceGetTokenCall {
             hub: self.hub,
@@ -559,7 +585,12 @@ impl<'a, C, NC, A> WebResourceMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Modify the list of owners for your website or domain.    
+    /// Modify the list of owners for your website or domain.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `id` - The id of a verified site or domain.
     pub fn update(&self, request: &SiteVerificationWebResourceResource, id: &str) -> WebResourceUpdateCall<'a, C, NC, A> {
         WebResourceUpdateCall {
             hub: self.hub,
@@ -573,7 +604,12 @@ impl<'a, C, NC, A> WebResourceMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Attempt verification of a website or domain.    
+    /// Attempt verification of a website or domain.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `verificationMethod` - The method to use for verifying a site or domain.
     pub fn insert(&self, request: &SiteVerificationWebResourceResource, verification_method: &str) -> WebResourceInsertCall<'a, C, NC, A> {
         WebResourceInsertCall {
             hub: self.hub,
@@ -597,7 +633,7 @@ impl<'a, C, NC, A> WebResourceMethods<'a, C, NC, A> {
 /// Get the most current data for a website or domain.
 ///
 /// A builder for the *get* method supported by a *webResource* resource.
-/// It is not used directly, but through a `WebResourceMethods`.
+/// It is not used directly, but through a `WebResourceMethods` instance.
 ///
 /// # Example
 ///
@@ -655,7 +691,7 @@ impl<'a, C, NC, A> WebResourceGetCall<'a, C, NC, A> where NC: hyper::net::Networ
         for &field in ["alt", "id"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -708,7 +744,7 @@ impl<'a, C, NC, A> WebResourceGetCall<'a, C, NC, A> where NC: hyper::net::Networ
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -720,7 +756,6 @@ impl<'a, C, NC, A> WebResourceGetCall<'a, C, NC, A> where NC: hyper::net::Networ
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -730,7 +765,7 @@ impl<'a, C, NC, A> WebResourceGetCall<'a, C, NC, A> where NC: hyper::net::Networ
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -741,7 +776,7 @@ impl<'a, C, NC, A> WebResourceGetCall<'a, C, NC, A> where NC: hyper::net::Networ
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -750,13 +785,13 @@ impl<'a, C, NC, A> WebResourceGetCall<'a, C, NC, A> where NC: hyper::net::Networ
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -768,7 +803,7 @@ impl<'a, C, NC, A> WebResourceGetCall<'a, C, NC, A> where NC: hyper::net::Networ
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The id of a verified site or domain.    
+    /// The id of a verified site or domain.
     pub fn id(mut self, new_value: &str) -> WebResourceGetCall<'a, C, NC, A> {
         self._id = new_value.to_string();
         self
@@ -829,7 +864,7 @@ impl<'a, C, NC, A> WebResourceGetCall<'a, C, NC, A> where NC: hyper::net::Networ
 /// Modify the list of owners for your website or domain. This method supports patch semantics.
 ///
 /// A builder for the *patch* method supported by a *webResource* resource.
-/// It is not used directly, but through a `WebResourceMethods`.
+/// It is not used directly, but through a `WebResourceMethods` instance.
 ///
 /// # Example
 ///
@@ -894,7 +929,7 @@ impl<'a, C, NC, A> WebResourcePatchCall<'a, C, NC, A> where NC: hyper::net::Netw
         for &field in ["alt", "id"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -951,7 +986,7 @@ impl<'a, C, NC, A> WebResourcePatchCall<'a, C, NC, A> where NC: hyper::net::Netw
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -967,7 +1002,6 @@ impl<'a, C, NC, A> WebResourcePatchCall<'a, C, NC, A> where NC: hyper::net::Netw
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -977,7 +1011,7 @@ impl<'a, C, NC, A> WebResourcePatchCall<'a, C, NC, A> where NC: hyper::net::Netw
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -988,7 +1022,7 @@ impl<'a, C, NC, A> WebResourcePatchCall<'a, C, NC, A> where NC: hyper::net::Netw
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -997,13 +1031,13 @@ impl<'a, C, NC, A> WebResourcePatchCall<'a, C, NC, A> where NC: hyper::net::Netw
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -1024,7 +1058,7 @@ impl<'a, C, NC, A> WebResourcePatchCall<'a, C, NC, A> where NC: hyper::net::Netw
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The id of a verified site or domain.    
+    /// The id of a verified site or domain.
     pub fn id(mut self, new_value: &str) -> WebResourcePatchCall<'a, C, NC, A> {
         self._id = new_value.to_string();
         self
@@ -1085,7 +1119,7 @@ impl<'a, C, NC, A> WebResourcePatchCall<'a, C, NC, A> where NC: hyper::net::Netw
 /// Get the list of your verified websites and domains.
 ///
 /// A builder for the *list* method supported by a *webResource* resource.
-/// It is not used directly, but through a `WebResourceMethods`.
+/// It is not used directly, but through a `WebResourceMethods` instance.
 ///
 /// # Example
 ///
@@ -1141,7 +1175,7 @@ impl<'a, C, NC, A> WebResourceListCall<'a, C, NC, A> where NC: hyper::net::Netwo
         for &field in ["alt"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -1170,7 +1204,7 @@ impl<'a, C, NC, A> WebResourceListCall<'a, C, NC, A> where NC: hyper::net::Netwo
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -1182,7 +1216,6 @@ impl<'a, C, NC, A> WebResourceListCall<'a, C, NC, A> where NC: hyper::net::Netwo
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -1192,7 +1225,7 @@ impl<'a, C, NC, A> WebResourceListCall<'a, C, NC, A> where NC: hyper::net::Netwo
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -1203,7 +1236,7 @@ impl<'a, C, NC, A> WebResourceListCall<'a, C, NC, A> where NC: hyper::net::Netwo
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -1212,13 +1245,13 @@ impl<'a, C, NC, A> WebResourceListCall<'a, C, NC, A> where NC: hyper::net::Netwo
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -1281,7 +1314,7 @@ impl<'a, C, NC, A> WebResourceListCall<'a, C, NC, A> where NC: hyper::net::Netwo
 /// Relinquish ownership of a website or domain.
 ///
 /// A builder for the *delete* method supported by a *webResource* resource.
-/// It is not used directly, but through a `WebResourceMethods`.
+/// It is not used directly, but through a `WebResourceMethods` instance.
 ///
 /// # Example
 ///
@@ -1339,7 +1372,7 @@ impl<'a, C, NC, A> WebResourceDeleteCall<'a, C, NC, A> where NC: hyper::net::Net
         for &field in ["id"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -1391,7 +1424,7 @@ impl<'a, C, NC, A> WebResourceDeleteCall<'a, C, NC, A> where NC: hyper::net::Net
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -1403,7 +1436,6 @@ impl<'a, C, NC, A> WebResourceDeleteCall<'a, C, NC, A> where NC: hyper::net::Net
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -1413,7 +1445,7 @@ impl<'a, C, NC, A> WebResourceDeleteCall<'a, C, NC, A> where NC: hyper::net::Net
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -1424,12 +1456,12 @@ impl<'a, C, NC, A> WebResourceDeleteCall<'a, C, NC, A> where NC: hyper::net::Net
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = res;
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -1441,7 +1473,7 @@ impl<'a, C, NC, A> WebResourceDeleteCall<'a, C, NC, A> where NC: hyper::net::Net
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The id of a verified site or domain.    
+    /// The id of a verified site or domain.
     pub fn id(mut self, new_value: &str) -> WebResourceDeleteCall<'a, C, NC, A> {
         self._id = new_value.to_string();
         self
@@ -1502,7 +1534,7 @@ impl<'a, C, NC, A> WebResourceDeleteCall<'a, C, NC, A> where NC: hyper::net::Net
 /// Get a verification token for placing on a website or domain.
 ///
 /// A builder for the *getToken* method supported by a *webResource* resource.
-/// It is not used directly, but through a `WebResourceMethods`.
+/// It is not used directly, but through a `WebResourceMethods` instance.
 ///
 /// # Example
 ///
@@ -1565,7 +1597,7 @@ impl<'a, C, NC, A> WebResourceGetTokenCall<'a, C, NC, A> where NC: hyper::net::N
         for &field in ["alt"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -1598,7 +1630,7 @@ impl<'a, C, NC, A> WebResourceGetTokenCall<'a, C, NC, A> where NC: hyper::net::N
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -1614,7 +1646,6 @@ impl<'a, C, NC, A> WebResourceGetTokenCall<'a, C, NC, A> where NC: hyper::net::N
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -1624,7 +1655,7 @@ impl<'a, C, NC, A> WebResourceGetTokenCall<'a, C, NC, A> where NC: hyper::net::N
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -1635,7 +1666,7 @@ impl<'a, C, NC, A> WebResourceGetTokenCall<'a, C, NC, A> where NC: hyper::net::N
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -1644,13 +1675,13 @@ impl<'a, C, NC, A> WebResourceGetTokenCall<'a, C, NC, A> where NC: hyper::net::N
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -1722,7 +1753,7 @@ impl<'a, C, NC, A> WebResourceGetTokenCall<'a, C, NC, A> where NC: hyper::net::N
 /// Modify the list of owners for your website or domain.
 ///
 /// A builder for the *update* method supported by a *webResource* resource.
-/// It is not used directly, but through a `WebResourceMethods`.
+/// It is not used directly, but through a `WebResourceMethods` instance.
 ///
 /// # Example
 ///
@@ -1787,7 +1818,7 @@ impl<'a, C, NC, A> WebResourceUpdateCall<'a, C, NC, A> where NC: hyper::net::Net
         for &field in ["alt", "id"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -1844,7 +1875,7 @@ impl<'a, C, NC, A> WebResourceUpdateCall<'a, C, NC, A> where NC: hyper::net::Net
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -1860,7 +1891,6 @@ impl<'a, C, NC, A> WebResourceUpdateCall<'a, C, NC, A> where NC: hyper::net::Net
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -1870,7 +1900,7 @@ impl<'a, C, NC, A> WebResourceUpdateCall<'a, C, NC, A> where NC: hyper::net::Net
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -1881,7 +1911,7 @@ impl<'a, C, NC, A> WebResourceUpdateCall<'a, C, NC, A> where NC: hyper::net::Net
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -1890,13 +1920,13 @@ impl<'a, C, NC, A> WebResourceUpdateCall<'a, C, NC, A> where NC: hyper::net::Net
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -1917,7 +1947,7 @@ impl<'a, C, NC, A> WebResourceUpdateCall<'a, C, NC, A> where NC: hyper::net::Net
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The id of a verified site or domain.    
+    /// The id of a verified site or domain.
     pub fn id(mut self, new_value: &str) -> WebResourceUpdateCall<'a, C, NC, A> {
         self._id = new_value.to_string();
         self
@@ -1978,7 +2008,7 @@ impl<'a, C, NC, A> WebResourceUpdateCall<'a, C, NC, A> where NC: hyper::net::Net
 /// Attempt verification of a website or domain.
 ///
 /// A builder for the *insert* method supported by a *webResource* resource.
-/// It is not used directly, but through a `WebResourceMethods`.
+/// It is not used directly, but through a `WebResourceMethods` instance.
 ///
 /// # Example
 ///
@@ -2043,7 +2073,7 @@ impl<'a, C, NC, A> WebResourceInsertCall<'a, C, NC, A> where NC: hyper::net::Net
         for &field in ["alt", "verificationMethod"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -2076,7 +2106,7 @@ impl<'a, C, NC, A> WebResourceInsertCall<'a, C, NC, A> where NC: hyper::net::Net
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -2092,7 +2122,6 @@ impl<'a, C, NC, A> WebResourceInsertCall<'a, C, NC, A> where NC: hyper::net::Net
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -2102,7 +2131,7 @@ impl<'a, C, NC, A> WebResourceInsertCall<'a, C, NC, A> where NC: hyper::net::Net
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -2113,7 +2142,7 @@ impl<'a, C, NC, A> WebResourceInsertCall<'a, C, NC, A> where NC: hyper::net::Net
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -2122,13 +2151,13 @@ impl<'a, C, NC, A> WebResourceInsertCall<'a, C, NC, A> where NC: hyper::net::Net
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -2149,7 +2178,7 @@ impl<'a, C, NC, A> WebResourceInsertCall<'a, C, NC, A> where NC: hyper::net::Net
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The method to use for verifying a site or domain.    
+    /// The method to use for verifying a site or domain.
     pub fn verification_method(mut self, new_value: &str) -> WebResourceInsertCall<'a, C, NC, A> {
         self._verification_method = new_value.to_string();
         self

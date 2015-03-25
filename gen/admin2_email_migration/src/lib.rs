@@ -1,8 +1,8 @@
 // DO NOT EDIT !
-// This file was generated automatically from 'src/mako/lib.rs.mako'
+// This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *admin* crate version *0.1.1+20150303*, where *20150303* is the exact revision of the *admin:email_migration_v2* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.1*.
+//! This documentation was generated from *admin* crate version *0.1.2+20150303*, where *20150303* is the exact revision of the *admin:email_migration_v2* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.2*.
 //! 
 //! Everything else about the *admin* *v2_email_migration* API can be found at the
 //! [official documentation site](https://developers.google.com/admin-sdk/email-migration/v2/).
@@ -29,6 +29,8 @@
 //! 
 //! * **[Hub](struct.Admin.html)**
 //!     * a central object to maintain state and allow accessing all *Activities*
+//!     * creates [*Method Builders*](trait.MethodsBuilder.html) which in turn
+//!       allow access to individual [*Call Builders*](trait.CallBuilder.html)
 //! * **[Resources](trait.Resource.html)**
 //!     * primary types that you can apply *Activities* to
 //!     * a collection of properties and *Parts*
@@ -37,6 +39,8 @@
 //!         * never directly used in *Activities*
 //! * **[Activities](trait.CallBuilder.html)**
 //!     * operations to apply to *Resources*
+//! 
+//! All *structures* are marked with applicable traits to further categorize them and ease browsing.
 //! 
 //! Generally speaking, you can invoke *Activities* like this:
 //! 
@@ -73,7 +77,7 @@
 //! extern crate "yup-oauth2" as oauth2;
 //! extern crate "google-admin2_email_migration" as admin2_email_migration;
 //! use admin2_email_migration::MailItem;
-//! use admin2_email_migration::Result;
+//! use admin2_email_migration::{Result, Error};
 //! use std::fs;
 //! # #[test] fn egal() {
 //! use std::default::Default;
@@ -104,15 +108,17 @@
 //!              .upload(fs::File::open("file.ext").unwrap(), "application/octet-stream".parse().unwrap());
 //! 
 //! match result {
-//!     Result::HttpError(err) => println!("HTTPERROR: {:?}", err),
-//!     Result::MissingAPIKey => println!("Auth: Missing API Key - used if there are no scopes"),
-//!     Result::MissingToken => println!("OAuth2: Missing Token"),
-//!     Result::Cancelled => println!("Operation cancelled by user"),
-//!     Result::UploadSizeLimitExceeded(size, max_size) => println!("Upload size too big: {} of {}", size, max_size),
-//!     Result::Failure(_) => println!("General Failure (hyper::client::Response doesn't print)"),
-//!     Result::FieldClash(clashed_field) => println!("You added custom parameter which is part of builder: {:?}", clashed_field),
-//!     Result::JsonDecodeError(err) => println!("Couldn't understand server reply - maybe API needs update: {:?}", err),
-//!     Result::Success(_) => println!("Success (value doesn't print)"),
+//!     Err(e) => match e {
+//!         Error::HttpError(err) => println!("HTTPERROR: {:?}", err),
+//!         Error::MissingAPIKey => println!("Auth: Missing API Key - used if there are no scopes"),
+//!         Error::MissingToken => println!("OAuth2: Missing Token"),
+//!         Error::Cancelled => println!("Operation canceled by user"),
+//!         Error::UploadSizeLimitExceeded(size, max_size) => println!("Upload size too big: {} of {}", size, max_size),
+//!         Error::Failure(_) => println!("General Failure (hyper::client::Response doesn't print)"),
+//!         Error::FieldClash(clashed_field) => println!("You added custom parameter which is part of builder: {:?}", clashed_field),
+//!         Error::JsonDecodeError(err) => println!("Couldn't understand server reply - maybe API needs update: {:?}", err),
+//!     },
+//!     Ok(_) => println!("Success (value doesn't print)"),
 //! }
 //! # }
 //! ```
@@ -125,7 +131,7 @@
 //! When delegates handle errors or intermediate values, they may have a chance to instruct the system to retry. This 
 //! makes the system potentially resilient to all kinds of errors.
 //! 
-//! ## Uploads and Downlods
+//! ## Uploads and Downloads
 //! If a method supports downloads, the response body, which is part of the [Result](enum.Result.html), should be
 //! read by you to obtain the media.
 //! If such a method also supports a [Response Result](trait.ResponseResult.html), it will return that by default.
@@ -148,8 +154,9 @@
 //! ## Optional Parts in Server-Requests
 //! 
 //! All structures provided by this library are made to be [enocodable](trait.RequestValue.html) and 
-//! [decodable](trait.ResponseResult.html) via json. Optionals are used to indicate that partial requests are responses are valid.
-//! Most optionals are are considered [Parts](trait.Part.html) which are identifyable by name, which will be sent to 
+//! [decodable](trait.ResponseResult.html) via *json*. Optionals are used to indicate that partial requests are responses 
+//! are valid.
+//! Most optionals are are considered [Parts](trait.Part.html) which are identifiable by name, which will be sent to 
 //! the server to indicate either the set parts of the request or the desired parts in the response.
 //! 
 //! ## Builder Arguments
@@ -198,7 +205,7 @@ use std::io;
 use std::fs;
 use std::thread::sleep;
 
-pub use cmn::{MultiPartReader, ToParts, MethodInfo, Result, CallBuilder, Hub, ReadSeek, Part, ResponseResult, RequestValue, NestedType, Delegate, DefaultDelegate, ResourceMethodsBuilder, Resource, JsonServerError};
+pub use cmn::{MultiPartReader, ToParts, MethodInfo, Result, Error, CallBuilder, Hub, ReadSeek, Part, ResponseResult, RequestValue, NestedType, Delegate, DefaultDelegate, MethodsBuilder, Resource, JsonServerError};
 
 
 // ##############
@@ -245,7 +252,7 @@ impl Default for Scope {
 /// extern crate "yup-oauth2" as oauth2;
 /// extern crate "google-admin2_email_migration" as admin2_email_migration;
 /// use admin2_email_migration::MailItem;
-/// use admin2_email_migration::Result;
+/// use admin2_email_migration::{Result, Error};
 /// use std::fs;
 /// # #[test] fn egal() {
 /// use std::default::Default;
@@ -276,15 +283,17 @@ impl Default for Scope {
 ///              .upload(fs::File::open("file.ext").unwrap(), "application/octet-stream".parse().unwrap());
 /// 
 /// match result {
-///     Result::HttpError(err) => println!("HTTPERROR: {:?}", err),
-///     Result::MissingAPIKey => println!("Auth: Missing API Key - used if there are no scopes"),
-///     Result::MissingToken => println!("OAuth2: Missing Token"),
-///     Result::Cancelled => println!("Operation cancelled by user"),
-///     Result::UploadSizeLimitExceeded(size, max_size) => println!("Upload size too big: {} of {}", size, max_size),
-///     Result::Failure(_) => println!("General Failure (hyper::client::Response doesn't print)"),
-///     Result::FieldClash(clashed_field) => println!("You added custom parameter which is part of builder: {:?}", clashed_field),
-///     Result::JsonDecodeError(err) => println!("Couldn't understand server reply - maybe API needs update: {:?}", err),
-///     Result::Success(_) => println!("Success (value doesn't print)"),
+///     Err(e) => match e {
+///         Error::HttpError(err) => println!("HTTPERROR: {:?}", err),
+///         Error::MissingAPIKey => println!("Auth: Missing API Key - used if there are no scopes"),
+///         Error::MissingToken => println!("OAuth2: Missing Token"),
+///         Error::Cancelled => println!("Operation canceled by user"),
+///         Error::UploadSizeLimitExceeded(size, max_size) => println!("Upload size too big: {} of {}", size, max_size),
+///         Error::Failure(_) => println!("General Failure (hyper::client::Response doesn't print)"),
+///         Error::FieldClash(clashed_field) => println!("You added custom parameter which is part of builder: {:?}", clashed_field),
+///         Error::JsonDecodeError(err) => println!("Couldn't understand server reply - maybe API needs update: {:?}", err),
+///     },
+///     Ok(_) => println!("Success (value doesn't print)"),
 /// }
 /// # }
 /// ```
@@ -305,7 +314,7 @@ impl<'a, C, NC, A> Admin<C, NC, A>
         Admin {
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/0.1.1".to_string(),
+            _user_agent: "google-api-rust-client/0.1.2".to_string(),
             _m: PhantomData
         }
     }
@@ -315,7 +324,7 @@ impl<'a, C, NC, A> Admin<C, NC, A>
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/0.1.1`.
+    /// It defaults to `google-api-rust-client/0.1.2`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -340,29 +349,29 @@ impl<'a, C, NC, A> Admin<C, NC, A>
 /// 
 #[derive(Default, Clone, Debug, Serialize)]
 pub struct MailItem {
-    /// Boolean indicating if the mail is in trash    
+    /// Boolean indicating if the mail is in trash
     #[serde(alias="isTrash")]
     pub is_trash: Option<bool>,
-    /// Kind of resource this is.    
+    /// Kind of resource this is.
     pub kind: Option<String>,
-    /// List of labels (strings)    
+    /// List of labels (strings)
     pub labels: Option<Vec<String>>,
-    /// Boolean indicating if the mail is draft    
+    /// Boolean indicating if the mail is draft
     #[serde(alias="isDraft")]
     pub is_draft: Option<bool>,
-    /// Boolean indicating if the mail is in inbox    
+    /// Boolean indicating if the mail is in inbox
     #[serde(alias="isInbox")]
     pub is_inbox: Option<bool>,
-    /// Boolean indicating if the mail is in 'sent mails'    
+    /// Boolean indicating if the mail is in 'sent mails'
     #[serde(alias="isSent")]
     pub is_sent: Option<bool>,
-    /// Boolean indicating if the mail is starred    
+    /// Boolean indicating if the mail is starred
     #[serde(alias="isStarred")]
     pub is_starred: Option<bool>,
-    /// Boolean indicating if the mail is unread    
+    /// Boolean indicating if the mail is unread
     #[serde(alias="isUnread")]
     pub is_unread: Option<bool>,
-    /// Boolean indicating if the mail is deleted (used in Vault)    
+    /// Boolean indicating if the mail is deleted (used in Vault)
     #[serde(alias="isDeleted")]
     pub is_deleted: Option<bool>,
 }
@@ -409,13 +418,18 @@ pub struct MailMethods<'a, C, NC, A>
     hub: &'a Admin<C, NC, A>,
 }
 
-impl<'a, C, NC, A> ResourceMethodsBuilder for MailMethods<'a, C, NC, A> {}
+impl<'a, C, NC, A> MethodsBuilder for MailMethods<'a, C, NC, A> {}
 
 impl<'a, C, NC, A> MailMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Insert Mail into Google's Gmail backends    
+    /// Insert Mail into Google's Gmail backends
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `userKey` - The email or immutable id of the user
     pub fn insert(&self, request: &MailItem, user_key: &str) -> MailInsertCall<'a, C, NC, A> {
         MailInsertCall {
             hub: self.hub,
@@ -439,7 +453,7 @@ impl<'a, C, NC, A> MailMethods<'a, C, NC, A> {
 /// Insert Mail into Google's Gmail backends
 ///
 /// A builder for the *insert* method supported by a *mail* resource.
-/// It is not used directly, but through a `MailMethods`.
+/// It is not used directly, but through a `MailMethods` instance.
 ///
 /// # Example
 ///
@@ -506,7 +520,7 @@ impl<'a, C, NC, A> MailInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
         for &field in ["userKey"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -572,7 +586,7 @@ impl<'a, C, NC, A> MailInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -598,7 +612,7 @@ impl<'a, C, NC, A> MailInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
                             let size = reader.seek(io::SeekFrom::End(0)).unwrap();
                         reader.seek(io::SeekFrom::Start(0)).unwrap();
                         if size > 36700160 {
-                        	return Result::UploadSizeLimitExceeded(size, 36700160)
+                        	return Err(Error::UploadSizeLimitExceeded(size, 36700160))
                         }
                             mp_reader.add_part(&mut request_value_reader, request_size, json_mime_type.clone())
                                      .add_part(&mut reader, size, reader_mime_type.clone());
@@ -620,7 +634,6 @@ impl<'a, C, NC, A> MailInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     
                     dlg.pre_request();
                     req.send()
-    
                 }
             };
 
@@ -631,7 +644,7 @@ impl<'a, C, NC, A> MailInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -642,13 +655,13 @@ impl<'a, C, NC, A> MailInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     if protocol == "resumable" {
                         let size = reader.seek(io::SeekFrom::End(0)).unwrap();
                         reader.seek(io::SeekFrom::Start(0)).unwrap();
                         if size > 36700160 {
-                        	return Result::UploadSizeLimitExceeded(size, 36700160)
+                        	return Err(Error::UploadSizeLimitExceeded(size, 36700160))
                         }
                         let mut client = &mut *self.hub.client.borrow_mut();
                         let upload_result = {
@@ -673,17 +686,17 @@ impl<'a, C, NC, A> MailInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
                         match upload_result {
                             None => {
                                 dlg.finished(false);
-                                return Result::Cancelled
+                                return Err(Error::Cancelled)
                             }
                             Some(Err(err)) => {
                                 dlg.finished(false);
-                                return Result::HttpError(err)
+                                return Err(Error::HttpError(err))
                             }
                             Some(Ok(upload_result)) => {
                                 res = upload_result;
                                 if !res.status.is_success() {
                                     dlg.finished(false);
-                                    return Result::Failure(res)
+                                    return Err(Error::Failure(res))
                                 }
                             }
                         }
@@ -691,7 +704,7 @@ impl<'a, C, NC, A> MailInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
                     let result_value = res;
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -707,11 +720,14 @@ impl<'a, C, NC, A> MailInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
                 where RS: ReadSeek {
         self.doit(stream, mime_type, "simple")
     }
-    /// Upload media in a resumeable fashion.
+    /// Upload media in a resumable fashion.
     /// Even if the upload fails or is interrupted, it can be resumed for a 
     /// certain amount of time as the server maintains state temporarily.
     /// 
-    /// TODO: Write more about how delegation works in this particular case.
+    /// The delegate will be asked for an `upload_url()`, and if not provided, will be asked to store an upload URL 
+    /// that was provided by the server, using `store_upload_url(...)`. The upload will be done in chunks, the delegate
+    /// may specify the `chunk_size()` and may cancel the operation before each chunk is uploaded, using
+    /// `cancel_chunk_upload(...)`.
     ///
     /// * *max size*: 35MB
     /// * *multipart*: yes
@@ -735,7 +751,7 @@ impl<'a, C, NC, A> MailInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The email or immutable id of the user    
+    /// The email or immutable id of the user
     pub fn user_key(mut self, new_value: &str) -> MailInsertCall<'a, C, NC, A> {
         self._user_key = new_value.to_string();
         self

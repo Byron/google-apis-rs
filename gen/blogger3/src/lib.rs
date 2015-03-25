@@ -1,8 +1,8 @@
 // DO NOT EDIT !
-// This file was generated automatically from 'src/mako/lib.rs.mako'
+// This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *blogger* crate version *0.1.1+20150208*, where *20150208* is the exact revision of the *blogger:v3* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.1*.
+//! This documentation was generated from *blogger* crate version *0.1.2+20150208*, where *20150208* is the exact revision of the *blogger:v3* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.2*.
 //! 
 //! Everything else about the *blogger* *v3* API can be found at the
 //! [official documentation site](https://developers.google.com/blogger/docs/3.0/getting_started).
@@ -39,6 +39,8 @@
 //! 
 //! * **[Hub](struct.Blogger.html)**
 //!     * a central object to maintain state and allow accessing all *Activities*
+//!     * creates [*Method Builders*](trait.MethodsBuilder.html) which in turn
+//!       allow access to individual [*Call Builders*](trait.CallBuilder.html)
 //! * **[Resources](trait.Resource.html)**
 //!     * primary types that you can apply *Activities* to
 //!     * a collection of properties and *Parts*
@@ -47,6 +49,8 @@
 //!         * never directly used in *Activities*
 //! * **[Activities](trait.CallBuilder.html)**
 //!     * operations to apply to *Resources*
+//! 
+//! All *structures* are marked with applicable traits to further categorize them and ease browsing.
 //! 
 //! Generally speaking, you can invoke *Activities* like this:
 //! 
@@ -91,7 +95,7 @@
 //! extern crate hyper;
 //! extern crate "yup-oauth2" as oauth2;
 //! extern crate "google-blogger3" as blogger3;
-//! use blogger3::Result;
+//! use blogger3::{Result, Error};
 //! # #[test] fn egal() {
 //! use std::default::Default;
 //! use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -126,15 +130,17 @@
 //!              .doit();
 //! 
 //! match result {
-//!     Result::HttpError(err) => println!("HTTPERROR: {:?}", err),
-//!     Result::MissingAPIKey => println!("Auth: Missing API Key - used if there are no scopes"),
-//!     Result::MissingToken => println!("OAuth2: Missing Token"),
-//!     Result::Cancelled => println!("Operation cancelled by user"),
-//!     Result::UploadSizeLimitExceeded(size, max_size) => println!("Upload size too big: {} of {}", size, max_size),
-//!     Result::Failure(_) => println!("General Failure (hyper::client::Response doesn't print)"),
-//!     Result::FieldClash(clashed_field) => println!("You added custom parameter which is part of builder: {:?}", clashed_field),
-//!     Result::JsonDecodeError(err) => println!("Couldn't understand server reply - maybe API needs update: {:?}", err),
-//!     Result::Success(_) => println!("Success (value doesn't print)"),
+//!     Err(e) => match e {
+//!         Error::HttpError(err) => println!("HTTPERROR: {:?}", err),
+//!         Error::MissingAPIKey => println!("Auth: Missing API Key - used if there are no scopes"),
+//!         Error::MissingToken => println!("OAuth2: Missing Token"),
+//!         Error::Cancelled => println!("Operation canceled by user"),
+//!         Error::UploadSizeLimitExceeded(size, max_size) => println!("Upload size too big: {} of {}", size, max_size),
+//!         Error::Failure(_) => println!("General Failure (hyper::client::Response doesn't print)"),
+//!         Error::FieldClash(clashed_field) => println!("You added custom parameter which is part of builder: {:?}", clashed_field),
+//!         Error::JsonDecodeError(err) => println!("Couldn't understand server reply - maybe API needs update: {:?}", err),
+//!     },
+//!     Ok(_) => println!("Success (value doesn't print)"),
 //! }
 //! # }
 //! ```
@@ -147,7 +153,7 @@
 //! When delegates handle errors or intermediate values, they may have a chance to instruct the system to retry. This 
 //! makes the system potentially resilient to all kinds of errors.
 //! 
-//! ## Uploads and Downlods
+//! ## Uploads and Downloads
 //! If a method supports downloads, the response body, which is part of the [Result](enum.Result.html), should be
 //! read by you to obtain the media.
 //! If such a method also supports a [Response Result](trait.ResponseResult.html), it will return that by default.
@@ -170,8 +176,9 @@
 //! ## Optional Parts in Server-Requests
 //! 
 //! All structures provided by this library are made to be [enocodable](trait.RequestValue.html) and 
-//! [decodable](trait.ResponseResult.html) via json. Optionals are used to indicate that partial requests are responses are valid.
-//! Most optionals are are considered [Parts](trait.Part.html) which are identifyable by name, which will be sent to 
+//! [decodable](trait.ResponseResult.html) via *json*. Optionals are used to indicate that partial requests are responses 
+//! are valid.
+//! Most optionals are are considered [Parts](trait.Part.html) which are identifiable by name, which will be sent to 
 //! the server to indicate either the set parts of the request or the desired parts in the response.
 //! 
 //! ## Builder Arguments
@@ -220,7 +227,7 @@ use std::io;
 use std::fs;
 use std::thread::sleep;
 
-pub use cmn::{MultiPartReader, ToParts, MethodInfo, Result, CallBuilder, Hub, ReadSeek, Part, ResponseResult, RequestValue, NestedType, Delegate, DefaultDelegate, ResourceMethodsBuilder, Resource, JsonServerError};
+pub use cmn::{MultiPartReader, ToParts, MethodInfo, Result, Error, CallBuilder, Hub, ReadSeek, Part, ResponseResult, RequestValue, NestedType, Delegate, DefaultDelegate, MethodsBuilder, Resource, JsonServerError};
 
 
 // ##############
@@ -270,7 +277,7 @@ impl Default for Scope {
 /// extern crate hyper;
 /// extern crate "yup-oauth2" as oauth2;
 /// extern crate "google-blogger3" as blogger3;
-/// use blogger3::Result;
+/// use blogger3::{Result, Error};
 /// # #[test] fn egal() {
 /// use std::default::Default;
 /// use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -305,15 +312,17 @@ impl Default for Scope {
 ///              .doit();
 /// 
 /// match result {
-///     Result::HttpError(err) => println!("HTTPERROR: {:?}", err),
-///     Result::MissingAPIKey => println!("Auth: Missing API Key - used if there are no scopes"),
-///     Result::MissingToken => println!("OAuth2: Missing Token"),
-///     Result::Cancelled => println!("Operation cancelled by user"),
-///     Result::UploadSizeLimitExceeded(size, max_size) => println!("Upload size too big: {} of {}", size, max_size),
-///     Result::Failure(_) => println!("General Failure (hyper::client::Response doesn't print)"),
-///     Result::FieldClash(clashed_field) => println!("You added custom parameter which is part of builder: {:?}", clashed_field),
-///     Result::JsonDecodeError(err) => println!("Couldn't understand server reply - maybe API needs update: {:?}", err),
-///     Result::Success(_) => println!("Success (value doesn't print)"),
+///     Err(e) => match e {
+///         Error::HttpError(err) => println!("HTTPERROR: {:?}", err),
+///         Error::MissingAPIKey => println!("Auth: Missing API Key - used if there are no scopes"),
+///         Error::MissingToken => println!("OAuth2: Missing Token"),
+///         Error::Cancelled => println!("Operation canceled by user"),
+///         Error::UploadSizeLimitExceeded(size, max_size) => println!("Upload size too big: {} of {}", size, max_size),
+///         Error::Failure(_) => println!("General Failure (hyper::client::Response doesn't print)"),
+///         Error::FieldClash(clashed_field) => println!("You added custom parameter which is part of builder: {:?}", clashed_field),
+///         Error::JsonDecodeError(err) => println!("Couldn't understand server reply - maybe API needs update: {:?}", err),
+///     },
+///     Ok(_) => println!("Success (value doesn't print)"),
 /// }
 /// # }
 /// ```
@@ -334,7 +343,7 @@ impl<'a, C, NC, A> Blogger<C, NC, A>
         Blogger {
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/0.1.1".to_string(),
+            _user_agent: "google-api-rust-client/0.1.2".to_string(),
             _m: PhantomData
         }
     }
@@ -365,7 +374,7 @@ impl<'a, C, NC, A> Blogger<C, NC, A>
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/0.1.1`.
+    /// It defaults to `google-api-rust-client/0.1.2`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -385,7 +394,7 @@ impl<'a, C, NC, A> Blogger<C, NC, A>
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct PostBlog {
-    /// The identifier of the Blog that contains this Post.    
+    /// The identifier of the Blog that contains this Post.
     pub id: String,
 }
 
@@ -399,20 +408,20 @@ impl Part for PostBlog {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct BlogPerUserInfo {
-    /// True if the user has Admin level access to the blog.    
+    /// True if the user has Admin level access to the blog.
     #[serde(alias="hasAdminAccess")]
     pub has_admin_access: bool,
-    /// The kind of this entity. Always blogger#blogPerUserInfo    
+    /// The kind of this entity. Always blogger#blogPerUserInfo
     pub kind: String,
-    /// Access permissions that the user has for the blog (ADMIN, AUTHOR, or READER).    
+    /// Access permissions that the user has for the blog (ADMIN, AUTHOR, or READER).
     pub role: String,
-    /// The Photo Album Key for the user when adding photos to the blog    
+    /// The Photo Album Key for the user when adding photos to the blog
     #[serde(alias="photosAlbumKey")]
     pub photos_album_key: String,
-    /// ID of the User    
+    /// ID of the User
     #[serde(alias="userId")]
     pub user_id: String,
-    /// ID of the Blog resource    
+    /// ID of the Blog resource
     #[serde(alias="blogId")]
     pub blog_id: String,
 }
@@ -426,18 +435,18 @@ impl Part for BlogPerUserInfo {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct PostPerUserInfo {
-    /// The kind of this entity. Always blogger#postPerUserInfo    
+    /// The kind of this entity. Always blogger#postPerUserInfo
     pub kind: String,
-    /// ID of the Post resource.    
+    /// ID of the Post resource.
     #[serde(alias="postId")]
     pub post_id: String,
-    /// ID of the User.    
+    /// ID of the User.
     #[serde(alias="userId")]
     pub user_id: String,
-    /// ID of the Blog that the post resource belongs to.    
+    /// ID of the Blog that the post resource belongs to.
     #[serde(alias="blogId")]
     pub blog_id: String,
-    /// True if the user has Author level access to the post.    
+    /// True if the user has Author level access to the post.
     #[serde(alias="hasEditAccess")]
     pub has_edit_access: bool,
 }
@@ -458,33 +467,33 @@ impl Part for PostPerUserInfo {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct Blog {
-    /// The status of the blog.    
+    /// The status of the blog.
     pub status: String,
-    /// The kind of this entry. Always blogger#blog    
+    /// The kind of this entry. Always blogger#blog
     pub kind: String,
-    /// The description of this blog. This is displayed underneath the title.    
+    /// The description of this blog. This is displayed underneath the title.
     pub description: String,
-    /// The locale this Blog is set to.    
+    /// The locale this Blog is set to.
     pub locale: BlogLocale,
-    /// The JSON custom meta-data for the Blog    
+    /// The JSON custom meta-data for the Blog
     #[serde(alias="customMetaData")]
     pub custom_meta_data: String,
-    /// The container of posts in this blog.    
+    /// The container of posts in this blog.
     pub posts: BlogPosts,
-    /// RFC 3339 date-time when this blog was last updated.    
+    /// RFC 3339 date-time when this blog was last updated.
     pub updated: String,
-    /// The identifier for this resource.    
+    /// The identifier for this resource.
     pub id: String,
-    /// The URL where this blog is published.    
+    /// The URL where this blog is published.
     pub url: String,
-    /// RFC 3339 date-time when this blog was published.    
+    /// RFC 3339 date-time when this blog was published.
     pub published: String,
-    /// The container of pages in this blog.    
+    /// The container of pages in this blog.
     pub pages: BlogPages,
-    /// The API REST URL to fetch this resource from.    
+    /// The API REST URL to fetch this resource from.
     #[serde(alias="selfLink")]
     pub self_link: String,
-    /// The name of this blog. This is displayed as the title.    
+    /// The name of this blog. This is displayed as the title.
     pub name: String,
 }
 
@@ -503,12 +512,12 @@ impl ResponseResult for Blog {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct PostUserInfosList {
-    /// Pagination token to fetch the next page, if one exists.    
+    /// Pagination token to fetch the next page, if one exists.
     #[serde(alias="nextPageToken")]
     pub next_page_token: String,
-    /// The list of Posts with User information for the post, for this Blog.    
+    /// The list of Posts with User information for the post, for this Blog.
     pub items: Vec<PostUserInfo>,
-    /// The kind of this entity. Always blogger#postList    
+    /// The kind of this entity. Always blogger#postList
     pub kind: String,
 }
 
@@ -526,11 +535,11 @@ impl ResponseResult for PostUserInfosList {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct BlogUserInfo {
-    /// The Blog resource.    
+    /// The Blog resource.
     pub blog: Blog,
-    /// The kind of this entity. Always blogger#blogUserInfo    
+    /// The kind of this entity. Always blogger#blogUserInfo
     pub kind: String,
-    /// Information about a User for the Blog.    
+    /// Information about a User for the Blog.
     pub blog_user_info: BlogPerUserInfo,
 }
 
@@ -544,7 +553,7 @@ impl ResponseResult for BlogUserInfo {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct CommentInReplyTo {
-    /// The identified of the parent of this comment.    
+    /// The identified of the parent of this comment.
     pub id: String,
 }
 
@@ -558,14 +567,14 @@ impl Part for CommentInReplyTo {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct CommentAuthor {
-    /// The URL of the Comment creator's Profile page.    
+    /// The URL of the Comment creator's Profile page.
     pub url: String,
-    /// The comment creator's avatar.    
+    /// The comment creator's avatar.
     pub image: CommentAuthorImage,
-    /// The display name.    
+    /// The display name.
     #[serde(alias="displayName")]
     pub display_name: String,
-    /// The identifier of the Comment creator.    
+    /// The identifier of the Comment creator.
     pub id: String,
 }
 
@@ -579,7 +588,7 @@ impl Part for CommentAuthor {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct PageAuthorImage {
-    /// The page author's avatar URL.    
+    /// The page author's avatar URL.
     pub url: String,
 }
 
@@ -593,7 +602,7 @@ impl Part for PageAuthorImage {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct CommentPost {
-    /// The identifier of the post containing this comment.    
+    /// The identifier of the post containing this comment.
     pub id: String,
 }
 
@@ -607,7 +616,7 @@ impl Part for CommentPost {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct UserBlogs {
-    /// The URL of the Blogs for this user.    
+    /// The URL of the Blogs for this user.
     #[serde(alias="selfLink")]
     pub self_link: String,
 }
@@ -622,12 +631,12 @@ impl Part for UserBlogs {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct PostReplies {
-    /// The count of comments on this post.    
+    /// The count of comments on this post.
     #[serde(alias="totalItems")]
     pub total_items: String,
-    /// The List of Comments for this Post.    
+    /// The List of Comments for this Post.
     pub items: Vec<Comment>,
-    /// The URL of the comments on this post.    
+    /// The URL of the comments on this post.
     #[serde(alias="selfLink")]
     pub self_link: String,
 }
@@ -642,9 +651,9 @@ impl Part for PostReplies {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct PageviewsCounts {
-    /// Count of page views for the given time range    
+    /// Count of page views for the given time range
     pub count: String,
-    /// Time range the given count applies to    
+    /// Time range the given count applies to
     #[serde(alias="timeRange")]
     pub time_range: String,
 }
@@ -664,11 +673,11 @@ impl Part for PageviewsCounts {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct BlogList {
-    /// The list of Blogs this user has Authorship or Admin rights over.    
+    /// The list of Blogs this user has Authorship or Admin rights over.
     pub items: Vec<Blog>,
-    /// The kind of this entity. Always blogger#blogList    
+    /// The kind of this entity. Always blogger#blogList
     pub kind: String,
-    /// Admin level list of blog per-user information    
+    /// Admin level list of blog per-user information
     #[serde(alias="blogUserInfos")]
     pub blog_user_infos: Vec<BlogUserInfo>,
 }
@@ -687,24 +696,24 @@ impl ResponseResult for BlogList {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct User {
-    /// Profile summary information.    
+    /// Profile summary information.
     pub about: String,
-    /// The display name.    
+    /// The display name.
     #[serde(alias="displayName")]
     pub display_name: String,
-    /// The timestamp of when this profile was created, in seconds since epoch.    
+    /// The timestamp of when this profile was created, in seconds since epoch.
     pub created: String,
-    /// This user's locale    
+    /// This user's locale
     pub locale: UserLocale,
-    /// The container of blogs for this user.    
+    /// The container of blogs for this user.
     pub blogs: UserBlogs,
-    /// The kind of this entity. Always blogger#user    
+    /// The kind of this entity. Always blogger#user
     pub kind: String,
-    /// The user's profile page.    
+    /// The user's profile page.
     pub url: String,
-    /// The identifier for this User.    
+    /// The identifier for this User.
     pub id: String,
-    /// The API REST URL to fetch this resource from.    
+    /// The API REST URL to fetch this resource from.
     #[serde(alias="selfLink")]
     pub self_link: String,
 }
@@ -719,7 +728,7 @@ impl ResponseResult for User {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct PostAuthorImage {
-    /// The Post author's avatar URL.    
+    /// The Post author's avatar URL.
     pub url: String,
 }
 
@@ -747,46 +756,46 @@ impl Part for PostAuthorImage {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Post {
-    /// Status of the post. Only set for admin-level requests    
+    /// Status of the post. Only set for admin-level requests
     pub status: Option<String>,
-    /// RFC 3339 date-time when this Post was last updated.    
+    /// RFC 3339 date-time when this Post was last updated.
     pub updated: Option<String>,
-    /// Comment control and display setting for readers of this post.    
+    /// Comment control and display setting for readers of this post.
     #[serde(alias="readerComments")]
     pub reader_comments: Option<String>,
-    /// The list of labels this Post was tagged with.    
+    /// The list of labels this Post was tagged with.
     pub labels: Option<Vec<String>>,
-    /// The container of comments on this Post.    
+    /// The container of comments on this Post.
     pub replies: Option<PostReplies>,
-    /// Display image for the Post.    
+    /// Display image for the Post.
     pub images: Option<Vec<PostImages>>,
-    /// The identifier of this Post.    
+    /// The identifier of this Post.
     pub id: Option<String>,
-    /// Data about the blog containing this Post.    
+    /// Data about the blog containing this Post.
     pub blog: Option<PostBlog>,
-    /// The kind of this entity. Always blogger#post    
+    /// The kind of this entity. Always blogger#post
     pub kind: Option<String>,
-    /// The title link URL, similar to atom's related link.    
+    /// The title link URL, similar to atom's related link.
     #[serde(alias="titleLink")]
     pub title_link: Option<String>,
-    /// The author of this Post.    
+    /// The author of this Post.
     pub author: Option<PostAuthor>,
-    /// The URL where this Post is displayed.    
+    /// The URL where this Post is displayed.
     pub url: Option<String>,
-    /// The title of the Post.    
+    /// The title of the Post.
     pub title: Option<String>,
-    /// The JSON meta-data for the Post.    
+    /// The JSON meta-data for the Post.
     #[serde(alias="customMetaData")]
     pub custom_meta_data: Option<String>,
-    /// The content of the Post. May contain HTML markup.    
+    /// The content of the Post. May contain HTML markup.
     pub content: Option<String>,
-    /// Etag of the resource.    
+    /// Etag of the resource.
     pub etag: Option<String>,
-    /// The location for geotagged posts.    
+    /// The location for geotagged posts.
     pub location: Option<PostLocation>,
-    /// RFC 3339 date-time when this Post was published.    
+    /// RFC 3339 date-time when this Post was published.
     pub published: Option<String>,
-    /// The API REST URL to fetch this resource from.    
+    /// The API REST URL to fetch this resource from.
     #[serde(alias="selfLink")]
     pub self_link: Option<String>,
 }
@@ -802,13 +811,13 @@ impl ResponseResult for Post {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct PostLocation {
-    /// Location's latitude.    
+    /// Location's latitude.
     pub lat: f64,
-    /// Location's longitude.    
+    /// Location's longitude.
     pub lng: f64,
-    /// Location's viewport span. Can be used when rendering a map preview.    
+    /// Location's viewport span. Can be used when rendering a map preview.
     pub span: String,
-    /// Location name.    
+    /// Location name.
     pub name: String,
 }
 
@@ -822,14 +831,14 @@ impl Part for PostLocation {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct PostAuthor {
-    /// The URL of the Post creator's Profile page.    
+    /// The URL of the Post creator's Profile page.
     pub url: String,
-    /// The Post author's avatar.    
+    /// The Post author's avatar.
     pub image: PostAuthorImage,
-    /// The display name.    
+    /// The display name.
     #[serde(alias="displayName")]
     pub display_name: String,
-    /// The identifier of the Post creator.    
+    /// The identifier of the Post creator.
     pub id: String,
 }
 
@@ -849,14 +858,14 @@ impl Part for PostAuthor {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct CommentList {
-    /// Pagination token to fetch the next page, if one exists.    
+    /// Pagination token to fetch the next page, if one exists.
     #[serde(alias="nextPageToken")]
     pub next_page_token: String,
-    /// The List of Comments for a Post.    
+    /// The List of Comments for a Post.
     pub items: Vec<Comment>,
-    /// The kind of this entry. Always blogger#commentList    
+    /// The kind of this entry. Always blogger#commentList
     pub kind: String,
-    /// Pagination token to fetch the previous page, if one exists.    
+    /// Pagination token to fetch the previous page, if one exists.
     #[serde(alias="prevPageToken")]
     pub prev_page_token: String,
 }
@@ -870,7 +879,7 @@ impl ResponseResult for CommentList {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct PostImages {
-    /// no description provided    
+    /// no description provided
     pub url: String,
 }
 
@@ -890,12 +899,12 @@ impl Part for PostImages {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct PostList {
-    /// Pagination token to fetch the next page, if one exists.    
+    /// Pagination token to fetch the next page, if one exists.
     #[serde(alias="nextPageToken")]
     pub next_page_token: String,
-    /// The list of Posts for this Blog.    
+    /// The list of Posts for this Blog.
     pub items: Vec<Post>,
-    /// The kind of this entity. Always blogger#postList    
+    /// The kind of this entity. Always blogger#postList
     pub kind: String,
 }
 
@@ -908,7 +917,7 @@ impl ResponseResult for PostList {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct CommentAuthorImage {
-    /// The comment creator's avatar URL.    
+    /// The comment creator's avatar URL.
     pub url: String,
 }
 
@@ -922,10 +931,10 @@ impl Part for CommentAuthorImage {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct BlogPages {
-    /// The count of pages in this blog.    
+    /// The count of pages in this blog.
     #[serde(alias="totalItems")]
     pub total_items: i32,
-    /// The URL of the container for pages in this blog.    
+    /// The URL of the container for pages in this blog.
     #[serde(alias="selfLink")]
     pub self_link: String,
 }
@@ -940,12 +949,12 @@ impl Part for BlogPages {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct BlogPosts {
-    /// The count of posts in this blog.    
+    /// The count of posts in this blog.
     #[serde(alias="totalItems")]
     pub total_items: i32,
-    /// The List of Posts for this Blog.    
+    /// The List of Posts for this Blog.
     pub items: Vec<Post>,
-    /// The URL of the container for posts in this blog.    
+    /// The URL of the container for posts in this blog.
     #[serde(alias="selfLink")]
     pub self_link: String,
 }
@@ -972,29 +981,29 @@ impl Part for BlogPosts {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Page {
-    /// The status of the page for admin resources (either LIVE or DRAFT).    
+    /// The status of the page for admin resources (either LIVE or DRAFT).
     pub status: Option<String>,
-    /// Data about the blog containing this Page.    
+    /// Data about the blog containing this Page.
     pub blog: Option<PageBlog>,
-    /// The kind of this entity. Always blogger#page    
+    /// The kind of this entity. Always blogger#page
     pub kind: Option<String>,
-    /// The title of this entity. This is the name displayed in the Admin user interface.    
+    /// The title of this entity. This is the name displayed in the Admin user interface.
     pub title: Option<String>,
-    /// The URL that this Page is displayed at.    
+    /// The URL that this Page is displayed at.
     pub url: Option<String>,
-    /// The author of this Page.    
+    /// The author of this Page.
     pub author: Option<PageAuthor>,
-    /// RFC 3339 date-time when this Page was last updated.    
+    /// RFC 3339 date-time when this Page was last updated.
     pub updated: Option<String>,
-    /// The body content of this Page, in HTML.    
+    /// The body content of this Page, in HTML.
     pub content: Option<String>,
-    /// Etag of the resource.    
+    /// Etag of the resource.
     pub etag: Option<String>,
-    /// RFC 3339 date-time when this Page was published.    
+    /// RFC 3339 date-time when this Page was published.
     pub published: Option<String>,
-    /// The identifier for this resource.    
+    /// The identifier for this resource.
     pub id: Option<String>,
-    /// The API REST URL to fetch this resource from.    
+    /// The API REST URL to fetch this resource from.
     #[serde(alias="selfLink")]
     pub self_link: Option<String>,
 }
@@ -1021,28 +1030,28 @@ impl ResponseResult for Page {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Comment {
-    /// The status of the comment (only populated for admin users)    
+    /// The status of the comment (only populated for admin users)
     pub status: String,
-    /// Data about the comment this is in reply to.    
+    /// Data about the comment this is in reply to.
     #[serde(alias="inReplyTo")]
     pub in_reply_to: CommentInReplyTo,
-    /// The kind of this entry. Always blogger#comment    
+    /// The kind of this entry. Always blogger#comment
     pub kind: String,
-    /// The author of this Comment.    
+    /// The author of this Comment.
     pub author: CommentAuthor,
-    /// RFC 3339 date-time when this comment was last updated.    
+    /// RFC 3339 date-time when this comment was last updated.
     pub updated: String,
-    /// Data about the blog containing this comment.    
+    /// Data about the blog containing this comment.
     pub blog: CommentBlog,
-    /// RFC 3339 date-time when this comment was published.    
+    /// RFC 3339 date-time when this comment was published.
     pub published: String,
-    /// Data about the post containing this comment.    
+    /// Data about the post containing this comment.
     pub post: CommentPost,
-    /// The actual content of the comment. May include HTML markup.    
+    /// The actual content of the comment. May include HTML markup.
     pub content: String,
-    /// The identifier for this resource.    
+    /// The identifier for this resource.
     pub id: String,
-    /// The API REST URL to fetch this resource from.    
+    /// The API REST URL to fetch this resource from.
     #[serde(alias="selfLink")]
     pub self_link: String,
 }
@@ -1063,11 +1072,11 @@ impl ResponseResult for Comment {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct PostUserInfo {
-    /// The kind of this entity. Always blogger#postUserInfo    
+    /// The kind of this entity. Always blogger#postUserInfo
     pub kind: String,
-    /// The Post resource.    
+    /// The Post resource.
     pub post: Post,
-    /// Information about a User for the Post.    
+    /// Information about a User for the Post.
     pub post_user_info: PostPerUserInfo,
 }
 
@@ -1086,12 +1095,12 @@ impl ResponseResult for PostUserInfo {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct Pageviews {
-    /// The container of posts in this blog.    
+    /// The container of posts in this blog.
     pub counts: Vec<PageviewsCounts>,
-    /// Blog Id    
+    /// Blog Id
     #[serde(alias="blogId")]
     pub blog_id: String,
-    /// The kind of this entry. Always blogger#page_views    
+    /// The kind of this entry. Always blogger#page_views
     pub kind: String,
 }
 
@@ -1104,14 +1113,14 @@ impl ResponseResult for Pageviews {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct PageAuthor {
-    /// The URL of the Page creator's Profile page.    
+    /// The URL of the Page creator's Profile page.
     pub url: String,
-    /// The page author's avatar.    
+    /// The page author's avatar.
     pub image: PageAuthorImage,
-    /// The display name.    
+    /// The display name.
     #[serde(alias="displayName")]
     pub display_name: String,
-    /// The identifier of the Page creator.    
+    /// The identifier of the Page creator.
     pub id: String,
 }
 
@@ -1130,12 +1139,12 @@ impl Part for PageAuthor {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct PageList {
-    /// Pagination token to fetch the next page, if one exists.    
+    /// Pagination token to fetch the next page, if one exists.
     #[serde(alias="nextPageToken")]
     pub next_page_token: String,
-    /// The list of Pages for a Blog.    
+    /// The list of Pages for a Blog.
     pub items: Vec<Page>,
-    /// The kind of this entity. Always blogger#pageList    
+    /// The kind of this entity. Always blogger#pageList
     pub kind: String,
 }
 
@@ -1148,11 +1157,11 @@ impl ResponseResult for PageList {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct UserLocale {
-    /// The user's country setting.    
+    /// The user's country setting.
     pub country: String,
-    /// The user's language variant setting.    
+    /// The user's language variant setting.
     pub variant: String,
-    /// The user's language setting.    
+    /// The user's language setting.
     pub language: String,
 }
 
@@ -1166,7 +1175,7 @@ impl Part for UserLocale {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct CommentBlog {
-    /// The identifier of the blog containing this comment.    
+    /// The identifier of the blog containing this comment.
     pub id: String,
 }
 
@@ -1180,7 +1189,7 @@ impl Part for CommentBlog {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct PageBlog {
-    /// The identifier of the blog containing this page.    
+    /// The identifier of the blog containing this page.
     pub id: String,
 }
 
@@ -1194,11 +1203,11 @@ impl Part for PageBlog {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct BlogLocale {
-    /// The country this blog's locale is set to.    
+    /// The country this blog's locale is set to.
     pub country: String,
-    /// The language variant this blog is authored in.    
+    /// The language variant this blog is authored in.
     pub variant: String,
-    /// The language this blog is authored in.    
+    /// The language this blog is authored in.
     pub language: String,
 }
 
@@ -1245,13 +1254,17 @@ pub struct PageViewMethods<'a, C, NC, A>
     hub: &'a Blogger<C, NC, A>,
 }
 
-impl<'a, C, NC, A> ResourceMethodsBuilder for PageViewMethods<'a, C, NC, A> {}
+impl<'a, C, NC, A> MethodsBuilder for PageViewMethods<'a, C, NC, A> {}
 
 impl<'a, C, NC, A> PageViewMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Retrieve pageview stats for a Blog.    
+    /// Retrieve pageview stats for a Blog.
+    /// 
+    /// # Arguments
+    ///
+    /// * `blogId` - The ID of the blog to get.
     pub fn get(&self, blog_id: &str) -> PageViewGetCall<'a, C, NC, A> {
         PageViewGetCall {
             hub: self.hub,
@@ -1300,13 +1313,17 @@ pub struct UserMethods<'a, C, NC, A>
     hub: &'a Blogger<C, NC, A>,
 }
 
-impl<'a, C, NC, A> ResourceMethodsBuilder for UserMethods<'a, C, NC, A> {}
+impl<'a, C, NC, A> MethodsBuilder for UserMethods<'a, C, NC, A> {}
 
 impl<'a, C, NC, A> UserMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Gets one user by ID.    
+    /// Gets one user by ID.
+    /// 
+    /// # Arguments
+    ///
+    /// * `userId` - The ID of the user to get.
     pub fn get(&self, user_id: &str) -> UserGetCall<'a, C, NC, A> {
         UserGetCall {
             hub: self.hub,
@@ -1354,13 +1371,17 @@ pub struct BlogMethods<'a, C, NC, A>
     hub: &'a Blogger<C, NC, A>,
 }
 
-impl<'a, C, NC, A> ResourceMethodsBuilder for BlogMethods<'a, C, NC, A> {}
+impl<'a, C, NC, A> MethodsBuilder for BlogMethods<'a, C, NC, A> {}
 
 impl<'a, C, NC, A> BlogMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Retrieves a list of blogs, possibly filtered.    
+    /// Retrieves a list of blogs, possibly filtered.
+    /// 
+    /// # Arguments
+    ///
+    /// * `userId` - ID of the user whose blogs are to be fetched. Either the word 'self' (sans quote marks) or the user's profile identifier.
     pub fn list_by_user(&self, user_id: &str) -> BlogListByUserCall<'a, C, NC, A> {
         BlogListByUserCall {
             hub: self.hub,
@@ -1377,7 +1398,11 @@ impl<'a, C, NC, A> BlogMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Gets one blog by ID.    
+    /// Gets one blog by ID.
+    /// 
+    /// # Arguments
+    ///
+    /// * `blogId` - The ID of the blog to get.
     pub fn get(&self, blog_id: &str) -> BlogGetCall<'a, C, NC, A> {
         BlogGetCall {
             hub: self.hub,
@@ -1392,7 +1417,11 @@ impl<'a, C, NC, A> BlogMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Retrieve a Blog by URL.    
+    /// Retrieve a Blog by URL.
+    /// 
+    /// # Arguments
+    ///
+    /// * `url` - The URL of the blog to retrieve.
     pub fn get_by_url(&self, url: &str) -> BlogGetByUrlCall<'a, C, NC, A> {
         BlogGetByUrlCall {
             hub: self.hub,
@@ -1441,13 +1470,19 @@ pub struct PostMethods<'a, C, NC, A>
     hub: &'a Blogger<C, NC, A>,
 }
 
-impl<'a, C, NC, A> ResourceMethodsBuilder for PostMethods<'a, C, NC, A> {}
+impl<'a, C, NC, A> MethodsBuilder for PostMethods<'a, C, NC, A> {}
 
 impl<'a, C, NC, A> PostMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Update a post.    
+    /// Update a post.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `blogId` - The ID of the Blog.
+    /// * `postId` - The ID of the Post.
     pub fn update(&self, request: &Post, blog_id: &str, post_id: &str) -> PostUpdateCall<'a, C, NC, A> {
         PostUpdateCall {
             hub: self.hub,
@@ -1467,7 +1502,12 @@ impl<'a, C, NC, A> PostMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Retrieve a Post by Path.    
+    /// Retrieve a Post by Path.
+    /// 
+    /// # Arguments
+    ///
+    /// * `blogId` - ID of the blog to fetch the post from.
+    /// * `path` - Path of the Post to retrieve.
     pub fn get_by_path(&self, blog_id: &str, path: &str) -> PostGetByPathCall<'a, C, NC, A> {
         PostGetByPathCall {
             hub: self.hub,
@@ -1483,7 +1523,12 @@ impl<'a, C, NC, A> PostMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Get a post by ID.    
+    /// Get a post by ID.
+    /// 
+    /// # Arguments
+    ///
+    /// * `blogId` - ID of the blog to fetch the post from.
+    /// * `postId` - The ID of the post
     pub fn get(&self, blog_id: &str, post_id: &str) -> PostGetCall<'a, C, NC, A> {
         PostGetCall {
             hub: self.hub,
@@ -1501,7 +1546,12 @@ impl<'a, C, NC, A> PostMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Add a post.    
+    /// Add a post.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `blogId` - ID of the blog to add the post to.
     pub fn insert(&self, request: &Post, blog_id: &str) -> PostInsertCall<'a, C, NC, A> {
         PostInsertCall {
             hub: self.hub,
@@ -1518,7 +1568,12 @@ impl<'a, C, NC, A> PostMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Publishes a draft post, optionally at the specific time of the given publishDate parameter.    
+    /// Publishes a draft post, optionally at the specific time of the given publishDate parameter.
+    /// 
+    /// # Arguments
+    ///
+    /// * `blogId` - The ID of the Blog.
+    /// * `postId` - The ID of the Post.
     pub fn publish(&self, blog_id: &str, post_id: &str) -> PostPublishCall<'a, C, NC, A> {
         PostPublishCall {
             hub: self.hub,
@@ -1533,7 +1588,12 @@ impl<'a, C, NC, A> PostMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Delete a post by ID.    
+    /// Delete a post by ID.
+    /// 
+    /// # Arguments
+    ///
+    /// * `blogId` - The ID of the Blog.
+    /// * `postId` - The ID of the Post.
     pub fn delete(&self, blog_id: &str, post_id: &str) -> PostDeleteCall<'a, C, NC, A> {
         PostDeleteCall {
             hub: self.hub,
@@ -1547,7 +1607,12 @@ impl<'a, C, NC, A> PostMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Revert a published or scheduled post to draft state.    
+    /// Revert a published or scheduled post to draft state.
+    /// 
+    /// # Arguments
+    ///
+    /// * `blogId` - The ID of the Blog.
+    /// * `postId` - The ID of the Post.
     pub fn revert(&self, blog_id: &str, post_id: &str) -> PostRevertCall<'a, C, NC, A> {
         PostRevertCall {
             hub: self.hub,
@@ -1561,7 +1626,12 @@ impl<'a, C, NC, A> PostMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Search for a post.    
+    /// Search for a post.
+    /// 
+    /// # Arguments
+    ///
+    /// * `blogId` - ID of the blog to fetch the post from.
+    /// * `q` - Query terms to search this blog for matching posts.
     pub fn search(&self, blog_id: &str, q: &str) -> PostSearchCall<'a, C, NC, A> {
         PostSearchCall {
             hub: self.hub,
@@ -1577,7 +1647,13 @@ impl<'a, C, NC, A> PostMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Update a post. This method supports patch semantics.    
+    /// Update a post. This method supports patch semantics.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `blogId` - The ID of the Blog.
+    /// * `postId` - The ID of the Post.
     pub fn patch(&self, request: &Post, blog_id: &str, post_id: &str) -> PostPatchCall<'a, C, NC, A> {
         PostPatchCall {
             hub: self.hub,
@@ -1597,7 +1673,11 @@ impl<'a, C, NC, A> PostMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Retrieves a list of posts, possibly filtered.    
+    /// Retrieves a list of posts, possibly filtered.
+    /// 
+    /// # Arguments
+    ///
+    /// * `blogId` - ID of the blog to fetch posts from.
     pub fn list(&self, blog_id: &str) -> PostListCall<'a, C, NC, A> {
         PostListCall {
             hub: self.hub,
@@ -1655,13 +1735,19 @@ pub struct CommentMethods<'a, C, NC, A>
     hub: &'a Blogger<C, NC, A>,
 }
 
-impl<'a, C, NC, A> ResourceMethodsBuilder for CommentMethods<'a, C, NC, A> {}
+impl<'a, C, NC, A> MethodsBuilder for CommentMethods<'a, C, NC, A> {}
 
 impl<'a, C, NC, A> CommentMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Gets one comment by ID.    
+    /// Gets one comment by ID.
+    /// 
+    /// # Arguments
+    ///
+    /// * `blogId` - ID of the blog to containing the comment.
+    /// * `postId` - ID of the post to fetch posts from.
+    /// * `commentId` - The ID of the comment to get.
     pub fn get(&self, blog_id: &str, post_id: &str, comment_id: &str) -> CommentGetCall<'a, C, NC, A> {
         CommentGetCall {
             hub: self.hub,
@@ -1677,7 +1763,13 @@ impl<'a, C, NC, A> CommentMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Removes the content of a comment.    
+    /// Removes the content of a comment.
+    /// 
+    /// # Arguments
+    ///
+    /// * `blogId` - The ID of the Blog.
+    /// * `postId` - The ID of the Post.
+    /// * `commentId` - The ID of the comment to delete content from.
     pub fn remove_content(&self, blog_id: &str, post_id: &str, comment_id: &str) -> CommentRemoveContentCall<'a, C, NC, A> {
         CommentRemoveContentCall {
             hub: self.hub,
@@ -1692,7 +1784,11 @@ impl<'a, C, NC, A> CommentMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Retrieves the comments for a blog, across all posts, possibly filtered.    
+    /// Retrieves the comments for a blog, across all posts, possibly filtered.
+    /// 
+    /// # Arguments
+    ///
+    /// * `blogId` - ID of the blog to fetch comments from.
     pub fn list_by_blog(&self, blog_id: &str) -> CommentListByBlogCall<'a, C, NC, A> {
         CommentListByBlogCall {
             hub: self.hub,
@@ -1711,7 +1807,13 @@ impl<'a, C, NC, A> CommentMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Marks a comment as spam.    
+    /// Marks a comment as spam.
+    /// 
+    /// # Arguments
+    ///
+    /// * `blogId` - The ID of the Blog.
+    /// * `postId` - The ID of the Post.
+    /// * `commentId` - The ID of the comment to mark as spam.
     pub fn mark_as_spam(&self, blog_id: &str, post_id: &str, comment_id: &str) -> CommentMarkAsSpamCall<'a, C, NC, A> {
         CommentMarkAsSpamCall {
             hub: self.hub,
@@ -1726,7 +1828,12 @@ impl<'a, C, NC, A> CommentMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Retrieves the comments for a post, possibly filtered.    
+    /// Retrieves the comments for a post, possibly filtered.
+    /// 
+    /// # Arguments
+    ///
+    /// * `blogId` - ID of the blog to fetch comments from.
+    /// * `postId` - ID of the post to fetch posts from.
     pub fn list(&self, blog_id: &str, post_id: &str) -> CommentListCall<'a, C, NC, A> {
         CommentListCall {
             hub: self.hub,
@@ -1747,7 +1854,13 @@ impl<'a, C, NC, A> CommentMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Marks a comment as not spam.    
+    /// Marks a comment as not spam.
+    /// 
+    /// # Arguments
+    ///
+    /// * `blogId` - The ID of the Blog.
+    /// * `postId` - The ID of the Post.
+    /// * `commentId` - The ID of the comment to mark as not spam.
     pub fn approve(&self, blog_id: &str, post_id: &str, comment_id: &str) -> CommentApproveCall<'a, C, NC, A> {
         CommentApproveCall {
             hub: self.hub,
@@ -1762,7 +1875,13 @@ impl<'a, C, NC, A> CommentMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Delete a comment by ID.    
+    /// Delete a comment by ID.
+    /// 
+    /// # Arguments
+    ///
+    /// * `blogId` - The ID of the Blog.
+    /// * `postId` - The ID of the Post.
+    /// * `commentId` - The ID of the comment to delete.
     pub fn delete(&self, blog_id: &str, post_id: &str, comment_id: &str) -> CommentDeleteCall<'a, C, NC, A> {
         CommentDeleteCall {
             hub: self.hub,
@@ -1812,13 +1931,19 @@ pub struct PostUserInfoMethods<'a, C, NC, A>
     hub: &'a Blogger<C, NC, A>,
 }
 
-impl<'a, C, NC, A> ResourceMethodsBuilder for PostUserInfoMethods<'a, C, NC, A> {}
+impl<'a, C, NC, A> MethodsBuilder for PostUserInfoMethods<'a, C, NC, A> {}
 
 impl<'a, C, NC, A> PostUserInfoMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Gets one post and user info pair, by post ID and user ID. The post user info contains per-user information about the post, such as access rights, specific to the user.    
+    /// Gets one post and user info pair, by post ID and user ID. The post user info contains per-user information about the post, such as access rights, specific to the user.
+    /// 
+    /// # Arguments
+    ///
+    /// * `userId` - ID of the user for the per-user information to be fetched. Either the word 'self' (sans quote marks) or the user's profile identifier.
+    /// * `blogId` - The ID of the blog.
+    /// * `postId` - The ID of the post to get.
     pub fn get(&self, user_id: &str, blog_id: &str, post_id: &str) -> PostUserInfoGetCall<'a, C, NC, A> {
         PostUserInfoGetCall {
             hub: self.hub,
@@ -1834,7 +1959,12 @@ impl<'a, C, NC, A> PostUserInfoMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Retrieves a list of post and post user info pairs, possibly filtered. The post user info contains per-user information about the post, such as access rights, specific to the user.    
+    /// Retrieves a list of post and post user info pairs, possibly filtered. The post user info contains per-user information about the post, such as access rights, specific to the user.
+    /// 
+    /// # Arguments
+    ///
+    /// * `userId` - ID of the user for the per-user information to be fetched. Either the word 'self' (sans quote marks) or the user's profile identifier.
+    /// * `blogId` - ID of the blog to fetch posts from.
     pub fn list(&self, user_id: &str, blog_id: &str) -> PostUserInfoListCall<'a, C, NC, A> {
         PostUserInfoListCall {
             hub: self.hub,
@@ -1892,13 +2022,18 @@ pub struct BlogUserInfoMethods<'a, C, NC, A>
     hub: &'a Blogger<C, NC, A>,
 }
 
-impl<'a, C, NC, A> ResourceMethodsBuilder for BlogUserInfoMethods<'a, C, NC, A> {}
+impl<'a, C, NC, A> MethodsBuilder for BlogUserInfoMethods<'a, C, NC, A> {}
 
 impl<'a, C, NC, A> BlogUserInfoMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Gets one blog and user info pair by blogId and userId.    
+    /// Gets one blog and user info pair by blogId and userId.
+    /// 
+    /// # Arguments
+    ///
+    /// * `userId` - ID of the user whose blogs are to be fetched. Either the word 'self' (sans quote marks) or the user's profile identifier.
+    /// * `blogId` - The ID of the blog to get.
     pub fn get(&self, user_id: &str, blog_id: &str) -> BlogUserInfoGetCall<'a, C, NC, A> {
         BlogUserInfoGetCall {
             hub: self.hub,
@@ -1948,13 +2083,18 @@ pub struct PageMethods<'a, C, NC, A>
     hub: &'a Blogger<C, NC, A>,
 }
 
-impl<'a, C, NC, A> ResourceMethodsBuilder for PageMethods<'a, C, NC, A> {}
+impl<'a, C, NC, A> MethodsBuilder for PageMethods<'a, C, NC, A> {}
 
 impl<'a, C, NC, A> PageMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Gets one blog page by ID.    
+    /// Gets one blog page by ID.
+    /// 
+    /// # Arguments
+    ///
+    /// * `blogId` - ID of the blog containing the page.
+    /// * `pageId` - The ID of the page to get.
     pub fn get(&self, blog_id: &str, page_id: &str) -> PageGetCall<'a, C, NC, A> {
         PageGetCall {
             hub: self.hub,
@@ -1969,7 +2109,11 @@ impl<'a, C, NC, A> PageMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Retrieves the pages for a blog, optionally including non-LIVE statuses.    
+    /// Retrieves the pages for a blog, optionally including non-LIVE statuses.
+    /// 
+    /// # Arguments
+    ///
+    /// * `blogId` - ID of the blog to fetch Pages from.
     pub fn list(&self, blog_id: &str) -> PageListCall<'a, C, NC, A> {
         PageListCall {
             hub: self.hub,
@@ -1987,7 +2131,12 @@ impl<'a, C, NC, A> PageMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Revert a published or scheduled page to draft state.    
+    /// Revert a published or scheduled page to draft state.
+    /// 
+    /// # Arguments
+    ///
+    /// * `blogId` - The ID of the blog.
+    /// * `pageId` - The ID of the page.
     pub fn revert(&self, blog_id: &str, page_id: &str) -> PageRevertCall<'a, C, NC, A> {
         PageRevertCall {
             hub: self.hub,
@@ -2001,7 +2150,12 @@ impl<'a, C, NC, A> PageMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Add a page.    
+    /// Add a page.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `blogId` - ID of the blog to add the page to.
     pub fn insert(&self, request: &Page, blog_id: &str) -> PageInsertCall<'a, C, NC, A> {
         PageInsertCall {
             hub: self.hub,
@@ -2016,7 +2170,13 @@ impl<'a, C, NC, A> PageMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Update a page. This method supports patch semantics.    
+    /// Update a page. This method supports patch semantics.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `blogId` - The ID of the Blog.
+    /// * `pageId` - The ID of the Page.
     pub fn patch(&self, request: &Page, blog_id: &str, page_id: &str) -> PagePatchCall<'a, C, NC, A> {
         PagePatchCall {
             hub: self.hub,
@@ -2033,7 +2193,12 @@ impl<'a, C, NC, A> PageMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Publishes a draft page.    
+    /// Publishes a draft page.
+    /// 
+    /// # Arguments
+    ///
+    /// * `blogId` - The ID of the blog.
+    /// * `pageId` - The ID of the page.
     pub fn publish(&self, blog_id: &str, page_id: &str) -> PagePublishCall<'a, C, NC, A> {
         PagePublishCall {
             hub: self.hub,
@@ -2047,7 +2212,13 @@ impl<'a, C, NC, A> PageMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Update a page.    
+    /// Update a page.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `blogId` - The ID of the Blog.
+    /// * `pageId` - The ID of the Page.
     pub fn update(&self, request: &Page, blog_id: &str, page_id: &str) -> PageUpdateCall<'a, C, NC, A> {
         PageUpdateCall {
             hub: self.hub,
@@ -2064,7 +2235,12 @@ impl<'a, C, NC, A> PageMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Delete a page by ID.    
+    /// Delete a page by ID.
+    /// 
+    /// # Arguments
+    ///
+    /// * `blogId` - The ID of the Blog.
+    /// * `pageId` - The ID of the Page.
     pub fn delete(&self, blog_id: &str, page_id: &str) -> PageDeleteCall<'a, C, NC, A> {
         PageDeleteCall {
             hub: self.hub,
@@ -2088,7 +2264,7 @@ impl<'a, C, NC, A> PageMethods<'a, C, NC, A> {
 /// Retrieve pageview stats for a Blog.
 ///
 /// A builder for the *get* method supported by a *pageView* resource.
-/// It is not used directly, but through a `PageViewMethods`.
+/// It is not used directly, but through a `PageViewMethods` instance.
 ///
 /// # Example
 ///
@@ -2155,7 +2331,7 @@ impl<'a, C, NC, A> PageViewGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
         for &field in ["alt", "blogId", "range"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -2208,7 +2384,7 @@ impl<'a, C, NC, A> PageViewGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -2220,7 +2396,6 @@ impl<'a, C, NC, A> PageViewGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -2230,7 +2405,7 @@ impl<'a, C, NC, A> PageViewGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -2241,7 +2416,7 @@ impl<'a, C, NC, A> PageViewGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -2250,13 +2425,13 @@ impl<'a, C, NC, A> PageViewGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -2268,7 +2443,7 @@ impl<'a, C, NC, A> PageViewGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The ID of the blog to get.    
+    /// The ID of the blog to get.
     pub fn blog_id(mut self, new_value: &str) -> PageViewGetCall<'a, C, NC, A> {
         self._blog_id = new_value.to_string();
         self
@@ -2337,7 +2512,7 @@ impl<'a, C, NC, A> PageViewGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
 /// Gets one user by ID.
 ///
 /// A builder for the *get* method supported by a *user* resource.
-/// It is not used directly, but through a `UserMethods`.
+/// It is not used directly, but through a `UserMethods` instance.
 ///
 /// # Example
 ///
@@ -2395,7 +2570,7 @@ impl<'a, C, NC, A> UserGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnec
         for &field in ["alt", "userId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -2448,7 +2623,7 @@ impl<'a, C, NC, A> UserGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnec
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -2460,7 +2635,6 @@ impl<'a, C, NC, A> UserGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnec
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -2470,7 +2644,7 @@ impl<'a, C, NC, A> UserGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnec
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -2481,7 +2655,7 @@ impl<'a, C, NC, A> UserGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnec
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -2490,13 +2664,13 @@ impl<'a, C, NC, A> UserGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnec
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -2508,7 +2682,7 @@ impl<'a, C, NC, A> UserGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnec
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The ID of the user to get.    
+    /// The ID of the user to get.
     pub fn user_id(mut self, new_value: &str) -> UserGetCall<'a, C, NC, A> {
         self._user_id = new_value.to_string();
         self
@@ -2569,7 +2743,7 @@ impl<'a, C, NC, A> UserGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnec
 /// Retrieves a list of blogs, possibly filtered.
 ///
 /// A builder for the *listByUser* method supported by a *blog* resource.
-/// It is not used directly, but through a `BlogMethods`.
+/// It is not used directly, but through a `BlogMethods` instance.
 ///
 /// # Example
 ///
@@ -2655,7 +2829,7 @@ impl<'a, C, NC, A> BlogListByUserCall<'a, C, NC, A> where NC: hyper::net::Networ
         for &field in ["alt", "userId", "view", "status", "role", "fetchUserInfo"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -2708,7 +2882,7 @@ impl<'a, C, NC, A> BlogListByUserCall<'a, C, NC, A> where NC: hyper::net::Networ
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -2720,7 +2894,6 @@ impl<'a, C, NC, A> BlogListByUserCall<'a, C, NC, A> where NC: hyper::net::Networ
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -2730,7 +2903,7 @@ impl<'a, C, NC, A> BlogListByUserCall<'a, C, NC, A> where NC: hyper::net::Networ
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -2741,7 +2914,7 @@ impl<'a, C, NC, A> BlogListByUserCall<'a, C, NC, A> where NC: hyper::net::Networ
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -2750,13 +2923,13 @@ impl<'a, C, NC, A> BlogListByUserCall<'a, C, NC, A> where NC: hyper::net::Networ
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -2768,7 +2941,7 @@ impl<'a, C, NC, A> BlogListByUserCall<'a, C, NC, A> where NC: hyper::net::Networ
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// ID of the user whose blogs are to be fetched. Either the word 'self' (sans quote marks) or the user's profile identifier.    
+    /// ID of the user whose blogs are to be fetched. Either the word 'self' (sans quote marks) or the user's profile identifier.
     pub fn user_id(mut self, new_value: &str) -> BlogListByUserCall<'a, C, NC, A> {
         self._user_id = new_value.to_string();
         self
@@ -2776,7 +2949,7 @@ impl<'a, C, NC, A> BlogListByUserCall<'a, C, NC, A> where NC: hyper::net::Networ
     /// Sets the *view* query property to the given value.
     ///
     /// 
-    /// Access level with which to view the blogs. Note that some fields require elevated access.    
+    /// Access level with which to view the blogs. Note that some fields require elevated access.
     pub fn view(mut self, new_value: &str) -> BlogListByUserCall<'a, C, NC, A> {
         self._view = Some(new_value.to_string());
         self
@@ -2785,7 +2958,7 @@ impl<'a, C, NC, A> BlogListByUserCall<'a, C, NC, A> where NC: hyper::net::Networ
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
     ///
     /// 
-    /// Blog statuses to include in the result (default: Live blogs only). Note that ADMIN access is required to view deleted blogs.    
+    /// Blog statuses to include in the result (default: Live blogs only). Note that ADMIN access is required to view deleted blogs.
     pub fn add_status(mut self, new_value: &str) -> BlogListByUserCall<'a, C, NC, A> {
         self._status.push(new_value.to_string());
         self
@@ -2794,7 +2967,7 @@ impl<'a, C, NC, A> BlogListByUserCall<'a, C, NC, A> where NC: hyper::net::Networ
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
     ///
     /// 
-    /// User access types for blogs to include in the results, e.g. AUTHOR will return blogs where the user has author level access. If no roles are specified, defaults to ADMIN and AUTHOR roles.    
+    /// User access types for blogs to include in the results, e.g. AUTHOR will return blogs where the user has author level access. If no roles are specified, defaults to ADMIN and AUTHOR roles.
     pub fn add_role(mut self, new_value: &str) -> BlogListByUserCall<'a, C, NC, A> {
         self._role.push(new_value.to_string());
         self
@@ -2802,7 +2975,7 @@ impl<'a, C, NC, A> BlogListByUserCall<'a, C, NC, A> where NC: hyper::net::Networ
     /// Sets the *fetch user info* query property to the given value.
     ///
     /// 
-    /// Whether the response is a list of blogs with per-user information instead of just blogs.    
+    /// Whether the response is a list of blogs with per-user information instead of just blogs.
     pub fn fetch_user_info(mut self, new_value: bool) -> BlogListByUserCall<'a, C, NC, A> {
         self._fetch_user_info = Some(new_value);
         self
@@ -2863,7 +3036,7 @@ impl<'a, C, NC, A> BlogListByUserCall<'a, C, NC, A> where NC: hyper::net::Networ
 /// Gets one blog by ID.
 ///
 /// A builder for the *get* method supported by a *blog* resource.
-/// It is not used directly, but through a `BlogMethods`.
+/// It is not used directly, but through a `BlogMethods` instance.
 ///
 /// # Example
 ///
@@ -2931,7 +3104,7 @@ impl<'a, C, NC, A> BlogGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnec
         for &field in ["alt", "blogId", "view", "maxPosts"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -2984,7 +3157,7 @@ impl<'a, C, NC, A> BlogGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnec
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -2996,7 +3169,6 @@ impl<'a, C, NC, A> BlogGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnec
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -3006,7 +3178,7 @@ impl<'a, C, NC, A> BlogGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnec
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -3017,7 +3189,7 @@ impl<'a, C, NC, A> BlogGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnec
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -3026,13 +3198,13 @@ impl<'a, C, NC, A> BlogGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnec
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -3044,7 +3216,7 @@ impl<'a, C, NC, A> BlogGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnec
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The ID of the blog to get.    
+    /// The ID of the blog to get.
     pub fn blog_id(mut self, new_value: &str) -> BlogGetCall<'a, C, NC, A> {
         self._blog_id = new_value.to_string();
         self
@@ -3052,7 +3224,7 @@ impl<'a, C, NC, A> BlogGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnec
     /// Sets the *view* query property to the given value.
     ///
     /// 
-    /// Access level with which to view the blog. Note that some fields require elevated access.    
+    /// Access level with which to view the blog. Note that some fields require elevated access.
     pub fn view(mut self, new_value: &str) -> BlogGetCall<'a, C, NC, A> {
         self._view = Some(new_value.to_string());
         self
@@ -3060,7 +3232,7 @@ impl<'a, C, NC, A> BlogGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnec
     /// Sets the *max posts* query property to the given value.
     ///
     /// 
-    /// Maximum number of posts to pull back with the blog.    
+    /// Maximum number of posts to pull back with the blog.
     pub fn max_posts(mut self, new_value: u32) -> BlogGetCall<'a, C, NC, A> {
         self._max_posts = Some(new_value);
         self
@@ -3121,7 +3293,7 @@ impl<'a, C, NC, A> BlogGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnec
 /// Retrieve a Blog by URL.
 ///
 /// A builder for the *getByUrl* method supported by a *blog* resource.
-/// It is not used directly, but through a `BlogMethods`.
+/// It is not used directly, but through a `BlogMethods` instance.
 ///
 /// # Example
 ///
@@ -3184,7 +3356,7 @@ impl<'a, C, NC, A> BlogGetByUrlCall<'a, C, NC, A> where NC: hyper::net::NetworkC
         for &field in ["alt", "url", "view"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -3213,7 +3385,7 @@ impl<'a, C, NC, A> BlogGetByUrlCall<'a, C, NC, A> where NC: hyper::net::NetworkC
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -3225,7 +3397,6 @@ impl<'a, C, NC, A> BlogGetByUrlCall<'a, C, NC, A> where NC: hyper::net::NetworkC
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -3235,7 +3406,7 @@ impl<'a, C, NC, A> BlogGetByUrlCall<'a, C, NC, A> where NC: hyper::net::NetworkC
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -3246,7 +3417,7 @@ impl<'a, C, NC, A> BlogGetByUrlCall<'a, C, NC, A> where NC: hyper::net::NetworkC
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -3255,13 +3426,13 @@ impl<'a, C, NC, A> BlogGetByUrlCall<'a, C, NC, A> where NC: hyper::net::NetworkC
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -3273,7 +3444,7 @@ impl<'a, C, NC, A> BlogGetByUrlCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The URL of the blog to retrieve.    
+    /// The URL of the blog to retrieve.
     pub fn url(mut self, new_value: &str) -> BlogGetByUrlCall<'a, C, NC, A> {
         self._url = new_value.to_string();
         self
@@ -3281,7 +3452,7 @@ impl<'a, C, NC, A> BlogGetByUrlCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// Sets the *view* query property to the given value.
     ///
     /// 
-    /// Access level with which to view the blog. Note that some fields require elevated access.    
+    /// Access level with which to view the blog. Note that some fields require elevated access.
     pub fn view(mut self, new_value: &str) -> BlogGetByUrlCall<'a, C, NC, A> {
         self._view = Some(new_value.to_string());
         self
@@ -3342,7 +3513,7 @@ impl<'a, C, NC, A> BlogGetByUrlCall<'a, C, NC, A> where NC: hyper::net::NetworkC
 /// Update a post.
 ///
 /// A builder for the *update* method supported by a *post* resource.
-/// It is not used directly, but through a `PostMethods`.
+/// It is not used directly, but through a `PostMethods` instance.
 ///
 /// # Example
 ///
@@ -3434,7 +3605,7 @@ impl<'a, C, NC, A> PostUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
         for &field in ["alt", "blogId", "postId", "revert", "publish", "maxComments", "fetchImages", "fetchBody"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -3491,7 +3662,7 @@ impl<'a, C, NC, A> PostUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -3507,7 +3678,6 @@ impl<'a, C, NC, A> PostUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -3517,7 +3687,7 @@ impl<'a, C, NC, A> PostUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -3528,7 +3698,7 @@ impl<'a, C, NC, A> PostUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -3537,13 +3707,13 @@ impl<'a, C, NC, A> PostUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -3564,7 +3734,7 @@ impl<'a, C, NC, A> PostUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The ID of the Blog.    
+    /// The ID of the Blog.
     pub fn blog_id(mut self, new_value: &str) -> PostUpdateCall<'a, C, NC, A> {
         self._blog_id = new_value.to_string();
         self
@@ -3574,7 +3744,7 @@ impl<'a, C, NC, A> PostUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The ID of the Post.    
+    /// The ID of the Post.
     pub fn post_id(mut self, new_value: &str) -> PostUpdateCall<'a, C, NC, A> {
         self._post_id = new_value.to_string();
         self
@@ -3582,7 +3752,7 @@ impl<'a, C, NC, A> PostUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// Sets the *revert* query property to the given value.
     ///
     /// 
-    /// Whether a revert action should be performed when the post is updated (default: false).    
+    /// Whether a revert action should be performed when the post is updated (default: false).
     pub fn revert(mut self, new_value: bool) -> PostUpdateCall<'a, C, NC, A> {
         self._revert = Some(new_value);
         self
@@ -3590,7 +3760,7 @@ impl<'a, C, NC, A> PostUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// Sets the *publish* query property to the given value.
     ///
     /// 
-    /// Whether a publish action should be performed when the post is updated (default: false).    
+    /// Whether a publish action should be performed when the post is updated (default: false).
     pub fn publish(mut self, new_value: bool) -> PostUpdateCall<'a, C, NC, A> {
         self._publish = Some(new_value);
         self
@@ -3598,7 +3768,7 @@ impl<'a, C, NC, A> PostUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// Sets the *max comments* query property to the given value.
     ///
     /// 
-    /// Maximum number of comments to retrieve with the returned post.    
+    /// Maximum number of comments to retrieve with the returned post.
     pub fn max_comments(mut self, new_value: u32) -> PostUpdateCall<'a, C, NC, A> {
         self._max_comments = Some(new_value);
         self
@@ -3606,7 +3776,7 @@ impl<'a, C, NC, A> PostUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// Sets the *fetch images* query property to the given value.
     ///
     /// 
-    /// Whether image URL metadata for each post is included in the returned result (default: false).    
+    /// Whether image URL metadata for each post is included in the returned result (default: false).
     pub fn fetch_images(mut self, new_value: bool) -> PostUpdateCall<'a, C, NC, A> {
         self._fetch_images = Some(new_value);
         self
@@ -3614,7 +3784,7 @@ impl<'a, C, NC, A> PostUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// Sets the *fetch body* query property to the given value.
     ///
     /// 
-    /// Whether the body content of the post is included with the result (default: true).    
+    /// Whether the body content of the post is included with the result (default: true).
     pub fn fetch_body(mut self, new_value: bool) -> PostUpdateCall<'a, C, NC, A> {
         self._fetch_body = Some(new_value);
         self
@@ -3675,7 +3845,7 @@ impl<'a, C, NC, A> PostUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
 /// Retrieve a Post by Path.
 ///
 /// A builder for the *getByPath* method supported by a *post* resource.
-/// It is not used directly, but through a `PostMethods`.
+/// It is not used directly, but through a `PostMethods` instance.
 ///
 /// # Example
 ///
@@ -3745,7 +3915,7 @@ impl<'a, C, NC, A> PostGetByPathCall<'a, C, NC, A> where NC: hyper::net::Network
         for &field in ["alt", "blogId", "path", "view", "maxComments"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -3798,7 +3968,7 @@ impl<'a, C, NC, A> PostGetByPathCall<'a, C, NC, A> where NC: hyper::net::Network
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -3810,7 +3980,6 @@ impl<'a, C, NC, A> PostGetByPathCall<'a, C, NC, A> where NC: hyper::net::Network
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -3820,7 +3989,7 @@ impl<'a, C, NC, A> PostGetByPathCall<'a, C, NC, A> where NC: hyper::net::Network
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -3831,7 +4000,7 @@ impl<'a, C, NC, A> PostGetByPathCall<'a, C, NC, A> where NC: hyper::net::Network
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -3840,13 +4009,13 @@ impl<'a, C, NC, A> PostGetByPathCall<'a, C, NC, A> where NC: hyper::net::Network
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -3858,7 +4027,7 @@ impl<'a, C, NC, A> PostGetByPathCall<'a, C, NC, A> where NC: hyper::net::Network
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// ID of the blog to fetch the post from.    
+    /// ID of the blog to fetch the post from.
     pub fn blog_id(mut self, new_value: &str) -> PostGetByPathCall<'a, C, NC, A> {
         self._blog_id = new_value.to_string();
         self
@@ -3868,7 +4037,7 @@ impl<'a, C, NC, A> PostGetByPathCall<'a, C, NC, A> where NC: hyper::net::Network
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Path of the Post to retrieve.    
+    /// Path of the Post to retrieve.
     pub fn path(mut self, new_value: &str) -> PostGetByPathCall<'a, C, NC, A> {
         self._path = new_value.to_string();
         self
@@ -3876,7 +4045,7 @@ impl<'a, C, NC, A> PostGetByPathCall<'a, C, NC, A> where NC: hyper::net::Network
     /// Sets the *view* query property to the given value.
     ///
     /// 
-    /// Access level with which to view the returned result. Note that some fields require elevated access.    
+    /// Access level with which to view the returned result. Note that some fields require elevated access.
     pub fn view(mut self, new_value: &str) -> PostGetByPathCall<'a, C, NC, A> {
         self._view = Some(new_value.to_string());
         self
@@ -3884,7 +4053,7 @@ impl<'a, C, NC, A> PostGetByPathCall<'a, C, NC, A> where NC: hyper::net::Network
     /// Sets the *max comments* query property to the given value.
     ///
     /// 
-    /// Maximum number of comments to pull back on a post.    
+    /// Maximum number of comments to pull back on a post.
     pub fn max_comments(mut self, new_value: u32) -> PostGetByPathCall<'a, C, NC, A> {
         self._max_comments = Some(new_value);
         self
@@ -3945,7 +4114,7 @@ impl<'a, C, NC, A> PostGetByPathCall<'a, C, NC, A> where NC: hyper::net::Network
 /// Get a post by ID.
 ///
 /// A builder for the *get* method supported by a *post* resource.
-/// It is not used directly, but through a `PostMethods`.
+/// It is not used directly, but through a `PostMethods` instance.
 ///
 /// # Example
 ///
@@ -4025,7 +4194,7 @@ impl<'a, C, NC, A> PostGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnec
         for &field in ["alt", "blogId", "postId", "view", "maxComments", "fetchImages", "fetchBody"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -4078,7 +4247,7 @@ impl<'a, C, NC, A> PostGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnec
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -4090,7 +4259,6 @@ impl<'a, C, NC, A> PostGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnec
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -4100,7 +4268,7 @@ impl<'a, C, NC, A> PostGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnec
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -4111,7 +4279,7 @@ impl<'a, C, NC, A> PostGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnec
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -4120,13 +4288,13 @@ impl<'a, C, NC, A> PostGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnec
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -4138,7 +4306,7 @@ impl<'a, C, NC, A> PostGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnec
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// ID of the blog to fetch the post from.    
+    /// ID of the blog to fetch the post from.
     pub fn blog_id(mut self, new_value: &str) -> PostGetCall<'a, C, NC, A> {
         self._blog_id = new_value.to_string();
         self
@@ -4148,7 +4316,7 @@ impl<'a, C, NC, A> PostGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnec
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The ID of the post    
+    /// The ID of the post
     pub fn post_id(mut self, new_value: &str) -> PostGetCall<'a, C, NC, A> {
         self._post_id = new_value.to_string();
         self
@@ -4156,7 +4324,7 @@ impl<'a, C, NC, A> PostGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnec
     /// Sets the *view* query property to the given value.
     ///
     /// 
-    /// Access level with which to view the returned result. Note that some fields require elevated access.    
+    /// Access level with which to view the returned result. Note that some fields require elevated access.
     pub fn view(mut self, new_value: &str) -> PostGetCall<'a, C, NC, A> {
         self._view = Some(new_value.to_string());
         self
@@ -4164,7 +4332,7 @@ impl<'a, C, NC, A> PostGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnec
     /// Sets the *max comments* query property to the given value.
     ///
     /// 
-    /// Maximum number of comments to pull back on a post.    
+    /// Maximum number of comments to pull back on a post.
     pub fn max_comments(mut self, new_value: u32) -> PostGetCall<'a, C, NC, A> {
         self._max_comments = Some(new_value);
         self
@@ -4172,7 +4340,7 @@ impl<'a, C, NC, A> PostGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnec
     /// Sets the *fetch images* query property to the given value.
     ///
     /// 
-    /// Whether image URL metadata for each post is included (default: false).    
+    /// Whether image URL metadata for each post is included (default: false).
     pub fn fetch_images(mut self, new_value: bool) -> PostGetCall<'a, C, NC, A> {
         self._fetch_images = Some(new_value);
         self
@@ -4180,7 +4348,7 @@ impl<'a, C, NC, A> PostGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnec
     /// Sets the *fetch body* query property to the given value.
     ///
     /// 
-    /// Whether the body content of the post is included (default: true). This should be set to false when the post bodies are not required, to help minimize traffic.    
+    /// Whether the body content of the post is included (default: true). This should be set to false when the post bodies are not required, to help minimize traffic.
     pub fn fetch_body(mut self, new_value: bool) -> PostGetCall<'a, C, NC, A> {
         self._fetch_body = Some(new_value);
         self
@@ -4241,7 +4409,7 @@ impl<'a, C, NC, A> PostGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnec
 /// Add a post.
 ///
 /// A builder for the *insert* method supported by a *post* resource.
-/// It is not used directly, but through a `PostMethods`.
+/// It is not used directly, but through a `PostMethods` instance.
 ///
 /// # Example
 ///
@@ -4321,7 +4489,7 @@ impl<'a, C, NC, A> PostInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
         for &field in ["alt", "blogId", "isDraft", "fetchImages", "fetchBody"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -4378,7 +4546,7 @@ impl<'a, C, NC, A> PostInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -4394,7 +4562,6 @@ impl<'a, C, NC, A> PostInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -4404,7 +4571,7 @@ impl<'a, C, NC, A> PostInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -4415,7 +4582,7 @@ impl<'a, C, NC, A> PostInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -4424,13 +4591,13 @@ impl<'a, C, NC, A> PostInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -4451,7 +4618,7 @@ impl<'a, C, NC, A> PostInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// ID of the blog to add the post to.    
+    /// ID of the blog to add the post to.
     pub fn blog_id(mut self, new_value: &str) -> PostInsertCall<'a, C, NC, A> {
         self._blog_id = new_value.to_string();
         self
@@ -4459,7 +4626,7 @@ impl<'a, C, NC, A> PostInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// Sets the *is draft* query property to the given value.
     ///
     /// 
-    /// Whether to create the post as a draft (default: false).    
+    /// Whether to create the post as a draft (default: false).
     pub fn is_draft(mut self, new_value: bool) -> PostInsertCall<'a, C, NC, A> {
         self._is_draft = Some(new_value);
         self
@@ -4467,7 +4634,7 @@ impl<'a, C, NC, A> PostInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// Sets the *fetch images* query property to the given value.
     ///
     /// 
-    /// Whether image URL metadata for each post is included in the returned result (default: false).    
+    /// Whether image URL metadata for each post is included in the returned result (default: false).
     pub fn fetch_images(mut self, new_value: bool) -> PostInsertCall<'a, C, NC, A> {
         self._fetch_images = Some(new_value);
         self
@@ -4475,7 +4642,7 @@ impl<'a, C, NC, A> PostInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// Sets the *fetch body* query property to the given value.
     ///
     /// 
-    /// Whether the body content of the post is included with the result (default: true).    
+    /// Whether the body content of the post is included with the result (default: true).
     pub fn fetch_body(mut self, new_value: bool) -> PostInsertCall<'a, C, NC, A> {
         self._fetch_body = Some(new_value);
         self
@@ -4536,7 +4703,7 @@ impl<'a, C, NC, A> PostInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
 /// Publishes a draft post, optionally at the specific time of the given publishDate parameter.
 ///
 /// A builder for the *publish* method supported by a *post* resource.
-/// It is not used directly, but through a `PostMethods`.
+/// It is not used directly, but through a `PostMethods` instance.
 ///
 /// # Example
 ///
@@ -4601,7 +4768,7 @@ impl<'a, C, NC, A> PostPublishCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
         for &field in ["alt", "blogId", "postId", "publishDate"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -4654,7 +4821,7 @@ impl<'a, C, NC, A> PostPublishCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -4666,7 +4833,6 @@ impl<'a, C, NC, A> PostPublishCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -4676,7 +4842,7 @@ impl<'a, C, NC, A> PostPublishCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -4687,7 +4853,7 @@ impl<'a, C, NC, A> PostPublishCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -4696,13 +4862,13 @@ impl<'a, C, NC, A> PostPublishCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -4714,7 +4880,7 @@ impl<'a, C, NC, A> PostPublishCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The ID of the Blog.    
+    /// The ID of the Blog.
     pub fn blog_id(mut self, new_value: &str) -> PostPublishCall<'a, C, NC, A> {
         self._blog_id = new_value.to_string();
         self
@@ -4724,7 +4890,7 @@ impl<'a, C, NC, A> PostPublishCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The ID of the Post.    
+    /// The ID of the Post.
     pub fn post_id(mut self, new_value: &str) -> PostPublishCall<'a, C, NC, A> {
         self._post_id = new_value.to_string();
         self
@@ -4732,7 +4898,7 @@ impl<'a, C, NC, A> PostPublishCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// Sets the *publish date* query property to the given value.
     ///
     /// 
-    /// Optional date and time to schedule the publishing of the Blog. If no publishDate parameter is given, the post is either published at the a previously saved schedule date (if present), or the current time. If a future date is given, the post will be scheduled to be published.    
+    /// Optional date and time to schedule the publishing of the Blog. If no publishDate parameter is given, the post is either published at the a previously saved schedule date (if present), or the current time. If a future date is given, the post will be scheduled to be published.
     pub fn publish_date(mut self, new_value: &str) -> PostPublishCall<'a, C, NC, A> {
         self._publish_date = Some(new_value.to_string());
         self
@@ -4793,7 +4959,7 @@ impl<'a, C, NC, A> PostPublishCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
 /// Delete a post by ID.
 ///
 /// A builder for the *delete* method supported by a *post* resource.
-/// It is not used directly, but through a `PostMethods`.
+/// It is not used directly, but through a `PostMethods` instance.
 ///
 /// # Example
 ///
@@ -4853,7 +5019,7 @@ impl<'a, C, NC, A> PostDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
         for &field in ["blogId", "postId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -4905,7 +5071,7 @@ impl<'a, C, NC, A> PostDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -4917,7 +5083,6 @@ impl<'a, C, NC, A> PostDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -4927,7 +5092,7 @@ impl<'a, C, NC, A> PostDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -4938,12 +5103,12 @@ impl<'a, C, NC, A> PostDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = res;
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -4955,7 +5120,7 @@ impl<'a, C, NC, A> PostDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The ID of the Blog.    
+    /// The ID of the Blog.
     pub fn blog_id(mut self, new_value: &str) -> PostDeleteCall<'a, C, NC, A> {
         self._blog_id = new_value.to_string();
         self
@@ -4965,7 +5130,7 @@ impl<'a, C, NC, A> PostDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The ID of the Post.    
+    /// The ID of the Post.
     pub fn post_id(mut self, new_value: &str) -> PostDeleteCall<'a, C, NC, A> {
         self._post_id = new_value.to_string();
         self
@@ -5026,7 +5191,7 @@ impl<'a, C, NC, A> PostDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
 /// Revert a published or scheduled post to draft state.
 ///
 /// A builder for the *revert* method supported by a *post* resource.
-/// It is not used directly, but through a `PostMethods`.
+/// It is not used directly, but through a `PostMethods` instance.
 ///
 /// # Example
 ///
@@ -5086,7 +5251,7 @@ impl<'a, C, NC, A> PostRevertCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
         for &field in ["alt", "blogId", "postId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -5139,7 +5304,7 @@ impl<'a, C, NC, A> PostRevertCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -5151,7 +5316,6 @@ impl<'a, C, NC, A> PostRevertCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -5161,7 +5325,7 @@ impl<'a, C, NC, A> PostRevertCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -5172,7 +5336,7 @@ impl<'a, C, NC, A> PostRevertCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -5181,13 +5345,13 @@ impl<'a, C, NC, A> PostRevertCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -5199,7 +5363,7 @@ impl<'a, C, NC, A> PostRevertCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The ID of the Blog.    
+    /// The ID of the Blog.
     pub fn blog_id(mut self, new_value: &str) -> PostRevertCall<'a, C, NC, A> {
         self._blog_id = new_value.to_string();
         self
@@ -5209,7 +5373,7 @@ impl<'a, C, NC, A> PostRevertCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The ID of the Post.    
+    /// The ID of the Post.
     pub fn post_id(mut self, new_value: &str) -> PostRevertCall<'a, C, NC, A> {
         self._post_id = new_value.to_string();
         self
@@ -5270,7 +5434,7 @@ impl<'a, C, NC, A> PostRevertCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
 /// Search for a post.
 ///
 /// A builder for the *search* method supported by a *post* resource.
-/// It is not used directly, but through a `PostMethods`.
+/// It is not used directly, but through a `PostMethods` instance.
 ///
 /// # Example
 ///
@@ -5340,7 +5504,7 @@ impl<'a, C, NC, A> PostSearchCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
         for &field in ["alt", "blogId", "q", "orderBy", "fetchBodies"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -5393,7 +5557,7 @@ impl<'a, C, NC, A> PostSearchCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -5405,7 +5569,6 @@ impl<'a, C, NC, A> PostSearchCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -5415,7 +5578,7 @@ impl<'a, C, NC, A> PostSearchCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -5426,7 +5589,7 @@ impl<'a, C, NC, A> PostSearchCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -5435,13 +5598,13 @@ impl<'a, C, NC, A> PostSearchCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -5453,7 +5616,7 @@ impl<'a, C, NC, A> PostSearchCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// ID of the blog to fetch the post from.    
+    /// ID of the blog to fetch the post from.
     pub fn blog_id(mut self, new_value: &str) -> PostSearchCall<'a, C, NC, A> {
         self._blog_id = new_value.to_string();
         self
@@ -5463,7 +5626,7 @@ impl<'a, C, NC, A> PostSearchCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Query terms to search this blog for matching posts.    
+    /// Query terms to search this blog for matching posts.
     pub fn q(mut self, new_value: &str) -> PostSearchCall<'a, C, NC, A> {
         self._q = new_value.to_string();
         self
@@ -5471,7 +5634,7 @@ impl<'a, C, NC, A> PostSearchCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// Sets the *order by* query property to the given value.
     ///
     /// 
-    /// Sort search results    
+    /// Sort search results
     pub fn order_by(mut self, new_value: &str) -> PostSearchCall<'a, C, NC, A> {
         self._order_by = Some(new_value.to_string());
         self
@@ -5479,7 +5642,7 @@ impl<'a, C, NC, A> PostSearchCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// Sets the *fetch bodies* query property to the given value.
     ///
     /// 
-    /// Whether the body content of posts is included (default: true). This should be set to false when the post bodies are not required, to help minimize traffic.    
+    /// Whether the body content of posts is included (default: true). This should be set to false when the post bodies are not required, to help minimize traffic.
     pub fn fetch_bodies(mut self, new_value: bool) -> PostSearchCall<'a, C, NC, A> {
         self._fetch_bodies = Some(new_value);
         self
@@ -5540,7 +5703,7 @@ impl<'a, C, NC, A> PostSearchCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
 /// Update a post. This method supports patch semantics.
 ///
 /// A builder for the *patch* method supported by a *post* resource.
-/// It is not used directly, but through a `PostMethods`.
+/// It is not used directly, but through a `PostMethods` instance.
 ///
 /// # Example
 ///
@@ -5632,7 +5795,7 @@ impl<'a, C, NC, A> PostPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
         for &field in ["alt", "blogId", "postId", "revert", "publish", "maxComments", "fetchImages", "fetchBody"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -5689,7 +5852,7 @@ impl<'a, C, NC, A> PostPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -5705,7 +5868,6 @@ impl<'a, C, NC, A> PostPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -5715,7 +5877,7 @@ impl<'a, C, NC, A> PostPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -5726,7 +5888,7 @@ impl<'a, C, NC, A> PostPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -5735,13 +5897,13 @@ impl<'a, C, NC, A> PostPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -5762,7 +5924,7 @@ impl<'a, C, NC, A> PostPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The ID of the Blog.    
+    /// The ID of the Blog.
     pub fn blog_id(mut self, new_value: &str) -> PostPatchCall<'a, C, NC, A> {
         self._blog_id = new_value.to_string();
         self
@@ -5772,7 +5934,7 @@ impl<'a, C, NC, A> PostPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The ID of the Post.    
+    /// The ID of the Post.
     pub fn post_id(mut self, new_value: &str) -> PostPatchCall<'a, C, NC, A> {
         self._post_id = new_value.to_string();
         self
@@ -5780,7 +5942,7 @@ impl<'a, C, NC, A> PostPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     /// Sets the *revert* query property to the given value.
     ///
     /// 
-    /// Whether a revert action should be performed when the post is updated (default: false).    
+    /// Whether a revert action should be performed when the post is updated (default: false).
     pub fn revert(mut self, new_value: bool) -> PostPatchCall<'a, C, NC, A> {
         self._revert = Some(new_value);
         self
@@ -5788,7 +5950,7 @@ impl<'a, C, NC, A> PostPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     /// Sets the *publish* query property to the given value.
     ///
     /// 
-    /// Whether a publish action should be performed when the post is updated (default: false).    
+    /// Whether a publish action should be performed when the post is updated (default: false).
     pub fn publish(mut self, new_value: bool) -> PostPatchCall<'a, C, NC, A> {
         self._publish = Some(new_value);
         self
@@ -5796,7 +5958,7 @@ impl<'a, C, NC, A> PostPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     /// Sets the *max comments* query property to the given value.
     ///
     /// 
-    /// Maximum number of comments to retrieve with the returned post.    
+    /// Maximum number of comments to retrieve with the returned post.
     pub fn max_comments(mut self, new_value: u32) -> PostPatchCall<'a, C, NC, A> {
         self._max_comments = Some(new_value);
         self
@@ -5804,7 +5966,7 @@ impl<'a, C, NC, A> PostPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     /// Sets the *fetch images* query property to the given value.
     ///
     /// 
-    /// Whether image URL metadata for each post is included in the returned result (default: false).    
+    /// Whether image URL metadata for each post is included in the returned result (default: false).
     pub fn fetch_images(mut self, new_value: bool) -> PostPatchCall<'a, C, NC, A> {
         self._fetch_images = Some(new_value);
         self
@@ -5812,7 +5974,7 @@ impl<'a, C, NC, A> PostPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     /// Sets the *fetch body* query property to the given value.
     ///
     /// 
-    /// Whether the body content of the post is included with the result (default: true).    
+    /// Whether the body content of the post is included with the result (default: true).
     pub fn fetch_body(mut self, new_value: bool) -> PostPatchCall<'a, C, NC, A> {
         self._fetch_body = Some(new_value);
         self
@@ -5873,7 +6035,7 @@ impl<'a, C, NC, A> PostPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
 /// Retrieves a list of posts, possibly filtered.
 ///
 /// A builder for the *list* method supported by a *post* resource.
-/// It is not used directly, but through a `PostMethods`.
+/// It is not used directly, but through a `PostMethods` instance.
 ///
 /// # Example
 ///
@@ -5985,7 +6147,7 @@ impl<'a, C, NC, A> PostListCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
         for &field in ["alt", "blogId", "view", "status", "startDate", "pageToken", "orderBy", "maxResults", "labels", "fetchImages", "fetchBodies", "endDate"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -6038,7 +6200,7 @@ impl<'a, C, NC, A> PostListCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -6050,7 +6212,6 @@ impl<'a, C, NC, A> PostListCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -6060,7 +6221,7 @@ impl<'a, C, NC, A> PostListCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -6071,7 +6232,7 @@ impl<'a, C, NC, A> PostListCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -6080,13 +6241,13 @@ impl<'a, C, NC, A> PostListCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -6098,7 +6259,7 @@ impl<'a, C, NC, A> PostListCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// ID of the blog to fetch posts from.    
+    /// ID of the blog to fetch posts from.
     pub fn blog_id(mut self, new_value: &str) -> PostListCall<'a, C, NC, A> {
         self._blog_id = new_value.to_string();
         self
@@ -6106,7 +6267,7 @@ impl<'a, C, NC, A> PostListCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
     /// Sets the *view* query property to the given value.
     ///
     /// 
-    /// Access level with which to view the returned result. Note that some fields require escalated access.    
+    /// Access level with which to view the returned result. Note that some fields require escalated access.
     pub fn view(mut self, new_value: &str) -> PostListCall<'a, C, NC, A> {
         self._view = Some(new_value.to_string());
         self
@@ -6115,7 +6276,7 @@ impl<'a, C, NC, A> PostListCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
     ///
     /// 
-    /// Statuses to include in the results.    
+    /// Statuses to include in the results.
     pub fn add_status(mut self, new_value: &str) -> PostListCall<'a, C, NC, A> {
         self._status.push(new_value.to_string());
         self
@@ -6123,7 +6284,7 @@ impl<'a, C, NC, A> PostListCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
     /// Sets the *start date* query property to the given value.
     ///
     /// 
-    /// Earliest post date to fetch, a date-time with RFC 3339 formatting.    
+    /// Earliest post date to fetch, a date-time with RFC 3339 formatting.
     pub fn start_date(mut self, new_value: &str) -> PostListCall<'a, C, NC, A> {
         self._start_date = Some(new_value.to_string());
         self
@@ -6131,7 +6292,7 @@ impl<'a, C, NC, A> PostListCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
     /// Sets the *page token* query property to the given value.
     ///
     /// 
-    /// Continuation token if the request is paged.    
+    /// Continuation token if the request is paged.
     pub fn page_token(mut self, new_value: &str) -> PostListCall<'a, C, NC, A> {
         self._page_token = Some(new_value.to_string());
         self
@@ -6139,7 +6300,7 @@ impl<'a, C, NC, A> PostListCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
     /// Sets the *order by* query property to the given value.
     ///
     /// 
-    /// Sort search results    
+    /// Sort search results
     pub fn order_by(mut self, new_value: &str) -> PostListCall<'a, C, NC, A> {
         self._order_by = Some(new_value.to_string());
         self
@@ -6147,7 +6308,7 @@ impl<'a, C, NC, A> PostListCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
     /// Sets the *max results* query property to the given value.
     ///
     /// 
-    /// Maximum number of posts to fetch.    
+    /// Maximum number of posts to fetch.
     pub fn max_results(mut self, new_value: u32) -> PostListCall<'a, C, NC, A> {
         self._max_results = Some(new_value);
         self
@@ -6155,7 +6316,7 @@ impl<'a, C, NC, A> PostListCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
     /// Sets the *labels* query property to the given value.
     ///
     /// 
-    /// Comma-separated list of labels to search for.    
+    /// Comma-separated list of labels to search for.
     pub fn labels(mut self, new_value: &str) -> PostListCall<'a, C, NC, A> {
         self._labels = Some(new_value.to_string());
         self
@@ -6163,7 +6324,7 @@ impl<'a, C, NC, A> PostListCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
     /// Sets the *fetch images* query property to the given value.
     ///
     /// 
-    /// Whether image URL metadata for each post is included.    
+    /// Whether image URL metadata for each post is included.
     pub fn fetch_images(mut self, new_value: bool) -> PostListCall<'a, C, NC, A> {
         self._fetch_images = Some(new_value);
         self
@@ -6171,7 +6332,7 @@ impl<'a, C, NC, A> PostListCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
     /// Sets the *fetch bodies* query property to the given value.
     ///
     /// 
-    /// Whether the body content of posts is included (default: true). This should be set to false when the post bodies are not required, to help minimize traffic.    
+    /// Whether the body content of posts is included (default: true). This should be set to false when the post bodies are not required, to help minimize traffic.
     pub fn fetch_bodies(mut self, new_value: bool) -> PostListCall<'a, C, NC, A> {
         self._fetch_bodies = Some(new_value);
         self
@@ -6179,7 +6340,7 @@ impl<'a, C, NC, A> PostListCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
     /// Sets the *end date* query property to the given value.
     ///
     /// 
-    /// Latest post date to fetch, a date-time with RFC 3339 formatting.    
+    /// Latest post date to fetch, a date-time with RFC 3339 formatting.
     pub fn end_date(mut self, new_value: &str) -> PostListCall<'a, C, NC, A> {
         self._end_date = Some(new_value.to_string());
         self
@@ -6240,7 +6401,7 @@ impl<'a, C, NC, A> PostListCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
 /// Gets one comment by ID.
 ///
 /// A builder for the *get* method supported by a *comment* resource.
-/// It is not used directly, but through a `CommentMethods`.
+/// It is not used directly, but through a `CommentMethods` instance.
 ///
 /// # Example
 ///
@@ -6307,7 +6468,7 @@ impl<'a, C, NC, A> CommentGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
         for &field in ["alt", "blogId", "postId", "commentId", "view"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -6360,7 +6521,7 @@ impl<'a, C, NC, A> CommentGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -6372,7 +6533,6 @@ impl<'a, C, NC, A> CommentGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -6382,7 +6542,7 @@ impl<'a, C, NC, A> CommentGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -6393,7 +6553,7 @@ impl<'a, C, NC, A> CommentGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -6402,13 +6562,13 @@ impl<'a, C, NC, A> CommentGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -6420,7 +6580,7 @@ impl<'a, C, NC, A> CommentGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// ID of the blog to containing the comment.    
+    /// ID of the blog to containing the comment.
     pub fn blog_id(mut self, new_value: &str) -> CommentGetCall<'a, C, NC, A> {
         self._blog_id = new_value.to_string();
         self
@@ -6430,7 +6590,7 @@ impl<'a, C, NC, A> CommentGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// ID of the post to fetch posts from.    
+    /// ID of the post to fetch posts from.
     pub fn post_id(mut self, new_value: &str) -> CommentGetCall<'a, C, NC, A> {
         self._post_id = new_value.to_string();
         self
@@ -6440,7 +6600,7 @@ impl<'a, C, NC, A> CommentGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The ID of the comment to get.    
+    /// The ID of the comment to get.
     pub fn comment_id(mut self, new_value: &str) -> CommentGetCall<'a, C, NC, A> {
         self._comment_id = new_value.to_string();
         self
@@ -6448,7 +6608,7 @@ impl<'a, C, NC, A> CommentGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// Sets the *view* query property to the given value.
     ///
     /// 
-    /// Access level for the requested comment (default: READER). Note that some comments will require elevated permissions, for example comments where the parent posts which is in a draft state, or comments that are pending moderation.    
+    /// Access level for the requested comment (default: READER). Note that some comments will require elevated permissions, for example comments where the parent posts which is in a draft state, or comments that are pending moderation.
     pub fn view(mut self, new_value: &str) -> CommentGetCall<'a, C, NC, A> {
         self._view = Some(new_value.to_string());
         self
@@ -6509,7 +6669,7 @@ impl<'a, C, NC, A> CommentGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
 /// Removes the content of a comment.
 ///
 /// A builder for the *removeContent* method supported by a *comment* resource.
-/// It is not used directly, but through a `CommentMethods`.
+/// It is not used directly, but through a `CommentMethods` instance.
 ///
 /// # Example
 ///
@@ -6571,7 +6731,7 @@ impl<'a, C, NC, A> CommentRemoveContentCall<'a, C, NC, A> where NC: hyper::net::
         for &field in ["alt", "blogId", "postId", "commentId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -6624,7 +6784,7 @@ impl<'a, C, NC, A> CommentRemoveContentCall<'a, C, NC, A> where NC: hyper::net::
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -6636,7 +6796,6 @@ impl<'a, C, NC, A> CommentRemoveContentCall<'a, C, NC, A> where NC: hyper::net::
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -6646,7 +6805,7 @@ impl<'a, C, NC, A> CommentRemoveContentCall<'a, C, NC, A> where NC: hyper::net::
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -6657,7 +6816,7 @@ impl<'a, C, NC, A> CommentRemoveContentCall<'a, C, NC, A> where NC: hyper::net::
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -6666,13 +6825,13 @@ impl<'a, C, NC, A> CommentRemoveContentCall<'a, C, NC, A> where NC: hyper::net::
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -6684,7 +6843,7 @@ impl<'a, C, NC, A> CommentRemoveContentCall<'a, C, NC, A> where NC: hyper::net::
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The ID of the Blog.    
+    /// The ID of the Blog.
     pub fn blog_id(mut self, new_value: &str) -> CommentRemoveContentCall<'a, C, NC, A> {
         self._blog_id = new_value.to_string();
         self
@@ -6694,7 +6853,7 @@ impl<'a, C, NC, A> CommentRemoveContentCall<'a, C, NC, A> where NC: hyper::net::
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The ID of the Post.    
+    /// The ID of the Post.
     pub fn post_id(mut self, new_value: &str) -> CommentRemoveContentCall<'a, C, NC, A> {
         self._post_id = new_value.to_string();
         self
@@ -6704,7 +6863,7 @@ impl<'a, C, NC, A> CommentRemoveContentCall<'a, C, NC, A> where NC: hyper::net::
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The ID of the comment to delete content from.    
+    /// The ID of the comment to delete content from.
     pub fn comment_id(mut self, new_value: &str) -> CommentRemoveContentCall<'a, C, NC, A> {
         self._comment_id = new_value.to_string();
         self
@@ -6765,7 +6924,7 @@ impl<'a, C, NC, A> CommentRemoveContentCall<'a, C, NC, A> where NC: hyper::net::
 /// Retrieves the comments for a blog, across all posts, possibly filtered.
 ///
 /// A builder for the *listByBlog* method supported by a *comment* resource.
-/// It is not used directly, but through a `CommentMethods`.
+/// It is not used directly, but through a `CommentMethods` instance.
 ///
 /// # Example
 ///
@@ -6857,7 +7016,7 @@ impl<'a, C, NC, A> CommentListByBlogCall<'a, C, NC, A> where NC: hyper::net::Net
         for &field in ["alt", "blogId", "status", "startDate", "pageToken", "maxResults", "fetchBodies", "endDate"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -6910,7 +7069,7 @@ impl<'a, C, NC, A> CommentListByBlogCall<'a, C, NC, A> where NC: hyper::net::Net
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -6922,7 +7081,6 @@ impl<'a, C, NC, A> CommentListByBlogCall<'a, C, NC, A> where NC: hyper::net::Net
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -6932,7 +7090,7 @@ impl<'a, C, NC, A> CommentListByBlogCall<'a, C, NC, A> where NC: hyper::net::Net
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -6943,7 +7101,7 @@ impl<'a, C, NC, A> CommentListByBlogCall<'a, C, NC, A> where NC: hyper::net::Net
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -6952,13 +7110,13 @@ impl<'a, C, NC, A> CommentListByBlogCall<'a, C, NC, A> where NC: hyper::net::Net
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -6970,7 +7128,7 @@ impl<'a, C, NC, A> CommentListByBlogCall<'a, C, NC, A> where NC: hyper::net::Net
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// ID of the blog to fetch comments from.    
+    /// ID of the blog to fetch comments from.
     pub fn blog_id(mut self, new_value: &str) -> CommentListByBlogCall<'a, C, NC, A> {
         self._blog_id = new_value.to_string();
         self
@@ -6986,7 +7144,7 @@ impl<'a, C, NC, A> CommentListByBlogCall<'a, C, NC, A> where NC: hyper::net::Net
     /// Sets the *start date* query property to the given value.
     ///
     /// 
-    /// Earliest date of comment to fetch, a date-time with RFC 3339 formatting.    
+    /// Earliest date of comment to fetch, a date-time with RFC 3339 formatting.
     pub fn start_date(mut self, new_value: &str) -> CommentListByBlogCall<'a, C, NC, A> {
         self._start_date = Some(new_value.to_string());
         self
@@ -6994,7 +7152,7 @@ impl<'a, C, NC, A> CommentListByBlogCall<'a, C, NC, A> where NC: hyper::net::Net
     /// Sets the *page token* query property to the given value.
     ///
     /// 
-    /// Continuation token if request is paged.    
+    /// Continuation token if request is paged.
     pub fn page_token(mut self, new_value: &str) -> CommentListByBlogCall<'a, C, NC, A> {
         self._page_token = Some(new_value.to_string());
         self
@@ -7002,7 +7160,7 @@ impl<'a, C, NC, A> CommentListByBlogCall<'a, C, NC, A> where NC: hyper::net::Net
     /// Sets the *max results* query property to the given value.
     ///
     /// 
-    /// Maximum number of comments to include in the result.    
+    /// Maximum number of comments to include in the result.
     pub fn max_results(mut self, new_value: u32) -> CommentListByBlogCall<'a, C, NC, A> {
         self._max_results = Some(new_value);
         self
@@ -7010,7 +7168,7 @@ impl<'a, C, NC, A> CommentListByBlogCall<'a, C, NC, A> where NC: hyper::net::Net
     /// Sets the *fetch bodies* query property to the given value.
     ///
     /// 
-    /// Whether the body content of the comments is included.    
+    /// Whether the body content of the comments is included.
     pub fn fetch_bodies(mut self, new_value: bool) -> CommentListByBlogCall<'a, C, NC, A> {
         self._fetch_bodies = Some(new_value);
         self
@@ -7018,7 +7176,7 @@ impl<'a, C, NC, A> CommentListByBlogCall<'a, C, NC, A> where NC: hyper::net::Net
     /// Sets the *end date* query property to the given value.
     ///
     /// 
-    /// Latest date of comment to fetch, a date-time with RFC 3339 formatting.    
+    /// Latest date of comment to fetch, a date-time with RFC 3339 formatting.
     pub fn end_date(mut self, new_value: &str) -> CommentListByBlogCall<'a, C, NC, A> {
         self._end_date = Some(new_value.to_string());
         self
@@ -7079,7 +7237,7 @@ impl<'a, C, NC, A> CommentListByBlogCall<'a, C, NC, A> where NC: hyper::net::Net
 /// Marks a comment as spam.
 ///
 /// A builder for the *markAsSpam* method supported by a *comment* resource.
-/// It is not used directly, but through a `CommentMethods`.
+/// It is not used directly, but through a `CommentMethods` instance.
 ///
 /// # Example
 ///
@@ -7141,7 +7299,7 @@ impl<'a, C, NC, A> CommentMarkAsSpamCall<'a, C, NC, A> where NC: hyper::net::Net
         for &field in ["alt", "blogId", "postId", "commentId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -7194,7 +7352,7 @@ impl<'a, C, NC, A> CommentMarkAsSpamCall<'a, C, NC, A> where NC: hyper::net::Net
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -7206,7 +7364,6 @@ impl<'a, C, NC, A> CommentMarkAsSpamCall<'a, C, NC, A> where NC: hyper::net::Net
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -7216,7 +7373,7 @@ impl<'a, C, NC, A> CommentMarkAsSpamCall<'a, C, NC, A> where NC: hyper::net::Net
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -7227,7 +7384,7 @@ impl<'a, C, NC, A> CommentMarkAsSpamCall<'a, C, NC, A> where NC: hyper::net::Net
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -7236,13 +7393,13 @@ impl<'a, C, NC, A> CommentMarkAsSpamCall<'a, C, NC, A> where NC: hyper::net::Net
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -7254,7 +7411,7 @@ impl<'a, C, NC, A> CommentMarkAsSpamCall<'a, C, NC, A> where NC: hyper::net::Net
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The ID of the Blog.    
+    /// The ID of the Blog.
     pub fn blog_id(mut self, new_value: &str) -> CommentMarkAsSpamCall<'a, C, NC, A> {
         self._blog_id = new_value.to_string();
         self
@@ -7264,7 +7421,7 @@ impl<'a, C, NC, A> CommentMarkAsSpamCall<'a, C, NC, A> where NC: hyper::net::Net
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The ID of the Post.    
+    /// The ID of the Post.
     pub fn post_id(mut self, new_value: &str) -> CommentMarkAsSpamCall<'a, C, NC, A> {
         self._post_id = new_value.to_string();
         self
@@ -7274,7 +7431,7 @@ impl<'a, C, NC, A> CommentMarkAsSpamCall<'a, C, NC, A> where NC: hyper::net::Net
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The ID of the comment to mark as spam.    
+    /// The ID of the comment to mark as spam.
     pub fn comment_id(mut self, new_value: &str) -> CommentMarkAsSpamCall<'a, C, NC, A> {
         self._comment_id = new_value.to_string();
         self
@@ -7335,7 +7492,7 @@ impl<'a, C, NC, A> CommentMarkAsSpamCall<'a, C, NC, A> where NC: hyper::net::Net
 /// Retrieves the comments for a post, possibly filtered.
 ///
 /// A builder for the *list* method supported by a *comment* resource.
-/// It is not used directly, but through a `CommentMethods`.
+/// It is not used directly, but through a `CommentMethods` instance.
 ///
 /// # Example
 ///
@@ -7434,7 +7591,7 @@ impl<'a, C, NC, A> CommentListCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
         for &field in ["alt", "blogId", "postId", "view", "status", "startDate", "pageToken", "maxResults", "fetchBodies", "endDate"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -7487,7 +7644,7 @@ impl<'a, C, NC, A> CommentListCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -7499,7 +7656,6 @@ impl<'a, C, NC, A> CommentListCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -7509,7 +7665,7 @@ impl<'a, C, NC, A> CommentListCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -7520,7 +7676,7 @@ impl<'a, C, NC, A> CommentListCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -7529,13 +7685,13 @@ impl<'a, C, NC, A> CommentListCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -7547,7 +7703,7 @@ impl<'a, C, NC, A> CommentListCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// ID of the blog to fetch comments from.    
+    /// ID of the blog to fetch comments from.
     pub fn blog_id(mut self, new_value: &str) -> CommentListCall<'a, C, NC, A> {
         self._blog_id = new_value.to_string();
         self
@@ -7557,7 +7713,7 @@ impl<'a, C, NC, A> CommentListCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// ID of the post to fetch posts from.    
+    /// ID of the post to fetch posts from.
     pub fn post_id(mut self, new_value: &str) -> CommentListCall<'a, C, NC, A> {
         self._post_id = new_value.to_string();
         self
@@ -7565,7 +7721,7 @@ impl<'a, C, NC, A> CommentListCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// Sets the *view* query property to the given value.
     ///
     /// 
-    /// Access level with which to view the returned result. Note that some fields require elevated access.    
+    /// Access level with which to view the returned result. Note that some fields require elevated access.
     pub fn view(mut self, new_value: &str) -> CommentListCall<'a, C, NC, A> {
         self._view = Some(new_value.to_string());
         self
@@ -7581,7 +7737,7 @@ impl<'a, C, NC, A> CommentListCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// Sets the *start date* query property to the given value.
     ///
     /// 
-    /// Earliest date of comment to fetch, a date-time with RFC 3339 formatting.    
+    /// Earliest date of comment to fetch, a date-time with RFC 3339 formatting.
     pub fn start_date(mut self, new_value: &str) -> CommentListCall<'a, C, NC, A> {
         self._start_date = Some(new_value.to_string());
         self
@@ -7589,7 +7745,7 @@ impl<'a, C, NC, A> CommentListCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// Sets the *page token* query property to the given value.
     ///
     /// 
-    /// Continuation token if request is paged.    
+    /// Continuation token if request is paged.
     pub fn page_token(mut self, new_value: &str) -> CommentListCall<'a, C, NC, A> {
         self._page_token = Some(new_value.to_string());
         self
@@ -7597,7 +7753,7 @@ impl<'a, C, NC, A> CommentListCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// Sets the *max results* query property to the given value.
     ///
     /// 
-    /// Maximum number of comments to include in the result.    
+    /// Maximum number of comments to include in the result.
     pub fn max_results(mut self, new_value: u32) -> CommentListCall<'a, C, NC, A> {
         self._max_results = Some(new_value);
         self
@@ -7605,7 +7761,7 @@ impl<'a, C, NC, A> CommentListCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// Sets the *fetch bodies* query property to the given value.
     ///
     /// 
-    /// Whether the body content of the comments is included.    
+    /// Whether the body content of the comments is included.
     pub fn fetch_bodies(mut self, new_value: bool) -> CommentListCall<'a, C, NC, A> {
         self._fetch_bodies = Some(new_value);
         self
@@ -7613,7 +7769,7 @@ impl<'a, C, NC, A> CommentListCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// Sets the *end date* query property to the given value.
     ///
     /// 
-    /// Latest date of comment to fetch, a date-time with RFC 3339 formatting.    
+    /// Latest date of comment to fetch, a date-time with RFC 3339 formatting.
     pub fn end_date(mut self, new_value: &str) -> CommentListCall<'a, C, NC, A> {
         self._end_date = Some(new_value.to_string());
         self
@@ -7674,7 +7830,7 @@ impl<'a, C, NC, A> CommentListCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
 /// Marks a comment as not spam.
 ///
 /// A builder for the *approve* method supported by a *comment* resource.
-/// It is not used directly, but through a `CommentMethods`.
+/// It is not used directly, but through a `CommentMethods` instance.
 ///
 /// # Example
 ///
@@ -7736,7 +7892,7 @@ impl<'a, C, NC, A> CommentApproveCall<'a, C, NC, A> where NC: hyper::net::Networ
         for &field in ["alt", "blogId", "postId", "commentId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -7789,7 +7945,7 @@ impl<'a, C, NC, A> CommentApproveCall<'a, C, NC, A> where NC: hyper::net::Networ
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -7801,7 +7957,6 @@ impl<'a, C, NC, A> CommentApproveCall<'a, C, NC, A> where NC: hyper::net::Networ
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -7811,7 +7966,7 @@ impl<'a, C, NC, A> CommentApproveCall<'a, C, NC, A> where NC: hyper::net::Networ
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -7822,7 +7977,7 @@ impl<'a, C, NC, A> CommentApproveCall<'a, C, NC, A> where NC: hyper::net::Networ
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -7831,13 +7986,13 @@ impl<'a, C, NC, A> CommentApproveCall<'a, C, NC, A> where NC: hyper::net::Networ
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -7849,7 +8004,7 @@ impl<'a, C, NC, A> CommentApproveCall<'a, C, NC, A> where NC: hyper::net::Networ
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The ID of the Blog.    
+    /// The ID of the Blog.
     pub fn blog_id(mut self, new_value: &str) -> CommentApproveCall<'a, C, NC, A> {
         self._blog_id = new_value.to_string();
         self
@@ -7859,7 +8014,7 @@ impl<'a, C, NC, A> CommentApproveCall<'a, C, NC, A> where NC: hyper::net::Networ
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The ID of the Post.    
+    /// The ID of the Post.
     pub fn post_id(mut self, new_value: &str) -> CommentApproveCall<'a, C, NC, A> {
         self._post_id = new_value.to_string();
         self
@@ -7869,7 +8024,7 @@ impl<'a, C, NC, A> CommentApproveCall<'a, C, NC, A> where NC: hyper::net::Networ
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The ID of the comment to mark as not spam.    
+    /// The ID of the comment to mark as not spam.
     pub fn comment_id(mut self, new_value: &str) -> CommentApproveCall<'a, C, NC, A> {
         self._comment_id = new_value.to_string();
         self
@@ -7930,7 +8085,7 @@ impl<'a, C, NC, A> CommentApproveCall<'a, C, NC, A> where NC: hyper::net::Networ
 /// Delete a comment by ID.
 ///
 /// A builder for the *delete* method supported by a *comment* resource.
-/// It is not used directly, but through a `CommentMethods`.
+/// It is not used directly, but through a `CommentMethods` instance.
 ///
 /// # Example
 ///
@@ -7992,7 +8147,7 @@ impl<'a, C, NC, A> CommentDeleteCall<'a, C, NC, A> where NC: hyper::net::Network
         for &field in ["blogId", "postId", "commentId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -8044,7 +8199,7 @@ impl<'a, C, NC, A> CommentDeleteCall<'a, C, NC, A> where NC: hyper::net::Network
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -8056,7 +8211,6 @@ impl<'a, C, NC, A> CommentDeleteCall<'a, C, NC, A> where NC: hyper::net::Network
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -8066,7 +8220,7 @@ impl<'a, C, NC, A> CommentDeleteCall<'a, C, NC, A> where NC: hyper::net::Network
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -8077,12 +8231,12 @@ impl<'a, C, NC, A> CommentDeleteCall<'a, C, NC, A> where NC: hyper::net::Network
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = res;
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -8094,7 +8248,7 @@ impl<'a, C, NC, A> CommentDeleteCall<'a, C, NC, A> where NC: hyper::net::Network
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The ID of the Blog.    
+    /// The ID of the Blog.
     pub fn blog_id(mut self, new_value: &str) -> CommentDeleteCall<'a, C, NC, A> {
         self._blog_id = new_value.to_string();
         self
@@ -8104,7 +8258,7 @@ impl<'a, C, NC, A> CommentDeleteCall<'a, C, NC, A> where NC: hyper::net::Network
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The ID of the Post.    
+    /// The ID of the Post.
     pub fn post_id(mut self, new_value: &str) -> CommentDeleteCall<'a, C, NC, A> {
         self._post_id = new_value.to_string();
         self
@@ -8114,7 +8268,7 @@ impl<'a, C, NC, A> CommentDeleteCall<'a, C, NC, A> where NC: hyper::net::Network
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The ID of the comment to delete.    
+    /// The ID of the comment to delete.
     pub fn comment_id(mut self, new_value: &str) -> CommentDeleteCall<'a, C, NC, A> {
         self._comment_id = new_value.to_string();
         self
@@ -8175,7 +8329,7 @@ impl<'a, C, NC, A> CommentDeleteCall<'a, C, NC, A> where NC: hyper::net::Network
 /// Gets one post and user info pair, by post ID and user ID. The post user info contains per-user information about the post, such as access rights, specific to the user.
 ///
 /// A builder for the *get* method supported by a *postUserInfo* resource.
-/// It is not used directly, but through a `PostUserInfoMethods`.
+/// It is not used directly, but through a `PostUserInfoMethods` instance.
 ///
 /// # Example
 ///
@@ -8242,7 +8396,7 @@ impl<'a, C, NC, A> PostUserInfoGetCall<'a, C, NC, A> where NC: hyper::net::Netwo
         for &field in ["alt", "userId", "blogId", "postId", "maxComments"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -8295,7 +8449,7 @@ impl<'a, C, NC, A> PostUserInfoGetCall<'a, C, NC, A> where NC: hyper::net::Netwo
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -8307,7 +8461,6 @@ impl<'a, C, NC, A> PostUserInfoGetCall<'a, C, NC, A> where NC: hyper::net::Netwo
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -8317,7 +8470,7 @@ impl<'a, C, NC, A> PostUserInfoGetCall<'a, C, NC, A> where NC: hyper::net::Netwo
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -8328,7 +8481,7 @@ impl<'a, C, NC, A> PostUserInfoGetCall<'a, C, NC, A> where NC: hyper::net::Netwo
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -8337,13 +8490,13 @@ impl<'a, C, NC, A> PostUserInfoGetCall<'a, C, NC, A> where NC: hyper::net::Netwo
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -8355,7 +8508,7 @@ impl<'a, C, NC, A> PostUserInfoGetCall<'a, C, NC, A> where NC: hyper::net::Netwo
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// ID of the user for the per-user information to be fetched. Either the word 'self' (sans quote marks) or the user's profile identifier.    
+    /// ID of the user for the per-user information to be fetched. Either the word 'self' (sans quote marks) or the user's profile identifier.
     pub fn user_id(mut self, new_value: &str) -> PostUserInfoGetCall<'a, C, NC, A> {
         self._user_id = new_value.to_string();
         self
@@ -8365,7 +8518,7 @@ impl<'a, C, NC, A> PostUserInfoGetCall<'a, C, NC, A> where NC: hyper::net::Netwo
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The ID of the blog.    
+    /// The ID of the blog.
     pub fn blog_id(mut self, new_value: &str) -> PostUserInfoGetCall<'a, C, NC, A> {
         self._blog_id = new_value.to_string();
         self
@@ -8375,7 +8528,7 @@ impl<'a, C, NC, A> PostUserInfoGetCall<'a, C, NC, A> where NC: hyper::net::Netwo
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The ID of the post to get.    
+    /// The ID of the post to get.
     pub fn post_id(mut self, new_value: &str) -> PostUserInfoGetCall<'a, C, NC, A> {
         self._post_id = new_value.to_string();
         self
@@ -8383,7 +8536,7 @@ impl<'a, C, NC, A> PostUserInfoGetCall<'a, C, NC, A> where NC: hyper::net::Netwo
     /// Sets the *max comments* query property to the given value.
     ///
     /// 
-    /// Maximum number of comments to pull back on a post.    
+    /// Maximum number of comments to pull back on a post.
     pub fn max_comments(mut self, new_value: u32) -> PostUserInfoGetCall<'a, C, NC, A> {
         self._max_comments = Some(new_value);
         self
@@ -8444,7 +8597,7 @@ impl<'a, C, NC, A> PostUserInfoGetCall<'a, C, NC, A> where NC: hyper::net::Netwo
 /// Retrieves a list of post and post user info pairs, possibly filtered. The post user info contains per-user information about the post, such as access rights, specific to the user.
 ///
 /// A builder for the *list* method supported by a *postUserInfo* resource.
-/// It is not used directly, but through a `PostUserInfoMethods`.
+/// It is not used directly, but through a `PostUserInfoMethods` instance.
 ///
 /// # Example
 ///
@@ -8553,7 +8706,7 @@ impl<'a, C, NC, A> PostUserInfoListCall<'a, C, NC, A> where NC: hyper::net::Netw
         for &field in ["alt", "userId", "blogId", "view", "status", "startDate", "pageToken", "orderBy", "maxResults", "labels", "fetchBodies", "endDate"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -8606,7 +8759,7 @@ impl<'a, C, NC, A> PostUserInfoListCall<'a, C, NC, A> where NC: hyper::net::Netw
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -8618,7 +8771,6 @@ impl<'a, C, NC, A> PostUserInfoListCall<'a, C, NC, A> where NC: hyper::net::Netw
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -8628,7 +8780,7 @@ impl<'a, C, NC, A> PostUserInfoListCall<'a, C, NC, A> where NC: hyper::net::Netw
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -8639,7 +8791,7 @@ impl<'a, C, NC, A> PostUserInfoListCall<'a, C, NC, A> where NC: hyper::net::Netw
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -8648,13 +8800,13 @@ impl<'a, C, NC, A> PostUserInfoListCall<'a, C, NC, A> where NC: hyper::net::Netw
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -8666,7 +8818,7 @@ impl<'a, C, NC, A> PostUserInfoListCall<'a, C, NC, A> where NC: hyper::net::Netw
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// ID of the user for the per-user information to be fetched. Either the word 'self' (sans quote marks) or the user's profile identifier.    
+    /// ID of the user for the per-user information to be fetched. Either the word 'self' (sans quote marks) or the user's profile identifier.
     pub fn user_id(mut self, new_value: &str) -> PostUserInfoListCall<'a, C, NC, A> {
         self._user_id = new_value.to_string();
         self
@@ -8676,7 +8828,7 @@ impl<'a, C, NC, A> PostUserInfoListCall<'a, C, NC, A> where NC: hyper::net::Netw
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// ID of the blog to fetch posts from.    
+    /// ID of the blog to fetch posts from.
     pub fn blog_id(mut self, new_value: &str) -> PostUserInfoListCall<'a, C, NC, A> {
         self._blog_id = new_value.to_string();
         self
@@ -8684,7 +8836,7 @@ impl<'a, C, NC, A> PostUserInfoListCall<'a, C, NC, A> where NC: hyper::net::Netw
     /// Sets the *view* query property to the given value.
     ///
     /// 
-    /// Access level with which to view the returned result. Note that some fields require elevated access.    
+    /// Access level with which to view the returned result. Note that some fields require elevated access.
     pub fn view(mut self, new_value: &str) -> PostUserInfoListCall<'a, C, NC, A> {
         self._view = Some(new_value.to_string());
         self
@@ -8700,7 +8852,7 @@ impl<'a, C, NC, A> PostUserInfoListCall<'a, C, NC, A> where NC: hyper::net::Netw
     /// Sets the *start date* query property to the given value.
     ///
     /// 
-    /// Earliest post date to fetch, a date-time with RFC 3339 formatting.    
+    /// Earliest post date to fetch, a date-time with RFC 3339 formatting.
     pub fn start_date(mut self, new_value: &str) -> PostUserInfoListCall<'a, C, NC, A> {
         self._start_date = Some(new_value.to_string());
         self
@@ -8708,7 +8860,7 @@ impl<'a, C, NC, A> PostUserInfoListCall<'a, C, NC, A> where NC: hyper::net::Netw
     /// Sets the *page token* query property to the given value.
     ///
     /// 
-    /// Continuation token if the request is paged.    
+    /// Continuation token if the request is paged.
     pub fn page_token(mut self, new_value: &str) -> PostUserInfoListCall<'a, C, NC, A> {
         self._page_token = Some(new_value.to_string());
         self
@@ -8716,7 +8868,7 @@ impl<'a, C, NC, A> PostUserInfoListCall<'a, C, NC, A> where NC: hyper::net::Netw
     /// Sets the *order by* query property to the given value.
     ///
     /// 
-    /// Sort order applied to search results. Default is published.    
+    /// Sort order applied to search results. Default is published.
     pub fn order_by(mut self, new_value: &str) -> PostUserInfoListCall<'a, C, NC, A> {
         self._order_by = Some(new_value.to_string());
         self
@@ -8724,7 +8876,7 @@ impl<'a, C, NC, A> PostUserInfoListCall<'a, C, NC, A> where NC: hyper::net::Netw
     /// Sets the *max results* query property to the given value.
     ///
     /// 
-    /// Maximum number of posts to fetch.    
+    /// Maximum number of posts to fetch.
     pub fn max_results(mut self, new_value: u32) -> PostUserInfoListCall<'a, C, NC, A> {
         self._max_results = Some(new_value);
         self
@@ -8732,7 +8884,7 @@ impl<'a, C, NC, A> PostUserInfoListCall<'a, C, NC, A> where NC: hyper::net::Netw
     /// Sets the *labels* query property to the given value.
     ///
     /// 
-    /// Comma-separated list of labels to search for.    
+    /// Comma-separated list of labels to search for.
     pub fn labels(mut self, new_value: &str) -> PostUserInfoListCall<'a, C, NC, A> {
         self._labels = Some(new_value.to_string());
         self
@@ -8740,7 +8892,7 @@ impl<'a, C, NC, A> PostUserInfoListCall<'a, C, NC, A> where NC: hyper::net::Netw
     /// Sets the *fetch bodies* query property to the given value.
     ///
     /// 
-    /// Whether the body content of posts is included. Default is false.    
+    /// Whether the body content of posts is included. Default is false.
     pub fn fetch_bodies(mut self, new_value: bool) -> PostUserInfoListCall<'a, C, NC, A> {
         self._fetch_bodies = Some(new_value);
         self
@@ -8748,7 +8900,7 @@ impl<'a, C, NC, A> PostUserInfoListCall<'a, C, NC, A> where NC: hyper::net::Netw
     /// Sets the *end date* query property to the given value.
     ///
     /// 
-    /// Latest post date to fetch, a date-time with RFC 3339 formatting.    
+    /// Latest post date to fetch, a date-time with RFC 3339 formatting.
     pub fn end_date(mut self, new_value: &str) -> PostUserInfoListCall<'a, C, NC, A> {
         self._end_date = Some(new_value.to_string());
         self
@@ -8809,7 +8961,7 @@ impl<'a, C, NC, A> PostUserInfoListCall<'a, C, NC, A> where NC: hyper::net::Netw
 /// Gets one blog and user info pair by blogId and userId.
 ///
 /// A builder for the *get* method supported by a *blogUserInfo* resource.
-/// It is not used directly, but through a `BlogUserInfoMethods`.
+/// It is not used directly, but through a `BlogUserInfoMethods` instance.
 ///
 /// # Example
 ///
@@ -8874,7 +9026,7 @@ impl<'a, C, NC, A> BlogUserInfoGetCall<'a, C, NC, A> where NC: hyper::net::Netwo
         for &field in ["alt", "userId", "blogId", "maxPosts"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -8927,7 +9079,7 @@ impl<'a, C, NC, A> BlogUserInfoGetCall<'a, C, NC, A> where NC: hyper::net::Netwo
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -8939,7 +9091,6 @@ impl<'a, C, NC, A> BlogUserInfoGetCall<'a, C, NC, A> where NC: hyper::net::Netwo
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -8949,7 +9100,7 @@ impl<'a, C, NC, A> BlogUserInfoGetCall<'a, C, NC, A> where NC: hyper::net::Netwo
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -8960,7 +9111,7 @@ impl<'a, C, NC, A> BlogUserInfoGetCall<'a, C, NC, A> where NC: hyper::net::Netwo
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -8969,13 +9120,13 @@ impl<'a, C, NC, A> BlogUserInfoGetCall<'a, C, NC, A> where NC: hyper::net::Netwo
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -8987,7 +9138,7 @@ impl<'a, C, NC, A> BlogUserInfoGetCall<'a, C, NC, A> where NC: hyper::net::Netwo
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// ID of the user whose blogs are to be fetched. Either the word 'self' (sans quote marks) or the user's profile identifier.    
+    /// ID of the user whose blogs are to be fetched. Either the word 'self' (sans quote marks) or the user's profile identifier.
     pub fn user_id(mut self, new_value: &str) -> BlogUserInfoGetCall<'a, C, NC, A> {
         self._user_id = new_value.to_string();
         self
@@ -8997,7 +9148,7 @@ impl<'a, C, NC, A> BlogUserInfoGetCall<'a, C, NC, A> where NC: hyper::net::Netwo
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The ID of the blog to get.    
+    /// The ID of the blog to get.
     pub fn blog_id(mut self, new_value: &str) -> BlogUserInfoGetCall<'a, C, NC, A> {
         self._blog_id = new_value.to_string();
         self
@@ -9005,7 +9156,7 @@ impl<'a, C, NC, A> BlogUserInfoGetCall<'a, C, NC, A> where NC: hyper::net::Netwo
     /// Sets the *max posts* query property to the given value.
     ///
     /// 
-    /// Maximum number of posts to pull back with the blog.    
+    /// Maximum number of posts to pull back with the blog.
     pub fn max_posts(mut self, new_value: u32) -> BlogUserInfoGetCall<'a, C, NC, A> {
         self._max_posts = Some(new_value);
         self
@@ -9066,7 +9217,7 @@ impl<'a, C, NC, A> BlogUserInfoGetCall<'a, C, NC, A> where NC: hyper::net::Netwo
 /// Gets one blog page by ID.
 ///
 /// A builder for the *get* method supported by a *page* resource.
-/// It is not used directly, but through a `PageMethods`.
+/// It is not used directly, but through a `PageMethods` instance.
 ///
 /// # Example
 ///
@@ -9131,7 +9282,7 @@ impl<'a, C, NC, A> PageGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnec
         for &field in ["alt", "blogId", "pageId", "view"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -9184,7 +9335,7 @@ impl<'a, C, NC, A> PageGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnec
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -9196,7 +9347,6 @@ impl<'a, C, NC, A> PageGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnec
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -9206,7 +9356,7 @@ impl<'a, C, NC, A> PageGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnec
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -9217,7 +9367,7 @@ impl<'a, C, NC, A> PageGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnec
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -9226,13 +9376,13 @@ impl<'a, C, NC, A> PageGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnec
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -9244,7 +9394,7 @@ impl<'a, C, NC, A> PageGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnec
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// ID of the blog containing the page.    
+    /// ID of the blog containing the page.
     pub fn blog_id(mut self, new_value: &str) -> PageGetCall<'a, C, NC, A> {
         self._blog_id = new_value.to_string();
         self
@@ -9254,7 +9404,7 @@ impl<'a, C, NC, A> PageGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnec
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The ID of the page to get.    
+    /// The ID of the page to get.
     pub fn page_id(mut self, new_value: &str) -> PageGetCall<'a, C, NC, A> {
         self._page_id = new_value.to_string();
         self
@@ -9322,7 +9472,7 @@ impl<'a, C, NC, A> PageGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnec
 /// Retrieves the pages for a blog, optionally including non-LIVE statuses.
 ///
 /// A builder for the *list* method supported by a *page* resource.
-/// It is not used directly, but through a `PageMethods`.
+/// It is not used directly, but through a `PageMethods` instance.
 ///
 /// # Example
 ///
@@ -9409,7 +9559,7 @@ impl<'a, C, NC, A> PageListCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
         for &field in ["alt", "blogId", "view", "status", "pageToken", "maxResults", "fetchBodies"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -9462,7 +9612,7 @@ impl<'a, C, NC, A> PageListCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -9474,7 +9624,6 @@ impl<'a, C, NC, A> PageListCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -9484,7 +9633,7 @@ impl<'a, C, NC, A> PageListCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -9495,7 +9644,7 @@ impl<'a, C, NC, A> PageListCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -9504,13 +9653,13 @@ impl<'a, C, NC, A> PageListCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -9522,7 +9671,7 @@ impl<'a, C, NC, A> PageListCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// ID of the blog to fetch Pages from.    
+    /// ID of the blog to fetch Pages from.
     pub fn blog_id(mut self, new_value: &str) -> PageListCall<'a, C, NC, A> {
         self._blog_id = new_value.to_string();
         self
@@ -9530,7 +9679,7 @@ impl<'a, C, NC, A> PageListCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
     /// Sets the *view* query property to the given value.
     ///
     /// 
-    /// Access level with which to view the returned result. Note that some fields require elevated access.    
+    /// Access level with which to view the returned result. Note that some fields require elevated access.
     pub fn view(mut self, new_value: &str) -> PageListCall<'a, C, NC, A> {
         self._view = Some(new_value.to_string());
         self
@@ -9546,7 +9695,7 @@ impl<'a, C, NC, A> PageListCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
     /// Sets the *page token* query property to the given value.
     ///
     /// 
-    /// Continuation token if the request is paged.    
+    /// Continuation token if the request is paged.
     pub fn page_token(mut self, new_value: &str) -> PageListCall<'a, C, NC, A> {
         self._page_token = Some(new_value.to_string());
         self
@@ -9554,7 +9703,7 @@ impl<'a, C, NC, A> PageListCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
     /// Sets the *max results* query property to the given value.
     ///
     /// 
-    /// Maximum number of Pages to fetch.    
+    /// Maximum number of Pages to fetch.
     pub fn max_results(mut self, new_value: u32) -> PageListCall<'a, C, NC, A> {
         self._max_results = Some(new_value);
         self
@@ -9562,7 +9711,7 @@ impl<'a, C, NC, A> PageListCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
     /// Sets the *fetch bodies* query property to the given value.
     ///
     /// 
-    /// Whether to retrieve the Page bodies.    
+    /// Whether to retrieve the Page bodies.
     pub fn fetch_bodies(mut self, new_value: bool) -> PageListCall<'a, C, NC, A> {
         self._fetch_bodies = Some(new_value);
         self
@@ -9623,7 +9772,7 @@ impl<'a, C, NC, A> PageListCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
 /// Revert a published or scheduled page to draft state.
 ///
 /// A builder for the *revert* method supported by a *page* resource.
-/// It is not used directly, but through a `PageMethods`.
+/// It is not used directly, but through a `PageMethods` instance.
 ///
 /// # Example
 ///
@@ -9683,7 +9832,7 @@ impl<'a, C, NC, A> PageRevertCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
         for &field in ["alt", "blogId", "pageId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -9736,7 +9885,7 @@ impl<'a, C, NC, A> PageRevertCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -9748,7 +9897,6 @@ impl<'a, C, NC, A> PageRevertCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -9758,7 +9906,7 @@ impl<'a, C, NC, A> PageRevertCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -9769,7 +9917,7 @@ impl<'a, C, NC, A> PageRevertCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -9778,13 +9926,13 @@ impl<'a, C, NC, A> PageRevertCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -9796,7 +9944,7 @@ impl<'a, C, NC, A> PageRevertCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The ID of the blog.    
+    /// The ID of the blog.
     pub fn blog_id(mut self, new_value: &str) -> PageRevertCall<'a, C, NC, A> {
         self._blog_id = new_value.to_string();
         self
@@ -9806,7 +9954,7 @@ impl<'a, C, NC, A> PageRevertCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The ID of the page.    
+    /// The ID of the page.
     pub fn page_id(mut self, new_value: &str) -> PageRevertCall<'a, C, NC, A> {
         self._page_id = new_value.to_string();
         self
@@ -9867,7 +10015,7 @@ impl<'a, C, NC, A> PageRevertCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
 /// Add a page.
 ///
 /// A builder for the *insert* method supported by a *page* resource.
-/// It is not used directly, but through a `PageMethods`.
+/// It is not used directly, but through a `PageMethods` instance.
 ///
 /// # Example
 ///
@@ -9937,7 +10085,7 @@ impl<'a, C, NC, A> PageInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
         for &field in ["alt", "blogId", "isDraft"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -9994,7 +10142,7 @@ impl<'a, C, NC, A> PageInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -10010,7 +10158,6 @@ impl<'a, C, NC, A> PageInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -10020,7 +10167,7 @@ impl<'a, C, NC, A> PageInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -10031,7 +10178,7 @@ impl<'a, C, NC, A> PageInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -10040,13 +10187,13 @@ impl<'a, C, NC, A> PageInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -10067,7 +10214,7 @@ impl<'a, C, NC, A> PageInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// ID of the blog to add the page to.    
+    /// ID of the blog to add the page to.
     pub fn blog_id(mut self, new_value: &str) -> PageInsertCall<'a, C, NC, A> {
         self._blog_id = new_value.to_string();
         self
@@ -10075,7 +10222,7 @@ impl<'a, C, NC, A> PageInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// Sets the *is draft* query property to the given value.
     ///
     /// 
-    /// Whether to create the page as a draft (default: false).    
+    /// Whether to create the page as a draft (default: false).
     pub fn is_draft(mut self, new_value: bool) -> PageInsertCall<'a, C, NC, A> {
         self._is_draft = Some(new_value);
         self
@@ -10136,7 +10283,7 @@ impl<'a, C, NC, A> PageInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
 /// Update a page. This method supports patch semantics.
 ///
 /// A builder for the *patch* method supported by a *page* resource.
-/// It is not used directly, but through a `PageMethods`.
+/// It is not used directly, but through a `PageMethods` instance.
 ///
 /// # Example
 ///
@@ -10213,7 +10360,7 @@ impl<'a, C, NC, A> PagePatchCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
         for &field in ["alt", "blogId", "pageId", "revert", "publish"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -10270,7 +10417,7 @@ impl<'a, C, NC, A> PagePatchCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -10286,7 +10433,6 @@ impl<'a, C, NC, A> PagePatchCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -10296,7 +10442,7 @@ impl<'a, C, NC, A> PagePatchCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -10307,7 +10453,7 @@ impl<'a, C, NC, A> PagePatchCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -10316,13 +10462,13 @@ impl<'a, C, NC, A> PagePatchCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -10343,7 +10489,7 @@ impl<'a, C, NC, A> PagePatchCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The ID of the Blog.    
+    /// The ID of the Blog.
     pub fn blog_id(mut self, new_value: &str) -> PagePatchCall<'a, C, NC, A> {
         self._blog_id = new_value.to_string();
         self
@@ -10353,7 +10499,7 @@ impl<'a, C, NC, A> PagePatchCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The ID of the Page.    
+    /// The ID of the Page.
     pub fn page_id(mut self, new_value: &str) -> PagePatchCall<'a, C, NC, A> {
         self._page_id = new_value.to_string();
         self
@@ -10361,7 +10507,7 @@ impl<'a, C, NC, A> PagePatchCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     /// Sets the *revert* query property to the given value.
     ///
     /// 
-    /// Whether a revert action should be performed when the page is updated (default: false).    
+    /// Whether a revert action should be performed when the page is updated (default: false).
     pub fn revert(mut self, new_value: bool) -> PagePatchCall<'a, C, NC, A> {
         self._revert = Some(new_value);
         self
@@ -10369,7 +10515,7 @@ impl<'a, C, NC, A> PagePatchCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     /// Sets the *publish* query property to the given value.
     ///
     /// 
-    /// Whether a publish action should be performed when the page is updated (default: false).    
+    /// Whether a publish action should be performed when the page is updated (default: false).
     pub fn publish(mut self, new_value: bool) -> PagePatchCall<'a, C, NC, A> {
         self._publish = Some(new_value);
         self
@@ -10430,7 +10576,7 @@ impl<'a, C, NC, A> PagePatchCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
 /// Publishes a draft page.
 ///
 /// A builder for the *publish* method supported by a *page* resource.
-/// It is not used directly, but through a `PageMethods`.
+/// It is not used directly, but through a `PageMethods` instance.
 ///
 /// # Example
 ///
@@ -10490,7 +10636,7 @@ impl<'a, C, NC, A> PagePublishCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
         for &field in ["alt", "blogId", "pageId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -10543,7 +10689,7 @@ impl<'a, C, NC, A> PagePublishCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -10555,7 +10701,6 @@ impl<'a, C, NC, A> PagePublishCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -10565,7 +10710,7 @@ impl<'a, C, NC, A> PagePublishCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -10576,7 +10721,7 @@ impl<'a, C, NC, A> PagePublishCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -10585,13 +10730,13 @@ impl<'a, C, NC, A> PagePublishCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -10603,7 +10748,7 @@ impl<'a, C, NC, A> PagePublishCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The ID of the blog.    
+    /// The ID of the blog.
     pub fn blog_id(mut self, new_value: &str) -> PagePublishCall<'a, C, NC, A> {
         self._blog_id = new_value.to_string();
         self
@@ -10613,7 +10758,7 @@ impl<'a, C, NC, A> PagePublishCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The ID of the page.    
+    /// The ID of the page.
     pub fn page_id(mut self, new_value: &str) -> PagePublishCall<'a, C, NC, A> {
         self._page_id = new_value.to_string();
         self
@@ -10674,7 +10819,7 @@ impl<'a, C, NC, A> PagePublishCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
 /// Update a page.
 ///
 /// A builder for the *update* method supported by a *page* resource.
-/// It is not used directly, but through a `PageMethods`.
+/// It is not used directly, but through a `PageMethods` instance.
 ///
 /// # Example
 ///
@@ -10751,7 +10896,7 @@ impl<'a, C, NC, A> PageUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
         for &field in ["alt", "blogId", "pageId", "revert", "publish"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -10808,7 +10953,7 @@ impl<'a, C, NC, A> PageUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -10824,7 +10969,6 @@ impl<'a, C, NC, A> PageUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -10834,7 +10978,7 @@ impl<'a, C, NC, A> PageUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -10845,7 +10989,7 @@ impl<'a, C, NC, A> PageUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -10854,13 +10998,13 @@ impl<'a, C, NC, A> PageUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -10881,7 +11025,7 @@ impl<'a, C, NC, A> PageUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The ID of the Blog.    
+    /// The ID of the Blog.
     pub fn blog_id(mut self, new_value: &str) -> PageUpdateCall<'a, C, NC, A> {
         self._blog_id = new_value.to_string();
         self
@@ -10891,7 +11035,7 @@ impl<'a, C, NC, A> PageUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The ID of the Page.    
+    /// The ID of the Page.
     pub fn page_id(mut self, new_value: &str) -> PageUpdateCall<'a, C, NC, A> {
         self._page_id = new_value.to_string();
         self
@@ -10899,7 +11043,7 @@ impl<'a, C, NC, A> PageUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// Sets the *revert* query property to the given value.
     ///
     /// 
-    /// Whether a revert action should be performed when the page is updated (default: false).    
+    /// Whether a revert action should be performed when the page is updated (default: false).
     pub fn revert(mut self, new_value: bool) -> PageUpdateCall<'a, C, NC, A> {
         self._revert = Some(new_value);
         self
@@ -10907,7 +11051,7 @@ impl<'a, C, NC, A> PageUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// Sets the *publish* query property to the given value.
     ///
     /// 
-    /// Whether a publish action should be performed when the page is updated (default: false).    
+    /// Whether a publish action should be performed when the page is updated (default: false).
     pub fn publish(mut self, new_value: bool) -> PageUpdateCall<'a, C, NC, A> {
         self._publish = Some(new_value);
         self
@@ -10968,7 +11112,7 @@ impl<'a, C, NC, A> PageUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
 /// Delete a page by ID.
 ///
 /// A builder for the *delete* method supported by a *page* resource.
-/// It is not used directly, but through a `PageMethods`.
+/// It is not used directly, but through a `PageMethods` instance.
 ///
 /// # Example
 ///
@@ -11028,7 +11172,7 @@ impl<'a, C, NC, A> PageDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
         for &field in ["blogId", "pageId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -11080,7 +11224,7 @@ impl<'a, C, NC, A> PageDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -11092,7 +11236,6 @@ impl<'a, C, NC, A> PageDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -11102,7 +11245,7 @@ impl<'a, C, NC, A> PageDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -11113,12 +11256,12 @@ impl<'a, C, NC, A> PageDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = res;
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -11130,7 +11273,7 @@ impl<'a, C, NC, A> PageDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The ID of the Blog.    
+    /// The ID of the Blog.
     pub fn blog_id(mut self, new_value: &str) -> PageDeleteCall<'a, C, NC, A> {
         self._blog_id = new_value.to_string();
         self
@@ -11140,7 +11283,7 @@ impl<'a, C, NC, A> PageDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The ID of the Page.    
+    /// The ID of the Page.
     pub fn page_id(mut self, new_value: &str) -> PageDeleteCall<'a, C, NC, A> {
         self._page_id = new_value.to_string();
         self

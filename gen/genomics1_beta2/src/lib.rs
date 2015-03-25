@@ -1,8 +1,8 @@
 // DO NOT EDIT !
-// This file was generated automatically from 'src/mako/lib.rs.mako'
+// This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *genomics* crate version *0.1.1+20150303*, where *20150303* is the exact revision of the *genomics:v1beta2* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.1*.
+//! This documentation was generated from *genomics* crate version *0.1.2+20150317*, where *20150317* is the exact revision of the *genomics:v1beta2* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.2*.
 //! 
 //! Everything else about the *genomics* *v1_beta2* API can be found at the
 //! [official documentation site](https://developers.google.com/genomics/v1beta2/reference).
@@ -47,6 +47,8 @@
 //! 
 //! * **[Hub](struct.Genomics.html)**
 //!     * a central object to maintain state and allow accessing all *Activities*
+//!     * creates [*Method Builders*](trait.MethodsBuilder.html) which in turn
+//!       allow access to individual [*Call Builders*](trait.CallBuilder.html)
 //! * **[Resources](trait.Resource.html)**
 //!     * primary types that you can apply *Activities* to
 //!     * a collection of properties and *Parts*
@@ -55,6 +57,8 @@
 //!         * never directly used in *Activities*
 //! * **[Activities](trait.CallBuilder.html)**
 //!     * operations to apply to *Resources*
+//! 
+//! All *structures* are marked with applicable traits to further categorize them and ease browsing.
 //! 
 //! Generally speaking, you can invoke *Activities* like this:
 //! 
@@ -97,7 +101,7 @@
 //! extern crate "yup-oauth2" as oauth2;
 //! extern crate "google-genomics1_beta2" as genomics1_beta2;
 //! use genomics1_beta2::Annotation;
-//! use genomics1_beta2::Result;
+//! use genomics1_beta2::{Result, Error};
 //! # #[test] fn egal() {
 //! use std::default::Default;
 //! use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -127,15 +131,17 @@
 //!              .doit();
 //! 
 //! match result {
-//!     Result::HttpError(err) => println!("HTTPERROR: {:?}", err),
-//!     Result::MissingAPIKey => println!("Auth: Missing API Key - used if there are no scopes"),
-//!     Result::MissingToken => println!("OAuth2: Missing Token"),
-//!     Result::Cancelled => println!("Operation cancelled by user"),
-//!     Result::UploadSizeLimitExceeded(size, max_size) => println!("Upload size too big: {} of {}", size, max_size),
-//!     Result::Failure(_) => println!("General Failure (hyper::client::Response doesn't print)"),
-//!     Result::FieldClash(clashed_field) => println!("You added custom parameter which is part of builder: {:?}", clashed_field),
-//!     Result::JsonDecodeError(err) => println!("Couldn't understand server reply - maybe API needs update: {:?}", err),
-//!     Result::Success(_) => println!("Success (value doesn't print)"),
+//!     Err(e) => match e {
+//!         Error::HttpError(err) => println!("HTTPERROR: {:?}", err),
+//!         Error::MissingAPIKey => println!("Auth: Missing API Key - used if there are no scopes"),
+//!         Error::MissingToken => println!("OAuth2: Missing Token"),
+//!         Error::Cancelled => println!("Operation canceled by user"),
+//!         Error::UploadSizeLimitExceeded(size, max_size) => println!("Upload size too big: {} of {}", size, max_size),
+//!         Error::Failure(_) => println!("General Failure (hyper::client::Response doesn't print)"),
+//!         Error::FieldClash(clashed_field) => println!("You added custom parameter which is part of builder: {:?}", clashed_field),
+//!         Error::JsonDecodeError(err) => println!("Couldn't understand server reply - maybe API needs update: {:?}", err),
+//!     },
+//!     Ok(_) => println!("Success (value doesn't print)"),
 //! }
 //! # }
 //! ```
@@ -148,7 +154,7 @@
 //! When delegates handle errors or intermediate values, they may have a chance to instruct the system to retry. This 
 //! makes the system potentially resilient to all kinds of errors.
 //! 
-//! ## Uploads and Downlods
+//! ## Uploads and Downloads
 //! If a method supports downloads, the response body, which is part of the [Result](enum.Result.html), should be
 //! read by you to obtain the media.
 //! If such a method also supports a [Response Result](trait.ResponseResult.html), it will return that by default.
@@ -171,8 +177,9 @@
 //! ## Optional Parts in Server-Requests
 //! 
 //! All structures provided by this library are made to be [enocodable](trait.RequestValue.html) and 
-//! [decodable](trait.ResponseResult.html) via json. Optionals are used to indicate that partial requests are responses are valid.
-//! Most optionals are are considered [Parts](trait.Part.html) which are identifyable by name, which will be sent to 
+//! [decodable](trait.ResponseResult.html) via *json*. Optionals are used to indicate that partial requests are responses 
+//! are valid.
+//! Most optionals are are considered [Parts](trait.Part.html) which are identifiable by name, which will be sent to 
 //! the server to indicate either the set parts of the request or the desired parts in the response.
 //! 
 //! ## Builder Arguments
@@ -221,7 +228,7 @@ use std::io;
 use std::fs;
 use std::thread::sleep;
 
-pub use cmn::{MultiPartReader, ToParts, MethodInfo, Result, CallBuilder, Hub, ReadSeek, Part, ResponseResult, RequestValue, NestedType, Delegate, DefaultDelegate, ResourceMethodsBuilder, Resource, JsonServerError};
+pub use cmn::{MultiPartReader, ToParts, MethodInfo, Result, Error, CallBuilder, Hub, ReadSeek, Part, ResponseResult, RequestValue, NestedType, Delegate, DefaultDelegate, MethodsBuilder, Resource, JsonServerError};
 
 
 // ##############
@@ -280,7 +287,7 @@ impl Default for Scope {
 /// extern crate "yup-oauth2" as oauth2;
 /// extern crate "google-genomics1_beta2" as genomics1_beta2;
 /// use genomics1_beta2::Annotation;
-/// use genomics1_beta2::Result;
+/// use genomics1_beta2::{Result, Error};
 /// # #[test] fn egal() {
 /// use std::default::Default;
 /// use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -310,15 +317,17 @@ impl Default for Scope {
 ///              .doit();
 /// 
 /// match result {
-///     Result::HttpError(err) => println!("HTTPERROR: {:?}", err),
-///     Result::MissingAPIKey => println!("Auth: Missing API Key - used if there are no scopes"),
-///     Result::MissingToken => println!("OAuth2: Missing Token"),
-///     Result::Cancelled => println!("Operation cancelled by user"),
-///     Result::UploadSizeLimitExceeded(size, max_size) => println!("Upload size too big: {} of {}", size, max_size),
-///     Result::Failure(_) => println!("General Failure (hyper::client::Response doesn't print)"),
-///     Result::FieldClash(clashed_field) => println!("You added custom parameter which is part of builder: {:?}", clashed_field),
-///     Result::JsonDecodeError(err) => println!("Couldn't understand server reply - maybe API needs update: {:?}", err),
-///     Result::Success(_) => println!("Success (value doesn't print)"),
+///     Err(e) => match e {
+///         Error::HttpError(err) => println!("HTTPERROR: {:?}", err),
+///         Error::MissingAPIKey => println!("Auth: Missing API Key - used if there are no scopes"),
+///         Error::MissingToken => println!("OAuth2: Missing Token"),
+///         Error::Cancelled => println!("Operation canceled by user"),
+///         Error::UploadSizeLimitExceeded(size, max_size) => println!("Upload size too big: {} of {}", size, max_size),
+///         Error::Failure(_) => println!("General Failure (hyper::client::Response doesn't print)"),
+///         Error::FieldClash(clashed_field) => println!("You added custom parameter which is part of builder: {:?}", clashed_field),
+///         Error::JsonDecodeError(err) => println!("Couldn't understand server reply - maybe API needs update: {:?}", err),
+///     },
+///     Ok(_) => println!("Success (value doesn't print)"),
 /// }
 /// # }
 /// ```
@@ -339,7 +348,7 @@ impl<'a, C, NC, A> Genomics<C, NC, A>
         Genomics {
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/0.1.1".to_string(),
+            _user_agent: "google-api-rust-client/0.1.2".to_string(),
             _m: PhantomData
         }
     }
@@ -382,7 +391,7 @@ impl<'a, C, NC, A> Genomics<C, NC, A>
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/0.1.1`.
+    /// It defaults to `google-api-rust-client/0.1.2`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -407,7 +416,7 @@ impl<'a, C, NC, A> Genomics<C, NC, A>
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct BatchAnnotationsResponse {
-    /// The resulting per-annotation entries, ordered consistently with the original request.    
+    /// The resulting per-annotation entries, ordered consistently with the original request.
     pub entries: Vec<BatchAnnotationsResponseEntry>,
 }
 
@@ -425,13 +434,13 @@ impl ResponseResult for BatchAnnotationsResponse {}
 /// 
 #[derive(Default, Clone, Debug, Serialize)]
 pub struct SearchVariantSetsRequest {
-    /// The continuation token, which is used to page through large result sets. To get the next page of results, set this parameter to the value of nextPageToken from the previous response.    
+    /// The continuation token, which is used to page through large result sets. To get the next page of results, set this parameter to the value of nextPageToken from the previous response.
     #[serde(alias="pageToken")]
     pub page_token: Option<String>,
-    /// Exactly one dataset ID must be provided here. Only variant sets which belong to this dataset will be returned.    
+    /// Exactly one dataset ID must be provided here. Only variant sets which belong to this dataset will be returned.
     #[serde(alias="datasetIds")]
     pub dataset_ids: Option<Vec<String>>,
-    /// The maximum number of variant sets to return in a request.    
+    /// The maximum number of variant sets to return in a request.
     #[serde(alias="pageSize")]
     pub page_size: Option<i32>,
 }
@@ -445,7 +454,7 @@ impl RequestValue for SearchVariantSetsRequest {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Int32Value {
-    /// The int32 value.    
+    /// The int32 value.
     pub value: i32,
 }
 
@@ -463,10 +472,10 @@ impl Part for Int32Value {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct SearchJobsResponse {
-    /// The continuation token which is used to page through large result sets. Provide this value is a subsequent request to return the next page of results. This field will be empty if there are no more results.    
+    /// The continuation token which is used to page through large result sets. Provide this value is a subsequent request to return the next page of results. This field will be empty if there are no more results.
     #[serde(alias="nextPageToken")]
     pub next_page_token: String,
-    /// The list of jobs results, ordered newest to oldest.    
+    /// The list of jobs results, ordered newest to oldest.
     pub jobs: Vec<Job>,
 }
 
@@ -479,23 +488,23 @@ impl ResponseResult for SearchJobsResponse {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct VariantAnnotation {
-    /// Google annotation ID of the transcripts affected by this variant. These should be provided when the variant is created.    
+    /// Google annotation IDs of the transcripts affected by this variant. These should be provided when the variant is created.
     #[serde(alias="transcriptIds")]
     pub transcript_ids: Vec<String>,
-    /// The alternate allele for this variant. If multiple alternate alleles exist at this location, create a separate variant for each one, as they may represent distinct conditions.    
+    /// The alternate allele for this variant. If multiple alternate alleles exist at this location, create a separate variant for each one, as they may represent distinct conditions.
     #[serde(alias="alternateBases")]
     pub alternate_bases: String,
-    /// Describes the clinical significance of a variant. It is adapted from the ClinVar controlled vocabulary for clinical significance described at: http://www.ncbi.nlm.nih.gov/clinvar/docs/clinsig/    
+    /// Describes the clinical significance of a variant. It is adapted from the ClinVar controlled vocabulary for clinical significance described at: http://www.ncbi.nlm.nih.gov/clinvar/docs/clinsig/
     #[serde(alias="clinicalSignificance")]
     pub clinical_significance: String,
-    /// The set of conditions associated with this variant. A condition describes the way a variant influences human health.    
+    /// The set of conditions associated with this variant. A condition describes the way a variant influences human health.
     pub conditions: Vec<VariantAnnotationCondition>,
-    /// Type has been adapted from ClinVar's list of variant types.    
+    /// Type has been adapted from ClinVar's list of variant types.
     #[serde(alias="type")]
     pub type_: String,
-    /// Effect of the variant on the coding sequence.    
+    /// Effect of the variant on the coding sequence.
     pub effect: String,
-    /// Google annotation ID of the gene affected by this variant. This should be provided when the variant is created.    
+    /// Google annotation ID of the gene affected by this variant. This should be provided when the variant is created.
     #[serde(alias="geneId")]
     pub gene_id: String,
 }
@@ -509,16 +518,16 @@ impl Part for VariantAnnotation {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct VariantAnnotationCondition {
-    /// The MedGen concept id associated with this gene. Search for these IDs at http://www.ncbi.nlm.nih.gov/medgen/    
+    /// The MedGen concept id associated with this gene. Search for these IDs at http://www.ncbi.nlm.nih.gov/medgen/
     #[serde(alias="conceptId")]
     pub concept_id: String,
-    /// The OMIM id for this condition. Search for these IDs at http://omim.org/    
+    /// The OMIM id for this condition. Search for these IDs at http://omim.org/
     #[serde(alias="omimId")]
     pub omim_id: String,
-    /// The set of external ids for this condition.    
+    /// The set of external IDs for this condition.
     #[serde(alias="externalIds")]
     pub external_ids: Vec<ExternalId>,
-    /// A set of names for the condition.    
+    /// A set of names for the condition.
     pub names: Vec<String>,
 }
 
@@ -536,10 +545,10 @@ impl Part for VariantAnnotationCondition {}
 /// 
 #[derive(Default, Clone, Debug, Serialize)]
 pub struct ImportVariantsRequest {
-    /// A list of URIs pointing at VCF files in Google Cloud Storage. See the VCF Specification for more details on the input format.    
+    /// A list of URIs pointing at VCF files in Google Cloud Storage. See the VCF Specification for more details on the input format.
     #[serde(alias="sourceUris")]
     pub source_uris: Option<Vec<String>>,
-    /// The format of the variant data being imported.    
+    /// The format of the variant data being imported.
     pub format: Option<String>,
 }
 
@@ -552,20 +561,20 @@ impl RequestValue for ImportVariantsRequest {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Metadata {
-    /// Remaining structured metadata key-value pairs.    
+    /// Remaining structured metadata key-value pairs.
     pub info: HashMap<String, Vec<String>>,
-    /// A textual description of this metadata.    
+    /// A textual description of this metadata.
     pub description: String,
-    /// The top-level key.    
+    /// The top-level key.
     pub key: String,
-    /// The type of data. Possible types include: Integer, Float, Flag, Character, and String.    
+    /// The type of data. Possible types include: Integer, Float, Flag, Character, and String.
     #[serde(alias="type")]
     pub type_: String,
-    /// The number of values that can be included in a field described by this metadata.    
+    /// The number of values that can be included in a field described by this metadata.
     pub number: String,
-    /// The value field for simple metadata    
+    /// The value field for simple metadata
     pub value: String,
-    /// User-provided ID field, not enforced by this API. Two or more pieces of structured metadata with identical id and key fields are considered equivalent.    
+    /// User-provided ID field, not enforced by this API. Two or more pieces of structured metadata with identical id and key fields are considered equivalent.
     pub id: String,
 }
 
@@ -583,13 +592,13 @@ impl Part for Metadata {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct ListCoverageBucketsResponse {
-    /// The coverage buckets. The list of buckets is sparse; a bucket with 0 overlapping reads is not returned. A bucket never crosses more than one reference sequence. Each bucket has width bucketWidth, unless its end is the end of the reference sequence.    
+    /// The coverage buckets. The list of buckets is sparse; a bucket with 0 overlapping reads is not returned. A bucket never crosses more than one reference sequence. Each bucket has width bucketWidth, unless its end is the end of the reference sequence.
     #[serde(alias="coverageBuckets")]
     pub coverage_buckets: Vec<CoverageBucket>,
-    /// The continuation token, which is used to page through large result sets. Provide this value in a subsequent request to return the next page of results. This field will be empty if there aren't any additional results.    
+    /// The continuation token, which is used to page through large result sets. Provide this value in a subsequent request to return the next page of results. This field will be empty if there aren't any additional results.
     #[serde(alias="nextPageToken")]
     pub next_page_token: String,
-    /// The length of each coverage bucket in base pairs. Note that buckets at the end of a reference sequence may be shorter. This value is omitted if the bucket width is infinity (the default behaviour, with no range or targetBucketWidth).    
+    /// The length of each coverage bucket in base pairs. Note that buckets at the end of a reference sequence may be shorter. This value is omitted if the bucket width is infinity (the default behaviour, with no range or targetBucketWidth).
     #[serde(alias="bucketWidth")]
     pub bucket_width: String,
 }
@@ -603,19 +612,19 @@ impl ResponseResult for ListCoverageBucketsResponse {}
 /// 
 #[derive(Default, Clone, Debug, Serialize)]
 pub struct FastqMetadata {
-    /// Optionally specifies the platform unit for alignment from FASTQ. For example: flowcell-barcode.lane for Illumina or slide for SOLID.    
+    /// Optionally specifies the platform unit for alignment from FASTQ. For example: flowcell-barcode.lane for Illumina or slide for SOLID.
     #[serde(alias="platformUnit")]
     pub platform_unit: String,
-    /// Optionally specifies the read group name for alignment from FASTQ.    
+    /// Optionally specifies the read group name for alignment from FASTQ.
     #[serde(alias="readGroupName")]
     pub read_group_name: String,
-    /// Optionally specifies the library name for alignment from FASTQ.    
+    /// Optionally specifies the library name for alignment from FASTQ.
     #[serde(alias="libraryName")]
     pub library_name: String,
-    /// Optionally specifies the platform name for alignment from FASTQ. For example: CAPILLARY, LS454, ILLUMINA, SOLID, HELICOS, IONTORRENT, PACBIO.    
+    /// Optionally specifies the platform name for alignment from FASTQ. For example: CAPILLARY, LS454, ILLUMINA, SOLID, HELICOS, IONTORRENT, PACBIO.
     #[serde(alias="platformName")]
     pub platform_name: String,
-    /// Optionally specifies the sample name for alignment from FASTQ.    
+    /// Optionally specifies the sample name for alignment from FASTQ.
     #[serde(alias="sampleName")]
     pub sample_name: String,
 }
@@ -634,7 +643,7 @@ impl Part for FastqMetadata {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct ExportVariantSetResponse {
-    /// A job ID that can be used to get status information.    
+    /// A job ID that can be used to get status information.
     #[serde(alias="jobId")]
     pub job_id: String,
 }
@@ -653,10 +662,10 @@ impl ResponseResult for ExportVariantSetResponse {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct SearchAnnotationsResponse {
-    /// The continuation token, which is used to page through large result sets. Provide this value in a subsequent request to return the next page of results. This field will be empty if there aren't any additional results.    
+    /// The continuation token, which is used to page through large result sets. Provide this value in a subsequent request to return the next page of results. This field will be empty if there aren't any additional results.
     #[serde(alias="nextPageToken")]
     pub next_page_token: String,
-    /// The matching annotations.    
+    /// The matching annotations.
     pub annotations: Vec<Annotation>,
 }
 
@@ -669,16 +678,16 @@ impl ResponseResult for SearchAnnotationsResponse {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ReadGroupProgram {
-    /// The command line used to run this program.    
+    /// The command line used to run this program.
     #[serde(alias="commandLine")]
     pub command_line: String,
-    /// The version of the program run.    
+    /// The version of the program run.
     pub version: String,
-    /// The user specified locally unique ID of the program. Used along with prevProgramId to define an ordering between programs.    
+    /// The user specified locally unique ID of the program. Used along with prevProgramId to define an ordering between programs.
     pub id: String,
-    /// The name of the program.    
+    /// The name of the program.
     pub name: String,
-    /// The ID of the program run before this one.    
+    /// The ID of the program run before this one.
     #[serde(alias="prevProgramId")]
     pub prev_program_id: String,
 }
@@ -697,19 +706,19 @@ impl Part for ReadGroupProgram {}
 /// 
 #[derive(Default, Clone, Debug, Serialize)]
 pub struct AlignReadGroupSetsRequest {
-    /// The interleaved FASTQ source files for alignment, where both members of each pair of reads are found on consecutive records within the same FASTQ file. Exactly one of readGroupSetId, bamSourceUris, interleavedFastqSource or pairedFastqSource must be provided.    
+    /// The interleaved FASTQ source files for alignment, where both members of each pair of reads are found on consecutive records within the same FASTQ file. Exactly one of readGroupSetId, bamSourceUris, interleavedFastqSource or pairedFastqSource must be provided.
     #[serde(alias="interleavedFastqSource")]
     pub interleaved_fastq_source: Option<InterleavedFastqSource>,
-    /// The BAM source files for alignment. Exactly one of readGroupSetId, bamSourceUris, interleavedFastqSource or pairedFastqSource must be provided. The caller must have READ permissions for these files.    
+    /// The BAM source files for alignment. Exactly one of readGroupSetId, bamSourceUris, interleavedFastqSource or pairedFastqSource must be provided. The caller must have READ permissions for these files.
     #[serde(alias="bamSourceUris")]
     pub bam_source_uris: Option<Vec<String>>,
-    /// The paired end FASTQ source files for alignment, where each member of a pair of reads are found in separate files. Exactly one of readGroupSetId, bamSourceUris, interleavedFastqSource or pairedFastqSource must be provided.    
+    /// The paired end FASTQ source files for alignment, where each member of a pair of reads are found in separate files. Exactly one of readGroupSetId, bamSourceUris, interleavedFastqSource or pairedFastqSource must be provided.
     #[serde(alias="pairedFastqSource")]
     pub paired_fastq_source: Option<PairedFastqSource>,
-    /// Required. The ID of the dataset the newly aligned read group sets will belong to. The caller must have WRITE permissions to this dataset.    
+    /// Required. The ID of the dataset the newly aligned read group sets will belong to. The caller must have WRITE permissions to this dataset.
     #[serde(alias="datasetId")]
     pub dataset_id: Option<String>,
-    /// The ID of the read group set which will be aligned. A new read group set will be generated to hold the aligned data, the originals will not be modified. The caller must have READ permissions for this read group set. Exactly one of readGroupSetId, bamSourceUris, interleavedFastqSource or pairedFastqSource must be provided.    
+    /// The ID of the read group set which will be aligned. A new read group set will be generated to hold the aligned data, the originals will not be modified. The caller must have READ permissions for this read group set. Exactly one of readGroupSetId, bamSourceUris, interleavedFastqSource or pairedFastqSource must be provided.
     #[serde(alias="readGroupSetId")]
     pub read_group_set_id: Option<String>,
 }
@@ -728,10 +737,10 @@ pub struct Transcript {
     /// Note that in some cases, the reference genome will not exactly match the observed mRNA transcript e.g. due to variance in the source genome from reference. In these cases, exon.frame will not necessarily match the expected reference reading frame and coding exon reference bases cannot necessarily be concatenated to produce the original transcript mRNA.
     #[serde(alias="codingSequence")]
     pub coding_sequence: TranscriptCodingSequence,
-    /// The exons which compose this transcript. Exons are the pieces of the transcript which are spliced together, may be exported from a cell's nucleus, and may then be translated to protein. This field should be unset for genomes where transcript splicing does not occur, for example prokaryotes.
+    /// The exons that compose this transcript. This field should be unset for genomes where transcript splicing does not occur, for example prokaryotes.
     /// 
     /// 
-    /// Introns are regions of the transcript which are not included in the spliced RNA product. Though not explicitly modeled here, intron ranges can be deduced; all regions of this transcript which are not exons are introns.
+    /// Introns are regions of the transcript that are not included in the spliced RNA product. Though not explicitly modeled here, intron ranges can be deduced; all regions of this transcript that are not exons are introns.
     /// 
     /// 
     /// Exonic sequences do not necessarily code for a translational product (amino acids). Only the regions of exons bounded by the codingSequence correspond to coding DNA sequence.
@@ -739,7 +748,7 @@ pub struct Transcript {
     /// 
     /// Exons are ordered by start position and may not overlap.
     pub exons: Vec<TranscriptExon>,
-    /// The annotation ID of the gene from which this transcript is transcribed.    
+    /// The annotation ID of the gene from which this transcript is transcribed.
     #[serde(alias="geneId")]
     pub gene_id: String,
 }
@@ -747,7 +756,7 @@ pub struct Transcript {
 impl Part for Transcript {}
 
 
-/// An annotation describes a region of reference genome. The value of an annotation may be one of several canonical types, supplemented by arbitrary info tags. A variant annotation is represented by one or more of these canonical types. An annotation is not inherently associated with a specific sample/individual (though a client could choose to use annotations in this way). Example canonical annotation types are 'Gene' and 'Variant'.
+/// An annotation describes a region of reference genome. The value of an annotation may be one of several canonical types, supplemented by arbitrary info tags. A variant annotation is represented by one or more of these canonical types. An annotation is not inherently associated with a specific sample or individual (though a client could choose to use annotations in this way). Example canonical annotation types are 'Gene' and 'Variant'.
 /// 
 /// # Activities
 /// 
@@ -764,23 +773,23 @@ impl Part for Transcript {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Annotation {
-    /// A map of additional data for this annotation.    
+    /// A map of additional data for this annotation.
     pub info: Option<HashMap<String, Vec<String>>>,
-    /// The display name of this annotation.    
+    /// The display name of this annotation.
     pub name: Option<String>,
-    /// A transcript value represents the assertion that a particular region of the reference genome may be transcribed as RNA. An alternate splicing pattern would be represented as separate transcript object. This field is only set for annotations of type TRANSCRIPT.    
+    /// A transcript value represents the assertion that a particular region of the reference genome may be transcribed as RNA. An alternative splicing pattern would be represented as a separate transcript object. This field is only set for annotations of type TRANSCRIPT.
     pub transcript: Option<Transcript>,
-    /// A variant annotation which describes the effect of a variant on the genome, the coding sequence, and/or higher level consequences at the organism level e.g. pathogenicity. This field is only set for annotations of type VARIANT.    
+    /// A variant annotation, which describes the effect of a variant on the genome, the coding sequence, and/or higher level consequences at the organism level e.g. pathogenicity. This field is only set for annotations of type VARIANT.
     pub variant: Option<VariantAnnotation>,
-    /// The ID of the containing annotation set.    
+    /// The ID of the containing annotation set.
     #[serde(alias="annotationSetId")]
     pub annotation_set_id: Option<String>,
-    /// The position of this annotation on the reference sequence.    
+    /// The position of this annotation on the reference sequence.
     pub position: Option<RangePosition>,
-    /// The data type for this annotation. Must match the containing annotation set's type.    
+    /// The data type for this annotation. Must match the containing annotation set's type.
     #[serde(alias="type")]
     pub type_: Option<String>,
-    /// The generated unique ID for this annotation.    
+    /// The generated unique ID for this annotation.
     pub id: Option<String>,
 }
 
@@ -795,11 +804,11 @@ impl ResponseResult for Annotation {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct JobRequest {
-    /// The data source of the request, for example, a Google Cloud Storage object path or Readset ID.    
+    /// The data source of the request, for example, a Google Cloud Storage object path or Readset ID.
     pub source: Vec<String>,
-    /// The data destination of the request, for example, a Google BigQuery Table or Dataset ID.    
+    /// The data destination of the request, for example, a Google BigQuery Table or Dataset ID.
     pub destination: Vec<String>,
-    /// The original request type.    
+    /// The original request type.
     #[serde(alias="type")]
     pub type_: String,
 }
@@ -818,10 +827,10 @@ impl Part for JobRequest {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct SearchVariantsResponse {
-    /// The continuation token, which is used to page through large result sets. Provide this value in a subsequent request to return the next page of results. This field will be empty if there aren't any additional results.    
+    /// The continuation token, which is used to page through large result sets. Provide this value in a subsequent request to return the next page of results. This field will be empty if there aren't any additional results.
     #[serde(alias="nextPageToken")]
     pub next_page_token: String,
-    /// The list of matching Variants.    
+    /// The list of matching Variants.
     pub variants: Vec<Variant>,
 }
 
@@ -839,21 +848,21 @@ impl ResponseResult for SearchVariantsResponse {}
 /// 
 #[derive(Default, Clone, Debug, Serialize)]
 pub struct SearchJobsRequest {
-    /// Only return jobs which have a matching status.    
+    /// Only return jobs which have a matching status.
     pub status: Option<Vec<String>>,
-    /// The continuation token which is used to page through large result sets. To get the next page of results, set this parameter to the value of the nextPageToken from the previous response.    
+    /// The continuation token which is used to page through large result sets. To get the next page of results, set this parameter to the value of the nextPageToken from the previous response.
     #[serde(alias="pageToken")]
     pub page_token: Option<String>,
-    /// If specified, only jobs created on or after this date, given in milliseconds since Unix epoch, will be returned.    
+    /// If specified, only jobs created on or after this date, given in milliseconds since Unix epoch, will be returned.
     #[serde(alias="createdAfter")]
     pub created_after: Option<String>,
-    /// If specified, only jobs created prior to this date, given in milliseconds since Unix epoch, will be returned.    
+    /// If specified, only jobs created prior to this date, given in milliseconds since Unix epoch, will be returned.
     #[serde(alias="createdBefore")]
     pub created_before: Option<String>,
-    /// Specifies the number of results to return in a single page. Defaults to 128. The maximum value is 256.    
+    /// Specifies the number of results to return in a single page. Defaults to 128. The maximum value is 256.
     #[serde(alias="pageSize")]
     pub page_size: Option<i32>,
-    /// Required. Only return jobs which belong to this Google Developers Console project.    
+    /// Required. Only return jobs which belong to this Google Developers Console project.
     #[serde(alias="projectNumber")]
     pub project_number: Option<String>,
 }
@@ -867,17 +876,17 @@ impl RequestValue for SearchJobsRequest {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct RangePosition {
-    /// The start position of the range on the reference, 0-based inclusive.    
+    /// The start position of the range on the reference, 0-based inclusive.
     pub start: String,
-    /// The ID of the Google Genomics reference associated with this range.    
+    /// The ID of the Google Genomics reference associated with this range.
     #[serde(alias="referenceId")]
     pub reference_id: String,
-    /// The end position of the range on the reference, 0-based exclusive.    
+    /// The end position of the range on the reference, 0-based exclusive.
     pub end: String,
-    /// Whether this range refers to the reverse strand, as opposed to the forward strand. Note that regardless of this field, the start/end position of the range always refer to the forward strand.    
+    /// Whether this range refers to the reverse strand, as opposed to the forward strand. Note that regardless of this field, the start/end position of the range always refer to the forward strand.
     #[serde(alias="reverseStrand")]
     pub reverse_strand: bool,
-    /// The display name corresponding to the reference specified by referenceId, for example chr1, 1, or chrX.    
+    /// The display name corresponding to the reference specified by referenceId, for example chr1, 1, or chrX.
     #[serde(alias="referenceName")]
     pub reference_name: String,
 }
@@ -891,10 +900,10 @@ impl Part for RangePosition {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ExternalId {
-    /// The name of the source of this data.    
+    /// The name of the source of this data.
     #[serde(alias="sourceName")]
     pub source_name: String,
-    /// The id used by the source of this data.    
+    /// The id used by the source of this data.
     pub id: String,
 }
 
@@ -915,19 +924,19 @@ impl Part for ExternalId {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct CallSet {
-    /// A map of additional call set information.    
+    /// A map of additional call set information.
     pub info: Option<HashMap<String, Vec<String>>>,
-    /// The IDs of the variant sets this call set belongs to.    
+    /// The IDs of the variant sets this call set belongs to.
     #[serde(alias="variantSetIds")]
     pub variant_set_ids: Option<Vec<String>>,
-    /// The call set name.    
+    /// The call set name.
     pub name: Option<String>,
-    /// The date this call set was created in milliseconds from the epoch.    
+    /// The date this call set was created in milliseconds from the epoch.
     pub created: Option<String>,
-    /// The sample ID this call set corresponds to.    
+    /// The sample ID this call set corresponds to.
     #[serde(alias="sampleId")]
     pub sample_id: Option<String>,
-    /// The Google generated ID of the call set, immutable.    
+    /// The Google generated ID of the call set, immutable.
     pub id: Option<String>,
 }
 
@@ -942,12 +951,12 @@ impl ResponseResult for CallSet {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct Position {
-    /// The 0-based offset from the start of the forward strand for that reference.    
+    /// The 0-based offset from the start of the forward strand for that reference.
     pub position: String,
-    /// Whether this position is on the reverse strand, as opposed to the forward strand.    
+    /// Whether this position is on the reverse strand, as opposed to the forward strand.
     #[serde(alias="reverseStrand")]
     pub reverse_strand: bool,
-    /// The name of the reference in whatever reference set is being used.    
+    /// The name of the reference in whatever reference set is being used.
     #[serde(alias="referenceName")]
     pub reference_name: String,
 }
@@ -966,7 +975,7 @@ impl Part for Position {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct ImportVariantsResponse {
-    /// A job ID that can be used to get status information.    
+    /// A job ID that can be used to get status information.
     #[serde(alias="jobId")]
     pub job_id: String,
 }
@@ -980,16 +989,16 @@ impl ResponseResult for ImportVariantsResponse {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ReadGroupExperiment {
-    /// The sequencing center used as part of this experiment.    
+    /// The sequencing center used as part of this experiment.
     #[serde(alias="sequencingCenter")]
     pub sequencing_center: String,
-    /// The library used as part of this experiment. Note: This is not an actual ID within this repository, but rather an identifier for a library which may be meaningful to some external system.    
+    /// The library used as part of this experiment. Note: This is not an actual ID within this repository, but rather an identifier for a library which may be meaningful to some external system.
     #[serde(alias="libraryId")]
     pub library_id: String,
-    /// The instrument model used as part of this experiment. This maps to sequencing technology in BAM.    
+    /// The instrument model used as part of this experiment. This maps to sequencing technology in BAM.
     #[serde(alias="instrumentModel")]
     pub instrument_model: String,
-    /// The platform unit used as part of this experiment e.g. flowcell-barcode.lane for Illumina or slide for SOLiD. Corresponds to the    
+    /// The platform unit used as part of this experiment e.g. flowcell-barcode.lane for Illumina or slide for SOLiD. Corresponds to the
     #[serde(alias="platformUnit")]
     pub platform_unit: String,
 }
@@ -1008,15 +1017,15 @@ impl Part for ReadGroupExperiment {}
 /// 
 #[derive(Default, Clone, Debug, Serialize)]
 pub struct SearchCallSetsRequest {
-    /// The continuation token, which is used to page through large result sets. To get the next page of results, set this parameter to the value of nextPageToken from the previous response.    
+    /// The continuation token, which is used to page through large result sets. To get the next page of results, set this parameter to the value of nextPageToken from the previous response.
     #[serde(alias="pageToken")]
     pub page_token: Option<String>,
-    /// Restrict the query to call sets within the given variant sets. At least one ID must be provided.    
+    /// Restrict the query to call sets within the given variant sets. At least one ID must be provided.
     #[serde(alias="variantSetIds")]
     pub variant_set_ids: Option<Vec<String>>,
-    /// Only return call sets for which a substring of the name matches this string.    
+    /// Only return call sets for which a substring of the name matches this string.
     pub name: Option<String>,
-    /// The maximum number of call sets to return.    
+    /// The maximum number of call sets to return.
     #[serde(alias="pageSize")]
     pub page_size: Option<i32>,
 }
@@ -1035,10 +1044,10 @@ impl RequestValue for SearchCallSetsRequest {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct ListDatasetsResponse {
-    /// The continuation token, which is used to page through large result sets. Provide this value in a subsequent request to return the next page of results. This field will be empty if there aren't any additional results.    
+    /// The continuation token, which is used to page through large result sets. Provide this value in a subsequent request to return the next page of results. This field will be empty if there aren't any additional results.
     #[serde(alias="nextPageToken")]
     pub next_page_token: String,
-    /// The list of matching Datasets.    
+    /// The list of matching Datasets.
     pub datasets: Vec<Dataset>,
 }
 
@@ -1056,16 +1065,16 @@ impl ResponseResult for ListDatasetsResponse {}
 /// 
 #[derive(Default, Clone, Debug, Serialize)]
 pub struct ImportReadGroupSetsRequest {
-    /// A list of URIs pointing at BAM files in Google Cloud Storage.    
+    /// A list of URIs pointing at BAM files in Google Cloud Storage.
     #[serde(alias="sourceUris")]
     pub source_uris: Option<Vec<String>>,
-    /// The reference set to which the imported read group sets are aligned to, if any. The reference names of this reference set must be a superset of those found in the imported file headers. If no reference set id is provided, a best effort is made to associate with a matching reference set.    
+    /// The reference set to which the imported read group sets are aligned to, if any. The reference names of this reference set must be a superset of those found in the imported file headers. If no reference set id is provided, a best effort is made to associate with a matching reference set.
     #[serde(alias="referenceSetId")]
     pub reference_set_id: Option<String>,
-    /// The partition strategy describes how read groups are partitioned into read group sets.    
+    /// The partition strategy describes how read groups are partitioned into read group sets.
     #[serde(alias="partitionStrategy")]
     pub partition_strategy: Option<String>,
-    /// Required. The ID of the dataset these read group sets will belong to. The caller must have WRITE permissions to this dataset.    
+    /// Required. The ID of the dataset these read group sets will belong to. The caller must have WRITE permissions to this dataset.
     #[serde(alias="datasetId")]
     pub dataset_id: Option<String>,
 }
@@ -1084,7 +1093,7 @@ impl RequestValue for ImportReadGroupSetsRequest {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct CallReadGroupSetsResponse {
-    /// A job ID that can be used to get status information.    
+    /// A job ID that can be used to get status information.
     #[serde(alias="jobId")]
     pub job_id: String,
 }
@@ -1105,22 +1114,22 @@ impl ResponseResult for CallReadGroupSetsResponse {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct Reference {
-    /// The length of this reference's sequence.    
+    /// The length of this reference's sequence.
     pub length: String,
-    /// The name of this reference, for example 22.    
+    /// The name of this reference, for example 22.
     pub name: String,
-    /// The URI from which the sequence was obtained. Specifies a FASTA format file/string with one name, sequence pair.    
+    /// The URI from which the sequence was obtained. Specifies a FASTA format file/string with one name, sequence pair.
     #[serde(alias="sourceURI")]
     pub source_uri: String,
-    /// ID from http://www.ncbi.nlm.nih.gov/taxonomy (e.g. 9606->human) if not specified by the containing reference set.    
+    /// ID from http://www.ncbi.nlm.nih.gov/taxonomy (e.g. 9606->human) if not specified by the containing reference set.
     #[serde(alias="ncbiTaxonId")]
     pub ncbi_taxon_id: i32,
-    /// All known corresponding accession IDs in INSDC (GenBank/ENA/DDBJ) ideally with a version number, for example GCF_000001405.26.    
+    /// All known corresponding accession IDs in INSDC (GenBank/ENA/DDBJ) ideally with a version number, for example GCF_000001405.26.
     #[serde(alias="sourceAccessions")]
     pub source_accessions: Vec<String>,
-    /// The Google generated immutable ID of the reference.    
+    /// The Google generated immutable ID of the reference.
     pub id: String,
-    /// MD5 of the upper-case sequence excluding all whitespace characters (this is equivalent to SQ:M5 in SAM). This value is represented in lower case hexadecimal format.    
+    /// MD5 of the upper-case sequence excluding all whitespace characters (this is equivalent to SQ:M5 in SAM). This value is represented in lower case hexadecimal format.
     pub md5checksum: String,
 }
 
@@ -1139,19 +1148,19 @@ impl ResponseResult for Reference {}
 /// 
 #[derive(Default, Clone, Debug, Serialize)]
 pub struct ExportVariantSetRequest {
-    /// The BigQuery dataset to export data to. Note that this is distinct from the Genomics concept of "dataset".    
+    /// The BigQuery dataset to export data to. Note that this is distinct from the Genomics concept of "dataset".
     #[serde(alias="bigqueryDataset")]
     pub bigquery_dataset: Option<String>,
-    /// The BigQuery table to export data to. If the table doesn't exist, it will be created. If it already exists, it will be overwritten.    
+    /// The BigQuery table to export data to. If the table doesn't exist, it will be created. If it already exists, it will be overwritten.
     #[serde(alias="bigqueryTable")]
     pub bigquery_table: Option<String>,
-    /// If provided, only variant call information from the specified call sets will be exported. By default all variant calls are exported.    
+    /// If provided, only variant call information from the specified call sets will be exported. By default all variant calls are exported.
     #[serde(alias="callSetIds")]
     pub call_set_ids: Option<Vec<String>>,
-    /// The Google Cloud project number that owns the destination BigQuery dataset. The caller must have WRITE access to this project. This project will also own the resulting export job.    
+    /// The Google Cloud project number that owns the destination BigQuery dataset. The caller must have WRITE access to this project. This project will also own the resulting export job.
     #[serde(alias="projectNumber")]
     pub project_number: Option<String>,
-    /// The format for the exported data.    
+    /// The format for the exported data.
     pub format: Option<String>,
 }
 
@@ -1169,17 +1178,17 @@ impl RequestValue for ExportVariantSetRequest {}
 /// 
 #[derive(Default, Clone, Debug, Serialize)]
 pub struct SearchReferencesRequest {
-    /// If present, return references for which the md5checksum matches. See Reference.md5checksum for construction details.    
+    /// If present, return references for which the md5checksum matches. See Reference.md5checksum for construction details.
     pub md5checksums: Option<Vec<String>>,
-    /// The continuation token, which is used to page through large result sets. To get the next page of results, set this parameter to the value of nextPageToken from the previous response.    
+    /// The continuation token, which is used to page through large result sets. To get the next page of results, set this parameter to the value of nextPageToken from the previous response.
     #[serde(alias="pageToken")]
     pub page_token: Option<String>,
-    /// If present, return only references which belong to this reference set.    
+    /// If present, return only references which belong to this reference set.
     #[serde(alias="referenceSetId")]
     pub reference_set_id: Option<String>,
-    /// If present, return references for which the accession matches this string. Best to give a version number, for example GCF_000001405.26. If only the main accession number is given then all records with that main accession will be returned, whichever version. Note that different versions will have different sequences.    
+    /// If present, return references for which the accession matches this string. Best to give a version number, for example GCF_000001405.26. If only the main accession number is given then all records with that main accession will be returned, whichever version. Note that different versions will have different sequences.
     pub accessions: Option<Vec<String>>,
-    /// Specifies the maximum number of results to return in a single page.    
+    /// Specifies the maximum number of results to return in a single page.
     #[serde(alias="pageSize")]
     pub page_size: Option<i32>,
 }
@@ -1193,29 +1202,29 @@ impl RequestValue for SearchReferencesRequest {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ReadGroup {
-    /// A map of additional read group information.    
+    /// A map of additional read group information.
     pub info: HashMap<String, Vec<String>>,
-    /// The predicted insert size of this read group. The insert size is the length the sequenced DNA fragment from end-to-end, not including the adapters.    
+    /// The predicted insert size of this read group. The insert size is the length the sequenced DNA fragment from end-to-end, not including the adapters.
     #[serde(alias="predictedInsertSize")]
     pub predicted_insert_size: i32,
-    /// The read group name. This corresponds to the @RG ID field in the SAM spec.    
+    /// The read group name. This corresponds to the @RG ID field in the SAM spec.
     pub name: String,
-    /// The programs used to generate this read group. Programs are always identical for all read groups within a read group set. For this reason, only the first read group in a returned set will have this field populated.    
+    /// The programs used to generate this read group. Programs are always identical for all read groups within a read group set. For this reason, only the first read group in a returned set will have this field populated.
     pub programs: Vec<ReadGroupProgram>,
-    /// The sample this read group's data was generated from. Note: This is not an actual ID within this repository, but rather an identifier for a sample which may be meaningful to some external system.    
+    /// The sample this read group's data was generated from. Note: This is not an actual ID within this repository, but rather an identifier for a sample which may be meaningful to some external system.
     #[serde(alias="sampleId")]
     pub sample_id: String,
-    /// The experiment used to generate this read group.    
+    /// The experiment used to generate this read group.
     pub experiment: ReadGroupExperiment,
-    /// The reference set the reads in this read group are aligned to. Required if there are any read alignments.    
+    /// The reference set the reads in this read group are aligned to. Required if there are any read alignments.
     #[serde(alias="referenceSetId")]
     pub reference_set_id: String,
-    /// The generated unique read group ID. Note: This is different than the @RG ID field in the SAM spec. For that value, see the name field.    
+    /// The generated unique read group ID. Note: This is different than the @RG ID field in the SAM spec. For that value, see the name field.
     pub id: String,
-    /// The ID of the dataset this read group belongs to.    
+    /// The ID of the dataset this read group belongs to.
     #[serde(alias="datasetId")]
     pub dataset_id: String,
-    /// A free-form text description of this read group.    
+    /// A free-form text description of this read group.
     pub description: String,
 }
 
@@ -1233,10 +1242,10 @@ impl Part for ReadGroup {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct SearchReadGroupSetsResponse {
-    /// The continuation token, which is used to page through large result sets. Provide this value in a subsequent request to return the next page of results. This field will be empty if there aren't any additional results.    
+    /// The continuation token, which is used to page through large result sets. Provide this value in a subsequent request to return the next page of results. This field will be empty if there aren't any additional results.
     #[serde(alias="nextPageToken")]
     pub next_page_token: String,
-    /// The list of matching read group sets.    
+    /// The list of matching read group sets.
     #[serde(alias="readGroupSets")]
     pub read_group_sets: Vec<ReadGroupSet>,
 }
@@ -1255,7 +1264,7 @@ impl ResponseResult for SearchReadGroupSetsResponse {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct ImportReadGroupSetsResponse {
-    /// A job ID that can be used to get status information.    
+    /// A job ID that can be used to get status information.
     #[serde(alias="jobId")]
     pub job_id: String,
 }
@@ -1274,7 +1283,7 @@ impl ResponseResult for ImportReadGroupSetsResponse {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct ExportReadGroupSetsResponse {
-    /// A job ID that can be used to get status information.    
+    /// A job ID that can be used to get status information.
     #[serde(alias="jobId")]
     pub job_id: String,
 }
@@ -1293,15 +1302,15 @@ impl ResponseResult for ExportReadGroupSetsResponse {}
 /// 
 #[derive(Default, Clone, Debug, Serialize)]
 pub struct SearchReadGroupSetsRequest {
-    /// The continuation token, which is used to page through large result sets. To get the next page of results, set this parameter to the value of nextPageToken from the previous response.    
+    /// The continuation token, which is used to page through large result sets. To get the next page of results, set this parameter to the value of nextPageToken from the previous response.
     #[serde(alias="pageToken")]
     pub page_token: Option<String>,
-    /// Restricts this query to read group sets within the given datasets. At least one ID must be provided.    
+    /// Restricts this query to read group sets within the given datasets. At least one ID must be provided.
     #[serde(alias="datasetIds")]
     pub dataset_ids: Option<Vec<String>>,
-    /// Only return read group sets for which a substring of the name matches this string.    
+    /// Only return read group sets for which a substring of the name matches this string.
     pub name: Option<String>,
-    /// Specifies number of results to return in a single page. If unspecified, it will default to 256. The maximum value is 1024.    
+    /// Specifies number of results to return in a single page. If unspecified, it will default to 256. The maximum value is 1024.
     #[serde(alias="pageSize")]
     pub page_size: Option<i32>,
 }
@@ -1315,9 +1324,9 @@ impl RequestValue for SearchReadGroupSetsRequest {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct BatchAnnotationsResponseEntry {
-    /// The resulting status for this annotation operation.    
+    /// The resulting status for this annotation operation.
     pub status: BatchAnnotationsResponseEntryStatus,
-    /// The annotation, if any.    
+    /// The annotation, if any.
     pub annotation: Annotation,
 }
 
@@ -1330,9 +1339,9 @@ impl Part for BatchAnnotationsResponseEntry {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct BatchAnnotationsResponseEntryStatus {
-    /// Error message for this status, if any.    
+    /// Error message for this status, if any.
     pub message: String,
-    /// The HTTP status code for this operation.    
+    /// The HTTP status code for this operation.
     pub code: i32,
 }
 
@@ -1350,12 +1359,12 @@ impl Part for BatchAnnotationsResponseEntryStatus {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct ListBasesResponse {
-    /// The continuation token, which is used to page through large result sets. Provide this value in a subsequent request to return the next page of results. This field will be empty if there aren't any additional results.    
+    /// The continuation token, which is used to page through large result sets. Provide this value in a subsequent request to return the next page of results. This field will be empty if there aren't any additional results.
     #[serde(alias="nextPageToken")]
     pub next_page_token: String,
-    /// The offset position (0-based) of the given sequence from the start of this Reference. This value will differ for each page in a paginated request.    
+    /// The offset position (0-based) of the given sequence from the start of this Reference. This value will differ for each page in a paginated request.
     pub offset: String,
-    /// A substring of the bases that make up this reference.    
+    /// A substring of the bases that make up this reference.
     pub sequence: String,
 }
 
@@ -1368,10 +1377,10 @@ impl ResponseResult for ListBasesResponse {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ReferenceBound {
-    /// An upper bound (inclusive) on the starting coordinate of any variant in the reference sequence.    
+    /// An upper bound (inclusive) on the starting coordinate of any variant in the reference sequence.
     #[serde(alias="upperBound")]
     pub upper_bound: String,
-    /// The reference the bound is associate with.    
+    /// The reference the bound is associate with.
     #[serde(alias="referenceName")]
     pub reference_name: String,
 }
@@ -1385,19 +1394,19 @@ impl Part for ReferenceBound {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Call {
-    /// A map of additional variant call information.    
+    /// A map of additional variant call information.
     pub info: HashMap<String, Vec<String>>,
-    /// The genotype of this variant call. Each value represents either the value of the referenceBases field or a 1-based index into alternateBases. If a variant had a referenceBases value of T and an alternateBases value of ["A", "C"], and the genotype was [2, 1], that would mean the call represented the heterozygous value CA for this variant. If the genotype was instead [0, 1], the represented value would be TA. Ordering of the genotype values is important if the phaseset is present. If a genotype is not called (that is, a . is present in the GT string) -1 is returned.    
+    /// The genotype of this variant call. Each value represents either the value of the referenceBases field or a 1-based index into alternateBases. If a variant had a referenceBases value of T and an alternateBases value of ["A", "C"], and the genotype was [2, 1], that would mean the call represented the heterozygous value CA for this variant. If the genotype was instead [0, 1], the represented value would be TA. Ordering of the genotype values is important if the phaseset is present. If a genotype is not called (that is, a . is present in the GT string) -1 is returned.
     pub genotype: Vec<i32>,
-    /// The ID of the call set this variant call belongs to.    
+    /// The ID of the call set this variant call belongs to.
     #[serde(alias="callSetId")]
     pub call_set_id: String,
-    /// If this field is present, this variant call's genotype ordering implies the phase of the bases and is consistent with any other variant calls in the same reference sequence which have the same phaseset value. When importing data from VCF, if the genotype data was phased but no phase set was specified this field will be set to *.    
+    /// If this field is present, this variant call's genotype ordering implies the phase of the bases and is consistent with any other variant calls in the same reference sequence which have the same phaseset value. When importing data from VCF, if the genotype data was phased but no phase set was specified this field will be set to *.
     pub phaseset: String,
-    /// The genotype likelihoods for this variant call. Each array entry represents how likely a specific genotype is for this call. The value ordering is defined by the GL tag in the VCF spec. If Phred-scaled genotype likelihood scores (PL) are available and log10(P) genotype likelihood scores (GL) are not, PL scores are converted to GL scores. If both are available, PL scores are stored in info.    
+    /// The genotype likelihoods for this variant call. Each array entry represents how likely a specific genotype is for this call. The value ordering is defined by the GL tag in the VCF spec. If Phred-scaled genotype likelihood scores (PL) are available and log10(P) genotype likelihood scores (GL) are not, PL scores are converted to GL scores. If both are available, PL scores are stored in info.
     #[serde(alias="genotypeLikelihood")]
     pub genotype_likelihood: Vec<f64>,
-    /// The name of the call set this variant call belongs to.    
+    /// The name of the call set this variant call belongs to.
     #[serde(alias="callSetName")]
     pub call_set_name: String,
 }
@@ -1416,7 +1425,7 @@ impl Part for Call {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct ExperimentalCreateJobResponse {
-    /// A job ID that can be used to get status information.    
+    /// A job ID that can be used to get status information.
     #[serde(alias="jobId")]
     pub job_id: String,
 }
@@ -1435,29 +1444,29 @@ impl ResponseResult for ExperimentalCreateJobResponse {}
 /// 
 #[derive(Default, Clone, Debug, Serialize)]
 pub struct SearchVariantsRequest {
-    /// Required. The end of the window (0-based, exclusive) for which overlapping variants should be returned.    
+    /// Required. The end of the window (0-based, exclusive) for which overlapping variants should be returned.
     pub end: Option<String>,
-    /// The maximum number of variants to return.    
+    /// The maximum number of variants to return.
     #[serde(alias="pageSize")]
     pub page_size: Option<i32>,
-    /// The continuation token, which is used to page through large result sets. To get the next page of results, set this parameter to the value of nextPageToken from the previous response.    
+    /// The continuation token, which is used to page through large result sets. To get the next page of results, set this parameter to the value of nextPageToken from the previous response.
     #[serde(alias="pageToken")]
     pub page_token: Option<String>,
-    /// The maximum number of calls to return. However, at least one variant will always be returned, even if it has more calls than this limit.    
+    /// The maximum number of calls to return. However, at least one variant will always be returned, even if it has more calls than this limit.
     #[serde(alias="maxCalls")]
     pub max_calls: Option<i32>,
-    /// Required. The beginning of the window (0-based, inclusive) for which overlapping variants should be returned.    
+    /// Required. The beginning of the window (0-based, inclusive) for which overlapping variants should be returned.
     pub start: Option<String>,
-    /// Only return variant calls which belong to call sets with these ids. Leaving this blank returns all variant calls. If a variant has no calls belonging to any of these call sets, it won't be returned at all. Currently, variants with no calls from any call set will never be returned.    
+    /// Only return variant calls which belong to call sets with these ids. Leaving this blank returns all variant calls. If a variant has no calls belonging to any of these call sets, it won't be returned at all. Currently, variants with no calls from any call set will never be returned.
     #[serde(alias="callSetIds")]
     pub call_set_ids: Option<Vec<String>>,
-    /// Only return variants which have exactly this name.    
+    /// Only return variants which have exactly this name.
     #[serde(alias="variantName")]
     pub variant_name: Option<String>,
-    /// Required. Only return variants in this reference sequence.    
+    /// Required. Only return variants in this reference sequence.
     #[serde(alias="referenceName")]
     pub reference_name: Option<String>,
-    /// Exactly one variant set ID must be provided. Only variants from this variant set will be returned.    
+    /// Exactly one variant set ID must be provided. Only variants from this variant set will be returned.
     #[serde(alias="variantSetIds")]
     pub variant_set_ids: Option<Vec<String>>,
 }
@@ -1482,14 +1491,14 @@ impl RequestValue for SearchVariantsRequest {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Dataset {
-    /// Flag indicating whether or not a dataset is publicly viewable. If a dataset is not public, it inherits viewing permissions from its project.    
+    /// Flag indicating whether or not a dataset is publicly viewable. If a dataset is not public, it inherits viewing permissions from its project.
     #[serde(alias="isPublic")]
     pub is_public: Option<bool>,
-    /// The Google generated ID of the dataset, immutable.    
+    /// The Google generated ID of the dataset, immutable.
     pub id: Option<String>,
-    /// The dataset name.    
+    /// The dataset name.
     pub name: Option<String>,
-    /// The Google Developers Console project number that this dataset belongs to.    
+    /// The Google Developers Console project number that this dataset belongs to.
     #[serde(alias="projectNumber")]
     pub project_number: Option<String>,
 }
@@ -1513,52 +1522,52 @@ impl ResponseResult for Dataset {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct Read {
-    /// The ID of the read group set this read belongs to. (Every read must belong to exactly one read group set.)    
+    /// The ID of the read group set this read belongs to. (Every read must belong to exactly one read group set.)
     #[serde(alias="readGroupSetId")]
     pub read_group_set_id: Option<String>,
-    /// SAM flag 0x200    
+    /// SAM flag 0x200
     #[serde(alias="failedVendorQualityChecks")]
     pub failed_vendor_quality_checks: Option<bool>,
-    /// The fragment name. Equivalent to QNAME (query template name) in SAM.    
+    /// The fragment name. Equivalent to QNAME (query template name) in SAM.
     #[serde(alias="fragmentName")]
     pub fragment_name: Option<String>,
-    /// The mapping of the primary alignment of the (readNumber+1)%numberReads read in the fragment. It replaces mate position and mate strand in SAM.    
+    /// The mapping of the primary alignment of the (readNumber+1)%numberReads read in the fragment. It replaces mate position and mate strand in SAM.
     #[serde(alias="nextMatePosition")]
     pub next_mate_position: Option<Position>,
-    /// Whether this alignment is supplementary. Equivalent to SAM flag 0x800. Supplementary alignments are used in the representation of a chimeric alignment. In a chimeric alignment, a read is split into multiple linear alignments that map to different reference contigs. The first linear alignment in the read will be designated as the representative alignment; the remaining linear alignments will be designated as supplementary alignments. These alignments may have different mapping quality scores. In each linear alignment in a chimeric alignment, the read will be hard clipped. The alignedSequence and alignedQuality fields in the alignment record will only represent the bases for its respective linear alignment.    
+    /// Whether this alignment is supplementary. Equivalent to SAM flag 0x800. Supplementary alignments are used in the representation of a chimeric alignment. In a chimeric alignment, a read is split into multiple linear alignments that map to different reference contigs. The first linear alignment in the read will be designated as the representative alignment; the remaining linear alignments will be designated as supplementary alignments. These alignments may have different mapping quality scores. In each linear alignment in a chimeric alignment, the read will be hard clipped. The alignedSequence and alignedQuality fields in the alignment record will only represent the bases for its respective linear alignment.
     #[serde(alias="supplementaryAlignment")]
     pub supplementary_alignment: Option<bool>,
-    /// The observed length of the fragment, equivalent to TLEN in SAM.    
+    /// The observed length of the fragment, equivalent to TLEN in SAM.
     #[serde(alias="fragmentLength")]
     pub fragment_length: Option<i32>,
-    /// The unique ID for this read. This is a generated unique ID, not to be confused with fragmentName.    
+    /// The unique ID for this read. This is a generated unique ID, not to be confused with fragmentName.
     pub id: Option<String>,
-    /// The linear alignment for this alignment record. This field will be null if the read is unmapped.    
+    /// The linear alignment for this alignment record. This field will be null if the read is unmapped.
     pub alignment: Option<LinearAlignment>,
-    /// A map of additional read alignment information.    
+    /// A map of additional read alignment information.
     pub info: Option<HashMap<String, Vec<String>>>,
-    /// The fragment is a PCR or optical duplicate (SAM flag 0x400)    
+    /// The fragment is a PCR or optical duplicate (SAM flag 0x400)
     #[serde(alias="duplicateFragment")]
     pub duplicate_fragment: Option<bool>,
-    /// The quality of the read sequence contained in this alignment record. alignedSequence and alignedQuality may be shorter than the full read sequence and quality. This will occur if the alignment is part of a chimeric alignment, or if the read was trimmed. When this occurs, the CIGAR for this read will begin/end with a hard clip operator that will indicate the length of the excised sequence.    
+    /// The quality of the read sequence contained in this alignment record. alignedSequence and alignedQuality may be shorter than the full read sequence and quality. This will occur if the alignment is part of a chimeric alignment, or if the read was trimmed. When this occurs, the CIGAR for this read will begin/end with a hard clip operator that will indicate the length of the excised sequence.
     #[serde(alias="alignedQuality")]
     pub aligned_quality: Option<Vec<i32>>,
-    /// The read number in sequencing. 0-based and less than numberReads. This field replaces SAM flag 0x40 and 0x80.    
+    /// The read number in sequencing. 0-based and less than numberReads. This field replaces SAM flag 0x40 and 0x80.
     #[serde(alias="readNumber")]
     pub read_number: Option<i32>,
-    /// The orientation and the distance between reads from the fragment are consistent with the sequencing protocol (SAM flag 0x2)    
+    /// The orientation and the distance between reads from the fragment are consistent with the sequencing protocol (SAM flag 0x2)
     #[serde(alias="properPlacement")]
     pub proper_placement: Option<bool>,
-    /// The ID of the read group this read belongs to. (Every read must belong to exactly one read group.)    
+    /// The ID of the read group this read belongs to. (Every read must belong to exactly one read group.)
     #[serde(alias="readGroupId")]
     pub read_group_id: Option<String>,
-    /// The number of reads in the fragment (extension to SAM flag 0x1).    
+    /// The number of reads in the fragment (extension to SAM flag 0x1).
     #[serde(alias="numberReads")]
     pub number_reads: Option<i32>,
-    /// The bases of the read sequence contained in this alignment record, without CIGAR operations applied. alignedSequence and alignedQuality may be shorter than the full read sequence and quality. This will occur if the alignment is part of a chimeric alignment, or if the read was trimmed. When this occurs, the CIGAR for this read will begin/end with a hard clip operator that will indicate the length of the excised sequence.    
+    /// The bases of the read sequence contained in this alignment record, without CIGAR operations applied. alignedSequence and alignedQuality may be shorter than the full read sequence and quality. This will occur if the alignment is part of a chimeric alignment, or if the read was trimmed. When this occurs, the CIGAR for this read will begin/end with a hard clip operator that will indicate the length of the excised sequence.
     #[serde(alias="alignedSequence")]
     pub aligned_sequence: Option<String>,
-    /// Whether this alignment is secondary. Equivalent to SAM flag 0x100. A secondary alignment represents an alternative to the primary alignment for this read. Aligners may return secondary alignments if a read can map ambiguously to multiple coordinates in the genome. By convention, each read has one and only one alignment where both secondaryAlignment and supplementaryAlignment are false.    
+    /// Whether this alignment is secondary. Equivalent to SAM flag 0x100. A secondary alignment represents an alternative to the primary alignment for this read. Aligners may return secondary alignments if a read can map ambiguously to multiple coordinates in the genome. By convention, each read has one and only one alignment where both secondaryAlignment and supplementaryAlignment are false.
     #[serde(alias="secondaryAlignment")]
     pub secondary_alignment: Option<bool>,
 }
@@ -1577,21 +1586,21 @@ impl Resource for Read {}
 /// 
 #[derive(Default, Clone, Debug, Serialize)]
 pub struct ExperimentalCreateJobRequest {
-    /// A list of Google Cloud Storage URIs of paired end .fastq files to operate upon. If specified, this represents the second file of each paired .fastq file. The first file of each pair should be specified in sourceUris.    
+    /// A list of Google Cloud Storage URIs of paired end .fastq files to operate upon. If specified, this represents the second file of each paired .fastq file. The first file of each pair should be specified in sourceUris.
     #[serde(alias="pairedSourceUris")]
     pub paired_source_uris: Option<Vec<String>>,
-    /// A list of Google Cloud Storage URIs of data files to operate upon. These can be .bam, interleaved .fastq, or paired .fastq. If specifying paired .fastq files, the first of each pair of files should be listed here, and the second of each pair should be listed in pairedSourceUris.    
+    /// A list of Google Cloud Storage URIs of data files to operate upon. These can be .bam, interleaved .fastq, or paired .fastq. If specifying paired .fastq files, the first of each pair of files should be listed here, and the second of each pair should be listed in pairedSourceUris.
     #[serde(alias="sourceUris")]
     pub source_uris: Option<Vec<String>>,
-    /// Specifies whether or not to run the alignment pipeline. Either align or callVariants must be set.    
+    /// Specifies whether or not to run the alignment pipeline. Either align or callVariants must be set.
     pub align: Option<bool>,
-    /// Specifies where to copy the results of certain pipelines. This should be in the form of gs://bucket/path.    
+    /// Specifies where to copy the results of certain pipelines. This should be in the form of gs://bucket/path.
     #[serde(alias="gcsOutputPath")]
     pub gcs_output_path: Option<String>,
-    /// Specifies whether or not to run the variant calling pipeline. Either align or callVariants must be set.    
+    /// Specifies whether or not to run the variant calling pipeline. Either align or callVariants must be set.
     #[serde(alias="callVariants")]
     pub call_variants: Option<bool>,
-    /// Required. The Google Cloud Project ID with which to associate the request.    
+    /// Required. The Google Cloud Project ID with which to associate the request.
     #[serde(alias="projectNumber")]
     pub project_number: Option<String>,
 }
@@ -1614,34 +1623,34 @@ impl RequestValue for ExperimentalCreateJobRequest {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Variant {
-    /// A map of additional variant information.    
+    /// A map of additional variant information.
     pub info: Option<HashMap<String, Vec<String>>>,
-    /// The ID of the variant set this variant belongs to.    
+    /// The ID of the variant set this variant belongs to.
     #[serde(alias="variantSetId")]
     pub variant_set_id: Option<String>,
-    /// The end position (0-based) of this variant. This corresponds to the first base after the last base in the reference allele. So, the length of the reference allele is (end - start). This is useful for variants that don't explicitly give alternate bases, for example large deletions.    
+    /// The end position (0-based) of this variant. This corresponds to the first base after the last base in the reference allele. So, the length of the reference allele is (end - start). This is useful for variants that don't explicitly give alternate bases, for example large deletions.
     pub end: Option<String>,
-    /// The variant calls for this particular variant. Each one represents the determination of genotype with respect to this variant.    
+    /// The variant calls for this particular variant. Each one represents the determination of genotype with respect to this variant.
     pub calls: Option<Vec<Call>>,
-    /// The date this variant was created, in milliseconds from the epoch.    
+    /// The date this variant was created, in milliseconds from the epoch.
     pub created: Option<String>,
-    /// The Google generated ID of the variant, immutable.    
+    /// The Google generated ID of the variant, immutable.
     pub id: Option<String>,
-    /// A list of filters (normally quality filters) this variant has failed. PASS indicates this variant has passed all filters.    
+    /// A list of filters (normally quality filters) this variant has failed. PASS indicates this variant has passed all filters.
     pub filter: Option<Vec<String>>,
-    /// The position at which this variant occurs (0-based). This corresponds to the first base of the string of reference bases.    
+    /// The position at which this variant occurs (0-based). This corresponds to the first base of the string of reference bases.
     pub start: Option<String>,
-    /// Names for the variant, for example a RefSNP ID.    
+    /// Names for the variant, for example a RefSNP ID.
     pub names: Option<Vec<String>>,
-    /// The bases that appear instead of the reference bases.    
+    /// The bases that appear instead of the reference bases.
     #[serde(alias="alternateBases")]
     pub alternate_bases: Option<Vec<String>>,
-    /// The reference on which this variant occurs. (such as chr20 or X)    
+    /// The reference on which this variant occurs. (such as chr20 or X)
     #[serde(alias="referenceName")]
     pub reference_name: Option<String>,
-    /// A measure of how likely this variant is to be real. A higher value is better.    
+    /// A measure of how likely this variant is to be real. A higher value is better.
     pub quality: Option<f64>,
-    /// The reference bases for this variant. They start at the given position.    
+    /// The reference bases for this variant. They start at the given position.
     #[serde(alias="referenceBases")]
     pub reference_bases: Option<String>,
 }
@@ -1662,10 +1671,10 @@ impl ResponseResult for Variant {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct SearchAnnotationSetsResponse {
-    /// The continuation token, which is used to page through large result sets. Provide this value in a subsequent request to return the next page of results. This field will be empty if there aren't any additional results.    
+    /// The continuation token, which is used to page through large result sets. Provide this value in a subsequent request to return the next page of results. This field will be empty if there aren't any additional results.
     #[serde(alias="nextPageToken")]
     pub next_page_token: String,
-    /// The matching annotation sets.    
+    /// The matching annotation sets.
     #[serde(alias="annotationSets")]
     pub annotation_sets: Vec<AnnotationSet>,
 }
@@ -1686,25 +1695,25 @@ impl ResponseResult for SearchAnnotationSetsResponse {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct Job {
-    /// A more detailed description of this job's current status.    
+    /// A more detailed description of this job's current status.
     #[serde(alias="detailedStatus")]
     pub detailed_status: String,
-    /// The status of this job.    
+    /// The status of this job.
     pub status: String,
-    /// Any errors that occurred during processing.    
+    /// Any errors that occurred during processing.
     pub errors: Vec<String>,
-    /// Any warnings that occurred during processing.    
+    /// Any warnings that occurred during processing.
     pub warnings: Vec<String>,
-    /// The date this job was created, in milliseconds from the epoch.    
+    /// The date this job was created, in milliseconds from the epoch.
     pub created: String,
-    /// A summarized representation of the original service request.    
+    /// A summarized representation of the original service request.
     pub request: JobRequest,
-    /// The job ID.    
+    /// The job ID.
     pub id: String,
-    /// If this Job represents an import, this field will contain the IDs of the objects that were successfully imported.    
+    /// If this Job represents an import, this field will contain the IDs of the objects that were successfully imported.
     #[serde(alias="importedIds")]
     pub imported_ids: Vec<String>,
-    /// The Google Developers Console project number to which this job belongs.    
+    /// The Google Developers Console project number to which this job belongs.
     #[serde(alias="projectNumber")]
     pub project_number: String,
 }
@@ -1724,13 +1733,13 @@ impl ResponseResult for Job {}
 /// 
 #[derive(Default, Clone, Debug, Serialize)]
 pub struct CallReadGroupSetsRequest {
-    /// A list of URIs pointing at BAM files in Google Cloud Storage which will be called. FASTQ files are not allowed. The caller must have READ permissions for these files. One of readGroupSetId or sourceUris must be provided.    
+    /// A list of URIs pointing at BAM files in Google Cloud Storage which will be called. FASTQ files are not allowed. The caller must have READ permissions for these files. One of readGroupSetId or sourceUris must be provided.
     #[serde(alias="sourceUris")]
     pub source_uris: Option<Vec<String>>,
-    /// Required. The ID of the dataset the called variants will belong to. The caller must have WRITE permissions to this dataset.    
+    /// Required. The ID of the dataset the called variants will belong to. The caller must have WRITE permissions to this dataset.
     #[serde(alias="datasetId")]
     pub dataset_id: Option<String>,
-    /// The IDs of the read group sets which will be called. The caller must have READ permissions for these read group sets. One of readGroupSetId or sourceUris must be provided.    
+    /// The IDs of the read group sets which will be called. The caller must have READ permissions for these read group sets. One of readGroupSetId or sourceUris must be provided.
     #[serde(alias="readGroupSetId")]
     pub read_group_set_id: Option<String>,
 }
@@ -1749,7 +1758,7 @@ impl RequestValue for CallReadGroupSetsRequest {}
 /// 
 #[derive(Default, Clone, Debug, Serialize)]
 pub struct MergeVariantsRequest {
-    /// The variants to be merged with existing variants.    
+    /// The variants to be merged with existing variants.
     pub variants: Option<Vec<Variant>>,
 }
 
@@ -1767,7 +1776,7 @@ impl RequestValue for MergeVariantsRequest {}
 /// 
 #[derive(Default, Clone, Debug, Serialize)]
 pub struct BatchCreateAnnotationsRequest {
-    /// The annotations to be created. At most 4096 can be specified in a single request.    
+    /// The annotations to be created. At most 4096 can be specified in a single request.
     pub annotations: Option<Vec<Annotation>>,
 }
 
@@ -1785,16 +1794,16 @@ impl RequestValue for BatchCreateAnnotationsRequest {}
 /// 
 #[derive(Default, Clone, Debug, Serialize)]
 pub struct ExportReadGroupSetsRequest {
-    /// A Google Cloud Storage URI for the exported BAM file. The currently authenticated user must have write access to the new file. An error will be returned if the URI already contains data.    
+    /// A Google Cloud Storage URI for the exported BAM file. The currently authenticated user must have write access to the new file. An error will be returned if the URI already contains data.
     #[serde(alias="exportUri")]
     pub export_uri: Option<String>,
-    /// The reference names to export. If this is not specified, all reference sequences, including unmapped reads, are exported. Use * to export only unmapped reads.    
+    /// The reference names to export. If this is not specified, all reference sequences, including unmapped reads, are exported. Use * to export only unmapped reads.
     #[serde(alias="referenceNames")]
     pub reference_names: Option<Vec<String>>,
-    /// The IDs of the read group sets to export.    
+    /// The IDs of the read group sets to export.
     #[serde(alias="readGroupSetIds")]
     pub read_group_set_ids: Option<Vec<String>>,
-    /// The Google Developers Console project number that owns this export.    
+    /// The Google Developers Console project number that owns this export.
     #[serde(alias="projectNumber")]
     pub project_number: Option<String>,
 }
@@ -1813,10 +1822,10 @@ impl RequestValue for ExportReadGroupSetsRequest {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct SearchReferenceSetsResponse {
-    /// The continuation token, which is used to page through large result sets. Provide this value in a subsequent request to return the next page of results. This field will be empty if there aren't any additional results.    
+    /// The continuation token, which is used to page through large result sets. Provide this value in a subsequent request to return the next page of results. This field will be empty if there aren't any additional results.
     #[serde(alias="nextPageToken")]
     pub next_page_token: String,
-    /// The matching references sets.    
+    /// The matching references sets.
     #[serde(alias="referenceSets")]
     pub reference_sets: Vec<ReferenceSet>,
 }
@@ -1835,26 +1844,26 @@ impl ResponseResult for SearchReferenceSetsResponse {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct ReferenceSet {
-    /// Free text description of this reference set.    
+    /// Free text description of this reference set.
     pub description: String,
-    /// The URI from which the references were obtained.    
+    /// The URI from which the references were obtained.
     #[serde(alias="sourceURI")]
     pub source_uri: String,
-    /// The IDs of the reference objects that are part of this set. Reference.md5checksum must be unique within this set.    
+    /// The IDs of the reference objects that are part of this set. Reference.md5checksum must be unique within this set.
     #[serde(alias="referenceIds")]
     pub reference_ids: Vec<String>,
-    /// Public id of this reference set, such as GRCh37.    
+    /// Public id of this reference set, such as GRCh37.
     #[serde(alias="assemblyId")]
     pub assembly_id: String,
-    /// All known corresponding accession IDs in INSDC (GenBank/ENA/DDBJ) ideally with a version number, for example NC_000001.11.    
+    /// All known corresponding accession IDs in INSDC (GenBank/ENA/DDBJ) ideally with a version number, for example NC_000001.11.
     #[serde(alias="sourceAccessions")]
     pub source_accessions: Vec<String>,
-    /// ID from http://www.ncbi.nlm.nih.gov/taxonomy (e.g. 9606->human) indicating the species which this assembly is intended to model. Note that contained references may specify a different ncbiTaxonId, as assemblies may contain reference sequences which do not belong to the modeled species, e.g. EBV in a human reference genome.    
+    /// ID from http://www.ncbi.nlm.nih.gov/taxonomy (e.g. 9606->human) indicating the species which this assembly is intended to model. Note that contained references may specify a different ncbiTaxonId, as assemblies may contain reference sequences which do not belong to the modeled species, e.g. EBV in a human reference genome.
     #[serde(alias="ncbiTaxonId")]
     pub ncbi_taxon_id: i32,
-    /// The Google generated immutable ID of the reference set.    
+    /// The Google generated immutable ID of the reference set.
     pub id: String,
-    /// Order-independent MD5 checksum which identifies this reference set. The checksum is computed by sorting all lower case hexidecimal string reference.md5checksum (for all reference in this set) in ascending lexicographic order, concatenating, and taking the MD5 of that value. The resulting value is represented in lower case hexadecimal format.    
+    /// Order-independent MD5 checksum which identifies this reference set. The checksum is computed by sorting all lower case hexidecimal string reference.md5checksum (for all reference in this set) in ascending lexicographic order, concatenating, and taking the MD5 of that value. The resulting value is represented in lower case hexadecimal format.
     pub md5checksum: String,
 }
 
@@ -1875,14 +1884,14 @@ impl ResponseResult for ReferenceSet {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct VariantSet {
-    /// The metadata associated with this variant set.    
+    /// The metadata associated with this variant set.
     pub metadata: Option<Vec<Metadata>>,
-    /// The Google-generated ID of the variant set. Immutable.    
+    /// The Google-generated ID of the variant set. Immutable.
     pub id: Option<String>,
-    /// The dataset to which this variant set belongs. Immutable.    
+    /// The dataset to which this variant set belongs. Immutable.
     #[serde(alias="datasetId")]
     pub dataset_id: Option<String>,
-    /// A list of all references used by the variants in a variant set with associated coordinate upper bounds for each one.    
+    /// A list of all references used by the variants in a variant set with associated coordinate upper bounds for each one.
     #[serde(alias="referenceBounds")]
     pub reference_bounds: Option<Vec<ReferenceBound>>,
 }
@@ -1903,7 +1912,7 @@ impl ResponseResult for VariantSet {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct AlignReadGroupSetsResponse {
-    /// A job ID that can be used to get status information.    
+    /// A job ID that can be used to get status information.
     #[serde(alias="jobId")]
     pub job_id: String,
 }
@@ -1922,15 +1931,15 @@ impl ResponseResult for AlignReadGroupSetsResponse {}
 /// 
 #[derive(Default, Clone, Debug, Serialize)]
 pub struct SearchAnnotationsRequest {
-    /// The continuation token, which is used to page through large result sets. To get the next page of results, set this parameter to the value of nextPageToken from the previous response.    
+    /// The continuation token, which is used to page through large result sets. To get the next page of results, set this parameter to the value of nextPageToken from the previous response.
     #[serde(alias="pageToken")]
     pub page_token: Option<String>,
-    /// If specified, this query matches only annotations which overlap this range.    
+    /// If specified, this query matches only annotations that overlap this range.
     pub range: Option<QueryRange>,
-    /// The annotation sets to search within. The caller must have READ access to these annotation sets. Required. All queried annotation sets must have the same type.    
+    /// The annotation sets to search within. The caller must have READ access to these annotation sets. Required. All queried annotation sets must have the same type.
     #[serde(alias="annotationSetIds")]
     pub annotation_set_ids: Option<Vec<String>>,
-    /// Specifies number of results to return in a single page. If unspecified, it will default to 256. The maximum value is 2048.    
+    /// Specifies number of results to return in a single page. If unspecified, it will default to 256. The maximum value is 2048.
     #[serde(alias="pageSize")]
     pub page_size: Option<i32>,
 }
@@ -1944,13 +1953,13 @@ impl RequestValue for SearchAnnotationsRequest {}
 /// 
 #[derive(Default, Clone, Debug, Serialize)]
 pub struct PairedFastqSource {
-    /// A list of URIs pointing at paired end FASTQ files in Google Cloud Storage which will be aligned. The second of each paired file should be specified here, in an order that matches the first of each paired file specified in firstSourceUris. For example: firstSourceUris: [file1_1.fq, file2_1.fq], secondSourceUris: [file1_2.fq, file2_2.fq]. The caller must have READ permissions for these files.    
+    /// A list of URIs pointing at paired end FASTQ files in Google Cloud Storage which will be aligned. The second of each paired file should be specified here, in an order that matches the first of each paired file specified in firstSourceUris. For example: firstSourceUris: [file1_1.fq, file2_1.fq], secondSourceUris: [file1_2.fq, file2_2.fq]. The caller must have READ permissions for these files.
     #[serde(alias="secondSourceUris")]
     pub second_source_uris: Vec<String>,
-    /// A list of URIs pointing at paired end FASTQ files in Google Cloud Storage which will be aligned. The first of each paired file should be specified here, in an order that matches the second of each paired file specified in secondSourceUris. For example: firstSourceUris: [file1_1.fq, file2_1.fq], secondSourceUris: [file1_2.fq, file2_2.fq]. The caller must have READ permissions for these files.    
+    /// A list of URIs pointing at paired end FASTQ files in Google Cloud Storage which will be aligned. The first of each paired file should be specified here, in an order that matches the second of each paired file specified in secondSourceUris. For example: firstSourceUris: [file1_1.fq, file2_1.fq], secondSourceUris: [file1_2.fq, file2_2.fq]. The caller must have READ permissions for these files.
     #[serde(alias="firstSourceUris")]
     pub first_source_uris: Vec<String>,
-    /// Optionally specifies the metadata to be associated with the final aligned read group set.    
+    /// Optionally specifies the metadata to be associated with the final aligned read group set.
     pub metadata: FastqMetadata,
 }
 
@@ -1968,23 +1977,23 @@ impl Part for PairedFastqSource {}
 /// 
 #[derive(Default, Clone, Debug, Serialize)]
 pub struct SearchReadsRequest {
-    /// The continuation token, which is used to page through large result sets. To get the next page of results, set this parameter to the value of nextPageToken from the previous response.    
+    /// The continuation token, which is used to page through large result sets. To get the next page of results, set this parameter to the value of nextPageToken from the previous response.
     #[serde(alias="pageToken")]
     pub page_token: Option<String>,
-    /// The end position of the range on the reference, 0-based exclusive. If specified, referenceName must also be specified.    
+    /// The end position of the range on the reference, 0-based exclusive. If specified, referenceName must also be specified.
     pub end: Option<String>,
-    /// The IDs of the read groups within which to search for reads. All specified read groups must belong to the same read group sets. Must specify one of readGroupSetIds or readGroupIds.    
+    /// The IDs of the read groups within which to search for reads. All specified read groups must belong to the same read group sets. Must specify one of readGroupSetIds or readGroupIds.
     #[serde(alias="readGroupIds")]
     pub read_group_ids: Option<Vec<String>>,
-    /// Specifies number of results to return in a single page. If unspecified, it will default to 256. The maximum value is 2048.    
+    /// Specifies number of results to return in a single page. If unspecified, it will default to 256. The maximum value is 2048.
     #[serde(alias="pageSize")]
     pub page_size: Option<i32>,
-    /// The start position of the range on the reference, 0-based inclusive. If specified, referenceName must also be specified.    
+    /// The start position of the range on the reference, 0-based inclusive. If specified, referenceName must also be specified.
     pub start: Option<String>,
-    /// The IDs of the read groups sets within which to search for reads. All specified read group sets must be aligned against a common set of reference sequences; this defines the genomic coordinates for the query. Must specify one of readGroupSetIds or readGroupIds.    
+    /// The IDs of the read groups sets within which to search for reads. All specified read group sets must be aligned against a common set of reference sequences; this defines the genomic coordinates for the query. Must specify one of readGroupSetIds or readGroupIds.
     #[serde(alias="readGroupSetIds")]
     pub read_group_set_ids: Option<Vec<String>>,
-    /// The reference sequence name, for example chr1, 1, or chrX. If set to *, only unmapped reads are returned.    
+    /// The reference sequence name, for example chr1, 1, or chrX. If set to *, only unmapped reads are returned.
     #[serde(alias="referenceName")]
     pub reference_name: Option<String>,
 }
@@ -1998,11 +2007,11 @@ impl RequestValue for SearchReadsRequest {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct Range {
-    /// The start position of the range on the reference, 0-based inclusive. If specified, referenceName must also be specified.    
+    /// The start position of the range on the reference, 0-based inclusive. If specified, referenceName must also be specified.
     pub start: String,
-    /// The end position of the range on the reference, 0-based exclusive. If specified, referenceName must also be specified.    
+    /// The end position of the range on the reference, 0-based exclusive. If specified, referenceName must also be specified.
     pub end: String,
-    /// The reference sequence name, for example chr1, 1, or chrX.    
+    /// The reference sequence name, for example chr1, 1, or chrX.
     #[serde(alias="referenceName")]
     pub reference_name: String,
 }
@@ -2021,21 +2030,21 @@ impl Part for Range {}
 /// 
 #[derive(Default, Clone, Debug, Serialize)]
 pub struct SearchAnnotationSetsRequest {
-    /// The continuation token, which is used to page through large result sets. To get the next page of results, set this parameter to the value of nextPageToken from the previous response.    
+    /// The continuation token, which is used to page through large result sets. To get the next page of results, set this parameter to the value of nextPageToken from the previous response.
     #[serde(alias="pageToken")]
     pub page_token: Option<String>,
-    /// Only return annotations sets for which a substring of the name matches this string (case insensitive).    
+    /// Only return annotations sets for which a substring of the name matches this string (case insensitive).
     pub name: Option<String>,
-    /// Specifies number of results to return in a single page. If unspecified, it will default to 128. The maximum value is 1024.    
+    /// Specifies number of results to return in a single page. If unspecified, it will default to 128. The maximum value is 1024.
     #[serde(alias="pageSize")]
     pub page_size: Option<i32>,
-    /// The dataset IDs to search within. Caller must have READ access to these datasets.    
+    /// The dataset IDs to search within. Caller must have READ access to these datasets.
     #[serde(alias="datasetIds")]
     pub dataset_ids: Option<Vec<String>>,
-    /// If specified, only annotation sets associated with the given reference set are returned.    
+    /// If specified, only annotation sets associated with the given reference set are returned.
     #[serde(alias="referenceSetId")]
     pub reference_set_id: Option<String>,
-    /// If specified, only annotation sets which have any of these types are returned.    
+    /// If specified, only annotation sets that have any of these types are returned.
     pub types: Option<Vec<String>>,
 }
 
@@ -2053,10 +2062,10 @@ impl RequestValue for SearchAnnotationSetsRequest {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct SearchReadsResponse {
-    /// The continuation token, which is used to page through large result sets. Provide this value in a subsequent request to return the next page of results. This field will be empty if there aren't any additional results.    
+    /// The continuation token, which is used to page through large result sets. Provide this value in a subsequent request to return the next page of results. This field will be empty if there aren't any additional results.
     #[serde(alias="nextPageToken")]
     pub next_page_token: String,
-    /// The list of matching alignments sorted by mapped genomic coordinate, if any, ascending in position within the same reference. Unmapped reads, which have no position, are returned last and are further sorted in ascending lexicographic order by fragment name.    
+    /// The list of matching alignments sorted by mapped genomic coordinate, if any, ascending in position within the same reference. Unmapped reads, which have no position, are returned last and are further sorted in ascending lexicographic order by fragment name.
     pub alignments: Vec<Read>,
 }
 
@@ -2069,10 +2078,10 @@ impl ResponseResult for SearchReadsResponse {}
 /// 
 #[derive(Default, Clone, Debug, Serialize)]
 pub struct InterleavedFastqSource {
-    /// A list of URIs pointing at interleaved FASTQ files in Google Cloud Storage which will be aligned. The caller must have READ permissions for these files.    
+    /// A list of URIs pointing at interleaved FASTQ files in Google Cloud Storage which will be aligned. The caller must have READ permissions for these files.
     #[serde(alias="sourceUris")]
     pub source_uris: Vec<String>,
-    /// Optionally specifies the metadata to be associated with the final aligned read group set.    
+    /// Optionally specifies the metadata to be associated with the final aligned read group set.
     pub metadata: FastqMetadata,
 }
 
@@ -2090,10 +2099,10 @@ impl Part for InterleavedFastqSource {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct SearchReferencesResponse {
-    /// The continuation token, which is used to page through large result sets. Provide this value in a subsequent request to return the next page of results. This field will be empty if there aren't any additional results.    
+    /// The continuation token, which is used to page through large result sets. Provide this value in a subsequent request to return the next page of results. This field will be empty if there aren't any additional results.
     #[serde(alias="nextPageToken")]
     pub next_page_token: String,
-    /// The matching references.    
+    /// The matching references.
     pub references: Vec<Reference>,
 }
 
@@ -2116,22 +2125,22 @@ impl ResponseResult for SearchReferencesResponse {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ReadGroupSet {
-    /// A map of additional read group set information.    
+    /// A map of additional read group set information.
     pub info: Option<HashMap<String, Vec<String>>>,
-    /// The dataset ID.    
+    /// The dataset ID.
     #[serde(alias="datasetId")]
     pub dataset_id: Option<String>,
-    /// The read group set name. By default this will be initialized to the sample name of the sequenced data contained in this set.    
+    /// The read group set name. By default this will be initialized to the sample name of the sequenced data contained in this set.
     pub name: Option<String>,
-    /// The reference set the reads in this read group set are aligned to.    
+    /// The reference set the reads in this read group set are aligned to.
     #[serde(alias="referenceSetId")]
     pub reference_set_id: Option<String>,
-    /// The read group set ID.    
+    /// The read group set ID.
     pub id: Option<String>,
-    /// The read groups in this set. There are typically 1-10 read groups in a read group set.    
+    /// The read groups in this set. There are typically 1-10 read groups in a read group set.
     #[serde(alias="readGroups")]
     pub read_groups: Option<Vec<ReadGroup>>,
-    /// The filename of the original source file for this read group set, if any.    
+    /// The filename of the original source file for this read group set, if any.
     pub filename: Option<String>,
 }
 
@@ -2146,14 +2155,14 @@ impl ResponseResult for ReadGroupSet {}
 /// 
 #[derive(Default, Clone, Debug, Serialize)]
 pub struct QueryRange {
-    /// The start position of the range on the reference, 0-based inclusive. If specified, referenceId or referenceName must also be specified. Defaults to 0.    
+    /// The start position of the range on the reference, 0-based inclusive. If specified, referenceId or referenceName must also be specified. Defaults to 0.
     pub start: String,
-    /// The ID of the reference to query. At most one of referenceId and referenceName should be specified.    
+    /// The ID of the reference to query. At most one of referenceId and referenceName should be specified.
     #[serde(alias="referenceId")]
     pub reference_id: String,
-    /// The end position of the range on the reference, 0-based exclusive. If specified, referenceId or referenceName must also be specified. If unset or 0, defaults to the length of the reference.    
+    /// The end position of the range on the reference, 0-based exclusive. If specified, referenceId or referenceName must also be specified. If unset or 0, defaults to the length of the reference.
     pub end: String,
-    /// The name of the reference to query, within the reference set associated with this query. At most one of referenceId and referenceName pshould be specified.    
+    /// The name of the reference to query, within the reference set associated with this query. At most one of referenceId and referenceName pshould be specified.
     #[serde(alias="referenceName")]
     pub reference_name: String,
 }
@@ -2167,11 +2176,11 @@ impl Part for QueryRange {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct LinearAlignment {
-    /// The position of this alignment.    
+    /// The position of this alignment.
     pub position: Position,
-    /// Represents the local alignment of this sequence (alignment matches, indels, etc) against the reference.    
+    /// Represents the local alignment of this sequence (alignment matches, indels, etc) against the reference.
     pub cigar: Vec<CigarUnit>,
-    /// The mapping quality of this alignment. Represents how likely the read maps to this position as opposed to other locations.    
+    /// The mapping quality of this alignment. Represents how likely the read maps to this position as opposed to other locations.
     #[serde(alias="mappingQuality")]
     pub mapping_quality: i32,
 }
@@ -2179,7 +2188,7 @@ pub struct LinearAlignment {
 impl Part for LinearAlignment {}
 
 
-/// An annotation set is a logical grouping of annotations which share consistent type information and provenance. An example would be 'all genes from refseq', or 'all variant annotations from ClinVar'.
+/// An annotation set is a logical grouping of annotations that share consistent type information and provenance. Examples of annotation sets include 'all genes from refseq', and 'all variant annotations from ClinVar'.
 /// 
 /// # Activities
 /// 
@@ -2195,22 +2204,22 @@ impl Part for LinearAlignment {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct AnnotationSet {
-    /// A map of additional data for this annotation set.    
+    /// A map of additional data for this annotation set.
     pub info: Option<HashMap<String, Vec<String>>>,
-    /// The display name for this annotation set.    
+    /// The display name for this annotation set.
     pub name: Option<String>,
-    /// The source URI describing the file from which this annotation set was generated, if any.    
+    /// The source URI describing the file from which this annotation set was generated, if any.
     #[serde(alias="sourceUri")]
     pub source_uri: Option<String>,
-    /// The type of annotations contained within this set.    
+    /// The type of annotations contained within this set.
     #[serde(alias="type")]
     pub type_: Option<String>,
-    /// The ID of the reference set which defines the coordinate-space for this set's annotations.    
+    /// The ID of the reference set that defines the coordinate space for this set's annotations.
     #[serde(alias="referenceSetId")]
     pub reference_set_id: Option<String>,
-    /// The generated unique ID for this annotation set.    
+    /// The generated unique ID for this annotation set.
     pub id: Option<String>,
-    /// The ID of the containing dataset.    
+    /// The ID of the containing dataset.
     #[serde(alias="datasetId")]
     pub dataset_id: Option<String>,
 }
@@ -2226,12 +2235,12 @@ impl ResponseResult for AnnotationSet {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct CigarUnit {
-    /// referenceSequence is only used at mismatches (SEQUENCE_MISMATCH) and deletions (DELETE). Filling this field replaces SAM's MD tag. If the relevant information is not available, this field is unset.    
+    /// referenceSequence is only used at mismatches (SEQUENCE_MISMATCH) and deletions (DELETE). Filling this field replaces SAM's MD tag. If the relevant information is not available, this field is unset.
     #[serde(alias="referenceSequence")]
     pub reference_sequence: String,
-    /// no description provided    
+    /// no description provided
     pub operation: String,
-    /// The number of bases that the operation runs for. Required.    
+    /// The number of bases that the operation runs for. Required.
     #[serde(alias="operationLength")]
     pub operation_length: String,
 }
@@ -2245,9 +2254,9 @@ impl Part for CigarUnit {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct TranscriptCodingSequence {
-    /// The start of the coding sequence on this annotation's reference sequence, 0-based inclusive. Note that this position is relative to the reference start, and not the containing annotation start.    
+    /// The start of the coding sequence on this annotation's reference sequence, 0-based inclusive. Note that this position is relative to the reference start, and not the containing annotation start.
     pub start: String,
-    /// The end of the coding sequence on this annotation's reference sequence, 0-based exclusive. Note that this position is relative to the reference start, and not the containing annotation start.    
+    /// The end of the coding sequence on this annotation's reference sequence, 0-based exclusive. Note that this position is relative to the reference start, and not the containing annotation start.
     pub end: String,
 }
 
@@ -2260,13 +2269,13 @@ impl Part for TranscriptCodingSequence {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct TranscriptExon {
-    /// The start position of the exon on this annotation's reference sequence, 0-based inclusive. Note that this is relative to the reference start, and not the containing annotation start.    
+    /// The start position of the exon on this annotation's reference sequence, 0-based inclusive. Note that this is relative to the reference start, and not the containing annotation start.
     pub start: String,
-    /// The frame of this exon. Contains a value of 0, 1, or 2 which indicates the offset of the first coding base of the exon within the reading frame of the coding DNA sequence, if any. This field is dependent on the strandedness of this annotation (see Annotation.position.reverseStrand). For forward stranded annotations, this offset is relative to the exon.start. For reverse strand annotations, this offset is relative to the exon.end-1.
+    /// The frame of this exon. Contains a value of 0, 1, or 2, which indicates the offset of the first coding base of the exon within the reading frame of the coding DNA sequence, if any. This field is dependent on the strandedness of this annotation (see Annotation.position.reverseStrand). For forward stranded annotations, this offset is relative to the exon.start. For reverse strand annotations, this offset is relative to the exon.end-1.
     /// 
     /// Unset if this exon does not intersect the coding sequence. Upon creation of a transcript, the frame must be populated for all or none of the coding exons.
     pub frame: Int32Value,
-    /// The end position of the exon on this annotation's reference sequence, 0-based exclusive. Note that this is relative to the reference start, and not the containing annotation start.    
+    /// The end position of the exon on this annotation's reference sequence, 0-based exclusive. Note that this is relative to the reference start, and not the containing annotation start.
     pub end: String,
 }
 
@@ -2284,10 +2293,10 @@ impl Part for TranscriptExon {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct SearchVariantSetsResponse {
-    /// The continuation token, which is used to page through large result sets. Provide this value in a subsequent request to return the next page of results. This field will be empty if there aren't any additional results.    
+    /// The continuation token, which is used to page through large result sets. Provide this value in a subsequent request to return the next page of results. This field will be empty if there aren't any additional results.
     #[serde(alias="nextPageToken")]
     pub next_page_token: String,
-    /// The variant sets belonging to the requested dataset.    
+    /// The variant sets belonging to the requested dataset.
     #[serde(alias="variantSets")]
     pub variant_sets: Vec<VariantSet>,
 }
@@ -2301,10 +2310,10 @@ impl ResponseResult for SearchVariantSetsResponse {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct CoverageBucket {
-    /// The average number of reads which are aligned to each individual reference base in this bucket.    
+    /// The average number of reads which are aligned to each individual reference base in this bucket.
     #[serde(alias="meanCoverage")]
     pub mean_coverage: f32,
-    /// The genomic coordinate range spanned by this bucket.    
+    /// The genomic coordinate range spanned by this bucket.
     pub range: Range,
 }
 
@@ -2322,10 +2331,10 @@ impl Part for CoverageBucket {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct SearchCallSetsResponse {
-    /// The continuation token, which is used to page through large result sets. Provide this value in a subsequent request to return the next page of results. This field will be empty if there aren't any additional results.    
+    /// The continuation token, which is used to page through large result sets. Provide this value in a subsequent request to return the next page of results. This field will be empty if there aren't any additional results.
     #[serde(alias="nextPageToken")]
     pub next_page_token: String,
-    /// The list of matching call sets.    
+    /// The list of matching call sets.
     #[serde(alias="callSets")]
     pub call_sets: Vec<CallSet>,
 }
@@ -2344,17 +2353,17 @@ impl ResponseResult for SearchCallSetsResponse {}
 /// 
 #[derive(Default, Clone, Debug, Serialize)]
 pub struct SearchReferenceSetsRequest {
-    /// If present, return references for which the md5checksum matches. See ReferenceSet.md5checksum for details.    
+    /// If present, return references for which the md5checksum matches. See ReferenceSet.md5checksum for details.
     pub md5checksums: Option<Vec<String>>,
-    /// If present, return reference sets for which a substring of their assemblyId matches this string (case insensitive).    
+    /// If present, return reference sets for which a substring of their assemblyId matches this string (case insensitive).
     #[serde(alias="assemblyId")]
     pub assembly_id: Option<String>,
-    /// If present, return references for which the accession matches any of these strings. Best to give a version number, for example GCF_000001405.26. If only the main accession number is given then all records with that main accession will be returned, whichever version. Note that different versions will have different sequences.    
+    /// If present, return references for which the accession matches any of these strings. Best to give a version number, for example GCF_000001405.26. If only the main accession number is given then all records with that main accession will be returned, whichever version. Note that different versions will have different sequences.
     pub accessions: Option<Vec<String>>,
-    /// Specifies the maximum number of results to return in a single page.    
+    /// Specifies the maximum number of results to return in a single page.
     #[serde(alias="pageSize")]
     pub page_size: Option<i32>,
-    /// The continuation token, which is used to page through large result sets. To get the next page of results, set this parameter to the value of nextPageToken from the previous response.    
+    /// The continuation token, which is used to page through large result sets. To get the next page of results, set this parameter to the value of nextPageToken from the previous response.
     #[serde(alias="pageToken")]
     pub page_token: Option<String>,
 }
@@ -2401,13 +2410,17 @@ pub struct DatasetMethods<'a, C, NC, A>
     hub: &'a Genomics<C, NC, A>,
 }
 
-impl<'a, C, NC, A> ResourceMethodsBuilder for DatasetMethods<'a, C, NC, A> {}
+impl<'a, C, NC, A> MethodsBuilder for DatasetMethods<'a, C, NC, A> {}
 
 impl<'a, C, NC, A> DatasetMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Creates a new dataset.    
+    /// Creates a new dataset.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
     pub fn create(&self, request: &Dataset) -> DatasetCreateCall<'a, C, NC, A> {
         DatasetCreateCall {
             hub: self.hub,
@@ -2420,7 +2433,12 @@ impl<'a, C, NC, A> DatasetMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Updates a dataset.    
+    /// Updates a dataset.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `datasetId` - The ID of the dataset to be updated.
     pub fn update(&self, request: &Dataset, dataset_id: &str) -> DatasetUpdateCall<'a, C, NC, A> {
         DatasetUpdateCall {
             hub: self.hub,
@@ -2434,7 +2452,11 @@ impl<'a, C, NC, A> DatasetMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Deletes a dataset.    
+    /// Deletes a dataset.
+    /// 
+    /// # Arguments
+    ///
+    /// * `datasetId` - The ID of the dataset to be deleted.
     pub fn delete(&self, dataset_id: &str) -> DatasetDeleteCall<'a, C, NC, A> {
         DatasetDeleteCall {
             hub: self.hub,
@@ -2447,7 +2469,11 @@ impl<'a, C, NC, A> DatasetMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Undeletes a dataset by restoring a dataset which was deleted via this API. This operation is only possible for a week after the deletion occurred.    
+    /// Undeletes a dataset by restoring a dataset which was deleted via this API. This operation is only possible for a week after the deletion occurred.
+    /// 
+    /// # Arguments
+    ///
+    /// * `datasetId` - The ID of the dataset to be undeleted.
     pub fn undelete(&self, dataset_id: &str) -> DatasetUndeleteCall<'a, C, NC, A> {
         DatasetUndeleteCall {
             hub: self.hub,
@@ -2460,7 +2486,11 @@ impl<'a, C, NC, A> DatasetMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Gets a dataset by ID.    
+    /// Gets a dataset by ID.
+    /// 
+    /// # Arguments
+    ///
+    /// * `datasetId` - The ID of the dataset.
     pub fn get(&self, dataset_id: &str) -> DatasetGetCall<'a, C, NC, A> {
         DatasetGetCall {
             hub: self.hub,
@@ -2473,7 +2503,12 @@ impl<'a, C, NC, A> DatasetMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Updates a dataset. This method supports patch semantics.    
+    /// Updates a dataset. This method supports patch semantics.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `datasetId` - The ID of the dataset to be updated.
     pub fn patch(&self, request: &Dataset, dataset_id: &str) -> DatasetPatchCall<'a, C, NC, A> {
         DatasetPatchCall {
             hub: self.hub,
@@ -2487,7 +2522,7 @@ impl<'a, C, NC, A> DatasetMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Lists datasets within a project.    
+    /// Lists datasets within a project.
     pub fn list(&self) -> DatasetListCall<'a, C, NC, A> {
         DatasetListCall {
             hub: self.hub,
@@ -2537,13 +2572,17 @@ pub struct JobMethods<'a, C, NC, A>
     hub: &'a Genomics<C, NC, A>,
 }
 
-impl<'a, C, NC, A> ResourceMethodsBuilder for JobMethods<'a, C, NC, A> {}
+impl<'a, C, NC, A> MethodsBuilder for JobMethods<'a, C, NC, A> {}
 
 impl<'a, C, NC, A> JobMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Cancels a job by ID. Note that it is possible for partial results to be generated and stored for cancelled jobs.    
+    /// Cancels a job by ID. Note that it is possible for partial results to be generated and stored for cancelled jobs.
+    /// 
+    /// # Arguments
+    ///
+    /// * `jobId` - Required. The ID of the job.
     pub fn cancel(&self, job_id: &str) -> JobCancelCall<'a, C, NC, A> {
         JobCancelCall {
             hub: self.hub,
@@ -2556,7 +2595,11 @@ impl<'a, C, NC, A> JobMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Gets a job by ID.    
+    /// Gets a job by ID.
+    /// 
+    /// # Arguments
+    ///
+    /// * `jobId` - Required. The ID of the job.
     pub fn get(&self, job_id: &str) -> JobGetCall<'a, C, NC, A> {
         JobGetCall {
             hub: self.hub,
@@ -2569,7 +2612,11 @@ impl<'a, C, NC, A> JobMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Gets a list of jobs matching the criteria.    
+    /// Gets a list of jobs matching the criteria.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
     pub fn search(&self, request: &SearchJobsRequest) -> JobSearchCall<'a, C, NC, A> {
         JobSearchCall {
             hub: self.hub,
@@ -2617,7 +2664,7 @@ pub struct ReferencesetMethods<'a, C, NC, A>
     hub: &'a Genomics<C, NC, A>,
 }
 
-impl<'a, C, NC, A> ResourceMethodsBuilder for ReferencesetMethods<'a, C, NC, A> {}
+impl<'a, C, NC, A> MethodsBuilder for ReferencesetMethods<'a, C, NC, A> {}
 
 impl<'a, C, NC, A> ReferencesetMethods<'a, C, NC, A> {
     
@@ -2626,6 +2673,10 @@ impl<'a, C, NC, A> ReferencesetMethods<'a, C, NC, A> {
     /// Searches for reference sets which match the given criteria.
     /// 
     /// Implements GlobalAllianceApi.searchReferenceSets.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
     pub fn search(&self, request: &SearchReferenceSetsRequest) -> ReferencesetSearchCall<'a, C, NC, A> {
         ReferencesetSearchCall {
             hub: self.hub,
@@ -2641,6 +2692,10 @@ impl<'a, C, NC, A> ReferencesetMethods<'a, C, NC, A> {
     /// Gets a reference set.
     /// 
     /// Implements GlobalAllianceApi.getReferenceSet.
+    /// 
+    /// # Arguments
+    ///
+    /// * `referenceSetId` - The ID of the reference set.
     pub fn get(&self, reference_set_id: &str) -> ReferencesetGetCall<'a, C, NC, A> {
         ReferencesetGetCall {
             hub: self.hub,
@@ -2688,13 +2743,17 @@ pub struct CallsetMethods<'a, C, NC, A>
     hub: &'a Genomics<C, NC, A>,
 }
 
-impl<'a, C, NC, A> ResourceMethodsBuilder for CallsetMethods<'a, C, NC, A> {}
+impl<'a, C, NC, A> MethodsBuilder for CallsetMethods<'a, C, NC, A> {}
 
 impl<'a, C, NC, A> CallsetMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Deletes a call set.    
+    /// Deletes a call set.
+    /// 
+    /// # Arguments
+    ///
+    /// * `callSetId` - The ID of the call set to be deleted.
     pub fn delete(&self, call_set_id: &str) -> CallsetDeleteCall<'a, C, NC, A> {
         CallsetDeleteCall {
             hub: self.hub,
@@ -2710,6 +2769,10 @@ impl<'a, C, NC, A> CallsetMethods<'a, C, NC, A> {
     /// Gets a list of call sets matching the criteria.
     /// 
     /// Implements GlobalAllianceApi.searchCallSets.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
     pub fn search(&self, request: &SearchCallSetsRequest) -> CallsetSearchCall<'a, C, NC, A> {
         CallsetSearchCall {
             hub: self.hub,
@@ -2722,7 +2785,12 @@ impl<'a, C, NC, A> CallsetMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Updates a call set. This method supports patch semantics.    
+    /// Updates a call set. This method supports patch semantics.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `callSetId` - The ID of the call set to be updated.
     pub fn patch(&self, request: &CallSet, call_set_id: &str) -> CallsetPatchCall<'a, C, NC, A> {
         CallsetPatchCall {
             hub: self.hub,
@@ -2736,7 +2804,11 @@ impl<'a, C, NC, A> CallsetMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Creates a new call set.    
+    /// Creates a new call set.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
     pub fn create(&self, request: &CallSet) -> CallsetCreateCall<'a, C, NC, A> {
         CallsetCreateCall {
             hub: self.hub,
@@ -2749,7 +2821,11 @@ impl<'a, C, NC, A> CallsetMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Gets a call set by ID.    
+    /// Gets a call set by ID.
+    /// 
+    /// # Arguments
+    ///
+    /// * `callSetId` - The ID of the call set.
     pub fn get(&self, call_set_id: &str) -> CallsetGetCall<'a, C, NC, A> {
         CallsetGetCall {
             hub: self.hub,
@@ -2762,7 +2838,12 @@ impl<'a, C, NC, A> CallsetMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Updates a call set.    
+    /// Updates a call set.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `callSetId` - The ID of the call set to be updated.
     pub fn update(&self, request: &CallSet, call_set_id: &str) -> CallsetUpdateCall<'a, C, NC, A> {
         CallsetUpdateCall {
             hub: self.hub,
@@ -2811,7 +2892,7 @@ pub struct ReadMethods<'a, C, NC, A>
     hub: &'a Genomics<C, NC, A>,
 }
 
-impl<'a, C, NC, A> ResourceMethodsBuilder for ReadMethods<'a, C, NC, A> {}
+impl<'a, C, NC, A> MethodsBuilder for ReadMethods<'a, C, NC, A> {}
 
 impl<'a, C, NC, A> ReadMethods<'a, C, NC, A> {
     
@@ -2824,6 +2905,10 @@ impl<'a, C, NC, A> ReadMethods<'a, C, NC, A> {
     /// All reads returned (including reads on subsequent pages) are ordered by genomic coordinate (reference sequence & position). Reads with equivalent genomic coordinates are returned in a deterministic order.
     /// 
     /// Implements GlobalAllianceApi.searchReads.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
     pub fn search(&self, request: &SearchReadsRequest) -> ReadSearchCall<'a, C, NC, A> {
         ReadSearchCall {
             hub: self.hub,
@@ -2871,13 +2956,18 @@ pub struct ReadgroupsetMethods<'a, C, NC, A>
     hub: &'a Genomics<C, NC, A>,
 }
 
-impl<'a, C, NC, A> ResourceMethodsBuilder for ReadgroupsetMethods<'a, C, NC, A> {}
+impl<'a, C, NC, A> MethodsBuilder for ReadgroupsetMethods<'a, C, NC, A> {}
 
 impl<'a, C, NC, A> ReadgroupsetMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Updates a read group set.    
+    /// Updates a read group set.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `readGroupSetId` - The ID of the read group set to be updated. The caller must have WRITE permissions to the dataset associated with this read group set.
     pub fn update(&self, request: &ReadGroupSet, read_group_set_id: &str) -> ReadgroupsetUpdateCall<'a, C, NC, A> {
         ReadgroupsetUpdateCall {
             hub: self.hub,
@@ -2894,6 +2984,10 @@ impl<'a, C, NC, A> ReadgroupsetMethods<'a, C, NC, A> {
     /// Exports read group sets to a BAM file in Google Cloud Storage.
     /// 
     /// Note that currently there may be some differences between exported BAM files and the original BAM file at the time of import. In particular, comments in the input file header will not be preserved, some custom tags will be converted to strings, and original reference sequence order is not necessarily preserved.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
     pub fn export(&self, request: &ExportReadGroupSetsRequest) -> ReadgroupsetExportCall<'a, C, NC, A> {
         ReadgroupsetExportCall {
             hub: self.hub,
@@ -2909,6 +3003,10 @@ impl<'a, C, NC, A> ReadgroupsetMethods<'a, C, NC, A> {
     /// Creates read group sets by asynchronously importing the provided information.
     /// 
     /// Note that currently comments in the input file header are not imported and some custom tags will be converted to strings, rather than preserving tag types. The caller must have WRITE permissions to the dataset.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
     pub fn import(&self, request: &ImportReadGroupSetsRequest) -> ReadgroupsetImportCall<'a, C, NC, A> {
         ReadgroupsetImportCall {
             hub: self.hub,
@@ -2921,7 +3019,12 @@ impl<'a, C, NC, A> ReadgroupsetMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Updates a read group set. This method supports patch semantics.    
+    /// Updates a read group set. This method supports patch semantics.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `readGroupSetId` - The ID of the read group set to be updated. The caller must have WRITE permissions to the dataset associated with this read group set.
     pub fn patch(&self, request: &ReadGroupSet, read_group_set_id: &str) -> ReadgroupsetPatchCall<'a, C, NC, A> {
         ReadgroupsetPatchCall {
             hub: self.hub,
@@ -2935,7 +3038,11 @@ impl<'a, C, NC, A> ReadgroupsetMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Calls variants on read data from existing read group sets or files from Google Cloud Storage. See the  alignment and variant calling documentation for more details.    
+    /// Calls variants on read data from existing read group sets or files from Google Cloud Storage. See the  alignment and variant calling documentation for more details.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
     pub fn call(&self, request: &CallReadGroupSetsRequest) -> ReadgroupsetCallCall<'a, C, NC, A> {
         ReadgroupsetCallCall {
             hub: self.hub,
@@ -2948,7 +3055,11 @@ impl<'a, C, NC, A> ReadgroupsetMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Aligns read data from existing read group sets or files from Google Cloud Storage. See the  alignment and variant calling documentation for more details.    
+    /// Aligns read data from existing read group sets or files from Google Cloud Storage. See the  alignment and variant calling documentation for more details.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
     pub fn align(&self, request: &AlignReadGroupSetsRequest) -> ReadgroupsetAlignCall<'a, C, NC, A> {
         ReadgroupsetAlignCall {
             hub: self.hub,
@@ -2964,6 +3075,10 @@ impl<'a, C, NC, A> ReadgroupsetMethods<'a, C, NC, A> {
     /// Lists fixed width coverage buckets for a read group set, each of which correspond to a range of a reference sequence. Each bucket summarizes coverage information across its corresponding genomic range.
     /// 
     /// Coverage is defined as the number of reads which are aligned to a given base in the reference sequence. Coverage buckets are available at several precomputed bucket widths, enabling retrieval of various coverage 'zoom levels'. The caller must have READ permissions for the target read group set.
+    /// 
+    /// # Arguments
+    ///
+    /// * `readGroupSetId` - Required. The ID of the read group set over which coverage is requested.
     pub fn coveragebuckets_list(&self, read_group_set_id: &str) -> ReadgroupsetCoveragebucketListCall<'a, C, NC, A> {
         ReadgroupsetCoveragebucketListCall {
             hub: self.hub,
@@ -2982,7 +3097,11 @@ impl<'a, C, NC, A> ReadgroupsetMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Deletes a read group set.    
+    /// Deletes a read group set.
+    /// 
+    /// # Arguments
+    ///
+    /// * `readGroupSetId` - The ID of the read group set to be deleted. The caller must have WRITE permissions to the dataset associated with this read group set.
     pub fn delete(&self, read_group_set_id: &str) -> ReadgroupsetDeleteCall<'a, C, NC, A> {
         ReadgroupsetDeleteCall {
             hub: self.hub,
@@ -2998,6 +3117,10 @@ impl<'a, C, NC, A> ReadgroupsetMethods<'a, C, NC, A> {
     /// Searches for read group sets matching the criteria.
     /// 
     /// Implements GlobalAllianceApi.searchReadGroupSets.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
     pub fn search(&self, request: &SearchReadGroupSetsRequest) -> ReadgroupsetSearchCall<'a, C, NC, A> {
         ReadgroupsetSearchCall {
             hub: self.hub,
@@ -3010,7 +3133,11 @@ impl<'a, C, NC, A> ReadgroupsetMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Gets a read group set by ID.    
+    /// Gets a read group set by ID.
+    /// 
+    /// # Arguments
+    ///
+    /// * `readGroupSetId` - The ID of the read group set.
     pub fn get(&self, read_group_set_id: &str) -> ReadgroupsetGetCall<'a, C, NC, A> {
         ReadgroupsetGetCall {
             hub: self.hub,
@@ -3058,7 +3185,7 @@ pub struct ReferenceMethods<'a, C, NC, A>
     hub: &'a Genomics<C, NC, A>,
 }
 
-impl<'a, C, NC, A> ResourceMethodsBuilder for ReferenceMethods<'a, C, NC, A> {}
+impl<'a, C, NC, A> MethodsBuilder for ReferenceMethods<'a, C, NC, A> {}
 
 impl<'a, C, NC, A> ReferenceMethods<'a, C, NC, A> {
     
@@ -3067,6 +3194,10 @@ impl<'a, C, NC, A> ReferenceMethods<'a, C, NC, A> {
     /// Lists the bases in a reference, optionally restricted to a range.
     /// 
     /// Implements GlobalAllianceApi.getReferenceBases.
+    /// 
+    /// # Arguments
+    ///
+    /// * `referenceId` - The ID of the reference.
     pub fn bases_list(&self, reference_id: &str) -> ReferenceBaseListCall<'a, C, NC, A> {
         ReferenceBaseListCall {
             hub: self.hub,
@@ -3086,6 +3217,10 @@ impl<'a, C, NC, A> ReferenceMethods<'a, C, NC, A> {
     /// Searches for references which match the given criteria.
     /// 
     /// Implements GlobalAllianceApi.searchReferences.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
     pub fn search(&self, request: &SearchReferencesRequest) -> ReferenceSearchCall<'a, C, NC, A> {
         ReferenceSearchCall {
             hub: self.hub,
@@ -3101,6 +3236,10 @@ impl<'a, C, NC, A> ReferenceMethods<'a, C, NC, A> {
     /// Gets a reference.
     /// 
     /// Implements GlobalAllianceApi.getReference.
+    /// 
+    /// # Arguments
+    ///
+    /// * `referenceId` - The ID of the reference.
     pub fn get(&self, reference_id: &str) -> ReferenceGetCall<'a, C, NC, A> {
         ReferenceGetCall {
             hub: self.hub,
@@ -3148,13 +3287,17 @@ pub struct AnnotationSetMethods<'a, C, NC, A>
     hub: &'a Genomics<C, NC, A>,
 }
 
-impl<'a, C, NC, A> ResourceMethodsBuilder for AnnotationSetMethods<'a, C, NC, A> {}
+impl<'a, C, NC, A> MethodsBuilder for AnnotationSetMethods<'a, C, NC, A> {}
 
 impl<'a, C, NC, A> AnnotationSetMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Gets an annotation set. Caller must have READ permission for the associated dataset.    
+    /// Gets an annotation set. Caller must have READ permission for the associated dataset.
+    /// 
+    /// # Arguments
+    ///
+    /// * `annotationSetId` - The ID of the annotation set to be retrieved.
     pub fn get(&self, annotation_set_id: &str) -> AnnotationSetGetCall<'a, C, NC, A> {
         AnnotationSetGetCall {
             hub: self.hub,
@@ -3167,7 +3310,12 @@ impl<'a, C, NC, A> AnnotationSetMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Updates an annotation set. The update must respect all mutability restrictions and other invariants described on the annotation set resource. Caller must have WRITE permission for the associated dataset.    
+    /// Updates an annotation set. The update must respect all mutability restrictions and other invariants described on the annotation set resource. Caller must have WRITE permission for the associated dataset.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `annotationSetId` - The ID of the annotation set to be updated.
     pub fn update(&self, request: &AnnotationSet, annotation_set_id: &str) -> AnnotationSetUpdateCall<'a, C, NC, A> {
         AnnotationSetUpdateCall {
             hub: self.hub,
@@ -3181,7 +3329,11 @@ impl<'a, C, NC, A> AnnotationSetMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Creates a new annotation set. Caller must have WRITE permission for the associated dataset.    
+    /// Creates a new annotation set. Caller must have WRITE permission for the associated dataset.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
     pub fn create(&self, request: &AnnotationSet) -> AnnotationSetCreateCall<'a, C, NC, A> {
         AnnotationSetCreateCall {
             hub: self.hub,
@@ -3194,7 +3346,11 @@ impl<'a, C, NC, A> AnnotationSetMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Searches for annotation sets which match the given criteria. Results are returned in a deterministic order. Caller must have READ permission for the queried datasets.    
+    /// Searches for annotation sets that match the given criteria. Results are returned in a deterministic order. Caller must have READ permission for the queried datasets.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
     pub fn search(&self, request: &SearchAnnotationSetsRequest) -> AnnotationSetSearchCall<'a, C, NC, A> {
         AnnotationSetSearchCall {
             hub: self.hub,
@@ -3207,7 +3363,12 @@ impl<'a, C, NC, A> AnnotationSetMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Updates an annotation set. The update must respect all mutability restrictions and other invariants described on the annotation set resource. Caller must have WRITE permission for the associated dataset. This method supports patch semantics.    
+    /// Updates an annotation set. The update must respect all mutability restrictions and other invariants described on the annotation set resource. Caller must have WRITE permission for the associated dataset. This method supports patch semantics.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `annotationSetId` - The ID of the annotation set to be updated.
     pub fn patch(&self, request: &AnnotationSet, annotation_set_id: &str) -> AnnotationSetPatchCall<'a, C, NC, A> {
         AnnotationSetPatchCall {
             hub: self.hub,
@@ -3221,7 +3382,11 @@ impl<'a, C, NC, A> AnnotationSetMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Deletes an annotation set. Caller must have WRITE permission for the associated annotation set.    
+    /// Deletes an annotation set. Caller must have WRITE permission for the associated annotation set.
+    /// 
+    /// # Arguments
+    ///
+    /// * `annotationSetId` - The ID of the annotation set to be deleted.
     pub fn delete(&self, annotation_set_id: &str) -> AnnotationSetDeleteCall<'a, C, NC, A> {
         AnnotationSetDeleteCall {
             hub: self.hub,
@@ -3269,7 +3434,7 @@ pub struct VariantMethods<'a, C, NC, A>
     hub: &'a Genomics<C, NC, A>,
 }
 
-impl<'a, C, NC, A> ResourceMethodsBuilder for VariantMethods<'a, C, NC, A> {}
+impl<'a, C, NC, A> MethodsBuilder for VariantMethods<'a, C, NC, A> {}
 
 impl<'a, C, NC, A> VariantMethods<'a, C, NC, A> {
     
@@ -3278,6 +3443,10 @@ impl<'a, C, NC, A> VariantMethods<'a, C, NC, A> {
     /// Gets a list of variants matching the criteria.
     /// 
     /// Implements GlobalAllianceApi.searchVariants.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
     pub fn search(&self, request: &SearchVariantsRequest) -> VariantSearchCall<'a, C, NC, A> {
         VariantSearchCall {
             hub: self.hub,
@@ -3290,7 +3459,11 @@ impl<'a, C, NC, A> VariantMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Deletes a variant.    
+    /// Deletes a variant.
+    /// 
+    /// # Arguments
+    ///
+    /// * `variantId` - The ID of the variant to be deleted.
     pub fn delete(&self, variant_id: &str) -> VariantDeleteCall<'a, C, NC, A> {
         VariantDeleteCall {
             hub: self.hub,
@@ -3303,7 +3476,11 @@ impl<'a, C, NC, A> VariantMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Gets a variant by ID.    
+    /// Gets a variant by ID.
+    /// 
+    /// # Arguments
+    ///
+    /// * `variantId` - The ID of the variant.
     pub fn get(&self, variant_id: &str) -> VariantGetCall<'a, C, NC, A> {
         VariantGetCall {
             hub: self.hub,
@@ -3316,7 +3493,11 @@ impl<'a, C, NC, A> VariantMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Creates a new variant.    
+    /// Creates a new variant.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
     pub fn create(&self, request: &Variant) -> VariantCreateCall<'a, C, NC, A> {
         VariantCreateCall {
             hub: self.hub,
@@ -3329,7 +3510,12 @@ impl<'a, C, NC, A> VariantMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Updates a variant's names and info fields. All other modifications are silently ignored. Returns the modified variant without its calls.    
+    /// Updates a variant's names and info fields. All other modifications are silently ignored. Returns the modified variant without its calls.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `variantId` - The ID of the variant to be updated.
     pub fn update(&self, request: &Variant, variant_id: &str) -> VariantUpdateCall<'a, C, NC, A> {
         VariantUpdateCall {
             hub: self.hub,
@@ -3378,13 +3564,18 @@ pub struct AnnotationMethods<'a, C, NC, A>
     hub: &'a Genomics<C, NC, A>,
 }
 
-impl<'a, C, NC, A> ResourceMethodsBuilder for AnnotationMethods<'a, C, NC, A> {}
+impl<'a, C, NC, A> MethodsBuilder for AnnotationMethods<'a, C, NC, A> {}
 
 impl<'a, C, NC, A> AnnotationMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Updates an annotation. The update must respect all mutability restrictions and other invariants described on the annotation resource. Caller must have WRITE permission for the associated dataset. This method supports patch semantics.    
+    /// Updates an annotation. The update must respect all mutability restrictions and other invariants described on the annotation resource. Caller must have WRITE permission for the associated dataset. This method supports patch semantics.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `annotationId` - The ID of the annotation set to be updated.
     pub fn patch(&self, request: &Annotation, annotation_id: &str) -> AnnotationPatchCall<'a, C, NC, A> {
         AnnotationPatchCall {
             hub: self.hub,
@@ -3398,7 +3589,12 @@ impl<'a, C, NC, A> AnnotationMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Updates an annotation. The update must respect all mutability restrictions and other invariants described on the annotation resource. Caller must have WRITE permission for the associated dataset.    
+    /// Updates an annotation. The update must respect all mutability restrictions and other invariants described on the annotation resource. Caller must have WRITE permission for the associated dataset.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `annotationId` - The ID of the annotation set to be updated.
     pub fn update(&self, request: &Annotation, annotation_id: &str) -> AnnotationUpdateCall<'a, C, NC, A> {
         AnnotationUpdateCall {
             hub: self.hub,
@@ -3412,7 +3608,11 @@ impl<'a, C, NC, A> AnnotationMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Searches for annotations which match the given criteria. Results are returned ordered by start position. Annotations which have matching start positions are ordered deterministically. Caller must have READ permission for the queried annotation sets.    
+    /// Searches for annotations that match the given criteria. Results are returned ordered by start position. Annotations that have matching start positions are ordered deterministically. Caller must have READ permission for the queried annotation sets.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
     pub fn search(&self, request: &SearchAnnotationsRequest) -> AnnotationSearchCall<'a, C, NC, A> {
         AnnotationSearchCall {
             hub: self.hub,
@@ -3425,7 +3625,11 @@ impl<'a, C, NC, A> AnnotationMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Deletes an annotation. Caller must have WRITE permission for the associated annotation set.    
+    /// Deletes an annotation. Caller must have WRITE permission for the associated annotation set.
+    /// 
+    /// # Arguments
+    ///
+    /// * `annotationId` - The ID of the annotation set to be deleted.
     pub fn delete(&self, annotation_id: &str) -> AnnotationDeleteCall<'a, C, NC, A> {
         AnnotationDeleteCall {
             hub: self.hub,
@@ -3438,7 +3642,11 @@ impl<'a, C, NC, A> AnnotationMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Gets an annotation. Caller must have READ permission for the associated annotation set.    
+    /// Gets an annotation. Caller must have READ permission for the associated annotation set.
+    /// 
+    /// # Arguments
+    ///
+    /// * `annotationId` - The ID of the annotation set to be retrieved.
     pub fn get(&self, annotation_id: &str) -> AnnotationGetCall<'a, C, NC, A> {
         AnnotationGetCall {
             hub: self.hub,
@@ -3451,7 +3659,11 @@ impl<'a, C, NC, A> AnnotationMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Creates a new annotation. Caller must have WRITE permission for the associated annotation set.    
+    /// Creates a new annotation. Caller must have WRITE permission for the associated annotation set.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
     pub fn create(&self, request: &Annotation) -> AnnotationCreateCall<'a, C, NC, A> {
         AnnotationCreateCall {
             hub: self.hub,
@@ -3468,6 +3680,10 @@ impl<'a, C, NC, A> AnnotationMethods<'a, C, NC, A> {
     /// 
     /// 
     /// If the request has a systemic issue, such as an attempt to write to an inaccessible annotation set, the entire RPC will fail accordingly. For lesser data issues, when possible an error will be isolated to the corresponding batch entry in the response; the remaining well formed annotations will be created normally.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
     pub fn batch_create(&self, request: &BatchCreateAnnotationsRequest) -> AnnotationBatchCreateCall<'a, C, NC, A> {
         AnnotationBatchCreateCall {
             hub: self.hub,
@@ -3515,13 +3731,17 @@ pub struct ExperimentalMethods<'a, C, NC, A>
     hub: &'a Genomics<C, NC, A>,
 }
 
-impl<'a, C, NC, A> ResourceMethodsBuilder for ExperimentalMethods<'a, C, NC, A> {}
+impl<'a, C, NC, A> MethodsBuilder for ExperimentalMethods<'a, C, NC, A> {}
 
 impl<'a, C, NC, A> ExperimentalMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Creates and asynchronously runs an ad-hoc job. This is an experimental call and may be removed or changed at any time.    
+    /// Creates and asynchronously runs an ad-hoc job. This is an experimental call and may be removed or changed at any time.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
     pub fn jobs_create(&self, request: &ExperimentalCreateJobRequest) -> ExperimentalJobCreateCall<'a, C, NC, A> {
         ExperimentalJobCreateCall {
             hub: self.hub,
@@ -3569,13 +3789,18 @@ pub struct VariantsetMethods<'a, C, NC, A>
     hub: &'a Genomics<C, NC, A>,
 }
 
-impl<'a, C, NC, A> ResourceMethodsBuilder for VariantsetMethods<'a, C, NC, A> {}
+impl<'a, C, NC, A> MethodsBuilder for VariantsetMethods<'a, C, NC, A> {}
 
 impl<'a, C, NC, A> VariantsetMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Updates a variant set's metadata. All other modifications are silently ignored.    
+    /// Updates a variant set's metadata. All other modifications are silently ignored.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `variantSetId` - The ID of the variant to be updated.
     pub fn update(&self, request: &VariantSet, variant_set_id: &str) -> VariantsetUpdateCall<'a, C, NC, A> {
         VariantsetUpdateCall {
             hub: self.hub,
@@ -3589,7 +3814,12 @@ impl<'a, C, NC, A> VariantsetMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Exports variant set data to an external destination.    
+    /// Exports variant set data to an external destination.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `variantSetId` - Required. The ID of the variant set that contains variant data which should be exported. The caller must have READ access to this variant set.
     pub fn export(&self, request: &ExportVariantSetRequest, variant_set_id: &str) -> VariantsetExportCall<'a, C, NC, A> {
         VariantsetExportCall {
             hub: self.hub,
@@ -3603,7 +3833,12 @@ impl<'a, C, NC, A> VariantsetMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Updates a variant set's metadata. All other modifications are silently ignored. This method supports patch semantics.    
+    /// Updates a variant set's metadata. All other modifications are silently ignored. This method supports patch semantics.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `variantSetId` - The ID of the variant to be updated.
     pub fn patch(&self, request: &VariantSet, variant_set_id: &str) -> VariantsetPatchCall<'a, C, NC, A> {
         VariantsetPatchCall {
             hub: self.hub,
@@ -3620,6 +3855,10 @@ impl<'a, C, NC, A> VariantsetMethods<'a, C, NC, A> {
     /// Returns a list of all variant sets matching search criteria.
     /// 
     /// Implements GlobalAllianceApi.searchVariantSets.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
     pub fn search(&self, request: &SearchVariantSetsRequest) -> VariantsetSearchCall<'a, C, NC, A> {
         VariantsetSearchCall {
             hub: self.hub,
@@ -3632,7 +3871,11 @@ impl<'a, C, NC, A> VariantsetMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Gets a variant set by ID.    
+    /// Gets a variant set by ID.
+    /// 
+    /// # Arguments
+    ///
+    /// * `variantSetId` - Required. The ID of the variant set.
     pub fn get(&self, variant_set_id: &str) -> VariantsetGetCall<'a, C, NC, A> {
         VariantsetGetCall {
             hub: self.hub,
@@ -3648,6 +3891,11 @@ impl<'a, C, NC, A> VariantsetMethods<'a, C, NC, A> {
     /// Merges the given variants with existing variants. Each variant will be merged with an existing variant that matches its reference sequence, start, end, reference bases, and alternative bases. If no such variant exists, a new one will be created.
     /// 
     /// When variants are merged, the call information from the new variant is added to the existing variant, and other fields (such as key/value pairs) are discarded.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `variantSetId` - The destination variant set.
     pub fn merge_variants(&self, request: &MergeVariantsRequest, variant_set_id: &str) -> VariantsetMergeVariantCall<'a, C, NC, A> {
         VariantsetMergeVariantCall {
             hub: self.hub,
@@ -3661,7 +3909,11 @@ impl<'a, C, NC, A> VariantsetMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Deletes the contents of a variant set. The variant set object is not deleted.    
+    /// Deletes the contents of a variant set. The variant set object is not deleted.
+    /// 
+    /// # Arguments
+    ///
+    /// * `variantSetId` - The ID of the variant set to be deleted.
     pub fn delete(&self, variant_set_id: &str) -> VariantsetDeleteCall<'a, C, NC, A> {
         VariantsetDeleteCall {
             hub: self.hub,
@@ -3677,6 +3929,11 @@ impl<'a, C, NC, A> VariantsetMethods<'a, C, NC, A> {
     /// Creates variant data by asynchronously importing the provided information.
     /// 
     /// The variants for import will be merged with any existing data and each other according to the behavior of mergeVariants. In particular, this means for merged VCF variants that have conflicting INFO fields, some data will be arbitrarily discarded. As a special case, for single-sample VCF files, QUAL and FILTER fields will be moved to the call level; these are sometimes interpreted in a call-specific context. Imported VCF headers are appended to the metadata already in a variant set.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `variantSetId` - Required. The variant set to which variant data should be imported.
     pub fn import_variants(&self, request: &ImportVariantsRequest, variant_set_id: &str) -> VariantsetImportVariantCall<'a, C, NC, A> {
         VariantsetImportVariantCall {
             hub: self.hub,
@@ -3700,7 +3957,7 @@ impl<'a, C, NC, A> VariantsetMethods<'a, C, NC, A> {
 /// Creates a new dataset.
 ///
 /// A builder for the *create* method supported by a *dataset* resource.
-/// It is not used directly, but through a `DatasetMethods`.
+/// It is not used directly, but through a `DatasetMethods` instance.
 ///
 /// # Example
 ///
@@ -3763,7 +4020,7 @@ impl<'a, C, NC, A> DatasetCreateCall<'a, C, NC, A> where NC: hyper::net::Network
         for &field in ["alt"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -3796,7 +4053,7 @@ impl<'a, C, NC, A> DatasetCreateCall<'a, C, NC, A> where NC: hyper::net::Network
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -3812,7 +4069,6 @@ impl<'a, C, NC, A> DatasetCreateCall<'a, C, NC, A> where NC: hyper::net::Network
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -3822,7 +4078,7 @@ impl<'a, C, NC, A> DatasetCreateCall<'a, C, NC, A> where NC: hyper::net::Network
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -3833,7 +4089,7 @@ impl<'a, C, NC, A> DatasetCreateCall<'a, C, NC, A> where NC: hyper::net::Network
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -3842,13 +4098,13 @@ impl<'a, C, NC, A> DatasetCreateCall<'a, C, NC, A> where NC: hyper::net::Network
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -3920,7 +4176,7 @@ impl<'a, C, NC, A> DatasetCreateCall<'a, C, NC, A> where NC: hyper::net::Network
 /// Updates a dataset.
 ///
 /// A builder for the *update* method supported by a *dataset* resource.
-/// It is not used directly, but through a `DatasetMethods`.
+/// It is not used directly, but through a `DatasetMethods` instance.
 ///
 /// # Example
 ///
@@ -3985,7 +4241,7 @@ impl<'a, C, NC, A> DatasetUpdateCall<'a, C, NC, A> where NC: hyper::net::Network
         for &field in ["alt", "datasetId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -4042,7 +4298,7 @@ impl<'a, C, NC, A> DatasetUpdateCall<'a, C, NC, A> where NC: hyper::net::Network
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -4058,7 +4314,6 @@ impl<'a, C, NC, A> DatasetUpdateCall<'a, C, NC, A> where NC: hyper::net::Network
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -4068,7 +4323,7 @@ impl<'a, C, NC, A> DatasetUpdateCall<'a, C, NC, A> where NC: hyper::net::Network
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -4079,7 +4334,7 @@ impl<'a, C, NC, A> DatasetUpdateCall<'a, C, NC, A> where NC: hyper::net::Network
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -4088,13 +4343,13 @@ impl<'a, C, NC, A> DatasetUpdateCall<'a, C, NC, A> where NC: hyper::net::Network
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -4115,7 +4370,7 @@ impl<'a, C, NC, A> DatasetUpdateCall<'a, C, NC, A> where NC: hyper::net::Network
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The ID of the dataset to be updated.    
+    /// The ID of the dataset to be updated.
     pub fn dataset_id(mut self, new_value: &str) -> DatasetUpdateCall<'a, C, NC, A> {
         self._dataset_id = new_value.to_string();
         self
@@ -4176,7 +4431,7 @@ impl<'a, C, NC, A> DatasetUpdateCall<'a, C, NC, A> where NC: hyper::net::Network
 /// Deletes a dataset.
 ///
 /// A builder for the *delete* method supported by a *dataset* resource.
-/// It is not used directly, but through a `DatasetMethods`.
+/// It is not used directly, but through a `DatasetMethods` instance.
 ///
 /// # Example
 ///
@@ -4234,7 +4489,7 @@ impl<'a, C, NC, A> DatasetDeleteCall<'a, C, NC, A> where NC: hyper::net::Network
         for &field in ["datasetId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -4286,7 +4541,7 @@ impl<'a, C, NC, A> DatasetDeleteCall<'a, C, NC, A> where NC: hyper::net::Network
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -4298,7 +4553,6 @@ impl<'a, C, NC, A> DatasetDeleteCall<'a, C, NC, A> where NC: hyper::net::Network
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -4308,7 +4562,7 @@ impl<'a, C, NC, A> DatasetDeleteCall<'a, C, NC, A> where NC: hyper::net::Network
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -4319,12 +4573,12 @@ impl<'a, C, NC, A> DatasetDeleteCall<'a, C, NC, A> where NC: hyper::net::Network
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = res;
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -4336,7 +4590,7 @@ impl<'a, C, NC, A> DatasetDeleteCall<'a, C, NC, A> where NC: hyper::net::Network
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The ID of the dataset to be deleted.    
+    /// The ID of the dataset to be deleted.
     pub fn dataset_id(mut self, new_value: &str) -> DatasetDeleteCall<'a, C, NC, A> {
         self._dataset_id = new_value.to_string();
         self
@@ -4397,7 +4651,7 @@ impl<'a, C, NC, A> DatasetDeleteCall<'a, C, NC, A> where NC: hyper::net::Network
 /// Undeletes a dataset by restoring a dataset which was deleted via this API. This operation is only possible for a week after the deletion occurred.
 ///
 /// A builder for the *undelete* method supported by a *dataset* resource.
-/// It is not used directly, but through a `DatasetMethods`.
+/// It is not used directly, but through a `DatasetMethods` instance.
 ///
 /// # Example
 ///
@@ -4455,7 +4709,7 @@ impl<'a, C, NC, A> DatasetUndeleteCall<'a, C, NC, A> where NC: hyper::net::Netwo
         for &field in ["alt", "datasetId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -4508,7 +4762,7 @@ impl<'a, C, NC, A> DatasetUndeleteCall<'a, C, NC, A> where NC: hyper::net::Netwo
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -4520,7 +4774,6 @@ impl<'a, C, NC, A> DatasetUndeleteCall<'a, C, NC, A> where NC: hyper::net::Netwo
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -4530,7 +4783,7 @@ impl<'a, C, NC, A> DatasetUndeleteCall<'a, C, NC, A> where NC: hyper::net::Netwo
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -4541,7 +4794,7 @@ impl<'a, C, NC, A> DatasetUndeleteCall<'a, C, NC, A> where NC: hyper::net::Netwo
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -4550,13 +4803,13 @@ impl<'a, C, NC, A> DatasetUndeleteCall<'a, C, NC, A> where NC: hyper::net::Netwo
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -4568,7 +4821,7 @@ impl<'a, C, NC, A> DatasetUndeleteCall<'a, C, NC, A> where NC: hyper::net::Netwo
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The ID of the dataset to be undeleted.    
+    /// The ID of the dataset to be undeleted.
     pub fn dataset_id(mut self, new_value: &str) -> DatasetUndeleteCall<'a, C, NC, A> {
         self._dataset_id = new_value.to_string();
         self
@@ -4629,7 +4882,7 @@ impl<'a, C, NC, A> DatasetUndeleteCall<'a, C, NC, A> where NC: hyper::net::Netwo
 /// Gets a dataset by ID.
 ///
 /// A builder for the *get* method supported by a *dataset* resource.
-/// It is not used directly, but through a `DatasetMethods`.
+/// It is not used directly, but through a `DatasetMethods` instance.
 ///
 /// # Example
 ///
@@ -4687,7 +4940,7 @@ impl<'a, C, NC, A> DatasetGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
         for &field in ["alt", "datasetId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -4740,7 +4993,7 @@ impl<'a, C, NC, A> DatasetGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -4752,7 +5005,6 @@ impl<'a, C, NC, A> DatasetGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -4762,7 +5014,7 @@ impl<'a, C, NC, A> DatasetGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -4773,7 +5025,7 @@ impl<'a, C, NC, A> DatasetGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -4782,13 +5034,13 @@ impl<'a, C, NC, A> DatasetGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -4800,7 +5052,7 @@ impl<'a, C, NC, A> DatasetGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The ID of the dataset.    
+    /// The ID of the dataset.
     pub fn dataset_id(mut self, new_value: &str) -> DatasetGetCall<'a, C, NC, A> {
         self._dataset_id = new_value.to_string();
         self
@@ -4861,7 +5113,7 @@ impl<'a, C, NC, A> DatasetGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
 /// Updates a dataset. This method supports patch semantics.
 ///
 /// A builder for the *patch* method supported by a *dataset* resource.
-/// It is not used directly, but through a `DatasetMethods`.
+/// It is not used directly, but through a `DatasetMethods` instance.
 ///
 /// # Example
 ///
@@ -4926,7 +5178,7 @@ impl<'a, C, NC, A> DatasetPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkC
         for &field in ["alt", "datasetId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -4983,7 +5235,7 @@ impl<'a, C, NC, A> DatasetPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkC
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -4999,7 +5251,6 @@ impl<'a, C, NC, A> DatasetPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkC
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -5009,7 +5260,7 @@ impl<'a, C, NC, A> DatasetPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkC
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -5020,7 +5271,7 @@ impl<'a, C, NC, A> DatasetPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkC
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -5029,13 +5280,13 @@ impl<'a, C, NC, A> DatasetPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkC
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -5056,7 +5307,7 @@ impl<'a, C, NC, A> DatasetPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The ID of the dataset to be updated.    
+    /// The ID of the dataset to be updated.
     pub fn dataset_id(mut self, new_value: &str) -> DatasetPatchCall<'a, C, NC, A> {
         self._dataset_id = new_value.to_string();
         self
@@ -5117,7 +5368,7 @@ impl<'a, C, NC, A> DatasetPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkC
 /// Lists datasets within a project.
 ///
 /// A builder for the *list* method supported by a *dataset* resource.
-/// It is not used directly, but through a `DatasetMethods`.
+/// It is not used directly, but through a `DatasetMethods` instance.
 ///
 /// # Example
 ///
@@ -5188,7 +5439,7 @@ impl<'a, C, NC, A> DatasetListCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
         for &field in ["alt", "projectNumber", "pageToken", "pageSize"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -5217,7 +5468,7 @@ impl<'a, C, NC, A> DatasetListCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -5229,7 +5480,6 @@ impl<'a, C, NC, A> DatasetListCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -5239,7 +5489,7 @@ impl<'a, C, NC, A> DatasetListCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -5250,7 +5500,7 @@ impl<'a, C, NC, A> DatasetListCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -5259,13 +5509,13 @@ impl<'a, C, NC, A> DatasetListCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -5275,7 +5525,7 @@ impl<'a, C, NC, A> DatasetListCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// Sets the *project number* query property to the given value.
     ///
     /// 
-    /// The project to list datasets for.    
+    /// The project to list datasets for.
     pub fn project_number(mut self, new_value: &str) -> DatasetListCall<'a, C, NC, A> {
         self._project_number = Some(new_value.to_string());
         self
@@ -5283,7 +5533,7 @@ impl<'a, C, NC, A> DatasetListCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// Sets the *page token* query property to the given value.
     ///
     /// 
-    /// The continuation token, which is used to page through large result sets. To get the next page of results, set this parameter to the value of nextPageToken from the previous response.    
+    /// The continuation token, which is used to page through large result sets. To get the next page of results, set this parameter to the value of nextPageToken from the previous response.
     pub fn page_token(mut self, new_value: &str) -> DatasetListCall<'a, C, NC, A> {
         self._page_token = Some(new_value.to_string());
         self
@@ -5291,7 +5541,7 @@ impl<'a, C, NC, A> DatasetListCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// Sets the *page size* query property to the given value.
     ///
     /// 
-    /// The maximum number of results returned by this request. If unspecified, defaults to 50.    
+    /// The maximum number of results returned by this request. If unspecified, defaults to 50.
     pub fn page_size(mut self, new_value: i32) -> DatasetListCall<'a, C, NC, A> {
         self._page_size = Some(new_value);
         self
@@ -5352,7 +5602,7 @@ impl<'a, C, NC, A> DatasetListCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
 /// Cancels a job by ID. Note that it is possible for partial results to be generated and stored for cancelled jobs.
 ///
 /// A builder for the *cancel* method supported by a *job* resource.
-/// It is not used directly, but through a `JobMethods`.
+/// It is not used directly, but through a `JobMethods` instance.
 ///
 /// # Example
 ///
@@ -5410,7 +5660,7 @@ impl<'a, C, NC, A> JobCancelCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
         for &field in ["jobId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -5462,7 +5712,7 @@ impl<'a, C, NC, A> JobCancelCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -5474,7 +5724,6 @@ impl<'a, C, NC, A> JobCancelCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -5484,7 +5733,7 @@ impl<'a, C, NC, A> JobCancelCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -5495,12 +5744,12 @@ impl<'a, C, NC, A> JobCancelCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = res;
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -5512,7 +5761,7 @@ impl<'a, C, NC, A> JobCancelCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Required. The ID of the job.    
+    /// Required. The ID of the job.
     pub fn job_id(mut self, new_value: &str) -> JobCancelCall<'a, C, NC, A> {
         self._job_id = new_value.to_string();
         self
@@ -5573,7 +5822,7 @@ impl<'a, C, NC, A> JobCancelCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
 /// Gets a job by ID.
 ///
 /// A builder for the *get* method supported by a *job* resource.
-/// It is not used directly, but through a `JobMethods`.
+/// It is not used directly, but through a `JobMethods` instance.
 ///
 /// # Example
 ///
@@ -5631,7 +5880,7 @@ impl<'a, C, NC, A> JobGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnect
         for &field in ["alt", "jobId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -5684,7 +5933,7 @@ impl<'a, C, NC, A> JobGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnect
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -5696,7 +5945,6 @@ impl<'a, C, NC, A> JobGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnect
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -5706,7 +5954,7 @@ impl<'a, C, NC, A> JobGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnect
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -5717,7 +5965,7 @@ impl<'a, C, NC, A> JobGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnect
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -5726,13 +5974,13 @@ impl<'a, C, NC, A> JobGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnect
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -5744,7 +5992,7 @@ impl<'a, C, NC, A> JobGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnect
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Required. The ID of the job.    
+    /// Required. The ID of the job.
     pub fn job_id(mut self, new_value: &str) -> JobGetCall<'a, C, NC, A> {
         self._job_id = new_value.to_string();
         self
@@ -5805,7 +6053,7 @@ impl<'a, C, NC, A> JobGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnect
 /// Gets a list of jobs matching the criteria.
 ///
 /// A builder for the *search* method supported by a *job* resource.
-/// It is not used directly, but through a `JobMethods`.
+/// It is not used directly, but through a `JobMethods` instance.
 ///
 /// # Example
 ///
@@ -5868,7 +6116,7 @@ impl<'a, C, NC, A> JobSearchCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
         for &field in ["alt"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -5901,7 +6149,7 @@ impl<'a, C, NC, A> JobSearchCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -5917,7 +6165,6 @@ impl<'a, C, NC, A> JobSearchCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -5927,7 +6174,7 @@ impl<'a, C, NC, A> JobSearchCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -5938,7 +6185,7 @@ impl<'a, C, NC, A> JobSearchCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -5947,13 +6194,13 @@ impl<'a, C, NC, A> JobSearchCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -6027,7 +6274,7 @@ impl<'a, C, NC, A> JobSearchCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
 /// Implements GlobalAllianceApi.searchReferenceSets.
 ///
 /// A builder for the *search* method supported by a *referenceset* resource.
-/// It is not used directly, but through a `ReferencesetMethods`.
+/// It is not used directly, but through a `ReferencesetMethods` instance.
 ///
 /// # Example
 ///
@@ -6090,7 +6337,7 @@ impl<'a, C, NC, A> ReferencesetSearchCall<'a, C, NC, A> where NC: hyper::net::Ne
         for &field in ["alt"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -6123,7 +6370,7 @@ impl<'a, C, NC, A> ReferencesetSearchCall<'a, C, NC, A> where NC: hyper::net::Ne
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -6139,7 +6386,6 @@ impl<'a, C, NC, A> ReferencesetSearchCall<'a, C, NC, A> where NC: hyper::net::Ne
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -6149,7 +6395,7 @@ impl<'a, C, NC, A> ReferencesetSearchCall<'a, C, NC, A> where NC: hyper::net::Ne
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -6160,7 +6406,7 @@ impl<'a, C, NC, A> ReferencesetSearchCall<'a, C, NC, A> where NC: hyper::net::Ne
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -6169,13 +6415,13 @@ impl<'a, C, NC, A> ReferencesetSearchCall<'a, C, NC, A> where NC: hyper::net::Ne
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -6249,7 +6495,7 @@ impl<'a, C, NC, A> ReferencesetSearchCall<'a, C, NC, A> where NC: hyper::net::Ne
 /// Implements GlobalAllianceApi.getReferenceSet.
 ///
 /// A builder for the *get* method supported by a *referenceset* resource.
-/// It is not used directly, but through a `ReferencesetMethods`.
+/// It is not used directly, but through a `ReferencesetMethods` instance.
 ///
 /// # Example
 ///
@@ -6307,7 +6553,7 @@ impl<'a, C, NC, A> ReferencesetGetCall<'a, C, NC, A> where NC: hyper::net::Netwo
         for &field in ["alt", "referenceSetId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -6360,7 +6606,7 @@ impl<'a, C, NC, A> ReferencesetGetCall<'a, C, NC, A> where NC: hyper::net::Netwo
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -6372,7 +6618,6 @@ impl<'a, C, NC, A> ReferencesetGetCall<'a, C, NC, A> where NC: hyper::net::Netwo
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -6382,7 +6627,7 @@ impl<'a, C, NC, A> ReferencesetGetCall<'a, C, NC, A> where NC: hyper::net::Netwo
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -6393,7 +6638,7 @@ impl<'a, C, NC, A> ReferencesetGetCall<'a, C, NC, A> where NC: hyper::net::Netwo
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -6402,13 +6647,13 @@ impl<'a, C, NC, A> ReferencesetGetCall<'a, C, NC, A> where NC: hyper::net::Netwo
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -6420,7 +6665,7 @@ impl<'a, C, NC, A> ReferencesetGetCall<'a, C, NC, A> where NC: hyper::net::Netwo
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The ID of the reference set.    
+    /// The ID of the reference set.
     pub fn reference_set_id(mut self, new_value: &str) -> ReferencesetGetCall<'a, C, NC, A> {
         self._reference_set_id = new_value.to_string();
         self
@@ -6481,7 +6726,7 @@ impl<'a, C, NC, A> ReferencesetGetCall<'a, C, NC, A> where NC: hyper::net::Netwo
 /// Deletes a call set.
 ///
 /// A builder for the *delete* method supported by a *callset* resource.
-/// It is not used directly, but through a `CallsetMethods`.
+/// It is not used directly, but through a `CallsetMethods` instance.
 ///
 /// # Example
 ///
@@ -6539,7 +6784,7 @@ impl<'a, C, NC, A> CallsetDeleteCall<'a, C, NC, A> where NC: hyper::net::Network
         for &field in ["callSetId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -6591,7 +6836,7 @@ impl<'a, C, NC, A> CallsetDeleteCall<'a, C, NC, A> where NC: hyper::net::Network
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -6603,7 +6848,6 @@ impl<'a, C, NC, A> CallsetDeleteCall<'a, C, NC, A> where NC: hyper::net::Network
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -6613,7 +6857,7 @@ impl<'a, C, NC, A> CallsetDeleteCall<'a, C, NC, A> where NC: hyper::net::Network
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -6624,12 +6868,12 @@ impl<'a, C, NC, A> CallsetDeleteCall<'a, C, NC, A> where NC: hyper::net::Network
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = res;
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -6641,7 +6885,7 @@ impl<'a, C, NC, A> CallsetDeleteCall<'a, C, NC, A> where NC: hyper::net::Network
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The ID of the call set to be deleted.    
+    /// The ID of the call set to be deleted.
     pub fn call_set_id(mut self, new_value: &str) -> CallsetDeleteCall<'a, C, NC, A> {
         self._call_set_id = new_value.to_string();
         self
@@ -6704,7 +6948,7 @@ impl<'a, C, NC, A> CallsetDeleteCall<'a, C, NC, A> where NC: hyper::net::Network
 /// Implements GlobalAllianceApi.searchCallSets.
 ///
 /// A builder for the *search* method supported by a *callset* resource.
-/// It is not used directly, but through a `CallsetMethods`.
+/// It is not used directly, but through a `CallsetMethods` instance.
 ///
 /// # Example
 ///
@@ -6767,7 +7011,7 @@ impl<'a, C, NC, A> CallsetSearchCall<'a, C, NC, A> where NC: hyper::net::Network
         for &field in ["alt"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -6800,7 +7044,7 @@ impl<'a, C, NC, A> CallsetSearchCall<'a, C, NC, A> where NC: hyper::net::Network
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -6816,7 +7060,6 @@ impl<'a, C, NC, A> CallsetSearchCall<'a, C, NC, A> where NC: hyper::net::Network
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -6826,7 +7069,7 @@ impl<'a, C, NC, A> CallsetSearchCall<'a, C, NC, A> where NC: hyper::net::Network
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -6837,7 +7080,7 @@ impl<'a, C, NC, A> CallsetSearchCall<'a, C, NC, A> where NC: hyper::net::Network
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -6846,13 +7089,13 @@ impl<'a, C, NC, A> CallsetSearchCall<'a, C, NC, A> where NC: hyper::net::Network
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -6924,7 +7167,7 @@ impl<'a, C, NC, A> CallsetSearchCall<'a, C, NC, A> where NC: hyper::net::Network
 /// Updates a call set. This method supports patch semantics.
 ///
 /// A builder for the *patch* method supported by a *callset* resource.
-/// It is not used directly, but through a `CallsetMethods`.
+/// It is not used directly, but through a `CallsetMethods` instance.
 ///
 /// # Example
 ///
@@ -6989,7 +7232,7 @@ impl<'a, C, NC, A> CallsetPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkC
         for &field in ["alt", "callSetId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -7046,7 +7289,7 @@ impl<'a, C, NC, A> CallsetPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkC
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -7062,7 +7305,6 @@ impl<'a, C, NC, A> CallsetPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkC
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -7072,7 +7314,7 @@ impl<'a, C, NC, A> CallsetPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkC
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -7083,7 +7325,7 @@ impl<'a, C, NC, A> CallsetPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkC
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -7092,13 +7334,13 @@ impl<'a, C, NC, A> CallsetPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkC
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -7119,7 +7361,7 @@ impl<'a, C, NC, A> CallsetPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The ID of the call set to be updated.    
+    /// The ID of the call set to be updated.
     pub fn call_set_id(mut self, new_value: &str) -> CallsetPatchCall<'a, C, NC, A> {
         self._call_set_id = new_value.to_string();
         self
@@ -7180,7 +7422,7 @@ impl<'a, C, NC, A> CallsetPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkC
 /// Creates a new call set.
 ///
 /// A builder for the *create* method supported by a *callset* resource.
-/// It is not used directly, but through a `CallsetMethods`.
+/// It is not used directly, but through a `CallsetMethods` instance.
 ///
 /// # Example
 ///
@@ -7243,7 +7485,7 @@ impl<'a, C, NC, A> CallsetCreateCall<'a, C, NC, A> where NC: hyper::net::Network
         for &field in ["alt"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -7276,7 +7518,7 @@ impl<'a, C, NC, A> CallsetCreateCall<'a, C, NC, A> where NC: hyper::net::Network
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -7292,7 +7534,6 @@ impl<'a, C, NC, A> CallsetCreateCall<'a, C, NC, A> where NC: hyper::net::Network
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -7302,7 +7543,7 @@ impl<'a, C, NC, A> CallsetCreateCall<'a, C, NC, A> where NC: hyper::net::Network
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -7313,7 +7554,7 @@ impl<'a, C, NC, A> CallsetCreateCall<'a, C, NC, A> where NC: hyper::net::Network
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -7322,13 +7563,13 @@ impl<'a, C, NC, A> CallsetCreateCall<'a, C, NC, A> where NC: hyper::net::Network
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -7400,7 +7641,7 @@ impl<'a, C, NC, A> CallsetCreateCall<'a, C, NC, A> where NC: hyper::net::Network
 /// Gets a call set by ID.
 ///
 /// A builder for the *get* method supported by a *callset* resource.
-/// It is not used directly, but through a `CallsetMethods`.
+/// It is not used directly, but through a `CallsetMethods` instance.
 ///
 /// # Example
 ///
@@ -7458,7 +7699,7 @@ impl<'a, C, NC, A> CallsetGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
         for &field in ["alt", "callSetId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -7511,7 +7752,7 @@ impl<'a, C, NC, A> CallsetGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -7523,7 +7764,6 @@ impl<'a, C, NC, A> CallsetGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -7533,7 +7773,7 @@ impl<'a, C, NC, A> CallsetGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -7544,7 +7784,7 @@ impl<'a, C, NC, A> CallsetGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -7553,13 +7793,13 @@ impl<'a, C, NC, A> CallsetGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -7571,7 +7811,7 @@ impl<'a, C, NC, A> CallsetGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The ID of the call set.    
+    /// The ID of the call set.
     pub fn call_set_id(mut self, new_value: &str) -> CallsetGetCall<'a, C, NC, A> {
         self._call_set_id = new_value.to_string();
         self
@@ -7632,7 +7872,7 @@ impl<'a, C, NC, A> CallsetGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
 /// Updates a call set.
 ///
 /// A builder for the *update* method supported by a *callset* resource.
-/// It is not used directly, but through a `CallsetMethods`.
+/// It is not used directly, but through a `CallsetMethods` instance.
 ///
 /// # Example
 ///
@@ -7697,7 +7937,7 @@ impl<'a, C, NC, A> CallsetUpdateCall<'a, C, NC, A> where NC: hyper::net::Network
         for &field in ["alt", "callSetId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -7754,7 +7994,7 @@ impl<'a, C, NC, A> CallsetUpdateCall<'a, C, NC, A> where NC: hyper::net::Network
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -7770,7 +8010,6 @@ impl<'a, C, NC, A> CallsetUpdateCall<'a, C, NC, A> where NC: hyper::net::Network
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -7780,7 +8019,7 @@ impl<'a, C, NC, A> CallsetUpdateCall<'a, C, NC, A> where NC: hyper::net::Network
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -7791,7 +8030,7 @@ impl<'a, C, NC, A> CallsetUpdateCall<'a, C, NC, A> where NC: hyper::net::Network
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -7800,13 +8039,13 @@ impl<'a, C, NC, A> CallsetUpdateCall<'a, C, NC, A> where NC: hyper::net::Network
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -7827,7 +8066,7 @@ impl<'a, C, NC, A> CallsetUpdateCall<'a, C, NC, A> where NC: hyper::net::Network
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The ID of the call set to be updated.    
+    /// The ID of the call set to be updated.
     pub fn call_set_id(mut self, new_value: &str) -> CallsetUpdateCall<'a, C, NC, A> {
         self._call_set_id = new_value.to_string();
         self
@@ -7894,7 +8133,7 @@ impl<'a, C, NC, A> CallsetUpdateCall<'a, C, NC, A> where NC: hyper::net::Network
 /// Implements GlobalAllianceApi.searchReads.
 ///
 /// A builder for the *search* method supported by a *read* resource.
-/// It is not used directly, but through a `ReadMethods`.
+/// It is not used directly, but through a `ReadMethods` instance.
 ///
 /// # Example
 ///
@@ -7957,7 +8196,7 @@ impl<'a, C, NC, A> ReadSearchCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
         for &field in ["alt"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -7990,7 +8229,7 @@ impl<'a, C, NC, A> ReadSearchCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -8006,7 +8245,6 @@ impl<'a, C, NC, A> ReadSearchCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -8016,7 +8254,7 @@ impl<'a, C, NC, A> ReadSearchCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -8027,7 +8265,7 @@ impl<'a, C, NC, A> ReadSearchCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -8036,13 +8274,13 @@ impl<'a, C, NC, A> ReadSearchCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -8114,7 +8352,7 @@ impl<'a, C, NC, A> ReadSearchCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
 /// Updates a read group set.
 ///
 /// A builder for the *update* method supported by a *readgroupset* resource.
-/// It is not used directly, but through a `ReadgroupsetMethods`.
+/// It is not used directly, but through a `ReadgroupsetMethods` instance.
 ///
 /// # Example
 ///
@@ -8179,7 +8417,7 @@ impl<'a, C, NC, A> ReadgroupsetUpdateCall<'a, C, NC, A> where NC: hyper::net::Ne
         for &field in ["alt", "readGroupSetId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -8236,7 +8474,7 @@ impl<'a, C, NC, A> ReadgroupsetUpdateCall<'a, C, NC, A> where NC: hyper::net::Ne
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -8252,7 +8490,6 @@ impl<'a, C, NC, A> ReadgroupsetUpdateCall<'a, C, NC, A> where NC: hyper::net::Ne
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -8262,7 +8499,7 @@ impl<'a, C, NC, A> ReadgroupsetUpdateCall<'a, C, NC, A> where NC: hyper::net::Ne
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -8273,7 +8510,7 @@ impl<'a, C, NC, A> ReadgroupsetUpdateCall<'a, C, NC, A> where NC: hyper::net::Ne
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -8282,13 +8519,13 @@ impl<'a, C, NC, A> ReadgroupsetUpdateCall<'a, C, NC, A> where NC: hyper::net::Ne
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -8309,7 +8546,7 @@ impl<'a, C, NC, A> ReadgroupsetUpdateCall<'a, C, NC, A> where NC: hyper::net::Ne
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The ID of the read group set to be updated. The caller must have WRITE permissions to the dataset associated with this read group set.    
+    /// The ID of the read group set to be updated. The caller must have WRITE permissions to the dataset associated with this read group set.
     pub fn read_group_set_id(mut self, new_value: &str) -> ReadgroupsetUpdateCall<'a, C, NC, A> {
         self._read_group_set_id = new_value.to_string();
         self
@@ -8372,7 +8609,7 @@ impl<'a, C, NC, A> ReadgroupsetUpdateCall<'a, C, NC, A> where NC: hyper::net::Ne
 /// Note that currently there may be some differences between exported BAM files and the original BAM file at the time of import. In particular, comments in the input file header will not be preserved, some custom tags will be converted to strings, and original reference sequence order is not necessarily preserved.
 ///
 /// A builder for the *export* method supported by a *readgroupset* resource.
-/// It is not used directly, but through a `ReadgroupsetMethods`.
+/// It is not used directly, but through a `ReadgroupsetMethods` instance.
 ///
 /// # Example
 ///
@@ -8435,7 +8672,7 @@ impl<'a, C, NC, A> ReadgroupsetExportCall<'a, C, NC, A> where NC: hyper::net::Ne
         for &field in ["alt"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -8468,7 +8705,7 @@ impl<'a, C, NC, A> ReadgroupsetExportCall<'a, C, NC, A> where NC: hyper::net::Ne
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -8484,7 +8721,6 @@ impl<'a, C, NC, A> ReadgroupsetExportCall<'a, C, NC, A> where NC: hyper::net::Ne
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -8494,7 +8730,7 @@ impl<'a, C, NC, A> ReadgroupsetExportCall<'a, C, NC, A> where NC: hyper::net::Ne
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -8505,7 +8741,7 @@ impl<'a, C, NC, A> ReadgroupsetExportCall<'a, C, NC, A> where NC: hyper::net::Ne
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -8514,13 +8750,13 @@ impl<'a, C, NC, A> ReadgroupsetExportCall<'a, C, NC, A> where NC: hyper::net::Ne
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -8594,7 +8830,7 @@ impl<'a, C, NC, A> ReadgroupsetExportCall<'a, C, NC, A> where NC: hyper::net::Ne
 /// Note that currently comments in the input file header are not imported and some custom tags will be converted to strings, rather than preserving tag types. The caller must have WRITE permissions to the dataset.
 ///
 /// A builder for the *import* method supported by a *readgroupset* resource.
-/// It is not used directly, but through a `ReadgroupsetMethods`.
+/// It is not used directly, but through a `ReadgroupsetMethods` instance.
 ///
 /// # Example
 ///
@@ -8657,7 +8893,7 @@ impl<'a, C, NC, A> ReadgroupsetImportCall<'a, C, NC, A> where NC: hyper::net::Ne
         for &field in ["alt"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -8690,7 +8926,7 @@ impl<'a, C, NC, A> ReadgroupsetImportCall<'a, C, NC, A> where NC: hyper::net::Ne
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -8706,7 +8942,6 @@ impl<'a, C, NC, A> ReadgroupsetImportCall<'a, C, NC, A> where NC: hyper::net::Ne
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -8716,7 +8951,7 @@ impl<'a, C, NC, A> ReadgroupsetImportCall<'a, C, NC, A> where NC: hyper::net::Ne
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -8727,7 +8962,7 @@ impl<'a, C, NC, A> ReadgroupsetImportCall<'a, C, NC, A> where NC: hyper::net::Ne
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -8736,13 +8971,13 @@ impl<'a, C, NC, A> ReadgroupsetImportCall<'a, C, NC, A> where NC: hyper::net::Ne
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -8814,7 +9049,7 @@ impl<'a, C, NC, A> ReadgroupsetImportCall<'a, C, NC, A> where NC: hyper::net::Ne
 /// Updates a read group set. This method supports patch semantics.
 ///
 /// A builder for the *patch* method supported by a *readgroupset* resource.
-/// It is not used directly, but through a `ReadgroupsetMethods`.
+/// It is not used directly, but through a `ReadgroupsetMethods` instance.
 ///
 /// # Example
 ///
@@ -8879,7 +9114,7 @@ impl<'a, C, NC, A> ReadgroupsetPatchCall<'a, C, NC, A> where NC: hyper::net::Net
         for &field in ["alt", "readGroupSetId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -8936,7 +9171,7 @@ impl<'a, C, NC, A> ReadgroupsetPatchCall<'a, C, NC, A> where NC: hyper::net::Net
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -8952,7 +9187,6 @@ impl<'a, C, NC, A> ReadgroupsetPatchCall<'a, C, NC, A> where NC: hyper::net::Net
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -8962,7 +9196,7 @@ impl<'a, C, NC, A> ReadgroupsetPatchCall<'a, C, NC, A> where NC: hyper::net::Net
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -8973,7 +9207,7 @@ impl<'a, C, NC, A> ReadgroupsetPatchCall<'a, C, NC, A> where NC: hyper::net::Net
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -8982,13 +9216,13 @@ impl<'a, C, NC, A> ReadgroupsetPatchCall<'a, C, NC, A> where NC: hyper::net::Net
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -9009,7 +9243,7 @@ impl<'a, C, NC, A> ReadgroupsetPatchCall<'a, C, NC, A> where NC: hyper::net::Net
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The ID of the read group set to be updated. The caller must have WRITE permissions to the dataset associated with this read group set.    
+    /// The ID of the read group set to be updated. The caller must have WRITE permissions to the dataset associated with this read group set.
     pub fn read_group_set_id(mut self, new_value: &str) -> ReadgroupsetPatchCall<'a, C, NC, A> {
         self._read_group_set_id = new_value.to_string();
         self
@@ -9070,7 +9304,7 @@ impl<'a, C, NC, A> ReadgroupsetPatchCall<'a, C, NC, A> where NC: hyper::net::Net
 /// Calls variants on read data from existing read group sets or files from Google Cloud Storage. See the  alignment and variant calling documentation for more details.
 ///
 /// A builder for the *call* method supported by a *readgroupset* resource.
-/// It is not used directly, but through a `ReadgroupsetMethods`.
+/// It is not used directly, but through a `ReadgroupsetMethods` instance.
 ///
 /// # Example
 ///
@@ -9133,7 +9367,7 @@ impl<'a, C, NC, A> ReadgroupsetCallCall<'a, C, NC, A> where NC: hyper::net::Netw
         for &field in ["alt"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -9166,7 +9400,7 @@ impl<'a, C, NC, A> ReadgroupsetCallCall<'a, C, NC, A> where NC: hyper::net::Netw
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -9182,7 +9416,6 @@ impl<'a, C, NC, A> ReadgroupsetCallCall<'a, C, NC, A> where NC: hyper::net::Netw
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -9192,7 +9425,7 @@ impl<'a, C, NC, A> ReadgroupsetCallCall<'a, C, NC, A> where NC: hyper::net::Netw
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -9203,7 +9436,7 @@ impl<'a, C, NC, A> ReadgroupsetCallCall<'a, C, NC, A> where NC: hyper::net::Netw
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -9212,13 +9445,13 @@ impl<'a, C, NC, A> ReadgroupsetCallCall<'a, C, NC, A> where NC: hyper::net::Netw
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -9290,7 +9523,7 @@ impl<'a, C, NC, A> ReadgroupsetCallCall<'a, C, NC, A> where NC: hyper::net::Netw
 /// Aligns read data from existing read group sets or files from Google Cloud Storage. See the  alignment and variant calling documentation for more details.
 ///
 /// A builder for the *align* method supported by a *readgroupset* resource.
-/// It is not used directly, but through a `ReadgroupsetMethods`.
+/// It is not used directly, but through a `ReadgroupsetMethods` instance.
 ///
 /// # Example
 ///
@@ -9353,7 +9586,7 @@ impl<'a, C, NC, A> ReadgroupsetAlignCall<'a, C, NC, A> where NC: hyper::net::Net
         for &field in ["alt"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -9386,7 +9619,7 @@ impl<'a, C, NC, A> ReadgroupsetAlignCall<'a, C, NC, A> where NC: hyper::net::Net
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -9402,7 +9635,6 @@ impl<'a, C, NC, A> ReadgroupsetAlignCall<'a, C, NC, A> where NC: hyper::net::Net
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -9412,7 +9644,7 @@ impl<'a, C, NC, A> ReadgroupsetAlignCall<'a, C, NC, A> where NC: hyper::net::Net
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -9423,7 +9655,7 @@ impl<'a, C, NC, A> ReadgroupsetAlignCall<'a, C, NC, A> where NC: hyper::net::Net
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -9432,13 +9664,13 @@ impl<'a, C, NC, A> ReadgroupsetAlignCall<'a, C, NC, A> where NC: hyper::net::Net
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -9512,7 +9744,7 @@ impl<'a, C, NC, A> ReadgroupsetAlignCall<'a, C, NC, A> where NC: hyper::net::Net
 /// Coverage is defined as the number of reads which are aligned to a given base in the reference sequence. Coverage buckets are available at several precomputed bucket widths, enabling retrieval of various coverage 'zoom levels'. The caller must have READ permissions for the target read group set.
 ///
 /// A builder for the *coveragebuckets.list* method supported by a *readgroupset* resource.
-/// It is not used directly, but through a `ReadgroupsetMethods`.
+/// It is not used directly, but through a `ReadgroupsetMethods` instance.
 ///
 /// # Example
 ///
@@ -9600,7 +9832,7 @@ impl<'a, C, NC, A> ReadgroupsetCoveragebucketListCall<'a, C, NC, A> where NC: hy
         for &field in ["alt", "readGroupSetId", "targetBucketWidth", "range.start", "range.referenceName", "range.end", "pageToken", "pageSize"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -9653,7 +9885,7 @@ impl<'a, C, NC, A> ReadgroupsetCoveragebucketListCall<'a, C, NC, A> where NC: hy
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -9665,7 +9897,6 @@ impl<'a, C, NC, A> ReadgroupsetCoveragebucketListCall<'a, C, NC, A> where NC: hy
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -9675,7 +9906,7 @@ impl<'a, C, NC, A> ReadgroupsetCoveragebucketListCall<'a, C, NC, A> where NC: hy
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -9686,7 +9917,7 @@ impl<'a, C, NC, A> ReadgroupsetCoveragebucketListCall<'a, C, NC, A> where NC: hy
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -9695,13 +9926,13 @@ impl<'a, C, NC, A> ReadgroupsetCoveragebucketListCall<'a, C, NC, A> where NC: hy
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -9713,7 +9944,7 @@ impl<'a, C, NC, A> ReadgroupsetCoveragebucketListCall<'a, C, NC, A> where NC: hy
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Required. The ID of the read group set over which coverage is requested.    
+    /// Required. The ID of the read group set over which coverage is requested.
     pub fn read_group_set_id(mut self, new_value: &str) -> ReadgroupsetCoveragebucketListCall<'a, C, NC, A> {
         self._read_group_set_id = new_value.to_string();
         self
@@ -9721,7 +9952,7 @@ impl<'a, C, NC, A> ReadgroupsetCoveragebucketListCall<'a, C, NC, A> where NC: hy
     /// Sets the *target bucket width* query property to the given value.
     ///
     /// 
-    /// The desired width of each reported coverage bucket in base pairs. This will be rounded down to the nearest precomputed bucket width; the value of which is returned as bucketWidth in the response. Defaults to infinity (each bucket spans an entire reference sequence) or the length of the target range, if specified. The smallest precomputed bucketWidth is currently 2048 base pairs; this is subject to change.    
+    /// The desired width of each reported coverage bucket in base pairs. This will be rounded down to the nearest precomputed bucket width; the value of which is returned as bucketWidth in the response. Defaults to infinity (each bucket spans an entire reference sequence) or the length of the target range, if specified. The smallest precomputed bucketWidth is currently 2048 base pairs; this is subject to change.
     pub fn target_bucket_width(mut self, new_value: &str) -> ReadgroupsetCoveragebucketListCall<'a, C, NC, A> {
         self._target_bucket_width = Some(new_value.to_string());
         self
@@ -9729,7 +9960,7 @@ impl<'a, C, NC, A> ReadgroupsetCoveragebucketListCall<'a, C, NC, A> where NC: hy
     /// Sets the *range.start* query property to the given value.
     ///
     /// 
-    /// The start position of the range on the reference, 0-based inclusive. If specified, referenceName must also be specified.    
+    /// The start position of the range on the reference, 0-based inclusive. If specified, referenceName must also be specified.
     pub fn range_start(mut self, new_value: &str) -> ReadgroupsetCoveragebucketListCall<'a, C, NC, A> {
         self._range_start = Some(new_value.to_string());
         self
@@ -9737,7 +9968,7 @@ impl<'a, C, NC, A> ReadgroupsetCoveragebucketListCall<'a, C, NC, A> where NC: hy
     /// Sets the *range.reference name* query property to the given value.
     ///
     /// 
-    /// The reference sequence name, for example chr1, 1, or chrX.    
+    /// The reference sequence name, for example chr1, 1, or chrX.
     pub fn range_reference_name(mut self, new_value: &str) -> ReadgroupsetCoveragebucketListCall<'a, C, NC, A> {
         self._range_reference_name = Some(new_value.to_string());
         self
@@ -9745,7 +9976,7 @@ impl<'a, C, NC, A> ReadgroupsetCoveragebucketListCall<'a, C, NC, A> where NC: hy
     /// Sets the *range.end* query property to the given value.
     ///
     /// 
-    /// The end position of the range on the reference, 0-based exclusive. If specified, referenceName must also be specified.    
+    /// The end position of the range on the reference, 0-based exclusive. If specified, referenceName must also be specified.
     pub fn range_end(mut self, new_value: &str) -> ReadgroupsetCoveragebucketListCall<'a, C, NC, A> {
         self._range_end = Some(new_value.to_string());
         self
@@ -9753,7 +9984,7 @@ impl<'a, C, NC, A> ReadgroupsetCoveragebucketListCall<'a, C, NC, A> where NC: hy
     /// Sets the *page token* query property to the given value.
     ///
     /// 
-    /// The continuation token, which is used to page through large result sets. To get the next page of results, set this parameter to the value of nextPageToken from the previous response.    
+    /// The continuation token, which is used to page through large result sets. To get the next page of results, set this parameter to the value of nextPageToken from the previous response.
     pub fn page_token(mut self, new_value: &str) -> ReadgroupsetCoveragebucketListCall<'a, C, NC, A> {
         self._page_token = Some(new_value.to_string());
         self
@@ -9761,7 +9992,7 @@ impl<'a, C, NC, A> ReadgroupsetCoveragebucketListCall<'a, C, NC, A> where NC: hy
     /// Sets the *page size* query property to the given value.
     ///
     /// 
-    /// The maximum number of results to return in a single page. If unspecified, defaults to 1024. The maximum value is 2048.    
+    /// The maximum number of results to return in a single page. If unspecified, defaults to 1024. The maximum value is 2048.
     pub fn page_size(mut self, new_value: i32) -> ReadgroupsetCoveragebucketListCall<'a, C, NC, A> {
         self._page_size = Some(new_value);
         self
@@ -9822,7 +10053,7 @@ impl<'a, C, NC, A> ReadgroupsetCoveragebucketListCall<'a, C, NC, A> where NC: hy
 /// Deletes a read group set.
 ///
 /// A builder for the *delete* method supported by a *readgroupset* resource.
-/// It is not used directly, but through a `ReadgroupsetMethods`.
+/// It is not used directly, but through a `ReadgroupsetMethods` instance.
 ///
 /// # Example
 ///
@@ -9880,7 +10111,7 @@ impl<'a, C, NC, A> ReadgroupsetDeleteCall<'a, C, NC, A> where NC: hyper::net::Ne
         for &field in ["readGroupSetId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -9932,7 +10163,7 @@ impl<'a, C, NC, A> ReadgroupsetDeleteCall<'a, C, NC, A> where NC: hyper::net::Ne
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -9944,7 +10175,6 @@ impl<'a, C, NC, A> ReadgroupsetDeleteCall<'a, C, NC, A> where NC: hyper::net::Ne
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -9954,7 +10184,7 @@ impl<'a, C, NC, A> ReadgroupsetDeleteCall<'a, C, NC, A> where NC: hyper::net::Ne
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -9965,12 +10195,12 @@ impl<'a, C, NC, A> ReadgroupsetDeleteCall<'a, C, NC, A> where NC: hyper::net::Ne
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = res;
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -9982,7 +10212,7 @@ impl<'a, C, NC, A> ReadgroupsetDeleteCall<'a, C, NC, A> where NC: hyper::net::Ne
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The ID of the read group set to be deleted. The caller must have WRITE permissions to the dataset associated with this read group set.    
+    /// The ID of the read group set to be deleted. The caller must have WRITE permissions to the dataset associated with this read group set.
     pub fn read_group_set_id(mut self, new_value: &str) -> ReadgroupsetDeleteCall<'a, C, NC, A> {
         self._read_group_set_id = new_value.to_string();
         self
@@ -10045,7 +10275,7 @@ impl<'a, C, NC, A> ReadgroupsetDeleteCall<'a, C, NC, A> where NC: hyper::net::Ne
 /// Implements GlobalAllianceApi.searchReadGroupSets.
 ///
 /// A builder for the *search* method supported by a *readgroupset* resource.
-/// It is not used directly, but through a `ReadgroupsetMethods`.
+/// It is not used directly, but through a `ReadgroupsetMethods` instance.
 ///
 /// # Example
 ///
@@ -10108,7 +10338,7 @@ impl<'a, C, NC, A> ReadgroupsetSearchCall<'a, C, NC, A> where NC: hyper::net::Ne
         for &field in ["alt"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -10141,7 +10371,7 @@ impl<'a, C, NC, A> ReadgroupsetSearchCall<'a, C, NC, A> where NC: hyper::net::Ne
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -10157,7 +10387,6 @@ impl<'a, C, NC, A> ReadgroupsetSearchCall<'a, C, NC, A> where NC: hyper::net::Ne
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -10167,7 +10396,7 @@ impl<'a, C, NC, A> ReadgroupsetSearchCall<'a, C, NC, A> where NC: hyper::net::Ne
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -10178,7 +10407,7 @@ impl<'a, C, NC, A> ReadgroupsetSearchCall<'a, C, NC, A> where NC: hyper::net::Ne
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -10187,13 +10416,13 @@ impl<'a, C, NC, A> ReadgroupsetSearchCall<'a, C, NC, A> where NC: hyper::net::Ne
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -10265,7 +10494,7 @@ impl<'a, C, NC, A> ReadgroupsetSearchCall<'a, C, NC, A> where NC: hyper::net::Ne
 /// Gets a read group set by ID.
 ///
 /// A builder for the *get* method supported by a *readgroupset* resource.
-/// It is not used directly, but through a `ReadgroupsetMethods`.
+/// It is not used directly, but through a `ReadgroupsetMethods` instance.
 ///
 /// # Example
 ///
@@ -10323,7 +10552,7 @@ impl<'a, C, NC, A> ReadgroupsetGetCall<'a, C, NC, A> where NC: hyper::net::Netwo
         for &field in ["alt", "readGroupSetId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -10376,7 +10605,7 @@ impl<'a, C, NC, A> ReadgroupsetGetCall<'a, C, NC, A> where NC: hyper::net::Netwo
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -10388,7 +10617,6 @@ impl<'a, C, NC, A> ReadgroupsetGetCall<'a, C, NC, A> where NC: hyper::net::Netwo
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -10398,7 +10626,7 @@ impl<'a, C, NC, A> ReadgroupsetGetCall<'a, C, NC, A> where NC: hyper::net::Netwo
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -10409,7 +10637,7 @@ impl<'a, C, NC, A> ReadgroupsetGetCall<'a, C, NC, A> where NC: hyper::net::Netwo
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -10418,13 +10646,13 @@ impl<'a, C, NC, A> ReadgroupsetGetCall<'a, C, NC, A> where NC: hyper::net::Netwo
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -10436,7 +10664,7 @@ impl<'a, C, NC, A> ReadgroupsetGetCall<'a, C, NC, A> where NC: hyper::net::Netwo
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The ID of the read group set.    
+    /// The ID of the read group set.
     pub fn read_group_set_id(mut self, new_value: &str) -> ReadgroupsetGetCall<'a, C, NC, A> {
         self._read_group_set_id = new_value.to_string();
         self
@@ -10499,7 +10727,7 @@ impl<'a, C, NC, A> ReadgroupsetGetCall<'a, C, NC, A> where NC: hyper::net::Netwo
 /// Implements GlobalAllianceApi.getReferenceBases.
 ///
 /// A builder for the *bases.list* method supported by a *reference* resource.
-/// It is not used directly, but through a `ReferenceMethods`.
+/// It is not used directly, but through a `ReferenceMethods` instance.
 ///
 /// # Example
 ///
@@ -10577,7 +10805,7 @@ impl<'a, C, NC, A> ReferenceBaseListCall<'a, C, NC, A> where NC: hyper::net::Net
         for &field in ["alt", "referenceId", "start", "pageToken", "pageSize", "end"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -10630,7 +10858,7 @@ impl<'a, C, NC, A> ReferenceBaseListCall<'a, C, NC, A> where NC: hyper::net::Net
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -10642,7 +10870,6 @@ impl<'a, C, NC, A> ReferenceBaseListCall<'a, C, NC, A> where NC: hyper::net::Net
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -10652,7 +10879,7 @@ impl<'a, C, NC, A> ReferenceBaseListCall<'a, C, NC, A> where NC: hyper::net::Net
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -10663,7 +10890,7 @@ impl<'a, C, NC, A> ReferenceBaseListCall<'a, C, NC, A> where NC: hyper::net::Net
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -10672,13 +10899,13 @@ impl<'a, C, NC, A> ReferenceBaseListCall<'a, C, NC, A> where NC: hyper::net::Net
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -10690,7 +10917,7 @@ impl<'a, C, NC, A> ReferenceBaseListCall<'a, C, NC, A> where NC: hyper::net::Net
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The ID of the reference.    
+    /// The ID of the reference.
     pub fn reference_id(mut self, new_value: &str) -> ReferenceBaseListCall<'a, C, NC, A> {
         self._reference_id = new_value.to_string();
         self
@@ -10698,7 +10925,7 @@ impl<'a, C, NC, A> ReferenceBaseListCall<'a, C, NC, A> where NC: hyper::net::Net
     /// Sets the *start* query property to the given value.
     ///
     /// 
-    /// The start position (0-based) of this query. Defaults to 0.    
+    /// The start position (0-based) of this query. Defaults to 0.
     pub fn start(mut self, new_value: &str) -> ReferenceBaseListCall<'a, C, NC, A> {
         self._start = Some(new_value.to_string());
         self
@@ -10706,7 +10933,7 @@ impl<'a, C, NC, A> ReferenceBaseListCall<'a, C, NC, A> where NC: hyper::net::Net
     /// Sets the *page token* query property to the given value.
     ///
     /// 
-    /// The continuation token, which is used to page through large result sets. To get the next page of results, set this parameter to the value of nextPageToken from the previous response.    
+    /// The continuation token, which is used to page through large result sets. To get the next page of results, set this parameter to the value of nextPageToken from the previous response.
     pub fn page_token(mut self, new_value: &str) -> ReferenceBaseListCall<'a, C, NC, A> {
         self._page_token = Some(new_value.to_string());
         self
@@ -10714,7 +10941,7 @@ impl<'a, C, NC, A> ReferenceBaseListCall<'a, C, NC, A> where NC: hyper::net::Net
     /// Sets the *page size* query property to the given value.
     ///
     /// 
-    /// Specifies the maximum number of bases to return in a single page.    
+    /// Specifies the maximum number of bases to return in a single page.
     pub fn page_size(mut self, new_value: i32) -> ReferenceBaseListCall<'a, C, NC, A> {
         self._page_size = Some(new_value);
         self
@@ -10722,7 +10949,7 @@ impl<'a, C, NC, A> ReferenceBaseListCall<'a, C, NC, A> where NC: hyper::net::Net
     /// Sets the *end* query property to the given value.
     ///
     /// 
-    /// The end position (0-based, exclusive) of this query. Defaults to the length of this reference.    
+    /// The end position (0-based, exclusive) of this query. Defaults to the length of this reference.
     pub fn end(mut self, new_value: &str) -> ReferenceBaseListCall<'a, C, NC, A> {
         self._end = Some(new_value.to_string());
         self
@@ -10785,7 +11012,7 @@ impl<'a, C, NC, A> ReferenceBaseListCall<'a, C, NC, A> where NC: hyper::net::Net
 /// Implements GlobalAllianceApi.searchReferences.
 ///
 /// A builder for the *search* method supported by a *reference* resource.
-/// It is not used directly, but through a `ReferenceMethods`.
+/// It is not used directly, but through a `ReferenceMethods` instance.
 ///
 /// # Example
 ///
@@ -10848,7 +11075,7 @@ impl<'a, C, NC, A> ReferenceSearchCall<'a, C, NC, A> where NC: hyper::net::Netwo
         for &field in ["alt"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -10881,7 +11108,7 @@ impl<'a, C, NC, A> ReferenceSearchCall<'a, C, NC, A> where NC: hyper::net::Netwo
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -10897,7 +11124,6 @@ impl<'a, C, NC, A> ReferenceSearchCall<'a, C, NC, A> where NC: hyper::net::Netwo
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -10907,7 +11133,7 @@ impl<'a, C, NC, A> ReferenceSearchCall<'a, C, NC, A> where NC: hyper::net::Netwo
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -10918,7 +11144,7 @@ impl<'a, C, NC, A> ReferenceSearchCall<'a, C, NC, A> where NC: hyper::net::Netwo
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -10927,13 +11153,13 @@ impl<'a, C, NC, A> ReferenceSearchCall<'a, C, NC, A> where NC: hyper::net::Netwo
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -11007,7 +11233,7 @@ impl<'a, C, NC, A> ReferenceSearchCall<'a, C, NC, A> where NC: hyper::net::Netwo
 /// Implements GlobalAllianceApi.getReference.
 ///
 /// A builder for the *get* method supported by a *reference* resource.
-/// It is not used directly, but through a `ReferenceMethods`.
+/// It is not used directly, but through a `ReferenceMethods` instance.
 ///
 /// # Example
 ///
@@ -11065,7 +11291,7 @@ impl<'a, C, NC, A> ReferenceGetCall<'a, C, NC, A> where NC: hyper::net::NetworkC
         for &field in ["alt", "referenceId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -11118,7 +11344,7 @@ impl<'a, C, NC, A> ReferenceGetCall<'a, C, NC, A> where NC: hyper::net::NetworkC
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -11130,7 +11356,6 @@ impl<'a, C, NC, A> ReferenceGetCall<'a, C, NC, A> where NC: hyper::net::NetworkC
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -11140,7 +11365,7 @@ impl<'a, C, NC, A> ReferenceGetCall<'a, C, NC, A> where NC: hyper::net::NetworkC
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -11151,7 +11376,7 @@ impl<'a, C, NC, A> ReferenceGetCall<'a, C, NC, A> where NC: hyper::net::NetworkC
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -11160,13 +11385,13 @@ impl<'a, C, NC, A> ReferenceGetCall<'a, C, NC, A> where NC: hyper::net::NetworkC
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -11178,7 +11403,7 @@ impl<'a, C, NC, A> ReferenceGetCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The ID of the reference.    
+    /// The ID of the reference.
     pub fn reference_id(mut self, new_value: &str) -> ReferenceGetCall<'a, C, NC, A> {
         self._reference_id = new_value.to_string();
         self
@@ -11239,7 +11464,7 @@ impl<'a, C, NC, A> ReferenceGetCall<'a, C, NC, A> where NC: hyper::net::NetworkC
 /// Gets an annotation set. Caller must have READ permission for the associated dataset.
 ///
 /// A builder for the *get* method supported by a *annotationSet* resource.
-/// It is not used directly, but through a `AnnotationSetMethods`.
+/// It is not used directly, but through a `AnnotationSetMethods` instance.
 ///
 /// # Example
 ///
@@ -11297,7 +11522,7 @@ impl<'a, C, NC, A> AnnotationSetGetCall<'a, C, NC, A> where NC: hyper::net::Netw
         for &field in ["alt", "annotationSetId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -11350,7 +11575,7 @@ impl<'a, C, NC, A> AnnotationSetGetCall<'a, C, NC, A> where NC: hyper::net::Netw
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -11362,7 +11587,6 @@ impl<'a, C, NC, A> AnnotationSetGetCall<'a, C, NC, A> where NC: hyper::net::Netw
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -11372,7 +11596,7 @@ impl<'a, C, NC, A> AnnotationSetGetCall<'a, C, NC, A> where NC: hyper::net::Netw
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -11383,7 +11607,7 @@ impl<'a, C, NC, A> AnnotationSetGetCall<'a, C, NC, A> where NC: hyper::net::Netw
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -11392,13 +11616,13 @@ impl<'a, C, NC, A> AnnotationSetGetCall<'a, C, NC, A> where NC: hyper::net::Netw
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -11410,7 +11634,7 @@ impl<'a, C, NC, A> AnnotationSetGetCall<'a, C, NC, A> where NC: hyper::net::Netw
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The ID of the annotation set to be retrieved.    
+    /// The ID of the annotation set to be retrieved.
     pub fn annotation_set_id(mut self, new_value: &str) -> AnnotationSetGetCall<'a, C, NC, A> {
         self._annotation_set_id = new_value.to_string();
         self
@@ -11471,7 +11695,7 @@ impl<'a, C, NC, A> AnnotationSetGetCall<'a, C, NC, A> where NC: hyper::net::Netw
 /// Updates an annotation set. The update must respect all mutability restrictions and other invariants described on the annotation set resource. Caller must have WRITE permission for the associated dataset.
 ///
 /// A builder for the *update* method supported by a *annotationSet* resource.
-/// It is not used directly, but through a `AnnotationSetMethods`.
+/// It is not used directly, but through a `AnnotationSetMethods` instance.
 ///
 /// # Example
 ///
@@ -11536,7 +11760,7 @@ impl<'a, C, NC, A> AnnotationSetUpdateCall<'a, C, NC, A> where NC: hyper::net::N
         for &field in ["alt", "annotationSetId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -11593,7 +11817,7 @@ impl<'a, C, NC, A> AnnotationSetUpdateCall<'a, C, NC, A> where NC: hyper::net::N
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -11609,7 +11833,6 @@ impl<'a, C, NC, A> AnnotationSetUpdateCall<'a, C, NC, A> where NC: hyper::net::N
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -11619,7 +11842,7 @@ impl<'a, C, NC, A> AnnotationSetUpdateCall<'a, C, NC, A> where NC: hyper::net::N
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -11630,7 +11853,7 @@ impl<'a, C, NC, A> AnnotationSetUpdateCall<'a, C, NC, A> where NC: hyper::net::N
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -11639,13 +11862,13 @@ impl<'a, C, NC, A> AnnotationSetUpdateCall<'a, C, NC, A> where NC: hyper::net::N
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -11666,7 +11889,7 @@ impl<'a, C, NC, A> AnnotationSetUpdateCall<'a, C, NC, A> where NC: hyper::net::N
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The ID of the annotation set to be updated.    
+    /// The ID of the annotation set to be updated.
     pub fn annotation_set_id(mut self, new_value: &str) -> AnnotationSetUpdateCall<'a, C, NC, A> {
         self._annotation_set_id = new_value.to_string();
         self
@@ -11727,7 +11950,7 @@ impl<'a, C, NC, A> AnnotationSetUpdateCall<'a, C, NC, A> where NC: hyper::net::N
 /// Creates a new annotation set. Caller must have WRITE permission for the associated dataset.
 ///
 /// A builder for the *create* method supported by a *annotationSet* resource.
-/// It is not used directly, but through a `AnnotationSetMethods`.
+/// It is not used directly, but through a `AnnotationSetMethods` instance.
 ///
 /// # Example
 ///
@@ -11790,7 +12013,7 @@ impl<'a, C, NC, A> AnnotationSetCreateCall<'a, C, NC, A> where NC: hyper::net::N
         for &field in ["alt"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -11823,7 +12046,7 @@ impl<'a, C, NC, A> AnnotationSetCreateCall<'a, C, NC, A> where NC: hyper::net::N
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -11839,7 +12062,6 @@ impl<'a, C, NC, A> AnnotationSetCreateCall<'a, C, NC, A> where NC: hyper::net::N
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -11849,7 +12071,7 @@ impl<'a, C, NC, A> AnnotationSetCreateCall<'a, C, NC, A> where NC: hyper::net::N
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -11860,7 +12082,7 @@ impl<'a, C, NC, A> AnnotationSetCreateCall<'a, C, NC, A> where NC: hyper::net::N
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -11869,13 +12091,13 @@ impl<'a, C, NC, A> AnnotationSetCreateCall<'a, C, NC, A> where NC: hyper::net::N
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -11944,10 +12166,10 @@ impl<'a, C, NC, A> AnnotationSetCreateCall<'a, C, NC, A> where NC: hyper::net::N
 }
 
 
-/// Searches for annotation sets which match the given criteria. Results are returned in a deterministic order. Caller must have READ permission for the queried datasets.
+/// Searches for annotation sets that match the given criteria. Results are returned in a deterministic order. Caller must have READ permission for the queried datasets.
 ///
 /// A builder for the *search* method supported by a *annotationSet* resource.
-/// It is not used directly, but through a `AnnotationSetMethods`.
+/// It is not used directly, but through a `AnnotationSetMethods` instance.
 ///
 /// # Example
 ///
@@ -12010,7 +12232,7 @@ impl<'a, C, NC, A> AnnotationSetSearchCall<'a, C, NC, A> where NC: hyper::net::N
         for &field in ["alt"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -12043,7 +12265,7 @@ impl<'a, C, NC, A> AnnotationSetSearchCall<'a, C, NC, A> where NC: hyper::net::N
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -12059,7 +12281,6 @@ impl<'a, C, NC, A> AnnotationSetSearchCall<'a, C, NC, A> where NC: hyper::net::N
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -12069,7 +12290,7 @@ impl<'a, C, NC, A> AnnotationSetSearchCall<'a, C, NC, A> where NC: hyper::net::N
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -12080,7 +12301,7 @@ impl<'a, C, NC, A> AnnotationSetSearchCall<'a, C, NC, A> where NC: hyper::net::N
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -12089,13 +12310,13 @@ impl<'a, C, NC, A> AnnotationSetSearchCall<'a, C, NC, A> where NC: hyper::net::N
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -12167,7 +12388,7 @@ impl<'a, C, NC, A> AnnotationSetSearchCall<'a, C, NC, A> where NC: hyper::net::N
 /// Updates an annotation set. The update must respect all mutability restrictions and other invariants described on the annotation set resource. Caller must have WRITE permission for the associated dataset. This method supports patch semantics.
 ///
 /// A builder for the *patch* method supported by a *annotationSet* resource.
-/// It is not used directly, but through a `AnnotationSetMethods`.
+/// It is not used directly, but through a `AnnotationSetMethods` instance.
 ///
 /// # Example
 ///
@@ -12232,7 +12453,7 @@ impl<'a, C, NC, A> AnnotationSetPatchCall<'a, C, NC, A> where NC: hyper::net::Ne
         for &field in ["alt", "annotationSetId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -12289,7 +12510,7 @@ impl<'a, C, NC, A> AnnotationSetPatchCall<'a, C, NC, A> where NC: hyper::net::Ne
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -12305,7 +12526,6 @@ impl<'a, C, NC, A> AnnotationSetPatchCall<'a, C, NC, A> where NC: hyper::net::Ne
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -12315,7 +12535,7 @@ impl<'a, C, NC, A> AnnotationSetPatchCall<'a, C, NC, A> where NC: hyper::net::Ne
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -12326,7 +12546,7 @@ impl<'a, C, NC, A> AnnotationSetPatchCall<'a, C, NC, A> where NC: hyper::net::Ne
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -12335,13 +12555,13 @@ impl<'a, C, NC, A> AnnotationSetPatchCall<'a, C, NC, A> where NC: hyper::net::Ne
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -12362,7 +12582,7 @@ impl<'a, C, NC, A> AnnotationSetPatchCall<'a, C, NC, A> where NC: hyper::net::Ne
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The ID of the annotation set to be updated.    
+    /// The ID of the annotation set to be updated.
     pub fn annotation_set_id(mut self, new_value: &str) -> AnnotationSetPatchCall<'a, C, NC, A> {
         self._annotation_set_id = new_value.to_string();
         self
@@ -12423,7 +12643,7 @@ impl<'a, C, NC, A> AnnotationSetPatchCall<'a, C, NC, A> where NC: hyper::net::Ne
 /// Deletes an annotation set. Caller must have WRITE permission for the associated annotation set.
 ///
 /// A builder for the *delete* method supported by a *annotationSet* resource.
-/// It is not used directly, but through a `AnnotationSetMethods`.
+/// It is not used directly, but through a `AnnotationSetMethods` instance.
 ///
 /// # Example
 ///
@@ -12481,7 +12701,7 @@ impl<'a, C, NC, A> AnnotationSetDeleteCall<'a, C, NC, A> where NC: hyper::net::N
         for &field in ["annotationSetId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -12533,7 +12753,7 @@ impl<'a, C, NC, A> AnnotationSetDeleteCall<'a, C, NC, A> where NC: hyper::net::N
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -12545,7 +12765,6 @@ impl<'a, C, NC, A> AnnotationSetDeleteCall<'a, C, NC, A> where NC: hyper::net::N
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -12555,7 +12774,7 @@ impl<'a, C, NC, A> AnnotationSetDeleteCall<'a, C, NC, A> where NC: hyper::net::N
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -12566,12 +12785,12 @@ impl<'a, C, NC, A> AnnotationSetDeleteCall<'a, C, NC, A> where NC: hyper::net::N
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = res;
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -12583,7 +12802,7 @@ impl<'a, C, NC, A> AnnotationSetDeleteCall<'a, C, NC, A> where NC: hyper::net::N
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The ID of the annotation set to be deleted.    
+    /// The ID of the annotation set to be deleted.
     pub fn annotation_set_id(mut self, new_value: &str) -> AnnotationSetDeleteCall<'a, C, NC, A> {
         self._annotation_set_id = new_value.to_string();
         self
@@ -12646,7 +12865,7 @@ impl<'a, C, NC, A> AnnotationSetDeleteCall<'a, C, NC, A> where NC: hyper::net::N
 /// Implements GlobalAllianceApi.searchVariants.
 ///
 /// A builder for the *search* method supported by a *variant* resource.
-/// It is not used directly, but through a `VariantMethods`.
+/// It is not used directly, but through a `VariantMethods` instance.
 ///
 /// # Example
 ///
@@ -12709,7 +12928,7 @@ impl<'a, C, NC, A> VariantSearchCall<'a, C, NC, A> where NC: hyper::net::Network
         for &field in ["alt"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -12742,7 +12961,7 @@ impl<'a, C, NC, A> VariantSearchCall<'a, C, NC, A> where NC: hyper::net::Network
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -12758,7 +12977,6 @@ impl<'a, C, NC, A> VariantSearchCall<'a, C, NC, A> where NC: hyper::net::Network
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -12768,7 +12986,7 @@ impl<'a, C, NC, A> VariantSearchCall<'a, C, NC, A> where NC: hyper::net::Network
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -12779,7 +12997,7 @@ impl<'a, C, NC, A> VariantSearchCall<'a, C, NC, A> where NC: hyper::net::Network
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -12788,13 +13006,13 @@ impl<'a, C, NC, A> VariantSearchCall<'a, C, NC, A> where NC: hyper::net::Network
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -12866,7 +13084,7 @@ impl<'a, C, NC, A> VariantSearchCall<'a, C, NC, A> where NC: hyper::net::Network
 /// Deletes a variant.
 ///
 /// A builder for the *delete* method supported by a *variant* resource.
-/// It is not used directly, but through a `VariantMethods`.
+/// It is not used directly, but through a `VariantMethods` instance.
 ///
 /// # Example
 ///
@@ -12924,7 +13142,7 @@ impl<'a, C, NC, A> VariantDeleteCall<'a, C, NC, A> where NC: hyper::net::Network
         for &field in ["variantId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -12976,7 +13194,7 @@ impl<'a, C, NC, A> VariantDeleteCall<'a, C, NC, A> where NC: hyper::net::Network
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -12988,7 +13206,6 @@ impl<'a, C, NC, A> VariantDeleteCall<'a, C, NC, A> where NC: hyper::net::Network
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -12998,7 +13215,7 @@ impl<'a, C, NC, A> VariantDeleteCall<'a, C, NC, A> where NC: hyper::net::Network
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -13009,12 +13226,12 @@ impl<'a, C, NC, A> VariantDeleteCall<'a, C, NC, A> where NC: hyper::net::Network
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = res;
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -13026,7 +13243,7 @@ impl<'a, C, NC, A> VariantDeleteCall<'a, C, NC, A> where NC: hyper::net::Network
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The ID of the variant to be deleted.    
+    /// The ID of the variant to be deleted.
     pub fn variant_id(mut self, new_value: &str) -> VariantDeleteCall<'a, C, NC, A> {
         self._variant_id = new_value.to_string();
         self
@@ -13087,7 +13304,7 @@ impl<'a, C, NC, A> VariantDeleteCall<'a, C, NC, A> where NC: hyper::net::Network
 /// Gets a variant by ID.
 ///
 /// A builder for the *get* method supported by a *variant* resource.
-/// It is not used directly, but through a `VariantMethods`.
+/// It is not used directly, but through a `VariantMethods` instance.
 ///
 /// # Example
 ///
@@ -13145,7 +13362,7 @@ impl<'a, C, NC, A> VariantGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
         for &field in ["alt", "variantId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -13198,7 +13415,7 @@ impl<'a, C, NC, A> VariantGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -13210,7 +13427,6 @@ impl<'a, C, NC, A> VariantGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -13220,7 +13436,7 @@ impl<'a, C, NC, A> VariantGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -13231,7 +13447,7 @@ impl<'a, C, NC, A> VariantGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -13240,13 +13456,13 @@ impl<'a, C, NC, A> VariantGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -13258,7 +13474,7 @@ impl<'a, C, NC, A> VariantGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The ID of the variant.    
+    /// The ID of the variant.
     pub fn variant_id(mut self, new_value: &str) -> VariantGetCall<'a, C, NC, A> {
         self._variant_id = new_value.to_string();
         self
@@ -13319,7 +13535,7 @@ impl<'a, C, NC, A> VariantGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
 /// Creates a new variant.
 ///
 /// A builder for the *create* method supported by a *variant* resource.
-/// It is not used directly, but through a `VariantMethods`.
+/// It is not used directly, but through a `VariantMethods` instance.
 ///
 /// # Example
 ///
@@ -13382,7 +13598,7 @@ impl<'a, C, NC, A> VariantCreateCall<'a, C, NC, A> where NC: hyper::net::Network
         for &field in ["alt"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -13415,7 +13631,7 @@ impl<'a, C, NC, A> VariantCreateCall<'a, C, NC, A> where NC: hyper::net::Network
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -13431,7 +13647,6 @@ impl<'a, C, NC, A> VariantCreateCall<'a, C, NC, A> where NC: hyper::net::Network
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -13441,7 +13656,7 @@ impl<'a, C, NC, A> VariantCreateCall<'a, C, NC, A> where NC: hyper::net::Network
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -13452,7 +13667,7 @@ impl<'a, C, NC, A> VariantCreateCall<'a, C, NC, A> where NC: hyper::net::Network
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -13461,13 +13676,13 @@ impl<'a, C, NC, A> VariantCreateCall<'a, C, NC, A> where NC: hyper::net::Network
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -13539,7 +13754,7 @@ impl<'a, C, NC, A> VariantCreateCall<'a, C, NC, A> where NC: hyper::net::Network
 /// Updates a variant's names and info fields. All other modifications are silently ignored. Returns the modified variant without its calls.
 ///
 /// A builder for the *update* method supported by a *variant* resource.
-/// It is not used directly, but through a `VariantMethods`.
+/// It is not used directly, but through a `VariantMethods` instance.
 ///
 /// # Example
 ///
@@ -13604,7 +13819,7 @@ impl<'a, C, NC, A> VariantUpdateCall<'a, C, NC, A> where NC: hyper::net::Network
         for &field in ["alt", "variantId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -13661,7 +13876,7 @@ impl<'a, C, NC, A> VariantUpdateCall<'a, C, NC, A> where NC: hyper::net::Network
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -13677,7 +13892,6 @@ impl<'a, C, NC, A> VariantUpdateCall<'a, C, NC, A> where NC: hyper::net::Network
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -13687,7 +13901,7 @@ impl<'a, C, NC, A> VariantUpdateCall<'a, C, NC, A> where NC: hyper::net::Network
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -13698,7 +13912,7 @@ impl<'a, C, NC, A> VariantUpdateCall<'a, C, NC, A> where NC: hyper::net::Network
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -13707,13 +13921,13 @@ impl<'a, C, NC, A> VariantUpdateCall<'a, C, NC, A> where NC: hyper::net::Network
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -13734,7 +13948,7 @@ impl<'a, C, NC, A> VariantUpdateCall<'a, C, NC, A> where NC: hyper::net::Network
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The ID of the variant to be updated.    
+    /// The ID of the variant to be updated.
     pub fn variant_id(mut self, new_value: &str) -> VariantUpdateCall<'a, C, NC, A> {
         self._variant_id = new_value.to_string();
         self
@@ -13795,7 +14009,7 @@ impl<'a, C, NC, A> VariantUpdateCall<'a, C, NC, A> where NC: hyper::net::Network
 /// Updates an annotation. The update must respect all mutability restrictions and other invariants described on the annotation resource. Caller must have WRITE permission for the associated dataset. This method supports patch semantics.
 ///
 /// A builder for the *patch* method supported by a *annotation* resource.
-/// It is not used directly, but through a `AnnotationMethods`.
+/// It is not used directly, but through a `AnnotationMethods` instance.
 ///
 /// # Example
 ///
@@ -13860,7 +14074,7 @@ impl<'a, C, NC, A> AnnotationPatchCall<'a, C, NC, A> where NC: hyper::net::Netwo
         for &field in ["alt", "annotationId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -13917,7 +14131,7 @@ impl<'a, C, NC, A> AnnotationPatchCall<'a, C, NC, A> where NC: hyper::net::Netwo
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -13933,7 +14147,6 @@ impl<'a, C, NC, A> AnnotationPatchCall<'a, C, NC, A> where NC: hyper::net::Netwo
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -13943,7 +14156,7 @@ impl<'a, C, NC, A> AnnotationPatchCall<'a, C, NC, A> where NC: hyper::net::Netwo
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -13954,7 +14167,7 @@ impl<'a, C, NC, A> AnnotationPatchCall<'a, C, NC, A> where NC: hyper::net::Netwo
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -13963,13 +14176,13 @@ impl<'a, C, NC, A> AnnotationPatchCall<'a, C, NC, A> where NC: hyper::net::Netwo
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -13990,7 +14203,7 @@ impl<'a, C, NC, A> AnnotationPatchCall<'a, C, NC, A> where NC: hyper::net::Netwo
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The ID of the annotation set to be updated.    
+    /// The ID of the annotation set to be updated.
     pub fn annotation_id(mut self, new_value: &str) -> AnnotationPatchCall<'a, C, NC, A> {
         self._annotation_id = new_value.to_string();
         self
@@ -14051,7 +14264,7 @@ impl<'a, C, NC, A> AnnotationPatchCall<'a, C, NC, A> where NC: hyper::net::Netwo
 /// Updates an annotation. The update must respect all mutability restrictions and other invariants described on the annotation resource. Caller must have WRITE permission for the associated dataset.
 ///
 /// A builder for the *update* method supported by a *annotation* resource.
-/// It is not used directly, but through a `AnnotationMethods`.
+/// It is not used directly, but through a `AnnotationMethods` instance.
 ///
 /// # Example
 ///
@@ -14116,7 +14329,7 @@ impl<'a, C, NC, A> AnnotationUpdateCall<'a, C, NC, A> where NC: hyper::net::Netw
         for &field in ["alt", "annotationId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -14173,7 +14386,7 @@ impl<'a, C, NC, A> AnnotationUpdateCall<'a, C, NC, A> where NC: hyper::net::Netw
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -14189,7 +14402,6 @@ impl<'a, C, NC, A> AnnotationUpdateCall<'a, C, NC, A> where NC: hyper::net::Netw
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -14199,7 +14411,7 @@ impl<'a, C, NC, A> AnnotationUpdateCall<'a, C, NC, A> where NC: hyper::net::Netw
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -14210,7 +14422,7 @@ impl<'a, C, NC, A> AnnotationUpdateCall<'a, C, NC, A> where NC: hyper::net::Netw
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -14219,13 +14431,13 @@ impl<'a, C, NC, A> AnnotationUpdateCall<'a, C, NC, A> where NC: hyper::net::Netw
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -14246,7 +14458,7 @@ impl<'a, C, NC, A> AnnotationUpdateCall<'a, C, NC, A> where NC: hyper::net::Netw
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The ID of the annotation set to be updated.    
+    /// The ID of the annotation set to be updated.
     pub fn annotation_id(mut self, new_value: &str) -> AnnotationUpdateCall<'a, C, NC, A> {
         self._annotation_id = new_value.to_string();
         self
@@ -14304,10 +14516,10 @@ impl<'a, C, NC, A> AnnotationUpdateCall<'a, C, NC, A> where NC: hyper::net::Netw
 }
 
 
-/// Searches for annotations which match the given criteria. Results are returned ordered by start position. Annotations which have matching start positions are ordered deterministically. Caller must have READ permission for the queried annotation sets.
+/// Searches for annotations that match the given criteria. Results are returned ordered by start position. Annotations that have matching start positions are ordered deterministically. Caller must have READ permission for the queried annotation sets.
 ///
 /// A builder for the *search* method supported by a *annotation* resource.
-/// It is not used directly, but through a `AnnotationMethods`.
+/// It is not used directly, but through a `AnnotationMethods` instance.
 ///
 /// # Example
 ///
@@ -14370,7 +14582,7 @@ impl<'a, C, NC, A> AnnotationSearchCall<'a, C, NC, A> where NC: hyper::net::Netw
         for &field in ["alt"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -14403,7 +14615,7 @@ impl<'a, C, NC, A> AnnotationSearchCall<'a, C, NC, A> where NC: hyper::net::Netw
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -14419,7 +14631,6 @@ impl<'a, C, NC, A> AnnotationSearchCall<'a, C, NC, A> where NC: hyper::net::Netw
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -14429,7 +14640,7 @@ impl<'a, C, NC, A> AnnotationSearchCall<'a, C, NC, A> where NC: hyper::net::Netw
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -14440,7 +14651,7 @@ impl<'a, C, NC, A> AnnotationSearchCall<'a, C, NC, A> where NC: hyper::net::Netw
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -14449,13 +14660,13 @@ impl<'a, C, NC, A> AnnotationSearchCall<'a, C, NC, A> where NC: hyper::net::Netw
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -14527,7 +14738,7 @@ impl<'a, C, NC, A> AnnotationSearchCall<'a, C, NC, A> where NC: hyper::net::Netw
 /// Deletes an annotation. Caller must have WRITE permission for the associated annotation set.
 ///
 /// A builder for the *delete* method supported by a *annotation* resource.
-/// It is not used directly, but through a `AnnotationMethods`.
+/// It is not used directly, but through a `AnnotationMethods` instance.
 ///
 /// # Example
 ///
@@ -14585,7 +14796,7 @@ impl<'a, C, NC, A> AnnotationDeleteCall<'a, C, NC, A> where NC: hyper::net::Netw
         for &field in ["annotationId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -14637,7 +14848,7 @@ impl<'a, C, NC, A> AnnotationDeleteCall<'a, C, NC, A> where NC: hyper::net::Netw
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -14649,7 +14860,6 @@ impl<'a, C, NC, A> AnnotationDeleteCall<'a, C, NC, A> where NC: hyper::net::Netw
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -14659,7 +14869,7 @@ impl<'a, C, NC, A> AnnotationDeleteCall<'a, C, NC, A> where NC: hyper::net::Netw
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -14670,12 +14880,12 @@ impl<'a, C, NC, A> AnnotationDeleteCall<'a, C, NC, A> where NC: hyper::net::Netw
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = res;
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -14687,7 +14897,7 @@ impl<'a, C, NC, A> AnnotationDeleteCall<'a, C, NC, A> where NC: hyper::net::Netw
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The ID of the annotation set to be deleted.    
+    /// The ID of the annotation set to be deleted.
     pub fn annotation_id(mut self, new_value: &str) -> AnnotationDeleteCall<'a, C, NC, A> {
         self._annotation_id = new_value.to_string();
         self
@@ -14748,7 +14958,7 @@ impl<'a, C, NC, A> AnnotationDeleteCall<'a, C, NC, A> where NC: hyper::net::Netw
 /// Gets an annotation. Caller must have READ permission for the associated annotation set.
 ///
 /// A builder for the *get* method supported by a *annotation* resource.
-/// It is not used directly, but through a `AnnotationMethods`.
+/// It is not used directly, but through a `AnnotationMethods` instance.
 ///
 /// # Example
 ///
@@ -14806,7 +15016,7 @@ impl<'a, C, NC, A> AnnotationGetCall<'a, C, NC, A> where NC: hyper::net::Network
         for &field in ["alt", "annotationId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -14859,7 +15069,7 @@ impl<'a, C, NC, A> AnnotationGetCall<'a, C, NC, A> where NC: hyper::net::Network
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -14871,7 +15081,6 @@ impl<'a, C, NC, A> AnnotationGetCall<'a, C, NC, A> where NC: hyper::net::Network
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -14881,7 +15090,7 @@ impl<'a, C, NC, A> AnnotationGetCall<'a, C, NC, A> where NC: hyper::net::Network
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -14892,7 +15101,7 @@ impl<'a, C, NC, A> AnnotationGetCall<'a, C, NC, A> where NC: hyper::net::Network
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -14901,13 +15110,13 @@ impl<'a, C, NC, A> AnnotationGetCall<'a, C, NC, A> where NC: hyper::net::Network
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -14919,7 +15128,7 @@ impl<'a, C, NC, A> AnnotationGetCall<'a, C, NC, A> where NC: hyper::net::Network
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The ID of the annotation set to be retrieved.    
+    /// The ID of the annotation set to be retrieved.
     pub fn annotation_id(mut self, new_value: &str) -> AnnotationGetCall<'a, C, NC, A> {
         self._annotation_id = new_value.to_string();
         self
@@ -14980,7 +15189,7 @@ impl<'a, C, NC, A> AnnotationGetCall<'a, C, NC, A> where NC: hyper::net::Network
 /// Creates a new annotation. Caller must have WRITE permission for the associated annotation set.
 ///
 /// A builder for the *create* method supported by a *annotation* resource.
-/// It is not used directly, but through a `AnnotationMethods`.
+/// It is not used directly, but through a `AnnotationMethods` instance.
 ///
 /// # Example
 ///
@@ -15043,7 +15252,7 @@ impl<'a, C, NC, A> AnnotationCreateCall<'a, C, NC, A> where NC: hyper::net::Netw
         for &field in ["alt"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -15076,7 +15285,7 @@ impl<'a, C, NC, A> AnnotationCreateCall<'a, C, NC, A> where NC: hyper::net::Netw
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -15092,7 +15301,6 @@ impl<'a, C, NC, A> AnnotationCreateCall<'a, C, NC, A> where NC: hyper::net::Netw
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -15102,7 +15310,7 @@ impl<'a, C, NC, A> AnnotationCreateCall<'a, C, NC, A> where NC: hyper::net::Netw
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -15113,7 +15321,7 @@ impl<'a, C, NC, A> AnnotationCreateCall<'a, C, NC, A> where NC: hyper::net::Netw
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -15122,13 +15330,13 @@ impl<'a, C, NC, A> AnnotationCreateCall<'a, C, NC, A> where NC: hyper::net::Netw
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -15203,7 +15411,7 @@ impl<'a, C, NC, A> AnnotationCreateCall<'a, C, NC, A> where NC: hyper::net::Netw
 /// If the request has a systemic issue, such as an attempt to write to an inaccessible annotation set, the entire RPC will fail accordingly. For lesser data issues, when possible an error will be isolated to the corresponding batch entry in the response; the remaining well formed annotations will be created normally.
 ///
 /// A builder for the *batchCreate* method supported by a *annotation* resource.
-/// It is not used directly, but through a `AnnotationMethods`.
+/// It is not used directly, but through a `AnnotationMethods` instance.
 ///
 /// # Example
 ///
@@ -15266,7 +15474,7 @@ impl<'a, C, NC, A> AnnotationBatchCreateCall<'a, C, NC, A> where NC: hyper::net:
         for &field in ["alt"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -15299,7 +15507,7 @@ impl<'a, C, NC, A> AnnotationBatchCreateCall<'a, C, NC, A> where NC: hyper::net:
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -15315,7 +15523,6 @@ impl<'a, C, NC, A> AnnotationBatchCreateCall<'a, C, NC, A> where NC: hyper::net:
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -15325,7 +15532,7 @@ impl<'a, C, NC, A> AnnotationBatchCreateCall<'a, C, NC, A> where NC: hyper::net:
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -15336,7 +15543,7 @@ impl<'a, C, NC, A> AnnotationBatchCreateCall<'a, C, NC, A> where NC: hyper::net:
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -15345,13 +15552,13 @@ impl<'a, C, NC, A> AnnotationBatchCreateCall<'a, C, NC, A> where NC: hyper::net:
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -15423,7 +15630,7 @@ impl<'a, C, NC, A> AnnotationBatchCreateCall<'a, C, NC, A> where NC: hyper::net:
 /// Creates and asynchronously runs an ad-hoc job. This is an experimental call and may be removed or changed at any time.
 ///
 /// A builder for the *jobs.create* method supported by a *experimental* resource.
-/// It is not used directly, but through a `ExperimentalMethods`.
+/// It is not used directly, but through a `ExperimentalMethods` instance.
 ///
 /// # Example
 ///
@@ -15486,7 +15693,7 @@ impl<'a, C, NC, A> ExperimentalJobCreateCall<'a, C, NC, A> where NC: hyper::net:
         for &field in ["alt"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -15519,7 +15726,7 @@ impl<'a, C, NC, A> ExperimentalJobCreateCall<'a, C, NC, A> where NC: hyper::net:
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -15535,7 +15742,6 @@ impl<'a, C, NC, A> ExperimentalJobCreateCall<'a, C, NC, A> where NC: hyper::net:
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -15545,7 +15751,7 @@ impl<'a, C, NC, A> ExperimentalJobCreateCall<'a, C, NC, A> where NC: hyper::net:
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -15556,7 +15762,7 @@ impl<'a, C, NC, A> ExperimentalJobCreateCall<'a, C, NC, A> where NC: hyper::net:
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -15565,13 +15771,13 @@ impl<'a, C, NC, A> ExperimentalJobCreateCall<'a, C, NC, A> where NC: hyper::net:
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -15643,7 +15849,7 @@ impl<'a, C, NC, A> ExperimentalJobCreateCall<'a, C, NC, A> where NC: hyper::net:
 /// Updates a variant set's metadata. All other modifications are silently ignored.
 ///
 /// A builder for the *update* method supported by a *variantset* resource.
-/// It is not used directly, but through a `VariantsetMethods`.
+/// It is not used directly, but through a `VariantsetMethods` instance.
 ///
 /// # Example
 ///
@@ -15708,7 +15914,7 @@ impl<'a, C, NC, A> VariantsetUpdateCall<'a, C, NC, A> where NC: hyper::net::Netw
         for &field in ["alt", "variantSetId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -15765,7 +15971,7 @@ impl<'a, C, NC, A> VariantsetUpdateCall<'a, C, NC, A> where NC: hyper::net::Netw
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -15781,7 +15987,6 @@ impl<'a, C, NC, A> VariantsetUpdateCall<'a, C, NC, A> where NC: hyper::net::Netw
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -15791,7 +15996,7 @@ impl<'a, C, NC, A> VariantsetUpdateCall<'a, C, NC, A> where NC: hyper::net::Netw
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -15802,7 +16007,7 @@ impl<'a, C, NC, A> VariantsetUpdateCall<'a, C, NC, A> where NC: hyper::net::Netw
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -15811,13 +16016,13 @@ impl<'a, C, NC, A> VariantsetUpdateCall<'a, C, NC, A> where NC: hyper::net::Netw
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -15838,7 +16043,7 @@ impl<'a, C, NC, A> VariantsetUpdateCall<'a, C, NC, A> where NC: hyper::net::Netw
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The ID of the variant to be updated.    
+    /// The ID of the variant to be updated.
     pub fn variant_set_id(mut self, new_value: &str) -> VariantsetUpdateCall<'a, C, NC, A> {
         self._variant_set_id = new_value.to_string();
         self
@@ -15899,7 +16104,7 @@ impl<'a, C, NC, A> VariantsetUpdateCall<'a, C, NC, A> where NC: hyper::net::Netw
 /// Exports variant set data to an external destination.
 ///
 /// A builder for the *export* method supported by a *variantset* resource.
-/// It is not used directly, but through a `VariantsetMethods`.
+/// It is not used directly, but through a `VariantsetMethods` instance.
 ///
 /// # Example
 ///
@@ -15964,7 +16169,7 @@ impl<'a, C, NC, A> VariantsetExportCall<'a, C, NC, A> where NC: hyper::net::Netw
         for &field in ["alt", "variantSetId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -16021,7 +16226,7 @@ impl<'a, C, NC, A> VariantsetExportCall<'a, C, NC, A> where NC: hyper::net::Netw
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -16037,7 +16242,6 @@ impl<'a, C, NC, A> VariantsetExportCall<'a, C, NC, A> where NC: hyper::net::Netw
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -16047,7 +16251,7 @@ impl<'a, C, NC, A> VariantsetExportCall<'a, C, NC, A> where NC: hyper::net::Netw
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -16058,7 +16262,7 @@ impl<'a, C, NC, A> VariantsetExportCall<'a, C, NC, A> where NC: hyper::net::Netw
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -16067,13 +16271,13 @@ impl<'a, C, NC, A> VariantsetExportCall<'a, C, NC, A> where NC: hyper::net::Netw
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -16094,7 +16298,7 @@ impl<'a, C, NC, A> VariantsetExportCall<'a, C, NC, A> where NC: hyper::net::Netw
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Required. The ID of the variant set that contains variant data which should be exported. The caller must have READ access to this variant set.    
+    /// Required. The ID of the variant set that contains variant data which should be exported. The caller must have READ access to this variant set.
     pub fn variant_set_id(mut self, new_value: &str) -> VariantsetExportCall<'a, C, NC, A> {
         self._variant_set_id = new_value.to_string();
         self
@@ -16155,7 +16359,7 @@ impl<'a, C, NC, A> VariantsetExportCall<'a, C, NC, A> where NC: hyper::net::Netw
 /// Updates a variant set's metadata. All other modifications are silently ignored. This method supports patch semantics.
 ///
 /// A builder for the *patch* method supported by a *variantset* resource.
-/// It is not used directly, but through a `VariantsetMethods`.
+/// It is not used directly, but through a `VariantsetMethods` instance.
 ///
 /// # Example
 ///
@@ -16220,7 +16424,7 @@ impl<'a, C, NC, A> VariantsetPatchCall<'a, C, NC, A> where NC: hyper::net::Netwo
         for &field in ["alt", "variantSetId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -16277,7 +16481,7 @@ impl<'a, C, NC, A> VariantsetPatchCall<'a, C, NC, A> where NC: hyper::net::Netwo
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -16293,7 +16497,6 @@ impl<'a, C, NC, A> VariantsetPatchCall<'a, C, NC, A> where NC: hyper::net::Netwo
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -16303,7 +16506,7 @@ impl<'a, C, NC, A> VariantsetPatchCall<'a, C, NC, A> where NC: hyper::net::Netwo
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -16314,7 +16517,7 @@ impl<'a, C, NC, A> VariantsetPatchCall<'a, C, NC, A> where NC: hyper::net::Netwo
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -16323,13 +16526,13 @@ impl<'a, C, NC, A> VariantsetPatchCall<'a, C, NC, A> where NC: hyper::net::Netwo
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -16350,7 +16553,7 @@ impl<'a, C, NC, A> VariantsetPatchCall<'a, C, NC, A> where NC: hyper::net::Netwo
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The ID of the variant to be updated.    
+    /// The ID of the variant to be updated.
     pub fn variant_set_id(mut self, new_value: &str) -> VariantsetPatchCall<'a, C, NC, A> {
         self._variant_set_id = new_value.to_string();
         self
@@ -16413,7 +16616,7 @@ impl<'a, C, NC, A> VariantsetPatchCall<'a, C, NC, A> where NC: hyper::net::Netwo
 /// Implements GlobalAllianceApi.searchVariantSets.
 ///
 /// A builder for the *search* method supported by a *variantset* resource.
-/// It is not used directly, but through a `VariantsetMethods`.
+/// It is not used directly, but through a `VariantsetMethods` instance.
 ///
 /// # Example
 ///
@@ -16476,7 +16679,7 @@ impl<'a, C, NC, A> VariantsetSearchCall<'a, C, NC, A> where NC: hyper::net::Netw
         for &field in ["alt"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -16509,7 +16712,7 @@ impl<'a, C, NC, A> VariantsetSearchCall<'a, C, NC, A> where NC: hyper::net::Netw
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -16525,7 +16728,6 @@ impl<'a, C, NC, A> VariantsetSearchCall<'a, C, NC, A> where NC: hyper::net::Netw
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -16535,7 +16737,7 @@ impl<'a, C, NC, A> VariantsetSearchCall<'a, C, NC, A> where NC: hyper::net::Netw
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -16546,7 +16748,7 @@ impl<'a, C, NC, A> VariantsetSearchCall<'a, C, NC, A> where NC: hyper::net::Netw
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -16555,13 +16757,13 @@ impl<'a, C, NC, A> VariantsetSearchCall<'a, C, NC, A> where NC: hyper::net::Netw
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -16633,7 +16835,7 @@ impl<'a, C, NC, A> VariantsetSearchCall<'a, C, NC, A> where NC: hyper::net::Netw
 /// Gets a variant set by ID.
 ///
 /// A builder for the *get* method supported by a *variantset* resource.
-/// It is not used directly, but through a `VariantsetMethods`.
+/// It is not used directly, but through a `VariantsetMethods` instance.
 ///
 /// # Example
 ///
@@ -16691,7 +16893,7 @@ impl<'a, C, NC, A> VariantsetGetCall<'a, C, NC, A> where NC: hyper::net::Network
         for &field in ["alt", "variantSetId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -16744,7 +16946,7 @@ impl<'a, C, NC, A> VariantsetGetCall<'a, C, NC, A> where NC: hyper::net::Network
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -16756,7 +16958,6 @@ impl<'a, C, NC, A> VariantsetGetCall<'a, C, NC, A> where NC: hyper::net::Network
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -16766,7 +16967,7 @@ impl<'a, C, NC, A> VariantsetGetCall<'a, C, NC, A> where NC: hyper::net::Network
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -16777,7 +16978,7 @@ impl<'a, C, NC, A> VariantsetGetCall<'a, C, NC, A> where NC: hyper::net::Network
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -16786,13 +16987,13 @@ impl<'a, C, NC, A> VariantsetGetCall<'a, C, NC, A> where NC: hyper::net::Network
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -16804,7 +17005,7 @@ impl<'a, C, NC, A> VariantsetGetCall<'a, C, NC, A> where NC: hyper::net::Network
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Required. The ID of the variant set.    
+    /// Required. The ID of the variant set.
     pub fn variant_set_id(mut self, new_value: &str) -> VariantsetGetCall<'a, C, NC, A> {
         self._variant_set_id = new_value.to_string();
         self
@@ -16867,7 +17068,7 @@ impl<'a, C, NC, A> VariantsetGetCall<'a, C, NC, A> where NC: hyper::net::Network
 /// When variants are merged, the call information from the new variant is added to the existing variant, and other fields (such as key/value pairs) are discarded.
 ///
 /// A builder for the *mergeVariants* method supported by a *variantset* resource.
-/// It is not used directly, but through a `VariantsetMethods`.
+/// It is not used directly, but through a `VariantsetMethods` instance.
 ///
 /// # Example
 ///
@@ -16932,7 +17133,7 @@ impl<'a, C, NC, A> VariantsetMergeVariantCall<'a, C, NC, A> where NC: hyper::net
         for &field in ["variantSetId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -16988,7 +17189,7 @@ impl<'a, C, NC, A> VariantsetMergeVariantCall<'a, C, NC, A> where NC: hyper::net
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -17004,7 +17205,6 @@ impl<'a, C, NC, A> VariantsetMergeVariantCall<'a, C, NC, A> where NC: hyper::net
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -17014,7 +17214,7 @@ impl<'a, C, NC, A> VariantsetMergeVariantCall<'a, C, NC, A> where NC: hyper::net
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -17025,12 +17225,12 @@ impl<'a, C, NC, A> VariantsetMergeVariantCall<'a, C, NC, A> where NC: hyper::net
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = res;
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -17051,7 +17251,7 @@ impl<'a, C, NC, A> VariantsetMergeVariantCall<'a, C, NC, A> where NC: hyper::net
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The destination variant set.    
+    /// The destination variant set.
     pub fn variant_set_id(mut self, new_value: &str) -> VariantsetMergeVariantCall<'a, C, NC, A> {
         self._variant_set_id = new_value.to_string();
         self
@@ -17112,7 +17312,7 @@ impl<'a, C, NC, A> VariantsetMergeVariantCall<'a, C, NC, A> where NC: hyper::net
 /// Deletes the contents of a variant set. The variant set object is not deleted.
 ///
 /// A builder for the *delete* method supported by a *variantset* resource.
-/// It is not used directly, but through a `VariantsetMethods`.
+/// It is not used directly, but through a `VariantsetMethods` instance.
 ///
 /// # Example
 ///
@@ -17170,7 +17370,7 @@ impl<'a, C, NC, A> VariantsetDeleteCall<'a, C, NC, A> where NC: hyper::net::Netw
         for &field in ["variantSetId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -17222,7 +17422,7 @@ impl<'a, C, NC, A> VariantsetDeleteCall<'a, C, NC, A> where NC: hyper::net::Netw
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -17234,7 +17434,6 @@ impl<'a, C, NC, A> VariantsetDeleteCall<'a, C, NC, A> where NC: hyper::net::Netw
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -17244,7 +17443,7 @@ impl<'a, C, NC, A> VariantsetDeleteCall<'a, C, NC, A> where NC: hyper::net::Netw
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -17255,12 +17454,12 @@ impl<'a, C, NC, A> VariantsetDeleteCall<'a, C, NC, A> where NC: hyper::net::Netw
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = res;
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -17272,7 +17471,7 @@ impl<'a, C, NC, A> VariantsetDeleteCall<'a, C, NC, A> where NC: hyper::net::Netw
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The ID of the variant set to be deleted.    
+    /// The ID of the variant set to be deleted.
     pub fn variant_set_id(mut self, new_value: &str) -> VariantsetDeleteCall<'a, C, NC, A> {
         self._variant_set_id = new_value.to_string();
         self
@@ -17335,7 +17534,7 @@ impl<'a, C, NC, A> VariantsetDeleteCall<'a, C, NC, A> where NC: hyper::net::Netw
 /// The variants for import will be merged with any existing data and each other according to the behavior of mergeVariants. In particular, this means for merged VCF variants that have conflicting INFO fields, some data will be arbitrarily discarded. As a special case, for single-sample VCF files, QUAL and FILTER fields will be moved to the call level; these are sometimes interpreted in a call-specific context. Imported VCF headers are appended to the metadata already in a variant set.
 ///
 /// A builder for the *importVariants* method supported by a *variantset* resource.
-/// It is not used directly, but through a `VariantsetMethods`.
+/// It is not used directly, but through a `VariantsetMethods` instance.
 ///
 /// # Example
 ///
@@ -17400,7 +17599,7 @@ impl<'a, C, NC, A> VariantsetImportVariantCall<'a, C, NC, A> where NC: hyper::ne
         for &field in ["alt", "variantSetId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -17457,7 +17656,7 @@ impl<'a, C, NC, A> VariantsetImportVariantCall<'a, C, NC, A> where NC: hyper::ne
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -17473,7 +17672,6 @@ impl<'a, C, NC, A> VariantsetImportVariantCall<'a, C, NC, A> where NC: hyper::ne
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -17483,7 +17681,7 @@ impl<'a, C, NC, A> VariantsetImportVariantCall<'a, C, NC, A> where NC: hyper::ne
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -17494,7 +17692,7 @@ impl<'a, C, NC, A> VariantsetImportVariantCall<'a, C, NC, A> where NC: hyper::ne
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -17503,13 +17701,13 @@ impl<'a, C, NC, A> VariantsetImportVariantCall<'a, C, NC, A> where NC: hyper::ne
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -17530,7 +17728,7 @@ impl<'a, C, NC, A> VariantsetImportVariantCall<'a, C, NC, A> where NC: hyper::ne
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Required. The variant set to which variant data should be imported.    
+    /// Required. The variant set to which variant data should be imported.
     pub fn variant_set_id(mut self, new_value: &str) -> VariantsetImportVariantCall<'a, C, NC, A> {
         self._variant_set_id = new_value.to_string();
         self

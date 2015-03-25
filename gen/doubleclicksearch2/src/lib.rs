@@ -1,8 +1,8 @@
 // DO NOT EDIT !
-// This file was generated automatically from 'src/mako/lib.rs.mako'
+// This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *doubleclicksearch* crate version *0.1.1+20150224*, where *20150224* is the exact revision of the *doubleclicksearch:v2* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.1*.
+//! This documentation was generated from *doubleclicksearch* crate version *0.1.2+20150224*, where *20150224* is the exact revision of the *doubleclicksearch:v2* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.2*.
 //! 
 //! Everything else about the *doubleclicksearch* *v2* API can be found at the
 //! [official documentation site](https://developers.google.com/doubleclick-search/).
@@ -33,6 +33,8 @@
 //! 
 //! * **[Hub](struct.Doubleclicksearch.html)**
 //!     * a central object to maintain state and allow accessing all *Activities*
+//!     * creates [*Method Builders*](trait.MethodsBuilder.html) which in turn
+//!       allow access to individual [*Call Builders*](trait.CallBuilder.html)
 //! * **[Resources](trait.Resource.html)**
 //!     * primary types that you can apply *Activities* to
 //!     * a collection of properties and *Parts*
@@ -41,6 +43,8 @@
 //!         * never directly used in *Activities*
 //! * **[Activities](trait.CallBuilder.html)**
 //!     * operations to apply to *Resources*
+//! 
+//! All *structures* are marked with applicable traits to further categorize them and ease browsing.
 //! 
 //! Generally speaking, you can invoke *Activities* like this:
 //! 
@@ -79,7 +83,7 @@
 //! extern crate hyper;
 //! extern crate "yup-oauth2" as oauth2;
 //! extern crate "google-doubleclicksearch2" as doubleclicksearch2;
-//! use doubleclicksearch2::Result;
+//! use doubleclicksearch2::{Result, Error};
 //! # #[test] fn egal() {
 //! use std::default::Default;
 //! use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -104,15 +108,17 @@
 //!              .doit();
 //! 
 //! match result {
-//!     Result::HttpError(err) => println!("HTTPERROR: {:?}", err),
-//!     Result::MissingAPIKey => println!("Auth: Missing API Key - used if there are no scopes"),
-//!     Result::MissingToken => println!("OAuth2: Missing Token"),
-//!     Result::Cancelled => println!("Operation cancelled by user"),
-//!     Result::UploadSizeLimitExceeded(size, max_size) => println!("Upload size too big: {} of {}", size, max_size),
-//!     Result::Failure(_) => println!("General Failure (hyper::client::Response doesn't print)"),
-//!     Result::FieldClash(clashed_field) => println!("You added custom parameter which is part of builder: {:?}", clashed_field),
-//!     Result::JsonDecodeError(err) => println!("Couldn't understand server reply - maybe API needs update: {:?}", err),
-//!     Result::Success(_) => println!("Success (value doesn't print)"),
+//!     Err(e) => match e {
+//!         Error::HttpError(err) => println!("HTTPERROR: {:?}", err),
+//!         Error::MissingAPIKey => println!("Auth: Missing API Key - used if there are no scopes"),
+//!         Error::MissingToken => println!("OAuth2: Missing Token"),
+//!         Error::Cancelled => println!("Operation canceled by user"),
+//!         Error::UploadSizeLimitExceeded(size, max_size) => println!("Upload size too big: {} of {}", size, max_size),
+//!         Error::Failure(_) => println!("General Failure (hyper::client::Response doesn't print)"),
+//!         Error::FieldClash(clashed_field) => println!("You added custom parameter which is part of builder: {:?}", clashed_field),
+//!         Error::JsonDecodeError(err) => println!("Couldn't understand server reply - maybe API needs update: {:?}", err),
+//!     },
+//!     Ok(_) => println!("Success (value doesn't print)"),
 //! }
 //! # }
 //! ```
@@ -125,7 +131,7 @@
 //! When delegates handle errors or intermediate values, they may have a chance to instruct the system to retry. This 
 //! makes the system potentially resilient to all kinds of errors.
 //! 
-//! ## Uploads and Downlods
+//! ## Uploads and Downloads
 //! If a method supports downloads, the response body, which is part of the [Result](enum.Result.html), should be
 //! read by you to obtain the media.
 //! If such a method also supports a [Response Result](trait.ResponseResult.html), it will return that by default.
@@ -148,8 +154,9 @@
 //! ## Optional Parts in Server-Requests
 //! 
 //! All structures provided by this library are made to be [enocodable](trait.RequestValue.html) and 
-//! [decodable](trait.ResponseResult.html) via json. Optionals are used to indicate that partial requests are responses are valid.
-//! Most optionals are are considered [Parts](trait.Part.html) which are identifyable by name, which will be sent to 
+//! [decodable](trait.ResponseResult.html) via *json*. Optionals are used to indicate that partial requests are responses 
+//! are valid.
+//! Most optionals are are considered [Parts](trait.Part.html) which are identifiable by name, which will be sent to 
 //! the server to indicate either the set parts of the request or the desired parts in the response.
 //! 
 //! ## Builder Arguments
@@ -198,7 +205,7 @@ use std::io;
 use std::fs;
 use std::thread::sleep;
 
-pub use cmn::{MultiPartReader, ToParts, MethodInfo, Result, CallBuilder, Hub, ReadSeek, Part, ResponseResult, RequestValue, NestedType, Delegate, DefaultDelegate, ResourceMethodsBuilder, Resource, JsonServerError};
+pub use cmn::{MultiPartReader, ToParts, MethodInfo, Result, Error, CallBuilder, Hub, ReadSeek, Part, ResponseResult, RequestValue, NestedType, Delegate, DefaultDelegate, MethodsBuilder, Resource, JsonServerError};
 
 
 // ##############
@@ -244,7 +251,7 @@ impl Default for Scope {
 /// extern crate hyper;
 /// extern crate "yup-oauth2" as oauth2;
 /// extern crate "google-doubleclicksearch2" as doubleclicksearch2;
-/// use doubleclicksearch2::Result;
+/// use doubleclicksearch2::{Result, Error};
 /// # #[test] fn egal() {
 /// use std::default::Default;
 /// use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -269,15 +276,17 @@ impl Default for Scope {
 ///              .doit();
 /// 
 /// match result {
-///     Result::HttpError(err) => println!("HTTPERROR: {:?}", err),
-///     Result::MissingAPIKey => println!("Auth: Missing API Key - used if there are no scopes"),
-///     Result::MissingToken => println!("OAuth2: Missing Token"),
-///     Result::Cancelled => println!("Operation cancelled by user"),
-///     Result::UploadSizeLimitExceeded(size, max_size) => println!("Upload size too big: {} of {}", size, max_size),
-///     Result::Failure(_) => println!("General Failure (hyper::client::Response doesn't print)"),
-///     Result::FieldClash(clashed_field) => println!("You added custom parameter which is part of builder: {:?}", clashed_field),
-///     Result::JsonDecodeError(err) => println!("Couldn't understand server reply - maybe API needs update: {:?}", err),
-///     Result::Success(_) => println!("Success (value doesn't print)"),
+///     Err(e) => match e {
+///         Error::HttpError(err) => println!("HTTPERROR: {:?}", err),
+///         Error::MissingAPIKey => println!("Auth: Missing API Key - used if there are no scopes"),
+///         Error::MissingToken => println!("OAuth2: Missing Token"),
+///         Error::Cancelled => println!("Operation canceled by user"),
+///         Error::UploadSizeLimitExceeded(size, max_size) => println!("Upload size too big: {} of {}", size, max_size),
+///         Error::Failure(_) => println!("General Failure (hyper::client::Response doesn't print)"),
+///         Error::FieldClash(clashed_field) => println!("You added custom parameter which is part of builder: {:?}", clashed_field),
+///         Error::JsonDecodeError(err) => println!("Couldn't understand server reply - maybe API needs update: {:?}", err),
+///     },
+///     Ok(_) => println!("Success (value doesn't print)"),
 /// }
 /// # }
 /// ```
@@ -298,7 +307,7 @@ impl<'a, C, NC, A> Doubleclicksearch<C, NC, A>
         Doubleclicksearch {
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/0.1.1".to_string(),
+            _user_agent: "google-api-rust-client/0.1.2".to_string(),
             _m: PhantomData
         }
     }
@@ -314,7 +323,7 @@ impl<'a, C, NC, A> Doubleclicksearch<C, NC, A>
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/0.1.1`.
+    /// It defaults to `google-api-rust-client/0.1.2`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -334,9 +343,9 @@ impl<'a, C, NC, A> Doubleclicksearch<C, NC, A>
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct CustomDimension {
-    /// Custom dimension name.    
+    /// Custom dimension name.
     pub name: String,
-    /// Custom dimension value.    
+    /// Custom dimension value.
     pub value: String,
 }
 
@@ -349,9 +358,9 @@ impl Part for CustomDimension {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct CustomMetric {
-    /// Custom metric name.    
+    /// Custom metric name.
     pub name: String,
-    /// Custom metric numeric value.    
+    /// Custom metric numeric value.
     pub value: f64,
 }
 
@@ -364,78 +373,78 @@ impl Part for CustomMetric {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Conversion {
-    /// Custom dimensions for the conversion, which can be used to filter data in a report.    
+    /// Custom dimensions for the conversion, which can be used to filter data in a report.
     #[serde(alias="customDimension")]
     pub custom_dimension: Vec<CustomDimension>,
-    /// DS ad group ID.    
+    /// DS ad group ID.
     #[serde(alias="adGroupId")]
     pub ad_group_id: String,
-    /// The numeric segmentation identifier (for example, DoubleClick Search Floodlight activity ID).    
+    /// The numeric segmentation identifier (for example, DoubleClick Search Floodlight activity ID).
     #[serde(alias="segmentationId")]
     pub segmentation_id: String,
-    /// Attribution model name.    
+    /// Attribution model name.
     #[serde(alias="attributionModel")]
     pub attribution_model: String,
-    /// DS campaign ID.    
+    /// DS campaign ID.
     #[serde(alias="campaignId")]
     pub campaign_id: String,
-    /// The revenue amount of this TRANSACTION conversion, in micros.    
+    /// The revenue amount of this TRANSACTION conversion, in micros.
     #[serde(alias="revenueMicros")]
     pub revenue_micros: String,
-    /// DS advertiser ID.    
+    /// DS advertiser ID.
     #[serde(alias="advertiserId")]
     pub advertiser_id: String,
-    /// The quantity of this conversion, in millis.    
+    /// The quantity of this conversion, in millis.
     #[serde(alias="quantityMillis")]
     pub quantity_millis: String,
-    /// Conversion count in millis.    
+    /// Conversion count in millis.
     #[serde(alias="countMillis")]
     pub count_millis: String,
-    /// DS criterion (keyword) ID.    
+    /// DS criterion (keyword) ID.
     #[serde(alias="criterionId")]
     pub criterion_id: String,
-    /// The time at which the conversion took place, in epoch millis UTC.    
+    /// The time at which the conversion took place, in epoch millis UTC.
     #[serde(alias="conversionTimestamp")]
     pub conversion_timestamp: String,
-    /// The advertiser-provided order id for the conversion.    
+    /// The advertiser-provided order id for the conversion.
     #[serde(alias="floodlightOrderId")]
     pub floodlight_order_id: String,
-    /// The segmentation type of this conversion (for example, FLOODLIGHT).    
+    /// The segmentation type of this conversion (for example, FLOODLIGHT).
     #[serde(alias="segmentationType")]
     pub segmentation_type: String,
-    /// DS click ID for the conversion.    
+    /// DS click ID for the conversion.
     #[serde(alias="clickId")]
     pub click_id: String,
-    /// Custom metrics for the conversion.    
+    /// Custom metrics for the conversion.
     #[serde(alias="customMetric")]
     pub custom_metric: Vec<CustomMetric>,
-    /// DS conversion ID.    
+    /// DS conversion ID.
     #[serde(alias="dsConversionId")]
     pub ds_conversion_id: String,
-    /// DS engine account ID.    
+    /// DS engine account ID.
     #[serde(alias="engineAccountId")]
     pub engine_account_id: String,
-    /// The time at which the conversion was last modified, in epoch millis UTC.    
+    /// The time at which the conversion was last modified, in epoch millis UTC.
     #[serde(alias="conversionModifiedTimestamp")]
     pub conversion_modified_timestamp: String,
-    /// The currency code for the conversion's revenue. Should be in ISO 4217 alphabetic (3-char) format.    
+    /// The currency code for the conversion's revenue. Should be in ISO 4217 alphabetic (3-char) format.
     #[serde(alias="currencyCode")]
     pub currency_code: String,
-    /// The friendly segmentation identifier (for example, DoubleClick Search Floodlight activity name).    
+    /// The friendly segmentation identifier (for example, DoubleClick Search Floodlight activity name).
     #[serde(alias="segmentationName")]
     pub segmentation_name: String,
-    /// The state of the conversion, that is, either ACTIVE or REMOVED. Note: state DELETED is deprecated.    
+    /// The state of the conversion, that is, either ACTIVE or REMOVED. Note: state DELETED is deprecated.
     pub state: String,
-    /// DS ad ID.    
+    /// DS ad ID.
     #[serde(alias="adId")]
     pub ad_id: String,
-    /// DS agency ID.    
+    /// DS agency ID.
     #[serde(alias="agencyId")]
     pub agency_id: String,
-    /// Advertiser-provided ID for the conversion, also known as the order ID.    
+    /// Advertiser-provided ID for the conversion, also known as the order ID.
     #[serde(alias="conversionId")]
     pub conversion_id: String,
-    /// The type of the conversion, that is, either ACTION or TRANSACTION. An ACTION conversion is an action by the user that has no monetarily quantifiable value, while a TRANSACTION conversion is an action that does have a monetarily quantifiable value. Examples are email list signups (ACTION) versus ecommerce purchases (TRANSACTION).    
+    /// The type of the conversion, that is, either ACTION or TRANSACTION. An ACTION conversion is an action by the user that has no monetarily quantifiable value, while a TRANSACTION conversion is an action that does have a monetarily quantifiable value. Examples are email list signups (ACTION) versus ecommerce purchases (TRANSACTION).
     #[serde(alias="type")]
     pub type_: String,
 }
@@ -459,9 +468,9 @@ impl Part for ReportRow {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct ReportFiles {
-    /// Use this url to download the report file.    
+    /// Use this url to download the report file.
     pub url: String,
-    /// The size of this report file in bytes.    
+    /// The size of this report file in bytes.
     #[serde(alias="byteCount")]
     pub byte_count: i64,
 }
@@ -476,25 +485,25 @@ impl Part for ReportFiles {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ReportRequestReportScope {
-    /// DS advertiser ID.    
+    /// DS advertiser ID.
     #[serde(alias="advertiserId")]
     pub advertiser_id: String,
-    /// DS ad group ID.    
+    /// DS ad group ID.
     #[serde(alias="adGroupId")]
     pub ad_group_id: String,
-    /// DS keyword ID.    
+    /// DS keyword ID.
     #[serde(alias="keywordId")]
     pub keyword_id: String,
-    /// DS ad ID.    
+    /// DS ad ID.
     #[serde(alias="adId")]
     pub ad_id: String,
-    /// DS agency ID.    
+    /// DS agency ID.
     #[serde(alias="agencyId")]
     pub agency_id: String,
-    /// DS engine account ID.    
+    /// DS engine account ID.
     #[serde(alias="engineAccountId")]
     pub engine_account_id: String,
-    /// DS campaign ID.    
+    /// DS campaign ID.
     #[serde(alias="campaignId")]
     pub campaign_id: String,
 }
@@ -509,11 +518,11 @@ impl Part for ReportRequestReportScope {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ReportRequestFilters {
-    /// Column to perform the filter on. This can be a DoubleClick Search column or a saved column.    
+    /// Column to perform the filter on. This can be a DoubleClick Search column or a saved column.
     pub column: ReportApiColumnSpec,
-    /// Operator to use in the filter. See the filter reference for a list of available operators.    
+    /// Operator to use in the filter. See the filter reference for a list of available operators.
     pub operator: String,
-    /// A list of values to filter the column value against.    
+    /// A list of values to filter the column value against.
     pub values: Vec<String>,
 }
 
@@ -527,9 +536,9 @@ impl Part for ReportRequestFilters {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ReportRequestOrderBy {
-    /// Column to perform the sort on. This can be a DoubleClick Search-defined column or a saved column.    
+    /// Column to perform the sort on. This can be a DoubleClick Search-defined column or a saved column.
     pub column: ReportApiColumnSpec,
-    /// The sort direction, which is either ascending or descending.    
+    /// The sort direction, which is either ascending or descending.
     #[serde(alias="sortOrder")]
     pub sort_order: String,
 }
@@ -544,32 +553,32 @@ impl Part for ReportRequestOrderBy {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ReportApiColumnSpec {
-    /// Synchronous report only. Set to true to group by this column. Defaults to false.    
+    /// Synchronous report only. Set to true to group by this column. Defaults to false.
     #[serde(alias="groupByColumn")]
     pub group_by_column: bool,
-    /// Inclusive day in YYYY-MM-DD format. When provided, this overrides the overall time range of the report for this column only. Must be provided together with startDate.    
+    /// Inclusive day in YYYY-MM-DD format. When provided, this overrides the overall time range of the report for this column only. Must be provided together with startDate.
     #[serde(alias="endDate")]
     pub end_date: String,
-    /// Name of a saved column to include in the report. The report must be scoped at advertiser or lower, and this saved column must already be created in the DoubleClick Search UI.    
+    /// Name of a saved column to include in the report. The report must be scoped at advertiser or lower, and this saved column must already be created in the DoubleClick Search UI.
     #[serde(alias="savedColumnName")]
     pub saved_column_name: String,
     /// Segments a report by a custom dimension. The report must be scoped to an advertiser or lower, and the custom dimension must already be set up in DoubleClick Search. The custom dimension name, which appears in DoubleClick Search, is case sensitive.
     /// If used in a conversion report, returns the value of the specified custom dimension for the given conversion, if set. This column does not segment the conversion report.
     #[serde(alias="customDimensionName")]
     pub custom_dimension_name: String,
-    /// Text used to identify this column in the report output; defaults to columnName or savedColumnName when not specified. This can be used to prevent collisions between DoubleClick Search columns and saved columns with the same name.    
+    /// Text used to identify this column in the report output; defaults to columnName or savedColumnName when not specified. This can be used to prevent collisions between DoubleClick Search columns and saved columns with the same name.
     #[serde(alias="headerText")]
     pub header_text: String,
-    /// Name of a DoubleClick Search column to include in the report.    
+    /// Name of a DoubleClick Search column to include in the report.
     #[serde(alias="columnName")]
     pub column_name: String,
-    /// The platform that is used to provide data for the custom dimension. Acceptable values are "Floodlight".    
+    /// The platform that is used to provide data for the custom dimension. Acceptable values are "Floodlight".
     #[serde(alias="platformSource")]
     pub platform_source: String,
-    /// Inclusive date in YYYY-MM-DD format. When provided, this overrides the overall time range of the report for this column only. Must be provided together with endDate.    
+    /// Inclusive date in YYYY-MM-DD format. When provided, this overrides the overall time range of the report for this column only. Must be provided together with endDate.
     #[serde(alias="startDate")]
     pub start_date: String,
-    /// Name of a custom metric to include in the report. The report must be scoped to an advertiser or lower, and the custom metric must already be set up in DoubleClick Search. The custom metric name, which appears in DoubleClick Search, is case sensitive.    
+    /// Name of a custom metric to include in the report. The report must be scoped to an advertiser or lower, and the custom metric must already be set up in DoubleClick Search. The custom metric name, which appears in DoubleClick Search, is case sensitive.
     #[serde(alias="customMetricName")]
     pub custom_metric_name: String,
 }
@@ -583,22 +592,22 @@ impl Part for ReportApiColumnSpec {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Availability {
-    /// DS advertiser ID.    
+    /// DS advertiser ID.
     #[serde(alias="advertiserId")]
     pub advertiser_id: String,
-    /// The numeric segmentation identifier (for example, DoubleClick Search Floodlight activity ID).    
+    /// The numeric segmentation identifier (for example, DoubleClick Search Floodlight activity ID).
     #[serde(alias="segmentationId")]
     pub segmentation_id: String,
-    /// The segmentation type that this availability is for (its default value is FLOODLIGHT).    
+    /// The segmentation type that this availability is for (its default value is FLOODLIGHT).
     #[serde(alias="segmentationType")]
     pub segmentation_type: String,
-    /// DS agency ID.    
+    /// DS agency ID.
     #[serde(alias="agencyId")]
     pub agency_id: String,
-    /// The friendly segmentation identifier (for example, DoubleClick Search Floodlight activity name).    
+    /// The friendly segmentation identifier (for example, DoubleClick Search Floodlight activity name).
     #[serde(alias="segmentationName")]
     pub segmentation_name: String,
-    /// The time by which all conversions have been uploaded, in epoch millis UTC.    
+    /// The time by which all conversions have been uploaded, in epoch millis UTC.
     #[serde(alias="availabilityTimestamp")]
     pub availability_timestamp: String,
 }
@@ -618,44 +627,44 @@ impl Part for Availability {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ReportRequest {
-    /// Synchronous report only. A list of columns and directions defining sorting to be performed on the report rows.    
+    /// Synchronous report only. A list of columns and directions defining sorting to be performed on the report rows.
     #[serde(alias="orderBy")]
     pub order_by: Option<Vec<ReportRequestOrderBy>>,
-    /// The reportScope is a set of IDs that are used to determine which subset of entities will be returned in the report. The full lineage of IDs from the lowest scoped level desired up through agency is required.    
+    /// The reportScope is a set of IDs that are used to determine which subset of entities will be returned in the report. The full lineage of IDs from the lowest scoped level desired up through agency is required.
     #[serde(alias="reportScope")]
     pub report_scope: Option<ReportRequestReportScope>,
-    /// Asynchronous report only. The maximum number of rows per report file. A large report is split into many files based on this field. Acceptable values are 1000000 to 100000000, inclusive.    
+    /// Asynchronous report only. The maximum number of rows per report file. A large report is split into many files based on this field. Acceptable values are 1000000 to 100000000, inclusive.
     #[serde(alias="maxRowsPerFile")]
     pub max_rows_per_file: Option<i32>,
-    /// Specifies the currency in which monetary will be returned. Possible values are: usd, agency (valid if the report is scoped to agency or lower), advertiser (valid if the report is scoped to * advertiser or lower), or account (valid if the report is scoped to engine account or lower).    
+    /// Specifies the currency in which monetary will be returned. Possible values are: usd, agency (valid if the report is scoped to agency or lower), advertiser (valid if the report is scoped to * advertiser or lower), or account (valid if the report is scoped to engine account or lower).
     #[serde(alias="statisticsCurrency")]
     pub statistics_currency: Option<String>,
-    /// If metrics are requested in a report, this argument will be used to restrict the metrics to a specific time range.    
+    /// If metrics are requested in a report, this argument will be used to restrict the metrics to a specific time range.
     #[serde(alias="timeRange")]
     pub time_range: Option<ReportRequestTimeRange>,
-    /// Synchronous report only. Zero-based index of the first row to return. Acceptable values are 0 to 50000, inclusive. Defaults to 0.    
+    /// Synchronous report only. Zero-based index of the first row to return. Acceptable values are 0 to 50000, inclusive. Defaults to 0.
     #[serde(alias="startRow")]
     pub start_row: Option<i32>,
-    /// Synchronous report only. The maxinum number of rows to return; additional rows are dropped. Acceptable values are 0 to 10000, inclusive. Defaults to 10000.    
+    /// Synchronous report only. The maxinum number of rows to return; additional rows are dropped. Acceptable values are 0 to 10000, inclusive. Defaults to 10000.
     #[serde(alias="rowCount")]
     pub row_count: Option<i32>,
-    /// Determines the type of rows that are returned in the report. For example, if you specify reportType: keyword, each row in the report will contain data about a keyword. See the Types of Reports reference for the columns that are available for each type.    
+    /// Determines the type of rows that are returned in the report. For example, if you specify reportType: keyword, each row in the report will contain data about a keyword. See the Types of Reports reference for the columns that are available for each type.
     #[serde(alias="reportType")]
     pub report_type: Option<String>,
-    /// The columns to include in the report. This includes both DoubleClick Search columns and saved columns. For DoubleClick Search columns, only the columnName parameter is required. For saved columns only the savedColumnName parameter is required. Both columnName and savedColumnName cannot be set in the same stanza.    
+    /// The columns to include in the report. This includes both DoubleClick Search columns and saved columns. For DoubleClick Search columns, only the columnName parameter is required. For saved columns only the savedColumnName parameter is required. Both columnName and savedColumnName cannot be set in the same stanza.
     pub columns: Option<Vec<ReportApiColumnSpec>>,
-    /// A list of filters to be applied to the report.    
+    /// A list of filters to be applied to the report.
     pub filters: Option<Vec<ReportRequestFilters>>,
-    /// Determines if removed entities should be included in the report. Defaults to false.    
+    /// Determines if removed entities should be included in the report. Defaults to false.
     #[serde(alias="includeRemovedEntities")]
     pub include_removed_entities: Option<bool>,
-    /// Determines if removed entities should be included in the report. Defaults to false. Deprecated, please use includeRemovedEntities instead.    
+    /// Determines if removed entities should be included in the report. Defaults to false. Deprecated, please use includeRemovedEntities instead.
     #[serde(alias="includeDeletedEntities")]
     pub include_deleted_entities: Option<bool>,
-    /// If true, the report would only be created if all the requested stat data are sourced from a single timezone. Defaults to false.    
+    /// If true, the report would only be created if all the requested stat data are sourced from a single timezone. Defaults to false.
     #[serde(alias="verifySingleTimeZone")]
     pub verify_single_time_zone: Option<bool>,
-    /// Format that the report should be returned in. Currently csv or tsv is supported.    
+    /// Format that the report should be returned in. Currently csv or tsv is supported.
     #[serde(alias="downloadFormat")]
     pub download_format: Option<String>,
 }
@@ -677,27 +686,27 @@ impl RequestValue for ReportRequest {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct Report {
-    /// Asynchronous report only. Contains a list of generated report files once the report has succesfully completed.    
+    /// Asynchronous report only. Contains a list of generated report files once the report has succesfully completed.
     pub files: Vec<ReportFiles>,
-    /// Identifies this as a Report resource. Value: the fixed string doubleclicksearch#report.    
+    /// Identifies this as a Report resource. Value: the fixed string doubleclicksearch#report.
     pub kind: String,
-    /// Synchronous report only. Generated report rows.    
+    /// Synchronous report only. Generated report rows.
     pub rows: Vec<ReportRow>,
-    /// The request that created the report. Optional fields not specified in the original request are filled with default values.    
+    /// The request that created the report. Optional fields not specified in the original request are filled with default values.
     pub request: ReportRequest,
-    /// Asynchronous report only. True if and only if the report has completed successfully and the report files are ready to be downloaded.    
+    /// Asynchronous report only. True if and only if the report has completed successfully and the report files are ready to be downloaded.
     #[serde(alias="isReportReady")]
     pub is_report_ready: bool,
-    /// The number of report rows generated by the report, not including headers.    
+    /// The number of report rows generated by the report, not including headers.
     #[serde(alias="rowCount")]
     pub row_count: i32,
-    /// If all statistics of the report are sourced from the same time zone, this would be it. Otherwise the field is unset.    
+    /// If all statistics of the report are sourced from the same time zone, this would be it. Otherwise the field is unset.
     #[serde(alias="statisticsTimeZone")]
     pub statistics_time_zone: String,
-    /// The currency code of all monetary values produced in the report, including values that are set by users (e.g., keyword bid settings) and metrics (e.g., cost and revenue). The currency code of a report is determined by the statisticsCurrency field of the report request.    
+    /// The currency code of all monetary values produced in the report, including values that are set by users (e.g., keyword bid settings) and metrics (e.g., cost and revenue). The currency code of a report is determined by the statisticsCurrency field of the report request.
     #[serde(alias="statisticsCurrencyCode")]
     pub statistics_currency_code: String,
-    /// Asynchronous report only. Id of the report.    
+    /// Asynchronous report only. Id of the report.
     pub id: String,
 }
 
@@ -711,16 +720,16 @@ impl ResponseResult for Report {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ReportRequestTimeRange {
-    /// Inclusive UTC timestamp in RFC format, e.g., 2013-07-16T10:16:23.555Z. See additional references on how changed metrics reports work.    
+    /// Inclusive UTC timestamp in RFC format, e.g., 2013-07-16T10:16:23.555Z. See additional references on how changed metrics reports work.
     #[serde(alias="changedMetricsSinceTimestamp")]
     pub changed_metrics_since_timestamp: String,
-    /// Inclusive date in YYYY-MM-DD format.    
+    /// Inclusive date in YYYY-MM-DD format.
     #[serde(alias="endDate")]
     pub end_date: String,
-    /// Inclusive UTC timestamp in RFC format, e.g., 2013-07-16T10:16:23.555Z. See additional references on how changed attribute reports work.    
+    /// Inclusive UTC timestamp in RFC format, e.g., 2013-07-16T10:16:23.555Z. See additional references on how changed attribute reports work.
     #[serde(alias="changedAttributesSinceTimestamp")]
     pub changed_attributes_since_timestamp: String,
-    /// Inclusive date in YYYY-MM-DD format.    
+    /// Inclusive date in YYYY-MM-DD format.
     #[serde(alias="startDate")]
     pub start_date: String,
 }
@@ -740,9 +749,9 @@ impl Part for ReportRequestTimeRange {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct SavedColumnList {
-    /// The saved columns being requested.    
+    /// The saved columns being requested.
     pub items: Vec<SavedColumn>,
-    /// Identifies this as a SavedColumnList resource. Value: the fixed string doubleclicksearch#savedColumnList.    
+    /// Identifies this as a SavedColumnList resource. Value: the fixed string doubleclicksearch#savedColumnList.
     pub kind: String,
 }
 
@@ -760,12 +769,12 @@ impl ResponseResult for SavedColumnList {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct SavedColumn {
-    /// The name of the saved column.    
+    /// The name of the saved column.
     #[serde(alias="savedColumnName")]
     pub saved_column_name: Option<String>,
-    /// Identifies this as a SavedColumn resource. Value: the fixed string doubleclicksearch#savedColumn.    
+    /// Identifies this as a SavedColumn resource. Value: the fixed string doubleclicksearch#savedColumn.
     pub kind: Option<String>,
-    /// The type of data this saved column will produce.    
+    /// The type of data this saved column will produce.
     #[serde(alias="type")]
     pub type_: Option<String>,
 }
@@ -784,7 +793,7 @@ impl Resource for SavedColumn {}
 /// 
 #[derive(Default, Clone, Debug, Serialize)]
 pub struct UpdateAvailabilityRequest {
-    /// The availabilities being requested.    
+    /// The availabilities being requested.
     pub availabilities: Option<Vec<Availability>>,
 }
 
@@ -802,7 +811,7 @@ impl RequestValue for UpdateAvailabilityRequest {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct UpdateAvailabilityResponse {
-    /// The availabilities being returned.    
+    /// The availabilities being returned.
     pub availabilities: Vec<Availability>,
 }
 
@@ -823,9 +832,9 @@ impl ResponseResult for UpdateAvailabilityResponse {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ConversionList {
-    /// The conversions being requested.    
+    /// The conversions being requested.
     pub conversion: Option<Vec<Conversion>>,
-    /// Identifies this as a ConversionList resource. Value: the fixed string doubleclicksearch#conversionList.    
+    /// Identifies this as a ConversionList resource. Value: the fixed string doubleclicksearch#conversionList.
     pub kind: Option<String>,
 }
 
@@ -872,13 +881,17 @@ pub struct ConversionMethods<'a, C, NC, A>
     hub: &'a Doubleclicksearch<C, NC, A>,
 }
 
-impl<'a, C, NC, A> ResourceMethodsBuilder for ConversionMethods<'a, C, NC, A> {}
+impl<'a, C, NC, A> MethodsBuilder for ConversionMethods<'a, C, NC, A> {}
 
 impl<'a, C, NC, A> ConversionMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Inserts a batch of new conversions into DoubleClick Search.    
+    /// Inserts a batch of new conversions into DoubleClick Search.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
     pub fn insert(&self, request: &ConversionList) -> ConversionInsertCall<'a, C, NC, A> {
         ConversionInsertCall {
             hub: self.hub,
@@ -891,7 +904,17 @@ impl<'a, C, NC, A> ConversionMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Retrieves a list of conversions from a DoubleClick Search engine account.    
+    /// Retrieves a list of conversions from a DoubleClick Search engine account.
+    /// 
+    /// # Arguments
+    ///
+    /// * `agencyId` - Numeric ID of the agency.
+    /// * `advertiserId` - Numeric ID of the advertiser.
+    /// * `engineAccountId` - Numeric ID of the engine account.
+    /// * `endDate` - Last date (inclusive) on which to retrieve conversions. Format is yyyymmdd.
+    /// * `rowCount` - The number of conversions to return per call.
+    /// * `startDate` - First date (inclusive) on which to retrieve conversions. Format is yyyymmdd.
+    /// * `startRow` - The 0-based starting index for retrieving conversions results.
     pub fn get(&self, agency_id: &str, advertiser_id: &str, engine_account_id: &str, end_date: i32, row_count: i32, start_date: i32, start_row: u32) -> ConversionGetCall<'a, C, NC, A> {
         ConversionGetCall {
             hub: self.hub,
@@ -914,7 +937,11 @@ impl<'a, C, NC, A> ConversionMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Updates the availabilities of a batch of floodlight activities in DoubleClick Search.    
+    /// Updates the availabilities of a batch of floodlight activities in DoubleClick Search.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
     pub fn update_availability(&self, request: &UpdateAvailabilityRequest) -> ConversionUpdateAvailabilityCall<'a, C, NC, A> {
         ConversionUpdateAvailabilityCall {
             hub: self.hub,
@@ -927,7 +954,18 @@ impl<'a, C, NC, A> ConversionMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Updates a batch of conversions in DoubleClick Search. This method supports patch semantics.    
+    /// Updates a batch of conversions in DoubleClick Search. This method supports patch semantics.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `advertiserId` - Numeric ID of the advertiser.
+    /// * `agencyId` - Numeric ID of the agency.
+    /// * `endDate` - Last date (inclusive) on which to retrieve conversions. Format is yyyymmdd.
+    /// * `engineAccountId` - Numeric ID of the engine account.
+    /// * `rowCount` - The number of conversions to return per call.
+    /// * `startDate` - First date (inclusive) on which to retrieve conversions. Format is yyyymmdd.
+    /// * `startRow` - The 0-based starting index for retrieving conversions results.
     pub fn patch(&self, request: &ConversionList, advertiser_id: &str, agency_id: &str, end_date: i32, engine_account_id: &str, row_count: i32, start_date: i32, start_row: u32) -> ConversionPatchCall<'a, C, NC, A> {
         ConversionPatchCall {
             hub: self.hub,
@@ -947,7 +985,11 @@ impl<'a, C, NC, A> ConversionMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Updates a batch of conversions in DoubleClick Search.    
+    /// Updates a batch of conversions in DoubleClick Search.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
     pub fn update(&self, request: &ConversionList) -> ConversionUpdateCall<'a, C, NC, A> {
         ConversionUpdateCall {
             hub: self.hub,
@@ -995,13 +1037,18 @@ pub struct SavedColumnMethods<'a, C, NC, A>
     hub: &'a Doubleclicksearch<C, NC, A>,
 }
 
-impl<'a, C, NC, A> ResourceMethodsBuilder for SavedColumnMethods<'a, C, NC, A> {}
+impl<'a, C, NC, A> MethodsBuilder for SavedColumnMethods<'a, C, NC, A> {}
 
 impl<'a, C, NC, A> SavedColumnMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Retrieve the list of saved columns for a specified advertiser.    
+    /// Retrieve the list of saved columns for a specified advertiser.
+    /// 
+    /// # Arguments
+    ///
+    /// * `agencyId` - DS ID of the agency.
+    /// * `advertiserId` - DS ID of the advertiser.
     pub fn list(&self, agency_id: &str, advertiser_id: &str) -> SavedColumnListCall<'a, C, NC, A> {
         SavedColumnListCall {
             hub: self.hub,
@@ -1050,13 +1097,18 @@ pub struct ReportMethods<'a, C, NC, A>
     hub: &'a Doubleclicksearch<C, NC, A>,
 }
 
-impl<'a, C, NC, A> ResourceMethodsBuilder for ReportMethods<'a, C, NC, A> {}
+impl<'a, C, NC, A> MethodsBuilder for ReportMethods<'a, C, NC, A> {}
 
 impl<'a, C, NC, A> ReportMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Downloads a report file.    
+    /// Downloads a report file.
+    /// 
+    /// # Arguments
+    ///
+    /// * `reportId` - ID of the report.
+    /// * `reportFragment` - The index of the report fragment to download.
     pub fn get_file(&self, report_id: &str, report_fragment: i32) -> ReportGetFileCall<'a, C, NC, A> {
         ReportGetFileCall {
             hub: self.hub,
@@ -1070,7 +1122,11 @@ impl<'a, C, NC, A> ReportMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Generates and returns a report immediately.    
+    /// Generates and returns a report immediately.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
     pub fn generate(&self, request: &ReportRequest) -> ReportGenerateCall<'a, C, NC, A> {
         ReportGenerateCall {
             hub: self.hub,
@@ -1083,7 +1139,11 @@ impl<'a, C, NC, A> ReportMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Polls for the status of a report request.    
+    /// Polls for the status of a report request.
+    /// 
+    /// # Arguments
+    ///
+    /// * `reportId` - ID of the report request being polled.
     pub fn get(&self, report_id: &str) -> ReportGetCall<'a, C, NC, A> {
         ReportGetCall {
             hub: self.hub,
@@ -1096,7 +1156,11 @@ impl<'a, C, NC, A> ReportMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Inserts a report request into the reporting system.    
+    /// Inserts a report request into the reporting system.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
     pub fn request(&self, request: &ReportRequest) -> ReportRequestCall<'a, C, NC, A> {
         ReportRequestCall {
             hub: self.hub,
@@ -1119,7 +1183,7 @@ impl<'a, C, NC, A> ReportMethods<'a, C, NC, A> {
 /// Inserts a batch of new conversions into DoubleClick Search.
 ///
 /// A builder for the *insert* method supported by a *conversion* resource.
-/// It is not used directly, but through a `ConversionMethods`.
+/// It is not used directly, but through a `ConversionMethods` instance.
 ///
 /// # Example
 ///
@@ -1182,7 +1246,7 @@ impl<'a, C, NC, A> ConversionInsertCall<'a, C, NC, A> where NC: hyper::net::Netw
         for &field in ["alt"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -1215,7 +1279,7 @@ impl<'a, C, NC, A> ConversionInsertCall<'a, C, NC, A> where NC: hyper::net::Netw
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -1231,7 +1295,6 @@ impl<'a, C, NC, A> ConversionInsertCall<'a, C, NC, A> where NC: hyper::net::Netw
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -1241,7 +1304,7 @@ impl<'a, C, NC, A> ConversionInsertCall<'a, C, NC, A> where NC: hyper::net::Netw
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -1252,7 +1315,7 @@ impl<'a, C, NC, A> ConversionInsertCall<'a, C, NC, A> where NC: hyper::net::Netw
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -1261,13 +1324,13 @@ impl<'a, C, NC, A> ConversionInsertCall<'a, C, NC, A> where NC: hyper::net::Netw
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -1339,7 +1402,7 @@ impl<'a, C, NC, A> ConversionInsertCall<'a, C, NC, A> where NC: hyper::net::Netw
 /// Retrieves a list of conversions from a DoubleClick Search engine account.
 ///
 /// A builder for the *get* method supported by a *conversion* resource.
-/// It is not used directly, but through a `ConversionMethods`.
+/// It is not used directly, but through a `ConversionMethods` instance.
 ///
 /// # Example
 ///
@@ -1429,7 +1492,7 @@ impl<'a, C, NC, A> ConversionGetCall<'a, C, NC, A> where NC: hyper::net::Network
         for &field in ["alt", "agencyId", "advertiserId", "engineAccountId", "endDate", "rowCount", "startDate", "startRow", "criterionId", "campaignId", "adId", "adGroupId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -1482,7 +1545,7 @@ impl<'a, C, NC, A> ConversionGetCall<'a, C, NC, A> where NC: hyper::net::Network
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -1494,7 +1557,6 @@ impl<'a, C, NC, A> ConversionGetCall<'a, C, NC, A> where NC: hyper::net::Network
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -1504,7 +1566,7 @@ impl<'a, C, NC, A> ConversionGetCall<'a, C, NC, A> where NC: hyper::net::Network
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -1515,7 +1577,7 @@ impl<'a, C, NC, A> ConversionGetCall<'a, C, NC, A> where NC: hyper::net::Network
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -1524,13 +1586,13 @@ impl<'a, C, NC, A> ConversionGetCall<'a, C, NC, A> where NC: hyper::net::Network
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -1542,7 +1604,7 @@ impl<'a, C, NC, A> ConversionGetCall<'a, C, NC, A> where NC: hyper::net::Network
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Numeric ID of the agency.    
+    /// Numeric ID of the agency.
     pub fn agency_id(mut self, new_value: &str) -> ConversionGetCall<'a, C, NC, A> {
         self._agency_id = new_value.to_string();
         self
@@ -1552,7 +1614,7 @@ impl<'a, C, NC, A> ConversionGetCall<'a, C, NC, A> where NC: hyper::net::Network
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Numeric ID of the advertiser.    
+    /// Numeric ID of the advertiser.
     pub fn advertiser_id(mut self, new_value: &str) -> ConversionGetCall<'a, C, NC, A> {
         self._advertiser_id = new_value.to_string();
         self
@@ -1562,7 +1624,7 @@ impl<'a, C, NC, A> ConversionGetCall<'a, C, NC, A> where NC: hyper::net::Network
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Numeric ID of the engine account.    
+    /// Numeric ID of the engine account.
     pub fn engine_account_id(mut self, new_value: &str) -> ConversionGetCall<'a, C, NC, A> {
         self._engine_account_id = new_value.to_string();
         self
@@ -1572,7 +1634,7 @@ impl<'a, C, NC, A> ConversionGetCall<'a, C, NC, A> where NC: hyper::net::Network
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Last date (inclusive) on which to retrieve conversions. Format is yyyymmdd.    
+    /// Last date (inclusive) on which to retrieve conversions. Format is yyyymmdd.
     pub fn end_date(mut self, new_value: i32) -> ConversionGetCall<'a, C, NC, A> {
         self._end_date = new_value;
         self
@@ -1582,7 +1644,7 @@ impl<'a, C, NC, A> ConversionGetCall<'a, C, NC, A> where NC: hyper::net::Network
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The number of conversions to return per call.    
+    /// The number of conversions to return per call.
     pub fn row_count(mut self, new_value: i32) -> ConversionGetCall<'a, C, NC, A> {
         self._row_count = new_value;
         self
@@ -1592,7 +1654,7 @@ impl<'a, C, NC, A> ConversionGetCall<'a, C, NC, A> where NC: hyper::net::Network
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// First date (inclusive) on which to retrieve conversions. Format is yyyymmdd.    
+    /// First date (inclusive) on which to retrieve conversions. Format is yyyymmdd.
     pub fn start_date(mut self, new_value: i32) -> ConversionGetCall<'a, C, NC, A> {
         self._start_date = new_value;
         self
@@ -1602,7 +1664,7 @@ impl<'a, C, NC, A> ConversionGetCall<'a, C, NC, A> where NC: hyper::net::Network
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The 0-based starting index for retrieving conversions results.    
+    /// The 0-based starting index for retrieving conversions results.
     pub fn start_row(mut self, new_value: u32) -> ConversionGetCall<'a, C, NC, A> {
         self._start_row = new_value;
         self
@@ -1610,7 +1672,7 @@ impl<'a, C, NC, A> ConversionGetCall<'a, C, NC, A> where NC: hyper::net::Network
     /// Sets the *criterion id* query property to the given value.
     ///
     /// 
-    /// Numeric ID of the criterion.    
+    /// Numeric ID of the criterion.
     pub fn criterion_id(mut self, new_value: &str) -> ConversionGetCall<'a, C, NC, A> {
         self._criterion_id = Some(new_value.to_string());
         self
@@ -1618,7 +1680,7 @@ impl<'a, C, NC, A> ConversionGetCall<'a, C, NC, A> where NC: hyper::net::Network
     /// Sets the *campaign id* query property to the given value.
     ///
     /// 
-    /// Numeric ID of the campaign.    
+    /// Numeric ID of the campaign.
     pub fn campaign_id(mut self, new_value: &str) -> ConversionGetCall<'a, C, NC, A> {
         self._campaign_id = Some(new_value.to_string());
         self
@@ -1626,7 +1688,7 @@ impl<'a, C, NC, A> ConversionGetCall<'a, C, NC, A> where NC: hyper::net::Network
     /// Sets the *ad id* query property to the given value.
     ///
     /// 
-    /// Numeric ID of the ad.    
+    /// Numeric ID of the ad.
     pub fn ad_id(mut self, new_value: &str) -> ConversionGetCall<'a, C, NC, A> {
         self._ad_id = Some(new_value.to_string());
         self
@@ -1634,7 +1696,7 @@ impl<'a, C, NC, A> ConversionGetCall<'a, C, NC, A> where NC: hyper::net::Network
     /// Sets the *ad group id* query property to the given value.
     ///
     /// 
-    /// Numeric ID of the ad group.    
+    /// Numeric ID of the ad group.
     pub fn ad_group_id(mut self, new_value: &str) -> ConversionGetCall<'a, C, NC, A> {
         self._ad_group_id = Some(new_value.to_string());
         self
@@ -1695,7 +1757,7 @@ impl<'a, C, NC, A> ConversionGetCall<'a, C, NC, A> where NC: hyper::net::Network
 /// Updates the availabilities of a batch of floodlight activities in DoubleClick Search.
 ///
 /// A builder for the *updateAvailability* method supported by a *conversion* resource.
-/// It is not used directly, but through a `ConversionMethods`.
+/// It is not used directly, but through a `ConversionMethods` instance.
 ///
 /// # Example
 ///
@@ -1758,7 +1820,7 @@ impl<'a, C, NC, A> ConversionUpdateAvailabilityCall<'a, C, NC, A> where NC: hype
         for &field in ["alt"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -1791,7 +1853,7 @@ impl<'a, C, NC, A> ConversionUpdateAvailabilityCall<'a, C, NC, A> where NC: hype
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -1807,7 +1869,6 @@ impl<'a, C, NC, A> ConversionUpdateAvailabilityCall<'a, C, NC, A> where NC: hype
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -1817,7 +1878,7 @@ impl<'a, C, NC, A> ConversionUpdateAvailabilityCall<'a, C, NC, A> where NC: hype
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -1828,7 +1889,7 @@ impl<'a, C, NC, A> ConversionUpdateAvailabilityCall<'a, C, NC, A> where NC: hype
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -1837,13 +1898,13 @@ impl<'a, C, NC, A> ConversionUpdateAvailabilityCall<'a, C, NC, A> where NC: hype
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -1915,7 +1976,7 @@ impl<'a, C, NC, A> ConversionUpdateAvailabilityCall<'a, C, NC, A> where NC: hype
 /// Updates a batch of conversions in DoubleClick Search. This method supports patch semantics.
 ///
 /// A builder for the *patch* method supported by a *conversion* resource.
-/// It is not used directly, but through a `ConversionMethods`.
+/// It is not used directly, but through a `ConversionMethods` instance.
 ///
 /// # Example
 ///
@@ -1992,7 +2053,7 @@ impl<'a, C, NC, A> ConversionPatchCall<'a, C, NC, A> where NC: hyper::net::Netwo
         for &field in ["alt", "advertiserId", "agencyId", "endDate", "engineAccountId", "rowCount", "startDate", "startRow"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -2025,7 +2086,7 @@ impl<'a, C, NC, A> ConversionPatchCall<'a, C, NC, A> where NC: hyper::net::Netwo
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -2041,7 +2102,6 @@ impl<'a, C, NC, A> ConversionPatchCall<'a, C, NC, A> where NC: hyper::net::Netwo
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -2051,7 +2111,7 @@ impl<'a, C, NC, A> ConversionPatchCall<'a, C, NC, A> where NC: hyper::net::Netwo
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -2062,7 +2122,7 @@ impl<'a, C, NC, A> ConversionPatchCall<'a, C, NC, A> where NC: hyper::net::Netwo
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -2071,13 +2131,13 @@ impl<'a, C, NC, A> ConversionPatchCall<'a, C, NC, A> where NC: hyper::net::Netwo
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -2098,7 +2158,7 @@ impl<'a, C, NC, A> ConversionPatchCall<'a, C, NC, A> where NC: hyper::net::Netwo
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Numeric ID of the advertiser.    
+    /// Numeric ID of the advertiser.
     pub fn advertiser_id(mut self, new_value: &str) -> ConversionPatchCall<'a, C, NC, A> {
         self._advertiser_id = new_value.to_string();
         self
@@ -2108,7 +2168,7 @@ impl<'a, C, NC, A> ConversionPatchCall<'a, C, NC, A> where NC: hyper::net::Netwo
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Numeric ID of the agency.    
+    /// Numeric ID of the agency.
     pub fn agency_id(mut self, new_value: &str) -> ConversionPatchCall<'a, C, NC, A> {
         self._agency_id = new_value.to_string();
         self
@@ -2118,7 +2178,7 @@ impl<'a, C, NC, A> ConversionPatchCall<'a, C, NC, A> where NC: hyper::net::Netwo
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Last date (inclusive) on which to retrieve conversions. Format is yyyymmdd.    
+    /// Last date (inclusive) on which to retrieve conversions. Format is yyyymmdd.
     pub fn end_date(mut self, new_value: i32) -> ConversionPatchCall<'a, C, NC, A> {
         self._end_date = new_value;
         self
@@ -2128,7 +2188,7 @@ impl<'a, C, NC, A> ConversionPatchCall<'a, C, NC, A> where NC: hyper::net::Netwo
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Numeric ID of the engine account.    
+    /// Numeric ID of the engine account.
     pub fn engine_account_id(mut self, new_value: &str) -> ConversionPatchCall<'a, C, NC, A> {
         self._engine_account_id = new_value.to_string();
         self
@@ -2138,7 +2198,7 @@ impl<'a, C, NC, A> ConversionPatchCall<'a, C, NC, A> where NC: hyper::net::Netwo
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The number of conversions to return per call.    
+    /// The number of conversions to return per call.
     pub fn row_count(mut self, new_value: i32) -> ConversionPatchCall<'a, C, NC, A> {
         self._row_count = new_value;
         self
@@ -2148,7 +2208,7 @@ impl<'a, C, NC, A> ConversionPatchCall<'a, C, NC, A> where NC: hyper::net::Netwo
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// First date (inclusive) on which to retrieve conversions. Format is yyyymmdd.    
+    /// First date (inclusive) on which to retrieve conversions. Format is yyyymmdd.
     pub fn start_date(mut self, new_value: i32) -> ConversionPatchCall<'a, C, NC, A> {
         self._start_date = new_value;
         self
@@ -2158,7 +2218,7 @@ impl<'a, C, NC, A> ConversionPatchCall<'a, C, NC, A> where NC: hyper::net::Netwo
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The 0-based starting index for retrieving conversions results.    
+    /// The 0-based starting index for retrieving conversions results.
     pub fn start_row(mut self, new_value: u32) -> ConversionPatchCall<'a, C, NC, A> {
         self._start_row = new_value;
         self
@@ -2219,7 +2279,7 @@ impl<'a, C, NC, A> ConversionPatchCall<'a, C, NC, A> where NC: hyper::net::Netwo
 /// Updates a batch of conversions in DoubleClick Search.
 ///
 /// A builder for the *update* method supported by a *conversion* resource.
-/// It is not used directly, but through a `ConversionMethods`.
+/// It is not used directly, but through a `ConversionMethods` instance.
 ///
 /// # Example
 ///
@@ -2282,7 +2342,7 @@ impl<'a, C, NC, A> ConversionUpdateCall<'a, C, NC, A> where NC: hyper::net::Netw
         for &field in ["alt"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -2315,7 +2375,7 @@ impl<'a, C, NC, A> ConversionUpdateCall<'a, C, NC, A> where NC: hyper::net::Netw
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -2331,7 +2391,6 @@ impl<'a, C, NC, A> ConversionUpdateCall<'a, C, NC, A> where NC: hyper::net::Netw
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -2341,7 +2400,7 @@ impl<'a, C, NC, A> ConversionUpdateCall<'a, C, NC, A> where NC: hyper::net::Netw
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -2352,7 +2411,7 @@ impl<'a, C, NC, A> ConversionUpdateCall<'a, C, NC, A> where NC: hyper::net::Netw
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -2361,13 +2420,13 @@ impl<'a, C, NC, A> ConversionUpdateCall<'a, C, NC, A> where NC: hyper::net::Netw
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -2439,7 +2498,7 @@ impl<'a, C, NC, A> ConversionUpdateCall<'a, C, NC, A> where NC: hyper::net::Netw
 /// Retrieve the list of saved columns for a specified advertiser.
 ///
 /// A builder for the *list* method supported by a *savedColumn* resource.
-/// It is not used directly, but through a `SavedColumnMethods`.
+/// It is not used directly, but through a `SavedColumnMethods` instance.
 ///
 /// # Example
 ///
@@ -2499,7 +2558,7 @@ impl<'a, C, NC, A> SavedColumnListCall<'a, C, NC, A> where NC: hyper::net::Netwo
         for &field in ["alt", "agencyId", "advertiserId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -2552,7 +2611,7 @@ impl<'a, C, NC, A> SavedColumnListCall<'a, C, NC, A> where NC: hyper::net::Netwo
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -2564,7 +2623,6 @@ impl<'a, C, NC, A> SavedColumnListCall<'a, C, NC, A> where NC: hyper::net::Netwo
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -2574,7 +2632,7 @@ impl<'a, C, NC, A> SavedColumnListCall<'a, C, NC, A> where NC: hyper::net::Netwo
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -2585,7 +2643,7 @@ impl<'a, C, NC, A> SavedColumnListCall<'a, C, NC, A> where NC: hyper::net::Netwo
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -2594,13 +2652,13 @@ impl<'a, C, NC, A> SavedColumnListCall<'a, C, NC, A> where NC: hyper::net::Netwo
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -2612,7 +2670,7 @@ impl<'a, C, NC, A> SavedColumnListCall<'a, C, NC, A> where NC: hyper::net::Netwo
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// DS ID of the agency.    
+    /// DS ID of the agency.
     pub fn agency_id(mut self, new_value: &str) -> SavedColumnListCall<'a, C, NC, A> {
         self._agency_id = new_value.to_string();
         self
@@ -2622,7 +2680,7 @@ impl<'a, C, NC, A> SavedColumnListCall<'a, C, NC, A> where NC: hyper::net::Netwo
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// DS ID of the advertiser.    
+    /// DS ID of the advertiser.
     pub fn advertiser_id(mut self, new_value: &str) -> SavedColumnListCall<'a, C, NC, A> {
         self._advertiser_id = new_value.to_string();
         self
@@ -2686,7 +2744,7 @@ impl<'a, C, NC, A> SavedColumnListCall<'a, C, NC, A> where NC: hyper::net::Netwo
 /// `.param("alt", "media")`.
 ///
 /// A builder for the *getFile* method supported by a *report* resource.
-/// It is not used directly, but through a `ReportMethods`.
+/// It is not used directly, but through a `ReportMethods` instance.
 ///
 /// # Example
 ///
@@ -2746,7 +2804,7 @@ impl<'a, C, NC, A> ReportGetFileCall<'a, C, NC, A> where NC: hyper::net::Network
         for &field in ["reportId", "reportFragment"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -2798,7 +2856,7 @@ impl<'a, C, NC, A> ReportGetFileCall<'a, C, NC, A> where NC: hyper::net::Network
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -2810,7 +2868,6 @@ impl<'a, C, NC, A> ReportGetFileCall<'a, C, NC, A> where NC: hyper::net::Network
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -2820,7 +2877,7 @@ impl<'a, C, NC, A> ReportGetFileCall<'a, C, NC, A> where NC: hyper::net::Network
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -2831,12 +2888,12 @@ impl<'a, C, NC, A> ReportGetFileCall<'a, C, NC, A> where NC: hyper::net::Network
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = res;
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -2848,7 +2905,7 @@ impl<'a, C, NC, A> ReportGetFileCall<'a, C, NC, A> where NC: hyper::net::Network
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// ID of the report.    
+    /// ID of the report.
     pub fn report_id(mut self, new_value: &str) -> ReportGetFileCall<'a, C, NC, A> {
         self._report_id = new_value.to_string();
         self
@@ -2858,7 +2915,7 @@ impl<'a, C, NC, A> ReportGetFileCall<'a, C, NC, A> where NC: hyper::net::Network
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The index of the report fragment to download.    
+    /// The index of the report fragment to download.
     pub fn report_fragment(mut self, new_value: i32) -> ReportGetFileCall<'a, C, NC, A> {
         self._report_fragment = new_value;
         self
@@ -2919,7 +2976,7 @@ impl<'a, C, NC, A> ReportGetFileCall<'a, C, NC, A> where NC: hyper::net::Network
 /// Generates and returns a report immediately.
 ///
 /// A builder for the *generate* method supported by a *report* resource.
-/// It is not used directly, but through a `ReportMethods`.
+/// It is not used directly, but through a `ReportMethods` instance.
 ///
 /// # Example
 ///
@@ -2982,7 +3039,7 @@ impl<'a, C, NC, A> ReportGenerateCall<'a, C, NC, A> where NC: hyper::net::Networ
         for &field in ["alt"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -3015,7 +3072,7 @@ impl<'a, C, NC, A> ReportGenerateCall<'a, C, NC, A> where NC: hyper::net::Networ
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -3031,7 +3088,6 @@ impl<'a, C, NC, A> ReportGenerateCall<'a, C, NC, A> where NC: hyper::net::Networ
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -3041,7 +3097,7 @@ impl<'a, C, NC, A> ReportGenerateCall<'a, C, NC, A> where NC: hyper::net::Networ
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -3052,7 +3108,7 @@ impl<'a, C, NC, A> ReportGenerateCall<'a, C, NC, A> where NC: hyper::net::Networ
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -3061,13 +3117,13 @@ impl<'a, C, NC, A> ReportGenerateCall<'a, C, NC, A> where NC: hyper::net::Networ
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -3139,7 +3195,7 @@ impl<'a, C, NC, A> ReportGenerateCall<'a, C, NC, A> where NC: hyper::net::Networ
 /// Polls for the status of a report request.
 ///
 /// A builder for the *get* method supported by a *report* resource.
-/// It is not used directly, but through a `ReportMethods`.
+/// It is not used directly, but through a `ReportMethods` instance.
 ///
 /// # Example
 ///
@@ -3197,7 +3253,7 @@ impl<'a, C, NC, A> ReportGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
         for &field in ["alt", "reportId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -3250,7 +3306,7 @@ impl<'a, C, NC, A> ReportGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -3262,7 +3318,6 @@ impl<'a, C, NC, A> ReportGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -3272,7 +3327,7 @@ impl<'a, C, NC, A> ReportGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -3283,7 +3338,7 @@ impl<'a, C, NC, A> ReportGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -3292,13 +3347,13 @@ impl<'a, C, NC, A> ReportGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -3310,7 +3365,7 @@ impl<'a, C, NC, A> ReportGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// ID of the report request being polled.    
+    /// ID of the report request being polled.
     pub fn report_id(mut self, new_value: &str) -> ReportGetCall<'a, C, NC, A> {
         self._report_id = new_value.to_string();
         self
@@ -3371,7 +3426,7 @@ impl<'a, C, NC, A> ReportGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
 /// Inserts a report request into the reporting system.
 ///
 /// A builder for the *request* method supported by a *report* resource.
-/// It is not used directly, but through a `ReportMethods`.
+/// It is not used directly, but through a `ReportMethods` instance.
 ///
 /// # Example
 ///
@@ -3434,7 +3489,7 @@ impl<'a, C, NC, A> ReportRequestCall<'a, C, NC, A> where NC: hyper::net::Network
         for &field in ["alt"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -3467,7 +3522,7 @@ impl<'a, C, NC, A> ReportRequestCall<'a, C, NC, A> where NC: hyper::net::Network
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -3483,7 +3538,6 @@ impl<'a, C, NC, A> ReportRequestCall<'a, C, NC, A> where NC: hyper::net::Network
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -3493,7 +3547,7 @@ impl<'a, C, NC, A> ReportRequestCall<'a, C, NC, A> where NC: hyper::net::Network
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -3504,7 +3558,7 @@ impl<'a, C, NC, A> ReportRequestCall<'a, C, NC, A> where NC: hyper::net::Network
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -3513,13 +3567,13 @@ impl<'a, C, NC, A> ReportRequestCall<'a, C, NC, A> where NC: hyper::net::Network
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }

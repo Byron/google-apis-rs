@@ -1,8 +1,8 @@
 // DO NOT EDIT !
-// This file was generated automatically from 'src/mako/lib.rs.mako'
+// This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *licensing* crate version *0.1.1+20140122*, where *20140122* is the exact revision of the *licensing:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.1*.
+//! This documentation was generated from *licensing* crate version *0.1.2+20140122*, where *20140122* is the exact revision of the *licensing:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.2*.
 //! 
 //! Everything else about the *licensing* *v1* API can be found at the
 //! [official documentation site](https://developers.google.com/google-apps/licensing/).
@@ -25,6 +25,8 @@
 //! 
 //! * **[Hub](struct.Licensing.html)**
 //!     * a central object to maintain state and allow accessing all *Activities*
+//!     * creates [*Method Builders*](trait.MethodsBuilder.html) which in turn
+//!       allow access to individual [*Call Builders*](trait.CallBuilder.html)
 //! * **[Resources](trait.Resource.html)**
 //!     * primary types that you can apply *Activities* to
 //!     * a collection of properties and *Parts*
@@ -33,6 +35,8 @@
 //!         * never directly used in *Activities*
 //! * **[Activities](trait.CallBuilder.html)**
 //!     * operations to apply to *Resources*
+//! 
+//! All *structures* are marked with applicable traits to further categorize them and ease browsing.
 //! 
 //! Generally speaking, you can invoke *Activities* like this:
 //! 
@@ -74,7 +78,7 @@
 //! extern crate hyper;
 //! extern crate "yup-oauth2" as oauth2;
 //! extern crate "google-licensing1" as licensing1;
-//! use licensing1::Result;
+//! use licensing1::{Result, Error};
 //! # #[test] fn egal() {
 //! use std::default::Default;
 //! use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -101,15 +105,17 @@
 //!              .doit();
 //! 
 //! match result {
-//!     Result::HttpError(err) => println!("HTTPERROR: {:?}", err),
-//!     Result::MissingAPIKey => println!("Auth: Missing API Key - used if there are no scopes"),
-//!     Result::MissingToken => println!("OAuth2: Missing Token"),
-//!     Result::Cancelled => println!("Operation cancelled by user"),
-//!     Result::UploadSizeLimitExceeded(size, max_size) => println!("Upload size too big: {} of {}", size, max_size),
-//!     Result::Failure(_) => println!("General Failure (hyper::client::Response doesn't print)"),
-//!     Result::FieldClash(clashed_field) => println!("You added custom parameter which is part of builder: {:?}", clashed_field),
-//!     Result::JsonDecodeError(err) => println!("Couldn't understand server reply - maybe API needs update: {:?}", err),
-//!     Result::Success(_) => println!("Success (value doesn't print)"),
+//!     Err(e) => match e {
+//!         Error::HttpError(err) => println!("HTTPERROR: {:?}", err),
+//!         Error::MissingAPIKey => println!("Auth: Missing API Key - used if there are no scopes"),
+//!         Error::MissingToken => println!("OAuth2: Missing Token"),
+//!         Error::Cancelled => println!("Operation canceled by user"),
+//!         Error::UploadSizeLimitExceeded(size, max_size) => println!("Upload size too big: {} of {}", size, max_size),
+//!         Error::Failure(_) => println!("General Failure (hyper::client::Response doesn't print)"),
+//!         Error::FieldClash(clashed_field) => println!("You added custom parameter which is part of builder: {:?}", clashed_field),
+//!         Error::JsonDecodeError(err) => println!("Couldn't understand server reply - maybe API needs update: {:?}", err),
+//!     },
+//!     Ok(_) => println!("Success (value doesn't print)"),
 //! }
 //! # }
 //! ```
@@ -122,7 +128,7 @@
 //! When delegates handle errors or intermediate values, they may have a chance to instruct the system to retry. This 
 //! makes the system potentially resilient to all kinds of errors.
 //! 
-//! ## Uploads and Downlods
+//! ## Uploads and Downloads
 //! If a method supports downloads, the response body, which is part of the [Result](enum.Result.html), should be
 //! read by you to obtain the media.
 //! If such a method also supports a [Response Result](trait.ResponseResult.html), it will return that by default.
@@ -145,8 +151,9 @@
 //! ## Optional Parts in Server-Requests
 //! 
 //! All structures provided by this library are made to be [enocodable](trait.RequestValue.html) and 
-//! [decodable](trait.ResponseResult.html) via json. Optionals are used to indicate that partial requests are responses are valid.
-//! Most optionals are are considered [Parts](trait.Part.html) which are identifyable by name, which will be sent to 
+//! [decodable](trait.ResponseResult.html) via *json*. Optionals are used to indicate that partial requests are responses 
+//! are valid.
+//! Most optionals are are considered [Parts](trait.Part.html) which are identifiable by name, which will be sent to 
 //! the server to indicate either the set parts of the request or the desired parts in the response.
 //! 
 //! ## Builder Arguments
@@ -195,7 +202,7 @@ use std::io;
 use std::fs;
 use std::thread::sleep;
 
-pub use cmn::{MultiPartReader, ToParts, MethodInfo, Result, CallBuilder, Hub, ReadSeek, Part, ResponseResult, RequestValue, NestedType, Delegate, DefaultDelegate, ResourceMethodsBuilder, Resource, JsonServerError};
+pub use cmn::{MultiPartReader, ToParts, MethodInfo, Result, Error, CallBuilder, Hub, ReadSeek, Part, ResponseResult, RequestValue, NestedType, Delegate, DefaultDelegate, MethodsBuilder, Resource, JsonServerError};
 
 
 // ##############
@@ -241,7 +248,7 @@ impl Default for Scope {
 /// extern crate hyper;
 /// extern crate "yup-oauth2" as oauth2;
 /// extern crate "google-licensing1" as licensing1;
-/// use licensing1::Result;
+/// use licensing1::{Result, Error};
 /// # #[test] fn egal() {
 /// use std::default::Default;
 /// use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -268,15 +275,17 @@ impl Default for Scope {
 ///              .doit();
 /// 
 /// match result {
-///     Result::HttpError(err) => println!("HTTPERROR: {:?}", err),
-///     Result::MissingAPIKey => println!("Auth: Missing API Key - used if there are no scopes"),
-///     Result::MissingToken => println!("OAuth2: Missing Token"),
-///     Result::Cancelled => println!("Operation cancelled by user"),
-///     Result::UploadSizeLimitExceeded(size, max_size) => println!("Upload size too big: {} of {}", size, max_size),
-///     Result::Failure(_) => println!("General Failure (hyper::client::Response doesn't print)"),
-///     Result::FieldClash(clashed_field) => println!("You added custom parameter which is part of builder: {:?}", clashed_field),
-///     Result::JsonDecodeError(err) => println!("Couldn't understand server reply - maybe API needs update: {:?}", err),
-///     Result::Success(_) => println!("Success (value doesn't print)"),
+///     Err(e) => match e {
+///         Error::HttpError(err) => println!("HTTPERROR: {:?}", err),
+///         Error::MissingAPIKey => println!("Auth: Missing API Key - used if there are no scopes"),
+///         Error::MissingToken => println!("OAuth2: Missing Token"),
+///         Error::Cancelled => println!("Operation canceled by user"),
+///         Error::UploadSizeLimitExceeded(size, max_size) => println!("Upload size too big: {} of {}", size, max_size),
+///         Error::Failure(_) => println!("General Failure (hyper::client::Response doesn't print)"),
+///         Error::FieldClash(clashed_field) => println!("You added custom parameter which is part of builder: {:?}", clashed_field),
+///         Error::JsonDecodeError(err) => println!("Couldn't understand server reply - maybe API needs update: {:?}", err),
+///     },
+///     Ok(_) => println!("Success (value doesn't print)"),
 /// }
 /// # }
 /// ```
@@ -297,7 +306,7 @@ impl<'a, C, NC, A> Licensing<C, NC, A>
         Licensing {
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/0.1.1".to_string(),
+            _user_agent: "google-api-rust-client/0.1.2".to_string(),
             _m: PhantomData
         }
     }
@@ -307,7 +316,7 @@ impl<'a, C, NC, A> Licensing<C, NC, A>
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/0.1.1`.
+    /// It defaults to `google-api-rust-client/0.1.2`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -338,20 +347,20 @@ impl<'a, C, NC, A> Licensing<C, NC, A>
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct LicenseAssignment {
-    /// Name of the sku of the product.    
+    /// Name of the sku of the product.
     #[serde(alias="skuId")]
     pub sku_id: Option<String>,
-    /// Identifies the resource as a LicenseAssignment.    
+    /// Identifies the resource as a LicenseAssignment.
     pub kind: Option<String>,
-    /// ETag of the resource.    
+    /// ETag of the resource.
     pub etags: Option<String>,
-    /// Email id of the user.    
+    /// Email id of the user.
     #[serde(alias="userId")]
     pub user_id: Option<String>,
-    /// Link to this page.    
+    /// Link to this page.
     #[serde(alias="selfLink")]
     pub self_link: Option<String>,
-    /// Name of the product.    
+    /// Name of the product.
     #[serde(alias="productId")]
     pub product_id: Option<String>,
 }
@@ -372,7 +381,7 @@ impl ResponseResult for LicenseAssignment {}
 /// 
 #[derive(Default, Clone, Debug, Serialize)]
 pub struct LicenseAssignmentInsert {
-    /// Email id of the user    
+    /// Email id of the user
     #[serde(alias="userId")]
     pub user_id: Option<String>,
 }
@@ -392,14 +401,14 @@ impl RequestValue for LicenseAssignmentInsert {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct LicenseAssignmentList {
-    /// The continuation token, used to page through large result sets. Provide this value in a subsequent request to return the next page of results.    
+    /// The continuation token, used to page through large result sets. Provide this value in a subsequent request to return the next page of results.
     #[serde(alias="nextPageToken")]
     pub next_page_token: String,
-    /// The LicenseAssignments in this page of results.    
+    /// The LicenseAssignments in this page of results.
     pub items: Vec<LicenseAssignment>,
-    /// Identifies the resource as a collection of LicenseAssignments.    
+    /// Identifies the resource as a collection of LicenseAssignments.
     pub kind: String,
-    /// ETag of the resource.    
+    /// ETag of the resource.
     pub etag: String,
 }
 
@@ -445,13 +454,19 @@ pub struct LicenseAssignmentMethods<'a, C, NC, A>
     hub: &'a Licensing<C, NC, A>,
 }
 
-impl<'a, C, NC, A> ResourceMethodsBuilder for LicenseAssignmentMethods<'a, C, NC, A> {}
+impl<'a, C, NC, A> MethodsBuilder for LicenseAssignmentMethods<'a, C, NC, A> {}
 
 impl<'a, C, NC, A> LicenseAssignmentMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Revoke License.    
+    /// Revoke License.
+    /// 
+    /// # Arguments
+    ///
+    /// * `productId` - Name for product
+    /// * `skuId` - Name for sku
+    /// * `userId` - email id or unique Id of the user
     pub fn delete(&self, product_id: &str, sku_id: &str, user_id: &str) -> LicenseAssignmentDeleteCall<'a, C, NC, A> {
         LicenseAssignmentDeleteCall {
             hub: self.hub,
@@ -466,7 +481,12 @@ impl<'a, C, NC, A> LicenseAssignmentMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// List license assignments for given product of the customer.    
+    /// List license assignments for given product of the customer.
+    /// 
+    /// # Arguments
+    ///
+    /// * `productId` - Name for product
+    /// * `customerId` - CustomerId represents the customer for whom licenseassignments are queried
     pub fn list_for_product(&self, product_id: &str, customer_id: &str) -> LicenseAssignmentListForProductCall<'a, C, NC, A> {
         LicenseAssignmentListForProductCall {
             hub: self.hub,
@@ -482,7 +502,13 @@ impl<'a, C, NC, A> LicenseAssignmentMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Get license assignment of a particular product and sku for a user    
+    /// Get license assignment of a particular product and sku for a user
+    /// 
+    /// # Arguments
+    ///
+    /// * `productId` - Name for product
+    /// * `skuId` - Name for sku
+    /// * `userId` - email id or unique Id of the user
     pub fn get(&self, product_id: &str, sku_id: &str, user_id: &str) -> LicenseAssignmentGetCall<'a, C, NC, A> {
         LicenseAssignmentGetCall {
             hub: self.hub,
@@ -497,7 +523,13 @@ impl<'a, C, NC, A> LicenseAssignmentMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// List license assignments for given product and sku of the customer.    
+    /// List license assignments for given product and sku of the customer.
+    /// 
+    /// # Arguments
+    ///
+    /// * `productId` - Name for product
+    /// * `skuId` - Name for sku
+    /// * `customerId` - CustomerId represents the customer for whom licenseassignments are queried
     pub fn list_for_product_and_sku(&self, product_id: &str, sku_id: &str, customer_id: &str) -> LicenseAssignmentListForProductAndSkuCall<'a, C, NC, A> {
         LicenseAssignmentListForProductAndSkuCall {
             hub: self.hub,
@@ -514,7 +546,14 @@ impl<'a, C, NC, A> LicenseAssignmentMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Assign License.    
+    /// Assign License.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `productId` - Name for product
+    /// * `skuId` - Name for sku for which license would be revoked
+    /// * `userId` - email id or unique Id of the user
     pub fn update(&self, request: &LicenseAssignment, product_id: &str, sku_id: &str, user_id: &str) -> LicenseAssignmentUpdateCall<'a, C, NC, A> {
         LicenseAssignmentUpdateCall {
             hub: self.hub,
@@ -530,7 +569,14 @@ impl<'a, C, NC, A> LicenseAssignmentMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Assign License. This method supports patch semantics.    
+    /// Assign License. This method supports patch semantics.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `productId` - Name for product
+    /// * `skuId` - Name for sku for which license would be revoked
+    /// * `userId` - email id or unique Id of the user
     pub fn patch(&self, request: &LicenseAssignment, product_id: &str, sku_id: &str, user_id: &str) -> LicenseAssignmentPatchCall<'a, C, NC, A> {
         LicenseAssignmentPatchCall {
             hub: self.hub,
@@ -546,7 +592,13 @@ impl<'a, C, NC, A> LicenseAssignmentMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Assign License.    
+    /// Assign License.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `productId` - Name for product
+    /// * `skuId` - Name for sku
     pub fn insert(&self, request: &LicenseAssignmentInsert, product_id: &str, sku_id: &str) -> LicenseAssignmentInsertCall<'a, C, NC, A> {
         LicenseAssignmentInsertCall {
             hub: self.hub,
@@ -571,7 +623,7 @@ impl<'a, C, NC, A> LicenseAssignmentMethods<'a, C, NC, A> {
 /// Revoke License.
 ///
 /// A builder for the *delete* method supported by a *licenseAssignment* resource.
-/// It is not used directly, but through a `LicenseAssignmentMethods`.
+/// It is not used directly, but through a `LicenseAssignmentMethods` instance.
 ///
 /// # Example
 ///
@@ -633,7 +685,7 @@ impl<'a, C, NC, A> LicenseAssignmentDeleteCall<'a, C, NC, A> where NC: hyper::ne
         for &field in ["productId", "skuId", "userId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -685,7 +737,7 @@ impl<'a, C, NC, A> LicenseAssignmentDeleteCall<'a, C, NC, A> where NC: hyper::ne
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -697,7 +749,6 @@ impl<'a, C, NC, A> LicenseAssignmentDeleteCall<'a, C, NC, A> where NC: hyper::ne
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -707,7 +758,7 @@ impl<'a, C, NC, A> LicenseAssignmentDeleteCall<'a, C, NC, A> where NC: hyper::ne
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -718,12 +769,12 @@ impl<'a, C, NC, A> LicenseAssignmentDeleteCall<'a, C, NC, A> where NC: hyper::ne
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = res;
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -735,7 +786,7 @@ impl<'a, C, NC, A> LicenseAssignmentDeleteCall<'a, C, NC, A> where NC: hyper::ne
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Name for product    
+    /// Name for product
     pub fn product_id(mut self, new_value: &str) -> LicenseAssignmentDeleteCall<'a, C, NC, A> {
         self._product_id = new_value.to_string();
         self
@@ -745,7 +796,7 @@ impl<'a, C, NC, A> LicenseAssignmentDeleteCall<'a, C, NC, A> where NC: hyper::ne
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Name for sku    
+    /// Name for sku
     pub fn sku_id(mut self, new_value: &str) -> LicenseAssignmentDeleteCall<'a, C, NC, A> {
         self._sku_id = new_value.to_string();
         self
@@ -755,7 +806,7 @@ impl<'a, C, NC, A> LicenseAssignmentDeleteCall<'a, C, NC, A> where NC: hyper::ne
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// email id or unique Id of the user    
+    /// email id or unique Id of the user
     pub fn user_id(mut self, new_value: &str) -> LicenseAssignmentDeleteCall<'a, C, NC, A> {
         self._user_id = new_value.to_string();
         self
@@ -816,7 +867,7 @@ impl<'a, C, NC, A> LicenseAssignmentDeleteCall<'a, C, NC, A> where NC: hyper::ne
 /// List license assignments for given product of the customer.
 ///
 /// A builder for the *listForProduct* method supported by a *licenseAssignment* resource.
-/// It is not used directly, but through a `LicenseAssignmentMethods`.
+/// It is not used directly, but through a `LicenseAssignmentMethods` instance.
 ///
 /// # Example
 ///
@@ -886,7 +937,7 @@ impl<'a, C, NC, A> LicenseAssignmentListForProductCall<'a, C, NC, A> where NC: h
         for &field in ["alt", "productId", "customerId", "pageToken", "maxResults"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -939,7 +990,7 @@ impl<'a, C, NC, A> LicenseAssignmentListForProductCall<'a, C, NC, A> where NC: h
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -951,7 +1002,6 @@ impl<'a, C, NC, A> LicenseAssignmentListForProductCall<'a, C, NC, A> where NC: h
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -961,7 +1011,7 @@ impl<'a, C, NC, A> LicenseAssignmentListForProductCall<'a, C, NC, A> where NC: h
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -972,7 +1022,7 @@ impl<'a, C, NC, A> LicenseAssignmentListForProductCall<'a, C, NC, A> where NC: h
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -981,13 +1031,13 @@ impl<'a, C, NC, A> LicenseAssignmentListForProductCall<'a, C, NC, A> where NC: h
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -999,7 +1049,7 @@ impl<'a, C, NC, A> LicenseAssignmentListForProductCall<'a, C, NC, A> where NC: h
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Name for product    
+    /// Name for product
     pub fn product_id(mut self, new_value: &str) -> LicenseAssignmentListForProductCall<'a, C, NC, A> {
         self._product_id = new_value.to_string();
         self
@@ -1009,7 +1059,7 @@ impl<'a, C, NC, A> LicenseAssignmentListForProductCall<'a, C, NC, A> where NC: h
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// CustomerId represents the customer for whom licenseassignments are queried    
+    /// CustomerId represents the customer for whom licenseassignments are queried
     pub fn customer_id(mut self, new_value: &str) -> LicenseAssignmentListForProductCall<'a, C, NC, A> {
         self._customer_id = new_value.to_string();
         self
@@ -1017,7 +1067,7 @@ impl<'a, C, NC, A> LicenseAssignmentListForProductCall<'a, C, NC, A> where NC: h
     /// Sets the *page token* query property to the given value.
     ///
     /// 
-    /// Token to fetch the next page.Optional. By default server will return first page    
+    /// Token to fetch the next page.Optional. By default server will return first page
     pub fn page_token(mut self, new_value: &str) -> LicenseAssignmentListForProductCall<'a, C, NC, A> {
         self._page_token = Some(new_value.to_string());
         self
@@ -1025,7 +1075,7 @@ impl<'a, C, NC, A> LicenseAssignmentListForProductCall<'a, C, NC, A> where NC: h
     /// Sets the *max results* query property to the given value.
     ///
     /// 
-    /// Maximum number of campaigns to return at one time. Must be positive. Optional. Default value is 100.    
+    /// Maximum number of campaigns to return at one time. Must be positive. Optional. Default value is 100.
     pub fn max_results(mut self, new_value: u32) -> LicenseAssignmentListForProductCall<'a, C, NC, A> {
         self._max_results = Some(new_value);
         self
@@ -1086,7 +1136,7 @@ impl<'a, C, NC, A> LicenseAssignmentListForProductCall<'a, C, NC, A> where NC: h
 /// Get license assignment of a particular product and sku for a user
 ///
 /// A builder for the *get* method supported by a *licenseAssignment* resource.
-/// It is not used directly, but through a `LicenseAssignmentMethods`.
+/// It is not used directly, but through a `LicenseAssignmentMethods` instance.
 ///
 /// # Example
 ///
@@ -1148,7 +1198,7 @@ impl<'a, C, NC, A> LicenseAssignmentGetCall<'a, C, NC, A> where NC: hyper::net::
         for &field in ["alt", "productId", "skuId", "userId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -1201,7 +1251,7 @@ impl<'a, C, NC, A> LicenseAssignmentGetCall<'a, C, NC, A> where NC: hyper::net::
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -1213,7 +1263,6 @@ impl<'a, C, NC, A> LicenseAssignmentGetCall<'a, C, NC, A> where NC: hyper::net::
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -1223,7 +1272,7 @@ impl<'a, C, NC, A> LicenseAssignmentGetCall<'a, C, NC, A> where NC: hyper::net::
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -1234,7 +1283,7 @@ impl<'a, C, NC, A> LicenseAssignmentGetCall<'a, C, NC, A> where NC: hyper::net::
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -1243,13 +1292,13 @@ impl<'a, C, NC, A> LicenseAssignmentGetCall<'a, C, NC, A> where NC: hyper::net::
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -1261,7 +1310,7 @@ impl<'a, C, NC, A> LicenseAssignmentGetCall<'a, C, NC, A> where NC: hyper::net::
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Name for product    
+    /// Name for product
     pub fn product_id(mut self, new_value: &str) -> LicenseAssignmentGetCall<'a, C, NC, A> {
         self._product_id = new_value.to_string();
         self
@@ -1271,7 +1320,7 @@ impl<'a, C, NC, A> LicenseAssignmentGetCall<'a, C, NC, A> where NC: hyper::net::
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Name for sku    
+    /// Name for sku
     pub fn sku_id(mut self, new_value: &str) -> LicenseAssignmentGetCall<'a, C, NC, A> {
         self._sku_id = new_value.to_string();
         self
@@ -1281,7 +1330,7 @@ impl<'a, C, NC, A> LicenseAssignmentGetCall<'a, C, NC, A> where NC: hyper::net::
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// email id or unique Id of the user    
+    /// email id or unique Id of the user
     pub fn user_id(mut self, new_value: &str) -> LicenseAssignmentGetCall<'a, C, NC, A> {
         self._user_id = new_value.to_string();
         self
@@ -1342,7 +1391,7 @@ impl<'a, C, NC, A> LicenseAssignmentGetCall<'a, C, NC, A> where NC: hyper::net::
 /// List license assignments for given product and sku of the customer.
 ///
 /// A builder for the *listForProductAndSku* method supported by a *licenseAssignment* resource.
-/// It is not used directly, but through a `LicenseAssignmentMethods`.
+/// It is not used directly, but through a `LicenseAssignmentMethods` instance.
 ///
 /// # Example
 ///
@@ -1414,7 +1463,7 @@ impl<'a, C, NC, A> LicenseAssignmentListForProductAndSkuCall<'a, C, NC, A> where
         for &field in ["alt", "productId", "skuId", "customerId", "pageToken", "maxResults"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -1467,7 +1516,7 @@ impl<'a, C, NC, A> LicenseAssignmentListForProductAndSkuCall<'a, C, NC, A> where
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -1479,7 +1528,6 @@ impl<'a, C, NC, A> LicenseAssignmentListForProductAndSkuCall<'a, C, NC, A> where
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -1489,7 +1537,7 @@ impl<'a, C, NC, A> LicenseAssignmentListForProductAndSkuCall<'a, C, NC, A> where
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -1500,7 +1548,7 @@ impl<'a, C, NC, A> LicenseAssignmentListForProductAndSkuCall<'a, C, NC, A> where
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -1509,13 +1557,13 @@ impl<'a, C, NC, A> LicenseAssignmentListForProductAndSkuCall<'a, C, NC, A> where
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -1527,7 +1575,7 @@ impl<'a, C, NC, A> LicenseAssignmentListForProductAndSkuCall<'a, C, NC, A> where
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Name for product    
+    /// Name for product
     pub fn product_id(mut self, new_value: &str) -> LicenseAssignmentListForProductAndSkuCall<'a, C, NC, A> {
         self._product_id = new_value.to_string();
         self
@@ -1537,7 +1585,7 @@ impl<'a, C, NC, A> LicenseAssignmentListForProductAndSkuCall<'a, C, NC, A> where
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Name for sku    
+    /// Name for sku
     pub fn sku_id(mut self, new_value: &str) -> LicenseAssignmentListForProductAndSkuCall<'a, C, NC, A> {
         self._sku_id = new_value.to_string();
         self
@@ -1547,7 +1595,7 @@ impl<'a, C, NC, A> LicenseAssignmentListForProductAndSkuCall<'a, C, NC, A> where
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// CustomerId represents the customer for whom licenseassignments are queried    
+    /// CustomerId represents the customer for whom licenseassignments are queried
     pub fn customer_id(mut self, new_value: &str) -> LicenseAssignmentListForProductAndSkuCall<'a, C, NC, A> {
         self._customer_id = new_value.to_string();
         self
@@ -1555,7 +1603,7 @@ impl<'a, C, NC, A> LicenseAssignmentListForProductAndSkuCall<'a, C, NC, A> where
     /// Sets the *page token* query property to the given value.
     ///
     /// 
-    /// Token to fetch the next page.Optional. By default server will return first page    
+    /// Token to fetch the next page.Optional. By default server will return first page
     pub fn page_token(mut self, new_value: &str) -> LicenseAssignmentListForProductAndSkuCall<'a, C, NC, A> {
         self._page_token = Some(new_value.to_string());
         self
@@ -1563,7 +1611,7 @@ impl<'a, C, NC, A> LicenseAssignmentListForProductAndSkuCall<'a, C, NC, A> where
     /// Sets the *max results* query property to the given value.
     ///
     /// 
-    /// Maximum number of campaigns to return at one time. Must be positive. Optional. Default value is 100.    
+    /// Maximum number of campaigns to return at one time. Must be positive. Optional. Default value is 100.
     pub fn max_results(mut self, new_value: u32) -> LicenseAssignmentListForProductAndSkuCall<'a, C, NC, A> {
         self._max_results = Some(new_value);
         self
@@ -1624,7 +1672,7 @@ impl<'a, C, NC, A> LicenseAssignmentListForProductAndSkuCall<'a, C, NC, A> where
 /// Assign License.
 ///
 /// A builder for the *update* method supported by a *licenseAssignment* resource.
-/// It is not used directly, but through a `LicenseAssignmentMethods`.
+/// It is not used directly, but through a `LicenseAssignmentMethods` instance.
 ///
 /// # Example
 ///
@@ -1693,7 +1741,7 @@ impl<'a, C, NC, A> LicenseAssignmentUpdateCall<'a, C, NC, A> where NC: hyper::ne
         for &field in ["alt", "productId", "skuId", "userId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -1750,7 +1798,7 @@ impl<'a, C, NC, A> LicenseAssignmentUpdateCall<'a, C, NC, A> where NC: hyper::ne
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -1766,7 +1814,6 @@ impl<'a, C, NC, A> LicenseAssignmentUpdateCall<'a, C, NC, A> where NC: hyper::ne
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -1776,7 +1823,7 @@ impl<'a, C, NC, A> LicenseAssignmentUpdateCall<'a, C, NC, A> where NC: hyper::ne
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -1787,7 +1834,7 @@ impl<'a, C, NC, A> LicenseAssignmentUpdateCall<'a, C, NC, A> where NC: hyper::ne
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -1796,13 +1843,13 @@ impl<'a, C, NC, A> LicenseAssignmentUpdateCall<'a, C, NC, A> where NC: hyper::ne
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -1823,7 +1870,7 @@ impl<'a, C, NC, A> LicenseAssignmentUpdateCall<'a, C, NC, A> where NC: hyper::ne
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Name for product    
+    /// Name for product
     pub fn product_id(mut self, new_value: &str) -> LicenseAssignmentUpdateCall<'a, C, NC, A> {
         self._product_id = new_value.to_string();
         self
@@ -1833,7 +1880,7 @@ impl<'a, C, NC, A> LicenseAssignmentUpdateCall<'a, C, NC, A> where NC: hyper::ne
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Name for sku for which license would be revoked    
+    /// Name for sku for which license would be revoked
     pub fn sku_id(mut self, new_value: &str) -> LicenseAssignmentUpdateCall<'a, C, NC, A> {
         self._sku_id = new_value.to_string();
         self
@@ -1843,7 +1890,7 @@ impl<'a, C, NC, A> LicenseAssignmentUpdateCall<'a, C, NC, A> where NC: hyper::ne
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// email id or unique Id of the user    
+    /// email id or unique Id of the user
     pub fn user_id(mut self, new_value: &str) -> LicenseAssignmentUpdateCall<'a, C, NC, A> {
         self._user_id = new_value.to_string();
         self
@@ -1904,7 +1951,7 @@ impl<'a, C, NC, A> LicenseAssignmentUpdateCall<'a, C, NC, A> where NC: hyper::ne
 /// Assign License. This method supports patch semantics.
 ///
 /// A builder for the *patch* method supported by a *licenseAssignment* resource.
-/// It is not used directly, but through a `LicenseAssignmentMethods`.
+/// It is not used directly, but through a `LicenseAssignmentMethods` instance.
 ///
 /// # Example
 ///
@@ -1973,7 +2020,7 @@ impl<'a, C, NC, A> LicenseAssignmentPatchCall<'a, C, NC, A> where NC: hyper::net
         for &field in ["alt", "productId", "skuId", "userId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -2030,7 +2077,7 @@ impl<'a, C, NC, A> LicenseAssignmentPatchCall<'a, C, NC, A> where NC: hyper::net
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -2046,7 +2093,6 @@ impl<'a, C, NC, A> LicenseAssignmentPatchCall<'a, C, NC, A> where NC: hyper::net
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -2056,7 +2102,7 @@ impl<'a, C, NC, A> LicenseAssignmentPatchCall<'a, C, NC, A> where NC: hyper::net
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -2067,7 +2113,7 @@ impl<'a, C, NC, A> LicenseAssignmentPatchCall<'a, C, NC, A> where NC: hyper::net
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -2076,13 +2122,13 @@ impl<'a, C, NC, A> LicenseAssignmentPatchCall<'a, C, NC, A> where NC: hyper::net
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -2103,7 +2149,7 @@ impl<'a, C, NC, A> LicenseAssignmentPatchCall<'a, C, NC, A> where NC: hyper::net
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Name for product    
+    /// Name for product
     pub fn product_id(mut self, new_value: &str) -> LicenseAssignmentPatchCall<'a, C, NC, A> {
         self._product_id = new_value.to_string();
         self
@@ -2113,7 +2159,7 @@ impl<'a, C, NC, A> LicenseAssignmentPatchCall<'a, C, NC, A> where NC: hyper::net
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Name for sku for which license would be revoked    
+    /// Name for sku for which license would be revoked
     pub fn sku_id(mut self, new_value: &str) -> LicenseAssignmentPatchCall<'a, C, NC, A> {
         self._sku_id = new_value.to_string();
         self
@@ -2123,7 +2169,7 @@ impl<'a, C, NC, A> LicenseAssignmentPatchCall<'a, C, NC, A> where NC: hyper::net
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// email id or unique Id of the user    
+    /// email id or unique Id of the user
     pub fn user_id(mut self, new_value: &str) -> LicenseAssignmentPatchCall<'a, C, NC, A> {
         self._user_id = new_value.to_string();
         self
@@ -2184,7 +2230,7 @@ impl<'a, C, NC, A> LicenseAssignmentPatchCall<'a, C, NC, A> where NC: hyper::net
 /// Assign License.
 ///
 /// A builder for the *insert* method supported by a *licenseAssignment* resource.
-/// It is not used directly, but through a `LicenseAssignmentMethods`.
+/// It is not used directly, but through a `LicenseAssignmentMethods` instance.
 ///
 /// # Example
 ///
@@ -2251,7 +2297,7 @@ impl<'a, C, NC, A> LicenseAssignmentInsertCall<'a, C, NC, A> where NC: hyper::ne
         for &field in ["alt", "productId", "skuId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -2308,7 +2354,7 @@ impl<'a, C, NC, A> LicenseAssignmentInsertCall<'a, C, NC, A> where NC: hyper::ne
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -2324,7 +2370,6 @@ impl<'a, C, NC, A> LicenseAssignmentInsertCall<'a, C, NC, A> where NC: hyper::ne
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -2334,7 +2379,7 @@ impl<'a, C, NC, A> LicenseAssignmentInsertCall<'a, C, NC, A> where NC: hyper::ne
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -2345,7 +2390,7 @@ impl<'a, C, NC, A> LicenseAssignmentInsertCall<'a, C, NC, A> where NC: hyper::ne
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -2354,13 +2399,13 @@ impl<'a, C, NC, A> LicenseAssignmentInsertCall<'a, C, NC, A> where NC: hyper::ne
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -2381,7 +2426,7 @@ impl<'a, C, NC, A> LicenseAssignmentInsertCall<'a, C, NC, A> where NC: hyper::ne
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Name for product    
+    /// Name for product
     pub fn product_id(mut self, new_value: &str) -> LicenseAssignmentInsertCall<'a, C, NC, A> {
         self._product_id = new_value.to_string();
         self
@@ -2391,7 +2436,7 @@ impl<'a, C, NC, A> LicenseAssignmentInsertCall<'a, C, NC, A> where NC: hyper::ne
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Name for sku    
+    /// Name for sku
     pub fn sku_id(mut self, new_value: &str) -> LicenseAssignmentInsertCall<'a, C, NC, A> {
         self._sku_id = new_value.to_string();
         self

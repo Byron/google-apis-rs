@@ -1,8 +1,8 @@
 // DO NOT EDIT !
-// This file was generated automatically from 'src/mako/lib.rs.mako'
+// This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *mirror* crate version *0.1.1+20150220*, where *20150220* is the exact revision of the *mirror:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.1*.
+//! This documentation was generated from *mirror* crate version *0.1.2+20150220*, where *20150220* is the exact revision of the *mirror:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.2*.
 //! 
 //! Everything else about the *mirror* *v1* API can be found at the
 //! [official documentation site](https://developers.google.com/glass).
@@ -45,6 +45,8 @@
 //! 
 //! * **[Hub](struct.Mirror.html)**
 //!     * a central object to maintain state and allow accessing all *Activities*
+//!     * creates [*Method Builders*](trait.MethodsBuilder.html) which in turn
+//!       allow access to individual [*Call Builders*](trait.CallBuilder.html)
 //! * **[Resources](trait.Resource.html)**
 //!     * primary types that you can apply *Activities* to
 //!     * a collection of properties and *Parts*
@@ -53,6 +55,8 @@
 //!         * never directly used in *Activities*
 //! * **[Activities](trait.CallBuilder.html)**
 //!     * operations to apply to *Resources*
+//! 
+//! All *structures* are marked with applicable traits to further categorize them and ease browsing.
 //! 
 //! Generally speaking, you can invoke *Activities* like this:
 //! 
@@ -94,7 +98,7 @@
 //! extern crate "yup-oauth2" as oauth2;
 //! extern crate "google-mirror1" as mirror1;
 //! use mirror1::Contact;
-//! use mirror1::Result;
+//! use mirror1::{Result, Error};
 //! # #[test] fn egal() {
 //! use std::default::Default;
 //! use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -124,15 +128,17 @@
 //!              .doit();
 //! 
 //! match result {
-//!     Result::HttpError(err) => println!("HTTPERROR: {:?}", err),
-//!     Result::MissingAPIKey => println!("Auth: Missing API Key - used if there are no scopes"),
-//!     Result::MissingToken => println!("OAuth2: Missing Token"),
-//!     Result::Cancelled => println!("Operation cancelled by user"),
-//!     Result::UploadSizeLimitExceeded(size, max_size) => println!("Upload size too big: {} of {}", size, max_size),
-//!     Result::Failure(_) => println!("General Failure (hyper::client::Response doesn't print)"),
-//!     Result::FieldClash(clashed_field) => println!("You added custom parameter which is part of builder: {:?}", clashed_field),
-//!     Result::JsonDecodeError(err) => println!("Couldn't understand server reply - maybe API needs update: {:?}", err),
-//!     Result::Success(_) => println!("Success (value doesn't print)"),
+//!     Err(e) => match e {
+//!         Error::HttpError(err) => println!("HTTPERROR: {:?}", err),
+//!         Error::MissingAPIKey => println!("Auth: Missing API Key - used if there are no scopes"),
+//!         Error::MissingToken => println!("OAuth2: Missing Token"),
+//!         Error::Cancelled => println!("Operation canceled by user"),
+//!         Error::UploadSizeLimitExceeded(size, max_size) => println!("Upload size too big: {} of {}", size, max_size),
+//!         Error::Failure(_) => println!("General Failure (hyper::client::Response doesn't print)"),
+//!         Error::FieldClash(clashed_field) => println!("You added custom parameter which is part of builder: {:?}", clashed_field),
+//!         Error::JsonDecodeError(err) => println!("Couldn't understand server reply - maybe API needs update: {:?}", err),
+//!     },
+//!     Ok(_) => println!("Success (value doesn't print)"),
 //! }
 //! # }
 //! ```
@@ -145,7 +151,7 @@
 //! When delegates handle errors or intermediate values, they may have a chance to instruct the system to retry. This 
 //! makes the system potentially resilient to all kinds of errors.
 //! 
-//! ## Uploads and Downlods
+//! ## Uploads and Downloads
 //! If a method supports downloads, the response body, which is part of the [Result](enum.Result.html), should be
 //! read by you to obtain the media.
 //! If such a method also supports a [Response Result](trait.ResponseResult.html), it will return that by default.
@@ -168,8 +174,9 @@
 //! ## Optional Parts in Server-Requests
 //! 
 //! All structures provided by this library are made to be [enocodable](trait.RequestValue.html) and 
-//! [decodable](trait.ResponseResult.html) via json. Optionals are used to indicate that partial requests are responses are valid.
-//! Most optionals are are considered [Parts](trait.Part.html) which are identifyable by name, which will be sent to 
+//! [decodable](trait.ResponseResult.html) via *json*. Optionals are used to indicate that partial requests are responses 
+//! are valid.
+//! Most optionals are are considered [Parts](trait.Part.html) which are identifiable by name, which will be sent to 
 //! the server to indicate either the set parts of the request or the desired parts in the response.
 //! 
 //! ## Builder Arguments
@@ -218,7 +225,7 @@ use std::io;
 use std::fs;
 use std::thread::sleep;
 
-pub use cmn::{MultiPartReader, ToParts, MethodInfo, Result, CallBuilder, Hub, ReadSeek, Part, ResponseResult, RequestValue, NestedType, Delegate, DefaultDelegate, ResourceMethodsBuilder, Resource, JsonServerError};
+pub use cmn::{MultiPartReader, ToParts, MethodInfo, Result, Error, CallBuilder, Hub, ReadSeek, Part, ResponseResult, RequestValue, NestedType, Delegate, DefaultDelegate, MethodsBuilder, Resource, JsonServerError};
 
 
 // ##############
@@ -269,7 +276,7 @@ impl Default for Scope {
 /// extern crate "yup-oauth2" as oauth2;
 /// extern crate "google-mirror1" as mirror1;
 /// use mirror1::Contact;
-/// use mirror1::Result;
+/// use mirror1::{Result, Error};
 /// # #[test] fn egal() {
 /// use std::default::Default;
 /// use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -299,15 +306,17 @@ impl Default for Scope {
 ///              .doit();
 /// 
 /// match result {
-///     Result::HttpError(err) => println!("HTTPERROR: {:?}", err),
-///     Result::MissingAPIKey => println!("Auth: Missing API Key - used if there are no scopes"),
-///     Result::MissingToken => println!("OAuth2: Missing Token"),
-///     Result::Cancelled => println!("Operation cancelled by user"),
-///     Result::UploadSizeLimitExceeded(size, max_size) => println!("Upload size too big: {} of {}", size, max_size),
-///     Result::Failure(_) => println!("General Failure (hyper::client::Response doesn't print)"),
-///     Result::FieldClash(clashed_field) => println!("You added custom parameter which is part of builder: {:?}", clashed_field),
-///     Result::JsonDecodeError(err) => println!("Couldn't understand server reply - maybe API needs update: {:?}", err),
-///     Result::Success(_) => println!("Success (value doesn't print)"),
+///     Err(e) => match e {
+///         Error::HttpError(err) => println!("HTTPERROR: {:?}", err),
+///         Error::MissingAPIKey => println!("Auth: Missing API Key - used if there are no scopes"),
+///         Error::MissingToken => println!("OAuth2: Missing Token"),
+///         Error::Cancelled => println!("Operation canceled by user"),
+///         Error::UploadSizeLimitExceeded(size, max_size) => println!("Upload size too big: {} of {}", size, max_size),
+///         Error::Failure(_) => println!("General Failure (hyper::client::Response doesn't print)"),
+///         Error::FieldClash(clashed_field) => println!("You added custom parameter which is part of builder: {:?}", clashed_field),
+///         Error::JsonDecodeError(err) => println!("Couldn't understand server reply - maybe API needs update: {:?}", err),
+///     },
+///     Ok(_) => println!("Success (value doesn't print)"),
 /// }
 /// # }
 /// ```
@@ -328,7 +337,7 @@ impl<'a, C, NC, A> Mirror<C, NC, A>
         Mirror {
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/0.1.1".to_string(),
+            _user_agent: "google-api-rust-client/0.1.2".to_string(),
             _m: PhantomData
         }
     }
@@ -353,7 +362,7 @@ impl<'a, C, NC, A> Mirror<C, NC, A>
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/0.1.1`.
+    /// It defaults to `google-api-rust-client/0.1.2`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -404,15 +413,15 @@ impl Part for UserAction {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Account {
-    /// no description provided    
+    /// no description provided
     #[serde(alias="userData")]
     pub user_data: Option<Vec<UserData>>,
-    /// no description provided    
+    /// no description provided
     #[serde(alias="authTokens")]
     pub auth_tokens: Option<Vec<AuthToken>>,
-    /// no description provided    
+    /// no description provided
     pub password: Option<String>,
-    /// no description provided    
+    /// no description provided
     pub features: Option<Vec<String>>,
 }
 
@@ -433,15 +442,15 @@ impl ResponseResult for Account {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Attachment {
-    /// The URL for the content.    
+    /// The URL for the content.
     #[serde(alias="contentUrl")]
     pub content_url: String,
-    /// The MIME type of the attachment.    
+    /// The MIME type of the attachment.
     #[serde(alias="contentType")]
     pub content_type: String,
-    /// The ID of the attachment.    
+    /// The ID of the attachment.
     pub id: String,
-    /// Indicates that the contentUrl is not available because the attachment content is still being processed. If the caller wishes to retrieve the content, it should try again later.    
+    /// Indicates that the contentUrl is not available because the attachment content is still being processed. If the caller wishes to retrieve the content, it should try again later.
     #[serde(alias="isProcessingContent")]
     pub is_processing_content: bool,
 }
@@ -455,21 +464,21 @@ impl ResponseResult for Attachment {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Notification {
-    /// The ID of the item that generated the notification.    
+    /// The ID of the item that generated the notification.
     #[serde(alias="itemId")]
     pub item_id: String,
-    /// The secret verify token provided by the service when it subscribed for notifications.    
+    /// The secret verify token provided by the service when it subscribed for notifications.
     #[serde(alias="verifyToken")]
     pub verify_token: String,
-    /// A list of actions taken by the user that triggered the notification.    
+    /// A list of actions taken by the user that triggered the notification.
     #[serde(alias="userActions")]
     pub user_actions: Vec<UserAction>,
-    /// The user token provided by the service when it subscribed for notifications.    
+    /// The user token provided by the service when it subscribed for notifications.
     #[serde(alias="userToken")]
     pub user_token: String,
-    /// The type of operation that generated the notification.    
+    /// The type of operation that generated the notification.
     pub operation: String,
-    /// The collection that generated the notification.    
+    /// The collection that generated the notification.
     pub collection: String,
 }
 
@@ -487,12 +496,12 @@ impl Part for Notification {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct TimelineListResponse {
-    /// The next page token. Provide this as the pageToken parameter in the request to retrieve the next page of results.    
+    /// The next page token. Provide this as the pageToken parameter in the request to retrieve the next page of results.
     #[serde(alias="nextPageToken")]
     pub next_page_token: String,
-    /// Items in the timeline.    
+    /// Items in the timeline.
     pub items: Vec<TimelineItem>,
-    /// The type of resource. This is always mirror#timeline.    
+    /// The type of resource. This is always mirror#timeline.
     pub kind: String,
 }
 
@@ -510,9 +519,9 @@ impl ResponseResult for TimelineListResponse {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct ContactsListResponse {
-    /// Contact list.    
+    /// Contact list.
     pub items: Vec<Contact>,
-    /// The type of resource. This is always mirror#contacts.    
+    /// The type of resource. This is always mirror#contacts.
     pub kind: String,
 }
 
@@ -533,23 +542,23 @@ impl ResponseResult for ContactsListResponse {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct TimelineItem {
-    /// If this item was generated as a reply to another item, this field will be set to the ID of the item being replied to. This can be used to attach a reply to the appropriate conversation or post.    
+    /// If this item was generated as a reply to another item, this field will be set to the ID of the item being replied to. This can be used to attach a reply to the appropriate conversation or post.
     #[serde(alias="inReplyTo")]
     pub in_reply_to: Option<String>,
-    /// The time at which this item was last modified, formatted according to RFC 3339.    
+    /// The time at which this item was last modified, formatted according to RFC 3339.
     pub updated: Option<String>,
     /// A list of media attachments associated with this item. As a convenience, you can refer to attachments in your HTML payloads with the attachment or cid scheme. For example:  
     /// - attachment: <img src="attachment:attachment_index"> where attachment_index is the 0-based index of this array. 
     /// - cid: <img src="cid:attachment_id"> where attachment_id is the ID of the attachment.
     pub attachments: Option<Vec<Attachment>>,
-    /// The time that should be displayed when this item is viewed in the timeline, formatted according to RFC 3339. This user's timeline is sorted chronologically on display time, so this will also determine where the item is displayed in the timeline. If not set by the service, the display time defaults to the updated time.    
+    /// The time that should be displayed when this item is viewed in the timeline, formatted according to RFC 3339. This user's timeline is sorted chronologically on display time, so this will also determine where the item is displayed in the timeline. If not set by the service, the display time defaults to the updated time.
     #[serde(alias="displayTime")]
     pub display_time: Option<String>,
-    /// The user or group that created this item.    
+    /// The user or group that created this item.
     pub creator: Option<Contact>,
-    /// Text content of this item.    
+    /// Text content of this item.
     pub text: Option<String>,
-    /// A list of menu items that will be presented to the user when this item is selected in the timeline.    
+    /// A list of menu items that will be presented to the user when this item is selected in the timeline.
     #[serde(alias="menuItems")]
     pub menu_items: Option<Vec<MenuItem>>,
     /// Whether this item is a bundle cover.
@@ -562,29 +571,29 @@ pub struct TimelineItem {
     /// - Items that have the bundleId in question AND isBundleCover set to false
     #[serde(alias="isBundleCover")]
     pub is_bundle_cover: Option<bool>,
-    /// A URL that can be used to retrieve this item.    
+    /// A URL that can be used to retrieve this item.
     #[serde(alias="selfLink")]
     pub self_link: Option<String>,
-    /// The ID of the timeline item. This is unique within a user's timeline.    
+    /// The ID of the timeline item. This is unique within a user's timeline.
     pub id: Option<String>,
-    /// When true, indicates this item is deleted, and only the ID property is set.    
+    /// When true, indicates this item is deleted, and only the ID property is set.
     #[serde(alias="isDeleted")]
     pub is_deleted: Option<bool>,
-    /// The bundle ID for this item. Services can specify a bundleId to group many items together. They appear under a single top-level item on the device.    
+    /// The bundle ID for this item. Services can specify a bundleId to group many items together. They appear under a single top-level item on the device.
     #[serde(alias="bundleId")]
     pub bundle_id: Option<String>,
-    /// The type of resource. This is always mirror#timelineItem.    
+    /// The type of resource. This is always mirror#timelineItem.
     pub kind: Option<String>,
-    /// A list of users or groups that this item has been shared with.    
+    /// A list of users or groups that this item has been shared with.
     pub recipients: Option<Vec<Contact>>,
-    /// When true, indicates this item is pinned, which means it's grouped alongside "active" items like navigation and hangouts, on the opposite side of the home screen from historical (non-pinned) timeline items. You can allow the user to toggle the value of this property with the TOGGLE_PINNED built-in menu item.    
+    /// When true, indicates this item is pinned, which means it's grouped alongside "active" items like navigation and hangouts, on the opposite side of the home screen from historical (non-pinned) timeline items. You can allow the user to toggle the value of this property with the TOGGLE_PINNED built-in menu item.
     #[serde(alias="isPinned")]
     pub is_pinned: Option<bool>,
-    /// The title of this item.    
+    /// The title of this item.
     pub title: Option<String>,
-    /// Controls how notifications for this item are presented on the device. If this is missing, no notification will be generated.    
+    /// Controls how notifications for this item are presented on the device. If this is missing, no notification will be generated.
     pub notification: Option<NotificationConfig>,
-    /// The time at which this item was created, formatted according to RFC 3339.    
+    /// The time at which this item was created, formatted according to RFC 3339.
     pub created: Option<String>,
     /// HTML content for this item. If both text and html are provided for an item, the html will be rendered in the timeline.
     /// Allowed HTML elements - You can use these elements in your timeline cards.
@@ -609,11 +618,11 @@ pub struct TimelineItem {
     /// Glassware should also specify the speakableType field, which will be spoken before this text in cases where the additional context is useful, for example when the user requests that the item be read aloud following a notification.
     #[serde(alias="speakableText")]
     pub speakable_text: Option<String>,
-    /// ETag for this item.    
+    /// ETag for this item.
     pub etag: Option<String>,
-    /// The geographic location associated with this item.    
+    /// The geographic location associated with this item.
     pub location: Option<Location>,
-    /// For pinned items, this determines the order in which the item is displayed in the timeline, with a higher score appearing closer to the clock. Note: setting this field is currently not supported.    
+    /// For pinned items, this determines the order in which the item is displayed in the timeline, with a higher score appearing closer to the clock. Note: setting this field is currently not supported.
     #[serde(alias="pinScore")]
     pub pin_score: Option<i32>,
     /// A speakable description of the type of this item. This will be announced to the user prior to reading the content of the item in cases where the additional context is useful, for example when the user requests that the item be read aloud following a notification.
@@ -623,10 +632,10 @@ pub struct TimelineItem {
     /// Glassware are encouraged to populate this field for every timeline item, even if the item does not contain speakableText or text so that the user can learn the type of the item without looking at the screen.
     #[serde(alias="speakableType")]
     pub speakable_type: Option<String>,
-    /// A canonical URL pointing to the canonical/high quality version of the data represented by the timeline item.    
+    /// A canonical URL pointing to the canonical/high quality version of the data represented by the timeline item.
     #[serde(alias="canonicalUrl")]
     pub canonical_url: Option<String>,
-    /// Opaque string you can use to map a timeline item to data in your own service.    
+    /// Opaque string you can use to map a timeline item to data in your own service.
     #[serde(alias="sourceItemId")]
     pub source_item_id: Option<String>,
 }
@@ -651,22 +660,22 @@ impl ResponseResult for TimelineItem {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Contact {
-    /// The type of resource. This is always mirror#contact.    
+    /// The type of resource. This is always mirror#contact.
     pub kind: Option<String>,
-    /// The name to display for this contact.    
+    /// The name to display for this contact.
     #[serde(alias="displayName")]
     pub display_name: Option<String>,
-    /// A list of MIME types that a contact supports. The contact will be shown to the user if any of its acceptTypes matches any of the types of the attachments on the item. If no acceptTypes are given, the contact will be shown for all items.    
+    /// A list of MIME types that a contact supports. The contact will be shown to the user if any of its acceptTypes matches any of the types of the attachments on the item. If no acceptTypes are given, the contact will be shown for all items.
     #[serde(alias="acceptTypes")]
     pub accept_types: Option<Vec<String>>,
-    /// A list of voice menu commands that a contact can handle. Glass shows up to three contacts for each voice menu command. If there are more than that, the three contacts with the highest priority are shown for that particular command.    
+    /// A list of voice menu commands that a contact can handle. Glass shows up to three contacts for each voice menu command. If there are more than that, the three contacts with the highest priority are shown for that particular command.
     #[serde(alias="acceptCommands")]
     pub accept_commands: Option<Vec<Command>>,
-    /// Priority for the contact to determine ordering in a list of contacts. Contacts with higher priorities will be shown before ones with lower priorities.    
+    /// Priority for the contact to determine ordering in a list of contacts. Contacts with higher priorities will be shown before ones with lower priorities.
     pub priority: Option<u32>,
-    /// The ID of the application that created this contact. This is populated by the API    
+    /// The ID of the application that created this contact. This is populated by the API
     pub source: Option<String>,
-    /// Primary phone number for the contact. This can be a fully-qualified number, with country calling code and area code, or a local number.    
+    /// Primary phone number for the contact. This can be a fully-qualified number, with country calling code and area code, or a local number.
     #[serde(alias="phoneNumber")]
     pub phone_number: Option<String>,
     /// A list of sharing features that a contact can handle. Allowed values are:  
@@ -678,12 +687,12 @@ pub struct Contact {
     /// - GROUP - Represents more than a single person.
     #[serde(alias="type")]
     pub type_: Option<String>,
-    /// Set of image URLs to display for a contact. Most contacts will have a single image, but a "group" contact may include up to 8 image URLs and they will be resized and cropped into a mosaic on the client.    
+    /// Set of image URLs to display for a contact. Most contacts will have a single image, but a "group" contact may include up to 8 image URLs and they will be resized and cropped into a mosaic on the client.
     #[serde(alias="imageUrls")]
     pub image_urls: Option<Vec<String>>,
-    /// An ID for this contact. This is generated by the application and is treated as an opaque token.    
+    /// An ID for this contact. This is generated by the application and is treated as an opaque token.
     pub id: Option<String>,
-    /// Name of this contact as it should be pronounced. If this contact's name must be spoken as part of a voice disambiguation menu, this name is used as the expected pronunciation. This is useful for contact names with unpronounceable characters or whose display spelling is otherwise not phonetic.    
+    /// Name of this contact as it should be pronounced. If this contact's name must be spoken as part of a voice disambiguation menu, this name is used as the expected pronunciation. This is useful for contact names with unpronounceable characters or whose display spelling is otherwise not phonetic.
     #[serde(alias="speakableName")]
     pub speakable_name: Option<String>,
 }
@@ -721,22 +730,22 @@ impl Part for Command {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Location {
-    /// The type of resource. This is always mirror#location.    
+    /// The type of resource. This is always mirror#location.
     pub kind: String,
-    /// The name to be displayed. This may be a business name or a user-defined place, such as "Home".    
+    /// The name to be displayed. This may be a business name or a user-defined place, such as "Home".
     #[serde(alias="displayName")]
     pub display_name: String,
-    /// The time at which this location was captured, formatted according to RFC 3339.    
+    /// The time at which this location was captured, formatted according to RFC 3339.
     pub timestamp: String,
-    /// The longitude, in degrees.    
+    /// The longitude, in degrees.
     pub longitude: f64,
-    /// The full address of the location.    
+    /// The full address of the location.
     pub address: String,
-    /// The latitude, in degrees.    
+    /// The latitude, in degrees.
     pub latitude: f64,
-    /// The ID of the location.    
+    /// The ID of the location.
     pub id: String,
-    /// The accuracy of the location fix in meters.    
+    /// The accuracy of the location fix in meters.
     pub accuracy: f64,
 }
 
@@ -755,9 +764,9 @@ impl ResponseResult for Location {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct SubscriptionsListResponse {
-    /// The list of subscriptions.    
+    /// The list of subscriptions.
     pub items: Vec<Subscription>,
-    /// The type of resource. This is always mirror#subscriptionsList.    
+    /// The type of resource. This is always mirror#subscriptionsList.
     pub kind: String,
 }
 
@@ -770,10 +779,10 @@ impl ResponseResult for SubscriptionsListResponse {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct AuthToken {
-    /// no description provided    
+    /// no description provided
     #[serde(alias="authToken")]
     pub auth_token: String,
-    /// no description provided    
+    /// no description provided
     #[serde(alias="type")]
     pub type_: String,
 }
@@ -787,9 +796,9 @@ impl Part for AuthToken {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct UserData {
-    /// no description provided    
+    /// no description provided
     pub key: String,
-    /// no description provided    
+    /// no description provided
     pub value: String,
 }
 
@@ -807,9 +816,9 @@ impl Part for UserData {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct AttachmentsListResponse {
-    /// The list of attachments.    
+    /// The list of attachments.
     pub items: Vec<Attachment>,
-    /// The type of resource. This is always mirror#attachmentsList.    
+    /// The type of resource. This is always mirror#attachmentsList.
     pub kind: String,
 }
 
@@ -822,7 +831,7 @@ impl ResponseResult for AttachmentsListResponse {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct NotificationConfig {
-    /// The time at which the notification should be delivered.    
+    /// The time at which the notification should be delivered.
     #[serde(alias="deliveryTime")]
     pub delivery_time: String,
     /// Describes how important the notification is. Allowed values are:  
@@ -844,13 +853,13 @@ impl Part for NotificationConfig {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct Setting {
-    /// The type of resource. This is always mirror#setting.    
+    /// The type of resource. This is always mirror#setting.
     pub kind: String,
     /// The setting's ID. The following IDs are valid:  
     /// - locale - The key to the user’s language/locale (BCP 47 identifier) that Glassware should use to render localized content.  
     /// - timezone - The key to the user’s current time zone region as defined in the tz database. Example: America/Los_Angeles.
     pub id: String,
-    /// The setting value, as a string.    
+    /// The setting value, as a string.
     pub value: String,
 }
 
@@ -864,11 +873,11 @@ impl ResponseResult for Setting {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct MenuItem {
-    /// The ContextualMenus.Command associated with this MenuItem (e.g. READ_ALOUD). The voice label for this command will be displayed in the voice menu and the touch label will be displayed in the touch menu. Note that the default menu value's display name will be overriden if you specify this property. Values that do not correspond to a ContextualMenus.Command name will be ignored.    
+    /// The ContextualMenus.Command associated with this MenuItem (e.g. READ_ALOUD). The voice label for this command will be displayed in the voice menu and the touch label will be displayed in the touch menu. Note that the default menu value's display name will be overriden if you specify this property. Values that do not correspond to a ContextualMenus.Command name will be ignored.
     pub contextual_command: String,
-    /// For CUSTOM items, a list of values controlling the appearance of the menu item in each of its states. A value for the DEFAULT state must be provided. If the PENDING or CONFIRMED states are missing, they will not be shown.    
+    /// For CUSTOM items, a list of values controlling the appearance of the menu item in each of its states. A value for the DEFAULT state must be provided. If the PENDING or CONFIRMED states are missing, they will not be shown.
     pub values: Vec<MenuValue>,
-    /// If set to true on a CUSTOM menu item, that item will be removed from the menu after it is selected.    
+    /// If set to true on a CUSTOM menu item, that item will be removed from the menu after it is selected.
     #[serde(alias="removeWhenSelected")]
     pub remove_when_selected: bool,
     /// Controls the behavior when the user picks the menu option. Allowed values are:  
@@ -894,7 +903,7 @@ pub struct MenuItem {
     /// - When the action is PLAY_VIDEO, the payload is the streaming URL of the video 
     /// - When the action is GET_MEDIA_INPUT, the payload is the text transcription of a user's speech input
     pub payload: String,
-    /// The ID for this menu item. This is generated by the application and is treated as an opaque token.    
+    /// The ID for this menu item. This is generated by the application and is treated as an opaque token.
     pub id: String,
 }
 
@@ -912,9 +921,9 @@ impl Part for MenuItem {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct LocationsListResponse {
-    /// The list of locations.    
+    /// The list of locations.
     pub items: Vec<Location>,
-    /// The type of resource. This is always mirror#locationsList.    
+    /// The type of resource. This is always mirror#locationsList.
     pub kind: String,
 }
 
@@ -927,7 +936,7 @@ impl ResponseResult for LocationsListResponse {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct MenuValue {
-    /// URL of an icon to display with the menu item.    
+    /// URL of an icon to display with the menu item.
     #[serde(alias="iconUrl")]
     pub icon_url: String,
     /// The state that this value applies to. Allowed values are:  
@@ -935,7 +944,7 @@ pub struct MenuValue {
     /// - PENDING - Value shown when the menuItem has been selected by the user but can still be cancelled. 
     /// - CONFIRMED - Value shown when the menuItem has been selected by the user and can no longer be cancelled.
     pub state: String,
-    /// The name to display for the menu item. If you specify this property for a built-in menu item, the default contextual voice command for that menu item is not shown.    
+    /// The name to display for the menu item. If you specify this property for a built-in menu item, the default contextual voice command for that menu item is not shown.
     #[serde(alias="displayName")]
     pub display_name: String,
 }
@@ -957,21 +966,21 @@ impl Part for MenuValue {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Subscription {
-    /// The type of resource. This is always mirror#subscription.    
+    /// The type of resource. This is always mirror#subscription.
     pub kind: Option<String>,
-    /// Container object for notifications. This is not populated in the Subscription resource.    
+    /// Container object for notifications. This is not populated in the Subscription resource.
     pub notification: Option<Notification>,
-    /// The time at which this subscription was last modified, formatted according to RFC 3339.    
+    /// The time at which this subscription was last modified, formatted according to RFC 3339.
     pub updated: Option<String>,
     /// The collection to subscribe to. Allowed values are:  
     /// - timeline - Changes in the timeline including insertion, deletion, and updates. 
     /// - locations - Location updates. 
     /// - settings - Settings updates.
     pub collection: Option<String>,
-    /// A secret token sent to the subscriber in notifications so that it can verify that the notification was generated by Google.    
+    /// A secret token sent to the subscriber in notifications so that it can verify that the notification was generated by Google.
     #[serde(alias="verifyToken")]
     pub verify_token: Option<String>,
-    /// An opaque token sent to the subscriber in notifications so that it can determine the ID of the user.    
+    /// An opaque token sent to the subscriber in notifications so that it can determine the ID of the user.
     #[serde(alias="userToken")]
     pub user_token: Option<String>,
     /// A list of operations that should be subscribed to. An empty list indicates that all operations on the collection should be subscribed to. Allowed values are:  
@@ -980,9 +989,9 @@ pub struct Subscription {
     /// - DELETE - The item has been deleted. 
     /// - MENU_ACTION - A custom menu item has been triggered by the user.
     pub operation: Option<Vec<String>>,
-    /// The ID of the subscription.    
+    /// The ID of the subscription.
     pub id: Option<String>,
-    /// The URL where notifications should be delivered (must start with https://).    
+    /// The URL where notifications should be delivered (must start with https://).
     #[serde(alias="callbackUrl")]
     pub callback_url: Option<String>,
 }
@@ -1031,13 +1040,17 @@ pub struct SubscriptionMethods<'a, C, NC, A>
     hub: &'a Mirror<C, NC, A>,
 }
 
-impl<'a, C, NC, A> ResourceMethodsBuilder for SubscriptionMethods<'a, C, NC, A> {}
+impl<'a, C, NC, A> MethodsBuilder for SubscriptionMethods<'a, C, NC, A> {}
 
 impl<'a, C, NC, A> SubscriptionMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Creates a new subscription.    
+    /// Creates a new subscription.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
     pub fn insert(&self, request: &Subscription) -> SubscriptionInsertCall<'a, C, NC, A> {
         SubscriptionInsertCall {
             hub: self.hub,
@@ -1050,7 +1063,11 @@ impl<'a, C, NC, A> SubscriptionMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Deletes a subscription.    
+    /// Deletes a subscription.
+    /// 
+    /// # Arguments
+    ///
+    /// * `id` - The ID of the subscription.
     pub fn delete(&self, id: &str) -> SubscriptionDeleteCall<'a, C, NC, A> {
         SubscriptionDeleteCall {
             hub: self.hub,
@@ -1063,7 +1080,12 @@ impl<'a, C, NC, A> SubscriptionMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Updates an existing subscription in place.    
+    /// Updates an existing subscription in place.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `id` - The ID of the subscription.
     pub fn update(&self, request: &Subscription, id: &str) -> SubscriptionUpdateCall<'a, C, NC, A> {
         SubscriptionUpdateCall {
             hub: self.hub,
@@ -1077,7 +1099,7 @@ impl<'a, C, NC, A> SubscriptionMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Retrieves a list of subscriptions for the authenticated user and service.    
+    /// Retrieves a list of subscriptions for the authenticated user and service.
     pub fn list(&self) -> SubscriptionListCall<'a, C, NC, A> {
         SubscriptionListCall {
             hub: self.hub,
@@ -1124,13 +1146,17 @@ pub struct TimelineMethods<'a, C, NC, A>
     hub: &'a Mirror<C, NC, A>,
 }
 
-impl<'a, C, NC, A> ResourceMethodsBuilder for TimelineMethods<'a, C, NC, A> {}
+impl<'a, C, NC, A> MethodsBuilder for TimelineMethods<'a, C, NC, A> {}
 
 impl<'a, C, NC, A> TimelineMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Returns a list of attachments for a timeline item.    
+    /// Returns a list of attachments for a timeline item.
+    /// 
+    /// # Arguments
+    ///
+    /// * `itemId` - The ID of the timeline item whose attachments should be listed.
     pub fn attachments_list(&self, item_id: &str) -> TimelineAttachmentListCall<'a, C, NC, A> {
         TimelineAttachmentListCall {
             hub: self.hub,
@@ -1143,7 +1169,11 @@ impl<'a, C, NC, A> TimelineMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Inserts a new item into the timeline.    
+    /// Inserts a new item into the timeline.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
     pub fn insert(&self, request: &TimelineItem) -> TimelineInsertCall<'a, C, NC, A> {
         TimelineInsertCall {
             hub: self.hub,
@@ -1156,7 +1186,12 @@ impl<'a, C, NC, A> TimelineMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Updates a timeline item in place. This method supports patch semantics.    
+    /// Updates a timeline item in place. This method supports patch semantics.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `id` - The ID of the timeline item.
     pub fn patch(&self, request: &TimelineItem, id: &str) -> TimelinePatchCall<'a, C, NC, A> {
         TimelinePatchCall {
             hub: self.hub,
@@ -1170,7 +1205,7 @@ impl<'a, C, NC, A> TimelineMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Retrieves a list of timeline items for the authenticated user.    
+    /// Retrieves a list of timeline items for the authenticated user.
     pub fn list(&self) -> TimelineListCall<'a, C, NC, A> {
         TimelineListCall {
             hub: self.hub,
@@ -1189,7 +1224,11 @@ impl<'a, C, NC, A> TimelineMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Adds a new attachment to a timeline item.    
+    /// Adds a new attachment to a timeline item.
+    /// 
+    /// # Arguments
+    ///
+    /// * `itemId` - The ID of the timeline item the attachment belongs to.
     pub fn attachments_insert(&self, item_id: &str) -> TimelineAttachmentInsertCall<'a, C, NC, A> {
         TimelineAttachmentInsertCall {
             hub: self.hub,
@@ -1202,7 +1241,12 @@ impl<'a, C, NC, A> TimelineMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Deletes an attachment from a timeline item.    
+    /// Deletes an attachment from a timeline item.
+    /// 
+    /// # Arguments
+    ///
+    /// * `itemId` - The ID of the timeline item the attachment belongs to.
+    /// * `attachmentId` - The ID of the attachment.
     pub fn attachments_delete(&self, item_id: &str, attachment_id: &str) -> TimelineAttachmentDeleteCall<'a, C, NC, A> {
         TimelineAttachmentDeleteCall {
             hub: self.hub,
@@ -1216,7 +1260,11 @@ impl<'a, C, NC, A> TimelineMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Deletes a timeline item.    
+    /// Deletes a timeline item.
+    /// 
+    /// # Arguments
+    ///
+    /// * `id` - The ID of the timeline item.
     pub fn delete(&self, id: &str) -> TimelineDeleteCall<'a, C, NC, A> {
         TimelineDeleteCall {
             hub: self.hub,
@@ -1229,7 +1277,12 @@ impl<'a, C, NC, A> TimelineMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Updates a timeline item in place.    
+    /// Updates a timeline item in place.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `id` - The ID of the timeline item.
     pub fn update(&self, request: &TimelineItem, id: &str) -> TimelineUpdateCall<'a, C, NC, A> {
         TimelineUpdateCall {
             hub: self.hub,
@@ -1243,7 +1296,12 @@ impl<'a, C, NC, A> TimelineMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Retrieves an attachment on a timeline item by item ID and attachment ID.    
+    /// Retrieves an attachment on a timeline item by item ID and attachment ID.
+    /// 
+    /// # Arguments
+    ///
+    /// * `itemId` - The ID of the timeline item the attachment belongs to.
+    /// * `attachmentId` - The ID of the attachment.
     pub fn attachments_get(&self, item_id: &str, attachment_id: &str) -> TimelineAttachmentGetCall<'a, C, NC, A> {
         TimelineAttachmentGetCall {
             hub: self.hub,
@@ -1257,7 +1315,11 @@ impl<'a, C, NC, A> TimelineMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Gets a single timeline item by ID.    
+    /// Gets a single timeline item by ID.
+    /// 
+    /// # Arguments
+    ///
+    /// * `id` - The ID of the timeline item.
     pub fn get(&self, id: &str) -> TimelineGetCall<'a, C, NC, A> {
         TimelineGetCall {
             hub: self.hub,
@@ -1305,13 +1367,19 @@ pub struct SettingMethods<'a, C, NC, A>
     hub: &'a Mirror<C, NC, A>,
 }
 
-impl<'a, C, NC, A> ResourceMethodsBuilder for SettingMethods<'a, C, NC, A> {}
+impl<'a, C, NC, A> MethodsBuilder for SettingMethods<'a, C, NC, A> {}
 
 impl<'a, C, NC, A> SettingMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Gets a single setting by ID.    
+    /// Gets a single setting by ID.
+    /// 
+    /// # Arguments
+    ///
+    /// * `id` - The ID of the setting. The following IDs are valid: 
+    ///          - locale - The key to the user’s language/locale (BCP 47 identifier) that Glassware should use to render localized content. 
+    ///          - timezone - The key to the user’s current time zone region as defined in the tz database. Example: America/Los_Angeles.
     pub fn get(&self, id: &str) -> SettingGetCall<'a, C, NC, A> {
         SettingGetCall {
             hub: self.hub,
@@ -1359,13 +1427,17 @@ pub struct LocationMethods<'a, C, NC, A>
     hub: &'a Mirror<C, NC, A>,
 }
 
-impl<'a, C, NC, A> ResourceMethodsBuilder for LocationMethods<'a, C, NC, A> {}
+impl<'a, C, NC, A> MethodsBuilder for LocationMethods<'a, C, NC, A> {}
 
 impl<'a, C, NC, A> LocationMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Gets a single location by ID.    
+    /// Gets a single location by ID.
+    /// 
+    /// # Arguments
+    ///
+    /// * `id` - The ID of the location or latest for the last known location.
     pub fn get(&self, id: &str) -> LocationGetCall<'a, C, NC, A> {
         LocationGetCall {
             hub: self.hub,
@@ -1378,7 +1450,7 @@ impl<'a, C, NC, A> LocationMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Retrieves a list of locations for the user.    
+    /// Retrieves a list of locations for the user.
     pub fn list(&self) -> LocationListCall<'a, C, NC, A> {
         LocationListCall {
             hub: self.hub,
@@ -1425,13 +1497,20 @@ pub struct AccountMethods<'a, C, NC, A>
     hub: &'a Mirror<C, NC, A>,
 }
 
-impl<'a, C, NC, A> ResourceMethodsBuilder for AccountMethods<'a, C, NC, A> {}
+impl<'a, C, NC, A> MethodsBuilder for AccountMethods<'a, C, NC, A> {}
 
 impl<'a, C, NC, A> AccountMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Inserts a new account for a user    
+    /// Inserts a new account for a user
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `userToken` - The ID for the user.
+    /// * `accountType` - Account type to be passed to Android Account Manager.
+    /// * `accountName` - The name of the account to be passed to the Android Account Manager.
     pub fn insert(&self, request: &Account, user_token: &str, account_type: &str, account_name: &str) -> AccountInsertCall<'a, C, NC, A> {
         AccountInsertCall {
             hub: self.hub,
@@ -1482,13 +1561,17 @@ pub struct ContactMethods<'a, C, NC, A>
     hub: &'a Mirror<C, NC, A>,
 }
 
-impl<'a, C, NC, A> ResourceMethodsBuilder for ContactMethods<'a, C, NC, A> {}
+impl<'a, C, NC, A> MethodsBuilder for ContactMethods<'a, C, NC, A> {}
 
 impl<'a, C, NC, A> ContactMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Gets a single contact by ID.    
+    /// Gets a single contact by ID.
+    /// 
+    /// # Arguments
+    ///
+    /// * `id` - The ID of the contact.
     pub fn get(&self, id: &str) -> ContactGetCall<'a, C, NC, A> {
         ContactGetCall {
             hub: self.hub,
@@ -1501,7 +1584,11 @@ impl<'a, C, NC, A> ContactMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Deletes a contact.    
+    /// Deletes a contact.
+    /// 
+    /// # Arguments
+    ///
+    /// * `id` - The ID of the contact.
     pub fn delete(&self, id: &str) -> ContactDeleteCall<'a, C, NC, A> {
         ContactDeleteCall {
             hub: self.hub,
@@ -1514,7 +1601,11 @@ impl<'a, C, NC, A> ContactMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Inserts a new contact.    
+    /// Inserts a new contact.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
     pub fn insert(&self, request: &Contact) -> ContactInsertCall<'a, C, NC, A> {
         ContactInsertCall {
             hub: self.hub,
@@ -1527,7 +1618,12 @@ impl<'a, C, NC, A> ContactMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Updates a contact in place. This method supports patch semantics.    
+    /// Updates a contact in place. This method supports patch semantics.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `id` - The ID of the contact.
     pub fn patch(&self, request: &Contact, id: &str) -> ContactPatchCall<'a, C, NC, A> {
         ContactPatchCall {
             hub: self.hub,
@@ -1541,7 +1637,7 @@ impl<'a, C, NC, A> ContactMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Retrieves a list of contacts for the authenticated user.    
+    /// Retrieves a list of contacts for the authenticated user.
     pub fn list(&self) -> ContactListCall<'a, C, NC, A> {
         ContactListCall {
             hub: self.hub,
@@ -1553,7 +1649,12 @@ impl<'a, C, NC, A> ContactMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Updates a contact in place.    
+    /// Updates a contact in place.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `id` - The ID of the contact.
     pub fn update(&self, request: &Contact, id: &str) -> ContactUpdateCall<'a, C, NC, A> {
         ContactUpdateCall {
             hub: self.hub,
@@ -1577,7 +1678,7 @@ impl<'a, C, NC, A> ContactMethods<'a, C, NC, A> {
 /// Creates a new subscription.
 ///
 /// A builder for the *insert* method supported by a *subscription* resource.
-/// It is not used directly, but through a `SubscriptionMethods`.
+/// It is not used directly, but through a `SubscriptionMethods` instance.
 ///
 /// # Example
 ///
@@ -1640,7 +1741,7 @@ impl<'a, C, NC, A> SubscriptionInsertCall<'a, C, NC, A> where NC: hyper::net::Ne
         for &field in ["alt"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -1673,7 +1774,7 @@ impl<'a, C, NC, A> SubscriptionInsertCall<'a, C, NC, A> where NC: hyper::net::Ne
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -1689,7 +1790,6 @@ impl<'a, C, NC, A> SubscriptionInsertCall<'a, C, NC, A> where NC: hyper::net::Ne
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -1699,7 +1799,7 @@ impl<'a, C, NC, A> SubscriptionInsertCall<'a, C, NC, A> where NC: hyper::net::Ne
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -1710,7 +1810,7 @@ impl<'a, C, NC, A> SubscriptionInsertCall<'a, C, NC, A> where NC: hyper::net::Ne
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -1719,13 +1819,13 @@ impl<'a, C, NC, A> SubscriptionInsertCall<'a, C, NC, A> where NC: hyper::net::Ne
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -1797,7 +1897,7 @@ impl<'a, C, NC, A> SubscriptionInsertCall<'a, C, NC, A> where NC: hyper::net::Ne
 /// Deletes a subscription.
 ///
 /// A builder for the *delete* method supported by a *subscription* resource.
-/// It is not used directly, but through a `SubscriptionMethods`.
+/// It is not used directly, but through a `SubscriptionMethods` instance.
 ///
 /// # Example
 ///
@@ -1855,7 +1955,7 @@ impl<'a, C, NC, A> SubscriptionDeleteCall<'a, C, NC, A> where NC: hyper::net::Ne
         for &field in ["id"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -1907,7 +2007,7 @@ impl<'a, C, NC, A> SubscriptionDeleteCall<'a, C, NC, A> where NC: hyper::net::Ne
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -1919,7 +2019,6 @@ impl<'a, C, NC, A> SubscriptionDeleteCall<'a, C, NC, A> where NC: hyper::net::Ne
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -1929,7 +2028,7 @@ impl<'a, C, NC, A> SubscriptionDeleteCall<'a, C, NC, A> where NC: hyper::net::Ne
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -1940,12 +2039,12 @@ impl<'a, C, NC, A> SubscriptionDeleteCall<'a, C, NC, A> where NC: hyper::net::Ne
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = res;
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -1957,7 +2056,7 @@ impl<'a, C, NC, A> SubscriptionDeleteCall<'a, C, NC, A> where NC: hyper::net::Ne
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The ID of the subscription.    
+    /// The ID of the subscription.
     pub fn id(mut self, new_value: &str) -> SubscriptionDeleteCall<'a, C, NC, A> {
         self._id = new_value.to_string();
         self
@@ -2018,7 +2117,7 @@ impl<'a, C, NC, A> SubscriptionDeleteCall<'a, C, NC, A> where NC: hyper::net::Ne
 /// Updates an existing subscription in place.
 ///
 /// A builder for the *update* method supported by a *subscription* resource.
-/// It is not used directly, but through a `SubscriptionMethods`.
+/// It is not used directly, but through a `SubscriptionMethods` instance.
 ///
 /// # Example
 ///
@@ -2083,7 +2182,7 @@ impl<'a, C, NC, A> SubscriptionUpdateCall<'a, C, NC, A> where NC: hyper::net::Ne
         for &field in ["alt", "id"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -2140,7 +2239,7 @@ impl<'a, C, NC, A> SubscriptionUpdateCall<'a, C, NC, A> where NC: hyper::net::Ne
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -2156,7 +2255,6 @@ impl<'a, C, NC, A> SubscriptionUpdateCall<'a, C, NC, A> where NC: hyper::net::Ne
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -2166,7 +2264,7 @@ impl<'a, C, NC, A> SubscriptionUpdateCall<'a, C, NC, A> where NC: hyper::net::Ne
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -2177,7 +2275,7 @@ impl<'a, C, NC, A> SubscriptionUpdateCall<'a, C, NC, A> where NC: hyper::net::Ne
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -2186,13 +2284,13 @@ impl<'a, C, NC, A> SubscriptionUpdateCall<'a, C, NC, A> where NC: hyper::net::Ne
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -2213,7 +2311,7 @@ impl<'a, C, NC, A> SubscriptionUpdateCall<'a, C, NC, A> where NC: hyper::net::Ne
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The ID of the subscription.    
+    /// The ID of the subscription.
     pub fn id(mut self, new_value: &str) -> SubscriptionUpdateCall<'a, C, NC, A> {
         self._id = new_value.to_string();
         self
@@ -2274,7 +2372,7 @@ impl<'a, C, NC, A> SubscriptionUpdateCall<'a, C, NC, A> where NC: hyper::net::Ne
 /// Retrieves a list of subscriptions for the authenticated user and service.
 ///
 /// A builder for the *list* method supported by a *subscription* resource.
-/// It is not used directly, but through a `SubscriptionMethods`.
+/// It is not used directly, but through a `SubscriptionMethods` instance.
 ///
 /// # Example
 ///
@@ -2330,7 +2428,7 @@ impl<'a, C, NC, A> SubscriptionListCall<'a, C, NC, A> where NC: hyper::net::Netw
         for &field in ["alt"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -2359,7 +2457,7 @@ impl<'a, C, NC, A> SubscriptionListCall<'a, C, NC, A> where NC: hyper::net::Netw
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -2371,7 +2469,6 @@ impl<'a, C, NC, A> SubscriptionListCall<'a, C, NC, A> where NC: hyper::net::Netw
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -2381,7 +2478,7 @@ impl<'a, C, NC, A> SubscriptionListCall<'a, C, NC, A> where NC: hyper::net::Netw
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -2392,7 +2489,7 @@ impl<'a, C, NC, A> SubscriptionListCall<'a, C, NC, A> where NC: hyper::net::Netw
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -2401,13 +2498,13 @@ impl<'a, C, NC, A> SubscriptionListCall<'a, C, NC, A> where NC: hyper::net::Netw
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -2470,7 +2567,7 @@ impl<'a, C, NC, A> SubscriptionListCall<'a, C, NC, A> where NC: hyper::net::Netw
 /// Returns a list of attachments for a timeline item.
 ///
 /// A builder for the *attachments.list* method supported by a *timeline* resource.
-/// It is not used directly, but through a `TimelineMethods`.
+/// It is not used directly, but through a `TimelineMethods` instance.
 ///
 /// # Example
 ///
@@ -2528,7 +2625,7 @@ impl<'a, C, NC, A> TimelineAttachmentListCall<'a, C, NC, A> where NC: hyper::net
         for &field in ["alt", "itemId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -2581,7 +2678,7 @@ impl<'a, C, NC, A> TimelineAttachmentListCall<'a, C, NC, A> where NC: hyper::net
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -2593,7 +2690,6 @@ impl<'a, C, NC, A> TimelineAttachmentListCall<'a, C, NC, A> where NC: hyper::net
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -2603,7 +2699,7 @@ impl<'a, C, NC, A> TimelineAttachmentListCall<'a, C, NC, A> where NC: hyper::net
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -2614,7 +2710,7 @@ impl<'a, C, NC, A> TimelineAttachmentListCall<'a, C, NC, A> where NC: hyper::net
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -2623,13 +2719,13 @@ impl<'a, C, NC, A> TimelineAttachmentListCall<'a, C, NC, A> where NC: hyper::net
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -2641,7 +2737,7 @@ impl<'a, C, NC, A> TimelineAttachmentListCall<'a, C, NC, A> where NC: hyper::net
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The ID of the timeline item whose attachments should be listed.    
+    /// The ID of the timeline item whose attachments should be listed.
     pub fn item_id(mut self, new_value: &str) -> TimelineAttachmentListCall<'a, C, NC, A> {
         self._item_id = new_value.to_string();
         self
@@ -2702,7 +2798,7 @@ impl<'a, C, NC, A> TimelineAttachmentListCall<'a, C, NC, A> where NC: hyper::net
 /// Inserts a new item into the timeline.
 ///
 /// A builder for the *insert* method supported by a *timeline* resource.
-/// It is not used directly, but through a `TimelineMethods`.
+/// It is not used directly, but through a `TimelineMethods` instance.
 ///
 /// # Example
 ///
@@ -2767,7 +2863,7 @@ impl<'a, C, NC, A> TimelineInsertCall<'a, C, NC, A> where NC: hyper::net::Networ
         for &field in ["alt"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -2810,7 +2906,7 @@ impl<'a, C, NC, A> TimelineInsertCall<'a, C, NC, A> where NC: hyper::net::Networ
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -2836,7 +2932,7 @@ impl<'a, C, NC, A> TimelineInsertCall<'a, C, NC, A> where NC: hyper::net::Networ
                             let size = reader.seek(io::SeekFrom::End(0)).unwrap();
                         reader.seek(io::SeekFrom::Start(0)).unwrap();
                         if size > 10485760 {
-                        	return Result::UploadSizeLimitExceeded(size, 10485760)
+                        	return Err(Error::UploadSizeLimitExceeded(size, 10485760))
                         }
                             mp_reader.add_part(&mut request_value_reader, request_size, json_mime_type.clone())
                                      .add_part(&mut reader, size, reader_mime_type.clone());
@@ -2858,7 +2954,6 @@ impl<'a, C, NC, A> TimelineInsertCall<'a, C, NC, A> where NC: hyper::net::Networ
     
                     dlg.pre_request();
                     req.send()
-    
                 }
             };
 
@@ -2869,7 +2964,7 @@ impl<'a, C, NC, A> TimelineInsertCall<'a, C, NC, A> where NC: hyper::net::Networ
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -2880,13 +2975,13 @@ impl<'a, C, NC, A> TimelineInsertCall<'a, C, NC, A> where NC: hyper::net::Networ
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     if protocol == "resumable" {
                         let size = reader.seek(io::SeekFrom::End(0)).unwrap();
                         reader.seek(io::SeekFrom::Start(0)).unwrap();
                         if size > 10485760 {
-                        	return Result::UploadSizeLimitExceeded(size, 10485760)
+                        	return Err(Error::UploadSizeLimitExceeded(size, 10485760))
                         }
                         let mut client = &mut *self.hub.client.borrow_mut();
                         let upload_result = {
@@ -2911,17 +3006,17 @@ impl<'a, C, NC, A> TimelineInsertCall<'a, C, NC, A> where NC: hyper::net::Networ
                         match upload_result {
                             None => {
                                 dlg.finished(false);
-                                return Result::Cancelled
+                                return Err(Error::Cancelled)
                             }
                             Some(Err(err)) => {
                                 dlg.finished(false);
-                                return Result::HttpError(err)
+                                return Err(Error::HttpError(err))
                             }
                             Some(Ok(upload_result)) => {
                                 res = upload_result;
                                 if !res.status.is_success() {
                                     dlg.finished(false);
-                                    return Result::Failure(res)
+                                    return Err(Error::Failure(res))
                                 }
                             }
                         }
@@ -2933,13 +3028,13 @@ impl<'a, C, NC, A> TimelineInsertCall<'a, C, NC, A> where NC: hyper::net::Networ
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -2955,11 +3050,14 @@ impl<'a, C, NC, A> TimelineInsertCall<'a, C, NC, A> where NC: hyper::net::Networ
                 where RS: ReadSeek {
         self.doit(stream, mime_type, "simple")
     }
-    /// Upload media in a resumeable fashion.
+    /// Upload media in a resumable fashion.
     /// Even if the upload fails or is interrupted, it can be resumed for a 
     /// certain amount of time as the server maintains state temporarily.
     /// 
-    /// TODO: Write more about how delegation works in this particular case.
+    /// The delegate will be asked for an `upload_url()`, and if not provided, will be asked to store an upload URL 
+    /// that was provided by the server, using `store_upload_url(...)`. The upload will be done in chunks, the delegate
+    /// may specify the `chunk_size()` and may cancel the operation before each chunk is uploaded, using
+    /// `cancel_chunk_upload(...)`.
     ///
     /// * *max size*: 10MB
     /// * *multipart*: yes
@@ -3034,7 +3132,7 @@ impl<'a, C, NC, A> TimelineInsertCall<'a, C, NC, A> where NC: hyper::net::Networ
 /// Updates a timeline item in place. This method supports patch semantics.
 ///
 /// A builder for the *patch* method supported by a *timeline* resource.
-/// It is not used directly, but through a `TimelineMethods`.
+/// It is not used directly, but through a `TimelineMethods` instance.
 ///
 /// # Example
 ///
@@ -3099,7 +3197,7 @@ impl<'a, C, NC, A> TimelinePatchCall<'a, C, NC, A> where NC: hyper::net::Network
         for &field in ["alt", "id"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -3156,7 +3254,7 @@ impl<'a, C, NC, A> TimelinePatchCall<'a, C, NC, A> where NC: hyper::net::Network
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -3172,7 +3270,6 @@ impl<'a, C, NC, A> TimelinePatchCall<'a, C, NC, A> where NC: hyper::net::Network
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -3182,7 +3279,7 @@ impl<'a, C, NC, A> TimelinePatchCall<'a, C, NC, A> where NC: hyper::net::Network
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -3193,7 +3290,7 @@ impl<'a, C, NC, A> TimelinePatchCall<'a, C, NC, A> where NC: hyper::net::Network
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -3202,13 +3299,13 @@ impl<'a, C, NC, A> TimelinePatchCall<'a, C, NC, A> where NC: hyper::net::Network
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -3229,7 +3326,7 @@ impl<'a, C, NC, A> TimelinePatchCall<'a, C, NC, A> where NC: hyper::net::Network
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The ID of the timeline item.    
+    /// The ID of the timeline item.
     pub fn id(mut self, new_value: &str) -> TimelinePatchCall<'a, C, NC, A> {
         self._id = new_value.to_string();
         self
@@ -3290,7 +3387,7 @@ impl<'a, C, NC, A> TimelinePatchCall<'a, C, NC, A> where NC: hyper::net::Network
 /// Retrieves a list of timeline items for the authenticated user.
 ///
 /// A builder for the *list* method supported by a *timeline* resource.
-/// It is not used directly, but through a `TimelineMethods`.
+/// It is not used directly, but through a `TimelineMethods` instance.
 ///
 /// # Example
 ///
@@ -3381,7 +3478,7 @@ impl<'a, C, NC, A> TimelineListCall<'a, C, NC, A> where NC: hyper::net::NetworkC
         for &field in ["alt", "sourceItemId", "pinnedOnly", "pageToken", "orderBy", "maxResults", "includeDeleted", "bundleId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -3410,7 +3507,7 @@ impl<'a, C, NC, A> TimelineListCall<'a, C, NC, A> where NC: hyper::net::NetworkC
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -3422,7 +3519,6 @@ impl<'a, C, NC, A> TimelineListCall<'a, C, NC, A> where NC: hyper::net::NetworkC
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -3432,7 +3528,7 @@ impl<'a, C, NC, A> TimelineListCall<'a, C, NC, A> where NC: hyper::net::NetworkC
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -3443,7 +3539,7 @@ impl<'a, C, NC, A> TimelineListCall<'a, C, NC, A> where NC: hyper::net::NetworkC
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -3452,13 +3548,13 @@ impl<'a, C, NC, A> TimelineListCall<'a, C, NC, A> where NC: hyper::net::NetworkC
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -3468,7 +3564,7 @@ impl<'a, C, NC, A> TimelineListCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// Sets the *source item id* query property to the given value.
     ///
     /// 
-    /// If provided, only items with the given sourceItemId will be returned.    
+    /// If provided, only items with the given sourceItemId will be returned.
     pub fn source_item_id(mut self, new_value: &str) -> TimelineListCall<'a, C, NC, A> {
         self._source_item_id = Some(new_value.to_string());
         self
@@ -3476,7 +3572,7 @@ impl<'a, C, NC, A> TimelineListCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// Sets the *pinned only* query property to the given value.
     ///
     /// 
-    /// If true, only pinned items will be returned.    
+    /// If true, only pinned items will be returned.
     pub fn pinned_only(mut self, new_value: bool) -> TimelineListCall<'a, C, NC, A> {
         self._pinned_only = Some(new_value);
         self
@@ -3484,7 +3580,7 @@ impl<'a, C, NC, A> TimelineListCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// Sets the *page token* query property to the given value.
     ///
     /// 
-    /// Token for the page of results to return.    
+    /// Token for the page of results to return.
     pub fn page_token(mut self, new_value: &str) -> TimelineListCall<'a, C, NC, A> {
         self._page_token = Some(new_value.to_string());
         self
@@ -3492,7 +3588,7 @@ impl<'a, C, NC, A> TimelineListCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// Sets the *order by* query property to the given value.
     ///
     /// 
-    /// Controls the order in which timeline items are returned.    
+    /// Controls the order in which timeline items are returned.
     pub fn order_by(mut self, new_value: &str) -> TimelineListCall<'a, C, NC, A> {
         self._order_by = Some(new_value.to_string());
         self
@@ -3500,7 +3596,7 @@ impl<'a, C, NC, A> TimelineListCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// Sets the *max results* query property to the given value.
     ///
     /// 
-    /// The maximum number of items to include in the response, used for paging.    
+    /// The maximum number of items to include in the response, used for paging.
     pub fn max_results(mut self, new_value: u32) -> TimelineListCall<'a, C, NC, A> {
         self._max_results = Some(new_value);
         self
@@ -3508,7 +3604,7 @@ impl<'a, C, NC, A> TimelineListCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// Sets the *include deleted* query property to the given value.
     ///
     /// 
-    /// If true, tombstone records for deleted items will be returned.    
+    /// If true, tombstone records for deleted items will be returned.
     pub fn include_deleted(mut self, new_value: bool) -> TimelineListCall<'a, C, NC, A> {
         self._include_deleted = Some(new_value);
         self
@@ -3516,7 +3612,7 @@ impl<'a, C, NC, A> TimelineListCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// Sets the *bundle id* query property to the given value.
     ///
     /// 
-    /// If provided, only items with the given bundleId will be returned.    
+    /// If provided, only items with the given bundleId will be returned.
     pub fn bundle_id(mut self, new_value: &str) -> TimelineListCall<'a, C, NC, A> {
         self._bundle_id = Some(new_value.to_string());
         self
@@ -3577,7 +3673,7 @@ impl<'a, C, NC, A> TimelineListCall<'a, C, NC, A> where NC: hyper::net::NetworkC
 /// Adds a new attachment to a timeline item.
 ///
 /// A builder for the *attachments.insert* method supported by a *timeline* resource.
-/// It is not used directly, but through a `TimelineMethods`.
+/// It is not used directly, but through a `TimelineMethods` instance.
 ///
 /// # Example
 ///
@@ -3637,7 +3733,7 @@ impl<'a, C, NC, A> TimelineAttachmentInsertCall<'a, C, NC, A> where NC: hyper::n
         for &field in ["alt", "itemId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -3700,7 +3796,7 @@ impl<'a, C, NC, A> TimelineAttachmentInsertCall<'a, C, NC, A> where NC: hyper::n
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -3726,7 +3822,7 @@ impl<'a, C, NC, A> TimelineAttachmentInsertCall<'a, C, NC, A> where NC: hyper::n
                         let size = reader.seek(io::SeekFrom::End(0)).unwrap();
                     reader.seek(io::SeekFrom::Start(0)).unwrap();
                     if size > 10485760 {
-                    	return Result::UploadSizeLimitExceeded(size, 10485760)
+                    	return Err(Error::UploadSizeLimitExceeded(size, 10485760))
                     }
                         req = req.header(ContentType(reader_mime_type.clone()))
                                  .header(ContentLength(size))
@@ -3739,7 +3835,6 @@ impl<'a, C, NC, A> TimelineAttachmentInsertCall<'a, C, NC, A> where NC: hyper::n
     
                     dlg.pre_request();
                     req.send()
-    
                 }
             };
 
@@ -3750,7 +3845,7 @@ impl<'a, C, NC, A> TimelineAttachmentInsertCall<'a, C, NC, A> where NC: hyper::n
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -3761,13 +3856,13 @@ impl<'a, C, NC, A> TimelineAttachmentInsertCall<'a, C, NC, A> where NC: hyper::n
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     if protocol == "resumable" {
                         let size = reader.seek(io::SeekFrom::End(0)).unwrap();
                         reader.seek(io::SeekFrom::Start(0)).unwrap();
                         if size > 10485760 {
-                        	return Result::UploadSizeLimitExceeded(size, 10485760)
+                        	return Err(Error::UploadSizeLimitExceeded(size, 10485760))
                         }
                         let mut client = &mut *self.hub.client.borrow_mut();
                         let upload_result = {
@@ -3792,17 +3887,17 @@ impl<'a, C, NC, A> TimelineAttachmentInsertCall<'a, C, NC, A> where NC: hyper::n
                         match upload_result {
                             None => {
                                 dlg.finished(false);
-                                return Result::Cancelled
+                                return Err(Error::Cancelled)
                             }
                             Some(Err(err)) => {
                                 dlg.finished(false);
-                                return Result::HttpError(err)
+                                return Err(Error::HttpError(err))
                             }
                             Some(Ok(upload_result)) => {
                                 res = upload_result;
                                 if !res.status.is_success() {
                                     dlg.finished(false);
-                                    return Result::Failure(res)
+                                    return Err(Error::Failure(res))
                                 }
                             }
                         }
@@ -3814,13 +3909,13 @@ impl<'a, C, NC, A> TimelineAttachmentInsertCall<'a, C, NC, A> where NC: hyper::n
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -3836,11 +3931,14 @@ impl<'a, C, NC, A> TimelineAttachmentInsertCall<'a, C, NC, A> where NC: hyper::n
                 where RS: ReadSeek {
         self.doit(stream, mime_type, "simple")
     }
-    /// Upload media in a resumeable fashion.
+    /// Upload media in a resumable fashion.
     /// Even if the upload fails or is interrupted, it can be resumed for a 
     /// certain amount of time as the server maintains state temporarily.
     /// 
-    /// TODO: Write more about how delegation works in this particular case.
+    /// The delegate will be asked for an `upload_url()`, and if not provided, will be asked to store an upload URL 
+    /// that was provided by the server, using `store_upload_url(...)`. The upload will be done in chunks, the delegate
+    /// may specify the `chunk_size()` and may cancel the operation before each chunk is uploaded, using
+    /// `cancel_chunk_upload(...)`.
     ///
     /// * *max size*: 10MB
     /// * *multipart*: yes
@@ -3855,7 +3953,7 @@ impl<'a, C, NC, A> TimelineAttachmentInsertCall<'a, C, NC, A> where NC: hyper::n
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The ID of the timeline item the attachment belongs to.    
+    /// The ID of the timeline item the attachment belongs to.
     pub fn item_id(mut self, new_value: &str) -> TimelineAttachmentInsertCall<'a, C, NC, A> {
         self._item_id = new_value.to_string();
         self
@@ -3916,7 +4014,7 @@ impl<'a, C, NC, A> TimelineAttachmentInsertCall<'a, C, NC, A> where NC: hyper::n
 /// Deletes an attachment from a timeline item.
 ///
 /// A builder for the *attachments.delete* method supported by a *timeline* resource.
-/// It is not used directly, but through a `TimelineMethods`.
+/// It is not used directly, but through a `TimelineMethods` instance.
 ///
 /// # Example
 ///
@@ -3976,7 +4074,7 @@ impl<'a, C, NC, A> TimelineAttachmentDeleteCall<'a, C, NC, A> where NC: hyper::n
         for &field in ["itemId", "attachmentId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -4028,7 +4126,7 @@ impl<'a, C, NC, A> TimelineAttachmentDeleteCall<'a, C, NC, A> where NC: hyper::n
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -4040,7 +4138,6 @@ impl<'a, C, NC, A> TimelineAttachmentDeleteCall<'a, C, NC, A> where NC: hyper::n
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -4050,7 +4147,7 @@ impl<'a, C, NC, A> TimelineAttachmentDeleteCall<'a, C, NC, A> where NC: hyper::n
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -4061,12 +4158,12 @@ impl<'a, C, NC, A> TimelineAttachmentDeleteCall<'a, C, NC, A> where NC: hyper::n
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = res;
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -4078,7 +4175,7 @@ impl<'a, C, NC, A> TimelineAttachmentDeleteCall<'a, C, NC, A> where NC: hyper::n
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The ID of the timeline item the attachment belongs to.    
+    /// The ID of the timeline item the attachment belongs to.
     pub fn item_id(mut self, new_value: &str) -> TimelineAttachmentDeleteCall<'a, C, NC, A> {
         self._item_id = new_value.to_string();
         self
@@ -4088,7 +4185,7 @@ impl<'a, C, NC, A> TimelineAttachmentDeleteCall<'a, C, NC, A> where NC: hyper::n
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The ID of the attachment.    
+    /// The ID of the attachment.
     pub fn attachment_id(mut self, new_value: &str) -> TimelineAttachmentDeleteCall<'a, C, NC, A> {
         self._attachment_id = new_value.to_string();
         self
@@ -4149,7 +4246,7 @@ impl<'a, C, NC, A> TimelineAttachmentDeleteCall<'a, C, NC, A> where NC: hyper::n
 /// Deletes a timeline item.
 ///
 /// A builder for the *delete* method supported by a *timeline* resource.
-/// It is not used directly, but through a `TimelineMethods`.
+/// It is not used directly, but through a `TimelineMethods` instance.
 ///
 /// # Example
 ///
@@ -4207,7 +4304,7 @@ impl<'a, C, NC, A> TimelineDeleteCall<'a, C, NC, A> where NC: hyper::net::Networ
         for &field in ["id"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -4259,7 +4356,7 @@ impl<'a, C, NC, A> TimelineDeleteCall<'a, C, NC, A> where NC: hyper::net::Networ
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -4271,7 +4368,6 @@ impl<'a, C, NC, A> TimelineDeleteCall<'a, C, NC, A> where NC: hyper::net::Networ
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -4281,7 +4377,7 @@ impl<'a, C, NC, A> TimelineDeleteCall<'a, C, NC, A> where NC: hyper::net::Networ
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -4292,12 +4388,12 @@ impl<'a, C, NC, A> TimelineDeleteCall<'a, C, NC, A> where NC: hyper::net::Networ
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = res;
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -4309,7 +4405,7 @@ impl<'a, C, NC, A> TimelineDeleteCall<'a, C, NC, A> where NC: hyper::net::Networ
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The ID of the timeline item.    
+    /// The ID of the timeline item.
     pub fn id(mut self, new_value: &str) -> TimelineDeleteCall<'a, C, NC, A> {
         self._id = new_value.to_string();
         self
@@ -4370,7 +4466,7 @@ impl<'a, C, NC, A> TimelineDeleteCall<'a, C, NC, A> where NC: hyper::net::Networ
 /// Updates a timeline item in place.
 ///
 /// A builder for the *update* method supported by a *timeline* resource.
-/// It is not used directly, but through a `TimelineMethods`.
+/// It is not used directly, but through a `TimelineMethods` instance.
 ///
 /// # Example
 ///
@@ -4437,7 +4533,7 @@ impl<'a, C, NC, A> TimelineUpdateCall<'a, C, NC, A> where NC: hyper::net::Networ
         for &field in ["alt", "id"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -4504,7 +4600,7 @@ impl<'a, C, NC, A> TimelineUpdateCall<'a, C, NC, A> where NC: hyper::net::Networ
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -4530,7 +4626,7 @@ impl<'a, C, NC, A> TimelineUpdateCall<'a, C, NC, A> where NC: hyper::net::Networ
                             let size = reader.seek(io::SeekFrom::End(0)).unwrap();
                         reader.seek(io::SeekFrom::Start(0)).unwrap();
                         if size > 10485760 {
-                        	return Result::UploadSizeLimitExceeded(size, 10485760)
+                        	return Err(Error::UploadSizeLimitExceeded(size, 10485760))
                         }
                             mp_reader.add_part(&mut request_value_reader, request_size, json_mime_type.clone())
                                      .add_part(&mut reader, size, reader_mime_type.clone());
@@ -4552,7 +4648,6 @@ impl<'a, C, NC, A> TimelineUpdateCall<'a, C, NC, A> where NC: hyper::net::Networ
     
                     dlg.pre_request();
                     req.send()
-    
                 }
             };
 
@@ -4563,7 +4658,7 @@ impl<'a, C, NC, A> TimelineUpdateCall<'a, C, NC, A> where NC: hyper::net::Networ
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -4574,13 +4669,13 @@ impl<'a, C, NC, A> TimelineUpdateCall<'a, C, NC, A> where NC: hyper::net::Networ
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     if protocol == "resumable" {
                         let size = reader.seek(io::SeekFrom::End(0)).unwrap();
                         reader.seek(io::SeekFrom::Start(0)).unwrap();
                         if size > 10485760 {
-                        	return Result::UploadSizeLimitExceeded(size, 10485760)
+                        	return Err(Error::UploadSizeLimitExceeded(size, 10485760))
                         }
                         let mut client = &mut *self.hub.client.borrow_mut();
                         let upload_result = {
@@ -4605,17 +4700,17 @@ impl<'a, C, NC, A> TimelineUpdateCall<'a, C, NC, A> where NC: hyper::net::Networ
                         match upload_result {
                             None => {
                                 dlg.finished(false);
-                                return Result::Cancelled
+                                return Err(Error::Cancelled)
                             }
                             Some(Err(err)) => {
                                 dlg.finished(false);
-                                return Result::HttpError(err)
+                                return Err(Error::HttpError(err))
                             }
                             Some(Ok(upload_result)) => {
                                 res = upload_result;
                                 if !res.status.is_success() {
                                     dlg.finished(false);
-                                    return Result::Failure(res)
+                                    return Err(Error::Failure(res))
                                 }
                             }
                         }
@@ -4627,13 +4722,13 @@ impl<'a, C, NC, A> TimelineUpdateCall<'a, C, NC, A> where NC: hyper::net::Networ
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -4649,11 +4744,14 @@ impl<'a, C, NC, A> TimelineUpdateCall<'a, C, NC, A> where NC: hyper::net::Networ
                 where RS: ReadSeek {
         self.doit(stream, mime_type, "simple")
     }
-    /// Upload media in a resumeable fashion.
+    /// Upload media in a resumable fashion.
     /// Even if the upload fails or is interrupted, it can be resumed for a 
     /// certain amount of time as the server maintains state temporarily.
     /// 
-    /// TODO: Write more about how delegation works in this particular case.
+    /// The delegate will be asked for an `upload_url()`, and if not provided, will be asked to store an upload URL 
+    /// that was provided by the server, using `store_upload_url(...)`. The upload will be done in chunks, the delegate
+    /// may specify the `chunk_size()` and may cancel the operation before each chunk is uploaded, using
+    /// `cancel_chunk_upload(...)`.
     ///
     /// * *max size*: 10MB
     /// * *multipart*: yes
@@ -4677,7 +4775,7 @@ impl<'a, C, NC, A> TimelineUpdateCall<'a, C, NC, A> where NC: hyper::net::Networ
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The ID of the timeline item.    
+    /// The ID of the timeline item.
     pub fn id(mut self, new_value: &str) -> TimelineUpdateCall<'a, C, NC, A> {
         self._id = new_value.to_string();
         self
@@ -4743,7 +4841,7 @@ impl<'a, C, NC, A> TimelineUpdateCall<'a, C, NC, A> where NC: hyper::net::Networ
 /// but not the `Attachment` structure that you would usually get. The latter will be a default value.
 ///
 /// A builder for the *attachments.get* method supported by a *timeline* resource.
-/// It is not used directly, but through a `TimelineMethods`.
+/// It is not used directly, but through a `TimelineMethods` instance.
 ///
 /// # Example
 ///
@@ -4803,7 +4901,7 @@ impl<'a, C, NC, A> TimelineAttachmentGetCall<'a, C, NC, A> where NC: hyper::net:
         for &field in ["itemId", "attachmentId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -4872,7 +4970,7 @@ impl<'a, C, NC, A> TimelineAttachmentGetCall<'a, C, NC, A> where NC: hyper::net:
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -4884,7 +4982,6 @@ impl<'a, C, NC, A> TimelineAttachmentGetCall<'a, C, NC, A> where NC: hyper::net:
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -4894,7 +4991,7 @@ impl<'a, C, NC, A> TimelineAttachmentGetCall<'a, C, NC, A> where NC: hyper::net:
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -4905,7 +5002,7 @@ impl<'a, C, NC, A> TimelineAttachmentGetCall<'a, C, NC, A> where NC: hyper::net:
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = if enable_resource_parsing {
                         let mut json_response = String::new();
@@ -4914,13 +5011,13 @@ impl<'a, C, NC, A> TimelineAttachmentGetCall<'a, C, NC, A> where NC: hyper::net:
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     } else { (res, Default::default()) };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -4932,7 +5029,7 @@ impl<'a, C, NC, A> TimelineAttachmentGetCall<'a, C, NC, A> where NC: hyper::net:
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The ID of the timeline item the attachment belongs to.    
+    /// The ID of the timeline item the attachment belongs to.
     pub fn item_id(mut self, new_value: &str) -> TimelineAttachmentGetCall<'a, C, NC, A> {
         self._item_id = new_value.to_string();
         self
@@ -4942,7 +5039,7 @@ impl<'a, C, NC, A> TimelineAttachmentGetCall<'a, C, NC, A> where NC: hyper::net:
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The ID of the attachment.    
+    /// The ID of the attachment.
     pub fn attachment_id(mut self, new_value: &str) -> TimelineAttachmentGetCall<'a, C, NC, A> {
         self._attachment_id = new_value.to_string();
         self
@@ -5003,7 +5100,7 @@ impl<'a, C, NC, A> TimelineAttachmentGetCall<'a, C, NC, A> where NC: hyper::net:
 /// Gets a single timeline item by ID.
 ///
 /// A builder for the *get* method supported by a *timeline* resource.
-/// It is not used directly, but through a `TimelineMethods`.
+/// It is not used directly, but through a `TimelineMethods` instance.
 ///
 /// # Example
 ///
@@ -5061,7 +5158,7 @@ impl<'a, C, NC, A> TimelineGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
         for &field in ["alt", "id"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -5114,7 +5211,7 @@ impl<'a, C, NC, A> TimelineGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -5126,7 +5223,6 @@ impl<'a, C, NC, A> TimelineGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -5136,7 +5232,7 @@ impl<'a, C, NC, A> TimelineGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -5147,7 +5243,7 @@ impl<'a, C, NC, A> TimelineGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -5156,13 +5252,13 @@ impl<'a, C, NC, A> TimelineGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -5174,7 +5270,7 @@ impl<'a, C, NC, A> TimelineGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The ID of the timeline item.    
+    /// The ID of the timeline item.
     pub fn id(mut self, new_value: &str) -> TimelineGetCall<'a, C, NC, A> {
         self._id = new_value.to_string();
         self
@@ -5235,7 +5331,7 @@ impl<'a, C, NC, A> TimelineGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
 /// Gets a single setting by ID.
 ///
 /// A builder for the *get* method supported by a *setting* resource.
-/// It is not used directly, but through a `SettingMethods`.
+/// It is not used directly, but through a `SettingMethods` instance.
 ///
 /// # Example
 ///
@@ -5293,7 +5389,7 @@ impl<'a, C, NC, A> SettingGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
         for &field in ["alt", "id"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -5346,7 +5442,7 @@ impl<'a, C, NC, A> SettingGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -5358,7 +5454,6 @@ impl<'a, C, NC, A> SettingGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -5368,7 +5463,7 @@ impl<'a, C, NC, A> SettingGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -5379,7 +5474,7 @@ impl<'a, C, NC, A> SettingGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -5388,13 +5483,13 @@ impl<'a, C, NC, A> SettingGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -5469,7 +5564,7 @@ impl<'a, C, NC, A> SettingGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
 /// Gets a single location by ID.
 ///
 /// A builder for the *get* method supported by a *location* resource.
-/// It is not used directly, but through a `LocationMethods`.
+/// It is not used directly, but through a `LocationMethods` instance.
 ///
 /// # Example
 ///
@@ -5527,7 +5622,7 @@ impl<'a, C, NC, A> LocationGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
         for &field in ["alt", "id"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -5580,7 +5675,7 @@ impl<'a, C, NC, A> LocationGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -5592,7 +5687,6 @@ impl<'a, C, NC, A> LocationGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -5602,7 +5696,7 @@ impl<'a, C, NC, A> LocationGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -5613,7 +5707,7 @@ impl<'a, C, NC, A> LocationGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -5622,13 +5716,13 @@ impl<'a, C, NC, A> LocationGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -5640,7 +5734,7 @@ impl<'a, C, NC, A> LocationGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The ID of the location or latest for the last known location.    
+    /// The ID of the location or latest for the last known location.
     pub fn id(mut self, new_value: &str) -> LocationGetCall<'a, C, NC, A> {
         self._id = new_value.to_string();
         self
@@ -5701,7 +5795,7 @@ impl<'a, C, NC, A> LocationGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
 /// Retrieves a list of locations for the user.
 ///
 /// A builder for the *list* method supported by a *location* resource.
-/// It is not used directly, but through a `LocationMethods`.
+/// It is not used directly, but through a `LocationMethods` instance.
 ///
 /// # Example
 ///
@@ -5757,7 +5851,7 @@ impl<'a, C, NC, A> LocationListCall<'a, C, NC, A> where NC: hyper::net::NetworkC
         for &field in ["alt"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -5786,7 +5880,7 @@ impl<'a, C, NC, A> LocationListCall<'a, C, NC, A> where NC: hyper::net::NetworkC
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -5798,7 +5892,6 @@ impl<'a, C, NC, A> LocationListCall<'a, C, NC, A> where NC: hyper::net::NetworkC
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -5808,7 +5901,7 @@ impl<'a, C, NC, A> LocationListCall<'a, C, NC, A> where NC: hyper::net::NetworkC
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -5819,7 +5912,7 @@ impl<'a, C, NC, A> LocationListCall<'a, C, NC, A> where NC: hyper::net::NetworkC
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -5828,13 +5921,13 @@ impl<'a, C, NC, A> LocationListCall<'a, C, NC, A> where NC: hyper::net::NetworkC
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -5897,7 +5990,7 @@ impl<'a, C, NC, A> LocationListCall<'a, C, NC, A> where NC: hyper::net::NetworkC
 /// Inserts a new account for a user
 ///
 /// A builder for the *insert* method supported by a *account* resource.
-/// It is not used directly, but through a `AccountMethods`.
+/// It is not used directly, but through a `AccountMethods` instance.
 ///
 /// # Example
 ///
@@ -5966,7 +6059,7 @@ impl<'a, C, NC, A> AccountInsertCall<'a, C, NC, A> where NC: hyper::net::Network
         for &field in ["alt", "userToken", "accountType", "accountName"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -6023,7 +6116,7 @@ impl<'a, C, NC, A> AccountInsertCall<'a, C, NC, A> where NC: hyper::net::Network
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -6039,7 +6132,6 @@ impl<'a, C, NC, A> AccountInsertCall<'a, C, NC, A> where NC: hyper::net::Network
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -6049,7 +6141,7 @@ impl<'a, C, NC, A> AccountInsertCall<'a, C, NC, A> where NC: hyper::net::Network
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -6060,7 +6152,7 @@ impl<'a, C, NC, A> AccountInsertCall<'a, C, NC, A> where NC: hyper::net::Network
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -6069,13 +6161,13 @@ impl<'a, C, NC, A> AccountInsertCall<'a, C, NC, A> where NC: hyper::net::Network
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -6096,7 +6188,7 @@ impl<'a, C, NC, A> AccountInsertCall<'a, C, NC, A> where NC: hyper::net::Network
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The ID for the user.    
+    /// The ID for the user.
     pub fn user_token(mut self, new_value: &str) -> AccountInsertCall<'a, C, NC, A> {
         self._user_token = new_value.to_string();
         self
@@ -6106,7 +6198,7 @@ impl<'a, C, NC, A> AccountInsertCall<'a, C, NC, A> where NC: hyper::net::Network
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Account type to be passed to Android Account Manager.    
+    /// Account type to be passed to Android Account Manager.
     pub fn account_type(mut self, new_value: &str) -> AccountInsertCall<'a, C, NC, A> {
         self._account_type = new_value.to_string();
         self
@@ -6116,7 +6208,7 @@ impl<'a, C, NC, A> AccountInsertCall<'a, C, NC, A> where NC: hyper::net::Network
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The name of the account to be passed to the Android Account Manager.    
+    /// The name of the account to be passed to the Android Account Manager.
     pub fn account_name(mut self, new_value: &str) -> AccountInsertCall<'a, C, NC, A> {
         self._account_name = new_value.to_string();
         self
@@ -6177,7 +6269,7 @@ impl<'a, C, NC, A> AccountInsertCall<'a, C, NC, A> where NC: hyper::net::Network
 /// Gets a single contact by ID.
 ///
 /// A builder for the *get* method supported by a *contact* resource.
-/// It is not used directly, but through a `ContactMethods`.
+/// It is not used directly, but through a `ContactMethods` instance.
 ///
 /// # Example
 ///
@@ -6235,7 +6327,7 @@ impl<'a, C, NC, A> ContactGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
         for &field in ["alt", "id"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -6288,7 +6380,7 @@ impl<'a, C, NC, A> ContactGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -6300,7 +6392,6 @@ impl<'a, C, NC, A> ContactGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -6310,7 +6401,7 @@ impl<'a, C, NC, A> ContactGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -6321,7 +6412,7 @@ impl<'a, C, NC, A> ContactGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -6330,13 +6421,13 @@ impl<'a, C, NC, A> ContactGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -6348,7 +6439,7 @@ impl<'a, C, NC, A> ContactGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The ID of the contact.    
+    /// The ID of the contact.
     pub fn id(mut self, new_value: &str) -> ContactGetCall<'a, C, NC, A> {
         self._id = new_value.to_string();
         self
@@ -6409,7 +6500,7 @@ impl<'a, C, NC, A> ContactGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
 /// Deletes a contact.
 ///
 /// A builder for the *delete* method supported by a *contact* resource.
-/// It is not used directly, but through a `ContactMethods`.
+/// It is not used directly, but through a `ContactMethods` instance.
 ///
 /// # Example
 ///
@@ -6467,7 +6558,7 @@ impl<'a, C, NC, A> ContactDeleteCall<'a, C, NC, A> where NC: hyper::net::Network
         for &field in ["id"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -6519,7 +6610,7 @@ impl<'a, C, NC, A> ContactDeleteCall<'a, C, NC, A> where NC: hyper::net::Network
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -6531,7 +6622,6 @@ impl<'a, C, NC, A> ContactDeleteCall<'a, C, NC, A> where NC: hyper::net::Network
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -6541,7 +6631,7 @@ impl<'a, C, NC, A> ContactDeleteCall<'a, C, NC, A> where NC: hyper::net::Network
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -6552,12 +6642,12 @@ impl<'a, C, NC, A> ContactDeleteCall<'a, C, NC, A> where NC: hyper::net::Network
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = res;
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -6569,7 +6659,7 @@ impl<'a, C, NC, A> ContactDeleteCall<'a, C, NC, A> where NC: hyper::net::Network
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The ID of the contact.    
+    /// The ID of the contact.
     pub fn id(mut self, new_value: &str) -> ContactDeleteCall<'a, C, NC, A> {
         self._id = new_value.to_string();
         self
@@ -6630,7 +6720,7 @@ impl<'a, C, NC, A> ContactDeleteCall<'a, C, NC, A> where NC: hyper::net::Network
 /// Inserts a new contact.
 ///
 /// A builder for the *insert* method supported by a *contact* resource.
-/// It is not used directly, but through a `ContactMethods`.
+/// It is not used directly, but through a `ContactMethods` instance.
 ///
 /// # Example
 ///
@@ -6693,7 +6783,7 @@ impl<'a, C, NC, A> ContactInsertCall<'a, C, NC, A> where NC: hyper::net::Network
         for &field in ["alt"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -6726,7 +6816,7 @@ impl<'a, C, NC, A> ContactInsertCall<'a, C, NC, A> where NC: hyper::net::Network
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -6742,7 +6832,6 @@ impl<'a, C, NC, A> ContactInsertCall<'a, C, NC, A> where NC: hyper::net::Network
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -6752,7 +6841,7 @@ impl<'a, C, NC, A> ContactInsertCall<'a, C, NC, A> where NC: hyper::net::Network
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -6763,7 +6852,7 @@ impl<'a, C, NC, A> ContactInsertCall<'a, C, NC, A> where NC: hyper::net::Network
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -6772,13 +6861,13 @@ impl<'a, C, NC, A> ContactInsertCall<'a, C, NC, A> where NC: hyper::net::Network
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -6850,7 +6939,7 @@ impl<'a, C, NC, A> ContactInsertCall<'a, C, NC, A> where NC: hyper::net::Network
 /// Updates a contact in place. This method supports patch semantics.
 ///
 /// A builder for the *patch* method supported by a *contact* resource.
-/// It is not used directly, but through a `ContactMethods`.
+/// It is not used directly, but through a `ContactMethods` instance.
 ///
 /// # Example
 ///
@@ -6915,7 +7004,7 @@ impl<'a, C, NC, A> ContactPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkC
         for &field in ["alt", "id"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -6972,7 +7061,7 @@ impl<'a, C, NC, A> ContactPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkC
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -6988,7 +7077,6 @@ impl<'a, C, NC, A> ContactPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkC
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -6998,7 +7086,7 @@ impl<'a, C, NC, A> ContactPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkC
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -7009,7 +7097,7 @@ impl<'a, C, NC, A> ContactPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkC
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -7018,13 +7106,13 @@ impl<'a, C, NC, A> ContactPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkC
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -7045,7 +7133,7 @@ impl<'a, C, NC, A> ContactPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The ID of the contact.    
+    /// The ID of the contact.
     pub fn id(mut self, new_value: &str) -> ContactPatchCall<'a, C, NC, A> {
         self._id = new_value.to_string();
         self
@@ -7106,7 +7194,7 @@ impl<'a, C, NC, A> ContactPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkC
 /// Retrieves a list of contacts for the authenticated user.
 ///
 /// A builder for the *list* method supported by a *contact* resource.
-/// It is not used directly, but through a `ContactMethods`.
+/// It is not used directly, but through a `ContactMethods` instance.
 ///
 /// # Example
 ///
@@ -7162,7 +7250,7 @@ impl<'a, C, NC, A> ContactListCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
         for &field in ["alt"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -7191,7 +7279,7 @@ impl<'a, C, NC, A> ContactListCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -7203,7 +7291,6 @@ impl<'a, C, NC, A> ContactListCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -7213,7 +7300,7 @@ impl<'a, C, NC, A> ContactListCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -7224,7 +7311,7 @@ impl<'a, C, NC, A> ContactListCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -7233,13 +7320,13 @@ impl<'a, C, NC, A> ContactListCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -7302,7 +7389,7 @@ impl<'a, C, NC, A> ContactListCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
 /// Updates a contact in place.
 ///
 /// A builder for the *update* method supported by a *contact* resource.
-/// It is not used directly, but through a `ContactMethods`.
+/// It is not used directly, but through a `ContactMethods` instance.
 ///
 /// # Example
 ///
@@ -7367,7 +7454,7 @@ impl<'a, C, NC, A> ContactUpdateCall<'a, C, NC, A> where NC: hyper::net::Network
         for &field in ["alt", "id"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -7424,7 +7511,7 @@ impl<'a, C, NC, A> ContactUpdateCall<'a, C, NC, A> where NC: hyper::net::Network
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -7440,7 +7527,6 @@ impl<'a, C, NC, A> ContactUpdateCall<'a, C, NC, A> where NC: hyper::net::Network
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -7450,7 +7536,7 @@ impl<'a, C, NC, A> ContactUpdateCall<'a, C, NC, A> where NC: hyper::net::Network
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -7461,7 +7547,7 @@ impl<'a, C, NC, A> ContactUpdateCall<'a, C, NC, A> where NC: hyper::net::Network
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -7470,13 +7556,13 @@ impl<'a, C, NC, A> ContactUpdateCall<'a, C, NC, A> where NC: hyper::net::Network
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -7497,7 +7583,7 @@ impl<'a, C, NC, A> ContactUpdateCall<'a, C, NC, A> where NC: hyper::net::Network
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The ID of the contact.    
+    /// The ID of the contact.
     pub fn id(mut self, new_value: &str) -> ContactUpdateCall<'a, C, NC, A> {
         self._id = new_value.to_string();
         self

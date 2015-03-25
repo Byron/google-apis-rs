@@ -4,7 +4,7 @@
 [package]
 
 name = "google-genomics1_beta2"
-version = "0.1.1+20150303"
+version = "0.1.2+20150317"
 authors = ["Sebastian Thiel <byronimo@gmail>"]
 description = "A complete library to interact with genomics (protocol v1beta2)"
 repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/genomics1_beta2"
@@ -16,7 +16,7 @@ keywords = ["genomics", "google", "protocol", "web", "api"]
 [dependencies]
 hyper = "*"
 mime = "*"
+yup-oauth2 = "*"
 url = "*"
 serde = "*"
 serde_macros = "*"
-yup-oauth2 = "*"

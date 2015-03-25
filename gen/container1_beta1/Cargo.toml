@@ -4,7 +4,7 @@
 [package]
 
 name = "google-container1_beta1"
-version = "0.1.1+20150223"
+version = "0.1.2+20150316"
 authors = ["Sebastian Thiel <byronimo@gmail>"]
 description = "A complete library to interact with container (protocol v1beta1)"
 repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/container1_beta1"
@@ -16,7 +16,7 @@ keywords = ["container", "google", "protocol", "web", "api"]
 [dependencies]
 hyper = "*"
 mime = "*"
+yup-oauth2 = "*"
 url = "*"
 serde = "*"
 serde_macros = "*"
-yup-oauth2 = "*"

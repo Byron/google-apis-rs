@@ -1,8 +1,8 @@
 // DO NOT EDIT !
-// This file was generated automatically from 'src/mako/lib.rs.mako'
+// This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *replicapoolupdater* crate version *0.1.1+20150129*, where *20150129* is the exact revision of the *replicapoolupdater:v1beta1* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.1*.
+//! This documentation was generated from *replicapoolupdater* crate version *0.1.2+20150129*, where *20150129* is the exact revision of the *replicapoolupdater:v1beta1* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.2*.
 //! 
 //! Everything else about the *replicapoolupdater* *v1_beta1* API can be found at the
 //! [official documentation site](https://cloud.google.com/compute/docs/instance-groups/manager/#applying_rolling_updates_using_the_updater_service).
@@ -27,6 +27,8 @@
 //! 
 //! * **[Hub](struct.Replicapoolupdater.html)**
 //!     * a central object to maintain state and allow accessing all *Activities*
+//!     * creates [*Method Builders*](trait.MethodsBuilder.html) which in turn
+//!       allow access to individual [*Call Builders*](trait.CallBuilder.html)
 //! * **[Resources](trait.Resource.html)**
 //!     * primary types that you can apply *Activities* to
 //!     * a collection of properties and *Parts*
@@ -35,6 +37,8 @@
 //!         * never directly used in *Activities*
 //! * **[Activities](trait.CallBuilder.html)**
 //!     * operations to apply to *Resources*
+//! 
+//! All *structures* are marked with applicable traits to further categorize them and ease browsing.
 //! 
 //! Generally speaking, you can invoke *Activities* like this:
 //! 
@@ -77,7 +81,7 @@
 //! extern crate hyper;
 //! extern crate "yup-oauth2" as oauth2;
 //! extern crate "google-replicapoolupdater1_beta1" as replicapoolupdater1_beta1;
-//! use replicapoolupdater1_beta1::Result;
+//! use replicapoolupdater1_beta1::{Result, Error};
 //! # #[test] fn egal() {
 //! use std::default::Default;
 //! use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -106,15 +110,17 @@
 //!              .doit();
 //! 
 //! match result {
-//!     Result::HttpError(err) => println!("HTTPERROR: {:?}", err),
-//!     Result::MissingAPIKey => println!("Auth: Missing API Key - used if there are no scopes"),
-//!     Result::MissingToken => println!("OAuth2: Missing Token"),
-//!     Result::Cancelled => println!("Operation cancelled by user"),
-//!     Result::UploadSizeLimitExceeded(size, max_size) => println!("Upload size too big: {} of {}", size, max_size),
-//!     Result::Failure(_) => println!("General Failure (hyper::client::Response doesn't print)"),
-//!     Result::FieldClash(clashed_field) => println!("You added custom parameter which is part of builder: {:?}", clashed_field),
-//!     Result::JsonDecodeError(err) => println!("Couldn't understand server reply - maybe API needs update: {:?}", err),
-//!     Result::Success(_) => println!("Success (value doesn't print)"),
+//!     Err(e) => match e {
+//!         Error::HttpError(err) => println!("HTTPERROR: {:?}", err),
+//!         Error::MissingAPIKey => println!("Auth: Missing API Key - used if there are no scopes"),
+//!         Error::MissingToken => println!("OAuth2: Missing Token"),
+//!         Error::Cancelled => println!("Operation canceled by user"),
+//!         Error::UploadSizeLimitExceeded(size, max_size) => println!("Upload size too big: {} of {}", size, max_size),
+//!         Error::Failure(_) => println!("General Failure (hyper::client::Response doesn't print)"),
+//!         Error::FieldClash(clashed_field) => println!("You added custom parameter which is part of builder: {:?}", clashed_field),
+//!         Error::JsonDecodeError(err) => println!("Couldn't understand server reply - maybe API needs update: {:?}", err),
+//!     },
+//!     Ok(_) => println!("Success (value doesn't print)"),
 //! }
 //! # }
 //! ```
@@ -127,7 +133,7 @@
 //! When delegates handle errors or intermediate values, they may have a chance to instruct the system to retry. This 
 //! makes the system potentially resilient to all kinds of errors.
 //! 
-//! ## Uploads and Downlods
+//! ## Uploads and Downloads
 //! If a method supports downloads, the response body, which is part of the [Result](enum.Result.html), should be
 //! read by you to obtain the media.
 //! If such a method also supports a [Response Result](trait.ResponseResult.html), it will return that by default.
@@ -150,8 +156,9 @@
 //! ## Optional Parts in Server-Requests
 //! 
 //! All structures provided by this library are made to be [enocodable](trait.RequestValue.html) and 
-//! [decodable](trait.ResponseResult.html) via json. Optionals are used to indicate that partial requests are responses are valid.
-//! Most optionals are are considered [Parts](trait.Part.html) which are identifyable by name, which will be sent to 
+//! [decodable](trait.ResponseResult.html) via *json*. Optionals are used to indicate that partial requests are responses 
+//! are valid.
+//! Most optionals are are considered [Parts](trait.Part.html) which are identifiable by name, which will be sent to 
 //! the server to indicate either the set parts of the request or the desired parts in the response.
 //! 
 //! ## Builder Arguments
@@ -200,7 +207,7 @@ use std::io;
 use std::fs;
 use std::thread::sleep;
 
-pub use cmn::{MultiPartReader, ToParts, MethodInfo, Result, CallBuilder, Hub, ReadSeek, Part, ResponseResult, RequestValue, NestedType, Delegate, DefaultDelegate, ResourceMethodsBuilder, Resource, JsonServerError};
+pub use cmn::{MultiPartReader, ToParts, MethodInfo, Result, Error, CallBuilder, Hub, ReadSeek, Part, ResponseResult, RequestValue, NestedType, Delegate, DefaultDelegate, MethodsBuilder, Resource, JsonServerError};
 
 
 // ##############
@@ -254,7 +261,7 @@ impl Default for Scope {
 /// extern crate hyper;
 /// extern crate "yup-oauth2" as oauth2;
 /// extern crate "google-replicapoolupdater1_beta1" as replicapoolupdater1_beta1;
-/// use replicapoolupdater1_beta1::Result;
+/// use replicapoolupdater1_beta1::{Result, Error};
 /// # #[test] fn egal() {
 /// use std::default::Default;
 /// use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -283,15 +290,17 @@ impl Default for Scope {
 ///              .doit();
 /// 
 /// match result {
-///     Result::HttpError(err) => println!("HTTPERROR: {:?}", err),
-///     Result::MissingAPIKey => println!("Auth: Missing API Key - used if there are no scopes"),
-///     Result::MissingToken => println!("OAuth2: Missing Token"),
-///     Result::Cancelled => println!("Operation cancelled by user"),
-///     Result::UploadSizeLimitExceeded(size, max_size) => println!("Upload size too big: {} of {}", size, max_size),
-///     Result::Failure(_) => println!("General Failure (hyper::client::Response doesn't print)"),
-///     Result::FieldClash(clashed_field) => println!("You added custom parameter which is part of builder: {:?}", clashed_field),
-///     Result::JsonDecodeError(err) => println!("Couldn't understand server reply - maybe API needs update: {:?}", err),
-///     Result::Success(_) => println!("Success (value doesn't print)"),
+///     Err(e) => match e {
+///         Error::HttpError(err) => println!("HTTPERROR: {:?}", err),
+///         Error::MissingAPIKey => println!("Auth: Missing API Key - used if there are no scopes"),
+///         Error::MissingToken => println!("OAuth2: Missing Token"),
+///         Error::Cancelled => println!("Operation canceled by user"),
+///         Error::UploadSizeLimitExceeded(size, max_size) => println!("Upload size too big: {} of {}", size, max_size),
+///         Error::Failure(_) => println!("General Failure (hyper::client::Response doesn't print)"),
+///         Error::FieldClash(clashed_field) => println!("You added custom parameter which is part of builder: {:?}", clashed_field),
+///         Error::JsonDecodeError(err) => println!("Couldn't understand server reply - maybe API needs update: {:?}", err),
+///     },
+///     Ok(_) => println!("Success (value doesn't print)"),
 /// }
 /// # }
 /// ```
@@ -312,7 +321,7 @@ impl<'a, C, NC, A> Replicapoolupdater<C, NC, A>
         Replicapoolupdater {
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/0.1.1".to_string(),
+            _user_agent: "google-api-rust-client/0.1.2".to_string(),
             _m: PhantomData
         }
     }
@@ -325,7 +334,7 @@ impl<'a, C, NC, A> Replicapoolupdater<C, NC, A>
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/0.1.1`.
+    /// It defaults to `google-api-rust-client/0.1.2`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -354,9 +363,9 @@ pub struct InstanceUpdate {
     /// - "ROLLED_BACK": The instance update is finished, the instance has been reverted to the previous template. 
     /// - "CANCELLED": The instance update is paused and no longer can be resumed, undefined in which template the instance is running.
     pub status: String,
-    /// URL of the instance being updated.    
+    /// URL of the instance being updated.
     pub instance: String,
-    /// Errors that occurred during the instance update.    
+    /// Errors that occurred during the instance update.
     pub error: InstanceUpdateError,
 }
 
@@ -374,14 +383,14 @@ impl Part for InstanceUpdate {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct InstanceUpdateList {
-    /// A token used to continue a truncated list request.    
+    /// A token used to continue a truncated list request.
     #[serde(alias="nextPageToken")]
     pub next_page_token: String,
-    /// Collection of requested instance updates.    
+    /// Collection of requested instance updates.
     pub items: Vec<InstanceUpdate>,
-    /// [Output Only] Type of the resource.    
+    /// [Output Only] Type of the resource.
     pub kind: String,
-    /// [Output Only] The fully qualified URL for the resource.    
+    /// [Output Only] The fully qualified URL for the resource.
     #[serde(alias="selfLink")]
     pub self_link: String,
 }
@@ -395,9 +404,9 @@ impl ResponseResult for InstanceUpdateList {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct OperationWarningsData {
-    /// [Output Only] Metadata key for this warning.    
+    /// [Output Only] Metadata key for this warning.
     pub key: String,
-    /// [Output Only] Metadata value for this warning.    
+    /// [Output Only] Metadata value for this warning.
     pub value: String,
 }
 
@@ -411,7 +420,7 @@ impl Part for OperationWarningsData {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct InstanceUpdateError {
-    /// [Output Only] The array of errors encountered while processing this operation.    
+    /// [Output Only] The array of errors encountered while processing this operation.
     pub errors: Vec<InstanceUpdateErrorErrors>,
 }
 
@@ -445,41 +454,41 @@ pub struct RollingUpdate {
     /// - "ROLLED_BACK": The update is finished, all instances have been reverted to the previous template. 
     /// - "CANCELLED": The update is paused and no longer can be resumed, undefined how many instances are running in which template.
     pub status: Option<String>,
-    /// An optional textual description of the resource; provided by the client when the resource is created.    
+    /// An optional textual description of the resource; provided by the client when the resource is created.
     pub description: Option<String>,
-    /// Fully-qualified URL of an instance group being updated. Exactly one of instanceGroupManager, instanceGroup and instance list must be set.    
+    /// Fully-qualified URL of an instance group being updated. Exactly one of instanceGroupManager, instanceGroup and instance list must be set.
     #[serde(alias="instanceGroup")]
     pub instance_group: Option<String>,
-    /// List of fully-qualified URLs of instances to be updated. Exactly one of instanceGroupManager, instanceGroup and instance list must be set.    
+    /// List of fully-qualified URLs of instances to be updated. Exactly one of instanceGroupManager, instanceGroup and instance list must be set.
     pub instances: Option<Vec<String>>,
-    /// Fully-qualified URL of an instance template to apply.    
+    /// Fully-qualified URL of an instance template to apply.
     #[serde(alias="instanceTemplate")]
     pub instance_template: Option<String>,
-    /// Specifies the action to take for each instance within the instance group. This can be RECREATE which will recreate each instance and is only available for managed instance groups. It can also be REBOOT which performs a soft reboot for each instance and is only available for regular (non-managed) instance groups and explicit lists of instances.    
+    /// Specifies the action to take for each instance within the instance group. This can be RECREATE which will recreate each instance and is only available for managed instance groups. It can also be REBOOT which performs a soft reboot for each instance and is only available for regular (non-managed) instance groups and explicit lists of instances.
     #[serde(alias="actionType")]
     pub action_type: Option<String>,
-    /// [Output Only] User who requested the update, for example: user@example.com.    
+    /// [Output Only] User who requested the update, for example: user@example.com.
     pub user: Option<String>,
-    /// [Output Only] Creation timestamp in RFC3339 text format.    
+    /// [Output Only] Creation timestamp in RFC3339 text format.
     #[serde(alias="creationTimestamp")]
     pub creation_timestamp: Option<String>,
-    /// [Output Only] Unique identifier for the resource; defined by the server.    
+    /// [Output Only] Unique identifier for the resource; defined by the server.
     pub id: Option<String>,
-    /// [Output Only] Type of the resource.    
+    /// [Output Only] Type of the resource.
     pub kind: Option<String>,
-    /// [Output Only] The fully qualified URL for the resource.    
+    /// [Output Only] The fully qualified URL for the resource.
     #[serde(alias="selfLink")]
     pub self_link: Option<String>,
-    /// [Output Only] Errors that occurred during rolling update.    
+    /// [Output Only] Errors that occurred during rolling update.
     pub error: Option<RollingUpdateError>,
-    /// Parameters of the update process.    
+    /// Parameters of the update process.
     pub policy: Option<RollingUpdatePolicy>,
-    /// [Output Only] An optional progress indicator that ranges from 0 to 100. There is no requirement that this be linear or support any granularity of operations. This should not be used to guess at when the update will be complete. This number should be monotonically increasing as the update progresses.    
+    /// [Output Only] An optional progress indicator that ranges from 0 to 100. There is no requirement that this be linear or support any granularity of operations. This should not be used to guess at when the update will be complete. This number should be monotonically increasing as the update progresses.
     pub progress: Option<i32>,
-    /// [Output Only] An optional textual description of the current status of the update.    
+    /// [Output Only] An optional textual description of the current status of the update.
     #[serde(alias="statusMessage")]
     pub status_message: Option<String>,
-    /// Fully-qualified URL of an instance group manager being updated. Exactly one of instanceGroupManager, instanceGroup and instance list must be set.    
+    /// Fully-qualified URL of an instance group manager being updated. Exactly one of instanceGroupManager, instanceGroup and instance list must be set.
     #[serde(alias="instanceGroupManager")]
     pub instance_group_manager: Option<String>,
 }
@@ -495,11 +504,11 @@ impl ResponseResult for RollingUpdate {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct RollingUpdateErrorErrors {
-    /// [Output Only] An optional, human-readable error message.    
+    /// [Output Only] An optional, human-readable error message.
     pub message: String,
-    /// [Output Only] The error type identifier for this error.    
+    /// [Output Only] The error type identifier for this error.
     pub code: String,
-    /// [Output Only] Indicates the field in the request which caused the error. This property is optional.    
+    /// [Output Only] Indicates the field in the request which caused the error. This property is optional.
     pub location: String,
 }
 
@@ -513,22 +522,22 @@ impl Part for RollingUpdateErrorErrors {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct RollingUpdatePolicy {
-    /// Time period after the instance has been restarted but before marking the update of this instance as done. This field is deprecated and ignored by Rolling Updater.    
+    /// Time period after the instance has been restarted but before marking the update of this instance as done. This field is deprecated and ignored by Rolling Updater.
     #[serde(alias="sleepAfterInstanceRestartSec")]
     pub sleep_after_instance_restart_sec: i32,
-    /// Maximum amount of time we will wait after finishing all steps until we receive HEALTHY state for instance. If this deadline is exceeded instance update is considered as failed.    
+    /// Maximum amount of time we will wait after finishing all steps until we receive HEALTHY state for instance. If this deadline is exceeded instance update is considered as failed.
     #[serde(alias="instanceStartupTimeoutSec")]
     pub instance_startup_timeout_sec: i32,
-    /// Maximum number of instances that can be updated simultaneously (concurrently). An update of an instance starts when the instance is about to be restarted and finishes after the instance has been restarted and the sleep period (defined by sleepAfterInstanceRestartSec) has passed.    
+    /// Maximum number of instances that can be updated simultaneously (concurrently). An update of an instance starts when the instance is about to be restarted and finishes after the instance has been restarted and the sleep period (defined by sleepAfterInstanceRestartSec) has passed.
     #[serde(alias="maxNumConcurrentInstances")]
     pub max_num_concurrent_instances: i32,
-    /// Specifies minimum amount of time we will spend on updating single instance, measuring at the start of the first update action (e.g. Recreate call on Instance Group Manager or Stop call on Instance resource). If actual instance update takes less time we will simply sleep before proceeding with next instance.    
+    /// Specifies minimum amount of time we will spend on updating single instance, measuring at the start of the first update action (e.g. Recreate call on Instance Group Manager or Stop call on Instance resource). If actual instance update takes less time we will simply sleep before proceeding with next instance.
     #[serde(alias="minInstanceUpdateTimeSec")]
     pub min_instance_update_time_sec: i32,
-    /// Number of instances updated before the update gets automatically paused.    
+    /// Number of instances updated before the update gets automatically paused.
     #[serde(alias="autoPauseAfterInstances")]
     pub auto_pause_after_instances: i32,
-    /// Maximum number of instance updates that can fail without failing the group update. Instance update is considered failed if any of it's update actions (e.g. Stop call on Instance resource in Rolling Reboot) failed with permanent failure, or if after finishing all update actions this instance is in UNHEALTHY state.    
+    /// Maximum number of instance updates that can fail without failing the group update. Instance update is considered failed if any of it's update actions (e.g. Stop call on Instance resource in Rolling Reboot) failed with permanent failure, or if after finishing all update actions this instance is in UNHEALTHY state.
     #[serde(alias="maxNumFailedInstances")]
     pub max_num_failed_instances: i32,
 }
@@ -543,11 +552,11 @@ impl Part for RollingUpdatePolicy {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct OperationErrorErrors {
-    /// [Output Only] An optional, human-readable error message.    
+    /// [Output Only] An optional, human-readable error message.
     pub message: String,
-    /// [Output Only] The error type identifier for this error.    
+    /// [Output Only] The error type identifier for this error.
     pub code: String,
-    /// [Output Only] Indicates the field in the request which caused the error. This property is optional.    
+    /// [Output Only] Indicates the field in the request which caused the error. This property is optional.
     pub location: String,
 }
 
@@ -561,11 +570,11 @@ impl Part for OperationErrorErrors {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct InstanceUpdateErrorErrors {
-    /// [Output Only] An optional, human-readable error message.    
+    /// [Output Only] An optional, human-readable error message.
     pub message: String,
-    /// [Output Only] The error type identifier for this error.    
+    /// [Output Only] The error type identifier for this error.
     pub code: String,
-    /// [Output Only] Indicates the field in the request which caused the error. This property is optional.    
+    /// [Output Only] Indicates the field in the request which caused the error. This property is optional.
     pub location: String,
 }
 
@@ -579,7 +588,7 @@ impl Part for InstanceUpdateErrorErrors {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct OperationError {
-    /// [Output Only] The array of errors encountered while processing this operation.    
+    /// [Output Only] The array of errors encountered while processing this operation.
     pub errors: Vec<OperationErrorErrors>,
 }
 
@@ -593,11 +602,11 @@ impl Part for OperationError {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct OperationWarnings {
-    /// [Output only] Optional human-readable details for this warning.    
+    /// [Output only] Optional human-readable details for this warning.
     pub message: String,
-    /// [Output only] The warning type identifier for this warning.    
+    /// [Output only] The warning type identifier for this warning.
     pub code: String,
-    /// [Output only] Metadata for this warning in key:value format.    
+    /// [Output only] Metadata for this warning in key:value format.
     pub data: Vec<OperationWarningsData>,
 }
 
@@ -621,61 +630,61 @@ impl Part for OperationWarnings {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct Operation {
-    /// [Output Only] Status of the operation. Can be one of the following: "PENDING", "RUNNING", or "DONE".    
+    /// [Output Only] Status of the operation. Can be one of the following: "PENDING", "RUNNING", or "DONE".
     pub status: String,
-    /// [Output Only] The time that this operation was requested. This is in RFC 3339 format.    
+    /// [Output Only] The time that this operation was requested. This is in RFC 3339 format.
     #[serde(alias="insertTime")]
     pub insert_time: String,
-    /// no description provided    
+    /// no description provided
     pub warnings: Vec<OperationWarnings>,
-    /// [Output Only] If errors occurred during processing of this operation, this field will be populated.    
+    /// [Output Only] If errors occurred during processing of this operation, this field will be populated.
     pub error: OperationError,
-    /// [Output Only] Unique target id which identifies a particular incarnation of the target.    
+    /// [Output Only] Unique target id which identifies a particular incarnation of the target.
     #[serde(alias="targetId")]
     pub target_id: String,
-    /// [Output Only] URL of the resource the operation is mutating (output only).    
+    /// [Output Only] URL of the resource the operation is mutating (output only).
     #[serde(alias="targetLink")]
     pub target_link: String,
-    /// [Output Only] The time that this operation was started by the server. This is in RFC 3339 format.    
+    /// [Output Only] The time that this operation was started by the server. This is in RFC 3339 format.
     #[serde(alias="startTime")]
     pub start_time: String,
-    /// no description provided    
+    /// no description provided
     #[serde(alias="clientOperationId")]
     pub client_operation_id: String,
-    /// [Output Only] Creation timestamp in RFC3339 text format (output only).    
+    /// [Output Only] Creation timestamp in RFC3339 text format (output only).
     #[serde(alias="creationTimestamp")]
     pub creation_timestamp: String,
-    /// [Output Only] Unique identifier for the resource; defined by the server.    
+    /// [Output Only] Unique identifier for the resource; defined by the server.
     pub id: String,
-    /// [Output Only] Type of the resource. Always kind#operation for Operation resources.    
+    /// [Output Only] Type of the resource. Always kind#operation for Operation resources.
     pub kind: String,
-    /// [Output Only] Name of the resource (output only).    
+    /// [Output Only] Name of the resource (output only).
     pub name: String,
-    /// [Output Only] URL of the zone where the operation resides (output only).    
+    /// [Output Only] URL of the zone where the operation resides (output only).
     pub zone: String,
-    /// [Output Only] URL of the region where the operation resides (output only).    
+    /// [Output Only] URL of the region where the operation resides (output only).
     pub region: String,
-    /// [Output Only] Server defined URL for the resource.    
+    /// [Output Only] Server defined URL for the resource.
     #[serde(alias="selfLink")]
     pub self_link: String,
-    /// no description provided    
+    /// no description provided
     #[serde(alias="operationType")]
     pub operation_type: String,
-    /// no description provided    
+    /// no description provided
     #[serde(alias="httpErrorMessage")]
     pub http_error_message: String,
-    /// no description provided    
+    /// no description provided
     pub progress: i32,
-    /// no description provided    
+    /// no description provided
     #[serde(alias="endTime")]
     pub end_time: String,
-    /// no description provided    
+    /// no description provided
     #[serde(alias="httpErrorStatusCode")]
     pub http_error_status_code: i32,
-    /// [Output Only] An optional textual description of the current status of the operation.    
+    /// [Output Only] An optional textual description of the current status of the operation.
     #[serde(alias="statusMessage")]
     pub status_message: String,
-    /// no description provided    
+    /// no description provided
     pub user: String,
 }
 
@@ -688,7 +697,7 @@ impl ResponseResult for Operation {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct RollingUpdateError {
-    /// [Output Only] The array of errors encountered while processing this operation.    
+    /// [Output Only] The array of errors encountered while processing this operation.
     pub errors: Vec<RollingUpdateErrorErrors>,
 }
 
@@ -707,14 +716,14 @@ impl Part for RollingUpdateError {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct RollingUpdateList {
-    /// A token used to continue a truncated list request.    
+    /// A token used to continue a truncated list request.
     #[serde(alias="nextPageToken")]
     pub next_page_token: String,
-    /// Collection of requested updates.    
+    /// Collection of requested updates.
     pub items: Vec<RollingUpdate>,
-    /// [Output Only] Type of the resource.    
+    /// [Output Only] Type of the resource.
     pub kind: String,
-    /// [Output Only] The fully qualified URL for the resource.    
+    /// [Output Only] The fully qualified URL for the resource.
     #[serde(alias="selfLink")]
     pub self_link: String,
 }
@@ -761,13 +770,19 @@ pub struct RollingUpdateMethods<'a, C, NC, A>
     hub: &'a Replicapoolupdater<C, NC, A>,
 }
 
-impl<'a, C, NC, A> ResourceMethodsBuilder for RollingUpdateMethods<'a, C, NC, A> {}
+impl<'a, C, NC, A> MethodsBuilder for RollingUpdateMethods<'a, C, NC, A> {}
 
 impl<'a, C, NC, A> RollingUpdateMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Pauses the update in state from ROLLING_FORWARD or ROLLING_BACK. Has no effect if invoked when the state of the update is PAUSED.    
+    /// Pauses the update in state from ROLLING_FORWARD or ROLLING_BACK. Has no effect if invoked when the state of the update is PAUSED.
+    /// 
+    /// # Arguments
+    ///
+    /// * `project` - The Google Developers Console project name.
+    /// * `zone` - The name of the zone in which the update's target resides.
+    /// * `rollingUpdate` - The name of the update.
     pub fn pause(&self, project: &str, zone: &str, rolling_update: &str) -> RollingUpdatePauseCall<'a, C, NC, A> {
         RollingUpdatePauseCall {
             hub: self.hub,
@@ -782,7 +797,13 @@ impl<'a, C, NC, A> RollingUpdateMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Rolls back the update in state from ROLLING_FORWARD or PAUSED. Has no effect if invoked when the state of the update is ROLLED_BACK.    
+    /// Rolls back the update in state from ROLLING_FORWARD or PAUSED. Has no effect if invoked when the state of the update is ROLLED_BACK.
+    /// 
+    /// # Arguments
+    ///
+    /// * `project` - The Google Developers Console project name.
+    /// * `zone` - The name of the zone in which the update's target resides.
+    /// * `rollingUpdate` - The name of the update.
     pub fn rollback(&self, project: &str, zone: &str, rolling_update: &str) -> RollingUpdateRollbackCall<'a, C, NC, A> {
         RollingUpdateRollbackCall {
             hub: self.hub,
@@ -797,7 +818,13 @@ impl<'a, C, NC, A> RollingUpdateMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Returns information about an update.    
+    /// Returns information about an update.
+    /// 
+    /// # Arguments
+    ///
+    /// * `project` - The Google Developers Console project name.
+    /// * `zone` - The name of the zone in which the update's target resides.
+    /// * `rollingUpdate` - The name of the update.
     pub fn get(&self, project: &str, zone: &str, rolling_update: &str) -> RollingUpdateGetCall<'a, C, NC, A> {
         RollingUpdateGetCall {
             hub: self.hub,
@@ -812,7 +839,13 @@ impl<'a, C, NC, A> RollingUpdateMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Continues an update in PAUSED state. Has no effect if invoked when the state of the update is ROLLED_OUT.    
+    /// Continues an update in PAUSED state. Has no effect if invoked when the state of the update is ROLLED_OUT.
+    /// 
+    /// # Arguments
+    ///
+    /// * `project` - The Google Developers Console project name.
+    /// * `zone` - The name of the zone in which the update's target resides.
+    /// * `rollingUpdate` - The name of the update.
     pub fn resume(&self, project: &str, zone: &str, rolling_update: &str) -> RollingUpdateResumeCall<'a, C, NC, A> {
         RollingUpdateResumeCall {
             hub: self.hub,
@@ -827,7 +860,12 @@ impl<'a, C, NC, A> RollingUpdateMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Lists recent updates for a given managed instance group, in reverse chronological order and paginated format.    
+    /// Lists recent updates for a given managed instance group, in reverse chronological order and paginated format.
+    /// 
+    /// # Arguments
+    ///
+    /// * `project` - The Google Developers Console project name.
+    /// * `zone` - The name of the zone in which the update's target resides.
     pub fn list(&self, project: &str, zone: &str) -> RollingUpdateListCall<'a, C, NC, A> {
         RollingUpdateListCall {
             hub: self.hub,
@@ -845,7 +883,13 @@ impl<'a, C, NC, A> RollingUpdateMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Inserts and starts a new update.    
+    /// Inserts and starts a new update.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `project` - The Google Developers Console project name.
+    /// * `zone` - The name of the zone in which the update's target resides.
     pub fn insert(&self, request: &RollingUpdate, project: &str, zone: &str) -> RollingUpdateInsertCall<'a, C, NC, A> {
         RollingUpdateInsertCall {
             hub: self.hub,
@@ -860,7 +904,13 @@ impl<'a, C, NC, A> RollingUpdateMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Lists the current status for each instance within a given update.    
+    /// Lists the current status for each instance within a given update.
+    /// 
+    /// # Arguments
+    ///
+    /// * `project` - The Google Developers Console project name.
+    /// * `zone` - The name of the zone in which the update's target resides.
+    /// * `rollingUpdate` - The name of the update.
     pub fn list_instance_updates(&self, project: &str, zone: &str, rolling_update: &str) -> RollingUpdateListInstanceUpdateCall<'a, C, NC, A> {
         RollingUpdateListInstanceUpdateCall {
             hub: self.hub,
@@ -878,7 +928,13 @@ impl<'a, C, NC, A> RollingUpdateMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Cancels an update. The update must be PAUSED before it can be cancelled. This has no effect if the update is already CANCELLED.    
+    /// Cancels an update. The update must be PAUSED before it can be cancelled. This has no effect if the update is already CANCELLED.
+    /// 
+    /// # Arguments
+    ///
+    /// * `project` - The Google Developers Console project name.
+    /// * `zone` - The name of the zone in which the update's target resides.
+    /// * `rollingUpdate` - The name of the update.
     pub fn cancel(&self, project: &str, zone: &str, rolling_update: &str) -> RollingUpdateCancelCall<'a, C, NC, A> {
         RollingUpdateCancelCall {
             hub: self.hub,
@@ -928,13 +984,19 @@ pub struct ZoneOperationMethods<'a, C, NC, A>
     hub: &'a Replicapoolupdater<C, NC, A>,
 }
 
-impl<'a, C, NC, A> ResourceMethodsBuilder for ZoneOperationMethods<'a, C, NC, A> {}
+impl<'a, C, NC, A> MethodsBuilder for ZoneOperationMethods<'a, C, NC, A> {}
 
 impl<'a, C, NC, A> ZoneOperationMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Retrieves the specified zone-specific operation resource.    
+    /// Retrieves the specified zone-specific operation resource.
+    /// 
+    /// # Arguments
+    ///
+    /// * `project` - Name of the project scoping this request.
+    /// * `zone` - Name of the zone scoping this request.
+    /// * `operation` - Name of the operation resource to return.
     pub fn get(&self, project: &str, zone: &str, operation: &str) -> ZoneOperationGetCall<'a, C, NC, A> {
         ZoneOperationGetCall {
             hub: self.hub,
@@ -959,7 +1021,7 @@ impl<'a, C, NC, A> ZoneOperationMethods<'a, C, NC, A> {
 /// Pauses the update in state from ROLLING_FORWARD or ROLLING_BACK. Has no effect if invoked when the state of the update is PAUSED.
 ///
 /// A builder for the *pause* method supported by a *rollingUpdate* resource.
-/// It is not used directly, but through a `RollingUpdateMethods`.
+/// It is not used directly, but through a `RollingUpdateMethods` instance.
 ///
 /// # Example
 ///
@@ -1021,7 +1083,7 @@ impl<'a, C, NC, A> RollingUpdatePauseCall<'a, C, NC, A> where NC: hyper::net::Ne
         for &field in ["alt", "project", "zone", "rollingUpdate"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -1074,7 +1136,7 @@ impl<'a, C, NC, A> RollingUpdatePauseCall<'a, C, NC, A> where NC: hyper::net::Ne
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -1086,7 +1148,6 @@ impl<'a, C, NC, A> RollingUpdatePauseCall<'a, C, NC, A> where NC: hyper::net::Ne
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -1096,7 +1157,7 @@ impl<'a, C, NC, A> RollingUpdatePauseCall<'a, C, NC, A> where NC: hyper::net::Ne
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -1107,7 +1168,7 @@ impl<'a, C, NC, A> RollingUpdatePauseCall<'a, C, NC, A> where NC: hyper::net::Ne
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -1116,13 +1177,13 @@ impl<'a, C, NC, A> RollingUpdatePauseCall<'a, C, NC, A> where NC: hyper::net::Ne
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -1134,7 +1195,7 @@ impl<'a, C, NC, A> RollingUpdatePauseCall<'a, C, NC, A> where NC: hyper::net::Ne
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The Google Developers Console project name.    
+    /// The Google Developers Console project name.
     pub fn project(mut self, new_value: &str) -> RollingUpdatePauseCall<'a, C, NC, A> {
         self._project = new_value.to_string();
         self
@@ -1144,7 +1205,7 @@ impl<'a, C, NC, A> RollingUpdatePauseCall<'a, C, NC, A> where NC: hyper::net::Ne
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The name of the zone in which the update's target resides.    
+    /// The name of the zone in which the update's target resides.
     pub fn zone(mut self, new_value: &str) -> RollingUpdatePauseCall<'a, C, NC, A> {
         self._zone = new_value.to_string();
         self
@@ -1154,7 +1215,7 @@ impl<'a, C, NC, A> RollingUpdatePauseCall<'a, C, NC, A> where NC: hyper::net::Ne
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The name of the update.    
+    /// The name of the update.
     pub fn rolling_update(mut self, new_value: &str) -> RollingUpdatePauseCall<'a, C, NC, A> {
         self._rolling_update = new_value.to_string();
         self
@@ -1215,7 +1276,7 @@ impl<'a, C, NC, A> RollingUpdatePauseCall<'a, C, NC, A> where NC: hyper::net::Ne
 /// Rolls back the update in state from ROLLING_FORWARD or PAUSED. Has no effect if invoked when the state of the update is ROLLED_BACK.
 ///
 /// A builder for the *rollback* method supported by a *rollingUpdate* resource.
-/// It is not used directly, but through a `RollingUpdateMethods`.
+/// It is not used directly, but through a `RollingUpdateMethods` instance.
 ///
 /// # Example
 ///
@@ -1277,7 +1338,7 @@ impl<'a, C, NC, A> RollingUpdateRollbackCall<'a, C, NC, A> where NC: hyper::net:
         for &field in ["alt", "project", "zone", "rollingUpdate"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -1330,7 +1391,7 @@ impl<'a, C, NC, A> RollingUpdateRollbackCall<'a, C, NC, A> where NC: hyper::net:
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -1342,7 +1403,6 @@ impl<'a, C, NC, A> RollingUpdateRollbackCall<'a, C, NC, A> where NC: hyper::net:
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -1352,7 +1412,7 @@ impl<'a, C, NC, A> RollingUpdateRollbackCall<'a, C, NC, A> where NC: hyper::net:
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -1363,7 +1423,7 @@ impl<'a, C, NC, A> RollingUpdateRollbackCall<'a, C, NC, A> where NC: hyper::net:
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -1372,13 +1432,13 @@ impl<'a, C, NC, A> RollingUpdateRollbackCall<'a, C, NC, A> where NC: hyper::net:
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -1390,7 +1450,7 @@ impl<'a, C, NC, A> RollingUpdateRollbackCall<'a, C, NC, A> where NC: hyper::net:
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The Google Developers Console project name.    
+    /// The Google Developers Console project name.
     pub fn project(mut self, new_value: &str) -> RollingUpdateRollbackCall<'a, C, NC, A> {
         self._project = new_value.to_string();
         self
@@ -1400,7 +1460,7 @@ impl<'a, C, NC, A> RollingUpdateRollbackCall<'a, C, NC, A> where NC: hyper::net:
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The name of the zone in which the update's target resides.    
+    /// The name of the zone in which the update's target resides.
     pub fn zone(mut self, new_value: &str) -> RollingUpdateRollbackCall<'a, C, NC, A> {
         self._zone = new_value.to_string();
         self
@@ -1410,7 +1470,7 @@ impl<'a, C, NC, A> RollingUpdateRollbackCall<'a, C, NC, A> where NC: hyper::net:
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The name of the update.    
+    /// The name of the update.
     pub fn rolling_update(mut self, new_value: &str) -> RollingUpdateRollbackCall<'a, C, NC, A> {
         self._rolling_update = new_value.to_string();
         self
@@ -1471,7 +1531,7 @@ impl<'a, C, NC, A> RollingUpdateRollbackCall<'a, C, NC, A> where NC: hyper::net:
 /// Returns information about an update.
 ///
 /// A builder for the *get* method supported by a *rollingUpdate* resource.
-/// It is not used directly, but through a `RollingUpdateMethods`.
+/// It is not used directly, but through a `RollingUpdateMethods` instance.
 ///
 /// # Example
 ///
@@ -1533,7 +1593,7 @@ impl<'a, C, NC, A> RollingUpdateGetCall<'a, C, NC, A> where NC: hyper::net::Netw
         for &field in ["alt", "project", "zone", "rollingUpdate"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -1586,7 +1646,7 @@ impl<'a, C, NC, A> RollingUpdateGetCall<'a, C, NC, A> where NC: hyper::net::Netw
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -1598,7 +1658,6 @@ impl<'a, C, NC, A> RollingUpdateGetCall<'a, C, NC, A> where NC: hyper::net::Netw
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -1608,7 +1667,7 @@ impl<'a, C, NC, A> RollingUpdateGetCall<'a, C, NC, A> where NC: hyper::net::Netw
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -1619,7 +1678,7 @@ impl<'a, C, NC, A> RollingUpdateGetCall<'a, C, NC, A> where NC: hyper::net::Netw
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -1628,13 +1687,13 @@ impl<'a, C, NC, A> RollingUpdateGetCall<'a, C, NC, A> where NC: hyper::net::Netw
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -1646,7 +1705,7 @@ impl<'a, C, NC, A> RollingUpdateGetCall<'a, C, NC, A> where NC: hyper::net::Netw
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The Google Developers Console project name.    
+    /// The Google Developers Console project name.
     pub fn project(mut self, new_value: &str) -> RollingUpdateGetCall<'a, C, NC, A> {
         self._project = new_value.to_string();
         self
@@ -1656,7 +1715,7 @@ impl<'a, C, NC, A> RollingUpdateGetCall<'a, C, NC, A> where NC: hyper::net::Netw
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The name of the zone in which the update's target resides.    
+    /// The name of the zone in which the update's target resides.
     pub fn zone(mut self, new_value: &str) -> RollingUpdateGetCall<'a, C, NC, A> {
         self._zone = new_value.to_string();
         self
@@ -1666,7 +1725,7 @@ impl<'a, C, NC, A> RollingUpdateGetCall<'a, C, NC, A> where NC: hyper::net::Netw
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The name of the update.    
+    /// The name of the update.
     pub fn rolling_update(mut self, new_value: &str) -> RollingUpdateGetCall<'a, C, NC, A> {
         self._rolling_update = new_value.to_string();
         self
@@ -1727,7 +1786,7 @@ impl<'a, C, NC, A> RollingUpdateGetCall<'a, C, NC, A> where NC: hyper::net::Netw
 /// Continues an update in PAUSED state. Has no effect if invoked when the state of the update is ROLLED_OUT.
 ///
 /// A builder for the *resume* method supported by a *rollingUpdate* resource.
-/// It is not used directly, but through a `RollingUpdateMethods`.
+/// It is not used directly, but through a `RollingUpdateMethods` instance.
 ///
 /// # Example
 ///
@@ -1789,7 +1848,7 @@ impl<'a, C, NC, A> RollingUpdateResumeCall<'a, C, NC, A> where NC: hyper::net::N
         for &field in ["alt", "project", "zone", "rollingUpdate"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -1842,7 +1901,7 @@ impl<'a, C, NC, A> RollingUpdateResumeCall<'a, C, NC, A> where NC: hyper::net::N
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -1854,7 +1913,6 @@ impl<'a, C, NC, A> RollingUpdateResumeCall<'a, C, NC, A> where NC: hyper::net::N
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -1864,7 +1922,7 @@ impl<'a, C, NC, A> RollingUpdateResumeCall<'a, C, NC, A> where NC: hyper::net::N
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -1875,7 +1933,7 @@ impl<'a, C, NC, A> RollingUpdateResumeCall<'a, C, NC, A> where NC: hyper::net::N
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -1884,13 +1942,13 @@ impl<'a, C, NC, A> RollingUpdateResumeCall<'a, C, NC, A> where NC: hyper::net::N
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -1902,7 +1960,7 @@ impl<'a, C, NC, A> RollingUpdateResumeCall<'a, C, NC, A> where NC: hyper::net::N
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The Google Developers Console project name.    
+    /// The Google Developers Console project name.
     pub fn project(mut self, new_value: &str) -> RollingUpdateResumeCall<'a, C, NC, A> {
         self._project = new_value.to_string();
         self
@@ -1912,7 +1970,7 @@ impl<'a, C, NC, A> RollingUpdateResumeCall<'a, C, NC, A> where NC: hyper::net::N
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The name of the zone in which the update's target resides.    
+    /// The name of the zone in which the update's target resides.
     pub fn zone(mut self, new_value: &str) -> RollingUpdateResumeCall<'a, C, NC, A> {
         self._zone = new_value.to_string();
         self
@@ -1922,7 +1980,7 @@ impl<'a, C, NC, A> RollingUpdateResumeCall<'a, C, NC, A> where NC: hyper::net::N
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The name of the update.    
+    /// The name of the update.
     pub fn rolling_update(mut self, new_value: &str) -> RollingUpdateResumeCall<'a, C, NC, A> {
         self._rolling_update = new_value.to_string();
         self
@@ -1983,7 +2041,7 @@ impl<'a, C, NC, A> RollingUpdateResumeCall<'a, C, NC, A> where NC: hyper::net::N
 /// Lists recent updates for a given managed instance group, in reverse chronological order and paginated format.
 ///
 /// A builder for the *list* method supported by a *rollingUpdate* resource.
-/// It is not used directly, but through a `RollingUpdateMethods`.
+/// It is not used directly, but through a `RollingUpdateMethods` instance.
 ///
 /// # Example
 ///
@@ -2063,7 +2121,7 @@ impl<'a, C, NC, A> RollingUpdateListCall<'a, C, NC, A> where NC: hyper::net::Net
         for &field in ["alt", "project", "zone", "pageToken", "maxResults", "instanceGroupManager", "filter"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -2116,7 +2174,7 @@ impl<'a, C, NC, A> RollingUpdateListCall<'a, C, NC, A> where NC: hyper::net::Net
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -2128,7 +2186,6 @@ impl<'a, C, NC, A> RollingUpdateListCall<'a, C, NC, A> where NC: hyper::net::Net
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -2138,7 +2195,7 @@ impl<'a, C, NC, A> RollingUpdateListCall<'a, C, NC, A> where NC: hyper::net::Net
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -2149,7 +2206,7 @@ impl<'a, C, NC, A> RollingUpdateListCall<'a, C, NC, A> where NC: hyper::net::Net
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -2158,13 +2215,13 @@ impl<'a, C, NC, A> RollingUpdateListCall<'a, C, NC, A> where NC: hyper::net::Net
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -2176,7 +2233,7 @@ impl<'a, C, NC, A> RollingUpdateListCall<'a, C, NC, A> where NC: hyper::net::Net
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The Google Developers Console project name.    
+    /// The Google Developers Console project name.
     pub fn project(mut self, new_value: &str) -> RollingUpdateListCall<'a, C, NC, A> {
         self._project = new_value.to_string();
         self
@@ -2186,7 +2243,7 @@ impl<'a, C, NC, A> RollingUpdateListCall<'a, C, NC, A> where NC: hyper::net::Net
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The name of the zone in which the update's target resides.    
+    /// The name of the zone in which the update's target resides.
     pub fn zone(mut self, new_value: &str) -> RollingUpdateListCall<'a, C, NC, A> {
         self._zone = new_value.to_string();
         self
@@ -2194,7 +2251,7 @@ impl<'a, C, NC, A> RollingUpdateListCall<'a, C, NC, A> where NC: hyper::net::Net
     /// Sets the *page token* query property to the given value.
     ///
     /// 
-    /// Optional. Tag returned by a previous list request truncated by maxResults. Used to continue a previous list request.    
+    /// Optional. Tag returned by a previous list request truncated by maxResults. Used to continue a previous list request.
     pub fn page_token(mut self, new_value: &str) -> RollingUpdateListCall<'a, C, NC, A> {
         self._page_token = Some(new_value.to_string());
         self
@@ -2202,7 +2259,7 @@ impl<'a, C, NC, A> RollingUpdateListCall<'a, C, NC, A> where NC: hyper::net::Net
     /// Sets the *max results* query property to the given value.
     ///
     /// 
-    /// Optional. Maximum count of results to be returned. Maximum value is 500 and default value is 500.    
+    /// Optional. Maximum count of results to be returned. Maximum value is 500 and default value is 500.
     pub fn max_results(mut self, new_value: u32) -> RollingUpdateListCall<'a, C, NC, A> {
         self._max_results = Some(new_value);
         self
@@ -2210,7 +2267,7 @@ impl<'a, C, NC, A> RollingUpdateListCall<'a, C, NC, A> where NC: hyper::net::Net
     /// Sets the *instance group manager* query property to the given value.
     ///
     /// 
-    /// The name of the instance group manager used for filtering.    
+    /// The name of the instance group manager used for filtering.
     pub fn instance_group_manager(mut self, new_value: &str) -> RollingUpdateListCall<'a, C, NC, A> {
         self._instance_group_manager = Some(new_value.to_string());
         self
@@ -2218,7 +2275,7 @@ impl<'a, C, NC, A> RollingUpdateListCall<'a, C, NC, A> where NC: hyper::net::Net
     /// Sets the *filter* query property to the given value.
     ///
     /// 
-    /// Optional. Filter expression for filtering listed resources.    
+    /// Optional. Filter expression for filtering listed resources.
     pub fn filter(mut self, new_value: &str) -> RollingUpdateListCall<'a, C, NC, A> {
         self._filter = Some(new_value.to_string());
         self
@@ -2279,7 +2336,7 @@ impl<'a, C, NC, A> RollingUpdateListCall<'a, C, NC, A> where NC: hyper::net::Net
 /// Inserts and starts a new update.
 ///
 /// A builder for the *insert* method supported by a *rollingUpdate* resource.
-/// It is not used directly, but through a `RollingUpdateMethods`.
+/// It is not used directly, but through a `RollingUpdateMethods` instance.
 ///
 /// # Example
 ///
@@ -2346,7 +2403,7 @@ impl<'a, C, NC, A> RollingUpdateInsertCall<'a, C, NC, A> where NC: hyper::net::N
         for &field in ["alt", "project", "zone"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -2403,7 +2460,7 @@ impl<'a, C, NC, A> RollingUpdateInsertCall<'a, C, NC, A> where NC: hyper::net::N
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -2419,7 +2476,6 @@ impl<'a, C, NC, A> RollingUpdateInsertCall<'a, C, NC, A> where NC: hyper::net::N
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -2429,7 +2485,7 @@ impl<'a, C, NC, A> RollingUpdateInsertCall<'a, C, NC, A> where NC: hyper::net::N
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -2440,7 +2496,7 @@ impl<'a, C, NC, A> RollingUpdateInsertCall<'a, C, NC, A> where NC: hyper::net::N
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -2449,13 +2505,13 @@ impl<'a, C, NC, A> RollingUpdateInsertCall<'a, C, NC, A> where NC: hyper::net::N
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -2476,7 +2532,7 @@ impl<'a, C, NC, A> RollingUpdateInsertCall<'a, C, NC, A> where NC: hyper::net::N
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The Google Developers Console project name.    
+    /// The Google Developers Console project name.
     pub fn project(mut self, new_value: &str) -> RollingUpdateInsertCall<'a, C, NC, A> {
         self._project = new_value.to_string();
         self
@@ -2486,7 +2542,7 @@ impl<'a, C, NC, A> RollingUpdateInsertCall<'a, C, NC, A> where NC: hyper::net::N
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The name of the zone in which the update's target resides.    
+    /// The name of the zone in which the update's target resides.
     pub fn zone(mut self, new_value: &str) -> RollingUpdateInsertCall<'a, C, NC, A> {
         self._zone = new_value.to_string();
         self
@@ -2547,7 +2603,7 @@ impl<'a, C, NC, A> RollingUpdateInsertCall<'a, C, NC, A> where NC: hyper::net::N
 /// Lists the current status for each instance within a given update.
 ///
 /// A builder for the *listInstanceUpdates* method supported by a *rollingUpdate* resource.
-/// It is not used directly, but through a `RollingUpdateMethods`.
+/// It is not used directly, but through a `RollingUpdateMethods` instance.
 ///
 /// # Example
 ///
@@ -2624,7 +2680,7 @@ impl<'a, C, NC, A> RollingUpdateListInstanceUpdateCall<'a, C, NC, A> where NC: h
         for &field in ["alt", "project", "zone", "rollingUpdate", "pageToken", "maxResults", "filter"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -2677,7 +2733,7 @@ impl<'a, C, NC, A> RollingUpdateListInstanceUpdateCall<'a, C, NC, A> where NC: h
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -2689,7 +2745,6 @@ impl<'a, C, NC, A> RollingUpdateListInstanceUpdateCall<'a, C, NC, A> where NC: h
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -2699,7 +2754,7 @@ impl<'a, C, NC, A> RollingUpdateListInstanceUpdateCall<'a, C, NC, A> where NC: h
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -2710,7 +2765,7 @@ impl<'a, C, NC, A> RollingUpdateListInstanceUpdateCall<'a, C, NC, A> where NC: h
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -2719,13 +2774,13 @@ impl<'a, C, NC, A> RollingUpdateListInstanceUpdateCall<'a, C, NC, A> where NC: h
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -2737,7 +2792,7 @@ impl<'a, C, NC, A> RollingUpdateListInstanceUpdateCall<'a, C, NC, A> where NC: h
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The Google Developers Console project name.    
+    /// The Google Developers Console project name.
     pub fn project(mut self, new_value: &str) -> RollingUpdateListInstanceUpdateCall<'a, C, NC, A> {
         self._project = new_value.to_string();
         self
@@ -2747,7 +2802,7 @@ impl<'a, C, NC, A> RollingUpdateListInstanceUpdateCall<'a, C, NC, A> where NC: h
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The name of the zone in which the update's target resides.    
+    /// The name of the zone in which the update's target resides.
     pub fn zone(mut self, new_value: &str) -> RollingUpdateListInstanceUpdateCall<'a, C, NC, A> {
         self._zone = new_value.to_string();
         self
@@ -2757,7 +2812,7 @@ impl<'a, C, NC, A> RollingUpdateListInstanceUpdateCall<'a, C, NC, A> where NC: h
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The name of the update.    
+    /// The name of the update.
     pub fn rolling_update(mut self, new_value: &str) -> RollingUpdateListInstanceUpdateCall<'a, C, NC, A> {
         self._rolling_update = new_value.to_string();
         self
@@ -2765,7 +2820,7 @@ impl<'a, C, NC, A> RollingUpdateListInstanceUpdateCall<'a, C, NC, A> where NC: h
     /// Sets the *page token* query property to the given value.
     ///
     /// 
-    /// Optional. Tag returned by a previous list request truncated by maxResults. Used to continue a previous list request.    
+    /// Optional. Tag returned by a previous list request truncated by maxResults. Used to continue a previous list request.
     pub fn page_token(mut self, new_value: &str) -> RollingUpdateListInstanceUpdateCall<'a, C, NC, A> {
         self._page_token = Some(new_value.to_string());
         self
@@ -2773,7 +2828,7 @@ impl<'a, C, NC, A> RollingUpdateListInstanceUpdateCall<'a, C, NC, A> where NC: h
     /// Sets the *max results* query property to the given value.
     ///
     /// 
-    /// Optional. Maximum count of results to be returned. Maximum value is 500 and default value is 500.    
+    /// Optional. Maximum count of results to be returned. Maximum value is 500 and default value is 500.
     pub fn max_results(mut self, new_value: u32) -> RollingUpdateListInstanceUpdateCall<'a, C, NC, A> {
         self._max_results = Some(new_value);
         self
@@ -2781,7 +2836,7 @@ impl<'a, C, NC, A> RollingUpdateListInstanceUpdateCall<'a, C, NC, A> where NC: h
     /// Sets the *filter* query property to the given value.
     ///
     /// 
-    /// Optional. Filter expression for filtering listed resources.    
+    /// Optional. Filter expression for filtering listed resources.
     pub fn filter(mut self, new_value: &str) -> RollingUpdateListInstanceUpdateCall<'a, C, NC, A> {
         self._filter = Some(new_value.to_string());
         self
@@ -2842,7 +2897,7 @@ impl<'a, C, NC, A> RollingUpdateListInstanceUpdateCall<'a, C, NC, A> where NC: h
 /// Cancels an update. The update must be PAUSED before it can be cancelled. This has no effect if the update is already CANCELLED.
 ///
 /// A builder for the *cancel* method supported by a *rollingUpdate* resource.
-/// It is not used directly, but through a `RollingUpdateMethods`.
+/// It is not used directly, but through a `RollingUpdateMethods` instance.
 ///
 /// # Example
 ///
@@ -2904,7 +2959,7 @@ impl<'a, C, NC, A> RollingUpdateCancelCall<'a, C, NC, A> where NC: hyper::net::N
         for &field in ["alt", "project", "zone", "rollingUpdate"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -2957,7 +3012,7 @@ impl<'a, C, NC, A> RollingUpdateCancelCall<'a, C, NC, A> where NC: hyper::net::N
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -2969,7 +3024,6 @@ impl<'a, C, NC, A> RollingUpdateCancelCall<'a, C, NC, A> where NC: hyper::net::N
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -2979,7 +3033,7 @@ impl<'a, C, NC, A> RollingUpdateCancelCall<'a, C, NC, A> where NC: hyper::net::N
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -2990,7 +3044,7 @@ impl<'a, C, NC, A> RollingUpdateCancelCall<'a, C, NC, A> where NC: hyper::net::N
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -2999,13 +3053,13 @@ impl<'a, C, NC, A> RollingUpdateCancelCall<'a, C, NC, A> where NC: hyper::net::N
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -3017,7 +3071,7 @@ impl<'a, C, NC, A> RollingUpdateCancelCall<'a, C, NC, A> where NC: hyper::net::N
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The Google Developers Console project name.    
+    /// The Google Developers Console project name.
     pub fn project(mut self, new_value: &str) -> RollingUpdateCancelCall<'a, C, NC, A> {
         self._project = new_value.to_string();
         self
@@ -3027,7 +3081,7 @@ impl<'a, C, NC, A> RollingUpdateCancelCall<'a, C, NC, A> where NC: hyper::net::N
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The name of the zone in which the update's target resides.    
+    /// The name of the zone in which the update's target resides.
     pub fn zone(mut self, new_value: &str) -> RollingUpdateCancelCall<'a, C, NC, A> {
         self._zone = new_value.to_string();
         self
@@ -3037,7 +3091,7 @@ impl<'a, C, NC, A> RollingUpdateCancelCall<'a, C, NC, A> where NC: hyper::net::N
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The name of the update.    
+    /// The name of the update.
     pub fn rolling_update(mut self, new_value: &str) -> RollingUpdateCancelCall<'a, C, NC, A> {
         self._rolling_update = new_value.to_string();
         self
@@ -3098,7 +3152,7 @@ impl<'a, C, NC, A> RollingUpdateCancelCall<'a, C, NC, A> where NC: hyper::net::N
 /// Retrieves the specified zone-specific operation resource.
 ///
 /// A builder for the *get* method supported by a *zoneOperation* resource.
-/// It is not used directly, but through a `ZoneOperationMethods`.
+/// It is not used directly, but through a `ZoneOperationMethods` instance.
 ///
 /// # Example
 ///
@@ -3160,7 +3214,7 @@ impl<'a, C, NC, A> ZoneOperationGetCall<'a, C, NC, A> where NC: hyper::net::Netw
         for &field in ["alt", "project", "zone", "operation"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -3213,7 +3267,7 @@ impl<'a, C, NC, A> ZoneOperationGetCall<'a, C, NC, A> where NC: hyper::net::Netw
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -3225,7 +3279,6 @@ impl<'a, C, NC, A> ZoneOperationGetCall<'a, C, NC, A> where NC: hyper::net::Netw
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -3235,7 +3288,7 @@ impl<'a, C, NC, A> ZoneOperationGetCall<'a, C, NC, A> where NC: hyper::net::Netw
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -3246,7 +3299,7 @@ impl<'a, C, NC, A> ZoneOperationGetCall<'a, C, NC, A> where NC: hyper::net::Netw
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -3255,13 +3308,13 @@ impl<'a, C, NC, A> ZoneOperationGetCall<'a, C, NC, A> where NC: hyper::net::Netw
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -3273,7 +3326,7 @@ impl<'a, C, NC, A> ZoneOperationGetCall<'a, C, NC, A> where NC: hyper::net::Netw
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Name of the project scoping this request.    
+    /// Name of the project scoping this request.
     pub fn project(mut self, new_value: &str) -> ZoneOperationGetCall<'a, C, NC, A> {
         self._project = new_value.to_string();
         self
@@ -3283,7 +3336,7 @@ impl<'a, C, NC, A> ZoneOperationGetCall<'a, C, NC, A> where NC: hyper::net::Netw
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Name of the zone scoping this request.    
+    /// Name of the zone scoping this request.
     pub fn zone(mut self, new_value: &str) -> ZoneOperationGetCall<'a, C, NC, A> {
         self._zone = new_value.to_string();
         self
@@ -3293,7 +3346,7 @@ impl<'a, C, NC, A> ZoneOperationGetCall<'a, C, NC, A> where NC: hyper::net::Netw
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Name of the operation resource to return.    
+    /// Name of the operation resource to return.
     pub fn operation(mut self, new_value: &str) -> ZoneOperationGetCall<'a, C, NC, A> {
         self._operation = new_value.to_string();
         self

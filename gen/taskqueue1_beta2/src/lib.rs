@@ -1,8 +1,8 @@
 // DO NOT EDIT !
-// This file was generated automatically from 'src/mako/lib.rs.mako'
+// This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *taskqueue* crate version *0.1.1+20141111*, where *20141111* is the exact revision of the *taskqueue:v1beta2* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.1*.
+//! This documentation was generated from *taskqueue* crate version *0.1.2+20141111*, where *20141111* is the exact revision of the *taskqueue:v1beta2* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.2*.
 //! 
 //! Everything else about the *taskqueue* *v1_beta2* API can be found at the
 //! [official documentation site](https://developers.google.com/appengine/docs/python/taskqueue/rest).
@@ -27,6 +27,8 @@
 //! 
 //! * **[Hub](struct.Taskqueue.html)**
 //!     * a central object to maintain state and allow accessing all *Activities*
+//!     * creates [*Method Builders*](trait.MethodsBuilder.html) which in turn
+//!       allow access to individual [*Call Builders*](trait.CallBuilder.html)
 //! * **[Resources](trait.Resource.html)**
 //!     * primary types that you can apply *Activities* to
 //!     * a collection of properties and *Parts*
@@ -35,6 +37,8 @@
 //!         * never directly used in *Activities*
 //! * **[Activities](trait.CallBuilder.html)**
 //!     * operations to apply to *Resources*
+//! 
+//! All *structures* are marked with applicable traits to further categorize them and ease browsing.
 //! 
 //! Generally speaking, you can invoke *Activities* like this:
 //! 
@@ -76,7 +80,7 @@
 //! extern crate hyper;
 //! extern crate "yup-oauth2" as oauth2;
 //! extern crate "google-taskqueue1_beta2" as taskqueue1_beta2;
-//! use taskqueue1_beta2::Result;
+//! use taskqueue1_beta2::{Result, Error};
 //! # #[test] fn egal() {
 //! use std::default::Default;
 //! use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -103,15 +107,17 @@
 //!              .doit();
 //! 
 //! match result {
-//!     Result::HttpError(err) => println!("HTTPERROR: {:?}", err),
-//!     Result::MissingAPIKey => println!("Auth: Missing API Key - used if there are no scopes"),
-//!     Result::MissingToken => println!("OAuth2: Missing Token"),
-//!     Result::Cancelled => println!("Operation cancelled by user"),
-//!     Result::UploadSizeLimitExceeded(size, max_size) => println!("Upload size too big: {} of {}", size, max_size),
-//!     Result::Failure(_) => println!("General Failure (hyper::client::Response doesn't print)"),
-//!     Result::FieldClash(clashed_field) => println!("You added custom parameter which is part of builder: {:?}", clashed_field),
-//!     Result::JsonDecodeError(err) => println!("Couldn't understand server reply - maybe API needs update: {:?}", err),
-//!     Result::Success(_) => println!("Success (value doesn't print)"),
+//!     Err(e) => match e {
+//!         Error::HttpError(err) => println!("HTTPERROR: {:?}", err),
+//!         Error::MissingAPIKey => println!("Auth: Missing API Key - used if there are no scopes"),
+//!         Error::MissingToken => println!("OAuth2: Missing Token"),
+//!         Error::Cancelled => println!("Operation canceled by user"),
+//!         Error::UploadSizeLimitExceeded(size, max_size) => println!("Upload size too big: {} of {}", size, max_size),
+//!         Error::Failure(_) => println!("General Failure (hyper::client::Response doesn't print)"),
+//!         Error::FieldClash(clashed_field) => println!("You added custom parameter which is part of builder: {:?}", clashed_field),
+//!         Error::JsonDecodeError(err) => println!("Couldn't understand server reply - maybe API needs update: {:?}", err),
+//!     },
+//!     Ok(_) => println!("Success (value doesn't print)"),
 //! }
 //! # }
 //! ```
@@ -124,7 +130,7 @@
 //! When delegates handle errors or intermediate values, they may have a chance to instruct the system to retry. This 
 //! makes the system potentially resilient to all kinds of errors.
 //! 
-//! ## Uploads and Downlods
+//! ## Uploads and Downloads
 //! If a method supports downloads, the response body, which is part of the [Result](enum.Result.html), should be
 //! read by you to obtain the media.
 //! If such a method also supports a [Response Result](trait.ResponseResult.html), it will return that by default.
@@ -147,8 +153,9 @@
 //! ## Optional Parts in Server-Requests
 //! 
 //! All structures provided by this library are made to be [enocodable](trait.RequestValue.html) and 
-//! [decodable](trait.ResponseResult.html) via json. Optionals are used to indicate that partial requests are responses are valid.
-//! Most optionals are are considered [Parts](trait.Part.html) which are identifyable by name, which will be sent to 
+//! [decodable](trait.ResponseResult.html) via *json*. Optionals are used to indicate that partial requests are responses 
+//! are valid.
+//! Most optionals are are considered [Parts](trait.Part.html) which are identifiable by name, which will be sent to 
 //! the server to indicate either the set parts of the request or the desired parts in the response.
 //! 
 //! ## Builder Arguments
@@ -197,7 +204,7 @@ use std::io;
 use std::fs;
 use std::thread::sleep;
 
-pub use cmn::{MultiPartReader, ToParts, MethodInfo, Result, CallBuilder, Hub, ReadSeek, Part, ResponseResult, RequestValue, NestedType, Delegate, DefaultDelegate, ResourceMethodsBuilder, Resource, JsonServerError};
+pub use cmn::{MultiPartReader, ToParts, MethodInfo, Result, Error, CallBuilder, Hub, ReadSeek, Part, ResponseResult, RequestValue, NestedType, Delegate, DefaultDelegate, MethodsBuilder, Resource, JsonServerError};
 
 
 // ##############
@@ -247,7 +254,7 @@ impl Default for Scope {
 /// extern crate hyper;
 /// extern crate "yup-oauth2" as oauth2;
 /// extern crate "google-taskqueue1_beta2" as taskqueue1_beta2;
-/// use taskqueue1_beta2::Result;
+/// use taskqueue1_beta2::{Result, Error};
 /// # #[test] fn egal() {
 /// use std::default::Default;
 /// use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -274,15 +281,17 @@ impl Default for Scope {
 ///              .doit();
 /// 
 /// match result {
-///     Result::HttpError(err) => println!("HTTPERROR: {:?}", err),
-///     Result::MissingAPIKey => println!("Auth: Missing API Key - used if there are no scopes"),
-///     Result::MissingToken => println!("OAuth2: Missing Token"),
-///     Result::Cancelled => println!("Operation cancelled by user"),
-///     Result::UploadSizeLimitExceeded(size, max_size) => println!("Upload size too big: {} of {}", size, max_size),
-///     Result::Failure(_) => println!("General Failure (hyper::client::Response doesn't print)"),
-///     Result::FieldClash(clashed_field) => println!("You added custom parameter which is part of builder: {:?}", clashed_field),
-///     Result::JsonDecodeError(err) => println!("Couldn't understand server reply - maybe API needs update: {:?}", err),
-///     Result::Success(_) => println!("Success (value doesn't print)"),
+///     Err(e) => match e {
+///         Error::HttpError(err) => println!("HTTPERROR: {:?}", err),
+///         Error::MissingAPIKey => println!("Auth: Missing API Key - used if there are no scopes"),
+///         Error::MissingToken => println!("OAuth2: Missing Token"),
+///         Error::Cancelled => println!("Operation canceled by user"),
+///         Error::UploadSizeLimitExceeded(size, max_size) => println!("Upload size too big: {} of {}", size, max_size),
+///         Error::Failure(_) => println!("General Failure (hyper::client::Response doesn't print)"),
+///         Error::FieldClash(clashed_field) => println!("You added custom parameter which is part of builder: {:?}", clashed_field),
+///         Error::JsonDecodeError(err) => println!("Couldn't understand server reply - maybe API needs update: {:?}", err),
+///     },
+///     Ok(_) => println!("Success (value doesn't print)"),
 /// }
 /// # }
 /// ```
@@ -303,7 +312,7 @@ impl<'a, C, NC, A> Taskqueue<C, NC, A>
         Taskqueue {
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/0.1.1".to_string(),
+            _user_agent: "google-api-rust-client/0.1.2".to_string(),
             _m: PhantomData
         }
     }
@@ -316,7 +325,7 @@ impl<'a, C, NC, A> Taskqueue<C, NC, A>
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/0.1.1`.
+    /// It defaults to `google-api-rust-client/0.1.2`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -347,24 +356,24 @@ impl<'a, C, NC, A> Taskqueue<C, NC, A>
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Task {
-    /// The kind of object returned, in this case set to task.    
+    /// The kind of object returned, in this case set to task.
     pub kind: Option<String>,
-    /// Time (in seconds since the epoch) at which the task lease will expire. This value is 0 if the task isnt currently leased out to a worker.    
+    /// Time (in seconds since the epoch) at which the task lease will expire. This value is 0 if the task isnt currently leased out to a worker.
     #[serde(alias="leaseTimestamp")]
     pub lease_timestamp: Option<String>,
-    /// Name of the queue that the task is in.    
+    /// Name of the queue that the task is in.
     #[serde(alias="queueName")]
     pub queue_name: Option<String>,
-    /// The number of leases applied to this task.    
+    /// The number of leases applied to this task.
     pub retry_count: Option<i32>,
-    /// Tag for the task, could be used later to lease tasks grouped by a specific tag.    
+    /// Tag for the task, could be used later to lease tasks grouped by a specific tag.
     pub tag: Option<String>,
-    /// A bag of bytes which is the task payload. The payload on the JSON side is always Base64 encoded.    
+    /// A bag of bytes which is the task payload. The payload on the JSON side is always Base64 encoded.
     #[serde(alias="payloadBase64")]
     pub payload_base64: Option<String>,
-    /// Name of the task.    
+    /// Name of the task.
     pub id: Option<String>,
-    /// Time (in seconds since the epoch) at which the task was enqueued.    
+    /// Time (in seconds since the epoch) at which the task was enqueued.
     #[serde(alias="enqueueTimestamp")]
     pub enqueue_timestamp: Option<String>,
 }
@@ -385,9 +394,9 @@ impl ResponseResult for Task {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct Tasks2 {
-    /// The actual list of tasks currently active in the TaskQueue.    
+    /// The actual list of tasks currently active in the TaskQueue.
     pub items: Vec<Task>,
-    /// The kind of object returned, a list of tasks.    
+    /// The kind of object returned, a list of tasks.
     pub kind: String,
 }
 
@@ -400,16 +409,16 @@ impl ResponseResult for Tasks2 {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct TaskQueueStats {
-    /// The timestamp (in seconds since the epoch) of the oldest unfinished task.    
+    /// The timestamp (in seconds since the epoch) of the oldest unfinished task.
     #[serde(alias="oldestTask")]
     pub oldest_task: String,
-    /// Number of tasks leased in the last minute.    
+    /// Number of tasks leased in the last minute.
     #[serde(alias="leasedLastMinute")]
     pub leased_last_minute: String,
-    /// Number of tasks leased in the last hour.    
+    /// Number of tasks leased in the last hour.
     #[serde(alias="leasedLastHour")]
     pub leased_last_hour: String,
-    /// Number of tasks in the queue.    
+    /// Number of tasks in the queue.
     #[serde(alias="totalTasks")]
     pub total_tasks: i32,
 }
@@ -424,13 +433,13 @@ impl Part for TaskQueueStats {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct TaskQueueAcl {
-    /// Email addresses of users who can "consume" tasks from the TaskQueue. This means they can Dequeue and Delete tasks from the queue.    
+    /// Email addresses of users who can "consume" tasks from the TaskQueue. This means they can Dequeue and Delete tasks from the queue.
     #[serde(alias="consumerEmails")]
     pub consumer_emails: Vec<String>,
-    /// Email addresses of users who can "produce" tasks into the TaskQueue. This means they can Insert tasks into the queue.    
+    /// Email addresses of users who can "produce" tasks into the TaskQueue. This means they can Insert tasks into the queue.
     #[serde(alias="producerEmails")]
     pub producer_emails: Vec<String>,
-    /// Email addresses of users who are "admins" of the TaskQueue. This means they can control the queue, eg set ACLs for the queue.    
+    /// Email addresses of users who are "admins" of the TaskQueue. This means they can control the queue, eg set ACLs for the queue.
     #[serde(alias="adminEmails")]
     pub admin_emails: Vec<String>,
 }
@@ -450,16 +459,16 @@ impl Part for TaskQueueAcl {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct TaskQueue {
-    /// The kind of REST object returned, in this case taskqueue.    
+    /// The kind of REST object returned, in this case taskqueue.
     pub kind: String,
-    /// Statistics for the TaskQueue object in question.    
+    /// Statistics for the TaskQueue object in question.
     pub stats: TaskQueueStats,
-    /// Name of the taskqueue.    
+    /// Name of the taskqueue.
     pub id: String,
-    /// The number of times we should lease out tasks before giving up on them. If unset we lease them out forever until a worker deletes the task.    
+    /// The number of times we should lease out tasks before giving up on them. If unset we lease them out forever until a worker deletes the task.
     #[serde(alias="maxLeases")]
     pub max_leases: i32,
-    /// ACLs that are applicable to this TaskQueue object.    
+    /// ACLs that are applicable to this TaskQueue object.
     pub acl: TaskQueueAcl,
 }
 
@@ -478,9 +487,9 @@ impl ResponseResult for TaskQueue {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct Tasks {
-    /// The actual list of tasks returned as a result of the lease operation.    
+    /// The actual list of tasks returned as a result of the lease operation.
     pub items: Vec<Task>,
-    /// The kind of object returned, a list of tasks.    
+    /// The kind of object returned, a list of tasks.
     pub kind: String,
 }
 
@@ -526,13 +535,18 @@ pub struct TaskqueueMethods<'a, C, NC, A>
     hub: &'a Taskqueue<C, NC, A>,
 }
 
-impl<'a, C, NC, A> ResourceMethodsBuilder for TaskqueueMethods<'a, C, NC, A> {}
+impl<'a, C, NC, A> MethodsBuilder for TaskqueueMethods<'a, C, NC, A> {}
 
 impl<'a, C, NC, A> TaskqueueMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Get detailed information about a TaskQueue.    
+    /// Get detailed information about a TaskQueue.
+    /// 
+    /// # Arguments
+    ///
+    /// * `project` - The project under which the queue lies.
+    /// * `taskqueue` - The id of the taskqueue to get the properties of.
     pub fn get(&self, project: &str, taskqueue: &str) -> TaskqueueGetCall<'a, C, NC, A> {
         TaskqueueGetCall {
             hub: self.hub,
@@ -582,13 +596,20 @@ pub struct TaskMethods<'a, C, NC, A>
     hub: &'a Taskqueue<C, NC, A>,
 }
 
-impl<'a, C, NC, A> ResourceMethodsBuilder for TaskMethods<'a, C, NC, A> {}
+impl<'a, C, NC, A> MethodsBuilder for TaskMethods<'a, C, NC, A> {}
 
 impl<'a, C, NC, A> TaskMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Lease 1 or more tasks from a TaskQueue.    
+    /// Lease 1 or more tasks from a TaskQueue.
+    /// 
+    /// # Arguments
+    ///
+    /// * `project` - The project under which the queue lies.
+    /// * `taskqueue` - The taskqueue to lease a task from.
+    /// * `numTasks` - The number of tasks to lease.
+    /// * `leaseSecs` - The lease in seconds.
     pub fn lease(&self, project: &str, taskqueue: &str, num_tasks: i32, lease_secs: i32) -> TaskLeaseCall<'a, C, NC, A> {
         TaskLeaseCall {
             hub: self.hub,
@@ -606,7 +627,13 @@ impl<'a, C, NC, A> TaskMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Insert a new task in a TaskQueue    
+    /// Insert a new task in a TaskQueue
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `project` - The project under which the queue lies
+    /// * `taskqueue` - The taskqueue to insert the task into
     pub fn insert(&self, request: &Task, project: &str, taskqueue: &str) -> TaskInsertCall<'a, C, NC, A> {
         TaskInsertCall {
             hub: self.hub,
@@ -621,7 +648,13 @@ impl<'a, C, NC, A> TaskMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Delete a task from a TaskQueue.    
+    /// Delete a task from a TaskQueue.
+    /// 
+    /// # Arguments
+    ///
+    /// * `project` - The project under which the queue lies.
+    /// * `taskqueue` - The taskqueue to delete a task from.
+    /// * `task` - The id of the task to delete.
     pub fn delete(&self, project: &str, taskqueue: &str, task: &str) -> TaskDeleteCall<'a, C, NC, A> {
         TaskDeleteCall {
             hub: self.hub,
@@ -636,7 +669,15 @@ impl<'a, C, NC, A> TaskMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Update tasks that are leased out of a TaskQueue. This method supports patch semantics.    
+    /// Update tasks that are leased out of a TaskQueue. This method supports patch semantics.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `project` - The project under which the queue lies.
+    /// * `taskqueue` - No description provided.
+    /// * `task` - No description provided.
+    /// * `newLeaseSeconds` - The new lease in seconds.
     pub fn patch(&self, request: &Task, project: &str, taskqueue: &str, task: &str, new_lease_seconds: i32) -> TaskPatchCall<'a, C, NC, A> {
         TaskPatchCall {
             hub: self.hub,
@@ -653,7 +694,12 @@ impl<'a, C, NC, A> TaskMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// List Tasks in a TaskQueue    
+    /// List Tasks in a TaskQueue
+    /// 
+    /// # Arguments
+    ///
+    /// * `project` - The project under which the queue lies.
+    /// * `taskqueue` - The id of the taskqueue to list tasks from.
     pub fn list(&self, project: &str, taskqueue: &str) -> TaskListCall<'a, C, NC, A> {
         TaskListCall {
             hub: self.hub,
@@ -667,7 +713,13 @@ impl<'a, C, NC, A> TaskMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Get a particular task from a TaskQueue.    
+    /// Get a particular task from a TaskQueue.
+    /// 
+    /// # Arguments
+    ///
+    /// * `project` - The project under which the queue lies.
+    /// * `taskqueue` - The taskqueue in which the task belongs.
+    /// * `task` - The task to get properties of.
     pub fn get(&self, project: &str, taskqueue: &str, task: &str) -> TaskGetCall<'a, C, NC, A> {
         TaskGetCall {
             hub: self.hub,
@@ -682,7 +734,15 @@ impl<'a, C, NC, A> TaskMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Update tasks that are leased out of a TaskQueue.    
+    /// Update tasks that are leased out of a TaskQueue.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `project` - The project under which the queue lies.
+    /// * `taskqueue` - No description provided.
+    /// * `task` - No description provided.
+    /// * `newLeaseSeconds` - The new lease in seconds.
     pub fn update(&self, request: &Task, project: &str, taskqueue: &str, task: &str, new_lease_seconds: i32) -> TaskUpdateCall<'a, C, NC, A> {
         TaskUpdateCall {
             hub: self.hub,
@@ -709,7 +769,7 @@ impl<'a, C, NC, A> TaskMethods<'a, C, NC, A> {
 /// Get detailed information about a TaskQueue.
 ///
 /// A builder for the *get* method supported by a *taskqueue* resource.
-/// It is not used directly, but through a `TaskqueueMethods`.
+/// It is not used directly, but through a `TaskqueueMethods` instance.
 ///
 /// # Example
 ///
@@ -774,7 +834,7 @@ impl<'a, C, NC, A> TaskqueueGetCall<'a, C, NC, A> where NC: hyper::net::NetworkC
         for &field in ["alt", "project", "taskqueue", "getStats"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -827,7 +887,7 @@ impl<'a, C, NC, A> TaskqueueGetCall<'a, C, NC, A> where NC: hyper::net::NetworkC
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -839,7 +899,6 @@ impl<'a, C, NC, A> TaskqueueGetCall<'a, C, NC, A> where NC: hyper::net::NetworkC
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -849,7 +908,7 @@ impl<'a, C, NC, A> TaskqueueGetCall<'a, C, NC, A> where NC: hyper::net::NetworkC
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -860,7 +919,7 @@ impl<'a, C, NC, A> TaskqueueGetCall<'a, C, NC, A> where NC: hyper::net::NetworkC
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -869,13 +928,13 @@ impl<'a, C, NC, A> TaskqueueGetCall<'a, C, NC, A> where NC: hyper::net::NetworkC
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -887,7 +946,7 @@ impl<'a, C, NC, A> TaskqueueGetCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The project under which the queue lies.    
+    /// The project under which the queue lies.
     pub fn project(mut self, new_value: &str) -> TaskqueueGetCall<'a, C, NC, A> {
         self._project = new_value.to_string();
         self
@@ -897,7 +956,7 @@ impl<'a, C, NC, A> TaskqueueGetCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The id of the taskqueue to get the properties of.    
+    /// The id of the taskqueue to get the properties of.
     pub fn taskqueue(mut self, new_value: &str) -> TaskqueueGetCall<'a, C, NC, A> {
         self._taskqueue = new_value.to_string();
         self
@@ -905,7 +964,7 @@ impl<'a, C, NC, A> TaskqueueGetCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// Sets the *get stats* query property to the given value.
     ///
     /// 
-    /// Whether to get stats. Optional.    
+    /// Whether to get stats. Optional.
     pub fn get_stats(mut self, new_value: bool) -> TaskqueueGetCall<'a, C, NC, A> {
         self._get_stats = Some(new_value);
         self
@@ -966,7 +1025,7 @@ impl<'a, C, NC, A> TaskqueueGetCall<'a, C, NC, A> where NC: hyper::net::NetworkC
 /// Lease 1 or more tasks from a TaskQueue.
 ///
 /// A builder for the *lease* method supported by a *task* resource.
-/// It is not used directly, but through a `TaskMethods`.
+/// It is not used directly, but through a `TaskMethods` instance.
 ///
 /// # Example
 ///
@@ -1040,7 +1099,7 @@ impl<'a, C, NC, A> TaskLeaseCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
         for &field in ["alt", "project", "taskqueue", "numTasks", "leaseSecs", "tag", "groupByTag"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -1093,7 +1152,7 @@ impl<'a, C, NC, A> TaskLeaseCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -1105,7 +1164,6 @@ impl<'a, C, NC, A> TaskLeaseCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -1115,7 +1173,7 @@ impl<'a, C, NC, A> TaskLeaseCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -1126,7 +1184,7 @@ impl<'a, C, NC, A> TaskLeaseCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -1135,13 +1193,13 @@ impl<'a, C, NC, A> TaskLeaseCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -1153,7 +1211,7 @@ impl<'a, C, NC, A> TaskLeaseCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The project under which the queue lies.    
+    /// The project under which the queue lies.
     pub fn project(mut self, new_value: &str) -> TaskLeaseCall<'a, C, NC, A> {
         self._project = new_value.to_string();
         self
@@ -1163,7 +1221,7 @@ impl<'a, C, NC, A> TaskLeaseCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The taskqueue to lease a task from.    
+    /// The taskqueue to lease a task from.
     pub fn taskqueue(mut self, new_value: &str) -> TaskLeaseCall<'a, C, NC, A> {
         self._taskqueue = new_value.to_string();
         self
@@ -1173,7 +1231,7 @@ impl<'a, C, NC, A> TaskLeaseCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The number of tasks to lease.    
+    /// The number of tasks to lease.
     pub fn num_tasks(mut self, new_value: i32) -> TaskLeaseCall<'a, C, NC, A> {
         self._num_tasks = new_value;
         self
@@ -1183,7 +1241,7 @@ impl<'a, C, NC, A> TaskLeaseCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The lease in seconds.    
+    /// The lease in seconds.
     pub fn lease_secs(mut self, new_value: i32) -> TaskLeaseCall<'a, C, NC, A> {
         self._lease_secs = new_value;
         self
@@ -1191,7 +1249,7 @@ impl<'a, C, NC, A> TaskLeaseCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     /// Sets the *tag* query property to the given value.
     ///
     /// 
-    /// The tag allowed for tasks in the response. Must only be specified if group_by_tag is true. If group_by_tag is true and tag is not specified the tag will be that of the oldest task by eta, i.e. the first available tag    
+    /// The tag allowed for tasks in the response. Must only be specified if group_by_tag is true. If group_by_tag is true and tag is not specified the tag will be that of the oldest task by eta, i.e. the first available tag
     pub fn tag(mut self, new_value: &str) -> TaskLeaseCall<'a, C, NC, A> {
         self._tag = Some(new_value.to_string());
         self
@@ -1199,7 +1257,7 @@ impl<'a, C, NC, A> TaskLeaseCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     /// Sets the *group by tag* query property to the given value.
     ///
     /// 
-    /// When true, all returned tasks will have the same tag    
+    /// When true, all returned tasks will have the same tag
     pub fn group_by_tag(mut self, new_value: bool) -> TaskLeaseCall<'a, C, NC, A> {
         self._group_by_tag = Some(new_value);
         self
@@ -1260,7 +1318,7 @@ impl<'a, C, NC, A> TaskLeaseCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
 /// Insert a new task in a TaskQueue
 ///
 /// A builder for the *insert* method supported by a *task* resource.
-/// It is not used directly, but through a `TaskMethods`.
+/// It is not used directly, but through a `TaskMethods` instance.
 ///
 /// # Example
 ///
@@ -1327,7 +1385,7 @@ impl<'a, C, NC, A> TaskInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
         for &field in ["alt", "project", "taskqueue"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -1384,7 +1442,7 @@ impl<'a, C, NC, A> TaskInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -1400,7 +1458,6 @@ impl<'a, C, NC, A> TaskInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -1410,7 +1467,7 @@ impl<'a, C, NC, A> TaskInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -1421,7 +1478,7 @@ impl<'a, C, NC, A> TaskInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -1430,13 +1487,13 @@ impl<'a, C, NC, A> TaskInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -1457,7 +1514,7 @@ impl<'a, C, NC, A> TaskInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The project under which the queue lies    
+    /// The project under which the queue lies
     pub fn project(mut self, new_value: &str) -> TaskInsertCall<'a, C, NC, A> {
         self._project = new_value.to_string();
         self
@@ -1467,7 +1524,7 @@ impl<'a, C, NC, A> TaskInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The taskqueue to insert the task into    
+    /// The taskqueue to insert the task into
     pub fn taskqueue(mut self, new_value: &str) -> TaskInsertCall<'a, C, NC, A> {
         self._taskqueue = new_value.to_string();
         self
@@ -1528,7 +1585,7 @@ impl<'a, C, NC, A> TaskInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
 /// Delete a task from a TaskQueue.
 ///
 /// A builder for the *delete* method supported by a *task* resource.
-/// It is not used directly, but through a `TaskMethods`.
+/// It is not used directly, but through a `TaskMethods` instance.
 ///
 /// # Example
 ///
@@ -1590,7 +1647,7 @@ impl<'a, C, NC, A> TaskDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
         for &field in ["project", "taskqueue", "task"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -1642,7 +1699,7 @@ impl<'a, C, NC, A> TaskDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -1654,7 +1711,6 @@ impl<'a, C, NC, A> TaskDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -1664,7 +1720,7 @@ impl<'a, C, NC, A> TaskDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -1675,12 +1731,12 @@ impl<'a, C, NC, A> TaskDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = res;
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -1692,7 +1748,7 @@ impl<'a, C, NC, A> TaskDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The project under which the queue lies.    
+    /// The project under which the queue lies.
     pub fn project(mut self, new_value: &str) -> TaskDeleteCall<'a, C, NC, A> {
         self._project = new_value.to_string();
         self
@@ -1702,7 +1758,7 @@ impl<'a, C, NC, A> TaskDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The taskqueue to delete a task from.    
+    /// The taskqueue to delete a task from.
     pub fn taskqueue(mut self, new_value: &str) -> TaskDeleteCall<'a, C, NC, A> {
         self._taskqueue = new_value.to_string();
         self
@@ -1712,7 +1768,7 @@ impl<'a, C, NC, A> TaskDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The id of the task to delete.    
+    /// The id of the task to delete.
     pub fn task(mut self, new_value: &str) -> TaskDeleteCall<'a, C, NC, A> {
         self._task = new_value.to_string();
         self
@@ -1773,7 +1829,7 @@ impl<'a, C, NC, A> TaskDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
 /// Update tasks that are leased out of a TaskQueue. This method supports patch semantics.
 ///
 /// A builder for the *patch* method supported by a *task* resource.
-/// It is not used directly, but through a `TaskMethods`.
+/// It is not used directly, but through a `TaskMethods` instance.
 ///
 /// # Example
 ///
@@ -1844,7 +1900,7 @@ impl<'a, C, NC, A> TaskPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
         for &field in ["alt", "project", "taskqueue", "task", "newLeaseSeconds"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -1901,7 +1957,7 @@ impl<'a, C, NC, A> TaskPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -1917,7 +1973,6 @@ impl<'a, C, NC, A> TaskPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -1927,7 +1982,7 @@ impl<'a, C, NC, A> TaskPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -1938,7 +1993,7 @@ impl<'a, C, NC, A> TaskPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -1947,13 +2002,13 @@ impl<'a, C, NC, A> TaskPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -1974,7 +2029,7 @@ impl<'a, C, NC, A> TaskPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The project under which the queue lies.    
+    /// The project under which the queue lies.
     pub fn project(mut self, new_value: &str) -> TaskPatchCall<'a, C, NC, A> {
         self._project = new_value.to_string();
         self
@@ -2002,7 +2057,7 @@ impl<'a, C, NC, A> TaskPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The new lease in seconds.    
+    /// The new lease in seconds.
     pub fn new_lease_seconds(mut self, new_value: i32) -> TaskPatchCall<'a, C, NC, A> {
         self._new_lease_seconds = new_value;
         self
@@ -2063,7 +2118,7 @@ impl<'a, C, NC, A> TaskPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
 /// List Tasks in a TaskQueue
 ///
 /// A builder for the *list* method supported by a *task* resource.
-/// It is not used directly, but through a `TaskMethods`.
+/// It is not used directly, but through a `TaskMethods` instance.
 ///
 /// # Example
 ///
@@ -2123,7 +2178,7 @@ impl<'a, C, NC, A> TaskListCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
         for &field in ["alt", "project", "taskqueue"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -2176,7 +2231,7 @@ impl<'a, C, NC, A> TaskListCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -2188,7 +2243,6 @@ impl<'a, C, NC, A> TaskListCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -2198,7 +2252,7 @@ impl<'a, C, NC, A> TaskListCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -2209,7 +2263,7 @@ impl<'a, C, NC, A> TaskListCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -2218,13 +2272,13 @@ impl<'a, C, NC, A> TaskListCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -2236,7 +2290,7 @@ impl<'a, C, NC, A> TaskListCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The project under which the queue lies.    
+    /// The project under which the queue lies.
     pub fn project(mut self, new_value: &str) -> TaskListCall<'a, C, NC, A> {
         self._project = new_value.to_string();
         self
@@ -2246,7 +2300,7 @@ impl<'a, C, NC, A> TaskListCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The id of the taskqueue to list tasks from.    
+    /// The id of the taskqueue to list tasks from.
     pub fn taskqueue(mut self, new_value: &str) -> TaskListCall<'a, C, NC, A> {
         self._taskqueue = new_value.to_string();
         self
@@ -2307,7 +2361,7 @@ impl<'a, C, NC, A> TaskListCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
 /// Get a particular task from a TaskQueue.
 ///
 /// A builder for the *get* method supported by a *task* resource.
-/// It is not used directly, but through a `TaskMethods`.
+/// It is not used directly, but through a `TaskMethods` instance.
 ///
 /// # Example
 ///
@@ -2369,7 +2423,7 @@ impl<'a, C, NC, A> TaskGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnec
         for &field in ["alt", "project", "taskqueue", "task"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -2422,7 +2476,7 @@ impl<'a, C, NC, A> TaskGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnec
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -2434,7 +2488,6 @@ impl<'a, C, NC, A> TaskGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnec
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -2444,7 +2497,7 @@ impl<'a, C, NC, A> TaskGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnec
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -2455,7 +2508,7 @@ impl<'a, C, NC, A> TaskGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnec
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -2464,13 +2517,13 @@ impl<'a, C, NC, A> TaskGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnec
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -2482,7 +2535,7 @@ impl<'a, C, NC, A> TaskGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnec
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The project under which the queue lies.    
+    /// The project under which the queue lies.
     pub fn project(mut self, new_value: &str) -> TaskGetCall<'a, C, NC, A> {
         self._project = new_value.to_string();
         self
@@ -2492,7 +2545,7 @@ impl<'a, C, NC, A> TaskGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnec
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The taskqueue in which the task belongs.    
+    /// The taskqueue in which the task belongs.
     pub fn taskqueue(mut self, new_value: &str) -> TaskGetCall<'a, C, NC, A> {
         self._taskqueue = new_value.to_string();
         self
@@ -2502,7 +2555,7 @@ impl<'a, C, NC, A> TaskGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnec
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The task to get properties of.    
+    /// The task to get properties of.
     pub fn task(mut self, new_value: &str) -> TaskGetCall<'a, C, NC, A> {
         self._task = new_value.to_string();
         self
@@ -2563,7 +2616,7 @@ impl<'a, C, NC, A> TaskGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnec
 /// Update tasks that are leased out of a TaskQueue.
 ///
 /// A builder for the *update* method supported by a *task* resource.
-/// It is not used directly, but through a `TaskMethods`.
+/// It is not used directly, but through a `TaskMethods` instance.
 ///
 /// # Example
 ///
@@ -2634,7 +2687,7 @@ impl<'a, C, NC, A> TaskUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
         for &field in ["alt", "project", "taskqueue", "task", "newLeaseSeconds"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -2691,7 +2744,7 @@ impl<'a, C, NC, A> TaskUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -2707,7 +2760,6 @@ impl<'a, C, NC, A> TaskUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -2717,7 +2769,7 @@ impl<'a, C, NC, A> TaskUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -2728,7 +2780,7 @@ impl<'a, C, NC, A> TaskUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -2737,13 +2789,13 @@ impl<'a, C, NC, A> TaskUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -2764,7 +2816,7 @@ impl<'a, C, NC, A> TaskUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The project under which the queue lies.    
+    /// The project under which the queue lies.
     pub fn project(mut self, new_value: &str) -> TaskUpdateCall<'a, C, NC, A> {
         self._project = new_value.to_string();
         self
@@ -2792,7 +2844,7 @@ impl<'a, C, NC, A> TaskUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The new lease in seconds.    
+    /// The new lease in seconds.
     pub fn new_lease_seconds(mut self, new_value: i32) -> TaskUpdateCall<'a, C, NC, A> {
         self._new_lease_seconds = new_value;
         self

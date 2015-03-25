@@ -1,8 +1,8 @@
 // DO NOT EDIT !
-// This file was generated automatically from 'src/mako/lib.rs.mako'
+// This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *datastore* crate version *0.1.1+20140916*, where *20140916* is the exact revision of the *datastore:v1beta2* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.1*.
+//! This documentation was generated from *datastore* crate version *0.1.2+20140916*, where *20140916* is the exact revision of the *datastore:v1beta2* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.2*.
 //! 
 //! Everything else about the *datastore* *v1_beta2* API can be found at the
 //! [official documentation site](https://developers.google.com/datastore/).
@@ -25,6 +25,8 @@
 //! 
 //! * **[Hub](struct.Datastore.html)**
 //!     * a central object to maintain state and allow accessing all *Activities*
+//!     * creates [*Method Builders*](trait.MethodsBuilder.html) which in turn
+//!       allow access to individual [*Call Builders*](trait.CallBuilder.html)
 //! * **[Resources](trait.Resource.html)**
 //!     * primary types that you can apply *Activities* to
 //!     * a collection of properties and *Parts*
@@ -33,6 +35,8 @@
 //!         * never directly used in *Activities*
 //! * **[Activities](trait.CallBuilder.html)**
 //!     * operations to apply to *Resources*
+//! 
+//! All *structures* are marked with applicable traits to further categorize them and ease browsing.
 //! 
 //! Generally speaking, you can invoke *Activities* like this:
 //! 
@@ -69,7 +73,7 @@
 //! extern crate "yup-oauth2" as oauth2;
 //! extern crate "google-datastore1_beta2" as datastore1_beta2;
 //! use datastore1_beta2::LookupRequest;
-//! use datastore1_beta2::Result;
+//! use datastore1_beta2::{Result, Error};
 //! # #[test] fn egal() {
 //! use std::default::Default;
 //! use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -99,15 +103,17 @@
 //!              .doit();
 //! 
 //! match result {
-//!     Result::HttpError(err) => println!("HTTPERROR: {:?}", err),
-//!     Result::MissingAPIKey => println!("Auth: Missing API Key - used if there are no scopes"),
-//!     Result::MissingToken => println!("OAuth2: Missing Token"),
-//!     Result::Cancelled => println!("Operation cancelled by user"),
-//!     Result::UploadSizeLimitExceeded(size, max_size) => println!("Upload size too big: {} of {}", size, max_size),
-//!     Result::Failure(_) => println!("General Failure (hyper::client::Response doesn't print)"),
-//!     Result::FieldClash(clashed_field) => println!("You added custom parameter which is part of builder: {:?}", clashed_field),
-//!     Result::JsonDecodeError(err) => println!("Couldn't understand server reply - maybe API needs update: {:?}", err),
-//!     Result::Success(_) => println!("Success (value doesn't print)"),
+//!     Err(e) => match e {
+//!         Error::HttpError(err) => println!("HTTPERROR: {:?}", err),
+//!         Error::MissingAPIKey => println!("Auth: Missing API Key - used if there are no scopes"),
+//!         Error::MissingToken => println!("OAuth2: Missing Token"),
+//!         Error::Cancelled => println!("Operation canceled by user"),
+//!         Error::UploadSizeLimitExceeded(size, max_size) => println!("Upload size too big: {} of {}", size, max_size),
+//!         Error::Failure(_) => println!("General Failure (hyper::client::Response doesn't print)"),
+//!         Error::FieldClash(clashed_field) => println!("You added custom parameter which is part of builder: {:?}", clashed_field),
+//!         Error::JsonDecodeError(err) => println!("Couldn't understand server reply - maybe API needs update: {:?}", err),
+//!     },
+//!     Ok(_) => println!("Success (value doesn't print)"),
 //! }
 //! # }
 //! ```
@@ -120,7 +126,7 @@
 //! When delegates handle errors or intermediate values, they may have a chance to instruct the system to retry. This 
 //! makes the system potentially resilient to all kinds of errors.
 //! 
-//! ## Uploads and Downlods
+//! ## Uploads and Downloads
 //! If a method supports downloads, the response body, which is part of the [Result](enum.Result.html), should be
 //! read by you to obtain the media.
 //! If such a method also supports a [Response Result](trait.ResponseResult.html), it will return that by default.
@@ -143,8 +149,9 @@
 //! ## Optional Parts in Server-Requests
 //! 
 //! All structures provided by this library are made to be [enocodable](trait.RequestValue.html) and 
-//! [decodable](trait.ResponseResult.html) via json. Optionals are used to indicate that partial requests are responses are valid.
-//! Most optionals are are considered [Parts](trait.Part.html) which are identifyable by name, which will be sent to 
+//! [decodable](trait.ResponseResult.html) via *json*. Optionals are used to indicate that partial requests are responses 
+//! are valid.
+//! Most optionals are are considered [Parts](trait.Part.html) which are identifiable by name, which will be sent to 
 //! the server to indicate either the set parts of the request or the desired parts in the response.
 //! 
 //! ## Builder Arguments
@@ -193,7 +200,7 @@ use std::io;
 use std::fs;
 use std::thread::sleep;
 
-pub use cmn::{MultiPartReader, ToParts, MethodInfo, Result, CallBuilder, Hub, ReadSeek, Part, ResponseResult, RequestValue, NestedType, Delegate, DefaultDelegate, ResourceMethodsBuilder, Resource, JsonServerError};
+pub use cmn::{MultiPartReader, ToParts, MethodInfo, Result, Error, CallBuilder, Hub, ReadSeek, Part, ResponseResult, RequestValue, NestedType, Delegate, DefaultDelegate, MethodsBuilder, Resource, JsonServerError};
 
 
 // ##############
@@ -248,7 +255,7 @@ impl Default for Scope {
 /// extern crate "yup-oauth2" as oauth2;
 /// extern crate "google-datastore1_beta2" as datastore1_beta2;
 /// use datastore1_beta2::LookupRequest;
-/// use datastore1_beta2::Result;
+/// use datastore1_beta2::{Result, Error};
 /// # #[test] fn egal() {
 /// use std::default::Default;
 /// use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -278,15 +285,17 @@ impl Default for Scope {
 ///              .doit();
 /// 
 /// match result {
-///     Result::HttpError(err) => println!("HTTPERROR: {:?}", err),
-///     Result::MissingAPIKey => println!("Auth: Missing API Key - used if there are no scopes"),
-///     Result::MissingToken => println!("OAuth2: Missing Token"),
-///     Result::Cancelled => println!("Operation cancelled by user"),
-///     Result::UploadSizeLimitExceeded(size, max_size) => println!("Upload size too big: {} of {}", size, max_size),
-///     Result::Failure(_) => println!("General Failure (hyper::client::Response doesn't print)"),
-///     Result::FieldClash(clashed_field) => println!("You added custom parameter which is part of builder: {:?}", clashed_field),
-///     Result::JsonDecodeError(err) => println!("Couldn't understand server reply - maybe API needs update: {:?}", err),
-///     Result::Success(_) => println!("Success (value doesn't print)"),
+///     Err(e) => match e {
+///         Error::HttpError(err) => println!("HTTPERROR: {:?}", err),
+///         Error::MissingAPIKey => println!("Auth: Missing API Key - used if there are no scopes"),
+///         Error::MissingToken => println!("OAuth2: Missing Token"),
+///         Error::Cancelled => println!("Operation canceled by user"),
+///         Error::UploadSizeLimitExceeded(size, max_size) => println!("Upload size too big: {} of {}", size, max_size),
+///         Error::Failure(_) => println!("General Failure (hyper::client::Response doesn't print)"),
+///         Error::FieldClash(clashed_field) => println!("You added custom parameter which is part of builder: {:?}", clashed_field),
+///         Error::JsonDecodeError(err) => println!("Couldn't understand server reply - maybe API needs update: {:?}", err),
+///     },
+///     Ok(_) => println!("Success (value doesn't print)"),
 /// }
 /// # }
 /// ```
@@ -307,7 +316,7 @@ impl<'a, C, NC, A> Datastore<C, NC, A>
         Datastore {
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/0.1.1".to_string(),
+            _user_agent: "google-api-rust-client/0.1.2".to_string(),
             _m: PhantomData
         }
     }
@@ -317,7 +326,7 @@ impl<'a, C, NC, A> Datastore<C, NC, A>
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/0.1.1`.
+    /// It defaults to `google-api-rust-client/0.1.2`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -339,9 +348,9 @@ impl<'a, C, NC, A> Datastore<C, NC, A>
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct PartitionId {
-    /// The namespace.    
+    /// The namespace.
     pub namespace: String,
-    /// The dataset ID.    
+    /// The dataset ID.
     #[serde(alias="datasetId")]
     pub dataset_id: String,
 }
@@ -360,9 +369,9 @@ impl Part for PartitionId {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct AllocateIdsResponse {
-    /// The keys specified in the request (in the same order), each with its key path completed with a newly allocated ID.    
+    /// The keys specified in the request (in the same order), each with its key path completed with a newly allocated ID.
     pub keys: Vec<Key>,
-    /// no description provided    
+    /// no description provided
     pub header: ResponseHeader,
 }
 
@@ -380,9 +389,9 @@ impl ResponseResult for AllocateIdsResponse {}
 /// 
 #[derive(Default, Clone, Debug, Serialize)]
 pub struct LookupRequest {
-    /// Keys of entities to look up from the datastore.    
+    /// Keys of entities to look up from the datastore.
     pub keys: Option<Vec<Key>>,
-    /// Options for this lookup request. Optional.    
+    /// Options for this lookup request. Optional.
     #[serde(alias="readOptions")]
     pub read_options: Option<ReadOptions>,
 }
@@ -401,9 +410,9 @@ impl RequestValue for LookupRequest {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct BeginTransactionResponse {
-    /// no description provided    
+    /// no description provided
     pub header: ResponseHeader,
-    /// The transaction identifier (always present).    
+    /// The transaction identifier (always present).
     pub transaction: String,
 }
 
@@ -421,7 +430,7 @@ impl ResponseResult for BeginTransactionResponse {}
 /// 
 #[derive(Default, Clone, Debug, Serialize)]
 pub struct AllocateIdsRequest {
-    /// A list of keys with incomplete key paths to allocate IDs for. No key may be reserved/read-only.    
+    /// A list of keys with incomplete key paths to allocate IDs for. No key may be reserved/read-only.
     pub keys: Option<Vec<Key>>,
 }
 
@@ -439,9 +448,9 @@ impl RequestValue for AllocateIdsRequest {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct RunQueryResponse {
-    /// no description provided    
+    /// no description provided
     pub header: ResponseHeader,
-    /// A batch of query results (always present).    
+    /// A batch of query results (always present).
     pub batch: QueryResultBatch,
 }
 
@@ -454,18 +463,18 @@ impl ResponseResult for RunQueryResponse {}
 /// 
 #[derive(Default, Clone, Debug, Serialize)]
 pub struct Mutation {
-    /// Entities to insert. Each inserted entity's key must have a complete path and must not be reserved/read-only.    
+    /// Entities to insert. Each inserted entity's key must have a complete path and must not be reserved/read-only.
     pub insert: Vec<Entity>,
-    /// Ignore a user specified read-only period. Optional.    
+    /// Ignore a user specified read-only period. Optional.
     pub force: bool,
-    /// Insert entities with a newly allocated ID. Each inserted entity's key must omit the final identifier in its path and must not be reserved/read-only.    
+    /// Insert entities with a newly allocated ID. Each inserted entity's key must omit the final identifier in its path and must not be reserved/read-only.
     #[serde(alias="insertAutoId")]
     pub insert_auto_id: Vec<Entity>,
-    /// Keys of entities to delete. Each key must have a complete key path and must not be reserved/read-only.    
+    /// Keys of entities to delete. Each key must have a complete key path and must not be reserved/read-only.
     pub delete: Vec<Key>,
-    /// Entities to update. Each updated entity's key must have a complete path and must not be reserved/read-only.    
+    /// Entities to update. Each updated entity's key must have a complete path and must not be reserved/read-only.
     pub update: Vec<Entity>,
-    /// Entities to upsert. Each upserted entity's key must have a complete path and must not be reserved/read-only.    
+    /// Entities to upsert. Each upserted entity's key must have a complete path and must not be reserved/read-only.
     pub upsert: Vec<Entity>,
 }
 
@@ -483,9 +492,9 @@ impl Part for Mutation {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct CommitResponse {
-    /// no description provided    
+    /// no description provided
     pub header: ResponseHeader,
-    /// The result of performing the mutation (if any).    
+    /// The result of performing the mutation (if any).
     #[serde(alias="mutationResult")]
     pub mutation_result: MutationResult,
 }
@@ -499,19 +508,19 @@ impl ResponseResult for CommitResponse {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct QueryResultBatch {
-    /// The state of the query after the current batch. One of notFinished, moreResultsAfterLimit, noMoreResults.    
+    /// The state of the query after the current batch. One of notFinished, moreResultsAfterLimit, noMoreResults.
     #[serde(alias="moreResults")]
     pub more_results: String,
-    /// The number of results skipped because of Query.offset.    
+    /// The number of results skipped because of Query.offset.
     #[serde(alias="skippedResults")]
     pub skipped_results: i32,
-    /// A cursor that points to the position after the last result in the batch. May be absent. TODO(arfuller): Once all plans produce cursors update documentation here.    
+    /// A cursor that points to the position after the last result in the batch. May be absent. TODO(arfuller): Once all plans produce cursors update documentation here.
     #[serde(alias="endCursor")]
     pub end_cursor: String,
-    /// The results for this batch.    
+    /// The results for this batch.
     #[serde(alias="entityResults")]
     pub entity_results: Vec<EntityResult>,
-    /// The result type for every entity in entityResults. full for full entities, projection for entities with only projected properties, keyOnly for entities with only a key.    
+    /// The result type for every entity in entityResults. full for full entities, projection for entities with only projected properties, keyOnly for entities with only a key.
     #[serde(alias="entityResultType")]
     pub entity_result_type: String,
 }
@@ -525,7 +534,7 @@ impl Part for QueryResultBatch {}
 /// 
 #[derive(Default, Clone, Debug, Serialize)]
 pub struct PropertyReference {
-    /// The name of the property.    
+    /// The name of the property.
     pub name: String,
 }
 
@@ -538,7 +547,7 @@ impl Part for PropertyReference {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct EntityResult {
-    /// The resulting entity.    
+    /// The resulting entity.
     pub entity: Entity,
 }
 
@@ -556,7 +565,7 @@ impl Part for EntityResult {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct RollbackResponse {
-    /// no description provided    
+    /// no description provided
     pub header: ResponseHeader,
 }
 
@@ -569,16 +578,16 @@ impl ResponseResult for RollbackResponse {}
 /// 
 #[derive(Default, Clone, Debug, Serialize)]
 pub struct GqlQuery {
-    /// When false, the query string must not contain a literal.    
+    /// When false, the query string must not contain a literal.
     #[serde(alias="allowLiteral")]
     pub allow_literal: bool,
-    /// A named argument must set field GqlQueryArg.name. No two named arguments may have the same name. For each non-reserved named binding site in the query string, there must be a named argument with that name, but not necessarily the inverse.    
+    /// A named argument must set field GqlQueryArg.name. No two named arguments may have the same name. For each non-reserved named binding site in the query string, there must be a named argument with that name, but not necessarily the inverse.
     #[serde(alias="nameArgs")]
     pub name_args: Vec<GqlQueryArg>,
-    /// The query string.    
+    /// The query string.
     #[serde(alias="queryString")]
     pub query_string: String,
-    /// Numbered binding site @1 references the first numbered argument, effectively using 1-based indexing, rather than the usual 0. A numbered argument must NOT set field GqlQueryArg.name. For each binding site numbered i in query_string, there must be an ith numbered argument. The inverse must also be true.    
+    /// Numbered binding site @1 references the first numbered argument, effectively using 1-based indexing, rather than the usual 0. A numbered argument must NOT set field GqlQueryArg.name. For each binding site numbered i in query_string, there must be an ith numbered argument. The inverse must also be true.
     #[serde(alias="numberArgs")]
     pub number_args: Vec<GqlQueryArg>,
 }
@@ -592,9 +601,9 @@ impl Part for GqlQuery {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Key {
-    /// The entity path. An entity path consists of one or more elements composed of a kind and a string or numerical identifier, which identify entities. The first element identifies a root entity, the second element identifies a child of the root entity, the third element a child of the second entity, and so forth. The entities identified by all prefixes of the path are called the element's ancestors. An entity path is always fully complete: ALL of the entity's ancestors are required to be in the path along with the entity identifier itself. The only exception is that in some documented cases, the identifier in the last path element (for the entity) itself may be omitted. A path can never be empty. The path can have at most 100 elements.    
+    /// The entity path. An entity path consists of one or more elements composed of a kind and a string or numerical identifier, which identify entities. The first element identifies a root entity, the second element identifies a child of the root entity, the third element a child of the second entity, and so forth. The entities identified by all prefixes of the path are called the element's ancestors. An entity path is always fully complete: ALL of the entity's ancestors are required to be in the path along with the entity identifier itself. The only exception is that in some documented cases, the identifier in the last path element (for the entity) itself may be omitted. A path can never be empty. The path can have at most 100 elements.
     pub path: Vec<KeyPathElement>,
-    /// Entities are partitioned into subsets, currently identified by a dataset (usually implicitly specified by the project) and namespace ID. Queries are scoped to a single partition.    
+    /// Entities are partitioned into subsets, currently identified by a dataset (usually implicitly specified by the project) and namespace ID. Queries are scoped to a single partition.
     #[serde(alias="partitionId")]
     pub partition_id: PartitionId,
 }
@@ -608,10 +617,10 @@ impl Part for Key {}
 /// 
 #[derive(Default, Clone, Debug, Serialize)]
 pub struct PropertyExpression {
-    /// The aggregation function to apply to the property. Optional. Can only be used when grouping by at least one property. Must then be set on all properties in the projection that are not being grouped by. Aggregation functions: first selects the first result as determined by the query's order.    
+    /// The aggregation function to apply to the property. Optional. Can only be used when grouping by at least one property. Must then be set on all properties in the projection that are not being grouped by. Aggregation functions: first selects the first result as determined by the query's order.
     #[serde(alias="aggregationFunction")]
     pub aggregation_function: String,
-    /// The property to project.    
+    /// The property to project.
     pub property: PropertyReference,
 }
 
@@ -624,10 +633,10 @@ impl Part for PropertyExpression {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct MutationResult {
-    /// Keys for insertAutoId entities. One per entity from the request, in the same order.    
+    /// Keys for insertAutoId entities. One per entity from the request, in the same order.
     #[serde(alias="insertAutoIdKeys")]
     pub insert_auto_id_keys: Vec<Key>,
-    /// Number of index writes.    
+    /// Number of index writes.
     #[serde(alias="indexUpdates")]
     pub index_updates: i32,
 }
@@ -641,9 +650,9 @@ impl Part for MutationResult {}
 /// 
 #[derive(Default, Clone, Debug, Serialize)]
 pub struct ReadOptions {
-    /// The transaction to use. Optional.    
+    /// The transaction to use. Optional.
     pub transaction: String,
-    /// The read consistency to use. One of default, strong, or eventual. Cannot be set when transaction is set. Lookup and ancestor queries default to strong, global queries default to eventual and cannot be set to strong. Optional. Default is default.    
+    /// The read consistency to use. One of default, strong, or eventual. Cannot be set when transaction is set. Lookup and ancestor queries default to strong, global queries default to eventual and cannot be set to strong. Optional. Default is default.
     #[serde(alias="readConsistency")]
     pub read_consistency: String,
 }
@@ -657,11 +666,11 @@ impl Part for ReadOptions {}
 /// 
 #[derive(Default, Clone, Debug, Serialize)]
 pub struct PropertyFilter {
-    /// The operator to filter by. One of lessThan, lessThanOrEqual, greaterThan, greaterThanOrEqual, equal, or hasAncestor.    
+    /// The operator to filter by. One of lessThan, lessThanOrEqual, greaterThan, greaterThanOrEqual, equal, or hasAncestor.
     pub operator: String,
-    /// The property to filter by.    
+    /// The property to filter by.
     pub property: PropertyReference,
-    /// The value to compare the property to.    
+    /// The value to compare the property to.
     pub value: Value,
 }
 
@@ -674,7 +683,7 @@ impl Part for PropertyFilter {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct ResponseHeader {
-    /// Identifies what kind of resource this is. Value: the fixed string "datastore#responseHeader".    
+    /// Identifies what kind of resource this is. Value: the fixed string "datastore#responseHeader".
     pub kind: String,
 }
 
@@ -687,40 +696,40 @@ impl Part for ResponseHeader {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Value {
-    /// An entity value. May have no key. May have a key with an incomplete key path. May have a reserved/read-only key.    
+    /// An entity value. May have no key. May have a key with an incomplete key path. May have a reserved/read-only key.
     #[serde(alias="entityValue")]
     pub entity_value: Entity,
-    /// A double value.    
+    /// A double value.
     #[serde(alias="doubleValue")]
     pub double_value: f64,
-    /// A blob key value.    
+    /// A blob key value.
     #[serde(alias="blobKeyValue")]
     pub blob_key_value: String,
-    /// The meaning field is reserved and should not be used.    
+    /// The meaning field is reserved and should not be used.
     pub meaning: i32,
-    /// A timestamp value.    
+    /// A timestamp value.
     #[serde(alias="dateTimeValue")]
     pub date_time_value: String,
-    /// A key value.    
+    /// A key value.
     #[serde(alias="keyValue")]
     pub key_value: Key,
-    /// A blob value. May be a maximum of 1,000,000 bytes.    
+    /// A blob value. May be a maximum of 1,000,000 bytes.
     #[serde(alias="blobValue")]
     pub blob_value: String,
     /// If the value should be indexed.
     /// 
     /// The indexed property may be set for a null value. When indexed is true, stringValue is limited to 500 characters and the blob value is limited to 500 bytes. Input values by default have indexed set to true; however, you can explicitly set indexed to true if you want. (An output value never has indexed explicitly set to true.) If a value is itself an entity, it cannot have indexed set to true.
     pub indexed: bool,
-    /// A UTF-8 encoded string value.    
+    /// A UTF-8 encoded string value.
     #[serde(alias="stringValue")]
     pub string_value: String,
-    /// A list value. Cannot contain another list value. Cannot also have a meaning and indexing set.    
+    /// A list value. Cannot contain another list value. Cannot also have a meaning and indexing set.
     #[serde(alias="listValue")]
     pub list_value: Vec<Value>,
-    /// A boolean value.    
+    /// A boolean value.
     #[serde(alias="booleanValue")]
     pub boolean_value: bool,
-    /// An integer value.    
+    /// An integer value.
     #[serde(alias="integerValue")]
     pub integer_value: String,
 }
@@ -734,10 +743,10 @@ impl Part for Value {}
 /// 
 #[derive(Default, Clone, Debug, Serialize)]
 pub struct Filter {
-    /// A composite filter.    
+    /// A composite filter.
     #[serde(alias="compositeFilter")]
     pub composite_filter: CompositeFilter,
-    /// A filter on a property.    
+    /// A filter on a property.
     #[serde(alias="propertyFilter")]
     pub property_filter: PropertyFilter,
 }
@@ -753,11 +762,11 @@ impl Part for Filter {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct KeyPathElement {
-    /// The kind of the entity. A kind matching regex "__.*__" is reserved/read-only. A kind must not contain more than 500 characters. Cannot be "".    
+    /// The kind of the entity. A kind matching regex "__.*__" is reserved/read-only. A kind must not contain more than 500 characters. Cannot be "".
     pub kind: String,
-    /// The ID of the entity. Never equal to zero. Values less than zero are discouraged and will not be supported in the future.    
+    /// The ID of the entity. Never equal to zero. Values less than zero are discouraged and will not be supported in the future.
     pub id: String,
-    /// The name of the entity. A name matching regex "__.*__" is reserved/read-only. A name must not be more than 500 characters. Cannot be "".    
+    /// The name of the entity. A name matching regex "__.*__" is reserved/read-only. A name must not be more than 500 characters. Cannot be "".
     pub name: String,
 }
 
@@ -770,40 +779,40 @@ impl Part for KeyPathElement {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Property {
-    /// An entity value. May have no key. May have a key with an incomplete key path. May have a reserved/read-only key.    
+    /// An entity value. May have no key. May have a key with an incomplete key path. May have a reserved/read-only key.
     #[serde(alias="entityValue")]
     pub entity_value: Entity,
-    /// A double value.    
+    /// A double value.
     #[serde(alias="doubleValue")]
     pub double_value: f64,
-    /// A blob key value.    
+    /// A blob key value.
     #[serde(alias="blobKeyValue")]
     pub blob_key_value: String,
-    /// The meaning field is reserved and should not be used.    
+    /// The meaning field is reserved and should not be used.
     pub meaning: i32,
-    /// A timestamp value.    
+    /// A timestamp value.
     #[serde(alias="dateTimeValue")]
     pub date_time_value: String,
-    /// A key value.    
+    /// A key value.
     #[serde(alias="keyValue")]
     pub key_value: Key,
-    /// A blob value. May be a maximum of 1,000,000 bytes.    
+    /// A blob value. May be a maximum of 1,000,000 bytes.
     #[serde(alias="blobValue")]
     pub blob_value: String,
     /// If the value should be indexed.
     /// 
     /// The indexed property may be set for a null value. When indexed is true, stringValue is limited to 500 characters and the blob value is limited to 500 bytes. Input values by default have indexed set to true; however, you can explicitly set indexed to true if you want. (An output value never has indexed explicitly set to true.) If a value is itself an entity, it cannot have indexed set to true.
     pub indexed: bool,
-    /// A UTF-8 encoded string value.    
+    /// A UTF-8 encoded string value.
     #[serde(alias="stringValue")]
     pub string_value: String,
-    /// A list value. Cannot contain another list value. Cannot also have a meaning and indexing set.    
+    /// A list value. Cannot contain another list value. Cannot also have a meaning and indexing set.
     #[serde(alias="listValue")]
     pub list_value: Vec<Value>,
-    /// A boolean value.    
+    /// A boolean value.
     #[serde(alias="booleanValue")]
     pub boolean_value: bool,
-    /// An integer value.    
+    /// An integer value.
     #[serde(alias="integerValue")]
     pub integer_value: String,
 }
@@ -822,13 +831,13 @@ impl Part for Property {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct LookupResponse {
-    /// Entities found.    
+    /// Entities found.
     pub found: Vec<EntityResult>,
-    /// no description provided    
+    /// no description provided
     pub header: ResponseHeader,
-    /// A list of keys that were not looked up due to resource constraints.    
+    /// A list of keys that were not looked up due to resource constraints.
     pub deferred: Vec<Key>,
-    /// Entities not found, with only the key populated.    
+    /// Entities not found, with only the key populated.
     pub missing: Vec<EntityResult>,
 }
 
@@ -841,9 +850,9 @@ impl ResponseResult for LookupResponse {}
 /// 
 #[derive(Default, Clone, Debug, Serialize)]
 pub struct CompositeFilter {
-    /// The operator for combining multiple filters. Only "and" is currently supported.    
+    /// The operator for combining multiple filters. Only "and" is currently supported.
     pub operator: String,
-    /// The list of filters to combine. Must contain at least one filter.    
+    /// The list of filters to combine. Must contain at least one filter.
     pub filters: Vec<Filter>,
 }
 
@@ -861,14 +870,14 @@ impl Part for CompositeFilter {}
 /// 
 #[derive(Default, Clone, Debug, Serialize)]
 pub struct CommitRequest {
-    /// no description provided    
+    /// no description provided
     #[serde(alias="ignoreReadOnly")]
     pub ignore_read_only: Option<bool>,
-    /// The transaction identifier, returned by a call to beginTransaction. Must be set when mode is TRANSACTIONAL.    
+    /// The transaction identifier, returned by a call to beginTransaction. Must be set when mode is TRANSACTIONAL.
     pub transaction: Option<String>,
-    /// The type of commit to perform. Either TRANSACTIONAL or NON_TRANSACTIONAL.    
+    /// The type of commit to perform. Either TRANSACTIONAL or NON_TRANSACTIONAL.
     pub mode: Option<String>,
-    /// The mutation to perform. Optional.    
+    /// The mutation to perform. Optional.
     pub mutation: Option<Mutation>,
 }
 
@@ -886,15 +895,15 @@ impl RequestValue for CommitRequest {}
 /// 
 #[derive(Default, Clone, Debug, Serialize)]
 pub struct RunQueryRequest {
-    /// The query to run. Either this field or field gql_query must be set, but not both.    
+    /// The query to run. Either this field or field gql_query must be set, but not both.
     pub query: Option<Query>,
-    /// Entities are partitioned into subsets, identified by a dataset (usually implicitly specified by the project) and namespace ID. Queries are scoped to a single partition. This partition ID is normalized with the standard default context partition ID, but all other partition IDs in RunQueryRequest are normalized with this partition ID as the context partition ID.    
+    /// Entities are partitioned into subsets, identified by a dataset (usually implicitly specified by the project) and namespace ID. Queries are scoped to a single partition. This partition ID is normalized with the standard default context partition ID, but all other partition IDs in RunQueryRequest are normalized with this partition ID as the context partition ID.
     #[serde(alias="partitionId")]
     pub partition_id: Option<PartitionId>,
-    /// The GQL query to run. Either this field or field query must be set, but not both.    
+    /// The GQL query to run. Either this field or field query must be set, but not both.
     #[serde(alias="gqlQuery")]
     pub gql_query: Option<GqlQuery>,
-    /// The options for this query.    
+    /// The options for this query.
     #[serde(alias="readOptions")]
     pub read_options: Option<ReadOptions>,
 }
@@ -908,7 +917,7 @@ impl RequestValue for RunQueryRequest {}
 /// 
 #[derive(Default, Clone, Debug, Serialize)]
 pub struct KindExpression {
-    /// The name of the kind.    
+    /// The name of the kind.
     pub name: String,
 }
 
@@ -921,11 +930,11 @@ impl Part for KindExpression {}
 /// 
 #[derive(Default, Clone, Debug, Serialize)]
 pub struct GqlQueryArg {
-    /// no description provided    
+    /// no description provided
     pub cursor: String,
-    /// Must match regex "[A-Za-z_$][A-Za-z_$0-9]*". Must not match regex "__.*__". Must not be "".    
+    /// Must match regex "[A-Za-z_$][A-Za-z_$0-9]*". Must not match regex "__.*__". Must not be "".
     pub name: String,
-    /// no description provided    
+    /// no description provided
     pub value: Value,
 }
 
@@ -938,7 +947,7 @@ impl Part for GqlQueryArg {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Entity {
-    /// The entity's properties.    
+    /// The entity's properties.
     pub properties: HashMap<String, Property>,
     /// The entity's key.
     /// 
@@ -960,7 +969,7 @@ impl Part for Entity {}
 /// 
 #[derive(Default, Clone, Debug, Serialize)]
 pub struct RollbackRequest {
-    /// The transaction identifier, returned by a call to beginTransaction.    
+    /// The transaction identifier, returned by a call to beginTransaction.
     pub transaction: Option<String>,
 }
 
@@ -978,7 +987,7 @@ impl RequestValue for RollbackRequest {}
 /// 
 #[derive(Default, Clone, Debug, Serialize)]
 pub struct BeginTransactionRequest {
-    /// The transaction isolation level. Either snapshot or serializable. The default isolation level is snapshot isolation, which means that another transaction may not concurrently modify the data that is modified by this transaction. Optionally, a transaction can request to be made serializable which means that another transaction cannot concurrently modify the data that is read or modified by this transaction.    
+    /// The transaction isolation level. Either snapshot or serializable. The default isolation level is snapshot isolation, which means that another transaction may not concurrently modify the data that is modified by this transaction. Optionally, a transaction can request to be made serializable which means that another transaction cannot concurrently modify the data that is read or modified by this transaction.
     #[serde(alias="isolationLevel")]
     pub isolation_level: Option<String>,
 }
@@ -992,9 +1001,9 @@ impl RequestValue for BeginTransactionRequest {}
 /// 
 #[derive(Default, Clone, Debug, Serialize)]
 pub struct PropertyOrder {
-    /// The direction to order by. One of ascending or descending. Optional, defaults to ascending.    
+    /// The direction to order by. One of ascending or descending. Optional, defaults to ascending.
     pub direction: String,
-    /// The property to order by.    
+    /// The property to order by.
     pub property: PropertyReference,
 }
 
@@ -1007,26 +1016,26 @@ impl Part for PropertyOrder {}
 /// 
 #[derive(Default, Clone, Debug, Serialize)]
 pub struct Query {
-    /// A starting point for the query results. Optional. Query cursors are returned in query result batches.    
+    /// A starting point for the query results. Optional. Query cursors are returned in query result batches.
     #[serde(alias="startCursor")]
     pub start_cursor: String,
-    /// The kinds to query (if empty, returns entities from all kinds).    
+    /// The kinds to query (if empty, returns entities from all kinds).
     pub kinds: Vec<KindExpression>,
-    /// The projection to return. If not set the entire entity is returned.    
+    /// The projection to return. If not set the entire entity is returned.
     pub projection: Vec<PropertyExpression>,
-    /// The properties to group by (if empty, no grouping is applied to the result set).    
+    /// The properties to group by (if empty, no grouping is applied to the result set).
     #[serde(alias="groupBy")]
     pub group_by: Vec<PropertyReference>,
-    /// The filter to apply (optional).    
+    /// The filter to apply (optional).
     pub filter: Filter,
-    /// The maximum number of results to return. Applies after all other constraints. Optional.    
+    /// The maximum number of results to return. Applies after all other constraints. Optional.
     pub limit: i32,
-    /// The number of results to skip. Applies before limit, but after all other constraints (optional, defaults to 0).    
+    /// The number of results to skip. Applies before limit, but after all other constraints (optional, defaults to 0).
     pub offset: i32,
-    /// An ending point for the query results. Optional. Query cursors are returned in query result batches.    
+    /// An ending point for the query results. Optional. Query cursors are returned in query result batches.
     #[serde(alias="endCursor")]
     pub end_cursor: String,
-    /// The order to apply to the query results (if empty, order is unspecified).    
+    /// The order to apply to the query results (if empty, order is unspecified).
     pub order: Vec<PropertyOrder>,
 }
 
@@ -1072,13 +1081,18 @@ pub struct DatasetMethods<'a, C, NC, A>
     hub: &'a Datastore<C, NC, A>,
 }
 
-impl<'a, C, NC, A> ResourceMethodsBuilder for DatasetMethods<'a, C, NC, A> {}
+impl<'a, C, NC, A> MethodsBuilder for DatasetMethods<'a, C, NC, A> {}
 
 impl<'a, C, NC, A> DatasetMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Commit a transaction, optionally creating, deleting or modifying some entities.    
+    /// Commit a transaction, optionally creating, deleting or modifying some entities.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `datasetId` - Identifies the dataset.
     pub fn commit(&self, request: &CommitRequest, dataset_id: &str) -> DatasetCommitCall<'a, C, NC, A> {
         DatasetCommitCall {
             hub: self.hub,
@@ -1092,7 +1106,12 @@ impl<'a, C, NC, A> DatasetMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Allocate IDs for incomplete keys (useful for referencing an entity before it is inserted).    
+    /// Allocate IDs for incomplete keys (useful for referencing an entity before it is inserted).
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `datasetId` - Identifies the dataset.
     pub fn allocate_ids(&self, request: &AllocateIdsRequest, dataset_id: &str) -> DatasetAllocateIdCall<'a, C, NC, A> {
         DatasetAllocateIdCall {
             hub: self.hub,
@@ -1106,7 +1125,12 @@ impl<'a, C, NC, A> DatasetMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Roll back a transaction.    
+    /// Roll back a transaction.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `datasetId` - Identifies the dataset.
     pub fn rollback(&self, request: &RollbackRequest, dataset_id: &str) -> DatasetRollbackCall<'a, C, NC, A> {
         DatasetRollbackCall {
             hub: self.hub,
@@ -1120,7 +1144,12 @@ impl<'a, C, NC, A> DatasetMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Look up some entities by key.    
+    /// Look up some entities by key.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `datasetId` - Identifies the dataset.
     pub fn lookup(&self, request: &LookupRequest, dataset_id: &str) -> DatasetLookupCall<'a, C, NC, A> {
         DatasetLookupCall {
             hub: self.hub,
@@ -1134,7 +1163,12 @@ impl<'a, C, NC, A> DatasetMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Query for entities.    
+    /// Query for entities.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `datasetId` - Identifies the dataset.
     pub fn run_query(&self, request: &RunQueryRequest, dataset_id: &str) -> DatasetRunQueryCall<'a, C, NC, A> {
         DatasetRunQueryCall {
             hub: self.hub,
@@ -1148,7 +1182,12 @@ impl<'a, C, NC, A> DatasetMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Begin a new transaction.    
+    /// Begin a new transaction.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `datasetId` - Identifies the dataset.
     pub fn begin_transaction(&self, request: &BeginTransactionRequest, dataset_id: &str) -> DatasetBeginTransactionCall<'a, C, NC, A> {
         DatasetBeginTransactionCall {
             hub: self.hub,
@@ -1172,7 +1211,7 @@ impl<'a, C, NC, A> DatasetMethods<'a, C, NC, A> {
 /// Commit a transaction, optionally creating, deleting or modifying some entities.
 ///
 /// A builder for the *commit* method supported by a *dataset* resource.
-/// It is not used directly, but through a `DatasetMethods`.
+/// It is not used directly, but through a `DatasetMethods` instance.
 ///
 /// # Example
 ///
@@ -1237,7 +1276,7 @@ impl<'a, C, NC, A> DatasetCommitCall<'a, C, NC, A> where NC: hyper::net::Network
         for &field in ["alt", "datasetId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -1294,7 +1333,7 @@ impl<'a, C, NC, A> DatasetCommitCall<'a, C, NC, A> where NC: hyper::net::Network
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -1310,7 +1349,6 @@ impl<'a, C, NC, A> DatasetCommitCall<'a, C, NC, A> where NC: hyper::net::Network
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -1320,7 +1358,7 @@ impl<'a, C, NC, A> DatasetCommitCall<'a, C, NC, A> where NC: hyper::net::Network
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -1331,7 +1369,7 @@ impl<'a, C, NC, A> DatasetCommitCall<'a, C, NC, A> where NC: hyper::net::Network
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -1340,13 +1378,13 @@ impl<'a, C, NC, A> DatasetCommitCall<'a, C, NC, A> where NC: hyper::net::Network
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -1367,7 +1405,7 @@ impl<'a, C, NC, A> DatasetCommitCall<'a, C, NC, A> where NC: hyper::net::Network
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Identifies the dataset.    
+    /// Identifies the dataset.
     pub fn dataset_id(mut self, new_value: &str) -> DatasetCommitCall<'a, C, NC, A> {
         self._dataset_id = new_value.to_string();
         self
@@ -1428,7 +1466,7 @@ impl<'a, C, NC, A> DatasetCommitCall<'a, C, NC, A> where NC: hyper::net::Network
 /// Allocate IDs for incomplete keys (useful for referencing an entity before it is inserted).
 ///
 /// A builder for the *allocateIds* method supported by a *dataset* resource.
-/// It is not used directly, but through a `DatasetMethods`.
+/// It is not used directly, but through a `DatasetMethods` instance.
 ///
 /// # Example
 ///
@@ -1493,7 +1531,7 @@ impl<'a, C, NC, A> DatasetAllocateIdCall<'a, C, NC, A> where NC: hyper::net::Net
         for &field in ["alt", "datasetId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -1550,7 +1588,7 @@ impl<'a, C, NC, A> DatasetAllocateIdCall<'a, C, NC, A> where NC: hyper::net::Net
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -1566,7 +1604,6 @@ impl<'a, C, NC, A> DatasetAllocateIdCall<'a, C, NC, A> where NC: hyper::net::Net
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -1576,7 +1613,7 @@ impl<'a, C, NC, A> DatasetAllocateIdCall<'a, C, NC, A> where NC: hyper::net::Net
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -1587,7 +1624,7 @@ impl<'a, C, NC, A> DatasetAllocateIdCall<'a, C, NC, A> where NC: hyper::net::Net
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -1596,13 +1633,13 @@ impl<'a, C, NC, A> DatasetAllocateIdCall<'a, C, NC, A> where NC: hyper::net::Net
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -1623,7 +1660,7 @@ impl<'a, C, NC, A> DatasetAllocateIdCall<'a, C, NC, A> where NC: hyper::net::Net
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Identifies the dataset.    
+    /// Identifies the dataset.
     pub fn dataset_id(mut self, new_value: &str) -> DatasetAllocateIdCall<'a, C, NC, A> {
         self._dataset_id = new_value.to_string();
         self
@@ -1684,7 +1721,7 @@ impl<'a, C, NC, A> DatasetAllocateIdCall<'a, C, NC, A> where NC: hyper::net::Net
 /// Roll back a transaction.
 ///
 /// A builder for the *rollback* method supported by a *dataset* resource.
-/// It is not used directly, but through a `DatasetMethods`.
+/// It is not used directly, but through a `DatasetMethods` instance.
 ///
 /// # Example
 ///
@@ -1749,7 +1786,7 @@ impl<'a, C, NC, A> DatasetRollbackCall<'a, C, NC, A> where NC: hyper::net::Netwo
         for &field in ["alt", "datasetId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -1806,7 +1843,7 @@ impl<'a, C, NC, A> DatasetRollbackCall<'a, C, NC, A> where NC: hyper::net::Netwo
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -1822,7 +1859,6 @@ impl<'a, C, NC, A> DatasetRollbackCall<'a, C, NC, A> where NC: hyper::net::Netwo
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -1832,7 +1868,7 @@ impl<'a, C, NC, A> DatasetRollbackCall<'a, C, NC, A> where NC: hyper::net::Netwo
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -1843,7 +1879,7 @@ impl<'a, C, NC, A> DatasetRollbackCall<'a, C, NC, A> where NC: hyper::net::Netwo
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -1852,13 +1888,13 @@ impl<'a, C, NC, A> DatasetRollbackCall<'a, C, NC, A> where NC: hyper::net::Netwo
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -1879,7 +1915,7 @@ impl<'a, C, NC, A> DatasetRollbackCall<'a, C, NC, A> where NC: hyper::net::Netwo
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Identifies the dataset.    
+    /// Identifies the dataset.
     pub fn dataset_id(mut self, new_value: &str) -> DatasetRollbackCall<'a, C, NC, A> {
         self._dataset_id = new_value.to_string();
         self
@@ -1940,7 +1976,7 @@ impl<'a, C, NC, A> DatasetRollbackCall<'a, C, NC, A> where NC: hyper::net::Netwo
 /// Look up some entities by key.
 ///
 /// A builder for the *lookup* method supported by a *dataset* resource.
-/// It is not used directly, but through a `DatasetMethods`.
+/// It is not used directly, but through a `DatasetMethods` instance.
 ///
 /// # Example
 ///
@@ -2005,7 +2041,7 @@ impl<'a, C, NC, A> DatasetLookupCall<'a, C, NC, A> where NC: hyper::net::Network
         for &field in ["alt", "datasetId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -2062,7 +2098,7 @@ impl<'a, C, NC, A> DatasetLookupCall<'a, C, NC, A> where NC: hyper::net::Network
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -2078,7 +2114,6 @@ impl<'a, C, NC, A> DatasetLookupCall<'a, C, NC, A> where NC: hyper::net::Network
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -2088,7 +2123,7 @@ impl<'a, C, NC, A> DatasetLookupCall<'a, C, NC, A> where NC: hyper::net::Network
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -2099,7 +2134,7 @@ impl<'a, C, NC, A> DatasetLookupCall<'a, C, NC, A> where NC: hyper::net::Network
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -2108,13 +2143,13 @@ impl<'a, C, NC, A> DatasetLookupCall<'a, C, NC, A> where NC: hyper::net::Network
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -2135,7 +2170,7 @@ impl<'a, C, NC, A> DatasetLookupCall<'a, C, NC, A> where NC: hyper::net::Network
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Identifies the dataset.    
+    /// Identifies the dataset.
     pub fn dataset_id(mut self, new_value: &str) -> DatasetLookupCall<'a, C, NC, A> {
         self._dataset_id = new_value.to_string();
         self
@@ -2196,7 +2231,7 @@ impl<'a, C, NC, A> DatasetLookupCall<'a, C, NC, A> where NC: hyper::net::Network
 /// Query for entities.
 ///
 /// A builder for the *runQuery* method supported by a *dataset* resource.
-/// It is not used directly, but through a `DatasetMethods`.
+/// It is not used directly, but through a `DatasetMethods` instance.
 ///
 /// # Example
 ///
@@ -2261,7 +2296,7 @@ impl<'a, C, NC, A> DatasetRunQueryCall<'a, C, NC, A> where NC: hyper::net::Netwo
         for &field in ["alt", "datasetId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -2318,7 +2353,7 @@ impl<'a, C, NC, A> DatasetRunQueryCall<'a, C, NC, A> where NC: hyper::net::Netwo
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -2334,7 +2369,6 @@ impl<'a, C, NC, A> DatasetRunQueryCall<'a, C, NC, A> where NC: hyper::net::Netwo
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -2344,7 +2378,7 @@ impl<'a, C, NC, A> DatasetRunQueryCall<'a, C, NC, A> where NC: hyper::net::Netwo
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -2355,7 +2389,7 @@ impl<'a, C, NC, A> DatasetRunQueryCall<'a, C, NC, A> where NC: hyper::net::Netwo
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -2364,13 +2398,13 @@ impl<'a, C, NC, A> DatasetRunQueryCall<'a, C, NC, A> where NC: hyper::net::Netwo
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -2391,7 +2425,7 @@ impl<'a, C, NC, A> DatasetRunQueryCall<'a, C, NC, A> where NC: hyper::net::Netwo
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Identifies the dataset.    
+    /// Identifies the dataset.
     pub fn dataset_id(mut self, new_value: &str) -> DatasetRunQueryCall<'a, C, NC, A> {
         self._dataset_id = new_value.to_string();
         self
@@ -2452,7 +2486,7 @@ impl<'a, C, NC, A> DatasetRunQueryCall<'a, C, NC, A> where NC: hyper::net::Netwo
 /// Begin a new transaction.
 ///
 /// A builder for the *beginTransaction* method supported by a *dataset* resource.
-/// It is not used directly, but through a `DatasetMethods`.
+/// It is not used directly, but through a `DatasetMethods` instance.
 ///
 /// # Example
 ///
@@ -2517,7 +2551,7 @@ impl<'a, C, NC, A> DatasetBeginTransactionCall<'a, C, NC, A> where NC: hyper::ne
         for &field in ["alt", "datasetId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -2574,7 +2608,7 @@ impl<'a, C, NC, A> DatasetBeginTransactionCall<'a, C, NC, A> where NC: hyper::ne
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -2590,7 +2624,6 @@ impl<'a, C, NC, A> DatasetBeginTransactionCall<'a, C, NC, A> where NC: hyper::ne
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -2600,7 +2633,7 @@ impl<'a, C, NC, A> DatasetBeginTransactionCall<'a, C, NC, A> where NC: hyper::ne
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -2611,7 +2644,7 @@ impl<'a, C, NC, A> DatasetBeginTransactionCall<'a, C, NC, A> where NC: hyper::ne
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -2620,13 +2653,13 @@ impl<'a, C, NC, A> DatasetBeginTransactionCall<'a, C, NC, A> where NC: hyper::ne
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -2647,7 +2680,7 @@ impl<'a, C, NC, A> DatasetBeginTransactionCall<'a, C, NC, A> where NC: hyper::ne
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Identifies the dataset.    
+    /// Identifies the dataset.
     pub fn dataset_id(mut self, new_value: &str) -> DatasetBeginTransactionCall<'a, C, NC, A> {
         self._dataset_id = new_value.to_string();
         self

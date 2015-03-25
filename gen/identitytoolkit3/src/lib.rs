@@ -1,8 +1,8 @@
 // DO NOT EDIT !
-// This file was generated automatically from 'src/mako/lib.rs.mako'
+// This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *Identity Toolkit* crate version *0.1.1+20141009*, where *20141009* is the exact revision of the *identitytoolkit:v3* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.1*.
+//! This documentation was generated from *Identity Toolkit* crate version *0.1.2+20141009*, where *20141009* is the exact revision of the *identitytoolkit:v3* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.2*.
 //! 
 //! Everything else about the *Identity Toolkit* *v3* API can be found at the
 //! [official documentation site](https://developers.google.com/identity-toolkit/v3/).
@@ -25,6 +25,8 @@
 //! 
 //! * **[Hub](struct.IdentityToolkit.html)**
 //!     * a central object to maintain state and allow accessing all *Activities*
+//!     * creates [*Method Builders*](trait.MethodsBuilder.html) which in turn
+//!       allow access to individual [*Call Builders*](trait.CallBuilder.html)
 //! * **[Resources](trait.Resource.html)**
 //!     * primary types that you can apply *Activities* to
 //!     * a collection of properties and *Parts*
@@ -33,6 +35,8 @@
 //!         * never directly used in *Activities*
 //! * **[Activities](trait.CallBuilder.html)**
 //!     * operations to apply to *Resources*
+//! 
+//! All *structures* are marked with applicable traits to further categorize them and ease browsing.
 //! 
 //! Generally speaking, you can invoke *Activities* like this:
 //! 
@@ -69,7 +73,7 @@
 //! extern crate "yup-oauth2" as oauth2;
 //! extern crate "google-identitytoolkit3" as identitytoolkit3;
 //! use identitytoolkit3::IdentitytoolkitRelyingpartyVerifyAssertionRequest;
-//! use identitytoolkit3::Result;
+//! use identitytoolkit3::{Result, Error};
 //! # #[test] fn egal() {
 //! use std::default::Default;
 //! use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -99,15 +103,17 @@
 //!              .doit();
 //! 
 //! match result {
-//!     Result::HttpError(err) => println!("HTTPERROR: {:?}", err),
-//!     Result::MissingAPIKey => println!("Auth: Missing API Key - used if there are no scopes"),
-//!     Result::MissingToken => println!("OAuth2: Missing Token"),
-//!     Result::Cancelled => println!("Operation cancelled by user"),
-//!     Result::UploadSizeLimitExceeded(size, max_size) => println!("Upload size too big: {} of {}", size, max_size),
-//!     Result::Failure(_) => println!("General Failure (hyper::client::Response doesn't print)"),
-//!     Result::FieldClash(clashed_field) => println!("You added custom parameter which is part of builder: {:?}", clashed_field),
-//!     Result::JsonDecodeError(err) => println!("Couldn't understand server reply - maybe API needs update: {:?}", err),
-//!     Result::Success(_) => println!("Success (value doesn't print)"),
+//!     Err(e) => match e {
+//!         Error::HttpError(err) => println!("HTTPERROR: {:?}", err),
+//!         Error::MissingAPIKey => println!("Auth: Missing API Key - used if there are no scopes"),
+//!         Error::MissingToken => println!("OAuth2: Missing Token"),
+//!         Error::Cancelled => println!("Operation canceled by user"),
+//!         Error::UploadSizeLimitExceeded(size, max_size) => println!("Upload size too big: {} of {}", size, max_size),
+//!         Error::Failure(_) => println!("General Failure (hyper::client::Response doesn't print)"),
+//!         Error::FieldClash(clashed_field) => println!("You added custom parameter which is part of builder: {:?}", clashed_field),
+//!         Error::JsonDecodeError(err) => println!("Couldn't understand server reply - maybe API needs update: {:?}", err),
+//!     },
+//!     Ok(_) => println!("Success (value doesn't print)"),
 //! }
 //! # }
 //! ```
@@ -120,7 +126,7 @@
 //! When delegates handle errors or intermediate values, they may have a chance to instruct the system to retry. This 
 //! makes the system potentially resilient to all kinds of errors.
 //! 
-//! ## Uploads and Downlods
+//! ## Uploads and Downloads
 //! If a method supports downloads, the response body, which is part of the [Result](enum.Result.html), should be
 //! read by you to obtain the media.
 //! If such a method also supports a [Response Result](trait.ResponseResult.html), it will return that by default.
@@ -143,8 +149,9 @@
 //! ## Optional Parts in Server-Requests
 //! 
 //! All structures provided by this library are made to be [enocodable](trait.RequestValue.html) and 
-//! [decodable](trait.ResponseResult.html) via json. Optionals are used to indicate that partial requests are responses are valid.
-//! Most optionals are are considered [Parts](trait.Part.html) which are identifyable by name, which will be sent to 
+//! [decodable](trait.ResponseResult.html) via *json*. Optionals are used to indicate that partial requests are responses 
+//! are valid.
+//! Most optionals are are considered [Parts](trait.Part.html) which are identifiable by name, which will be sent to 
 //! the server to indicate either the set parts of the request or the desired parts in the response.
 //! 
 //! ## Builder Arguments
@@ -193,7 +200,7 @@ use std::io;
 use std::fs;
 use std::thread::sleep;
 
-pub use cmn::{MultiPartReader, ToParts, MethodInfo, Result, CallBuilder, Hub, ReadSeek, Part, ResponseResult, RequestValue, NestedType, Delegate, DefaultDelegate, ResourceMethodsBuilder, Resource, JsonServerError};
+pub use cmn::{MultiPartReader, ToParts, MethodInfo, Result, Error, CallBuilder, Hub, ReadSeek, Part, ResponseResult, RequestValue, NestedType, Delegate, DefaultDelegate, MethodsBuilder, Resource, JsonServerError};
 
 
 // ##############
@@ -218,7 +225,7 @@ pub use cmn::{MultiPartReader, ToParts, MethodInfo, Result, CallBuilder, Hub, Re
 /// extern crate "yup-oauth2" as oauth2;
 /// extern crate "google-identitytoolkit3" as identitytoolkit3;
 /// use identitytoolkit3::IdentitytoolkitRelyingpartyVerifyAssertionRequest;
-/// use identitytoolkit3::Result;
+/// use identitytoolkit3::{Result, Error};
 /// # #[test] fn egal() {
 /// use std::default::Default;
 /// use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -248,15 +255,17 @@ pub use cmn::{MultiPartReader, ToParts, MethodInfo, Result, CallBuilder, Hub, Re
 ///              .doit();
 /// 
 /// match result {
-///     Result::HttpError(err) => println!("HTTPERROR: {:?}", err),
-///     Result::MissingAPIKey => println!("Auth: Missing API Key - used if there are no scopes"),
-///     Result::MissingToken => println!("OAuth2: Missing Token"),
-///     Result::Cancelled => println!("Operation cancelled by user"),
-///     Result::UploadSizeLimitExceeded(size, max_size) => println!("Upload size too big: {} of {}", size, max_size),
-///     Result::Failure(_) => println!("General Failure (hyper::client::Response doesn't print)"),
-///     Result::FieldClash(clashed_field) => println!("You added custom parameter which is part of builder: {:?}", clashed_field),
-///     Result::JsonDecodeError(err) => println!("Couldn't understand server reply - maybe API needs update: {:?}", err),
-///     Result::Success(_) => println!("Success (value doesn't print)"),
+///     Err(e) => match e {
+///         Error::HttpError(err) => println!("HTTPERROR: {:?}", err),
+///         Error::MissingAPIKey => println!("Auth: Missing API Key - used if there are no scopes"),
+///         Error::MissingToken => println!("OAuth2: Missing Token"),
+///         Error::Cancelled => println!("Operation canceled by user"),
+///         Error::UploadSizeLimitExceeded(size, max_size) => println!("Upload size too big: {} of {}", size, max_size),
+///         Error::Failure(_) => println!("General Failure (hyper::client::Response doesn't print)"),
+///         Error::FieldClash(clashed_field) => println!("You added custom parameter which is part of builder: {:?}", clashed_field),
+///         Error::JsonDecodeError(err) => println!("Couldn't understand server reply - maybe API needs update: {:?}", err),
+///     },
+///     Ok(_) => println!("Success (value doesn't print)"),
 /// }
 /// # }
 /// ```
@@ -277,7 +286,7 @@ impl<'a, C, NC, A> IdentityToolkit<C, NC, A>
         IdentityToolkit {
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/0.1.1".to_string(),
+            _user_agent: "google-api-rust-client/0.1.2".to_string(),
             _m: PhantomData
         }
     }
@@ -287,7 +296,7 @@ impl<'a, C, NC, A> IdentityToolkit<C, NC, A>
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/0.1.1`.
+    /// It defaults to `google-api-rust-client/0.1.2`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -312,25 +321,25 @@ impl<'a, C, NC, A> IdentityToolkit<C, NC, A>
 /// 
 #[derive(Default, Clone, Debug, Serialize)]
 pub struct Relyingparty {
-    /// The fixed string "identitytoolkit#relyingparty".    
+    /// The fixed string "identitytoolkit#relyingparty".
     pub kind: Option<String>,
-    /// The request type.    
+    /// The request type.
     #[serde(alias="requestType")]
     pub request_type: Option<String>,
-    /// The user's Gitkit login token for email change.    
+    /// The user's Gitkit login token for email change.
     #[serde(alias="idToken")]
     pub id_token: Option<String>,
-    /// The recaptcha challenge presented to the user.    
+    /// The recaptcha challenge presented to the user.
     pub challenge: Option<String>,
-    /// The new email if the code is for email change.    
+    /// The new email if the code is for email change.
     #[serde(alias="newEmail")]
     pub new_email: Option<String>,
-    /// The IP address of the user.    
+    /// The IP address of the user.
     #[serde(alias="userIp")]
     pub user_ip: Option<String>,
-    /// The email of the user.    
+    /// The email of the user.
     pub email: Option<String>,
-    /// The recaptcha response from the user.    
+    /// The recaptcha response from the user.
     #[serde(alias="captchaResp")]
     pub captcha_resp: Option<String>,
 }
@@ -349,20 +358,20 @@ impl RequestValue for Relyingparty {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct CreateAuthUriResponse {
-    /// The fixed string identitytoolkit#CreateAuthUriResponse".    
+    /// The fixed string identitytoolkit#CreateAuthUriResponse".
     pub kind: String,
-    /// True if captcha is required.    
+    /// True if captcha is required.
     #[serde(alias="captchaRequired")]
     pub captcha_required: bool,
-    /// The URI used by the IDP to authenticate the user.    
+    /// The URI used by the IDP to authenticate the user.
     #[serde(alias="authUri")]
     pub auth_uri: String,
-    /// Whether the user is registered if the identifier is an email.    
+    /// Whether the user is registered if the identifier is an email.
     pub registered: bool,
-    /// The provider ID of the auth URI.    
+    /// The provider ID of the auth URI.
     #[serde(alias="providerId")]
     pub provider_id: String,
-    /// True if the authUri is for user's existing provider.    
+    /// True if the authUri is for user's existing provider.
     #[serde(alias="forExistingProvider")]
     pub for_existing_provider: bool,
 }
@@ -381,35 +390,35 @@ impl ResponseResult for CreateAuthUriResponse {}
 /// 
 #[derive(Default, Clone, Debug, Serialize)]
 pub struct IdentitytoolkitRelyingpartySetAccountInfoRequest {
-    /// The name of the user.    
+    /// The name of the user.
     #[serde(alias="displayName")]
     pub display_name: Option<String>,
-    /// The local ID of the user.    
+    /// The local ID of the user.
     #[serde(alias="localId")]
     pub local_id: Option<String>,
-    /// Mark the user to upgrade to federated login.    
+    /// Mark the user to upgrade to federated login.
     #[serde(alias="upgradeToFederatedLogin")]
     pub upgrade_to_federated_login: Option<bool>,
-    /// Response to the captcha.    
+    /// Response to the captcha.
     #[serde(alias="captchaResponse")]
     pub captcha_response: Option<String>,
-    /// The GITKit token of the authenticated user.    
+    /// The GITKit token of the authenticated user.
     #[serde(alias="idToken")]
     pub id_token: Option<String>,
-    /// Mark the email as verified or not.    
+    /// Mark the email as verified or not.
     #[serde(alias="emailVerified")]
     pub email_verified: Option<bool>,
-    /// The captcha challenge.    
+    /// The captcha challenge.
     #[serde(alias="captchaChallenge")]
     pub captcha_challenge: Option<String>,
-    /// The associated IDPs of the user.    
+    /// The associated IDPs of the user.
     pub provider: Option<Vec<String>>,
-    /// The out-of-band code of the change email request.    
+    /// The out-of-band code of the change email request.
     #[serde(alias="oobCode")]
     pub oob_code: Option<String>,
-    /// The new password of the user.    
+    /// The new password of the user.
     pub password: Option<String>,
-    /// The email of the user.    
+    /// The email of the user.
     pub email: Option<String>,
 }
 
@@ -427,7 +436,7 @@ impl RequestValue for IdentitytoolkitRelyingpartySetAccountInfoRequest {}
 /// 
 #[derive(Default, Clone, Debug, Serialize)]
 pub struct IdentitytoolkitRelyingpartyDeleteAccountRequest {
-    /// The local ID of the user.    
+    /// The local ID of the user.
     #[serde(alias="localId")]
     pub local_id: Option<String>,
 }
@@ -446,9 +455,9 @@ impl RequestValue for IdentitytoolkitRelyingpartyDeleteAccountRequest {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct GetOobConfirmationCodeResponse {
-    /// The fixed string "identitytoolkit#GetOobConfirmationCodeResponse".    
+    /// The fixed string "identitytoolkit#GetOobConfirmationCodeResponse".
     pub kind: String,
-    /// The code to be send to the user.    
+    /// The code to be send to the user.
     #[serde(alias="oobCode")]
     pub oob_code: String,
 }
@@ -467,12 +476,12 @@ impl ResponseResult for GetOobConfirmationCodeResponse {}
 /// 
 #[derive(Default, Clone, Debug, Serialize)]
 pub struct IdentitytoolkitRelyingpartyGetAccountInfoRequest {
-    /// The GITKit token of the authenticated user.    
+    /// The GITKit token of the authenticated user.
     #[serde(alias="idToken")]
     pub id_token: Option<String>,
-    /// The list of emails of the users to inquiry.    
+    /// The list of emails of the users to inquiry.
     pub email: Option<Vec<String>>,
-    /// The list of local ID's of the users to inquiry.    
+    /// The list of local ID's of the users to inquiry.
     #[serde(alias="localId")]
     pub local_id: Option<Vec<String>>,
 }
@@ -491,12 +500,12 @@ impl RequestValue for IdentitytoolkitRelyingpartyGetAccountInfoRequest {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct DownloadAccountResponse {
-    /// The next page token. To be used in a subsequent request to return the next page of results.    
+    /// The next page token. To be used in a subsequent request to return the next page of results.
     #[serde(alias="nextPageToken")]
     pub next_page_token: String,
-    /// The fixed string "identitytoolkit#DownloadAccountResponse".    
+    /// The fixed string "identitytoolkit#DownloadAccountResponse".
     pub kind: String,
-    /// The user accounts data.    
+    /// The user accounts data.
     pub users: Vec<UserInfo>,
 }
 
@@ -514,16 +523,16 @@ impl ResponseResult for DownloadAccountResponse {}
 /// 
 #[derive(Default, Clone, Debug, Serialize)]
 pub struct IdentitytoolkitRelyingpartyResetPasswordRequest {
-    /// The new password inputted by the user.    
+    /// The new password inputted by the user.
     #[serde(alias="newPassword")]
     pub new_password: Option<String>,
-    /// The old password inputted by the user.    
+    /// The old password inputted by the user.
     #[serde(alias="oldPassword")]
     pub old_password: Option<String>,
-    /// The confirmation code.    
+    /// The confirmation code.
     #[serde(alias="oobCode")]
     pub oob_code: Option<String>,
-    /// The email address of the user.    
+    /// The email address of the user.
     pub email: Option<String>,
 }
 
@@ -541,80 +550,80 @@ impl RequestValue for IdentitytoolkitRelyingpartyResetPasswordRequest {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct VerifyAssertionResponse {
-    /// The unique ID identifies the IdP account.    
+    /// The unique ID identifies the IdP account.
     #[serde(alias="federatedId")]
     pub federated_id: String,
-    /// The RP local ID if it's already been mapped to the IdP account identified by the federated ID.    
+    /// The RP local ID if it's already been mapped to the IdP account identified by the federated ID.
     #[serde(alias="localId")]
     pub local_id: String,
-    /// The URI of the public accessible profiel picture.    
+    /// The URI of the public accessible profiel picture.
     #[serde(alias="photoUrl")]
     pub photo_url: String,
-    /// It's the identifier param in the createAuthUri request if the identifier is an email. It can be used to check whether the user input email is different from the asserted email.    
+    /// It's the identifier param in the createAuthUri request if the identifier is an email. It can be used to check whether the user input email is different from the asserted email.
     #[serde(alias="inputEmail")]
     pub input_email: String,
-    /// The value is true if the IDP is also the email provider. It means the user owns the email.    
+    /// The value is true if the IDP is also the email provider. It means the user owns the email.
     #[serde(alias="emailVerified")]
     pub email_verified: bool,
-    /// Whether the assertion is from a non-trusted IDP and need account linking confirmation.    
+    /// Whether the assertion is from a non-trusted IDP and need account linking confirmation.
     #[serde(alias="needConfirmation")]
     pub need_confirmation: bool,
-    /// The custom scheme used by mobile app.    
+    /// The custom scheme used by mobile app.
     #[serde(alias="appScheme")]
     pub app_scheme: String,
-    /// The full name of the user.    
+    /// The full name of the user.
     #[serde(alias="fullName")]
     pub full_name: String,
-    /// URL for OTA app installation.    
+    /// URL for OTA app installation.
     #[serde(alias="appInstallationUrl")]
     pub app_installation_url: String,
-    /// The fixed string "identitytoolkit#VerifyAssertionResponse".    
+    /// The fixed string "identitytoolkit#VerifyAssertionResponse".
     pub kind: String,
-    /// The display name of the user.    
+    /// The display name of the user.
     #[serde(alias="displayName")]
     pub display_name: String,
-    /// The first name of the user.    
+    /// The first name of the user.
     #[serde(alias="firstName")]
     pub first_name: String,
-    /// The language preference of the user.    
+    /// The language preference of the user.
     pub language: String,
-    /// The ID token.    
+    /// The ID token.
     #[serde(alias="idToken")]
     pub id_token: String,
-    /// When action is 'map', contains the idps which can be used for confirmation.    
+    /// When action is 'map', contains the idps which can be used for confirmation.
     #[serde(alias="verifiedProvider")]
     pub verified_provider: Vec<String>,
-    /// The scope for the OpenID OAuth extension.    
+    /// The scope for the OpenID OAuth extension.
     #[serde(alias="oauthScope")]
     pub oauth_scope: String,
-    /// The user approved request token for the OpenID OAuth extension.    
+    /// The user approved request token for the OpenID OAuth extension.
     #[serde(alias="oauthRequestToken")]
     pub oauth_request_token: String,
-    /// The birth date of the IdP account.    
+    /// The birth date of the IdP account.
     #[serde(alias="dateOfBirth")]
     pub date_of_birth: String,
-    /// The original email stored in the mapping storage. It's returned when the federated ID is associated to a different email.    
+    /// The original email stored in the mapping storage. It's returned when the federated ID is associated to a different email.
     #[serde(alias="originalEmail")]
     pub original_email: String,
-    /// The IdP ID. For white listed IdPs it's a short domain name e.g. google.com, aol.com, live.net and yahoo.com. If the "providerId" param is set to OpenID OP identifer other than the whilte listed IdPs the OP identifier is returned. If the "identifier" param is federated ID in the createAuthUri request. The domain part of the federated ID is returned.    
+    /// The IdP ID. For white listed IdPs it's a short domain name e.g. google.com, aol.com, live.net and yahoo.com. If the "providerId" param is set to OpenID OP identifer other than the whilte listed IdPs the OP identifier is returned. If the "identifier" param is federated ID in the createAuthUri request. The domain part of the federated ID is returned.
     #[serde(alias="providerId")]
     pub provider_id: String,
-    /// The opaque value used by the client to maintain context info between the authentication request and the IDP callback.    
+    /// The opaque value used by the client to maintain context info between the authentication request and the IDP callback.
     pub context: String,
-    /// The last name of the user.    
+    /// The last name of the user.
     #[serde(alias="lastName")]
     pub last_name: String,
-    /// The action code.    
+    /// The action code.
     pub action: String,
-    /// The timezone of the user.    
+    /// The timezone of the user.
     #[serde(alias="timeZone")]
     pub time_zone: String,
-    /// The nick name of the user.    
+    /// The nick name of the user.
     #[serde(alias="nickName")]
     pub nick_name: String,
-    /// The email returned by the IdP. NOTE: The federated login user may not own the email.    
+    /// The email returned by the IdP. NOTE: The federated login user may not own the email.
     pub email: String,
-    /// It's true if the email is recycled.    
+    /// It's true if the email is recycled.
     #[serde(alias="emailRecycled")]
     pub email_recycled: bool,
 }
@@ -628,9 +637,9 @@ impl ResponseResult for VerifyAssertionResponse {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct UploadAccountResponseError {
-    /// The index of the malformed account, starting from 0.    
+    /// The index of the malformed account, starting from 0.
     pub index: i32,
-    /// Detailed error message for the account info.    
+    /// Detailed error message for the account info.
     pub message: String,
 }
 
@@ -649,9 +658,9 @@ impl Part for UploadAccountResponseError {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct UploadAccountResponse {
-    /// The fixed string "identitytoolkit#UploadAccountResponse".    
+    /// The fixed string "identitytoolkit#UploadAccountResponse".
     pub kind: String,
-    /// The error encountered while processing the account info.    
+    /// The error encountered while processing the account info.
     pub error: Vec<UploadAccountResponseError>,
 }
 
@@ -669,21 +678,21 @@ impl ResponseResult for UploadAccountResponse {}
 /// 
 #[derive(Default, Clone, Debug, Serialize)]
 pub struct IdentitytoolkitRelyingpartyUploadAccountRequest {
-    /// The password hash algorithm.    
+    /// The password hash algorithm.
     #[serde(alias="hashAlgorithm")]
     pub hash_algorithm: Option<String>,
-    /// Memory cost for hash calculation. Used by scrypt similar algorithms.    
+    /// Memory cost for hash calculation. Used by scrypt similar algorithms.
     #[serde(alias="memoryCost")]
     pub memory_cost: Option<i32>,
-    /// The account info to be stored.    
+    /// The account info to be stored.
     pub users: Option<Vec<UserInfo>>,
-    /// The salt separator.    
+    /// The salt separator.
     #[serde(alias="saltSeparator")]
     pub salt_separator: Option<String>,
-    /// The key for to hash the password.    
+    /// The key for to hash the password.
     #[serde(alias="signerKey")]
     pub signer_key: Option<String>,
-    /// Rounds for hash calculation. Used by scrypt and similar algorithms.    
+    /// Rounds for hash calculation. Used by scrypt and similar algorithms.
     pub rounds: Option<i32>,
 }
 
@@ -701,23 +710,23 @@ impl RequestValue for IdentitytoolkitRelyingpartyUploadAccountRequest {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct VerifyPasswordResponse {
-    /// The fixed string "identitytoolkit#VerifyPasswordResponse".    
+    /// The fixed string "identitytoolkit#VerifyPasswordResponse".
     pub kind: String,
-    /// The name of the user.    
+    /// The name of the user.
     #[serde(alias="displayName")]
     pub display_name: String,
-    /// The RP local ID if it's already been mapped to the IdP account identified by the federated ID.    
+    /// The RP local ID if it's already been mapped to the IdP account identified by the federated ID.
     #[serde(alias="localId")]
     pub local_id: String,
-    /// The URI of the user's photo at IdP    
+    /// The URI of the user's photo at IdP
     #[serde(alias="photoUrl")]
     pub photo_url: String,
-    /// The GITKit token for authenticated user.    
+    /// The GITKit token for authenticated user.
     #[serde(alias="idToken")]
     pub id_token: String,
-    /// Whether the email is registered.    
+    /// Whether the email is registered.
     pub registered: bool,
-    /// The email returned by the IdP. NOTE: The federated login user may not own the email.    
+    /// The email returned by the IdP. NOTE: The federated login user may not own the email.
     pub email: String,
 }
 
@@ -735,9 +744,9 @@ impl ResponseResult for VerifyPasswordResponse {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct ResetPasswordResponse {
-    /// The fixed string "identitytoolkit#ResetPasswordResponse".    
+    /// The fixed string "identitytoolkit#ResetPasswordResponse".
     pub kind: String,
-    /// The user's email.    
+    /// The user's email.
     pub email: String,
 }
 
@@ -755,7 +764,7 @@ impl ResponseResult for ResetPasswordResponse {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct DeleteAccountResponse {
-    /// The fixed string "identitytoolkit#DeleteAccountResponse".    
+    /// The fixed string "identitytoolkit#DeleteAccountResponse".
     pub kind: String,
 }
 
@@ -773,27 +782,27 @@ impl ResponseResult for DeleteAccountResponse {}
 /// 
 #[derive(Default, Clone, Debug, Serialize)]
 pub struct IdentitytoolkitRelyingpartyCreateAuthUriRequest {
-    /// Optional realm for OpenID protocol. The sub string "scheme://domain:port" of the param "continueUri" is used if this is not set.    
+    /// Optional realm for OpenID protocol. The sub string "scheme://domain:port" of the param "continueUri" is used if this is not set.
     #[serde(alias="openidRealm")]
     pub openid_realm: Option<String>,
-    /// The relying party OAuth client ID.    
+    /// The relying party OAuth client ID.
     #[serde(alias="clientId")]
     pub client_id: Option<String>,
-    /// The native app package for OTA installation.    
+    /// The native app package for OTA installation.
     #[serde(alias="otaApp")]
     pub ota_app: Option<String>,
-    /// The IdP ID. For white listed IdPs it's a short domain name e.g. google.com, aol.com, live.net and yahoo.com. For other OpenID IdPs it's the OP identifier.    
+    /// The IdP ID. For white listed IdPs it's a short domain name e.g. google.com, aol.com, live.net and yahoo.com. For other OpenID IdPs it's the OP identifier.
     #[serde(alias="providerId")]
     pub provider_id: Option<String>,
-    /// The opaque value used by the client to maintain context info between the authentication request and the IDP callback.    
+    /// The opaque value used by the client to maintain context info between the authentication request and the IDP callback.
     pub context: Option<String>,
-    /// The app ID of the mobile app, base64(CERT_SHA1):PACKAGE_NAME for Android, BUNDLE_ID for iOS.    
+    /// The app ID of the mobile app, base64(CERT_SHA1):PACKAGE_NAME for Android, BUNDLE_ID for iOS.
     #[serde(alias="appId")]
     pub app_id: Option<String>,
-    /// The URI to which the IDP redirects the user after the federated login flow.    
+    /// The URI to which the IDP redirects the user after the federated login flow.
     #[serde(alias="continueUri")]
     pub continue_uri: Option<String>,
-    /// The email or federated ID of the user.    
+    /// The email or federated ID of the user.
     pub identifier: Option<String>,
 }
 
@@ -806,16 +815,16 @@ impl RequestValue for IdentitytoolkitRelyingpartyCreateAuthUriRequest {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct UserInfoProviderUserInfo {
-    /// User's identifier at IDP.    
+    /// User's identifier at IDP.
     #[serde(alias="federatedId")]
     pub federated_id: String,
-    /// The IdP ID. For white listed IdPs it's a short domain name, e.g., google.com, aol.com, live.net and yahoo.com. For other OpenID IdPs it's the OP identifier.    
+    /// The IdP ID. For white listed IdPs it's a short domain name, e.g., google.com, aol.com, live.net and yahoo.com. For other OpenID IdPs it's the OP identifier.
     #[serde(alias="providerId")]
     pub provider_id: String,
-    /// The user's display name at the IDP.    
+    /// The user's display name at the IDP.
     #[serde(alias="displayName")]
     pub display_name: String,
-    /// The user's photo url at the IDP.    
+    /// The user's photo url at the IDP.
     #[serde(alias="photoUrl")]
     pub photo_url: String,
 }
@@ -850,17 +859,17 @@ impl ResponseResult for IdentitytoolkitRelyingpartyGetPublicKeysResponse {}
 /// 
 #[derive(Default, Clone, Debug, Serialize)]
 pub struct IdentitytoolkitRelyingpartyVerifyPasswordRequest {
-    /// Response to the captcha.    
+    /// Response to the captcha.
     #[serde(alias="captchaResponse")]
     pub captcha_response: Option<String>,
-    /// The captcha challenge.    
+    /// The captcha challenge.
     #[serde(alias="captchaChallenge")]
     pub captcha_challenge: Option<String>,
-    /// The password inputed by the user.    
+    /// The password inputed by the user.
     pub password: Option<String>,
-    /// The email of the user.    
+    /// The email of the user.
     pub email: Option<String>,
-    /// The GITKit token for the non-trusted IDP, which is to be confirmed by the user.    
+    /// The GITKit token for the non-trusted IDP, which is to be confirmed by the user.
     #[serde(alias="pendingIdToken")]
     pub pending_id_token: Option<String>,
 }
@@ -879,10 +888,10 @@ impl RequestValue for IdentitytoolkitRelyingpartyVerifyPasswordRequest {}
 /// 
 #[derive(Default, Clone, Debug, Serialize)]
 pub struct IdentitytoolkitRelyingpartyDownloadAccountRequest {
-    /// The token for the next page. This should be taken from the previous response.    
+    /// The token for the next page. This should be taken from the previous response.
     #[serde(alias="nextPageToken")]
     pub next_page_token: Option<String>,
-    /// The max number of results to return in the response.    
+    /// The max number of results to return in the response.
     #[serde(alias="maxResults")]
     pub max_results: Option<u32>,
 }
@@ -896,13 +905,13 @@ impl RequestValue for IdentitytoolkitRelyingpartyDownloadAccountRequest {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct SetAccountInfoResponseProviderUserInfo {
-    /// The IdP ID. For whitelisted IdPs it's a short domain name, e.g., google.com, aol.com, live.net and yahoo.com. For other OpenID IdPs it's the OP identifier.    
+    /// The IdP ID. For whitelisted IdPs it's a short domain name, e.g., google.com, aol.com, live.net and yahoo.com. For other OpenID IdPs it's the OP identifier.
     #[serde(alias="providerId")]
     pub provider_id: String,
-    /// The user's display name at the IDP.    
+    /// The user's display name at the IDP.
     #[serde(alias="displayName")]
     pub display_name: String,
-    /// The user's photo url at the IDP.    
+    /// The user's photo url at the IDP.
     #[serde(alias="photoUrl")]
     pub photo_url: String,
 }
@@ -922,9 +931,9 @@ impl Part for SetAccountInfoResponseProviderUserInfo {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct GetAccountInfoResponse {
-    /// The fixed string "identitytoolkit#GetAccountInfoResponse".    
+    /// The fixed string "identitytoolkit#GetAccountInfoResponse".
     pub kind: String,
-    /// The info of the users.    
+    /// The info of the users.
     pub users: Vec<UserInfo>,
 }
 
@@ -942,13 +951,13 @@ impl ResponseResult for GetAccountInfoResponse {}
 /// 
 #[derive(Default, Clone, Debug, Serialize)]
 pub struct IdentitytoolkitRelyingpartyVerifyAssertionRequest {
-    /// The URI to which the IDP redirects the user back. It may contain federated login result params added by the IDP.    
+    /// The URI to which the IDP redirects the user back. It may contain federated login result params added by the IDP.
     #[serde(alias="requestUri")]
     pub request_uri: Option<String>,
-    /// The post body if the request is a HTTP POST.    
+    /// The post body if the request is a HTTP POST.
     #[serde(alias="postBody")]
     pub post_body: Option<String>,
-    /// The GITKit token for the non-trusted IDP pending to be confirmed by the user.    
+    /// The GITKit token for the non-trusted IDP pending to be confirmed by the user.
     #[serde(alias="pendingIdToken")]
     pub pending_id_token: Option<String>,
 }
@@ -967,17 +976,17 @@ impl RequestValue for IdentitytoolkitRelyingpartyVerifyAssertionRequest {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct SetAccountInfoResponse {
-    /// The Gitkit id token to login the newly sign up user.    
+    /// The Gitkit id token to login the newly sign up user.
     #[serde(alias="idToken")]
     pub id_token: String,
-    /// The fixed string "identitytoolkit#SetAccountInfoResponse".    
+    /// The fixed string "identitytoolkit#SetAccountInfoResponse".
     pub kind: String,
-    /// The name of the user.    
+    /// The name of the user.
     #[serde(alias="displayName")]
     pub display_name: String,
-    /// The email of the user.    
+    /// The email of the user.
     pub email: String,
-    /// The user's profiles at the associated IdPs.    
+    /// The user's profiles at the associated IdPs.
     #[serde(alias="providerUserInfo")]
     pub provider_user_info: Vec<SetAccountInfoResponseProviderUserInfo>,
 }
@@ -991,32 +1000,32 @@ impl ResponseResult for SetAccountInfoResponse {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct UserInfo {
-    /// The name of the user.    
+    /// The name of the user.
     #[serde(alias="displayName")]
     pub display_name: String,
-    /// The local ID of the user.    
+    /// The local ID of the user.
     #[serde(alias="localId")]
     pub local_id: String,
-    /// The URL of the user profile photo.    
+    /// The URL of the user profile photo.
     #[serde(alias="photoUrl")]
     pub photo_url: String,
-    /// Whether the email has been verified.    
+    /// Whether the email has been verified.
     #[serde(alias="emailVerified")]
     pub email_verified: bool,
-    /// The user's hashed password.    
+    /// The user's hashed password.
     #[serde(alias="passwordHash")]
     pub password_hash: String,
-    /// Version of the user's password.    
+    /// Version of the user's password.
     pub version: i32,
-    /// The IDP of the user.    
+    /// The IDP of the user.
     #[serde(alias="providerUserInfo")]
     pub provider_user_info: Vec<UserInfoProviderUserInfo>,
-    /// The timestamp when the password was last updated.    
+    /// The timestamp when the password was last updated.
     #[serde(alias="passwordUpdatedAt")]
     pub password_updated_at: f64,
-    /// The user's password salt.    
+    /// The user's password salt.
     pub salt: String,
-    /// The email of the user.    
+    /// The email of the user.
     pub email: String,
 }
 
@@ -1062,13 +1071,17 @@ pub struct RelyingpartyMethods<'a, C, NC, A>
     hub: &'a IdentityToolkit<C, NC, A>,
 }
 
-impl<'a, C, NC, A> ResourceMethodsBuilder for RelyingpartyMethods<'a, C, NC, A> {}
+impl<'a, C, NC, A> MethodsBuilder for RelyingpartyMethods<'a, C, NC, A> {}
 
 impl<'a, C, NC, A> RelyingpartyMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Get a code for user action confirmation.    
+    /// Get a code for user action confirmation.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
     pub fn get_oob_confirmation_code(&self, request: &Relyingparty) -> RelyingpartyGetOobConfirmationCodeCall<'a, C, NC, A> {
         RelyingpartyGetOobConfirmationCodeCall {
             hub: self.hub,
@@ -1080,7 +1093,7 @@ impl<'a, C, NC, A> RelyingpartyMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Get token signing public key.    
+    /// Get token signing public key.
     pub fn get_public_keys(&self) -> RelyingpartyGetPublicKeyCall<'a, C, NC, A> {
         RelyingpartyGetPublicKeyCall {
             hub: self.hub,
@@ -1091,7 +1104,11 @@ impl<'a, C, NC, A> RelyingpartyMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Creates the URI used by the IdP to authenticate the user.    
+    /// Creates the URI used by the IdP to authenticate the user.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
     pub fn create_auth_uri(&self, request: &IdentitytoolkitRelyingpartyCreateAuthUriRequest) -> RelyingpartyCreateAuthUriCall<'a, C, NC, A> {
         RelyingpartyCreateAuthUriCall {
             hub: self.hub,
@@ -1103,7 +1120,11 @@ impl<'a, C, NC, A> RelyingpartyMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Verifies the assertion returned by the IdP.    
+    /// Verifies the assertion returned by the IdP.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
     pub fn verify_assertion(&self, request: &IdentitytoolkitRelyingpartyVerifyAssertionRequest) -> RelyingpartyVerifyAssertionCall<'a, C, NC, A> {
         RelyingpartyVerifyAssertionCall {
             hub: self.hub,
@@ -1115,7 +1136,11 @@ impl<'a, C, NC, A> RelyingpartyMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Batch upload existing user accounts.    
+    /// Batch upload existing user accounts.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
     pub fn upload_account(&self, request: &IdentitytoolkitRelyingpartyUploadAccountRequest) -> RelyingpartyUploadAccountCall<'a, C, NC, A> {
         RelyingpartyUploadAccountCall {
             hub: self.hub,
@@ -1127,7 +1152,11 @@ impl<'a, C, NC, A> RelyingpartyMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Returns the account info.    
+    /// Returns the account info.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
     pub fn get_account_info(&self, request: &IdentitytoolkitRelyingpartyGetAccountInfoRequest) -> RelyingpartyGetAccountInfoCall<'a, C, NC, A> {
         RelyingpartyGetAccountInfoCall {
             hub: self.hub,
@@ -1139,7 +1168,11 @@ impl<'a, C, NC, A> RelyingpartyMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Reset password for a user.    
+    /// Reset password for a user.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
     pub fn reset_password(&self, request: &IdentitytoolkitRelyingpartyResetPasswordRequest) -> RelyingpartyResetPasswordCall<'a, C, NC, A> {
         RelyingpartyResetPasswordCall {
             hub: self.hub,
@@ -1151,7 +1184,11 @@ impl<'a, C, NC, A> RelyingpartyMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Batch download user accounts.    
+    /// Batch download user accounts.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
     pub fn download_account(&self, request: &IdentitytoolkitRelyingpartyDownloadAccountRequest) -> RelyingpartyDownloadAccountCall<'a, C, NC, A> {
         RelyingpartyDownloadAccountCall {
             hub: self.hub,
@@ -1163,7 +1200,11 @@ impl<'a, C, NC, A> RelyingpartyMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Set account info for a user.    
+    /// Set account info for a user.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
     pub fn set_account_info(&self, request: &IdentitytoolkitRelyingpartySetAccountInfoRequest) -> RelyingpartySetAccountInfoCall<'a, C, NC, A> {
         RelyingpartySetAccountInfoCall {
             hub: self.hub,
@@ -1175,7 +1216,11 @@ impl<'a, C, NC, A> RelyingpartyMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Delete user account.    
+    /// Delete user account.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
     pub fn delete_account(&self, request: &IdentitytoolkitRelyingpartyDeleteAccountRequest) -> RelyingpartyDeleteAccountCall<'a, C, NC, A> {
         RelyingpartyDeleteAccountCall {
             hub: self.hub,
@@ -1187,7 +1232,11 @@ impl<'a, C, NC, A> RelyingpartyMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Verifies the user entered password.    
+    /// Verifies the user entered password.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
     pub fn verify_password(&self, request: &IdentitytoolkitRelyingpartyVerifyPasswordRequest) -> RelyingpartyVerifyPasswordCall<'a, C, NC, A> {
         RelyingpartyVerifyPasswordCall {
             hub: self.hub,
@@ -1209,7 +1258,7 @@ impl<'a, C, NC, A> RelyingpartyMethods<'a, C, NC, A> {
 /// Get a code for user action confirmation.
 ///
 /// A builder for the *getOobConfirmationCode* method supported by a *relyingparty* resource.
-/// It is not used directly, but through a `RelyingpartyMethods`.
+/// It is not used directly, but through a `RelyingpartyMethods` instance.
 ///
 /// # Example
 ///
@@ -1271,7 +1320,7 @@ impl<'a, C, NC, A> RelyingpartyGetOobConfirmationCodeCall<'a, C, NC, A> where NC
         for &field in ["alt"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -1290,7 +1339,7 @@ impl<'a, C, NC, A> RelyingpartyGetOobConfirmationCodeCall<'a, C, NC, A> where NC
             Some(value) => params.push(("key", value)),
             None => {
                 dlg.finished(false);
-                return Result::MissingAPIKey
+                return Err(Error::MissingAPIKey)
             }
         }
 
@@ -1318,7 +1367,6 @@ impl<'a, C, NC, A> RelyingpartyGetOobConfirmationCodeCall<'a, C, NC, A> where NC
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -1328,7 +1376,7 @@ impl<'a, C, NC, A> RelyingpartyGetOobConfirmationCodeCall<'a, C, NC, A> where NC
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -1339,7 +1387,7 @@ impl<'a, C, NC, A> RelyingpartyGetOobConfirmationCodeCall<'a, C, NC, A> where NC
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -1348,13 +1396,13 @@ impl<'a, C, NC, A> RelyingpartyGetOobConfirmationCodeCall<'a, C, NC, A> where NC
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -1410,7 +1458,7 @@ impl<'a, C, NC, A> RelyingpartyGetOobConfirmationCodeCall<'a, C, NC, A> where NC
 /// Get token signing public key.
 ///
 /// A builder for the *getPublicKeys* method supported by a *relyingparty* resource.
-/// It is not used directly, but through a `RelyingpartyMethods`.
+/// It is not used directly, but through a `RelyingpartyMethods` instance.
 ///
 /// # Example
 ///
@@ -1465,7 +1513,7 @@ impl<'a, C, NC, A> RelyingpartyGetPublicKeyCall<'a, C, NC, A> where NC: hyper::n
         for &field in ["alt"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -1484,7 +1532,7 @@ impl<'a, C, NC, A> RelyingpartyGetPublicKeyCall<'a, C, NC, A> where NC: hyper::n
             Some(value) => params.push(("key", value)),
             None => {
                 dlg.finished(false);
-                return Result::MissingAPIKey
+                return Err(Error::MissingAPIKey)
             }
         }
 
@@ -1504,7 +1552,6 @@ impl<'a, C, NC, A> RelyingpartyGetPublicKeyCall<'a, C, NC, A> where NC: hyper::n
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -1514,7 +1561,7 @@ impl<'a, C, NC, A> RelyingpartyGetPublicKeyCall<'a, C, NC, A> where NC: hyper::n
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -1525,7 +1572,7 @@ impl<'a, C, NC, A> RelyingpartyGetPublicKeyCall<'a, C, NC, A> where NC: hyper::n
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -1534,13 +1581,13 @@ impl<'a, C, NC, A> RelyingpartyGetPublicKeyCall<'a, C, NC, A> where NC: hyper::n
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -1587,7 +1634,7 @@ impl<'a, C, NC, A> RelyingpartyGetPublicKeyCall<'a, C, NC, A> where NC: hyper::n
 /// Creates the URI used by the IdP to authenticate the user.
 ///
 /// A builder for the *createAuthUri* method supported by a *relyingparty* resource.
-/// It is not used directly, but through a `RelyingpartyMethods`.
+/// It is not used directly, but through a `RelyingpartyMethods` instance.
 ///
 /// # Example
 ///
@@ -1649,7 +1696,7 @@ impl<'a, C, NC, A> RelyingpartyCreateAuthUriCall<'a, C, NC, A> where NC: hyper::
         for &field in ["alt"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -1668,7 +1715,7 @@ impl<'a, C, NC, A> RelyingpartyCreateAuthUriCall<'a, C, NC, A> where NC: hyper::
             Some(value) => params.push(("key", value)),
             None => {
                 dlg.finished(false);
-                return Result::MissingAPIKey
+                return Err(Error::MissingAPIKey)
             }
         }
 
@@ -1696,7 +1743,6 @@ impl<'a, C, NC, A> RelyingpartyCreateAuthUriCall<'a, C, NC, A> where NC: hyper::
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -1706,7 +1752,7 @@ impl<'a, C, NC, A> RelyingpartyCreateAuthUriCall<'a, C, NC, A> where NC: hyper::
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -1717,7 +1763,7 @@ impl<'a, C, NC, A> RelyingpartyCreateAuthUriCall<'a, C, NC, A> where NC: hyper::
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -1726,13 +1772,13 @@ impl<'a, C, NC, A> RelyingpartyCreateAuthUriCall<'a, C, NC, A> where NC: hyper::
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -1788,7 +1834,7 @@ impl<'a, C, NC, A> RelyingpartyCreateAuthUriCall<'a, C, NC, A> where NC: hyper::
 /// Verifies the assertion returned by the IdP.
 ///
 /// A builder for the *verifyAssertion* method supported by a *relyingparty* resource.
-/// It is not used directly, but through a `RelyingpartyMethods`.
+/// It is not used directly, but through a `RelyingpartyMethods` instance.
 ///
 /// # Example
 ///
@@ -1850,7 +1896,7 @@ impl<'a, C, NC, A> RelyingpartyVerifyAssertionCall<'a, C, NC, A> where NC: hyper
         for &field in ["alt"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -1869,7 +1915,7 @@ impl<'a, C, NC, A> RelyingpartyVerifyAssertionCall<'a, C, NC, A> where NC: hyper
             Some(value) => params.push(("key", value)),
             None => {
                 dlg.finished(false);
-                return Result::MissingAPIKey
+                return Err(Error::MissingAPIKey)
             }
         }
 
@@ -1897,7 +1943,6 @@ impl<'a, C, NC, A> RelyingpartyVerifyAssertionCall<'a, C, NC, A> where NC: hyper
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -1907,7 +1952,7 @@ impl<'a, C, NC, A> RelyingpartyVerifyAssertionCall<'a, C, NC, A> where NC: hyper
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -1918,7 +1963,7 @@ impl<'a, C, NC, A> RelyingpartyVerifyAssertionCall<'a, C, NC, A> where NC: hyper
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -1927,13 +1972,13 @@ impl<'a, C, NC, A> RelyingpartyVerifyAssertionCall<'a, C, NC, A> where NC: hyper
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -1989,7 +2034,7 @@ impl<'a, C, NC, A> RelyingpartyVerifyAssertionCall<'a, C, NC, A> where NC: hyper
 /// Batch upload existing user accounts.
 ///
 /// A builder for the *uploadAccount* method supported by a *relyingparty* resource.
-/// It is not used directly, but through a `RelyingpartyMethods`.
+/// It is not used directly, but through a `RelyingpartyMethods` instance.
 ///
 /// # Example
 ///
@@ -2051,7 +2096,7 @@ impl<'a, C, NC, A> RelyingpartyUploadAccountCall<'a, C, NC, A> where NC: hyper::
         for &field in ["alt"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -2070,7 +2115,7 @@ impl<'a, C, NC, A> RelyingpartyUploadAccountCall<'a, C, NC, A> where NC: hyper::
             Some(value) => params.push(("key", value)),
             None => {
                 dlg.finished(false);
-                return Result::MissingAPIKey
+                return Err(Error::MissingAPIKey)
             }
         }
 
@@ -2098,7 +2143,6 @@ impl<'a, C, NC, A> RelyingpartyUploadAccountCall<'a, C, NC, A> where NC: hyper::
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -2108,7 +2152,7 @@ impl<'a, C, NC, A> RelyingpartyUploadAccountCall<'a, C, NC, A> where NC: hyper::
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -2119,7 +2163,7 @@ impl<'a, C, NC, A> RelyingpartyUploadAccountCall<'a, C, NC, A> where NC: hyper::
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -2128,13 +2172,13 @@ impl<'a, C, NC, A> RelyingpartyUploadAccountCall<'a, C, NC, A> where NC: hyper::
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -2190,7 +2234,7 @@ impl<'a, C, NC, A> RelyingpartyUploadAccountCall<'a, C, NC, A> where NC: hyper::
 /// Returns the account info.
 ///
 /// A builder for the *getAccountInfo* method supported by a *relyingparty* resource.
-/// It is not used directly, but through a `RelyingpartyMethods`.
+/// It is not used directly, but through a `RelyingpartyMethods` instance.
 ///
 /// # Example
 ///
@@ -2252,7 +2296,7 @@ impl<'a, C, NC, A> RelyingpartyGetAccountInfoCall<'a, C, NC, A> where NC: hyper:
         for &field in ["alt"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -2271,7 +2315,7 @@ impl<'a, C, NC, A> RelyingpartyGetAccountInfoCall<'a, C, NC, A> where NC: hyper:
             Some(value) => params.push(("key", value)),
             None => {
                 dlg.finished(false);
-                return Result::MissingAPIKey
+                return Err(Error::MissingAPIKey)
             }
         }
 
@@ -2299,7 +2343,6 @@ impl<'a, C, NC, A> RelyingpartyGetAccountInfoCall<'a, C, NC, A> where NC: hyper:
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -2309,7 +2352,7 @@ impl<'a, C, NC, A> RelyingpartyGetAccountInfoCall<'a, C, NC, A> where NC: hyper:
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -2320,7 +2363,7 @@ impl<'a, C, NC, A> RelyingpartyGetAccountInfoCall<'a, C, NC, A> where NC: hyper:
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -2329,13 +2372,13 @@ impl<'a, C, NC, A> RelyingpartyGetAccountInfoCall<'a, C, NC, A> where NC: hyper:
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -2391,7 +2434,7 @@ impl<'a, C, NC, A> RelyingpartyGetAccountInfoCall<'a, C, NC, A> where NC: hyper:
 /// Reset password for a user.
 ///
 /// A builder for the *resetPassword* method supported by a *relyingparty* resource.
-/// It is not used directly, but through a `RelyingpartyMethods`.
+/// It is not used directly, but through a `RelyingpartyMethods` instance.
 ///
 /// # Example
 ///
@@ -2453,7 +2496,7 @@ impl<'a, C, NC, A> RelyingpartyResetPasswordCall<'a, C, NC, A> where NC: hyper::
         for &field in ["alt"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -2472,7 +2515,7 @@ impl<'a, C, NC, A> RelyingpartyResetPasswordCall<'a, C, NC, A> where NC: hyper::
             Some(value) => params.push(("key", value)),
             None => {
                 dlg.finished(false);
-                return Result::MissingAPIKey
+                return Err(Error::MissingAPIKey)
             }
         }
 
@@ -2500,7 +2543,6 @@ impl<'a, C, NC, A> RelyingpartyResetPasswordCall<'a, C, NC, A> where NC: hyper::
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -2510,7 +2552,7 @@ impl<'a, C, NC, A> RelyingpartyResetPasswordCall<'a, C, NC, A> where NC: hyper::
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -2521,7 +2563,7 @@ impl<'a, C, NC, A> RelyingpartyResetPasswordCall<'a, C, NC, A> where NC: hyper::
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -2530,13 +2572,13 @@ impl<'a, C, NC, A> RelyingpartyResetPasswordCall<'a, C, NC, A> where NC: hyper::
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -2592,7 +2634,7 @@ impl<'a, C, NC, A> RelyingpartyResetPasswordCall<'a, C, NC, A> where NC: hyper::
 /// Batch download user accounts.
 ///
 /// A builder for the *downloadAccount* method supported by a *relyingparty* resource.
-/// It is not used directly, but through a `RelyingpartyMethods`.
+/// It is not used directly, but through a `RelyingpartyMethods` instance.
 ///
 /// # Example
 ///
@@ -2654,7 +2696,7 @@ impl<'a, C, NC, A> RelyingpartyDownloadAccountCall<'a, C, NC, A> where NC: hyper
         for &field in ["alt"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -2673,7 +2715,7 @@ impl<'a, C, NC, A> RelyingpartyDownloadAccountCall<'a, C, NC, A> where NC: hyper
             Some(value) => params.push(("key", value)),
             None => {
                 dlg.finished(false);
-                return Result::MissingAPIKey
+                return Err(Error::MissingAPIKey)
             }
         }
 
@@ -2701,7 +2743,6 @@ impl<'a, C, NC, A> RelyingpartyDownloadAccountCall<'a, C, NC, A> where NC: hyper
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -2711,7 +2752,7 @@ impl<'a, C, NC, A> RelyingpartyDownloadAccountCall<'a, C, NC, A> where NC: hyper
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -2722,7 +2763,7 @@ impl<'a, C, NC, A> RelyingpartyDownloadAccountCall<'a, C, NC, A> where NC: hyper
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -2731,13 +2772,13 @@ impl<'a, C, NC, A> RelyingpartyDownloadAccountCall<'a, C, NC, A> where NC: hyper
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -2793,7 +2834,7 @@ impl<'a, C, NC, A> RelyingpartyDownloadAccountCall<'a, C, NC, A> where NC: hyper
 /// Set account info for a user.
 ///
 /// A builder for the *setAccountInfo* method supported by a *relyingparty* resource.
-/// It is not used directly, but through a `RelyingpartyMethods`.
+/// It is not used directly, but through a `RelyingpartyMethods` instance.
 ///
 /// # Example
 ///
@@ -2855,7 +2896,7 @@ impl<'a, C, NC, A> RelyingpartySetAccountInfoCall<'a, C, NC, A> where NC: hyper:
         for &field in ["alt"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -2874,7 +2915,7 @@ impl<'a, C, NC, A> RelyingpartySetAccountInfoCall<'a, C, NC, A> where NC: hyper:
             Some(value) => params.push(("key", value)),
             None => {
                 dlg.finished(false);
-                return Result::MissingAPIKey
+                return Err(Error::MissingAPIKey)
             }
         }
 
@@ -2902,7 +2943,6 @@ impl<'a, C, NC, A> RelyingpartySetAccountInfoCall<'a, C, NC, A> where NC: hyper:
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -2912,7 +2952,7 @@ impl<'a, C, NC, A> RelyingpartySetAccountInfoCall<'a, C, NC, A> where NC: hyper:
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -2923,7 +2963,7 @@ impl<'a, C, NC, A> RelyingpartySetAccountInfoCall<'a, C, NC, A> where NC: hyper:
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -2932,13 +2972,13 @@ impl<'a, C, NC, A> RelyingpartySetAccountInfoCall<'a, C, NC, A> where NC: hyper:
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -2994,7 +3034,7 @@ impl<'a, C, NC, A> RelyingpartySetAccountInfoCall<'a, C, NC, A> where NC: hyper:
 /// Delete user account.
 ///
 /// A builder for the *deleteAccount* method supported by a *relyingparty* resource.
-/// It is not used directly, but through a `RelyingpartyMethods`.
+/// It is not used directly, but through a `RelyingpartyMethods` instance.
 ///
 /// # Example
 ///
@@ -3056,7 +3096,7 @@ impl<'a, C, NC, A> RelyingpartyDeleteAccountCall<'a, C, NC, A> where NC: hyper::
         for &field in ["alt"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -3075,7 +3115,7 @@ impl<'a, C, NC, A> RelyingpartyDeleteAccountCall<'a, C, NC, A> where NC: hyper::
             Some(value) => params.push(("key", value)),
             None => {
                 dlg.finished(false);
-                return Result::MissingAPIKey
+                return Err(Error::MissingAPIKey)
             }
         }
 
@@ -3103,7 +3143,6 @@ impl<'a, C, NC, A> RelyingpartyDeleteAccountCall<'a, C, NC, A> where NC: hyper::
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -3113,7 +3152,7 @@ impl<'a, C, NC, A> RelyingpartyDeleteAccountCall<'a, C, NC, A> where NC: hyper::
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -3124,7 +3163,7 @@ impl<'a, C, NC, A> RelyingpartyDeleteAccountCall<'a, C, NC, A> where NC: hyper::
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -3133,13 +3172,13 @@ impl<'a, C, NC, A> RelyingpartyDeleteAccountCall<'a, C, NC, A> where NC: hyper::
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -3195,7 +3234,7 @@ impl<'a, C, NC, A> RelyingpartyDeleteAccountCall<'a, C, NC, A> where NC: hyper::
 /// Verifies the user entered password.
 ///
 /// A builder for the *verifyPassword* method supported by a *relyingparty* resource.
-/// It is not used directly, but through a `RelyingpartyMethods`.
+/// It is not used directly, but through a `RelyingpartyMethods` instance.
 ///
 /// # Example
 ///
@@ -3257,7 +3296,7 @@ impl<'a, C, NC, A> RelyingpartyVerifyPasswordCall<'a, C, NC, A> where NC: hyper:
         for &field in ["alt"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -3276,7 +3315,7 @@ impl<'a, C, NC, A> RelyingpartyVerifyPasswordCall<'a, C, NC, A> where NC: hyper:
             Some(value) => params.push(("key", value)),
             None => {
                 dlg.finished(false);
-                return Result::MissingAPIKey
+                return Err(Error::MissingAPIKey)
             }
         }
 
@@ -3304,7 +3343,6 @@ impl<'a, C, NC, A> RelyingpartyVerifyPasswordCall<'a, C, NC, A> where NC: hyper:
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -3314,7 +3352,7 @@ impl<'a, C, NC, A> RelyingpartyVerifyPasswordCall<'a, C, NC, A> where NC: hyper:
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -3325,7 +3363,7 @@ impl<'a, C, NC, A> RelyingpartyVerifyPasswordCall<'a, C, NC, A> where NC: hyper:
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -3334,13 +3372,13 @@ impl<'a, C, NC, A> RelyingpartyVerifyPasswordCall<'a, C, NC, A> where NC: hyper:
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }

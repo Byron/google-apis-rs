@@ -4,7 +4,7 @@
 [package]
 
 name = "google-dfareporting2"
-version = "0.1.1+20150223"
+version = "0.1.2+20150223"
 authors = ["Sebastian Thiel <byronimo@gmail>"]
 description = "A complete library to interact with dfareporting (protocol v2.0)"
 repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/dfareporting2"
@@ -16,7 +16,7 @@ keywords = ["dfareporting", "google", "protocol", "web", "api"]
 [dependencies]
 hyper = "*"
 mime = "*"
+yup-oauth2 = "*"
 url = "*"
 serde = "*"
 serde_macros = "*"
-yup-oauth2 = "*"

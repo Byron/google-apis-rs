@@ -4,7 +4,7 @@
 [package]
 
 name = "google-blogger3"
-version = "0.1.1+20150208"
+version = "0.1.2+20150208"
 authors = ["Sebastian Thiel <byronimo@gmail>"]
 description = "A complete library to interact with blogger (protocol v3)"
 repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/blogger3"
@@ -16,7 +16,7 @@ keywords = ["blogger", "google", "protocol", "web", "api"]
 [dependencies]
 hyper = "*"
 mime = "*"
+yup-oauth2 = "*"
 url = "*"
 serde = "*"
 serde_macros = "*"
-yup-oauth2 = "*"

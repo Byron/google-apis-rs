@@ -4,7 +4,7 @@
 [package]
 
 name = "google-adsense1d4"
-version = "0.1.1+20150312"
+version = "0.1.2+20150303"
 authors = ["Sebastian Thiel <byronimo@gmail>"]
 description = "A complete library to interact with AdSense (protocol v1.4)"
 repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/adsense1d4"
@@ -16,7 +16,7 @@ keywords = ["adsense", "google", "protocol", "web", "api"]
 [dependencies]
 hyper = "*"
 mime = "*"
+yup-oauth2 = "*"
 url = "*"
 serde = "*"
 serde_macros = "*"
-yup-oauth2 = "*"

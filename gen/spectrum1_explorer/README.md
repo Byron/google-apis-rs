@@ -1,11 +1,11 @@
 <!---
 DO NOT EDIT !
-This file was generated automatically from 'src/mako/README.md.mako'
+This file was generated automatically from 'src/mako/api/README.md.mako'
 DO NOT EDIT !
 -->
 The `google-spectrum1_explorer` library allows access to all features of the *Google spectrum* service.
 
-This documentation was generated from *spectrum* crate version *0.1.1+20150112*, where *20150112* is the exact revision of the *spectrum:v1explorer* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.1*.
+This documentation was generated from *spectrum* crate version *0.1.2+20150112*, where *20150112* is the exact revision of the *spectrum:v1explorer* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.2*.
 
 Everything else about the *spectrum* *v1_explorer* API can be found at the
 [official documentation site](http://developers.google.com/spectrum).
@@ -25,6 +25,8 @@ The API is structured into the following primary items:
 
 * **[Hub](http://byron.github.io/google-apis-rs/google-spectrum1_explorer/struct.Spectrum.html)**
     * a central object to maintain state and allow accessing all *Activities*
+    * creates [*Method Builders*](http://byron.github.io/google-apis-rs/google-spectrum1_explorer/trait.MethodsBuilder.html) which in turn
+      allow access to individual [*Call Builders*](http://byron.github.io/google-apis-rs/google-spectrum1_explorer/trait.CallBuilder.html)
 * **[Resources](http://byron.github.io/google-apis-rs/google-spectrum1_explorer/trait.Resource.html)**
     * primary types that you can apply *Activities* to
     * a collection of properties and *Parts*
@@ -33,6 +35,8 @@ The API is structured into the following primary items:
         * never directly used in *Activities*
 * **[Activities](http://byron.github.io/google-apis-rs/google-spectrum1_explorer/trait.CallBuilder.html)**
     * operations to apply to *Resources*
+
+All *structures* are marked with applicable traits to further categorize them and ease browsing.
 
 Generally speaking, you can invoke *Activities* like this:
 
@@ -69,7 +73,7 @@ extern crate hyper;
 extern crate "yup-oauth2" as oauth2;
 extern crate "google-spectrum1_explorer" as spectrum1_explorer;
 use spectrum1_explorer::PawsGetSpectrumBatchRequest;
-use spectrum1_explorer::Result;
+use spectrum1_explorer::{Result, Error};
 use std::default::Default;
 use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
 use spectrum1_explorer::Spectrum;
@@ -98,15 +102,17 @@ let result = hub.paws().get_spectrum_batch(&req)
              .doit();
 
 match result {
-    Result::HttpError(err) => println!("HTTPERROR: {:?}", err),
-    Result::MissingAPIKey => println!("Auth: Missing API Key - used if there are no scopes"),
-    Result::MissingToken => println!("OAuth2: Missing Token"),
-    Result::Cancelled => println!("Operation cancelled by user"),
-    Result::UploadSizeLimitExceeded(size, max_size) => println!("Upload size too big: {} of {}", size, max_size),
-    Result::Failure(_) => println!("General Failure (hyper::client::Response doesn't print)"),
-    Result::FieldClash(clashed_field) => println!("You added custom parameter which is part of builder: {:?}", clashed_field),
-    Result::JsonDecodeError(err) => println!("Couldn't understand server reply - maybe API needs update: {:?}", err),
-    Result::Success(_) => println!("Success (value doesn't print)"),
+    Err(e) => match e {
+        Error::HttpError(err) => println!("HTTPERROR: {:?}", err),
+        Error::MissingAPIKey => println!("Auth: Missing API Key - used if there are no scopes"),
+        Error::MissingToken => println!("OAuth2: Missing Token"),
+        Error::Cancelled => println!("Operation canceled by user"),
+        Error::UploadSizeLimitExceeded(size, max_size) => println!("Upload size too big: {} of {}", size, max_size),
+        Error::Failure(_) => println!("General Failure (hyper::client::Response doesn't print)"),
+        Error::FieldClash(clashed_field) => println!("You added custom parameter which is part of builder: {:?}", clashed_field),
+        Error::JsonDecodeError(err) => println!("Couldn't understand server reply - maybe API needs update: {:?}", err),
+    },
+    Ok(_) => println!("Success (value doesn't print)"),
 }
 
 ```
@@ -119,7 +125,7 @@ the doit() methods, or handed as possibly intermediate results to either the
 When delegates handle errors or intermediate values, they may have a chance to instruct the system to retry. This 
 makes the system potentially resilient to all kinds of errors.
 
-## Uploads and Downlods
+## Uploads and Downloads
 If a method supports downloads, the response body, which is part of the [Result](http://byron.github.io/google-apis-rs/google-spectrum1_explorer/enum.Result.html), should be
 read by you to obtain the media.
 If such a method also supports a [Response Result](http://byron.github.io/google-apis-rs/google-spectrum1_explorer/trait.ResponseResult.html), it will return that by default.
@@ -142,8 +148,9 @@ The [delegate trait](http://byron.github.io/google-apis-rs/google-spectrum1_expl
 ## Optional Parts in Server-Requests
 
 All structures provided by this library are made to be [enocodable](http://byron.github.io/google-apis-rs/google-spectrum1_explorer/trait.RequestValue.html) and 
-[decodable](http://byron.github.io/google-apis-rs/google-spectrum1_explorer/trait.ResponseResult.html) via json. Optionals are used to indicate that partial requests are responses are valid.
-Most optionals are are considered [Parts](http://byron.github.io/google-apis-rs/google-spectrum1_explorer/trait.Part.html) which are identifyable by name, which will be sent to 
+[decodable](http://byron.github.io/google-apis-rs/google-spectrum1_explorer/trait.ResponseResult.html) via *json*. Optionals are used to indicate that partial requests are responses 
+are valid.
+Most optionals are are considered [Parts](http://byron.github.io/google-apis-rs/google-spectrum1_explorer/trait.Part.html) which are identifiable by name, which will be sent to 
 the server to indicate either the set parts of the request or the desired parts in the response.
 
 ## Builder Arguments

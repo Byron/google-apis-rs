@@ -1,8 +1,8 @@
 // DO NOT EDIT !
-// This file was generated automatically from 'src/mako/lib.rs.mako'
+// This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *Games* crate version *0.1.1+20150309*, where *20150309* is the exact revision of the *games:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.1*.
+//! This documentation was generated from *Games* crate version *0.1.2+20150316*, where *20150316* is the exact revision of the *games:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.2*.
 //! 
 //! Everything else about the *Games* *v1* API can be found at the
 //! [official documentation site](https://developers.google.com/games/services/).
@@ -53,6 +53,8 @@
 //! 
 //! * **[Hub](struct.Games.html)**
 //!     * a central object to maintain state and allow accessing all *Activities*
+//!     * creates [*Method Builders*](trait.MethodsBuilder.html) which in turn
+//!       allow access to individual [*Call Builders*](trait.CallBuilder.html)
 //! * **[Resources](trait.Resource.html)**
 //!     * primary types that you can apply *Activities* to
 //!     * a collection of properties and *Parts*
@@ -61,6 +63,8 @@
 //!         * never directly used in *Activities*
 //! * **[Activities](trait.CallBuilder.html)**
 //!     * operations to apply to *Resources*
+//! 
+//! All *structures* are marked with applicable traits to further categorize them and ease browsing.
 //! 
 //! Generally speaking, you can invoke *Activities* like this:
 //! 
@@ -103,7 +107,7 @@
 //! extern crate hyper;
 //! extern crate "yup-oauth2" as oauth2;
 //! extern crate "google-games1" as games1;
-//! use games1::Result;
+//! use games1::{Result, Error};
 //! # #[test] fn egal() {
 //! use std::default::Default;
 //! use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -130,15 +134,17 @@
 //!              .doit();
 //! 
 //! match result {
-//!     Result::HttpError(err) => println!("HTTPERROR: {:?}", err),
-//!     Result::MissingAPIKey => println!("Auth: Missing API Key - used if there are no scopes"),
-//!     Result::MissingToken => println!("OAuth2: Missing Token"),
-//!     Result::Cancelled => println!("Operation cancelled by user"),
-//!     Result::UploadSizeLimitExceeded(size, max_size) => println!("Upload size too big: {} of {}", size, max_size),
-//!     Result::Failure(_) => println!("General Failure (hyper::client::Response doesn't print)"),
-//!     Result::FieldClash(clashed_field) => println!("You added custom parameter which is part of builder: {:?}", clashed_field),
-//!     Result::JsonDecodeError(err) => println!("Couldn't understand server reply - maybe API needs update: {:?}", err),
-//!     Result::Success(_) => println!("Success (value doesn't print)"),
+//!     Err(e) => match e {
+//!         Error::HttpError(err) => println!("HTTPERROR: {:?}", err),
+//!         Error::MissingAPIKey => println!("Auth: Missing API Key - used if there are no scopes"),
+//!         Error::MissingToken => println!("OAuth2: Missing Token"),
+//!         Error::Cancelled => println!("Operation canceled by user"),
+//!         Error::UploadSizeLimitExceeded(size, max_size) => println!("Upload size too big: {} of {}", size, max_size),
+//!         Error::Failure(_) => println!("General Failure (hyper::client::Response doesn't print)"),
+//!         Error::FieldClash(clashed_field) => println!("You added custom parameter which is part of builder: {:?}", clashed_field),
+//!         Error::JsonDecodeError(err) => println!("Couldn't understand server reply - maybe API needs update: {:?}", err),
+//!     },
+//!     Ok(_) => println!("Success (value doesn't print)"),
 //! }
 //! # }
 //! ```
@@ -151,7 +157,7 @@
 //! When delegates handle errors or intermediate values, they may have a chance to instruct the system to retry. This 
 //! makes the system potentially resilient to all kinds of errors.
 //! 
-//! ## Uploads and Downlods
+//! ## Uploads and Downloads
 //! If a method supports downloads, the response body, which is part of the [Result](enum.Result.html), should be
 //! read by you to obtain the media.
 //! If such a method also supports a [Response Result](trait.ResponseResult.html), it will return that by default.
@@ -174,8 +180,9 @@
 //! ## Optional Parts in Server-Requests
 //! 
 //! All structures provided by this library are made to be [enocodable](trait.RequestValue.html) and 
-//! [decodable](trait.ResponseResult.html) via json. Optionals are used to indicate that partial requests are responses are valid.
-//! Most optionals are are considered [Parts](trait.Part.html) which are identifyable by name, which will be sent to 
+//! [decodable](trait.ResponseResult.html) via *json*. Optionals are used to indicate that partial requests are responses 
+//! are valid.
+//! Most optionals are are considered [Parts](trait.Part.html) which are identifiable by name, which will be sent to 
 //! the server to indicate either the set parts of the request or the desired parts in the response.
 //! 
 //! ## Builder Arguments
@@ -224,7 +231,7 @@ use std::io;
 use std::fs;
 use std::thread::sleep;
 
-pub use cmn::{MultiPartReader, ToParts, MethodInfo, Result, CallBuilder, Hub, ReadSeek, Part, ResponseResult, RequestValue, NestedType, Delegate, DefaultDelegate, ResourceMethodsBuilder, Resource, JsonServerError};
+pub use cmn::{MultiPartReader, ToParts, MethodInfo, Result, Error, CallBuilder, Hub, ReadSeek, Part, ResponseResult, RequestValue, NestedType, Delegate, DefaultDelegate, MethodsBuilder, Resource, JsonServerError};
 
 
 // ##############
@@ -278,7 +285,7 @@ impl Default for Scope {
 /// extern crate hyper;
 /// extern crate "yup-oauth2" as oauth2;
 /// extern crate "google-games1" as games1;
-/// use games1::Result;
+/// use games1::{Result, Error};
 /// # #[test] fn egal() {
 /// use std::default::Default;
 /// use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -305,15 +312,17 @@ impl Default for Scope {
 ///              .doit();
 /// 
 /// match result {
-///     Result::HttpError(err) => println!("HTTPERROR: {:?}", err),
-///     Result::MissingAPIKey => println!("Auth: Missing API Key - used if there are no scopes"),
-///     Result::MissingToken => println!("OAuth2: Missing Token"),
-///     Result::Cancelled => println!("Operation cancelled by user"),
-///     Result::UploadSizeLimitExceeded(size, max_size) => println!("Upload size too big: {} of {}", size, max_size),
-///     Result::Failure(_) => println!("General Failure (hyper::client::Response doesn't print)"),
-///     Result::FieldClash(clashed_field) => println!("You added custom parameter which is part of builder: {:?}", clashed_field),
-///     Result::JsonDecodeError(err) => println!("Couldn't understand server reply - maybe API needs update: {:?}", err),
-///     Result::Success(_) => println!("Success (value doesn't print)"),
+///     Err(e) => match e {
+///         Error::HttpError(err) => println!("HTTPERROR: {:?}", err),
+///         Error::MissingAPIKey => println!("Auth: Missing API Key - used if there are no scopes"),
+///         Error::MissingToken => println!("OAuth2: Missing Token"),
+///         Error::Cancelled => println!("Operation canceled by user"),
+///         Error::UploadSizeLimitExceeded(size, max_size) => println!("Upload size too big: {} of {}", size, max_size),
+///         Error::Failure(_) => println!("General Failure (hyper::client::Response doesn't print)"),
+///         Error::FieldClash(clashed_field) => println!("You added custom parameter which is part of builder: {:?}", clashed_field),
+///         Error::JsonDecodeError(err) => println!("Couldn't understand server reply - maybe API needs update: {:?}", err),
+///     },
+///     Ok(_) => println!("Success (value doesn't print)"),
 /// }
 /// # }
 /// ```
@@ -334,7 +343,7 @@ impl<'a, C, NC, A> Games<C, NC, A>
         Games {
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/0.1.1".to_string(),
+            _user_agent: "google-api-rust-client/0.1.2".to_string(),
             _m: PhantomData
         }
     }
@@ -386,7 +395,7 @@ impl<'a, C, NC, A> Games<C, NC, A>
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/0.1.1`.
+    /// It defaults to `google-api-rust-client/0.1.2`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -406,12 +415,12 @@ impl<'a, C, NC, A> Games<C, NC, A>
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct Category {
-    /// The category name.    
+    /// The category name.
     pub category: String,
-    /// Experience points earned in this category.    
+    /// Experience points earned in this category.
     #[serde(alias="experiencePoints")]
     pub experience_points: String,
-    /// Uniquely identifies the type of this resource. Value is always the fixed string games#category.    
+    /// Uniquely identifies the type of this resource. Value is always the fixed string games#category.
     pub kind: String,
 }
 
@@ -429,12 +438,12 @@ impl Part for Category {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct PlayerListResponse {
-    /// Token corresponding to the next page of results.    
+    /// Token corresponding to the next page of results.
     #[serde(alias="nextPageToken")]
     pub next_page_token: String,
-    /// The players.    
+    /// The players.
     pub items: Vec<Player>,
-    /// Uniquely identifies the type of this resource. Value is always the fixed string games#playerListResponse.    
+    /// Uniquely identifies the type of this resource. Value is always the fixed string games#playerListResponse.
     pub kind: String,
 }
 
@@ -447,14 +456,14 @@ impl ResponseResult for PlayerListResponse {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct PlayerScore {
-    /// Uniquely identifies the type of this resource. Value is always the fixed string games#playerScore.    
+    /// Uniquely identifies the type of this resource. Value is always the fixed string games#playerScore.
     pub kind: String,
-    /// The numerical value for this player score.    
+    /// The numerical value for this player score.
     pub score: String,
-    /// The formatted score for this player score.    
+    /// The formatted score for this player score.
     #[serde(alias="formattedScore")]
     pub formatted_score: String,
-    /// Additional information about this score. Values will contain no more than 64 URI-safe characters as defined by section 2.3 of RFC 3986.    
+    /// Additional information about this score. Values will contain no more than 64 URI-safe characters as defined by section 2.3 of RFC 3986.
     #[serde(alias="scoreTag")]
     pub score_tag: String,
     /// The time span for this player score.
@@ -475,23 +484,23 @@ impl Part for PlayerScore {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct Instance {
-    /// Uniquely identifies the type of this resource. Value is always the fixed string games#instance.    
+    /// Uniquely identifies the type of this resource. Value is always the fixed string games#instance.
     pub kind: String,
-    /// URI which shows where a user can acquire this instance.    
+    /// URI which shows where a user can acquire this instance.
     #[serde(alias="acquisitionUri")]
     pub acquisition_uri: String,
-    /// Localized display name.    
+    /// Localized display name.
     pub name: String,
-    /// Flag to show if this game instance supports turn based play.    
+    /// Flag to show if this game instance supports turn based play.
     #[serde(alias="turnBasedPlay")]
     pub turn_based_play: bool,
-    /// Platform dependent details for Web.    
+    /// Platform dependent details for Web.
     #[serde(alias="webInstance")]
     pub web_instance: InstanceWebDetails,
-    /// Platform dependent details for Android.    
+    /// Platform dependent details for Android.
     #[serde(alias="androidInstance")]
     pub android_instance: InstanceAndroidDetails,
-    /// Platform dependent details for iOS.    
+    /// Platform dependent details for iOS.
     #[serde(alias="iosInstance")]
     pub ios_instance: InstanceIosDetails,
     /// The platform type.
@@ -501,7 +510,7 @@ pub struct Instance {
     /// - "WEB_APP" - Instance is for Web App.
     #[serde(alias="platformType")]
     pub platform_type: String,
-    /// Flag to show if this game instance supports realtime play.    
+    /// Flag to show if this game instance supports realtime play.
     #[serde(alias="realtimePlay")]
     pub realtime_play: bool,
 }
@@ -520,7 +529,7 @@ impl Part for Instance {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct AchievementDefinition {
-    /// The total steps for an incremental achievement.    
+    /// The total steps for an incremental achievement.
     #[serde(alias="totalSteps")]
     pub total_steps: Option<i32>,
     /// The type of the achievement.
@@ -529,12 +538,12 @@ pub struct AchievementDefinition {
     /// - "INCREMENTAL" - Achievement is incremental.
     #[serde(alias="achievementType")]
     pub achievement_type: Option<String>,
-    /// The description of the achievement.    
+    /// The description of the achievement.
     pub description: Option<String>,
-    /// The total steps for an incremental achievement as a string.    
+    /// The total steps for an incremental achievement as a string.
     #[serde(alias="formattedTotalSteps")]
     pub formatted_total_steps: Option<String>,
-    /// Uniquely identifies the type of this resource. Value is always the fixed string games#achievementDefinition.    
+    /// Uniquely identifies the type of this resource. Value is always the fixed string games#achievementDefinition.
     pub kind: Option<String>,
     /// The initial state of the achievement.
     /// Possible values are:  
@@ -543,24 +552,24 @@ pub struct AchievementDefinition {
     /// - "UNLOCKED" - Achievement is unlocked.
     #[serde(alias="initialState")]
     pub initial_state: Option<String>,
-    /// Experience points which will be earned when unlocking this achievement.    
+    /// Experience points which will be earned when unlocking this achievement.
     #[serde(alias="experiencePoints")]
     pub experience_points: Option<String>,
-    /// The ID of the achievement.    
+    /// The ID of the achievement.
     pub id: Option<String>,
-    /// Indicates whether the revealed icon image being returned is a default image, or is provided by the game.    
+    /// Indicates whether the revealed icon image being returned is a default image, or is provided by the game.
     #[serde(alias="isRevealedIconUrlDefault")]
     pub is_revealed_icon_url_default: Option<bool>,
-    /// The image URL for the unlocked achievement icon.    
+    /// The image URL for the unlocked achievement icon.
     #[serde(alias="unlockedIconUrl")]
     pub unlocked_icon_url: Option<String>,
-    /// The image URL for the revealed achievement icon.    
+    /// The image URL for the revealed achievement icon.
     #[serde(alias="revealedIconUrl")]
     pub revealed_icon_url: Option<String>,
-    /// Indicates whether the unlocked icon image being returned is a default image, or is game-provided.    
+    /// Indicates whether the unlocked icon image being returned is a default image, or is game-provided.
     #[serde(alias="isUnlockedIconUrlDefault")]
     pub is_unlocked_icon_url_default: Option<bool>,
-    /// The name of the achievement.    
+    /// The name of the achievement.
     pub name: Option<String>,
 }
 
@@ -578,10 +587,10 @@ impl Resource for AchievementDefinition {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct AchievementUnlockResponse {
-    /// Whether this achievement was newly unlocked (that is, whether the unlock request for the achievement was the first for the player).    
+    /// Whether this achievement was newly unlocked (that is, whether the unlock request for the achievement was the first for the player).
     #[serde(alias="newlyUnlocked")]
     pub newly_unlocked: bool,
-    /// Uniquely identifies the type of this resource. Value is always the fixed string games#achievementUnlockResponse.    
+    /// Uniquely identifies the type of this resource. Value is always the fixed string games#achievementUnlockResponse.
     pub kind: String,
 }
 
@@ -594,15 +603,15 @@ impl ResponseResult for AchievementUnlockResponse {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct RoomAutoMatchingCriteria {
-    /// Uniquely identifies the type of this resource. Value is always the fixed string games#roomAutoMatchingCriteria.    
+    /// Uniquely identifies the type of this resource. Value is always the fixed string games#roomAutoMatchingCriteria.
     pub kind: String,
-    /// The minimum number of players that should be added to the room by auto-matching.    
+    /// The minimum number of players that should be added to the room by auto-matching.
     #[serde(alias="minAutoMatchingPlayers")]
     pub min_auto_matching_players: i32,
-    /// A bitmask indicating when auto-matches are valid. When ANDed with other exclusive bitmasks, the result must be zero. Can be used to support exclusive roles within a game.    
+    /// A bitmask indicating when auto-matches are valid. When ANDed with other exclusive bitmasks, the result must be zero. Can be used to support exclusive roles within a game.
     #[serde(alias="exclusiveBitmask")]
     pub exclusive_bitmask: String,
-    /// The maximum number of players that should be added to the room by auto-matching.    
+    /// The maximum number of players that should be added to the room by auto-matching.
     #[serde(alias="maxAutoMatchingPlayers")]
     pub max_auto_matching_players: i32,
 }
@@ -616,12 +625,12 @@ impl Part for RoomAutoMatchingCriteria {}
 /// 
 #[derive(Default, Clone, Debug, Serialize)]
 pub struct EventUpdateRequest {
-    /// The ID of the event being modified in this update.    
+    /// The ID of the event being modified in this update.
     #[serde(alias="definitionId")]
     pub definition_id: String,
-    /// Uniquely identifies the type of this resource. Value is always the fixed string games#eventUpdateRequest.    
+    /// Uniquely identifies the type of this resource. Value is always the fixed string games#eventUpdateRequest.
     pub kind: String,
-    /// The number of times this event occurred in this time period.    
+    /// The number of times this event occurred in this time period.
     #[serde(alias="updateCount")]
     pub update_count: i64,
 }
@@ -640,12 +649,12 @@ impl Part for EventUpdateRequest {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct TurnBasedMatchList {
-    /// The pagination token for the next page of results.    
+    /// The pagination token for the next page of results.
     #[serde(alias="nextPageToken")]
     pub next_page_token: String,
-    /// The matches.    
+    /// The matches.
     pub items: Vec<TurnBasedMatch>,
-    /// Uniquely identifies the type of this resource. Value is always the fixed string games#turnBasedMatchList.    
+    /// Uniquely identifies the type of this resource. Value is always the fixed string games#turnBasedMatchList.
     pub kind: String,
 }
 
@@ -663,9 +672,9 @@ impl ResponseResult for TurnBasedMatchList {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct AchievementUpdateMultipleResponse {
-    /// Uniquely identifies the type of this resource. Value is always the fixed string games#achievementUpdateListResponse.    
+    /// Uniquely identifies the type of this resource. Value is always the fixed string games#achievementUpdateListResponse.
     pub kind: String,
-    /// The updated state of the achievements.    
+    /// The updated state of the achievements.
     #[serde(alias="updatedAchievements")]
     pub updated_achievements: Vec<AchievementUpdateResponse>,
 }
@@ -679,9 +688,9 @@ impl ResponseResult for AchievementUpdateMultipleResponse {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct EventChild {
-    /// Uniquely identifies the type of this resource. Value is always the fixed string games#eventChild.    
+    /// Uniquely identifies the type of this resource. Value is always the fixed string games#eventChild.
     pub kind: String,
-    /// The ID of the child event.    
+    /// The ID of the child event.
     #[serde(alias="childId")]
     pub child_id: String,
 }
@@ -695,10 +704,10 @@ impl Part for EventChild {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct EventRecordFailure {
-    /// The ID of the event that was not updated.    
+    /// The ID of the event that was not updated.
     #[serde(alias="eventId")]
     pub event_id: String,
-    /// Uniquely identifies the type of this resource. Value is always the fixed string games#eventRecordFailure.    
+    /// Uniquely identifies the type of this resource. Value is always the fixed string games#eventRecordFailure.
     pub kind: String,
     /// The cause for the update failure.
     /// Possible values are:  
@@ -717,18 +726,18 @@ impl Part for EventRecordFailure {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct AchievementUpdateResponse {
-    /// The current steps recorded for this achievement if it is incremental.    
+    /// The current steps recorded for this achievement if it is incremental.
     #[serde(alias="currentSteps")]
     pub current_steps: i32,
-    /// Whether this achievement was newly unlocked (that is, whether the unlock request for the achievement was the first for the player).    
+    /// Whether this achievement was newly unlocked (that is, whether the unlock request for the achievement was the first for the player).
     #[serde(alias="newlyUnlocked")]
     pub newly_unlocked: bool,
-    /// Uniquely identifies the type of this resource. Value is always the fixed string games#achievementUpdateResponse.    
+    /// Uniquely identifies the type of this resource. Value is always the fixed string games#achievementUpdateResponse.
     pub kind: String,
-    /// The achievement this update is was applied to.    
+    /// The achievement this update is was applied to.
     #[serde(alias="achievementId")]
     pub achievement_id: String,
-    /// Whether the requested updates actually affected the achievement.    
+    /// Whether the requested updates actually affected the achievement.
     #[serde(alias="updateOccurred")]
     pub update_occurred: bool,
     /// The current state of the achievement.
@@ -749,12 +758,12 @@ impl Part for AchievementUpdateResponse {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct RoomModification {
-    /// Uniquely identifies the type of this resource. Value is always the fixed string games#roomModification.    
+    /// Uniquely identifies the type of this resource. Value is always the fixed string games#roomModification.
     pub kind: String,
-    /// The timestamp at which they modified the room, in milliseconds since the epoch in UTC.    
+    /// The timestamp at which they modified the room, in milliseconds since the epoch in UTC.
     #[serde(alias="modifiedTimestampMillis")]
     pub modified_timestamp_millis: String,
-    /// The ID of the participant that modified the room.    
+    /// The ID of the participant that modified the room.
     #[serde(alias="participantId")]
     pub participant_id: String,
 }
@@ -773,12 +782,12 @@ impl Part for RoomModification {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct EventDefinitionListResponse {
-    /// The pagination token for the next page of results.    
+    /// The pagination token for the next page of results.
     #[serde(alias="nextPageToken")]
     pub next_page_token: String,
-    /// The event definitions.    
+    /// The event definitions.
     pub items: Vec<EventDefinition>,
-    /// Uniquely identifies the type of this resource. Value is always the fixed string games#eventDefinitionListResponse.    
+    /// Uniquely identifies the type of this resource. Value is always the fixed string games#eventDefinitionListResponse.
     pub kind: String,
 }
 
@@ -796,7 +805,7 @@ impl ResponseResult for EventDefinitionListResponse {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct PlayerScoreResponse {
-    /// Uniquely identifies the type of this resource. Value is always the fixed string games#playerScoreResponse.    
+    /// Uniquely identifies the type of this resource. Value is always the fixed string games#playerScoreResponse.
     pub kind: String,
     /// The time spans where the submitted score is better than the existing score for that time span.
     /// Possible values are:  
@@ -805,16 +814,16 @@ pub struct PlayerScoreResponse {
     /// - "DAILY" - The score is a daily score.
     #[serde(alias="beatenScoreTimeSpans")]
     pub beaten_score_time_spans: Vec<String>,
-    /// Additional information about this score. Values will contain no more than 64 URI-safe characters as defined by section 2.3 of RFC 3986.    
+    /// Additional information about this score. Values will contain no more than 64 URI-safe characters as defined by section 2.3 of RFC 3986.
     #[serde(alias="scoreTag")]
     pub score_tag: String,
-    /// The scores in time spans that have not been beaten. As an example, the submitted score may be better than the player's DAILY score, but not better than the player's scores for the WEEKLY or ALL_TIME time spans.    
+    /// The scores in time spans that have not been beaten. As an example, the submitted score may be better than the player's DAILY score, but not better than the player's scores for the WEEKLY or ALL_TIME time spans.
     #[serde(alias="unbeatenScores")]
     pub unbeaten_scores: Vec<PlayerScore>,
-    /// The leaderboard ID that this score was submitted to.    
+    /// The leaderboard ID that this score was submitted to.
     #[serde(alias="leaderboardId")]
     pub leaderboard_id: String,
-    /// The formatted value of the submitted score.    
+    /// The formatted value of the submitted score.
     #[serde(alias="formattedScore")]
     pub formatted_score: String,
 }
@@ -828,15 +837,15 @@ impl ResponseResult for PlayerScoreResponse {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct ImageAsset {
-    /// The URL of the asset.    
+    /// The URL of the asset.
     pub url: String,
-    /// The width of the asset.    
+    /// The width of the asset.
     pub width: i32,
-    /// Uniquely identifies the type of this resource. Value is always the fixed string games#imageAsset.    
+    /// Uniquely identifies the type of this resource. Value is always the fixed string games#imageAsset.
     pub kind: String,
-    /// The name of the asset.    
+    /// The name of the asset.
     pub name: String,
-    /// The height of the asset.    
+    /// The height of the asset.
     pub height: i32,
 }
 
@@ -854,9 +863,9 @@ impl Part for ImageAsset {}
 /// 
 #[derive(Default, Clone, Debug, Serialize)]
 pub struct RoomP2PStatuses {
-    /// Uniquely identifies the type of this resource. Value is always the fixed string games#roomP2PStatuses.    
+    /// Uniquely identifies the type of this resource. Value is always the fixed string games#roomP2PStatuses.
     pub kind: Option<String>,
-    /// The updates for the peers.    
+    /// The updates for the peers.
     pub updates: Option<Vec<RoomP2PStatus>>,
 }
 
@@ -874,13 +883,13 @@ impl RequestValue for RoomP2PStatuses {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct AchievementIncrementResponse {
-    /// The current steps recorded for this incremental achievement.    
+    /// The current steps recorded for this incremental achievement.
     #[serde(alias="currentSteps")]
     pub current_steps: i32,
-    /// Whether the the current steps for the achievement has reached the number of steps required to unlock.    
+    /// Whether the the current steps for the achievement has reached the number of steps required to unlock.
     #[serde(alias="newlyUnlocked")]
     pub newly_unlocked: bool,
-    /// Uniquely identifies the type of this resource. Value is always the fixed string games#achievementIncrementResponse.    
+    /// Uniquely identifies the type of this resource. Value is always the fixed string games#achievementIncrementResponse.
     pub kind: String,
 }
 
@@ -898,14 +907,14 @@ impl ResponseResult for AchievementIncrementResponse {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct TurnBasedMatchSync {
-    /// The pagination token for the next page of results.    
+    /// The pagination token for the next page of results.
     #[serde(alias="nextPageToken")]
     pub next_page_token: String,
-    /// The matches.    
+    /// The matches.
     pub items: Vec<TurnBasedMatch>,
-    /// Uniquely identifies the type of this resource. Value is always the fixed string games#turnBasedMatchSync.    
+    /// Uniquely identifies the type of this resource. Value is always the fixed string games#turnBasedMatchSync.
     pub kind: String,
-    /// True if there were more matches available to fetch at the time the response was generated (which were not returned due to page size limits.)    
+    /// True if there were more matches available to fetch at the time the response was generated (which were not returned due to page size limits.)
     #[serde(alias="moreAvailable")]
     pub more_available: bool,
 }
@@ -924,17 +933,17 @@ impl ResponseResult for TurnBasedMatchSync {}
 /// 
 #[derive(Default, Clone, Debug, Serialize)]
 pub struct TurnBasedMatchCreateRequest {
-    /// The player ids to invite to the match.    
+    /// The player ids to invite to the match.
     #[serde(alias="invitedPlayerIds")]
     pub invited_player_ids: Option<Vec<String>>,
-    /// Uniquely identifies the type of this resource. Value is always the fixed string games#turnBasedMatchCreateRequest.    
+    /// Uniquely identifies the type of this resource. Value is always the fixed string games#turnBasedMatchCreateRequest.
     pub kind: Option<String>,
-    /// Criteria for auto-matching players into this match.    
+    /// Criteria for auto-matching players into this match.
     #[serde(alias="autoMatchingCriteria")]
     pub auto_matching_criteria: Option<TurnBasedAutoMatchingCriteria>,
-    /// The variant / mode of the application to be played. This can be any integer value, or left blank. You should use a small number of variants to keep the auto-matching pool as large as possible.    
+    /// The variant / mode of the application to be played. This can be any integer value, or left blank. You should use a small number of variants to keep the auto-matching pool as large as possible.
     pub variant: Option<i32>,
-    /// A randomly generated numeric ID. This number is used at the server to ensure that the request is handled correctly across retries.    
+    /// A randomly generated numeric ID. This number is used at the server to ensure that the request is handled correctly across retries.
     #[serde(alias="requestId")]
     pub request_id: Option<String>,
 }
@@ -954,38 +963,38 @@ impl RequestValue for TurnBasedMatchCreateRequest {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct Quest {
-    /// The description of the quest.    
+    /// The description of the quest.
     pub description: String,
-    /// The banner image URL for the quest.    
+    /// The banner image URL for the quest.
     #[serde(alias="bannerUrl")]
     pub banner_url: String,
-    /// The timestamp at which the quest was last updated by the user in milliseconds since the epoch in UTC. Only present if the player has accepted the quest.    
+    /// The timestamp at which the quest was last updated by the user in milliseconds since the epoch in UTC. Only present if the player has accepted the quest.
     #[serde(alias="lastUpdatedTimestampMillis")]
     pub last_updated_timestamp_millis: String,
-    /// The timestamp at which the user accepted the quest in milliseconds since the epoch in UTC. Only present if the player has accepted the quest.    
+    /// The timestamp at which the user accepted the quest in milliseconds since the epoch in UTC. Only present if the player has accepted the quest.
     #[serde(alias="acceptedTimestampMillis")]
     pub accepted_timestamp_millis: String,
-    /// The icon image URL for the quest.    
+    /// The icon image URL for the quest.
     #[serde(alias="iconUrl")]
     pub icon_url: String,
-    /// The timestamp at which the user should be notified that the quest will end soon in milliseconds since the epoch in UTC.    
+    /// The timestamp at which the user should be notified that the quest will end soon in milliseconds since the epoch in UTC.
     #[serde(alias="notifyTimestampMillis")]
     pub notify_timestamp_millis: String,
-    /// The ID of the application this quest is part of.    
+    /// The ID of the application this quest is part of.
     #[serde(alias="applicationId")]
     pub application_id: String,
-    /// The ID of the quest.    
+    /// The ID of the quest.
     pub id: String,
-    /// Uniquely identifies the type of this resource. Value is always the fixed string games#quest.    
+    /// Uniquely identifies the type of this resource. Value is always the fixed string games#quest.
     pub kind: String,
-    /// The quest milestones.    
+    /// The quest milestones.
     pub milestones: Vec<QuestMilestone>,
-    /// The name of the quest.    
+    /// The name of the quest.
     pub name: String,
-    /// The timestamp at which the quest becomes active in milliseconds since the epoch in UTC.    
+    /// The timestamp at which the quest becomes active in milliseconds since the epoch in UTC.
     #[serde(alias="startTimestampMillis")]
     pub start_timestamp_millis: String,
-    /// The timestamp at which the quest ceases to be active in milliseconds since the epoch in UTC.    
+    /// The timestamp at which the quest ceases to be active in milliseconds since the epoch in UTC.
     #[serde(alias="endTimestampMillis")]
     pub end_timestamp_millis: String,
     /// The state of the quest.
@@ -998,10 +1007,10 @@ pub struct Quest {
     /// - "EXPIRED": The quest has expired and was not accepted. 
     /// - "DELETED": The quest should be deleted from the local database.
     pub state: String,
-    /// Indicates whether the banner image being returned is a default image, or is game-provided.    
+    /// Indicates whether the banner image being returned is a default image, or is game-provided.
     #[serde(alias="isDefaultBannerUrl")]
     pub is_default_banner_url: bool,
-    /// Indicates whether the icon image being returned is a default image, or is game-provided.    
+    /// Indicates whether the icon image being returned is a default image, or is game-provided.
     #[serde(alias="isDefaultIconUrl")]
     pub is_default_icon_url: bool,
 }
@@ -1016,15 +1025,15 @@ impl ResponseResult for Quest {}
 /// 
 #[derive(Default, Clone, Debug, Serialize)]
 pub struct AggregateStats {
-    /// The number of messages sent between a pair of peers.    
+    /// The number of messages sent between a pair of peers.
     pub count: String,
-    /// The maximum amount.    
+    /// The maximum amount.
     pub max: String,
-    /// Uniquely identifies the type of this resource. Value is always the fixed string games#aggregateStats.    
+    /// Uniquely identifies the type of this resource. Value is always the fixed string games#aggregateStats.
     pub kind: String,
-    /// The total number of bytes sent for messages between a pair of peers.    
+    /// The total number of bytes sent for messages between a pair of peers.
     pub sum: String,
-    /// The minimum amount.    
+    /// The minimum amount.
     pub min: String,
 }
 
@@ -1042,13 +1051,13 @@ impl Part for AggregateStats {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct AchievementSetStepsAtLeastResponse {
-    /// The current steps recorded for this incremental achievement.    
+    /// The current steps recorded for this incremental achievement.
     #[serde(alias="currentSteps")]
     pub current_steps: i32,
-    /// Whether the the current steps for the achievement has reached the number of steps required to unlock.    
+    /// Whether the the current steps for the achievement has reached the number of steps required to unlock.
     #[serde(alias="newlyUnlocked")]
     pub newly_unlocked: bool,
-    /// Uniquely identifies the type of this resource. Value is always the fixed string games#achievementSetStepsAtLeastResponse.    
+    /// Uniquely identifies the type of this resource. Value is always the fixed string games#achievementSetStepsAtLeastResponse.
     pub kind: String,
 }
 
@@ -1066,12 +1075,12 @@ impl ResponseResult for AchievementSetStepsAtLeastResponse {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct MetagameConfig {
-    /// Uniquely identifies the type of this resource. Value is always the fixed string games#metagameConfig.    
+    /// Uniquely identifies the type of this resource. Value is always the fixed string games#metagameConfig.
     pub kind: String,
-    /// Current version of the metagame configuration data. When this data is updated, the version number will be increased by one.    
+    /// Current version of the metagame configuration data. When this data is updated, the version number will be increased by one.
     #[serde(alias="currentVersion")]
     pub current_version: i32,
-    /// The list of player levels.    
+    /// The list of player levels.
     #[serde(alias="playerLevels")]
     pub player_levels: Vec<PlayerLevel>,
 }
@@ -1090,12 +1099,12 @@ impl ResponseResult for MetagameConfig {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct AchievementDefinitionsListResponse {
-    /// Token corresponding to the next page of results.    
+    /// Token corresponding to the next page of results.
     #[serde(alias="nextPageToken")]
     pub next_page_token: String,
-    /// The achievement definitions.    
+    /// The achievement definitions.
     pub items: Vec<AchievementDefinition>,
-    /// Uniquely identifies the type of this resource. Value is always the fixed string games#achievementDefinitionsListResponse.    
+    /// Uniquely identifies the type of this resource. Value is always the fixed string games#achievementDefinitionsListResponse.
     pub kind: String,
 }
 
@@ -1108,18 +1117,18 @@ impl ResponseResult for AchievementDefinitionsListResponse {}
 /// 
 #[derive(Default, Clone, Debug, Serialize)]
 pub struct PeerSessionDiagnostics {
-    /// Unreliable channel diagnostics.    
+    /// Unreliable channel diagnostics.
     #[serde(alias="unreliableChannel")]
     pub unreliable_channel: PeerChannelDiagnostics,
-    /// Uniquely identifies the type of this resource. Value is always the fixed string games#peerSessionDiagnostics.    
+    /// Uniquely identifies the type of this resource. Value is always the fixed string games#peerSessionDiagnostics.
     pub kind: String,
-    /// Reliable channel diagnostics.    
+    /// Reliable channel diagnostics.
     #[serde(alias="reliableChannel")]
     pub reliable_channel: PeerChannelDiagnostics,
-    /// Connected time in milliseconds.    
+    /// Connected time in milliseconds.
     #[serde(alias="connectedTimestampMillis")]
     pub connected_timestamp_millis: String,
-    /// The participant ID of the peer.    
+    /// The participant ID of the peer.
     #[serde(alias="participantId")]
     pub participant_id: String,
 }
@@ -1133,9 +1142,9 @@ impl Part for PeerSessionDiagnostics {}
 /// 
 #[derive(Default, Clone, Debug, Serialize)]
 pub struct TurnBasedMatchDataRequest {
-    /// Uniquely identifies the type of this resource. Value is always the fixed string games#turnBasedMatchDataRequest.    
+    /// Uniquely identifies the type of this resource. Value is always the fixed string games#turnBasedMatchDataRequest.
     pub kind: String,
-    /// The byte representation of the data (limited to 128 kB), as a Base64-encoded string with the URL_SAFE encoding option.    
+    /// The byte representation of the data (limited to 128 kB), as a Base64-encoded string with the URL_SAFE encoding option.
     pub data: String,
 }
 
@@ -1148,12 +1157,12 @@ impl Part for TurnBasedMatchDataRequest {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct EventPeriodRange {
-    /// Uniquely identifies the type of this resource. Value is always the fixed string games#eventPeriodRange.    
+    /// Uniquely identifies the type of this resource. Value is always the fixed string games#eventPeriodRange.
     pub kind: String,
-    /// The time when this update period begins, in millis, since 1970 UTC (Unix Epoch).    
+    /// The time when this update period begins, in millis, since 1970 UTC (Unix Epoch).
     #[serde(alias="periodStartMillis")]
     pub period_start_millis: String,
-    /// The time when this update period ends, in millis, since 1970 UTC (Unix Epoch).    
+    /// The time when this update period ends, in millis, since 1970 UTC (Unix Epoch).
     #[serde(alias="periodEndMillis")]
     pub period_end_millis: String,
 }
@@ -1167,11 +1176,11 @@ impl Part for EventPeriodRange {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ParticipantResult {
-    /// Uniquely identifies the type of this resource. Value is always the fixed string games#participantResult.    
+    /// Uniquely identifies the type of this resource. Value is always the fixed string games#participantResult.
     pub kind: String,
-    /// The placement or ranking of the participant in the match results; a number from one to the number of participants in the match. Multiple participants may have the same placing value in case of a type.    
+    /// The placement or ranking of the participant in the match results; a number from one to the number of participants in the match. Multiple participants may have the same placing value in case of a type.
     pub placing: i32,
-    /// The ID of the participant.    
+    /// The ID of the participant.
     #[serde(alias="participantId")]
     pub participant_id: String,
     /// The result of the participant for this match.
@@ -1194,24 +1203,24 @@ impl Part for ParticipantResult {}
 /// 
 #[derive(Default, Clone, Debug, Serialize)]
 pub struct NetworkDiagnostics {
-    /// Uniquely identifies the type of this resource. Value is always the fixed string games#networkDiagnostics.    
+    /// Uniquely identifies the type of this resource. Value is always the fixed string games#networkDiagnostics.
     pub kind: String,
-    /// The name of the carrier of the client's network connection. On Android: http://developer.android.com/reference/android/telephony/TelephonyManager.html#getNetworkOperatorName() On iOS: https://developer.apple.com/library/ios/documentation/NetworkingInternet/Reference/CTCarrier/Reference/Reference.html#//apple_ref/occ/instp/CTCarrier/carrierName    
+    /// The name of the carrier of the client's network connection. On Android: http://developer.android.com/reference/android/telephony/TelephonyManager.html#getNetworkOperatorName() On iOS: https://developer.apple.com/library/ios/documentation/NetworkingInternet/Reference/CTCarrier/Reference/Reference.html#//apple_ref/occ/instp/CTCarrier/carrierName
     #[serde(alias="networkOperatorName")]
     pub network_operator_name: String,
-    /// The amount of time in milliseconds it took for the client to establish a connection with the XMPP server.    
+    /// The amount of time in milliseconds it took for the client to establish a connection with the XMPP server.
     #[serde(alias="registrationLatencyMillis")]
     pub registration_latency_millis: i32,
-    /// iOS network type as defined in Reachability.h.    
+    /// iOS network type as defined in Reachability.h.
     #[serde(alias="iosNetworkType")]
     pub ios_network_type: i32,
-    /// The MCC+MNC code for the client's network connection. On Android: http://developer.android.com/reference/android/telephony/TelephonyManager.html#getNetworkOperator() On iOS, see: https://developer.apple.com/library/ios/documentation/NetworkingInternet/Reference/CTCarrier/Reference/Reference.html    
+    /// The MCC+MNC code for the client's network connection. On Android: http://developer.android.com/reference/android/telephony/TelephonyManager.html#getNetworkOperator() On iOS, see: https://developer.apple.com/library/ios/documentation/NetworkingInternet/Reference/CTCarrier/Reference/Reference.html
     #[serde(alias="networkOperatorCode")]
     pub network_operator_code: String,
-    /// The Android network subtype.    
+    /// The Android network subtype.
     #[serde(alias="androidNetworkSubtype")]
     pub android_network_subtype: i32,
-    /// The Android network type.    
+    /// The Android network type.
     #[serde(alias="androidNetworkType")]
     pub android_network_type: i32,
 }
@@ -1230,9 +1239,9 @@ impl Part for NetworkDiagnostics {}
 /// 
 #[derive(Default, Clone, Debug, Serialize)]
 pub struct PushTokenId {
-    /// Uniquely identifies the type of this resource. Value is always the fixed string games#pushTokenId.    
+    /// Uniquely identifies the type of this resource. Value is always the fixed string games#pushTokenId.
     pub kind: Option<String>,
-    /// A push token ID for iOS devices.    
+    /// A push token ID for iOS devices.
     pub ios: Option<PushTokenIdIos>,
 }
 
@@ -1245,9 +1254,9 @@ impl RequestValue for PushTokenId {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct EventBatchRecordFailure {
-    /// Uniquely identifies the type of this resource. Value is always the fixed string games#eventBatchRecordFailure.    
+    /// Uniquely identifies the type of this resource. Value is always the fixed string games#eventBatchRecordFailure.
     pub kind: String,
-    /// The time range which was rejected; empty for a request-wide failure.    
+    /// The time range which was rejected; empty for a request-wide failure.
     pub range: EventPeriodRange,
     /// The cause for the update failure.
     /// Possible values are:  
@@ -1270,9 +1279,9 @@ impl Part for EventBatchRecordFailure {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct RoomClientAddress {
-    /// Uniquely identifies the type of this resource. Value is always the fixed string games#roomClientAddress.    
+    /// Uniquely identifies the type of this resource. Value is always the fixed string games#roomClientAddress.
     pub kind: String,
-    /// The XMPP address of the client on the Google Games XMPP network.    
+    /// The XMPP address of the client on the Google Games XMPP network.
     #[serde(alias="xmppAddress")]
     pub xmpp_address: String,
 }
@@ -1286,18 +1295,18 @@ impl Part for RoomClientAddress {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct PlayerExperienceInfo {
-    /// The current number of experience points for the player.    
+    /// The current number of experience points for the player.
     #[serde(alias="currentExperiencePoints")]
     pub current_experience_points: String,
-    /// Uniquely identifies the type of this resource. Value is always the fixed string games#playerExperienceInfo.    
+    /// Uniquely identifies the type of this resource. Value is always the fixed string games#playerExperienceInfo.
     pub kind: String,
-    /// The timestamp when the player was leveled up, in millis since Unix epoch UTC.    
+    /// The timestamp when the player was leveled up, in millis since Unix epoch UTC.
     #[serde(alias="lastLevelUpTimestampMillis")]
     pub last_level_up_timestamp_millis: String,
-    /// The next level of the player. If the current level is the maximum level, this should be same as the current level.    
+    /// The next level of the player. If the current level is the maximum level, this should be same as the current level.
     #[serde(alias="nextLevel")]
     pub next_level: PlayerLevel,
-    /// The current level of the player.    
+    /// The current level of the player.
     #[serde(alias="currentLevel")]
     pub current_level: PlayerLevel,
 }
@@ -1317,20 +1326,20 @@ impl Part for PlayerExperienceInfo {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct LeaderboardScores {
-    /// The pagination token for the next page of results.    
+    /// The pagination token for the next page of results.
     #[serde(alias="nextPageToken")]
     pub next_page_token: String,
-    /// Uniquely identifies the type of this resource. Value is always the fixed string games#leaderboardScores.    
+    /// Uniquely identifies the type of this resource. Value is always the fixed string games#leaderboardScores.
     pub kind: String,
-    /// The pagination token for the previous page of results.    
+    /// The pagination token for the previous page of results.
     #[serde(alias="prevPageToken")]
     pub prev_page_token: String,
-    /// The total number of scores in the leaderboard.    
+    /// The total number of scores in the leaderboard.
     #[serde(alias="numScores")]
     pub num_scores: String,
-    /// The scores in the leaderboard.    
+    /// The scores in the leaderboard.
     pub items: Vec<LeaderboardEntry>,
-    /// The score of the requesting player on the leaderboard. The player's score may appear both here and in the list of scores above. If you are viewing a public leaderboard and the player is not sharing their gameplay information publicly, the scoreRank and formattedScoreRank values will not be present.    
+    /// The score of the requesting player on the leaderboard. The player's score may appear both here and in the list of scores above. If you are viewing a public leaderboard and the player is not sharing their gameplay information publicly, the scoreRank and formattedScoreRank values will not be present.
     #[serde(alias="playerScore")]
     pub player_score: LeaderboardEntry,
 }
@@ -1344,7 +1353,7 @@ impl ResponseResult for LeaderboardScores {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct RoomParticipant {
-    /// True if this participant was auto-matched with the requesting player.    
+    /// True if this participant was auto-matched with the requesting player.
     #[serde(alias="autoMatched")]
     pub auto_matched: bool,
     /// The status of the participant with respect to the room.
@@ -1354,17 +1363,17 @@ pub struct RoomParticipant {
     /// - "PARTICIPANT_DECLINED" - The participant declined an invitation to join the room. 
     /// - "PARTICIPANT_LEFT" - The participant joined the room and then left it.
     pub status: String,
-    /// Uniquely identifies the type of this resource. Value is always the fixed string games#roomParticipant.    
+    /// Uniquely identifies the type of this resource. Value is always the fixed string games#roomParticipant.
     pub kind: String,
-    /// Information about a player that has been anonymously auto-matched against the requesting player. (Either player or autoMatchedPlayer will be set.)    
+    /// Information about a player that has been anonymously auto-matched against the requesting player. (Either player or autoMatchedPlayer will be set.)
     #[serde(alias="autoMatchedPlayer")]
     pub auto_matched_player: AnonymousPlayer,
-    /// Client address for the participant.    
+    /// Client address for the participant.
     #[serde(alias="clientAddress")]
     pub client_address: RoomClientAddress,
-    /// The capabilities which can be used when communicating with this participant.    
+    /// The capabilities which can be used when communicating with this participant.
     pub capabilities: Vec<String>,
-    /// Information about the player. Not populated if this player was anonymously auto-matched against the requesting player. (Either player or autoMatchedPlayer will be set.)    
+    /// Information about the player. Not populated if this player was anonymously auto-matched against the requesting player. (Either player or autoMatchedPlayer will be set.)
     pub player: Player,
     /// The reason the participant left the room; populated if the participant status is PARTICIPANT_LEFT.
     /// Possible values are:  
@@ -1377,9 +1386,9 @@ pub struct RoomParticipant {
     /// - "PRESENCE_FAILURE" - The client's XMPP connection ended abruptly.
     #[serde(alias="leaveReason")]
     pub leave_reason: String,
-    /// True if this participant is in the fully connected set of peers in the room.    
+    /// True if this participant is in the fully connected set of peers in the room.
     pub connected: bool,
-    /// An identifier for the participant in the scope of the room. Cannot be used to identify a player across rooms or in other contexts.    
+    /// An identifier for the participant in the scope of the room. Cannot be used to identify a player across rooms or in other contexts.
     pub id: String,
 }
 
@@ -1398,27 +1407,27 @@ impl Part for RoomParticipant {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct Snapshot {
-    /// Uniquely identifies the type of this resource. Value is always the fixed string games#snapshot.    
+    /// Uniquely identifies the type of this resource. Value is always the fixed string games#snapshot.
     pub kind: String,
-    /// The description of this snapshot.    
+    /// The description of this snapshot.
     pub description: String,
-    /// The title of this snapshot.    
+    /// The title of this snapshot.
     pub title: String,
-    /// The cover image of this snapshot. May be absent if there is no image.    
+    /// The cover image of this snapshot. May be absent if there is no image.
     #[serde(alias="coverImage")]
     pub cover_image: SnapshotImage,
-    /// The timestamp (in millis since Unix epoch) of the last modification to this snapshot.    
+    /// The timestamp (in millis since Unix epoch) of the last modification to this snapshot.
     #[serde(alias="lastModifiedMillis")]
     pub last_modified_millis: String,
-    /// The ID of the snapshot.    
+    /// The ID of the snapshot.
     pub id: String,
-    /// The ID of the file underlying this snapshot in the Drive API. Only present if the snapshot is a view on a Drive file and the file is owned by the caller.    
+    /// The ID of the file underlying this snapshot in the Drive API. Only present if the snapshot is a view on a Drive file and the file is owned by the caller.
     #[serde(alias="driveId")]
     pub drive_id: String,
-    /// The duration associated with this snapshot, in millis.    
+    /// The duration associated with this snapshot, in millis.
     #[serde(alias="durationMillis")]
     pub duration_millis: String,
-    /// The unique name provided when the snapshot was created.    
+    /// The unique name provided when the snapshot was created.
     #[serde(alias="uniqueName")]
     pub unique_name: String,
     /// The type of this snapshot.
@@ -1426,7 +1435,7 @@ pub struct Snapshot {
     /// - "SAVE_GAME" - A snapshot representing a save game.
     #[serde(alias="type")]
     pub type_: String,
-    /// The progress value (64-bit integer set by developer) associated with this snapshot.    
+    /// The progress value (64-bit integer set by developer) associated with this snapshot.
     #[serde(alias="progressValue")]
     pub progress_value: String,
 }
@@ -1446,7 +1455,7 @@ impl ResponseResult for Snapshot {}
 /// 
 #[derive(Default, Clone, Debug, Serialize)]
 pub struct RoomLeaveRequest {
-    /// Uniquely identifies the type of this resource. Value is always the fixed string games#roomLeaveRequest.    
+    /// Uniquely identifies the type of this resource. Value is always the fixed string games#roomLeaveRequest.
     pub kind: Option<String>,
     /// Reason for leaving the match.
     /// Possible values are:  
@@ -1464,7 +1473,7 @@ pub struct RoomLeaveRequest {
     /// - "REALTIME_DIFFERENT_CLIENT_ROOM_OPERATION" - Another client is trying to enter a room. 
     /// - "REALTIME_SAME_CLIENT_ROOM_OPERATION" - The same client is trying to enter a new room.
     pub reason: Option<String>,
-    /// Diagnostics for a player leaving the room.    
+    /// Diagnostics for a player leaving the room.
     #[serde(alias="leaveDiagnostics")]
     pub leave_diagnostics: Option<RoomLeaveDiagnostics>,
 }
@@ -1483,10 +1492,10 @@ impl RequestValue for RoomLeaveRequest {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct PlayerScoreListResponse {
-    /// The score submissions statuses.    
+    /// The score submissions statuses.
     #[serde(alias="submittedScores")]
     pub submitted_scores: Vec<PlayerScoreResponse>,
-    /// Uniquely identifies the type of this resource. Value is always the fixed string games#playerScoreListResponse.    
+    /// Uniquely identifies the type of this resource. Value is always the fixed string games#playerScoreListResponse.
     pub kind: String,
 }
 
@@ -1499,27 +1508,27 @@ impl ResponseResult for PlayerScoreListResponse {}
 /// 
 #[derive(Default, Clone, Debug, Serialize)]
 pub struct RoomLeaveDiagnostics {
-    /// Uniquely identifies the type of this resource. Value is always the fixed string games#roomLeaveDiagnostics.    
+    /// Uniquely identifies the type of this resource. Value is always the fixed string games#roomLeaveDiagnostics.
     pub kind: String,
-    /// Whether or not sockets were used.    
+    /// Whether or not sockets were used.
     #[serde(alias="socketsUsed")]
     pub sockets_used: bool,
-    /// iOS network type as defined in Reachability.h.    
+    /// iOS network type as defined in Reachability.h.
     #[serde(alias="iosNetworkType")]
     pub ios_network_type: i32,
-    /// The MCC+MNC code for the client's network connection. On Android: http://developer.android.com/reference/android/telephony/TelephonyManager.html#getNetworkOperator() On iOS, see: https://developer.apple.com/library/ios/documentation/NetworkingInternet/Reference/CTCarrier/Reference/Reference.html    
+    /// The MCC+MNC code for the client's network connection. On Android: http://developer.android.com/reference/android/telephony/TelephonyManager.html#getNetworkOperator() On iOS, see: https://developer.apple.com/library/ios/documentation/NetworkingInternet/Reference/CTCarrier/Reference/Reference.html
     #[serde(alias="networkOperatorCode")]
     pub network_operator_code: String,
-    /// Diagnostics about all peer sessions.    
+    /// Diagnostics about all peer sessions.
     #[serde(alias="peerSession")]
     pub peer_session: Vec<PeerSessionDiagnostics>,
-    /// Android network subtype. http://developer.android.com/reference/android/net/NetworkInfo.html#getSubtype()    
+    /// Android network subtype. http://developer.android.com/reference/android/net/NetworkInfo.html#getSubtype()
     #[serde(alias="androidNetworkSubtype")]
     pub android_network_subtype: i32,
-    /// The name of the carrier of the client's network connection. On Android: http://developer.android.com/reference/android/telephony/TelephonyManager.html#getNetworkOperatorName() On iOS: https://developer.apple.com/library/ios/documentation/NetworkingInternet/Reference/CTCarrier/Reference/Reference.html#//apple_ref/occ/instp/CTCarrier/carrierName    
+    /// The name of the carrier of the client's network connection. On Android: http://developer.android.com/reference/android/telephony/TelephonyManager.html#getNetworkOperatorName() On iOS: https://developer.apple.com/library/ios/documentation/NetworkingInternet/Reference/CTCarrier/Reference/Reference.html#//apple_ref/occ/instp/CTCarrier/carrierName
     #[serde(alias="networkOperatorName")]
     pub network_operator_name: String,
-    /// Android network type. http://developer.android.com/reference/android/net/NetworkInfo.html#getType()    
+    /// Android network type. http://developer.android.com/reference/android/net/NetworkInfo.html#getType()
     #[serde(alias="androidNetworkType")]
     pub android_network_type: i32,
 }
@@ -1545,14 +1554,14 @@ pub struct QuestMilestone {
     /// - "NOT_COMPLETED" - The milestone has not yet been completed. 
     /// - "NOT_STARTED" - The milestone is for a quest that has not yet been accepted.
     pub state: Option<String>,
-    /// The completion reward data of the milestone, represented as a Base64-encoded string. This is a developer-specified binary blob with size between 0 and 2 KB before encoding.    
+    /// The completion reward data of the milestone, represented as a Base64-encoded string. This is a developer-specified binary blob with size between 0 and 2 KB before encoding.
     #[serde(alias="completionRewardData")]
     pub completion_reward_data: Option<String>,
-    /// The milestone ID.    
+    /// The milestone ID.
     pub id: Option<String>,
-    /// Uniquely identifies the type of this resource. Value is always the fixed string games#questMilestone.    
+    /// Uniquely identifies the type of this resource. Value is always the fixed string games#questMilestone.
     pub kind: Option<String>,
-    /// The criteria of the milestone.    
+    /// The criteria of the milestone.
     pub criteria: Option<Vec<QuestCriterion>>,
 }
 
@@ -1570,11 +1579,11 @@ impl Resource for QuestMilestone {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct TurnBasedMatchRematch {
-    /// The newly created match; a rematch of the old match with the same participants.    
+    /// The newly created match; a rematch of the old match with the same participants.
     pub rematch: TurnBasedMatch,
-    /// Uniquely identifies the type of this resource. Value is always the fixed string games#turnBasedMatchRematch.    
+    /// Uniquely identifies the type of this resource. Value is always the fixed string games#turnBasedMatchRematch.
     pub kind: String,
-    /// The old match that the rematch was created from; will be updated such that the rematchId field will point at the new match.    
+    /// The old match that the rematch was created from; will be updated such that the rematchId field will point at the new match.
     #[serde(alias="previousMatch")]
     pub previous_match: TurnBasedMatch,
 }
@@ -1593,14 +1602,14 @@ impl ResponseResult for TurnBasedMatchRematch {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct PlayerLeaderboardScoreListResponse {
-    /// The pagination token for the next page of results.    
+    /// The pagination token for the next page of results.
     #[serde(alias="nextPageToken")]
     pub next_page_token: String,
-    /// The leaderboard scores.    
+    /// The leaderboard scores.
     pub items: Vec<PlayerLeaderboardScore>,
-    /// Uniquely identifies the type of this resource. Value is always the fixed string games#playerLeaderboardScoreListResponse.    
+    /// Uniquely identifies the type of this resource. Value is always the fixed string games#playerLeaderboardScoreListResponse.
     pub kind: String,
-    /// The Player resources for the owner of this score.    
+    /// The Player resources for the owner of this score.
     pub player: Player,
 }
 
@@ -1619,36 +1628,36 @@ impl ResponseResult for PlayerLeaderboardScoreListResponse {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct Application {
-    /// The category of the application.    
+    /// The category of the application.
     pub category: ApplicationCategory,
-    /// A hint to the client UI for what color to use as an app-themed color. The color is given as an RGB triplet (e.g. "E0E0E0").    
+    /// A hint to the client UI for what color to use as an app-themed color. The color is given as an RGB triplet (e.g. "E0E0E0").
     #[serde(alias="themeColor")]
     pub theme_color: String,
-    /// The description of the application.    
+    /// The description of the application.
     pub description: String,
-    /// The author of the application.    
+    /// The author of the application.
     pub author: String,
-    /// The last updated timestamp of the application.    
+    /// The last updated timestamp of the application.
     #[serde(alias="lastUpdatedTimestamp")]
     pub last_updated_timestamp: String,
-    /// Uniquely identifies the type of this resource. Value is always the fixed string games#application.    
+    /// Uniquely identifies the type of this resource. Value is always the fixed string games#application.
     pub kind: String,
-    /// The instances of the application.    
+    /// The instances of the application.
     pub instances: Vec<Instance>,
     /// A list of features that have been enabled for the application.
     /// Possible values are:  
     /// - "SNAPSHOTS" - Snapshots has been enabled
     #[serde(alias="enabledFeatures")]
     pub enabled_features: Vec<String>,
-    /// The number of achievements visible to the currently authenticated player.    
+    /// The number of achievements visible to the currently authenticated player.
     pub achievement_count: i32,
-    /// The number of leaderboards visible to the currently authenticated player.    
+    /// The number of leaderboards visible to the currently authenticated player.
     pub leaderboard_count: i32,
-    /// The assets of the application.    
+    /// The assets of the application.
     pub assets: Vec<ImageAsset>,
-    /// The ID of the application.    
+    /// The ID of the application.
     pub id: String,
-    /// The name of the application.    
+    /// The name of the application.
     pub name: String,
 }
 
@@ -1662,12 +1671,12 @@ impl ResponseResult for Application {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct Played {
-    /// True if the player was auto-matched with the currently authenticated user.    
+    /// True if the player was auto-matched with the currently authenticated user.
     #[serde(alias="autoMatched")]
     pub auto_matched: bool,
-    /// Uniquely identifies the type of this resource. Value is always the fixed string games#played.    
+    /// Uniquely identifies the type of this resource. Value is always the fixed string games#played.
     pub kind: String,
-    /// The last time the player played the game in milliseconds since the epoch in UTC.    
+    /// The last time the player played the game in milliseconds since the epoch in UTC.
     #[serde(alias="timeMillis")]
     pub time_millis: String,
 }
@@ -1681,12 +1690,12 @@ impl Part for Played {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct QuestContribution {
-    /// The formatted value of the contribution as a string. Format depends on the configuration for the associated event definition in the Play Games Developer Console.    
+    /// The formatted value of the contribution as a string. Format depends on the configuration for the associated event definition in the Play Games Developer Console.
     #[serde(alias="formattedValue")]
     pub formatted_value: String,
-    /// Uniquely identifies the type of this resource. Value is always the fixed string games#questContribution.    
+    /// Uniquely identifies the type of this resource. Value is always the fixed string games#questContribution.
     pub kind: String,
-    /// The value of the contribution.    
+    /// The value of the contribution.
     pub value: String,
 }
 
@@ -1699,17 +1708,17 @@ impl Part for QuestContribution {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct QuestCriterion {
-    /// The ID of the event the criterion corresponds to.    
+    /// The ID of the event the criterion corresponds to.
     #[serde(alias="eventId")]
     pub event_id: String,
-    /// The total number of times the associated event must be incremented for the player to complete this quest.    
+    /// The total number of times the associated event must be incremented for the player to complete this quest.
     #[serde(alias="completionContribution")]
     pub completion_contribution: QuestContribution,
     /// The value of the event associated with this quest at the time that the quest was accepted. This value may change if event increments that took place before the start of quest are uploaded after the quest starts.
     /// There will be no initialPlayerProgress until the player has accepted the quest.
     #[serde(alias="initialPlayerProgress")]
     pub initial_player_progress: QuestContribution,
-    /// Uniquely identifies the type of this resource. Value is always the fixed string games#questCriterion.    
+    /// Uniquely identifies the type of this resource. Value is always the fixed string games#questCriterion.
     pub kind: String,
     /// The number of increments the player has made toward the completion count event increments required to complete the quest. This value will not exceed the completion contribution.
     /// There will be no currentContribution until the player has accepted the quest.
@@ -1731,12 +1740,12 @@ impl Part for QuestCriterion {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct RoomList {
-    /// The pagination token for the next page of results.    
+    /// The pagination token for the next page of results.
     #[serde(alias="nextPageToken")]
     pub next_page_token: String,
-    /// The rooms.    
+    /// The rooms.
     pub items: Vec<Room>,
-    /// Uniquely identifies the type of this resource. Value is always the fixed string games#roomList.    
+    /// Uniquely identifies the type of this resource. Value is always the fixed string games#roomList.
     pub kind: String,
 }
 
@@ -1749,15 +1758,15 @@ impl ResponseResult for RoomList {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct PlayerLevel {
-    /// The maximum experience points for this level.    
+    /// The maximum experience points for this level.
     #[serde(alias="maxExperiencePoints")]
     pub max_experience_points: String,
-    /// Uniquely identifies the type of this resource. Value is always the fixed string games#playerLevel.    
+    /// Uniquely identifies the type of this resource. Value is always the fixed string games#playerLevel.
     pub kind: String,
-    /// The minimum experience points for this level.    
+    /// The minimum experience points for this level.
     #[serde(alias="minExperiencePoints")]
     pub min_experience_points: String,
-    /// The level for the user.    
+    /// The level for the user.
     pub level: i32,
 }
 
@@ -1770,9 +1779,9 @@ impl Part for PlayerLevel {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct RoomAutoMatchStatus {
-    /// Uniquely identifies the type of this resource. Value is always the fixed string games#roomAutoMatchStatus.    
+    /// Uniquely identifies the type of this resource. Value is always the fixed string games#roomAutoMatchStatus.
     pub kind: String,
-    /// An estimate for the amount of time (in seconds) that auto-matching is expected to take to complete.    
+    /// An estimate for the amount of time (in seconds) that auto-matching is expected to take to complete.
     #[serde(alias="waitEstimateSeconds")]
     pub wait_estimate_seconds: i32,
 }
@@ -1786,11 +1795,11 @@ impl Part for RoomAutoMatchStatus {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct TurnBasedMatchData {
-    /// The byte representation of the data (limited to 128 kB), as a Base64-encoded string with the URL_SAFE encoding option.    
+    /// The byte representation of the data (limited to 128 kB), as a Base64-encoded string with the URL_SAFE encoding option.
     pub data: String,
-    /// Uniquely identifies the type of this resource. Value is always the fixed string games#turnBasedMatchData.    
+    /// Uniquely identifies the type of this resource. Value is always the fixed string games#turnBasedMatchData.
     pub kind: String,
-    /// True if this match has data available but it wasn't returned in a list response; fetching the match individually will retrieve this data.    
+    /// True if this match has data available but it wasn't returned in a list response; fetching the match individually will retrieve this data.
     #[serde(alias="dataAvailable")]
     pub data_available: bool,
 }
@@ -1804,17 +1813,17 @@ impl Part for TurnBasedMatchData {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct EventDefinition {
-    /// Indicates whether the icon image being returned is a default image, or is game-provided.    
+    /// Indicates whether the icon image being returned is a default image, or is game-provided.
     #[serde(alias="isDefaultImageUrl")]
     pub is_default_image_url: bool,
-    /// Uniquely identifies the type of this resource. Value is always the fixed string games#eventDefinition.    
+    /// Uniquely identifies the type of this resource. Value is always the fixed string games#eventDefinition.
     pub kind: String,
-    /// The name to display for the event.    
+    /// The name to display for the event.
     #[serde(alias="displayName")]
     pub display_name: String,
-    /// Description of what this event represents.    
+    /// Description of what this event represents.
     pub description: String,
-    /// The base URL for the image that represents the event.    
+    /// The base URL for the image that represents the event.
     #[serde(alias="imageUrl")]
     pub image_url: String,
     /// The visibility of event being tracked in this definition.
@@ -1822,10 +1831,10 @@ pub struct EventDefinition {
     /// - "REVEALED": This event should be visible to all users. 
     /// - "HIDDEN": This event should only be shown to users that have recorded this event at least once.
     pub visibility: String,
-    /// A list of events that are a child of this event.    
+    /// A list of events that are a child of this event.
     #[serde(alias="childEvents")]
     pub child_events: Vec<EventChild>,
-    /// The ID of the event.    
+    /// The ID of the event.
     pub id: String,
 }
 
@@ -1838,24 +1847,24 @@ impl Part for EventDefinition {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct InstanceIosDetails {
-    /// Indicates that this instance is the default for new installations on iPhone devices.    
+    /// Indicates that this instance is the default for new installations on iPhone devices.
     #[serde(alias="preferredForIphone")]
     pub preferred_for_iphone: bool,
-    /// Uniquely identifies the type of this resource. Value is always the fixed string games#instanceIosDetails.    
+    /// Uniquely identifies the type of this resource. Value is always the fixed string games#instanceIosDetails.
     pub kind: String,
-    /// Flag to indicate if this instance supports iPhone.    
+    /// Flag to indicate if this instance supports iPhone.
     #[serde(alias="supportIphone")]
     pub support_iphone: bool,
-    /// Indicates that this instance is the default for new installations on iPad devices.    
+    /// Indicates that this instance is the default for new installations on iPad devices.
     #[serde(alias="preferredForIpad")]
     pub preferred_for_ipad: bool,
-    /// iTunes App ID.    
+    /// iTunes App ID.
     #[serde(alias="itunesAppId")]
     pub itunes_app_id: String,
-    /// Bundle identifier.    
+    /// Bundle identifier.
     #[serde(alias="bundleIdentifier")]
     pub bundle_identifier: String,
-    /// Flag to indicate if this instance supports iPad.    
+    /// Flag to indicate if this instance supports iPad.
     #[serde(alias="supportIpad")]
     pub support_ipad: bool,
 }
@@ -1869,15 +1878,15 @@ impl Part for InstanceIosDetails {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct InstanceAndroidDetails {
-    /// Uniquely identifies the type of this resource. Value is always the fixed string games#instanceAndroidDetails.    
+    /// Uniquely identifies the type of this resource. Value is always the fixed string games#instanceAndroidDetails.
     pub kind: String,
-    /// Flag indicating whether the anti-piracy check is enabled.    
+    /// Flag indicating whether the anti-piracy check is enabled.
     #[serde(alias="enablePiracyCheck")]
     pub enable_piracy_check: bool,
-    /// Android package name which maps to Google Play URL.    
+    /// Android package name which maps to Google Play URL.
     #[serde(alias="packageName")]
     pub package_name: String,
-    /// Indicates that this instance is the default for new installations.    
+    /// Indicates that this instance is the default for new installations.
     pub preferred: bool,
 }
 
@@ -1895,7 +1904,7 @@ impl Part for InstanceAndroidDetails {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct AchievementRevealResponse {
-    /// Uniquely identifies the type of this resource. Value is always the fixed string games#achievementRevealResponse.    
+    /// Uniquely identifies the type of this resource. Value is always the fixed string games#achievementRevealResponse.
     pub kind: String,
     /// The current state of the achievement for which a reveal was attempted. This might be UNLOCKED if the achievement was already unlocked.
     /// Possible values are:  
@@ -1934,36 +1943,36 @@ pub struct Room {
     /// - "ROOM_ACTIVE" - All players have joined and connected to each other. 
     /// - "ROOM_DELETED" - The room should no longer be shown on the client. Returned in sync calls when a player joins a room (as a tombstone), or for rooms where all joined participants have left.
     pub status: String,
-    /// Uniquely identifies the type of this resource. Value is always the fixed string games#room.    
+    /// Uniquely identifies the type of this resource. Value is always the fixed string games#room.
     pub kind: String,
-    /// Criteria for auto-matching players into this room.    
+    /// Criteria for auto-matching players into this room.
     #[serde(alias="autoMatchingCriteria")]
     pub auto_matching_criteria: RoomAutoMatchingCriteria,
-    /// Details about the room creation.    
+    /// Details about the room creation.
     #[serde(alias="creationDetails")]
     pub creation_details: RoomModification,
-    /// This short description is generated by our servers and worded relative to the player requesting the room. It is intended to be displayed when the room is shown in a list (that is, an invitation to a room.)    
+    /// This short description is generated by our servers and worded relative to the player requesting the room. It is intended to be displayed when the room is shown in a list (that is, an invitation to a room.)
     pub description: String,
-    /// The version of the room status: an increasing counter, used by the client to ignore out-of-order updates to room status.    
+    /// The version of the room status: an increasing counter, used by the client to ignore out-of-order updates to room status.
     #[serde(alias="roomStatusVersion")]
     pub room_status_version: i32,
-    /// Auto-matching status for this room. Not set if the room is not currently in the auto-matching queue.    
+    /// Auto-matching status for this room. Not set if the room is not currently in the auto-matching queue.
     #[serde(alias="autoMatchingStatus")]
     pub auto_matching_status: RoomAutoMatchStatus,
-    /// Details about the last update to the room.    
+    /// Details about the last update to the room.
     #[serde(alias="lastUpdateDetails")]
     pub last_update_details: RoomModification,
-    /// The variant / mode of the application being played; can be any integer value, or left blank.    
+    /// The variant / mode of the application being played; can be any integer value, or left blank.
     pub variant: i32,
-    /// The participants involved in the room, along with their statuses. Includes participants who have left or declined invitations.    
+    /// The participants involved in the room, along with their statuses. Includes participants who have left or declined invitations.
     pub participants: Vec<RoomParticipant>,
-    /// Globally unique ID for a room.    
+    /// Globally unique ID for a room.
     #[serde(alias="roomId")]
     pub room_id: String,
-    /// The ID of the application being played.    
+    /// The ID of the application being played.
     #[serde(alias="applicationId")]
     pub application_id: String,
-    /// The ID of the participant that invited the user to the room. Not set if the user was not invited to the room.    
+    /// The ID of the participant that invited the user to the room. Not set if the user was not invited to the room.
     #[serde(alias="inviterId")]
     pub inviter_id: String,
 }
@@ -1978,12 +1987,12 @@ impl ResponseResult for Room {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct LeaderboardEntry {
-    /// Uniquely identifies the type of this resource. Value is always the fixed string games#leaderboardEntry.    
+    /// Uniquely identifies the type of this resource. Value is always the fixed string games#leaderboardEntry.
     pub kind: String,
-    /// The numerical value of this score.    
+    /// The numerical value of this score.
     #[serde(alias="scoreValue")]
     pub score_value: String,
-    /// Additional information about the score. Values must contain no more than 64 URI-safe characters as defined by section 2.3 of RFC 3986.    
+    /// Additional information about the score. Values must contain no more than 64 URI-safe characters as defined by section 2.3 of RFC 3986.
     #[serde(alias="scoreTag")]
     pub score_tag: String,
     /// The time span of this high score.
@@ -1993,18 +2002,18 @@ pub struct LeaderboardEntry {
     /// - "DAILY" - The score is a daily high score.
     #[serde(alias="timeSpan")]
     pub time_span: String,
-    /// The localized string for the numerical value of this score.    
+    /// The localized string for the numerical value of this score.
     #[serde(alias="formattedScore")]
     pub formatted_score: String,
-    /// The player who holds this score.    
+    /// The player who holds this score.
     pub player: Player,
-    /// The localized string for the rank of this score for this leaderboard.    
+    /// The localized string for the rank of this score for this leaderboard.
     #[serde(alias="formattedScoreRank")]
     pub formatted_score_rank: String,
-    /// The rank of this score for this leaderboard.    
+    /// The rank of this score for this leaderboard.
     #[serde(alias="scoreRank")]
     pub score_rank: String,
-    /// The timestamp at which this score was recorded, in milliseconds since the epoch in UTC.    
+    /// The timestamp at which this score was recorded, in milliseconds since the epoch in UTC.
     #[serde(alias="writeTimestampMillis")]
     pub write_timestamp_millis: String,
 }
@@ -2018,15 +2027,15 @@ impl Part for LeaderboardEntry {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct TurnBasedAutoMatchingCriteria {
-    /// Uniquely identifies the type of this resource. Value is always the fixed string games#turnBasedAutoMatchingCriteria.    
+    /// Uniquely identifies the type of this resource. Value is always the fixed string games#turnBasedAutoMatchingCriteria.
     pub kind: String,
-    /// The minimum number of players that should be added to the match by auto-matching.    
+    /// The minimum number of players that should be added to the match by auto-matching.
     #[serde(alias="minAutoMatchingPlayers")]
     pub min_auto_matching_players: i32,
-    /// A bitmask indicating when auto-matches are valid. When ANDed with other exclusive bitmasks, the result must be zero. Can be used to support exclusive roles within a game.    
+    /// A bitmask indicating when auto-matches are valid. When ANDed with other exclusive bitmasks, the result must be zero. Can be used to support exclusive roles within a game.
     #[serde(alias="exclusiveBitmask")]
     pub exclusive_bitmask: String,
-    /// The maximum number of players that should be added to the match by auto-matching.    
+    /// The maximum number of players that should be added to the match by auto-matching.
     #[serde(alias="maxAutoMatchingPlayers")]
     pub max_auto_matching_players: i32,
 }
@@ -2045,25 +2054,25 @@ impl Part for TurnBasedAutoMatchingCriteria {}
 /// 
 #[derive(Default, Clone, Debug, Serialize)]
 pub struct RoomCreateRequest {
-    /// Uniquely identifies the type of this resource. Value is always the fixed string games#roomCreateRequest.    
+    /// Uniquely identifies the type of this resource. Value is always the fixed string games#roomCreateRequest.
     pub kind: Option<String>,
-    /// Criteria for auto-matching players into this room.    
+    /// Criteria for auto-matching players into this room.
     #[serde(alias="autoMatchingCriteria")]
     pub auto_matching_criteria: Option<RoomAutoMatchingCriteria>,
-    /// The player IDs to invite to the room.    
+    /// The player IDs to invite to the room.
     #[serde(alias="invitedPlayerIds")]
     pub invited_player_ids: Option<Vec<String>>,
-    /// The variant / mode of the application to be played. This can be any integer value, or left blank. You should use a small number of variants to keep the auto-matching pool as large as possible.    
+    /// The variant / mode of the application to be played. This can be any integer value, or left blank. You should use a small number of variants to keep the auto-matching pool as large as possible.
     pub variant: Option<i32>,
-    /// The capabilities that this client supports for realtime communication.    
+    /// The capabilities that this client supports for realtime communication.
     pub capabilities: Option<Vec<String>>,
-    /// Network diagnostics for the client creating the room.    
+    /// Network diagnostics for the client creating the room.
     #[serde(alias="networkDiagnostics")]
     pub network_diagnostics: Option<NetworkDiagnostics>,
-    /// Client address for the player creating the room.    
+    /// Client address for the player creating the room.
     #[serde(alias="clientAddress")]
     pub client_address: Option<RoomClientAddress>,
-    /// A randomly generated numeric ID. This number is used at the server to ensure that the request is handled correctly across retries.    
+    /// A randomly generated numeric ID. This number is used at the server to ensure that the request is handled correctly across retries.
     #[serde(alias="requestId")]
     pub request_id: Option<String>,
 }
@@ -2082,12 +2091,12 @@ impl RequestValue for RoomCreateRequest {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct QuestListResponse {
-    /// Token corresponding to the next page of results.    
+    /// Token corresponding to the next page of results.
     #[serde(alias="nextPageToken")]
     pub next_page_token: String,
-    /// The quests.    
+    /// The quests.
     pub items: Vec<Quest>,
-    /// Uniquely identifies the type of this resource. Value is always the fixed string games#questListResponse.    
+    /// Uniquely identifies the type of this resource. Value is always the fixed string games#questListResponse.
     pub kind: String,
 }
 
@@ -2105,12 +2114,12 @@ impl ResponseResult for QuestListResponse {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct PlayerEventListResponse {
-    /// The pagination token for the next page of results.    
+    /// The pagination token for the next page of results.
     #[serde(alias="nextPageToken")]
     pub next_page_token: String,
-    /// The player events.    
+    /// The player events.
     pub items: Vec<PlayerEvent>,
-    /// Uniquely identifies the type of this resource. Value is always the fixed string games#playerEventListResponse.    
+    /// Uniquely identifies the type of this resource. Value is always the fixed string games#playerEventListResponse.
     pub kind: String,
 }
 
@@ -2123,11 +2132,11 @@ impl ResponseResult for PlayerEventListResponse {}
 /// 
 #[derive(Default, Clone, Debug, Serialize)]
 pub struct GamesAchievementIncrement {
-    /// Uniquely identifies the type of this resource. Value is always the fixed string games#GamesAchievementIncrement.    
+    /// Uniquely identifies the type of this resource. Value is always the fixed string games#GamesAchievementIncrement.
     pub kind: String,
-    /// The number of steps to be incremented.    
+    /// The number of steps to be incremented.
     pub steps: i32,
-    /// The requestId associated with an increment to an achievement.    
+    /// The requestId associated with an increment to an achievement.
     #[serde(alias="requestId")]
     pub request_id: String,
 }
@@ -2141,12 +2150,12 @@ impl Part for GamesAchievementIncrement {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct TurnBasedMatchModification {
-    /// Uniquely identifies the type of this resource. Value is always the fixed string games#turnBasedMatchModification.    
+    /// Uniquely identifies the type of this resource. Value is always the fixed string games#turnBasedMatchModification.
     pub kind: String,
-    /// The timestamp at which they modified the match, in milliseconds since the epoch in UTC.    
+    /// The timestamp at which they modified the match, in milliseconds since the epoch in UTC.
     #[serde(alias="modifiedTimestampMillis")]
     pub modified_timestamp_millis: String,
-    /// The ID of the participant that modified the match.    
+    /// The ID of the participant that modified the match.
     #[serde(alias="participantId")]
     pub participant_id: String,
 }
@@ -2165,12 +2174,12 @@ impl Part for TurnBasedMatchModification {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct PlayerAchievementListResponse {
-    /// Token corresponding to the next page of results.    
+    /// Token corresponding to the next page of results.
     #[serde(alias="nextPageToken")]
     pub next_page_token: String,
-    /// The achievements.    
+    /// The achievements.
     pub items: Vec<PlayerAchievement>,
-    /// Uniquely identifies the type of this resource. Value is always the fixed string games#playerAchievementListResponse.    
+    /// Uniquely identifies the type of this resource. Value is always the fixed string games#playerAchievementListResponse.
     pub kind: String,
 }
 
@@ -2188,15 +2197,15 @@ impl ResponseResult for PlayerAchievementListResponse {}
 /// 
 #[derive(Default, Clone, Debug, Serialize)]
 pub struct PushToken {
-    /// Uniquely identifies the type of this resource. Value is always the fixed string games#pushToken.    
+    /// Uniquely identifies the type of this resource. Value is always the fixed string games#pushToken.
     pub kind: Option<String>,
     /// The revision of the client SDK used by your application, in the same format that's used by revisions.check. Used to send backward compatible messages. Format: [PLATFORM_TYPE]:[VERSION_NUMBER]. Possible values of PLATFORM_TYPE are:  
     /// - IOS - Push token is for iOS
     #[serde(alias="clientRevision")]
     pub client_revision: Option<String>,
-    /// Unique identifier for this push token.    
+    /// Unique identifier for this push token.
     pub id: Option<PushTokenId>,
-    /// The preferred language for notifications that are sent using this token.    
+    /// The preferred language for notifications that are sent using this token.
     pub language: Option<String>,
 }
 
@@ -2210,15 +2219,15 @@ impl Resource for PushToken {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct PlayerLeaderboardScore {
-    /// The timestamp at which this score was recorded, in milliseconds since the epoch in UTC.    
+    /// The timestamp at which this score was recorded, in milliseconds since the epoch in UTC.
     #[serde(alias="writeTimestamp")]
     pub write_timestamp: String,
-    /// Uniquely identifies the type of this resource. Value is always the fixed string games#playerLeaderboardScore.    
+    /// Uniquely identifies the type of this resource. Value is always the fixed string games#playerLeaderboardScore.
     pub kind: String,
-    /// The public rank of the score in this leaderboard. This object will not be present if the user is not sharing their scores publicly.    
+    /// The public rank of the score in this leaderboard. This object will not be present if the user is not sharing their scores publicly.
     #[serde(alias="publicRank")]
     pub public_rank: LeaderboardScoreRank,
-    /// Additional information about the score. Values must contain no more than 64 URI-safe characters as defined by section 2.3 of RFC 3986.    
+    /// Additional information about the score. Values must contain no more than 64 URI-safe characters as defined by section 2.3 of RFC 3986.
     #[serde(alias="scoreTag")]
     pub score_tag: String,
     /// The time span of this score.
@@ -2228,15 +2237,15 @@ pub struct PlayerLeaderboardScore {
     /// - "DAILY" - The score is a daily score.
     #[serde(alias="timeSpan")]
     pub time_span: String,
-    /// The formatted value of this score.    
+    /// The formatted value of this score.
     #[serde(alias="scoreString")]
     pub score_string: String,
-    /// The ID of the leaderboard this score is in.    
+    /// The ID of the leaderboard this score is in.
     pub leaderboard_id: String,
-    /// The numerical value of this score.    
+    /// The numerical value of this score.
     #[serde(alias="scoreValue")]
     pub score_value: String,
-    /// The social rank of the score in this leaderboard.    
+    /// The social rank of the score in this leaderboard.
     #[serde(alias="socialRank")]
     pub social_rank: LeaderboardScoreRank,
 }
@@ -2255,9 +2264,9 @@ impl Part for PlayerLeaderboardScore {}
 /// 
 #[derive(Default, Clone, Debug, Serialize)]
 pub struct PlayerScoreSubmissionList {
-    /// Uniquely identifies the type of this resource. Value is always the fixed string games#playerScoreSubmissionList.    
+    /// Uniquely identifies the type of this resource. Value is always the fixed string games#playerScoreSubmissionList.
     pub kind: Option<String>,
-    /// The score submissions.    
+    /// The score submissions.
     pub scores: Option<Vec<ScoreSubmission>>,
 }
 
@@ -2270,15 +2279,15 @@ impl RequestValue for PlayerScoreSubmissionList {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct SnapshotImage {
-    /// The URL of the image. This URL may be invalidated at any time and should not be cached.    
+    /// The URL of the image. This URL may be invalidated at any time and should not be cached.
     pub url: String,
-    /// The width of the image.    
+    /// The width of the image.
     pub width: i32,
-    /// Uniquely identifies the type of this resource. Value is always the fixed string games#snapshotImage.    
+    /// Uniquely identifies the type of this resource. Value is always the fixed string games#snapshotImage.
     pub kind: String,
-    /// The MIME type of the image.    
+    /// The MIME type of the image.
     pub mime_type: String,
-    /// The height of the image.    
+    /// The height of the image.
     pub height: i32,
 }
 
@@ -2291,12 +2300,12 @@ impl Part for SnapshotImage {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct AnonymousPlayer {
-    /// Uniquely identifies the type of this resource. Value is always the fixed string games#anonymousPlayer.    
+    /// Uniquely identifies the type of this resource. Value is always the fixed string games#anonymousPlayer.
     pub kind: String,
-    /// The base URL for the image to display for the anonymous player.    
+    /// The base URL for the image to display for the anonymous player.
     #[serde(alias="avatarImageUrl")]
     pub avatar_image_url: String,
-    /// The name to display for the anonymous player.    
+    /// The name to display for the anonymous player.
     #[serde(alias="displayName")]
     pub display_name: String,
 }
@@ -2310,27 +2319,27 @@ impl Part for AnonymousPlayer {}
 /// 
 #[derive(Default, Clone, Debug, Serialize)]
 pub struct PeerChannelDiagnostics {
-    /// Number of bytes received.    
+    /// Number of bytes received.
     #[serde(alias="bytesReceived")]
     pub bytes_received: AggregateStats,
-    /// Uniquely identifies the type of this resource. Value is always the fixed string games#peerChannelDiagnostics.    
+    /// Uniquely identifies the type of this resource. Value is always the fixed string games#peerChannelDiagnostics.
     pub kind: String,
-    /// Number of bytes sent.    
+    /// Number of bytes sent.
     #[serde(alias="bytesSent")]
     pub bytes_sent: AggregateStats,
-    /// Number of send failures.    
+    /// Number of send failures.
     #[serde(alias="numSendFailures")]
     pub num_send_failures: i32,
-    /// Number of messages lost.    
+    /// Number of messages lost.
     #[serde(alias="numMessagesLost")]
     pub num_messages_lost: i32,
-    /// Number of messages received.    
+    /// Number of messages received.
     #[serde(alias="numMessagesReceived")]
     pub num_messages_received: i32,
-    /// Number of messages sent.    
+    /// Number of messages sent.
     #[serde(alias="numMessagesSent")]
     pub num_messages_sent: i32,
-    /// Roundtrip latency stats in milliseconds.    
+    /// Roundtrip latency stats in milliseconds.
     #[serde(alias="roundtripLatencyMillis")]
     pub roundtrip_latency_millis: AggregateStats,
 }
@@ -2349,15 +2358,15 @@ impl Part for PeerChannelDiagnostics {}
 /// 
 #[derive(Default, Clone, Debug, Serialize)]
 pub struct RoomJoinRequest {
-    /// Network diagnostics for the client joining the room.    
+    /// Network diagnostics for the client joining the room.
     #[serde(alias="networkDiagnostics")]
     pub network_diagnostics: Option<NetworkDiagnostics>,
-    /// Client address for the player joining the room.    
+    /// Client address for the player joining the room.
     #[serde(alias="clientAddress")]
     pub client_address: Option<RoomClientAddress>,
-    /// Uniquely identifies the type of this resource. Value is always the fixed string games#roomJoinRequest.    
+    /// Uniquely identifies the type of this resource. Value is always the fixed string games#roomJoinRequest.
     pub kind: Option<String>,
-    /// The capabilities that this client supports for realtime communication.    
+    /// The capabilities that this client supports for realtime communication.
     pub capabilities: Option<Vec<String>>,
 }
 
@@ -2383,18 +2392,18 @@ pub struct RoomStatus {
     /// - "ROOM_ACTIVE" - All players have joined and connected to each other. 
     /// - "ROOM_DELETED" - All joined players have left.
     pub status: String,
-    /// Uniquely identifies the type of this resource. Value is always the fixed string games#roomStatus.    
+    /// Uniquely identifies the type of this resource. Value is always the fixed string games#roomStatus.
     pub kind: String,
-    /// The version of the status for the room: an increasing counter, used by the client to ignore out-of-order updates to room status.    
+    /// The version of the status for the room: an increasing counter, used by the client to ignore out-of-order updates to room status.
     #[serde(alias="statusVersion")]
     pub status_version: i32,
-    /// Globally unique ID for a room.    
+    /// Globally unique ID for a room.
     #[serde(alias="roomId")]
     pub room_id: String,
-    /// Auto-matching status for this room. Not set if the room is not currently in the automatching queue.    
+    /// Auto-matching status for this room. Not set if the room is not currently in the automatching queue.
     #[serde(alias="autoMatchingStatus")]
     pub auto_matching_status: RoomAutoMatchStatus,
-    /// The participants involved in the room, along with their statuses. Includes participants who have left or declined invitations.    
+    /// The participants involved in the room, along with their statuses. Includes participants who have left or declined invitations.
     pub participants: Vec<RoomParticipant>,
 }
 
@@ -2407,9 +2416,9 @@ impl ResponseResult for RoomStatus {}
 /// 
 #[derive(Default, Clone, Debug, Serialize)]
 pub struct PushTokenIdIos {
-    /// Device token supplied by an iOS system call to register for remote notifications. Encode this field as web-safe base64.    
+    /// Device token supplied by an iOS system call to register for remote notifications. Encode this field as web-safe base64.
     pub apns_device_token: String,
-    /// Indicates whether this token should be used for the production or sandbox APNS server.    
+    /// Indicates whether this token should be used for the production or sandbox APNS server.
     pub apns_environment: String,
 }
 
@@ -2429,16 +2438,16 @@ impl Part for PushTokenIdIos {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct Leaderboard {
-    /// The icon for the leaderboard.    
+    /// The icon for the leaderboard.
     #[serde(alias="iconUrl")]
     pub icon_url: String,
-    /// Uniquely identifies the type of this resource. Value is always the fixed string games#leaderboard.    
+    /// Uniquely identifies the type of this resource. Value is always the fixed string games#leaderboard.
     pub kind: String,
-    /// The name of the leaderboard.    
+    /// The name of the leaderboard.
     pub name: String,
-    /// The leaderboard ID.    
+    /// The leaderboard ID.
     pub id: String,
-    /// Indicates whether the icon image being returned is a default image, or is game-provided.    
+    /// Indicates whether the icon image being returned is a default image, or is game-provided.
     #[serde(alias="isIconUrlDefault")]
     pub is_icon_url_default: bool,
     /// How scores are ordered.
@@ -2458,7 +2467,7 @@ impl ResponseResult for Leaderboard {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct TurnBasedMatchParticipant {
-    /// True if this participant was auto-matched with the requesting player.    
+    /// True if this participant was auto-matched with the requesting player.
     #[serde(alias="autoMatched")]
     pub auto_matched: bool,
     /// The status of the participant with respect to the match.
@@ -2471,14 +2480,14 @@ pub struct TurnBasedMatchParticipant {
     /// - "PARTICIPANT_FINISHED" - The participant finished playing in the match. 
     /// - "PARTICIPANT_UNRESPONSIVE" - The participant did not take their turn in the allotted time.
     pub status: String,
-    /// Uniquely identifies the type of this resource. Value is always the fixed string games#turnBasedMatchParticipant.    
+    /// Uniquely identifies the type of this resource. Value is always the fixed string games#turnBasedMatchParticipant.
     pub kind: String,
-    /// Information about a player that has been anonymously auto-matched against the requesting player. (Either player or autoMatchedPlayer will be set.)    
+    /// Information about a player that has been anonymously auto-matched against the requesting player. (Either player or autoMatchedPlayer will be set.)
     #[serde(alias="autoMatchedPlayer")]
     pub auto_matched_player: AnonymousPlayer,
-    /// Information about the player. Not populated if this player was anonymously auto-matched against the requesting player. (Either player or autoMatchedPlayer will be set.)    
+    /// Information about the player. Not populated if this player was anonymously auto-matched against the requesting player. (Either player or autoMatchedPlayer will be set.)
     pub player: Player,
-    /// An identifier for the participant in the scope of the match. Cannot be used to identify a player across matches or in other contexts.    
+    /// An identifier for the participant in the scope of the match. Cannot be used to identify a player across matches or in other contexts.
     pub id: String,
 }
 
@@ -2491,17 +2500,17 @@ impl Part for TurnBasedMatchParticipant {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct LeaderboardScoreRank {
-    /// The number of scores in the leaderboard.    
+    /// The number of scores in the leaderboard.
     #[serde(alias="numScores")]
     pub num_scores: String,
-    /// Uniquely identifies the type of this resource. Value is always the fixed string games#leaderboardScoreRank.    
+    /// Uniquely identifies the type of this resource. Value is always the fixed string games#leaderboardScoreRank.
     pub kind: String,
-    /// The rank in the leaderboard as a string.    
+    /// The rank in the leaderboard as a string.
     #[serde(alias="formattedRank")]
     pub formatted_rank: String,
-    /// The rank in the leaderboard.    
+    /// The rank in the leaderboard.
     pub rank: String,
-    /// The number of scores in the leaderboard as a string.    
+    /// The number of scores in the leaderboard as a string.
     #[serde(alias="formattedNumScores")]
     pub formatted_num_scores: String,
 }
@@ -2515,10 +2524,10 @@ impl Part for LeaderboardScoreRank {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct PlayerName {
-    /// The given name of this player. In some places, this is known as the first name.    
+    /// The given name of this player. In some places, this is known as the first name.
     #[serde(alias="givenName")]
     pub given_name: String,
-    /// The family name of this player. In some places, this is known as the last name.    
+    /// The family name of this player. In some places, this is known as the last name.
     #[serde(alias="familyName")]
     pub family_name: String,
 }
@@ -2540,21 +2549,21 @@ pub struct PlayerAchievement {
     /// - "UNLOCKED" - Achievement is unlocked.
     #[serde(alias="achievementState")]
     pub achievement_state: String,
-    /// The current steps for an incremental achievement.    
+    /// The current steps for an incremental achievement.
     #[serde(alias="currentSteps")]
     pub current_steps: i32,
-    /// Uniquely identifies the type of this resource. Value is always the fixed string games#playerAchievement.    
+    /// Uniquely identifies the type of this resource. Value is always the fixed string games#playerAchievement.
     pub kind: String,
-    /// Experience points earned for the achievement. This field is absent for achievements that have not yet been unlocked and 0 for achievements that have been unlocked by testers but that are unpublished.    
+    /// Experience points earned for the achievement. This field is absent for achievements that have not yet been unlocked and 0 for achievements that have been unlocked by testers but that are unpublished.
     #[serde(alias="experiencePoints")]
     pub experience_points: String,
-    /// The current steps for an incremental achievement as a string.    
+    /// The current steps for an incremental achievement as a string.
     #[serde(alias="formattedCurrentStepsString")]
     pub formatted_current_steps_string: String,
-    /// The timestamp of the last modification to this achievement's state.    
+    /// The timestamp of the last modification to this achievement's state.
     #[serde(alias="lastUpdatedTimestamp")]
     pub last_updated_timestamp: String,
-    /// The ID of the achievement.    
+    /// The ID of the achievement.
     pub id: String,
 }
 
@@ -2572,9 +2581,9 @@ pub struct RoomP2PStatus {
     /// - "CONNECTION_ESTABLISHED" - The client established a P2P connection with the peer. 
     /// - "CONNECTION_FAILED" - The client failed to establish directed presence with the peer.
     pub status: String,
-    /// Uniquely identifies the type of this resource. Value is always the fixed string games#roomP2PStatus.    
+    /// Uniquely identifies the type of this resource. Value is always the fixed string games#roomP2PStatus.
     pub kind: String,
-    /// The ID of the participant.    
+    /// The ID of the participant.
     #[serde(alias="participantId")]
     pub participant_id: String,
     /// The error code in event of a failure.
@@ -2583,12 +2592,12 @@ pub struct RoomP2PStatus {
     /// - "PRESENCE_FAILED" - The client failed to register to receive P2P connections. 
     /// - "RELAY_SERVER_FAILED" - The client received an error when trying to use the relay server to establish a P2P connection with the peer.
     pub error: String,
-    /// More detailed diagnostic message returned in event of a failure.    
+    /// More detailed diagnostic message returned in event of a failure.
     pub error_reason: String,
-    /// The amount of time in milliseconds it took to send packets back and forth on the unreliable channel with this peer.    
+    /// The amount of time in milliseconds it took to send packets back and forth on the unreliable channel with this peer.
     #[serde(alias="unreliableRoundtripLatencyMillis")]
     pub unreliable_roundtrip_latency_millis: i32,
-    /// The amount of time in milliseconds it took to establish connections with this peer.    
+    /// The amount of time in milliseconds it took to establish connections with this peer.
     #[serde(alias="connectionSetupLatencyMillis")]
     pub connection_setup_latency_millis: i32,
 }
@@ -2602,12 +2611,12 @@ impl Part for RoomP2PStatus {}
 /// 
 #[derive(Default, Clone, Debug, Serialize)]
 pub struct EventPeriodUpdate {
-    /// Uniquely identifies the type of this resource. Value is always the fixed string games#eventPeriodUpdate.    
+    /// Uniquely identifies the type of this resource. Value is always the fixed string games#eventPeriodUpdate.
     pub kind: String,
-    /// The time period being covered by this update.    
+    /// The time period being covered by this update.
     #[serde(alias="timePeriod")]
     pub time_period: EventPeriodRange,
-    /// The updates being made for this time period.    
+    /// The updates being made for this time period.
     pub updates: Vec<EventUpdateRequest>,
 }
 
@@ -2625,9 +2634,9 @@ impl Part for EventPeriodUpdate {}
 /// 
 #[derive(Default, Clone, Debug, Serialize)]
 pub struct AchievementUpdateMultipleRequest {
-    /// Uniquely identifies the type of this resource. Value is always the fixed string games#achievementUpdateMultipleRequest.    
+    /// Uniquely identifies the type of this resource. Value is always the fixed string games#achievementUpdateMultipleRequest.
     pub kind: Option<String>,
-    /// The individual achievement update requests.    
+    /// The individual achievement update requests.
     pub updates: Option<Vec<AchievementUpdateRequest>>,
 }
 
@@ -2645,12 +2654,12 @@ impl RequestValue for AchievementUpdateMultipleRequest {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct SnapshotListResponse {
-    /// Token corresponding to the next page of results. If there are no more results, the token is omitted.    
+    /// Token corresponding to the next page of results. If there are no more results, the token is omitted.
     #[serde(alias="nextPageToken")]
     pub next_page_token: String,
-    /// The snapshots.    
+    /// The snapshots.
     pub items: Vec<Snapshot>,
-    /// Uniquely identifies the type of this resource. Value is always the fixed string games#snapshotListResponse.    
+    /// Uniquely identifies the type of this resource. Value is always the fixed string games#snapshotListResponse.
     pub kind: String,
 }
 
@@ -2663,11 +2672,11 @@ impl ResponseResult for SnapshotListResponse {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct ApplicationCategory {
-    /// Uniquely identifies the type of this resource. Value is always the fixed string games#applicationCategory.    
+    /// Uniquely identifies the type of this resource. Value is always the fixed string games#applicationCategory.
     pub kind: String,
-    /// The primary category.    
+    /// The primary category.
     pub primary: String,
-    /// The secondary category.    
+    /// The secondary category.
     pub secondary: String,
 }
 
@@ -2680,17 +2689,17 @@ impl Part for ApplicationCategory {}
 /// 
 #[derive(Default, Clone, Debug, Serialize)]
 pub struct ScoreSubmission {
-    /// Uniquely identifies the type of this resource. Value is always the fixed string games#scoreSubmission.    
+    /// Uniquely identifies the type of this resource. Value is always the fixed string games#scoreSubmission.
     pub kind: String,
-    /// The leaderboard this score is being submitted to.    
+    /// The leaderboard this score is being submitted to.
     #[serde(alias="leaderboardId")]
     pub leaderboard_id: String,
-    /// The new score being submitted.    
+    /// The new score being submitted.
     pub score: String,
-    /// Additional information about this score. Values will contain no more than 64 URI-safe characters as defined by section 2.3 of RFC 3986.    
+    /// Additional information about this score. Values will contain no more than 64 URI-safe characters as defined by section 2.3 of RFC 3986.
     #[serde(alias="scoreTag")]
     pub score_tag: String,
-    /// Signature Values will contain URI-safe characters as defined by section 2.3 of RFC 3986.    
+    /// Signature Values will contain URI-safe characters as defined by section 2.3 of RFC 3986.
     pub signature: String,
 }
 
@@ -2708,14 +2717,14 @@ impl Part for ScoreSubmission {}
 /// 
 #[derive(Default, Clone, Debug, Serialize)]
 pub struct TurnBasedMatchResults {
-    /// Uniquely identifies the type of this resource. Value is always the fixed string games#turnBasedMatchResults.    
+    /// Uniquely identifies the type of this resource. Value is always the fixed string games#turnBasedMatchResults.
     pub kind: Option<String>,
-    /// The final match data.    
+    /// The final match data.
     pub data: Option<TurnBasedMatchDataRequest>,
-    /// The version of the match being updated.    
+    /// The version of the match being updated.
     #[serde(alias="matchVersion")]
     pub match_version: Option<i32>,
-    /// The match results for the participants in the match.    
+    /// The match results for the participants in the match.
     pub results: Option<Vec<ParticipantResult>>,
 }
 
@@ -2733,17 +2742,17 @@ impl RequestValue for TurnBasedMatchResults {}
 /// 
 #[derive(Default, Clone, Debug, Serialize)]
 pub struct TurnBasedMatchTurn {
-    /// Uniquely identifies the type of this resource. Value is always the fixed string games#turnBasedMatchTurn.    
+    /// Uniquely identifies the type of this resource. Value is always the fixed string games#turnBasedMatchTurn.
     pub kind: Option<String>,
-    /// The ID of the participant who should take their turn next. May be set to the current player's participant ID to update match state without changing the turn. If not set, the match will wait for other player(s) to join via automatching; this is only valid if automatch criteria is set on the match with remaining slots for automatched players.    
+    /// The ID of the participant who should take their turn next. May be set to the current player's participant ID to update match state without changing the turn. If not set, the match will wait for other player(s) to join via automatching; this is only valid if automatch criteria is set on the match with remaining slots for automatched players.
     #[serde(alias="pendingParticipantId")]
     pub pending_participant_id: Option<String>,
-    /// The shared game state data after the turn is over.    
+    /// The shared game state data after the turn is over.
     pub data: Option<TurnBasedMatchDataRequest>,
-    /// The version of this match: an increasing counter, used to avoid out-of-date updates to the match.    
+    /// The version of this match: an increasing counter, used to avoid out-of-date updates to the match.
     #[serde(alias="matchVersion")]
     pub match_version: Option<i32>,
-    /// The match results for the participants in the match.    
+    /// The match results for the participants in the match.
     pub results: Option<Vec<ParticipantResult>>,
 }
 
@@ -2777,42 +2786,42 @@ pub struct TurnBasedMatch {
     /// - "MATCH_EXPIRED" - The match expired due to inactivity. 
     /// - "MATCH_DELETED" - The match should no longer be shown on the client. Returned only for tombstones for matches when sync is called.
     pub status: String,
-    /// Criteria for auto-matching players into this match.    
+    /// Criteria for auto-matching players into this match.
     #[serde(alias="autoMatchingCriteria")]
     pub auto_matching_criteria: TurnBasedAutoMatchingCriteria,
-    /// The ID of the participant that invited the user to the match. Not set if the user was not invited to the match.    
+    /// The ID of the participant that invited the user to the match. Not set if the user was not invited to the match.
     #[serde(alias="inviterId")]
     pub inviter_id: String,
-    /// The version of this match: an increasing counter, used to avoid out-of-date updates to the match.    
+    /// The version of this match: an increasing counter, used to avoid out-of-date updates to the match.
     #[serde(alias="matchVersion")]
     pub match_version: i32,
-    /// The variant / mode of the application being played; can be any integer value, or left blank.    
+    /// The variant / mode of the application being played; can be any integer value, or left blank.
     pub variant: i32,
-    /// Globally unique ID for a turn-based match.    
+    /// Globally unique ID for a turn-based match.
     #[serde(alias="matchId")]
     pub match_id: String,
-    /// The ID of a rematch of this match. Only set for completed matches that have been rematched.    
+    /// The ID of a rematch of this match. Only set for completed matches that have been rematched.
     #[serde(alias="rematchId")]
     pub rematch_id: String,
-    /// The results reported for this match.    
+    /// The results reported for this match.
     pub results: Vec<ParticipantResult>,
-    /// The number of the match in a chain of rematches. Will be set to 1 for the first match and incremented by 1 for each rematch.    
+    /// The number of the match in a chain of rematches. Will be set to 1 for the first match and incremented by 1 for each rematch.
     #[serde(alias="matchNumber")]
     pub match_number: i32,
-    /// The data / game state for the previous match; set for the first turn of rematches only.    
+    /// The data / game state for the previous match; set for the first turn of rematches only.
     #[serde(alias="previousMatchData")]
     pub previous_match_data: TurnBasedMatchData,
-    /// The ID of the application being played.    
+    /// The ID of the application being played.
     #[serde(alias="applicationId")]
     pub application_id: String,
-    /// This short description is generated by our servers based on turn state and is localized and worded relative to the player requesting the match. It is intended to be displayed when the match is shown in a list.    
+    /// This short description is generated by our servers based on turn state and is localized and worded relative to the player requesting the match. It is intended to be displayed when the match is shown in a list.
     pub description: String,
-    /// The ID of another participant in the match that can be used when describing the participants the user is playing with.    
+    /// The ID of another participant in the match that can be used when describing the participants the user is playing with.
     #[serde(alias="withParticipantId")]
     pub with_participant_id: String,
-    /// Uniquely identifies the type of this resource. Value is always the fixed string games#turnBasedMatch.    
+    /// Uniquely identifies the type of this resource. Value is always the fixed string games#turnBasedMatch.
     pub kind: String,
-    /// Details about the match creation.    
+    /// Details about the match creation.
     #[serde(alias="creationDetails")]
     pub creation_details: TurnBasedMatchModification,
     /// The status of the current user in the match. Derived from the match type, match status, the user's participant status, and the pending participant for the match.
@@ -2823,14 +2832,14 @@ pub struct TurnBasedMatch {
     /// - "USER_MATCH_COMPLETED" - The match has ended (it is completed, canceled, or expired.)
     #[serde(alias="userMatchStatus")]
     pub user_match_status: String,
-    /// The data / game state for this match.    
+    /// The data / game state for this match.
     pub data: TurnBasedMatchData,
-    /// The participants involved in the match, along with their statuses. Includes participants who have left or declined invitations.    
+    /// The participants involved in the match, along with their statuses. Includes participants who have left or declined invitations.
     pub participants: Vec<TurnBasedMatchParticipant>,
-    /// The ID of the participant that is taking a turn.    
+    /// The ID of the participant that is taking a turn.
     #[serde(alias="pendingParticipantId")]
     pub pending_participant_id: String,
-    /// Details about the last update to the match.    
+    /// Details about the last update to the match.
     #[serde(alias="lastUpdateDetails")]
     pub last_update_details: TurnBasedMatchModification,
 }
@@ -2849,15 +2858,15 @@ impl ResponseResult for TurnBasedMatch {}
 /// 
 #[derive(Default, Clone, Debug, Serialize)]
 pub struct EventRecordRequest {
-    /// A list of the time period updates being made in this request.    
+    /// A list of the time period updates being made in this request.
     #[serde(alias="timePeriods")]
     pub time_periods: Option<Vec<EventPeriodUpdate>>,
-    /// Uniquely identifies the type of this resource. Value is always the fixed string games#eventRecordRequest.    
+    /// Uniquely identifies the type of this resource. Value is always the fixed string games#eventRecordRequest.
     pub kind: Option<String>,
-    /// The request ID used to identify this attempt to record events.    
+    /// The request ID used to identify this attempt to record events.
     #[serde(alias="requestId")]
     pub request_id: Option<String>,
-    /// The current time when this update was sent, in milliseconds, since 1970 UTC (Unix Epoch).    
+    /// The current time when this update was sent, in milliseconds, since 1970 UTC (Unix Epoch).
     #[serde(alias="currentTimeMillis")]
     pub current_time_millis: Option<String>,
 }
@@ -2871,12 +2880,12 @@ impl RequestValue for EventRecordRequest {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct InstanceWebDetails {
-    /// Uniquely identifies the type of this resource. Value is always the fixed string games#instanceWebDetails.    
+    /// Uniquely identifies the type of this resource. Value is always the fixed string games#instanceWebDetails.
     pub kind: String,
-    /// Launch URL for the game.    
+    /// Launch URL for the game.
     #[serde(alias="launchUrl")]
     pub launch_url: String,
-    /// Indicates that this instance is the default for new installations.    
+    /// Indicates that this instance is the default for new installations.
     pub preferred: bool,
 }
 
@@ -2894,12 +2903,12 @@ impl Part for InstanceWebDetails {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct CategoryListResponse {
-    /// Token corresponding to the next page of results.    
+    /// Token corresponding to the next page of results.
     #[serde(alias="nextPageToken")]
     pub next_page_token: String,
-    /// The list of categories with usage data.    
+    /// The list of categories with usage data.
     pub items: Vec<Category>,
-    /// Uniquely identifies the type of this resource. Value is always the fixed string games#categoryListResponse.    
+    /// Uniquely identifies the type of this resource. Value is always the fixed string games#categoryListResponse.
     pub kind: String,
 }
 
@@ -2912,18 +2921,18 @@ impl ResponseResult for CategoryListResponse {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct PlayerEvent {
-    /// The ID of the event definition.    
+    /// The ID of the event definition.
     #[serde(alias="definitionId")]
     pub definition_id: String,
-    /// The ID of the player.    
+    /// The ID of the player.
     #[serde(alias="playerId")]
     pub player_id: String,
-    /// Uniquely identifies the type of this resource. Value is always the fixed string games#playerEvent.    
+    /// Uniquely identifies the type of this resource. Value is always the fixed string games#playerEvent.
     pub kind: String,
-    /// The current number of times this event has occurred.    
+    /// The current number of times this event has occurred.
     #[serde(alias="numEvents")]
     pub num_events: String,
-    /// The current number of times this event has occurred, as a string. The formatting of this string depends on the configuration of your event in the Play Games Developer Console.    
+    /// The current number of times this event has occurred, as a string. The formatting of this string depends on the configuration of your event in the Play Games Developer Console.
     #[serde(alias="formattedNumEvents")]
     pub formatted_num_events: String,
 }
@@ -2943,25 +2952,25 @@ impl Part for PlayerEvent {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct Player {
-    /// Uniquely identifies the type of this resource. Value is always the fixed string games#player.    
+    /// Uniquely identifies the type of this resource. Value is always the fixed string games#player.
     pub kind: String,
-    /// The name to display for the player.    
+    /// The name to display for the player.
     #[serde(alias="displayName")]
     pub display_name: String,
-    /// An object representation of the individual components of the player's name. For some players, these fields may not be present.    
+    /// An object representation of the individual components of the player's name. For some players, these fields may not be present.
     pub name: PlayerName,
-    /// The player's title rewarded for their game activities.    
+    /// The player's title rewarded for their game activities.
     pub title: String,
-    /// The ID of the player.    
+    /// The ID of the player.
     #[serde(alias="playerId")]
     pub player_id: String,
-    /// Details about the last time this player played a multiplayer game with the currently authenticated player. Populated for PLAYED_WITH player collection members.    
+    /// Details about the last time this player played a multiplayer game with the currently authenticated player. Populated for PLAYED_WITH player collection members.
     #[serde(alias="lastPlayedWith")]
     pub last_played_with: Played,
-    /// An object to represent Play Game experience information for the player.    
+    /// An object to represent Play Game experience information for the player.
     #[serde(alias="experienceInfo")]
     pub experience_info: PlayerExperienceInfo,
-    /// The base URL for the image that represents the player.    
+    /// The base URL for the image that represents the player.
     #[serde(alias="avatarImageUrl")]
     pub avatar_image_url: String,
 }
@@ -2981,15 +2990,15 @@ impl ResponseResult for Player {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct EventUpdateResponse {
-    /// The current status of any updated events    
+    /// The current status of any updated events
     #[serde(alias="playerEvents")]
     pub player_events: Vec<PlayerEvent>,
-    /// Any batch-wide failures which occurred applying updates.    
+    /// Any batch-wide failures which occurred applying updates.
     #[serde(alias="batchFailures")]
     pub batch_failures: Vec<EventBatchRecordFailure>,
-    /// Uniquely identifies the type of this resource. Value is always the fixed string games#eventUpdateResponse.    
+    /// Uniquely identifies the type of this resource. Value is always the fixed string games#eventUpdateResponse.
     pub kind: String,
-    /// Any failures updating a particular event.    
+    /// Any failures updating a particular event.
     #[serde(alias="eventFailures")]
     pub event_failures: Vec<EventRecordFailure>,
 }
@@ -3008,7 +3017,7 @@ impl ResponseResult for EventUpdateResponse {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct RevisionCheckResponse {
-    /// Uniquely identifies the type of this resource. Value is always the fixed string games#revisionCheckResponse.    
+    /// Uniquely identifies the type of this resource. Value is always the fixed string games#revisionCheckResponse.
     pub kind: String,
     /// The result of the revision check.
     /// Possible values are:  
@@ -3017,7 +3026,7 @@ pub struct RevisionCheckResponse {
     /// - "INVALID" - The revision being used is not supported in any released version.
     #[serde(alias="revisionStatus")]
     pub revision_status: String,
-    /// The version of the API this client revision should use when calling API methods.    
+    /// The version of the API this client revision should use when calling API methods.
     #[serde(alias="apiVersion")]
     pub api_version: String,
 }
@@ -3031,7 +3040,7 @@ impl ResponseResult for RevisionCheckResponse {}
 /// 
 #[derive(Default, Clone, Debug, Serialize)]
 pub struct AchievementUpdateRequest {
-    /// The achievement this update is being applied to.    
+    /// The achievement this update is being applied to.
     #[serde(alias="achievementId")]
     pub achievement_id: String,
     /// The type of update being applied.
@@ -3042,12 +3051,12 @@ pub struct AchievementUpdateRequest {
     /// - "SET_STEPS_AT_LEAST" - Achievement progress is set to at least the passed value.
     #[serde(alias="updateType")]
     pub update_type: String,
-    /// Uniquely identifies the type of this resource. Value is always the fixed string games#achievementUpdateRequest.    
+    /// Uniquely identifies the type of this resource. Value is always the fixed string games#achievementUpdateRequest.
     pub kind: String,
-    /// The payload if an update of type SET_STEPS_AT_LEAST was requested for the achievement.    
+    /// The payload if an update of type SET_STEPS_AT_LEAST was requested for the achievement.
     #[serde(alias="setStepsAtLeastPayload")]
     pub set_steps_at_least_payload: GamesAchievementSetStepsAtLeast,
-    /// The payload if an update of type INCREMENT was requested for the achievement.    
+    /// The payload if an update of type INCREMENT was requested for the achievement.
     #[serde(alias="incrementPayload")]
     pub increment_payload: GamesAchievementIncrement,
 }
@@ -3066,12 +3075,12 @@ impl Part for AchievementUpdateRequest {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct LeaderboardListResponse {
-    /// Token corresponding to the next page of results.    
+    /// Token corresponding to the next page of results.
     #[serde(alias="nextPageToken")]
     pub next_page_token: String,
-    /// The leaderboards.    
+    /// The leaderboards.
     pub items: Vec<Leaderboard>,
-    /// Uniquely identifies the type of this resource. Value is always the fixed string games#leaderboardListResponse.    
+    /// Uniquely identifies the type of this resource. Value is always the fixed string games#leaderboardListResponse.
     pub kind: String,
 }
 
@@ -3084,9 +3093,9 @@ impl ResponseResult for LeaderboardListResponse {}
 /// 
 #[derive(Default, Clone, Debug, Serialize)]
 pub struct GamesAchievementSetStepsAtLeast {
-    /// Uniquely identifies the type of this resource. Value is always the fixed string games#GamesAchievementSetStepsAtLeast.    
+    /// Uniquely identifies the type of this resource. Value is always the fixed string games#GamesAchievementSetStepsAtLeast.
     pub kind: String,
-    /// The minimum number of steps for the achievement to be set to.    
+    /// The minimum number of steps for the achievement to be set to.
     pub steps: i32,
 }
 
@@ -3132,13 +3141,17 @@ pub struct AchievementMethods<'a, C, NC, A>
     hub: &'a Games<C, NC, A>,
 }
 
-impl<'a, C, NC, A> ResourceMethodsBuilder for AchievementMethods<'a, C, NC, A> {}
+impl<'a, C, NC, A> MethodsBuilder for AchievementMethods<'a, C, NC, A> {}
 
 impl<'a, C, NC, A> AchievementMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Lists the progress for all your application's achievements for the currently authenticated player.    
+    /// Lists the progress for all your application's achievements for the currently authenticated player.
+    /// 
+    /// # Arguments
+    ///
+    /// * `playerId` - A player ID. A value of me may be used in place of the authenticated player's ID.
     pub fn list(&self, player_id: &str) -> AchievementListCall<'a, C, NC, A> {
         AchievementListCall {
             hub: self.hub,
@@ -3155,7 +3168,12 @@ impl<'a, C, NC, A> AchievementMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Increments the steps of the achievement with the given ID for the currently authenticated player.    
+    /// Increments the steps of the achievement with the given ID for the currently authenticated player.
+    /// 
+    /// # Arguments
+    ///
+    /// * `achievementId` - The ID of the achievement used by this method.
+    /// * `stepsToIncrement` - The number of steps to increment.
     pub fn increment(&self, achievement_id: &str, steps_to_increment: i32) -> AchievementIncrementCall<'a, C, NC, A> {
         AchievementIncrementCall {
             hub: self.hub,
@@ -3170,7 +3188,12 @@ impl<'a, C, NC, A> AchievementMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Sets the steps for the currently authenticated player towards unlocking an achievement. If the steps parameter is less than the current number of steps that the player already gained for the achievement, the achievement is not modified.    
+    /// Sets the steps for the currently authenticated player towards unlocking an achievement. If the steps parameter is less than the current number of steps that the player already gained for the achievement, the achievement is not modified.
+    /// 
+    /// # Arguments
+    ///
+    /// * `achievementId` - The ID of the achievement used by this method.
+    /// * `steps` - The minimum value to set the steps to.
     pub fn set_steps_at_least(&self, achievement_id: &str, steps: i32) -> AchievementSetStepsAtLeastCall<'a, C, NC, A> {
         AchievementSetStepsAtLeastCall {
             hub: self.hub,
@@ -3184,7 +3207,11 @@ impl<'a, C, NC, A> AchievementMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Updates multiple achievements for the currently authenticated player.    
+    /// Updates multiple achievements for the currently authenticated player.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
     pub fn update_multiple(&self, request: &AchievementUpdateMultipleRequest) -> AchievementUpdateMultipleCall<'a, C, NC, A> {
         AchievementUpdateMultipleCall {
             hub: self.hub,
@@ -3197,7 +3224,11 @@ impl<'a, C, NC, A> AchievementMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Sets the state of the achievement with the given ID to REVEALED for the currently authenticated player.    
+    /// Sets the state of the achievement with the given ID to REVEALED for the currently authenticated player.
+    /// 
+    /// # Arguments
+    ///
+    /// * `achievementId` - The ID of the achievement used by this method.
     pub fn reveal(&self, achievement_id: &str) -> AchievementRevealCall<'a, C, NC, A> {
         AchievementRevealCall {
             hub: self.hub,
@@ -3210,7 +3241,11 @@ impl<'a, C, NC, A> AchievementMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Unlocks this achievement for the currently authenticated player.    
+    /// Unlocks this achievement for the currently authenticated player.
+    /// 
+    /// # Arguments
+    ///
+    /// * `achievementId` - The ID of the achievement used by this method.
     pub fn unlock(&self, achievement_id: &str) -> AchievementUnlockCall<'a, C, NC, A> {
         AchievementUnlockCall {
             hub: self.hub,
@@ -3258,13 +3293,17 @@ pub struct LeaderboardMethods<'a, C, NC, A>
     hub: &'a Games<C, NC, A>,
 }
 
-impl<'a, C, NC, A> ResourceMethodsBuilder for LeaderboardMethods<'a, C, NC, A> {}
+impl<'a, C, NC, A> MethodsBuilder for LeaderboardMethods<'a, C, NC, A> {}
 
 impl<'a, C, NC, A> LeaderboardMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Retrieves the metadata of the leaderboard with the given ID.    
+    /// Retrieves the metadata of the leaderboard with the given ID.
+    /// 
+    /// # Arguments
+    ///
+    /// * `leaderboardId` - The ID of the leaderboard.
     pub fn get(&self, leaderboard_id: &str) -> LeaderboardGetCall<'a, C, NC, A> {
         LeaderboardGetCall {
             hub: self.hub,
@@ -3278,7 +3317,7 @@ impl<'a, C, NC, A> LeaderboardMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Lists all the leaderboard metadata for your application.    
+    /// Lists all the leaderboard metadata for your application.
     pub fn list(&self) -> LeaderboardListCall<'a, C, NC, A> {
         LeaderboardListCall {
             hub: self.hub,
@@ -3328,13 +3367,18 @@ pub struct MetagameMethods<'a, C, NC, A>
     hub: &'a Games<C, NC, A>,
 }
 
-impl<'a, C, NC, A> ResourceMethodsBuilder for MetagameMethods<'a, C, NC, A> {}
+impl<'a, C, NC, A> MethodsBuilder for MetagameMethods<'a, C, NC, A> {}
 
 impl<'a, C, NC, A> MetagameMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// List play data aggregated per category for the player corresponding to playerId.    
+    /// List play data aggregated per category for the player corresponding to playerId.
+    /// 
+    /// # Arguments
+    ///
+    /// * `playerId` - A player ID. A value of me may be used in place of the authenticated player's ID.
+    /// * `collection` - The collection of categories for which data will be returned.
     pub fn list_categories_by_player(&self, player_id: &str, collection: &str) -> MetagameListCategoriesByPlayerCall<'a, C, NC, A> {
         MetagameListCategoriesByPlayerCall {
             hub: self.hub,
@@ -3351,7 +3395,7 @@ impl<'a, C, NC, A> MetagameMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Return the metagame configuration data for the calling application.    
+    /// Return the metagame configuration data for the calling application.
     pub fn get_metagame_config(&self) -> MetagameGetMetagameConfigCall<'a, C, NC, A> {
         MetagameGetMetagameConfigCall {
             hub: self.hub,
@@ -3398,13 +3442,17 @@ pub struct PlayerMethods<'a, C, NC, A>
     hub: &'a Games<C, NC, A>,
 }
 
-impl<'a, C, NC, A> ResourceMethodsBuilder for PlayerMethods<'a, C, NC, A> {}
+impl<'a, C, NC, A> MethodsBuilder for PlayerMethods<'a, C, NC, A> {}
 
 impl<'a, C, NC, A> PlayerMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Get the collection of players for the currently authenticated user.    
+    /// Get the collection of players for the currently authenticated user.
+    /// 
+    /// # Arguments
+    ///
+    /// * `collection` - Collection of players being retrieved
     pub fn list(&self, collection: &str) -> PlayerListCall<'a, C, NC, A> {
         PlayerListCall {
             hub: self.hub,
@@ -3420,7 +3468,11 @@ impl<'a, C, NC, A> PlayerMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Retrieves the Player resource with the given ID. To retrieve the player for the currently authenticated user, set playerId to me.    
+    /// Retrieves the Player resource with the given ID. To retrieve the player for the currently authenticated user, set playerId to me.
+    /// 
+    /// # Arguments
+    ///
+    /// * `playerId` - A player ID. A value of me may be used in place of the authenticated player's ID.
     pub fn get(&self, player_id: &str) -> PlayerGetCall<'a, C, NC, A> {
         PlayerGetCall {
             hub: self.hub,
@@ -3469,13 +3521,17 @@ pub struct QuestMethods<'a, C, NC, A>
     hub: &'a Games<C, NC, A>,
 }
 
-impl<'a, C, NC, A> ResourceMethodsBuilder for QuestMethods<'a, C, NC, A> {}
+impl<'a, C, NC, A> MethodsBuilder for QuestMethods<'a, C, NC, A> {}
 
 impl<'a, C, NC, A> QuestMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Indicates that the currently authorized user will participate in the quest.    
+    /// Indicates that the currently authorized user will participate in the quest.
+    /// 
+    /// # Arguments
+    ///
+    /// * `questId` - The ID of the quest.
     pub fn accept(&self, quest_id: &str) -> QuestAcceptCall<'a, C, NC, A> {
         QuestAcceptCall {
             hub: self.hub,
@@ -3489,7 +3545,11 @@ impl<'a, C, NC, A> QuestMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Get a list of quests for your application and the currently authenticated player.    
+    /// Get a list of quests for your application and the currently authenticated player.
+    /// 
+    /// # Arguments
+    ///
+    /// * `playerId` - A player ID. A value of me may be used in place of the authenticated player's ID.
     pub fn list(&self, player_id: &str) -> QuestListCall<'a, C, NC, A> {
         QuestListCall {
             hub: self.hub,
@@ -3540,13 +3600,17 @@ pub struct SnapshotMethods<'a, C, NC, A>
     hub: &'a Games<C, NC, A>,
 }
 
-impl<'a, C, NC, A> ResourceMethodsBuilder for SnapshotMethods<'a, C, NC, A> {}
+impl<'a, C, NC, A> MethodsBuilder for SnapshotMethods<'a, C, NC, A> {}
 
 impl<'a, C, NC, A> SnapshotMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Retrieves the metadata for a given snapshot ID.    
+    /// Retrieves the metadata for a given snapshot ID.
+    /// 
+    /// # Arguments
+    ///
+    /// * `snapshotId` - The ID of the snapshot.
     pub fn get(&self, snapshot_id: &str) -> SnapshotGetCall<'a, C, NC, A> {
         SnapshotGetCall {
             hub: self.hub,
@@ -3560,7 +3624,11 @@ impl<'a, C, NC, A> SnapshotMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Retrieves a list of snapshots created by your application for the player corresponding to the player ID.    
+    /// Retrieves a list of snapshots created by your application for the player corresponding to the player ID.
+    /// 
+    /// # Arguments
+    ///
+    /// * `playerId` - A player ID. A value of me may be used in place of the authenticated player's ID.
     pub fn list(&self, player_id: &str) -> SnapshotListCall<'a, C, NC, A> {
         SnapshotListCall {
             hub: self.hub,
@@ -3611,13 +3679,17 @@ pub struct TurnBasedMatcheMethods<'a, C, NC, A>
     hub: &'a Games<C, NC, A>,
 }
 
-impl<'a, C, NC, A> ResourceMethodsBuilder for TurnBasedMatcheMethods<'a, C, NC, A> {}
+impl<'a, C, NC, A> MethodsBuilder for TurnBasedMatcheMethods<'a, C, NC, A> {}
 
 impl<'a, C, NC, A> TurnBasedMatcheMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Dismiss a turn-based match from the match list. The match will no longer show up in the list and will not generate notifications.    
+    /// Dismiss a turn-based match from the match list. The match will no longer show up in the list and will not generate notifications.
+    /// 
+    /// # Arguments
+    ///
+    /// * `matchId` - The ID of the match.
     pub fn dismiss(&self, match_id: &str) -> TurnBasedMatcheDismisCall<'a, C, NC, A> {
         TurnBasedMatcheDismisCall {
             hub: self.hub,
@@ -3630,7 +3702,7 @@ impl<'a, C, NC, A> TurnBasedMatcheMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Returns turn-based matches the player is or was involved in that changed since the last sync call, with the least recent changes coming first. Matches that should be removed from the local cache will have a status of MATCH_DELETED.    
+    /// Returns turn-based matches the player is or was involved in that changed since the last sync call, with the least recent changes coming first. Matches that should be removed from the local cache will have a status of MATCH_DELETED.
     pub fn sync(&self) -> TurnBasedMatcheSyncCall<'a, C, NC, A> {
         TurnBasedMatcheSyncCall {
             hub: self.hub,
@@ -3647,7 +3719,11 @@ impl<'a, C, NC, A> TurnBasedMatcheMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Decline an invitation to play a turn-based match.    
+    /// Decline an invitation to play a turn-based match.
+    /// 
+    /// # Arguments
+    ///
+    /// * `matchId` - The ID of the match.
     pub fn decline(&self, match_id: &str) -> TurnBasedMatcheDeclineCall<'a, C, NC, A> {
         TurnBasedMatcheDeclineCall {
             hub: self.hub,
@@ -3661,7 +3737,11 @@ impl<'a, C, NC, A> TurnBasedMatcheMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Get the data for a turn-based match.    
+    /// Get the data for a turn-based match.
+    /// 
+    /// # Arguments
+    ///
+    /// * `matchId` - The ID of the match.
     pub fn get(&self, match_id: &str) -> TurnBasedMatcheGetCall<'a, C, NC, A> {
         TurnBasedMatcheGetCall {
             hub: self.hub,
@@ -3676,7 +3756,11 @@ impl<'a, C, NC, A> TurnBasedMatcheMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Create a turn-based match.    
+    /// Create a turn-based match.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
     pub fn create(&self, request: &TurnBasedMatchCreateRequest) -> TurnBasedMatcheCreateCall<'a, C, NC, A> {
         TurnBasedMatcheCreateCall {
             hub: self.hub,
@@ -3690,7 +3774,11 @@ impl<'a, C, NC, A> TurnBasedMatcheMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Join a turn-based match.    
+    /// Join a turn-based match.
+    /// 
+    /// # Arguments
+    ///
+    /// * `matchId` - The ID of the match.
     pub fn join(&self, match_id: &str) -> TurnBasedMatcheJoinCall<'a, C, NC, A> {
         TurnBasedMatcheJoinCall {
             hub: self.hub,
@@ -3704,7 +3792,12 @@ impl<'a, C, NC, A> TurnBasedMatcheMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Leave a turn-based match during the current player's turn, without canceling the match.    
+    /// Leave a turn-based match during the current player's turn, without canceling the match.
+    /// 
+    /// # Arguments
+    ///
+    /// * `matchId` - The ID of the match.
+    /// * `matchVersion` - The version of the match being updated.
     pub fn leave_turn(&self, match_id: &str, match_version: i32) -> TurnBasedMatcheLeaveTurnCall<'a, C, NC, A> {
         TurnBasedMatcheLeaveTurnCall {
             hub: self.hub,
@@ -3720,7 +3813,11 @@ impl<'a, C, NC, A> TurnBasedMatcheMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Cancel a turn-based match.    
+    /// Cancel a turn-based match.
+    /// 
+    /// # Arguments
+    ///
+    /// * `matchId` - The ID of the match.
     pub fn cancel(&self, match_id: &str) -> TurnBasedMatcheCancelCall<'a, C, NC, A> {
         TurnBasedMatcheCancelCall {
             hub: self.hub,
@@ -3733,7 +3830,12 @@ impl<'a, C, NC, A> TurnBasedMatcheMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Finish a turn-based match. Each player should make this call once, after all results are in. Only the player whose turn it is may make the first call to Finish, and can pass in the final match state.    
+    /// Finish a turn-based match. Each player should make this call once, after all results are in. Only the player whose turn it is may make the first call to Finish, and can pass in the final match state.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `matchId` - The ID of the match.
     pub fn finish(&self, request: &TurnBasedMatchResults, match_id: &str) -> TurnBasedMatcheFinishCall<'a, C, NC, A> {
         TurnBasedMatcheFinishCall {
             hub: self.hub,
@@ -3748,7 +3850,11 @@ impl<'a, C, NC, A> TurnBasedMatcheMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Leave a turn-based match when it is not the current player's turn, without canceling the match.    
+    /// Leave a turn-based match when it is not the current player's turn, without canceling the match.
+    /// 
+    /// # Arguments
+    ///
+    /// * `matchId` - The ID of the match.
     pub fn leave(&self, match_id: &str) -> TurnBasedMatcheLeaveCall<'a, C, NC, A> {
         TurnBasedMatcheLeaveCall {
             hub: self.hub,
@@ -3762,7 +3868,7 @@ impl<'a, C, NC, A> TurnBasedMatcheMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Returns turn-based matches the player is or was involved in.    
+    /// Returns turn-based matches the player is or was involved in.
     pub fn list(&self) -> TurnBasedMatcheListCall<'a, C, NC, A> {
         TurnBasedMatcheListCall {
             hub: self.hub,
@@ -3779,7 +3885,12 @@ impl<'a, C, NC, A> TurnBasedMatcheMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Commit the results of a player turn.    
+    /// Commit the results of a player turn.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `matchId` - The ID of the match.
     pub fn take_turn(&self, request: &TurnBasedMatchTurn, match_id: &str) -> TurnBasedMatcheTakeTurnCall<'a, C, NC, A> {
         TurnBasedMatcheTakeTurnCall {
             hub: self.hub,
@@ -3794,7 +3905,11 @@ impl<'a, C, NC, A> TurnBasedMatcheMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Create a rematch of a match that was previously completed, with the same participants. This can be called by only one player on a match still in their list; the player must have called Finish first. Returns the newly created match; it will be the caller's turn.    
+    /// Create a rematch of a match that was previously completed, with the same participants. This can be called by only one player on a match still in their list; the player must have called Finish first. Returns the newly created match; it will be the caller's turn.
+    /// 
+    /// # Arguments
+    ///
+    /// * `matchId` - The ID of the match.
     pub fn rematch(&self, match_id: &str) -> TurnBasedMatcheRematchCall<'a, C, NC, A> {
         TurnBasedMatcheRematchCall {
             hub: self.hub,
@@ -3844,13 +3959,17 @@ pub struct ApplicationMethods<'a, C, NC, A>
     hub: &'a Games<C, NC, A>,
 }
 
-impl<'a, C, NC, A> ResourceMethodsBuilder for ApplicationMethods<'a, C, NC, A> {}
+impl<'a, C, NC, A> MethodsBuilder for ApplicationMethods<'a, C, NC, A> {}
 
 impl<'a, C, NC, A> ApplicationMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Retrieves the metadata of the application with the given ID. If the requested application is not available for the specified platformType, the returned response will not include any instance data.    
+    /// Retrieves the metadata of the application with the given ID. If the requested application is not available for the specified platformType, the returned response will not include any instance data.
+    /// 
+    /// # Arguments
+    ///
+    /// * `applicationId` - The application ID from the Google Play developer console.
     pub fn get(&self, application_id: &str) -> ApplicationGetCall<'a, C, NC, A> {
         ApplicationGetCall {
             hub: self.hub,
@@ -3865,7 +3984,7 @@ impl<'a, C, NC, A> ApplicationMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Indicate that the the currently authenticated user is playing your application.    
+    /// Indicate that the the currently authenticated user is playing your application.
     pub fn played(&self) -> ApplicationPlayedCall<'a, C, NC, A> {
         ApplicationPlayedCall {
             hub: self.hub,
@@ -3912,13 +4031,17 @@ pub struct RoomMethods<'a, C, NC, A>
     hub: &'a Games<C, NC, A>,
 }
 
-impl<'a, C, NC, A> ResourceMethodsBuilder for RoomMethods<'a, C, NC, A> {}
+impl<'a, C, NC, A> MethodsBuilder for RoomMethods<'a, C, NC, A> {}
 
 impl<'a, C, NC, A> RoomMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Get the data for a room.    
+    /// Get the data for a room.
+    /// 
+    /// # Arguments
+    ///
+    /// * `roomId` - The ID of the room.
     pub fn get(&self, room_id: &str) -> RoomGetCall<'a, C, NC, A> {
         RoomGetCall {
             hub: self.hub,
@@ -3932,7 +4055,12 @@ impl<'a, C, NC, A> RoomMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Leave a room. For internal use by the Games SDK only. Calling this method directly is unsupported.    
+    /// Leave a room. For internal use by the Games SDK only. Calling this method directly is unsupported.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `roomId` - The ID of the room.
     pub fn leave(&self, request: &RoomLeaveRequest, room_id: &str) -> RoomLeaveCall<'a, C, NC, A> {
         RoomLeaveCall {
             hub: self.hub,
@@ -3947,7 +4075,7 @@ impl<'a, C, NC, A> RoomMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Returns invitations to join rooms.    
+    /// Returns invitations to join rooms.
     pub fn list(&self) -> RoomListCall<'a, C, NC, A> {
         RoomListCall {
             hub: self.hub,
@@ -3962,7 +4090,12 @@ impl<'a, C, NC, A> RoomMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Updates sent by a client reporting the status of peers in a room. For internal use by the Games SDK only. Calling this method directly is unsupported.    
+    /// Updates sent by a client reporting the status of peers in a room. For internal use by the Games SDK only. Calling this method directly is unsupported.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `roomId` - The ID of the room.
     pub fn report_status(&self, request: &RoomP2PStatuses, room_id: &str) -> RoomReportStatuCall<'a, C, NC, A> {
         RoomReportStatuCall {
             hub: self.hub,
@@ -3977,7 +4110,11 @@ impl<'a, C, NC, A> RoomMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Create a room. For internal use by the Games SDK only. Calling this method directly is unsupported.    
+    /// Create a room. For internal use by the Games SDK only. Calling this method directly is unsupported.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
     pub fn create(&self, request: &RoomCreateRequest) -> RoomCreateCall<'a, C, NC, A> {
         RoomCreateCall {
             hub: self.hub,
@@ -3991,7 +4128,11 @@ impl<'a, C, NC, A> RoomMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Decline an invitation to join a room. For internal use by the Games SDK only. Calling this method directly is unsupported.    
+    /// Decline an invitation to join a room. For internal use by the Games SDK only. Calling this method directly is unsupported.
+    /// 
+    /// # Arguments
+    ///
+    /// * `roomId` - The ID of the room.
     pub fn decline(&self, room_id: &str) -> RoomDeclineCall<'a, C, NC, A> {
         RoomDeclineCall {
             hub: self.hub,
@@ -4005,7 +4146,11 @@ impl<'a, C, NC, A> RoomMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Dismiss an invitation to join a room. For internal use by the Games SDK only. Calling this method directly is unsupported.    
+    /// Dismiss an invitation to join a room. For internal use by the Games SDK only. Calling this method directly is unsupported.
+    /// 
+    /// # Arguments
+    ///
+    /// * `roomId` - The ID of the room.
     pub fn dismiss(&self, room_id: &str) -> RoomDismisCall<'a, C, NC, A> {
         RoomDismisCall {
             hub: self.hub,
@@ -4018,7 +4163,12 @@ impl<'a, C, NC, A> RoomMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Join a room. For internal use by the Games SDK only. Calling this method directly is unsupported.    
+    /// Join a room. For internal use by the Games SDK only. Calling this method directly is unsupported.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `roomId` - The ID of the room.
     pub fn join(&self, request: &RoomJoinRequest, room_id: &str) -> RoomJoinCall<'a, C, NC, A> {
         RoomJoinCall {
             hub: self.hub,
@@ -4068,13 +4218,18 @@ pub struct ScoreMethods<'a, C, NC, A>
     hub: &'a Games<C, NC, A>,
 }
 
-impl<'a, C, NC, A> ResourceMethodsBuilder for ScoreMethods<'a, C, NC, A> {}
+impl<'a, C, NC, A> MethodsBuilder for ScoreMethods<'a, C, NC, A> {}
 
 impl<'a, C, NC, A> ScoreMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Submits a score to the specified leaderboard.    
+    /// Submits a score to the specified leaderboard.
+    /// 
+    /// # Arguments
+    ///
+    /// * `leaderboardId` - The ID of the leaderboard.
+    /// * `score` - The score you're submitting. The submitted score is ignored if it is worse than a previously submitted score, where worse depends on the leaderboard sort order. The meaning of the score value depends on the leaderboard format type. For fixed-point, the score represents the raw value. For time, the score represents elapsed time in milliseconds. For currency, the score represents a value in micro units.
     pub fn submit(&self, leaderboard_id: &str, score: &str) -> ScoreSubmitCall<'a, C, NC, A> {
         ScoreSubmitCall {
             hub: self.hub,
@@ -4090,7 +4245,13 @@ impl<'a, C, NC, A> ScoreMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Lists the scores in a leaderboard, starting from the top.    
+    /// Lists the scores in a leaderboard, starting from the top.
+    /// 
+    /// # Arguments
+    ///
+    /// * `leaderboardId` - The ID of the leaderboard.
+    /// * `collection` - The collection of scores you're requesting.
+    /// * `timeSpan` - The time span for the scores and ranks you're requesting.
     pub fn list(&self, leaderboard_id: &str, collection: &str, time_span: &str) -> ScoreListCall<'a, C, NC, A> {
         ScoreListCall {
             hub: self.hub,
@@ -4110,6 +4271,12 @@ impl<'a, C, NC, A> ScoreMethods<'a, C, NC, A> {
     ///
     /// Get high scores, and optionally ranks, in leaderboards for the currently authenticated player. For a specific time span, leaderboardId can be set to ALL to retrieve data for all leaderboards in a given time span.
     /// NOTE: You cannot ask for 'ALL' leaderboards and 'ALL' timeSpans in the same request; only one parameter may be set to 'ALL'.
+    /// 
+    /// # Arguments
+    ///
+    /// * `playerId` - A player ID. A value of me may be used in place of the authenticated player's ID.
+    /// * `leaderboardId` - The ID of the leaderboard. Can be set to 'ALL' to retrieve data for all leaderboards for this application.
+    /// * `timeSpan` - The time span for the scores and ranks you're requesting.
     pub fn get(&self, player_id: &str, leaderboard_id: &str, time_span: &str) -> ScoreGetCall<'a, C, NC, A> {
         ScoreGetCall {
             hub: self.hub,
@@ -4128,7 +4295,11 @@ impl<'a, C, NC, A> ScoreMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Submits multiple scores to leaderboards.    
+    /// Submits multiple scores to leaderboards.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
     pub fn submit_multiple(&self, request: &PlayerScoreSubmissionList) -> ScoreSubmitMultipleCall<'a, C, NC, A> {
         ScoreSubmitMultipleCall {
             hub: self.hub,
@@ -4142,7 +4313,13 @@ impl<'a, C, NC, A> ScoreMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Lists the scores in a leaderboard around (and including) a player's score.    
+    /// Lists the scores in a leaderboard around (and including) a player's score.
+    /// 
+    /// # Arguments
+    ///
+    /// * `leaderboardId` - The ID of the leaderboard.
+    /// * `collection` - The collection of scores you're requesting.
+    /// * `timeSpan` - The time span for the scores and ranks you're requesting.
     pub fn list_window(&self, leaderboard_id: &str, collection: &str, time_span: &str) -> ScoreListWindowCall<'a, C, NC, A> {
         ScoreListWindowCall {
             hub: self.hub,
@@ -4197,13 +4374,17 @@ pub struct PushtokenMethods<'a, C, NC, A>
     hub: &'a Games<C, NC, A>,
 }
 
-impl<'a, C, NC, A> ResourceMethodsBuilder for PushtokenMethods<'a, C, NC, A> {}
+impl<'a, C, NC, A> MethodsBuilder for PushtokenMethods<'a, C, NC, A> {}
 
 impl<'a, C, NC, A> PushtokenMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Removes a push token for the current user and application. Removing a non-existent push token will report success.    
+    /// Removes a push token for the current user and application. Removing a non-existent push token will report success.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
     pub fn remove(&self, request: &PushTokenId) -> PushtokenRemoveCall<'a, C, NC, A> {
         PushtokenRemoveCall {
             hub: self.hub,
@@ -4216,7 +4397,11 @@ impl<'a, C, NC, A> PushtokenMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Registers a push token for the current user and application.    
+    /// Registers a push token for the current user and application.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
     pub fn update(&self, request: &PushToken) -> PushtokenUpdateCall<'a, C, NC, A> {
         PushtokenUpdateCall {
             hub: self.hub,
@@ -4264,13 +4449,22 @@ pub struct RevisionMethods<'a, C, NC, A>
     hub: &'a Games<C, NC, A>,
 }
 
-impl<'a, C, NC, A> ResourceMethodsBuilder for RevisionMethods<'a, C, NC, A> {}
+impl<'a, C, NC, A> MethodsBuilder for RevisionMethods<'a, C, NC, A> {}
 
 impl<'a, C, NC, A> RevisionMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Checks whether the games client is out of date.    
+    /// Checks whether the games client is out of date.
+    /// 
+    /// # Arguments
+    ///
+    /// * `clientRevision` - The revision of the client SDK used by your application. Format:
+    ///                      [PLATFORM_TYPE]:[VERSION_NUMBER]. Possible values of PLATFORM_TYPE are:
+    ///                       
+    ///                      - "ANDROID" - Client is running the Android SDK. 
+    ///                      - "IOS" - Client is running the iOS SDK. 
+    ///                      - "WEB_APP" - Client is running as a Web App.
     pub fn check(&self, client_revision: &str) -> RevisionCheckCall<'a, C, NC, A> {
         RevisionCheckCall {
             hub: self.hub,
@@ -4318,13 +4512,13 @@ pub struct EventMethods<'a, C, NC, A>
     hub: &'a Games<C, NC, A>,
 }
 
-impl<'a, C, NC, A> ResourceMethodsBuilder for EventMethods<'a, C, NC, A> {}
+impl<'a, C, NC, A> MethodsBuilder for EventMethods<'a, C, NC, A> {}
 
 impl<'a, C, NC, A> EventMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Returns a list of the event definitions in this application.    
+    /// Returns a list of the event definitions in this application.
     pub fn list_definitions(&self) -> EventListDefinitionCall<'a, C, NC, A> {
         EventListDefinitionCall {
             hub: self.hub,
@@ -4339,7 +4533,11 @@ impl<'a, C, NC, A> EventMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Records a batch of changes to the number of times events have occurred for the currently authenticated user of this application.    
+    /// Records a batch of changes to the number of times events have occurred for the currently authenticated user of this application.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
     pub fn record(&self, request: &EventRecordRequest) -> EventRecordCall<'a, C, NC, A> {
         EventRecordCall {
             hub: self.hub,
@@ -4353,7 +4551,7 @@ impl<'a, C, NC, A> EventMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Returns a list showing the current progress on events in this application for the currently authenticated user.    
+    /// Returns a list showing the current progress on events in this application for the currently authenticated user.
     pub fn list_by_player(&self) -> EventListByPlayerCall<'a, C, NC, A> {
         EventListByPlayerCall {
             hub: self.hub,
@@ -4403,13 +4601,19 @@ pub struct QuestMilestoneMethods<'a, C, NC, A>
     hub: &'a Games<C, NC, A>,
 }
 
-impl<'a, C, NC, A> ResourceMethodsBuilder for QuestMilestoneMethods<'a, C, NC, A> {}
+impl<'a, C, NC, A> MethodsBuilder for QuestMilestoneMethods<'a, C, NC, A> {}
 
 impl<'a, C, NC, A> QuestMilestoneMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Report that a reward for the milestone corresponding to milestoneId for the quest corresponding to questId has been claimed by the currently authorized user.    
+    /// Report that a reward for the milestone corresponding to milestoneId for the quest corresponding to questId has been claimed by the currently authorized user.
+    /// 
+    /// # Arguments
+    ///
+    /// * `questId` - The ID of the quest.
+    /// * `milestoneId` - The ID of the milestone.
+    /// * `requestId` - A numeric ID to ensure that the request is handled correctly across retries. Your client application must generate this ID randomly.
     pub fn claim(&self, quest_id: &str, milestone_id: &str, request_id: &str) -> QuestMilestoneClaimCall<'a, C, NC, A> {
         QuestMilestoneClaimCall {
             hub: self.hub,
@@ -4459,13 +4663,13 @@ pub struct AchievementDefinitionMethods<'a, C, NC, A>
     hub: &'a Games<C, NC, A>,
 }
 
-impl<'a, C, NC, A> ResourceMethodsBuilder for AchievementDefinitionMethods<'a, C, NC, A> {}
+impl<'a, C, NC, A> MethodsBuilder for AchievementDefinitionMethods<'a, C, NC, A> {}
 
 impl<'a, C, NC, A> AchievementDefinitionMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Lists all the achievement definitions for your application.    
+    /// Lists all the achievement definitions for your application.
     pub fn list(&self) -> AchievementDefinitionListCall<'a, C, NC, A> {
         AchievementDefinitionListCall {
             hub: self.hub,
@@ -4490,7 +4694,7 @@ impl<'a, C, NC, A> AchievementDefinitionMethods<'a, C, NC, A> {
 /// Lists the progress for all your application's achievements for the currently authenticated player.
 ///
 /// A builder for the *list* method supported by a *achievement* resource.
-/// It is not used directly, but through a `AchievementMethods`.
+/// It is not used directly, but through a `AchievementMethods` instance.
 ///
 /// # Example
 ///
@@ -4568,7 +4772,7 @@ impl<'a, C, NC, A> AchievementListCall<'a, C, NC, A> where NC: hyper::net::Netwo
         for &field in ["alt", "playerId", "state", "pageToken", "maxResults", "language"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -4621,7 +4825,7 @@ impl<'a, C, NC, A> AchievementListCall<'a, C, NC, A> where NC: hyper::net::Netwo
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -4633,7 +4837,6 @@ impl<'a, C, NC, A> AchievementListCall<'a, C, NC, A> where NC: hyper::net::Netwo
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -4643,7 +4846,7 @@ impl<'a, C, NC, A> AchievementListCall<'a, C, NC, A> where NC: hyper::net::Netwo
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -4654,7 +4857,7 @@ impl<'a, C, NC, A> AchievementListCall<'a, C, NC, A> where NC: hyper::net::Netwo
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -4663,13 +4866,13 @@ impl<'a, C, NC, A> AchievementListCall<'a, C, NC, A> where NC: hyper::net::Netwo
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -4681,7 +4884,7 @@ impl<'a, C, NC, A> AchievementListCall<'a, C, NC, A> where NC: hyper::net::Netwo
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// A player ID. A value of me may be used in place of the authenticated player's ID.    
+    /// A player ID. A value of me may be used in place of the authenticated player's ID.
     pub fn player_id(mut self, new_value: &str) -> AchievementListCall<'a, C, NC, A> {
         self._player_id = new_value.to_string();
         self
@@ -4689,7 +4892,7 @@ impl<'a, C, NC, A> AchievementListCall<'a, C, NC, A> where NC: hyper::net::Netwo
     /// Sets the *state* query property to the given value.
     ///
     /// 
-    /// Tells the server to return only achievements with the specified state. If this parameter isn't specified, all achievements are returned.    
+    /// Tells the server to return only achievements with the specified state. If this parameter isn't specified, all achievements are returned.
     pub fn state(mut self, new_value: &str) -> AchievementListCall<'a, C, NC, A> {
         self._state = Some(new_value.to_string());
         self
@@ -4697,7 +4900,7 @@ impl<'a, C, NC, A> AchievementListCall<'a, C, NC, A> where NC: hyper::net::Netwo
     /// Sets the *page token* query property to the given value.
     ///
     /// 
-    /// The token returned by the previous request.    
+    /// The token returned by the previous request.
     pub fn page_token(mut self, new_value: &str) -> AchievementListCall<'a, C, NC, A> {
         self._page_token = Some(new_value.to_string());
         self
@@ -4705,7 +4908,7 @@ impl<'a, C, NC, A> AchievementListCall<'a, C, NC, A> where NC: hyper::net::Netwo
     /// Sets the *max results* query property to the given value.
     ///
     /// 
-    /// The maximum number of achievement resources to return in the response, used for paging. For any response, the actual number of achievement resources returned may be less than the specified maxResults.    
+    /// The maximum number of achievement resources to return in the response, used for paging. For any response, the actual number of achievement resources returned may be less than the specified maxResults.
     pub fn max_results(mut self, new_value: i32) -> AchievementListCall<'a, C, NC, A> {
         self._max_results = Some(new_value);
         self
@@ -4713,7 +4916,7 @@ impl<'a, C, NC, A> AchievementListCall<'a, C, NC, A> where NC: hyper::net::Netwo
     /// Sets the *language* query property to the given value.
     ///
     /// 
-    /// The preferred language to use for strings returned by this method.    
+    /// The preferred language to use for strings returned by this method.
     pub fn language(mut self, new_value: &str) -> AchievementListCall<'a, C, NC, A> {
         self._language = Some(new_value.to_string());
         self
@@ -4774,7 +4977,7 @@ impl<'a, C, NC, A> AchievementListCall<'a, C, NC, A> where NC: hyper::net::Netwo
 /// Increments the steps of the achievement with the given ID for the currently authenticated player.
 ///
 /// A builder for the *increment* method supported by a *achievement* resource.
-/// It is not used directly, but through a `AchievementMethods`.
+/// It is not used directly, but through a `AchievementMethods` instance.
 ///
 /// # Example
 ///
@@ -4839,7 +5042,7 @@ impl<'a, C, NC, A> AchievementIncrementCall<'a, C, NC, A> where NC: hyper::net::
         for &field in ["alt", "achievementId", "stepsToIncrement", "requestId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -4892,7 +5095,7 @@ impl<'a, C, NC, A> AchievementIncrementCall<'a, C, NC, A> where NC: hyper::net::
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -4904,7 +5107,6 @@ impl<'a, C, NC, A> AchievementIncrementCall<'a, C, NC, A> where NC: hyper::net::
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -4914,7 +5116,7 @@ impl<'a, C, NC, A> AchievementIncrementCall<'a, C, NC, A> where NC: hyper::net::
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -4925,7 +5127,7 @@ impl<'a, C, NC, A> AchievementIncrementCall<'a, C, NC, A> where NC: hyper::net::
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -4934,13 +5136,13 @@ impl<'a, C, NC, A> AchievementIncrementCall<'a, C, NC, A> where NC: hyper::net::
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -4952,7 +5154,7 @@ impl<'a, C, NC, A> AchievementIncrementCall<'a, C, NC, A> where NC: hyper::net::
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The ID of the achievement used by this method.    
+    /// The ID of the achievement used by this method.
     pub fn achievement_id(mut self, new_value: &str) -> AchievementIncrementCall<'a, C, NC, A> {
         self._achievement_id = new_value.to_string();
         self
@@ -4962,7 +5164,7 @@ impl<'a, C, NC, A> AchievementIncrementCall<'a, C, NC, A> where NC: hyper::net::
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The number of steps to increment.    
+    /// The number of steps to increment.
     pub fn steps_to_increment(mut self, new_value: i32) -> AchievementIncrementCall<'a, C, NC, A> {
         self._steps_to_increment = new_value;
         self
@@ -4970,7 +5172,7 @@ impl<'a, C, NC, A> AchievementIncrementCall<'a, C, NC, A> where NC: hyper::net::
     /// Sets the *request id* query property to the given value.
     ///
     /// 
-    /// A randomly generated numeric ID for each request specified by the caller. This number is used at the server to ensure that the request is handled correctly across retries.    
+    /// A randomly generated numeric ID for each request specified by the caller. This number is used at the server to ensure that the request is handled correctly across retries.
     pub fn request_id(mut self, new_value: &str) -> AchievementIncrementCall<'a, C, NC, A> {
         self._request_id = Some(new_value.to_string());
         self
@@ -5031,7 +5233,7 @@ impl<'a, C, NC, A> AchievementIncrementCall<'a, C, NC, A> where NC: hyper::net::
 /// Sets the steps for the currently authenticated player towards unlocking an achievement. If the steps parameter is less than the current number of steps that the player already gained for the achievement, the achievement is not modified.
 ///
 /// A builder for the *setStepsAtLeast* method supported by a *achievement* resource.
-/// It is not used directly, but through a `AchievementMethods`.
+/// It is not used directly, but through a `AchievementMethods` instance.
 ///
 /// # Example
 ///
@@ -5091,7 +5293,7 @@ impl<'a, C, NC, A> AchievementSetStepsAtLeastCall<'a, C, NC, A> where NC: hyper:
         for &field in ["alt", "achievementId", "steps"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -5144,7 +5346,7 @@ impl<'a, C, NC, A> AchievementSetStepsAtLeastCall<'a, C, NC, A> where NC: hyper:
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -5156,7 +5358,6 @@ impl<'a, C, NC, A> AchievementSetStepsAtLeastCall<'a, C, NC, A> where NC: hyper:
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -5166,7 +5367,7 @@ impl<'a, C, NC, A> AchievementSetStepsAtLeastCall<'a, C, NC, A> where NC: hyper:
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -5177,7 +5378,7 @@ impl<'a, C, NC, A> AchievementSetStepsAtLeastCall<'a, C, NC, A> where NC: hyper:
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -5186,13 +5387,13 @@ impl<'a, C, NC, A> AchievementSetStepsAtLeastCall<'a, C, NC, A> where NC: hyper:
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -5204,7 +5405,7 @@ impl<'a, C, NC, A> AchievementSetStepsAtLeastCall<'a, C, NC, A> where NC: hyper:
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The ID of the achievement used by this method.    
+    /// The ID of the achievement used by this method.
     pub fn achievement_id(mut self, new_value: &str) -> AchievementSetStepsAtLeastCall<'a, C, NC, A> {
         self._achievement_id = new_value.to_string();
         self
@@ -5214,7 +5415,7 @@ impl<'a, C, NC, A> AchievementSetStepsAtLeastCall<'a, C, NC, A> where NC: hyper:
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The minimum value to set the steps to.    
+    /// The minimum value to set the steps to.
     pub fn steps(mut self, new_value: i32) -> AchievementSetStepsAtLeastCall<'a, C, NC, A> {
         self._steps = new_value;
         self
@@ -5275,7 +5476,7 @@ impl<'a, C, NC, A> AchievementSetStepsAtLeastCall<'a, C, NC, A> where NC: hyper:
 /// Updates multiple achievements for the currently authenticated player.
 ///
 /// A builder for the *updateMultiple* method supported by a *achievement* resource.
-/// It is not used directly, but through a `AchievementMethods`.
+/// It is not used directly, but through a `AchievementMethods` instance.
 ///
 /// # Example
 ///
@@ -5338,7 +5539,7 @@ impl<'a, C, NC, A> AchievementUpdateMultipleCall<'a, C, NC, A> where NC: hyper::
         for &field in ["alt"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -5371,7 +5572,7 @@ impl<'a, C, NC, A> AchievementUpdateMultipleCall<'a, C, NC, A> where NC: hyper::
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -5387,7 +5588,6 @@ impl<'a, C, NC, A> AchievementUpdateMultipleCall<'a, C, NC, A> where NC: hyper::
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -5397,7 +5597,7 @@ impl<'a, C, NC, A> AchievementUpdateMultipleCall<'a, C, NC, A> where NC: hyper::
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -5408,7 +5608,7 @@ impl<'a, C, NC, A> AchievementUpdateMultipleCall<'a, C, NC, A> where NC: hyper::
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -5417,13 +5617,13 @@ impl<'a, C, NC, A> AchievementUpdateMultipleCall<'a, C, NC, A> where NC: hyper::
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -5495,7 +5695,7 @@ impl<'a, C, NC, A> AchievementUpdateMultipleCall<'a, C, NC, A> where NC: hyper::
 /// Sets the state of the achievement with the given ID to REVEALED for the currently authenticated player.
 ///
 /// A builder for the *reveal* method supported by a *achievement* resource.
-/// It is not used directly, but through a `AchievementMethods`.
+/// It is not used directly, but through a `AchievementMethods` instance.
 ///
 /// # Example
 ///
@@ -5553,7 +5753,7 @@ impl<'a, C, NC, A> AchievementRevealCall<'a, C, NC, A> where NC: hyper::net::Net
         for &field in ["alt", "achievementId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -5606,7 +5806,7 @@ impl<'a, C, NC, A> AchievementRevealCall<'a, C, NC, A> where NC: hyper::net::Net
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -5618,7 +5818,6 @@ impl<'a, C, NC, A> AchievementRevealCall<'a, C, NC, A> where NC: hyper::net::Net
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -5628,7 +5827,7 @@ impl<'a, C, NC, A> AchievementRevealCall<'a, C, NC, A> where NC: hyper::net::Net
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -5639,7 +5838,7 @@ impl<'a, C, NC, A> AchievementRevealCall<'a, C, NC, A> where NC: hyper::net::Net
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -5648,13 +5847,13 @@ impl<'a, C, NC, A> AchievementRevealCall<'a, C, NC, A> where NC: hyper::net::Net
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -5666,7 +5865,7 @@ impl<'a, C, NC, A> AchievementRevealCall<'a, C, NC, A> where NC: hyper::net::Net
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The ID of the achievement used by this method.    
+    /// The ID of the achievement used by this method.
     pub fn achievement_id(mut self, new_value: &str) -> AchievementRevealCall<'a, C, NC, A> {
         self._achievement_id = new_value.to_string();
         self
@@ -5727,7 +5926,7 @@ impl<'a, C, NC, A> AchievementRevealCall<'a, C, NC, A> where NC: hyper::net::Net
 /// Unlocks this achievement for the currently authenticated player.
 ///
 /// A builder for the *unlock* method supported by a *achievement* resource.
-/// It is not used directly, but through a `AchievementMethods`.
+/// It is not used directly, but through a `AchievementMethods` instance.
 ///
 /// # Example
 ///
@@ -5785,7 +5984,7 @@ impl<'a, C, NC, A> AchievementUnlockCall<'a, C, NC, A> where NC: hyper::net::Net
         for &field in ["alt", "achievementId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -5838,7 +6037,7 @@ impl<'a, C, NC, A> AchievementUnlockCall<'a, C, NC, A> where NC: hyper::net::Net
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -5850,7 +6049,6 @@ impl<'a, C, NC, A> AchievementUnlockCall<'a, C, NC, A> where NC: hyper::net::Net
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -5860,7 +6058,7 @@ impl<'a, C, NC, A> AchievementUnlockCall<'a, C, NC, A> where NC: hyper::net::Net
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -5871,7 +6069,7 @@ impl<'a, C, NC, A> AchievementUnlockCall<'a, C, NC, A> where NC: hyper::net::Net
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -5880,13 +6078,13 @@ impl<'a, C, NC, A> AchievementUnlockCall<'a, C, NC, A> where NC: hyper::net::Net
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -5898,7 +6096,7 @@ impl<'a, C, NC, A> AchievementUnlockCall<'a, C, NC, A> where NC: hyper::net::Net
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The ID of the achievement used by this method.    
+    /// The ID of the achievement used by this method.
     pub fn achievement_id(mut self, new_value: &str) -> AchievementUnlockCall<'a, C, NC, A> {
         self._achievement_id = new_value.to_string();
         self
@@ -5959,7 +6157,7 @@ impl<'a, C, NC, A> AchievementUnlockCall<'a, C, NC, A> where NC: hyper::net::Net
 /// Retrieves the metadata of the leaderboard with the given ID.
 ///
 /// A builder for the *get* method supported by a *leaderboard* resource.
-/// It is not used directly, but through a `LeaderboardMethods`.
+/// It is not used directly, but through a `LeaderboardMethods` instance.
 ///
 /// # Example
 ///
@@ -6022,7 +6220,7 @@ impl<'a, C, NC, A> LeaderboardGetCall<'a, C, NC, A> where NC: hyper::net::Networ
         for &field in ["alt", "leaderboardId", "language"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -6075,7 +6273,7 @@ impl<'a, C, NC, A> LeaderboardGetCall<'a, C, NC, A> where NC: hyper::net::Networ
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -6087,7 +6285,6 @@ impl<'a, C, NC, A> LeaderboardGetCall<'a, C, NC, A> where NC: hyper::net::Networ
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -6097,7 +6294,7 @@ impl<'a, C, NC, A> LeaderboardGetCall<'a, C, NC, A> where NC: hyper::net::Networ
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -6108,7 +6305,7 @@ impl<'a, C, NC, A> LeaderboardGetCall<'a, C, NC, A> where NC: hyper::net::Networ
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -6117,13 +6314,13 @@ impl<'a, C, NC, A> LeaderboardGetCall<'a, C, NC, A> where NC: hyper::net::Networ
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -6135,7 +6332,7 @@ impl<'a, C, NC, A> LeaderboardGetCall<'a, C, NC, A> where NC: hyper::net::Networ
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The ID of the leaderboard.    
+    /// The ID of the leaderboard.
     pub fn leaderboard_id(mut self, new_value: &str) -> LeaderboardGetCall<'a, C, NC, A> {
         self._leaderboard_id = new_value.to_string();
         self
@@ -6143,7 +6340,7 @@ impl<'a, C, NC, A> LeaderboardGetCall<'a, C, NC, A> where NC: hyper::net::Networ
     /// Sets the *language* query property to the given value.
     ///
     /// 
-    /// The preferred language to use for strings returned by this method.    
+    /// The preferred language to use for strings returned by this method.
     pub fn language(mut self, new_value: &str) -> LeaderboardGetCall<'a, C, NC, A> {
         self._language = Some(new_value.to_string());
         self
@@ -6204,7 +6401,7 @@ impl<'a, C, NC, A> LeaderboardGetCall<'a, C, NC, A> where NC: hyper::net::Networ
 /// Lists all the leaderboard metadata for your application.
 ///
 /// A builder for the *list* method supported by a *leaderboard* resource.
-/// It is not used directly, but through a `LeaderboardMethods`.
+/// It is not used directly, but through a `LeaderboardMethods` instance.
 ///
 /// # Example
 ///
@@ -6275,7 +6472,7 @@ impl<'a, C, NC, A> LeaderboardListCall<'a, C, NC, A> where NC: hyper::net::Netwo
         for &field in ["alt", "pageToken", "maxResults", "language"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -6304,7 +6501,7 @@ impl<'a, C, NC, A> LeaderboardListCall<'a, C, NC, A> where NC: hyper::net::Netwo
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -6316,7 +6513,6 @@ impl<'a, C, NC, A> LeaderboardListCall<'a, C, NC, A> where NC: hyper::net::Netwo
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -6326,7 +6522,7 @@ impl<'a, C, NC, A> LeaderboardListCall<'a, C, NC, A> where NC: hyper::net::Netwo
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -6337,7 +6533,7 @@ impl<'a, C, NC, A> LeaderboardListCall<'a, C, NC, A> where NC: hyper::net::Netwo
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -6346,13 +6542,13 @@ impl<'a, C, NC, A> LeaderboardListCall<'a, C, NC, A> where NC: hyper::net::Netwo
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -6362,7 +6558,7 @@ impl<'a, C, NC, A> LeaderboardListCall<'a, C, NC, A> where NC: hyper::net::Netwo
     /// Sets the *page token* query property to the given value.
     ///
     /// 
-    /// The token returned by the previous request.    
+    /// The token returned by the previous request.
     pub fn page_token(mut self, new_value: &str) -> LeaderboardListCall<'a, C, NC, A> {
         self._page_token = Some(new_value.to_string());
         self
@@ -6370,7 +6566,7 @@ impl<'a, C, NC, A> LeaderboardListCall<'a, C, NC, A> where NC: hyper::net::Netwo
     /// Sets the *max results* query property to the given value.
     ///
     /// 
-    /// The maximum number of leaderboards to return in the response. For any response, the actual number of leaderboards returned may be less than the specified maxResults.    
+    /// The maximum number of leaderboards to return in the response. For any response, the actual number of leaderboards returned may be less than the specified maxResults.
     pub fn max_results(mut self, new_value: i32) -> LeaderboardListCall<'a, C, NC, A> {
         self._max_results = Some(new_value);
         self
@@ -6378,7 +6574,7 @@ impl<'a, C, NC, A> LeaderboardListCall<'a, C, NC, A> where NC: hyper::net::Netwo
     /// Sets the *language* query property to the given value.
     ///
     /// 
-    /// The preferred language to use for strings returned by this method.    
+    /// The preferred language to use for strings returned by this method.
     pub fn language(mut self, new_value: &str) -> LeaderboardListCall<'a, C, NC, A> {
         self._language = Some(new_value.to_string());
         self
@@ -6439,7 +6635,7 @@ impl<'a, C, NC, A> LeaderboardListCall<'a, C, NC, A> where NC: hyper::net::Netwo
 /// List play data aggregated per category for the player corresponding to playerId.
 ///
 /// A builder for the *listCategoriesByPlayer* method supported by a *metagame* resource.
-/// It is not used directly, but through a `MetagameMethods`.
+/// It is not used directly, but through a `MetagameMethods` instance.
 ///
 /// # Example
 ///
@@ -6514,7 +6710,7 @@ impl<'a, C, NC, A> MetagameListCategoriesByPlayerCall<'a, C, NC, A> where NC: hy
         for &field in ["alt", "playerId", "collection", "pageToken", "maxResults", "language"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -6567,7 +6763,7 @@ impl<'a, C, NC, A> MetagameListCategoriesByPlayerCall<'a, C, NC, A> where NC: hy
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -6579,7 +6775,6 @@ impl<'a, C, NC, A> MetagameListCategoriesByPlayerCall<'a, C, NC, A> where NC: hy
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -6589,7 +6784,7 @@ impl<'a, C, NC, A> MetagameListCategoriesByPlayerCall<'a, C, NC, A> where NC: hy
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -6600,7 +6795,7 @@ impl<'a, C, NC, A> MetagameListCategoriesByPlayerCall<'a, C, NC, A> where NC: hy
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -6609,13 +6804,13 @@ impl<'a, C, NC, A> MetagameListCategoriesByPlayerCall<'a, C, NC, A> where NC: hy
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -6627,7 +6822,7 @@ impl<'a, C, NC, A> MetagameListCategoriesByPlayerCall<'a, C, NC, A> where NC: hy
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// A player ID. A value of me may be used in place of the authenticated player's ID.    
+    /// A player ID. A value of me may be used in place of the authenticated player's ID.
     pub fn player_id(mut self, new_value: &str) -> MetagameListCategoriesByPlayerCall<'a, C, NC, A> {
         self._player_id = new_value.to_string();
         self
@@ -6637,7 +6832,7 @@ impl<'a, C, NC, A> MetagameListCategoriesByPlayerCall<'a, C, NC, A> where NC: hy
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The collection of categories for which data will be returned.    
+    /// The collection of categories for which data will be returned.
     pub fn collection(mut self, new_value: &str) -> MetagameListCategoriesByPlayerCall<'a, C, NC, A> {
         self._collection = new_value.to_string();
         self
@@ -6645,7 +6840,7 @@ impl<'a, C, NC, A> MetagameListCategoriesByPlayerCall<'a, C, NC, A> where NC: hy
     /// Sets the *page token* query property to the given value.
     ///
     /// 
-    /// The token returned by the previous request.    
+    /// The token returned by the previous request.
     pub fn page_token(mut self, new_value: &str) -> MetagameListCategoriesByPlayerCall<'a, C, NC, A> {
         self._page_token = Some(new_value.to_string());
         self
@@ -6653,7 +6848,7 @@ impl<'a, C, NC, A> MetagameListCategoriesByPlayerCall<'a, C, NC, A> where NC: hy
     /// Sets the *max results* query property to the given value.
     ///
     /// 
-    /// The maximum number of category resources to return in the response, used for paging. For any response, the actual number of category resources returned may be less than the specified maxResults.    
+    /// The maximum number of category resources to return in the response, used for paging. For any response, the actual number of category resources returned may be less than the specified maxResults.
     pub fn max_results(mut self, new_value: i32) -> MetagameListCategoriesByPlayerCall<'a, C, NC, A> {
         self._max_results = Some(new_value);
         self
@@ -6661,7 +6856,7 @@ impl<'a, C, NC, A> MetagameListCategoriesByPlayerCall<'a, C, NC, A> where NC: hy
     /// Sets the *language* query property to the given value.
     ///
     /// 
-    /// The preferred language to use for strings returned by this method.    
+    /// The preferred language to use for strings returned by this method.
     pub fn language(mut self, new_value: &str) -> MetagameListCategoriesByPlayerCall<'a, C, NC, A> {
         self._language = Some(new_value.to_string());
         self
@@ -6722,7 +6917,7 @@ impl<'a, C, NC, A> MetagameListCategoriesByPlayerCall<'a, C, NC, A> where NC: hy
 /// Return the metagame configuration data for the calling application.
 ///
 /// A builder for the *getMetagameConfig* method supported by a *metagame* resource.
-/// It is not used directly, but through a `MetagameMethods`.
+/// It is not used directly, but through a `MetagameMethods` instance.
 ///
 /// # Example
 ///
@@ -6778,7 +6973,7 @@ impl<'a, C, NC, A> MetagameGetMetagameConfigCall<'a, C, NC, A> where NC: hyper::
         for &field in ["alt"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -6807,7 +7002,7 @@ impl<'a, C, NC, A> MetagameGetMetagameConfigCall<'a, C, NC, A> where NC: hyper::
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -6819,7 +7014,6 @@ impl<'a, C, NC, A> MetagameGetMetagameConfigCall<'a, C, NC, A> where NC: hyper::
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -6829,7 +7023,7 @@ impl<'a, C, NC, A> MetagameGetMetagameConfigCall<'a, C, NC, A> where NC: hyper::
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -6840,7 +7034,7 @@ impl<'a, C, NC, A> MetagameGetMetagameConfigCall<'a, C, NC, A> where NC: hyper::
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -6849,13 +7043,13 @@ impl<'a, C, NC, A> MetagameGetMetagameConfigCall<'a, C, NC, A> where NC: hyper::
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -6918,7 +7112,7 @@ impl<'a, C, NC, A> MetagameGetMetagameConfigCall<'a, C, NC, A> where NC: hyper::
 /// Get the collection of players for the currently authenticated user.
 ///
 /// A builder for the *list* method supported by a *player* resource.
-/// It is not used directly, but through a `PlayerMethods`.
+/// It is not used directly, but through a `PlayerMethods` instance.
 ///
 /// # Example
 ///
@@ -6991,7 +7185,7 @@ impl<'a, C, NC, A> PlayerListCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
         for &field in ["alt", "collection", "pageToken", "maxResults", "language"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -7044,7 +7238,7 @@ impl<'a, C, NC, A> PlayerListCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -7056,7 +7250,6 @@ impl<'a, C, NC, A> PlayerListCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -7066,7 +7259,7 @@ impl<'a, C, NC, A> PlayerListCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -7077,7 +7270,7 @@ impl<'a, C, NC, A> PlayerListCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -7086,13 +7279,13 @@ impl<'a, C, NC, A> PlayerListCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -7104,7 +7297,7 @@ impl<'a, C, NC, A> PlayerListCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Collection of players being retrieved    
+    /// Collection of players being retrieved
     pub fn collection(mut self, new_value: &str) -> PlayerListCall<'a, C, NC, A> {
         self._collection = new_value.to_string();
         self
@@ -7112,7 +7305,7 @@ impl<'a, C, NC, A> PlayerListCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// Sets the *page token* query property to the given value.
     ///
     /// 
-    /// The token returned by the previous request.    
+    /// The token returned by the previous request.
     pub fn page_token(mut self, new_value: &str) -> PlayerListCall<'a, C, NC, A> {
         self._page_token = Some(new_value.to_string());
         self
@@ -7120,7 +7313,7 @@ impl<'a, C, NC, A> PlayerListCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// Sets the *max results* query property to the given value.
     ///
     /// 
-    /// The maximum number of player resources to return in the response, used for paging. For any response, the actual number of player resources returned may be less than the specified maxResults.    
+    /// The maximum number of player resources to return in the response, used for paging. For any response, the actual number of player resources returned may be less than the specified maxResults.
     pub fn max_results(mut self, new_value: i32) -> PlayerListCall<'a, C, NC, A> {
         self._max_results = Some(new_value);
         self
@@ -7128,7 +7321,7 @@ impl<'a, C, NC, A> PlayerListCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// Sets the *language* query property to the given value.
     ///
     /// 
-    /// The preferred language to use for strings returned by this method.    
+    /// The preferred language to use for strings returned by this method.
     pub fn language(mut self, new_value: &str) -> PlayerListCall<'a, C, NC, A> {
         self._language = Some(new_value.to_string());
         self
@@ -7189,7 +7382,7 @@ impl<'a, C, NC, A> PlayerListCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
 /// Retrieves the Player resource with the given ID. To retrieve the player for the currently authenticated user, set playerId to me.
 ///
 /// A builder for the *get* method supported by a *player* resource.
-/// It is not used directly, but through a `PlayerMethods`.
+/// It is not used directly, but through a `PlayerMethods` instance.
 ///
 /// # Example
 ///
@@ -7252,7 +7445,7 @@ impl<'a, C, NC, A> PlayerGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
         for &field in ["alt", "playerId", "language"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -7305,7 +7498,7 @@ impl<'a, C, NC, A> PlayerGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -7317,7 +7510,6 @@ impl<'a, C, NC, A> PlayerGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -7327,7 +7519,7 @@ impl<'a, C, NC, A> PlayerGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -7338,7 +7530,7 @@ impl<'a, C, NC, A> PlayerGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -7347,13 +7539,13 @@ impl<'a, C, NC, A> PlayerGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -7365,7 +7557,7 @@ impl<'a, C, NC, A> PlayerGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// A player ID. A value of me may be used in place of the authenticated player's ID.    
+    /// A player ID. A value of me may be used in place of the authenticated player's ID.
     pub fn player_id(mut self, new_value: &str) -> PlayerGetCall<'a, C, NC, A> {
         self._player_id = new_value.to_string();
         self
@@ -7373,7 +7565,7 @@ impl<'a, C, NC, A> PlayerGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     /// Sets the *language* query property to the given value.
     ///
     /// 
-    /// The preferred language to use for strings returned by this method.    
+    /// The preferred language to use for strings returned by this method.
     pub fn language(mut self, new_value: &str) -> PlayerGetCall<'a, C, NC, A> {
         self._language = Some(new_value.to_string());
         self
@@ -7434,7 +7626,7 @@ impl<'a, C, NC, A> PlayerGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
 /// Indicates that the currently authorized user will participate in the quest.
 ///
 /// A builder for the *accept* method supported by a *quest* resource.
-/// It is not used directly, but through a `QuestMethods`.
+/// It is not used directly, but through a `QuestMethods` instance.
 ///
 /// # Example
 ///
@@ -7497,7 +7689,7 @@ impl<'a, C, NC, A> QuestAcceptCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
         for &field in ["alt", "questId", "language"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -7550,7 +7742,7 @@ impl<'a, C, NC, A> QuestAcceptCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -7562,7 +7754,6 @@ impl<'a, C, NC, A> QuestAcceptCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -7572,7 +7763,7 @@ impl<'a, C, NC, A> QuestAcceptCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -7583,7 +7774,7 @@ impl<'a, C, NC, A> QuestAcceptCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -7592,13 +7783,13 @@ impl<'a, C, NC, A> QuestAcceptCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -7610,7 +7801,7 @@ impl<'a, C, NC, A> QuestAcceptCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The ID of the quest.    
+    /// The ID of the quest.
     pub fn quest_id(mut self, new_value: &str) -> QuestAcceptCall<'a, C, NC, A> {
         self._quest_id = new_value.to_string();
         self
@@ -7618,7 +7809,7 @@ impl<'a, C, NC, A> QuestAcceptCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// Sets the *language* query property to the given value.
     ///
     /// 
-    /// The preferred language to use for strings returned by this method.    
+    /// The preferred language to use for strings returned by this method.
     pub fn language(mut self, new_value: &str) -> QuestAcceptCall<'a, C, NC, A> {
         self._language = Some(new_value.to_string());
         self
@@ -7679,7 +7870,7 @@ impl<'a, C, NC, A> QuestAcceptCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
 /// Get a list of quests for your application and the currently authenticated player.
 ///
 /// A builder for the *list* method supported by a *quest* resource.
-/// It is not used directly, but through a `QuestMethods`.
+/// It is not used directly, but through a `QuestMethods` instance.
 ///
 /// # Example
 ///
@@ -7752,7 +7943,7 @@ impl<'a, C, NC, A> QuestListCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
         for &field in ["alt", "playerId", "pageToken", "maxResults", "language"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -7805,7 +7996,7 @@ impl<'a, C, NC, A> QuestListCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -7817,7 +8008,6 @@ impl<'a, C, NC, A> QuestListCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -7827,7 +8017,7 @@ impl<'a, C, NC, A> QuestListCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -7838,7 +8028,7 @@ impl<'a, C, NC, A> QuestListCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -7847,13 +8037,13 @@ impl<'a, C, NC, A> QuestListCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -7865,7 +8055,7 @@ impl<'a, C, NC, A> QuestListCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// A player ID. A value of me may be used in place of the authenticated player's ID.    
+    /// A player ID. A value of me may be used in place of the authenticated player's ID.
     pub fn player_id(mut self, new_value: &str) -> QuestListCall<'a, C, NC, A> {
         self._player_id = new_value.to_string();
         self
@@ -7873,7 +8063,7 @@ impl<'a, C, NC, A> QuestListCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     /// Sets the *page token* query property to the given value.
     ///
     /// 
-    /// The token returned by the previous request.    
+    /// The token returned by the previous request.
     pub fn page_token(mut self, new_value: &str) -> QuestListCall<'a, C, NC, A> {
         self._page_token = Some(new_value.to_string());
         self
@@ -7881,7 +8071,7 @@ impl<'a, C, NC, A> QuestListCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     /// Sets the *max results* query property to the given value.
     ///
     /// 
-    /// The maximum number of quest resources to return in the response, used for paging. For any response, the actual number of quest resources returned may be less than the specified maxResults. Acceptable values are 1 to 50, inclusive. (Default: 50).    
+    /// The maximum number of quest resources to return in the response, used for paging. For any response, the actual number of quest resources returned may be less than the specified maxResults. Acceptable values are 1 to 50, inclusive. (Default: 50).
     pub fn max_results(mut self, new_value: i32) -> QuestListCall<'a, C, NC, A> {
         self._max_results = Some(new_value);
         self
@@ -7889,7 +8079,7 @@ impl<'a, C, NC, A> QuestListCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     /// Sets the *language* query property to the given value.
     ///
     /// 
-    /// The preferred language to use for strings returned by this method.    
+    /// The preferred language to use for strings returned by this method.
     pub fn language(mut self, new_value: &str) -> QuestListCall<'a, C, NC, A> {
         self._language = Some(new_value.to_string());
         self
@@ -7950,7 +8140,7 @@ impl<'a, C, NC, A> QuestListCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
 /// Retrieves the metadata for a given snapshot ID.
 ///
 /// A builder for the *get* method supported by a *snapshot* resource.
-/// It is not used directly, but through a `SnapshotMethods`.
+/// It is not used directly, but through a `SnapshotMethods` instance.
 ///
 /// # Example
 ///
@@ -8013,7 +8203,7 @@ impl<'a, C, NC, A> SnapshotGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
         for &field in ["alt", "snapshotId", "language"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -8066,7 +8256,7 @@ impl<'a, C, NC, A> SnapshotGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -8078,7 +8268,6 @@ impl<'a, C, NC, A> SnapshotGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -8088,7 +8277,7 @@ impl<'a, C, NC, A> SnapshotGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -8099,7 +8288,7 @@ impl<'a, C, NC, A> SnapshotGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -8108,13 +8297,13 @@ impl<'a, C, NC, A> SnapshotGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -8126,7 +8315,7 @@ impl<'a, C, NC, A> SnapshotGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The ID of the snapshot.    
+    /// The ID of the snapshot.
     pub fn snapshot_id(mut self, new_value: &str) -> SnapshotGetCall<'a, C, NC, A> {
         self._snapshot_id = new_value.to_string();
         self
@@ -8134,7 +8323,7 @@ impl<'a, C, NC, A> SnapshotGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// Sets the *language* query property to the given value.
     ///
     /// 
-    /// The preferred language to use for strings returned by this method.    
+    /// The preferred language to use for strings returned by this method.
     pub fn language(mut self, new_value: &str) -> SnapshotGetCall<'a, C, NC, A> {
         self._language = Some(new_value.to_string());
         self
@@ -8195,7 +8384,7 @@ impl<'a, C, NC, A> SnapshotGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
 /// Retrieves a list of snapshots created by your application for the player corresponding to the player ID.
 ///
 /// A builder for the *list* method supported by a *snapshot* resource.
-/// It is not used directly, but through a `SnapshotMethods`.
+/// It is not used directly, but through a `SnapshotMethods` instance.
 ///
 /// # Example
 ///
@@ -8268,7 +8457,7 @@ impl<'a, C, NC, A> SnapshotListCall<'a, C, NC, A> where NC: hyper::net::NetworkC
         for &field in ["alt", "playerId", "pageToken", "maxResults", "language"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -8321,7 +8510,7 @@ impl<'a, C, NC, A> SnapshotListCall<'a, C, NC, A> where NC: hyper::net::NetworkC
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -8333,7 +8522,6 @@ impl<'a, C, NC, A> SnapshotListCall<'a, C, NC, A> where NC: hyper::net::NetworkC
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -8343,7 +8531,7 @@ impl<'a, C, NC, A> SnapshotListCall<'a, C, NC, A> where NC: hyper::net::NetworkC
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -8354,7 +8542,7 @@ impl<'a, C, NC, A> SnapshotListCall<'a, C, NC, A> where NC: hyper::net::NetworkC
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -8363,13 +8551,13 @@ impl<'a, C, NC, A> SnapshotListCall<'a, C, NC, A> where NC: hyper::net::NetworkC
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -8381,7 +8569,7 @@ impl<'a, C, NC, A> SnapshotListCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// A player ID. A value of me may be used in place of the authenticated player's ID.    
+    /// A player ID. A value of me may be used in place of the authenticated player's ID.
     pub fn player_id(mut self, new_value: &str) -> SnapshotListCall<'a, C, NC, A> {
         self._player_id = new_value.to_string();
         self
@@ -8389,7 +8577,7 @@ impl<'a, C, NC, A> SnapshotListCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// Sets the *page token* query property to the given value.
     ///
     /// 
-    /// The token returned by the previous request.    
+    /// The token returned by the previous request.
     pub fn page_token(mut self, new_value: &str) -> SnapshotListCall<'a, C, NC, A> {
         self._page_token = Some(new_value.to_string());
         self
@@ -8397,7 +8585,7 @@ impl<'a, C, NC, A> SnapshotListCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// Sets the *max results* query property to the given value.
     ///
     /// 
-    /// The maximum number of snapshot resources to return in the response, used for paging. For any response, the actual number of snapshot resources returned may be less than the specified maxResults.    
+    /// The maximum number of snapshot resources to return in the response, used for paging. For any response, the actual number of snapshot resources returned may be less than the specified maxResults.
     pub fn max_results(mut self, new_value: i32) -> SnapshotListCall<'a, C, NC, A> {
         self._max_results = Some(new_value);
         self
@@ -8405,7 +8593,7 @@ impl<'a, C, NC, A> SnapshotListCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// Sets the *language* query property to the given value.
     ///
     /// 
-    /// The preferred language to use for strings returned by this method.    
+    /// The preferred language to use for strings returned by this method.
     pub fn language(mut self, new_value: &str) -> SnapshotListCall<'a, C, NC, A> {
         self._language = Some(new_value.to_string());
         self
@@ -8466,7 +8654,7 @@ impl<'a, C, NC, A> SnapshotListCall<'a, C, NC, A> where NC: hyper::net::NetworkC
 /// Dismiss a turn-based match from the match list. The match will no longer show up in the list and will not generate notifications.
 ///
 /// A builder for the *dismiss* method supported by a *turnBasedMatche* resource.
-/// It is not used directly, but through a `TurnBasedMatcheMethods`.
+/// It is not used directly, but through a `TurnBasedMatcheMethods` instance.
 ///
 /// # Example
 ///
@@ -8524,7 +8712,7 @@ impl<'a, C, NC, A> TurnBasedMatcheDismisCall<'a, C, NC, A> where NC: hyper::net:
         for &field in ["matchId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -8576,7 +8764,7 @@ impl<'a, C, NC, A> TurnBasedMatcheDismisCall<'a, C, NC, A> where NC: hyper::net:
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -8588,7 +8776,6 @@ impl<'a, C, NC, A> TurnBasedMatcheDismisCall<'a, C, NC, A> where NC: hyper::net:
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -8598,7 +8785,7 @@ impl<'a, C, NC, A> TurnBasedMatcheDismisCall<'a, C, NC, A> where NC: hyper::net:
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -8609,12 +8796,12 @@ impl<'a, C, NC, A> TurnBasedMatcheDismisCall<'a, C, NC, A> where NC: hyper::net:
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = res;
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -8626,7 +8813,7 @@ impl<'a, C, NC, A> TurnBasedMatcheDismisCall<'a, C, NC, A> where NC: hyper::net:
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The ID of the match.    
+    /// The ID of the match.
     pub fn match_id(mut self, new_value: &str) -> TurnBasedMatcheDismisCall<'a, C, NC, A> {
         self._match_id = new_value.to_string();
         self
@@ -8687,7 +8874,7 @@ impl<'a, C, NC, A> TurnBasedMatcheDismisCall<'a, C, NC, A> where NC: hyper::net:
 /// Returns turn-based matches the player is or was involved in that changed since the last sync call, with the least recent changes coming first. Matches that should be removed from the local cache will have a status of MATCH_DELETED.
 ///
 /// A builder for the *sync* method supported by a *turnBasedMatche* resource.
-/// It is not used directly, but through a `TurnBasedMatcheMethods`.
+/// It is not used directly, but through a `TurnBasedMatcheMethods` instance.
 ///
 /// # Example
 ///
@@ -8768,7 +8955,7 @@ impl<'a, C, NC, A> TurnBasedMatcheSyncCall<'a, C, NC, A> where NC: hyper::net::N
         for &field in ["alt", "pageToken", "maxResults", "maxCompletedMatches", "language", "includeMatchData"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -8797,7 +8984,7 @@ impl<'a, C, NC, A> TurnBasedMatcheSyncCall<'a, C, NC, A> where NC: hyper::net::N
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -8809,7 +8996,6 @@ impl<'a, C, NC, A> TurnBasedMatcheSyncCall<'a, C, NC, A> where NC: hyper::net::N
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -8819,7 +9005,7 @@ impl<'a, C, NC, A> TurnBasedMatcheSyncCall<'a, C, NC, A> where NC: hyper::net::N
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -8830,7 +9016,7 @@ impl<'a, C, NC, A> TurnBasedMatcheSyncCall<'a, C, NC, A> where NC: hyper::net::N
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -8839,13 +9025,13 @@ impl<'a, C, NC, A> TurnBasedMatcheSyncCall<'a, C, NC, A> where NC: hyper::net::N
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -8855,7 +9041,7 @@ impl<'a, C, NC, A> TurnBasedMatcheSyncCall<'a, C, NC, A> where NC: hyper::net::N
     /// Sets the *page token* query property to the given value.
     ///
     /// 
-    /// The token returned by the previous request.    
+    /// The token returned by the previous request.
     pub fn page_token(mut self, new_value: &str) -> TurnBasedMatcheSyncCall<'a, C, NC, A> {
         self._page_token = Some(new_value.to_string());
         self
@@ -8863,7 +9049,7 @@ impl<'a, C, NC, A> TurnBasedMatcheSyncCall<'a, C, NC, A> where NC: hyper::net::N
     /// Sets the *max results* query property to the given value.
     ///
     /// 
-    /// The maximum number of matches to return in the response, used for paging. For any response, the actual number of matches to return may be less than the specified maxResults.    
+    /// The maximum number of matches to return in the response, used for paging. For any response, the actual number of matches to return may be less than the specified maxResults.
     pub fn max_results(mut self, new_value: i32) -> TurnBasedMatcheSyncCall<'a, C, NC, A> {
         self._max_results = Some(new_value);
         self
@@ -8871,7 +9057,7 @@ impl<'a, C, NC, A> TurnBasedMatcheSyncCall<'a, C, NC, A> where NC: hyper::net::N
     /// Sets the *max completed matches* query property to the given value.
     ///
     /// 
-    /// The maximum number of completed or canceled matches to return in the response. If not set, all matches returned could be completed or canceled.    
+    /// The maximum number of completed or canceled matches to return in the response. If not set, all matches returned could be completed or canceled.
     pub fn max_completed_matches(mut self, new_value: i32) -> TurnBasedMatcheSyncCall<'a, C, NC, A> {
         self._max_completed_matches = Some(new_value);
         self
@@ -8879,7 +9065,7 @@ impl<'a, C, NC, A> TurnBasedMatcheSyncCall<'a, C, NC, A> where NC: hyper::net::N
     /// Sets the *language* query property to the given value.
     ///
     /// 
-    /// The preferred language to use for strings returned by this method.    
+    /// The preferred language to use for strings returned by this method.
     pub fn language(mut self, new_value: &str) -> TurnBasedMatcheSyncCall<'a, C, NC, A> {
         self._language = Some(new_value.to_string());
         self
@@ -8887,7 +9073,7 @@ impl<'a, C, NC, A> TurnBasedMatcheSyncCall<'a, C, NC, A> where NC: hyper::net::N
     /// Sets the *include match data* query property to the given value.
     ///
     /// 
-    /// True if match data should be returned in the response. Note that not all data will necessarily be returned if include_match_data is true; the server may decide to only return data for some of the matches to limit download size for the client. The remainder of the data for these matches will be retrievable on request.    
+    /// True if match data should be returned in the response. Note that not all data will necessarily be returned if include_match_data is true; the server may decide to only return data for some of the matches to limit download size for the client. The remainder of the data for these matches will be retrievable on request.
     pub fn include_match_data(mut self, new_value: bool) -> TurnBasedMatcheSyncCall<'a, C, NC, A> {
         self._include_match_data = Some(new_value);
         self
@@ -8948,7 +9134,7 @@ impl<'a, C, NC, A> TurnBasedMatcheSyncCall<'a, C, NC, A> where NC: hyper::net::N
 /// Decline an invitation to play a turn-based match.
 ///
 /// A builder for the *decline* method supported by a *turnBasedMatche* resource.
-/// It is not used directly, but through a `TurnBasedMatcheMethods`.
+/// It is not used directly, but through a `TurnBasedMatcheMethods` instance.
 ///
 /// # Example
 ///
@@ -9011,7 +9197,7 @@ impl<'a, C, NC, A> TurnBasedMatcheDeclineCall<'a, C, NC, A> where NC: hyper::net
         for &field in ["alt", "matchId", "language"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -9064,7 +9250,7 @@ impl<'a, C, NC, A> TurnBasedMatcheDeclineCall<'a, C, NC, A> where NC: hyper::net
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -9076,7 +9262,6 @@ impl<'a, C, NC, A> TurnBasedMatcheDeclineCall<'a, C, NC, A> where NC: hyper::net
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -9086,7 +9271,7 @@ impl<'a, C, NC, A> TurnBasedMatcheDeclineCall<'a, C, NC, A> where NC: hyper::net
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -9097,7 +9282,7 @@ impl<'a, C, NC, A> TurnBasedMatcheDeclineCall<'a, C, NC, A> where NC: hyper::net
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -9106,13 +9291,13 @@ impl<'a, C, NC, A> TurnBasedMatcheDeclineCall<'a, C, NC, A> where NC: hyper::net
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -9124,7 +9309,7 @@ impl<'a, C, NC, A> TurnBasedMatcheDeclineCall<'a, C, NC, A> where NC: hyper::net
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The ID of the match.    
+    /// The ID of the match.
     pub fn match_id(mut self, new_value: &str) -> TurnBasedMatcheDeclineCall<'a, C, NC, A> {
         self._match_id = new_value.to_string();
         self
@@ -9132,7 +9317,7 @@ impl<'a, C, NC, A> TurnBasedMatcheDeclineCall<'a, C, NC, A> where NC: hyper::net
     /// Sets the *language* query property to the given value.
     ///
     /// 
-    /// The preferred language to use for strings returned by this method.    
+    /// The preferred language to use for strings returned by this method.
     pub fn language(mut self, new_value: &str) -> TurnBasedMatcheDeclineCall<'a, C, NC, A> {
         self._language = Some(new_value.to_string());
         self
@@ -9193,7 +9378,7 @@ impl<'a, C, NC, A> TurnBasedMatcheDeclineCall<'a, C, NC, A> where NC: hyper::net
 /// Get the data for a turn-based match.
 ///
 /// A builder for the *get* method supported by a *turnBasedMatche* resource.
-/// It is not used directly, but through a `TurnBasedMatcheMethods`.
+/// It is not used directly, but through a `TurnBasedMatcheMethods` instance.
 ///
 /// # Example
 ///
@@ -9261,7 +9446,7 @@ impl<'a, C, NC, A> TurnBasedMatcheGetCall<'a, C, NC, A> where NC: hyper::net::Ne
         for &field in ["alt", "matchId", "language", "includeMatchData"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -9314,7 +9499,7 @@ impl<'a, C, NC, A> TurnBasedMatcheGetCall<'a, C, NC, A> where NC: hyper::net::Ne
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -9326,7 +9511,6 @@ impl<'a, C, NC, A> TurnBasedMatcheGetCall<'a, C, NC, A> where NC: hyper::net::Ne
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -9336,7 +9520,7 @@ impl<'a, C, NC, A> TurnBasedMatcheGetCall<'a, C, NC, A> where NC: hyper::net::Ne
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -9347,7 +9531,7 @@ impl<'a, C, NC, A> TurnBasedMatcheGetCall<'a, C, NC, A> where NC: hyper::net::Ne
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -9356,13 +9540,13 @@ impl<'a, C, NC, A> TurnBasedMatcheGetCall<'a, C, NC, A> where NC: hyper::net::Ne
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -9374,7 +9558,7 @@ impl<'a, C, NC, A> TurnBasedMatcheGetCall<'a, C, NC, A> where NC: hyper::net::Ne
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The ID of the match.    
+    /// The ID of the match.
     pub fn match_id(mut self, new_value: &str) -> TurnBasedMatcheGetCall<'a, C, NC, A> {
         self._match_id = new_value.to_string();
         self
@@ -9382,7 +9566,7 @@ impl<'a, C, NC, A> TurnBasedMatcheGetCall<'a, C, NC, A> where NC: hyper::net::Ne
     /// Sets the *language* query property to the given value.
     ///
     /// 
-    /// The preferred language to use for strings returned by this method.    
+    /// The preferred language to use for strings returned by this method.
     pub fn language(mut self, new_value: &str) -> TurnBasedMatcheGetCall<'a, C, NC, A> {
         self._language = Some(new_value.to_string());
         self
@@ -9390,7 +9574,7 @@ impl<'a, C, NC, A> TurnBasedMatcheGetCall<'a, C, NC, A> where NC: hyper::net::Ne
     /// Sets the *include match data* query property to the given value.
     ///
     /// 
-    /// Get match data along with metadata.    
+    /// Get match data along with metadata.
     pub fn include_match_data(mut self, new_value: bool) -> TurnBasedMatcheGetCall<'a, C, NC, A> {
         self._include_match_data = Some(new_value);
         self
@@ -9451,7 +9635,7 @@ impl<'a, C, NC, A> TurnBasedMatcheGetCall<'a, C, NC, A> where NC: hyper::net::Ne
 /// Create a turn-based match.
 ///
 /// A builder for the *create* method supported by a *turnBasedMatche* resource.
-/// It is not used directly, but through a `TurnBasedMatcheMethods`.
+/// It is not used directly, but through a `TurnBasedMatcheMethods` instance.
 ///
 /// # Example
 ///
@@ -9519,7 +9703,7 @@ impl<'a, C, NC, A> TurnBasedMatcheCreateCall<'a, C, NC, A> where NC: hyper::net:
         for &field in ["alt", "language"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -9552,7 +9736,7 @@ impl<'a, C, NC, A> TurnBasedMatcheCreateCall<'a, C, NC, A> where NC: hyper::net:
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -9568,7 +9752,6 @@ impl<'a, C, NC, A> TurnBasedMatcheCreateCall<'a, C, NC, A> where NC: hyper::net:
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -9578,7 +9761,7 @@ impl<'a, C, NC, A> TurnBasedMatcheCreateCall<'a, C, NC, A> where NC: hyper::net:
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -9589,7 +9772,7 @@ impl<'a, C, NC, A> TurnBasedMatcheCreateCall<'a, C, NC, A> where NC: hyper::net:
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -9598,13 +9781,13 @@ impl<'a, C, NC, A> TurnBasedMatcheCreateCall<'a, C, NC, A> where NC: hyper::net:
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -9623,7 +9806,7 @@ impl<'a, C, NC, A> TurnBasedMatcheCreateCall<'a, C, NC, A> where NC: hyper::net:
     /// Sets the *language* query property to the given value.
     ///
     /// 
-    /// The preferred language to use for strings returned by this method.    
+    /// The preferred language to use for strings returned by this method.
     pub fn language(mut self, new_value: &str) -> TurnBasedMatcheCreateCall<'a, C, NC, A> {
         self._language = Some(new_value.to_string());
         self
@@ -9684,7 +9867,7 @@ impl<'a, C, NC, A> TurnBasedMatcheCreateCall<'a, C, NC, A> where NC: hyper::net:
 /// Join a turn-based match.
 ///
 /// A builder for the *join* method supported by a *turnBasedMatche* resource.
-/// It is not used directly, but through a `TurnBasedMatcheMethods`.
+/// It is not used directly, but through a `TurnBasedMatcheMethods` instance.
 ///
 /// # Example
 ///
@@ -9747,7 +9930,7 @@ impl<'a, C, NC, A> TurnBasedMatcheJoinCall<'a, C, NC, A> where NC: hyper::net::N
         for &field in ["alt", "matchId", "language"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -9800,7 +9983,7 @@ impl<'a, C, NC, A> TurnBasedMatcheJoinCall<'a, C, NC, A> where NC: hyper::net::N
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -9812,7 +9995,6 @@ impl<'a, C, NC, A> TurnBasedMatcheJoinCall<'a, C, NC, A> where NC: hyper::net::N
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -9822,7 +10004,7 @@ impl<'a, C, NC, A> TurnBasedMatcheJoinCall<'a, C, NC, A> where NC: hyper::net::N
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -9833,7 +10015,7 @@ impl<'a, C, NC, A> TurnBasedMatcheJoinCall<'a, C, NC, A> where NC: hyper::net::N
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -9842,13 +10024,13 @@ impl<'a, C, NC, A> TurnBasedMatcheJoinCall<'a, C, NC, A> where NC: hyper::net::N
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -9860,7 +10042,7 @@ impl<'a, C, NC, A> TurnBasedMatcheJoinCall<'a, C, NC, A> where NC: hyper::net::N
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The ID of the match.    
+    /// The ID of the match.
     pub fn match_id(mut self, new_value: &str) -> TurnBasedMatcheJoinCall<'a, C, NC, A> {
         self._match_id = new_value.to_string();
         self
@@ -9868,7 +10050,7 @@ impl<'a, C, NC, A> TurnBasedMatcheJoinCall<'a, C, NC, A> where NC: hyper::net::N
     /// Sets the *language* query property to the given value.
     ///
     /// 
-    /// The preferred language to use for strings returned by this method.    
+    /// The preferred language to use for strings returned by this method.
     pub fn language(mut self, new_value: &str) -> TurnBasedMatcheJoinCall<'a, C, NC, A> {
         self._language = Some(new_value.to_string());
         self
@@ -9929,7 +10111,7 @@ impl<'a, C, NC, A> TurnBasedMatcheJoinCall<'a, C, NC, A> where NC: hyper::net::N
 /// Leave a turn-based match during the current player's turn, without canceling the match.
 ///
 /// A builder for the *leaveTurn* method supported by a *turnBasedMatche* resource.
-/// It is not used directly, but through a `TurnBasedMatcheMethods`.
+/// It is not used directly, but through a `TurnBasedMatcheMethods` instance.
 ///
 /// # Example
 ///
@@ -9999,7 +10181,7 @@ impl<'a, C, NC, A> TurnBasedMatcheLeaveTurnCall<'a, C, NC, A> where NC: hyper::n
         for &field in ["alt", "matchId", "matchVersion", "pendingParticipantId", "language"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -10052,7 +10234,7 @@ impl<'a, C, NC, A> TurnBasedMatcheLeaveTurnCall<'a, C, NC, A> where NC: hyper::n
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -10064,7 +10246,6 @@ impl<'a, C, NC, A> TurnBasedMatcheLeaveTurnCall<'a, C, NC, A> where NC: hyper::n
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -10074,7 +10255,7 @@ impl<'a, C, NC, A> TurnBasedMatcheLeaveTurnCall<'a, C, NC, A> where NC: hyper::n
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -10085,7 +10266,7 @@ impl<'a, C, NC, A> TurnBasedMatcheLeaveTurnCall<'a, C, NC, A> where NC: hyper::n
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -10094,13 +10275,13 @@ impl<'a, C, NC, A> TurnBasedMatcheLeaveTurnCall<'a, C, NC, A> where NC: hyper::n
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -10112,7 +10293,7 @@ impl<'a, C, NC, A> TurnBasedMatcheLeaveTurnCall<'a, C, NC, A> where NC: hyper::n
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The ID of the match.    
+    /// The ID of the match.
     pub fn match_id(mut self, new_value: &str) -> TurnBasedMatcheLeaveTurnCall<'a, C, NC, A> {
         self._match_id = new_value.to_string();
         self
@@ -10122,7 +10303,7 @@ impl<'a, C, NC, A> TurnBasedMatcheLeaveTurnCall<'a, C, NC, A> where NC: hyper::n
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The version of the match being updated.    
+    /// The version of the match being updated.
     pub fn match_version(mut self, new_value: i32) -> TurnBasedMatcheLeaveTurnCall<'a, C, NC, A> {
         self._match_version = new_value;
         self
@@ -10130,7 +10311,7 @@ impl<'a, C, NC, A> TurnBasedMatcheLeaveTurnCall<'a, C, NC, A> where NC: hyper::n
     /// Sets the *pending participant id* query property to the given value.
     ///
     /// 
-    /// The ID of another participant who should take their turn next. If not set, the match will wait for other player(s) to join via automatching; this is only valid if automatch criteria is set on the match with remaining slots for automatched players.    
+    /// The ID of another participant who should take their turn next. If not set, the match will wait for other player(s) to join via automatching; this is only valid if automatch criteria is set on the match with remaining slots for automatched players.
     pub fn pending_participant_id(mut self, new_value: &str) -> TurnBasedMatcheLeaveTurnCall<'a, C, NC, A> {
         self._pending_participant_id = Some(new_value.to_string());
         self
@@ -10138,7 +10319,7 @@ impl<'a, C, NC, A> TurnBasedMatcheLeaveTurnCall<'a, C, NC, A> where NC: hyper::n
     /// Sets the *language* query property to the given value.
     ///
     /// 
-    /// The preferred language to use for strings returned by this method.    
+    /// The preferred language to use for strings returned by this method.
     pub fn language(mut self, new_value: &str) -> TurnBasedMatcheLeaveTurnCall<'a, C, NC, A> {
         self._language = Some(new_value.to_string());
         self
@@ -10199,7 +10380,7 @@ impl<'a, C, NC, A> TurnBasedMatcheLeaveTurnCall<'a, C, NC, A> where NC: hyper::n
 /// Cancel a turn-based match.
 ///
 /// A builder for the *cancel* method supported by a *turnBasedMatche* resource.
-/// It is not used directly, but through a `TurnBasedMatcheMethods`.
+/// It is not used directly, but through a `TurnBasedMatcheMethods` instance.
 ///
 /// # Example
 ///
@@ -10257,7 +10438,7 @@ impl<'a, C, NC, A> TurnBasedMatcheCancelCall<'a, C, NC, A> where NC: hyper::net:
         for &field in ["matchId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -10309,7 +10490,7 @@ impl<'a, C, NC, A> TurnBasedMatcheCancelCall<'a, C, NC, A> where NC: hyper::net:
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -10321,7 +10502,6 @@ impl<'a, C, NC, A> TurnBasedMatcheCancelCall<'a, C, NC, A> where NC: hyper::net:
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -10331,7 +10511,7 @@ impl<'a, C, NC, A> TurnBasedMatcheCancelCall<'a, C, NC, A> where NC: hyper::net:
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -10342,12 +10522,12 @@ impl<'a, C, NC, A> TurnBasedMatcheCancelCall<'a, C, NC, A> where NC: hyper::net:
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = res;
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -10359,7 +10539,7 @@ impl<'a, C, NC, A> TurnBasedMatcheCancelCall<'a, C, NC, A> where NC: hyper::net:
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The ID of the match.    
+    /// The ID of the match.
     pub fn match_id(mut self, new_value: &str) -> TurnBasedMatcheCancelCall<'a, C, NC, A> {
         self._match_id = new_value.to_string();
         self
@@ -10420,7 +10600,7 @@ impl<'a, C, NC, A> TurnBasedMatcheCancelCall<'a, C, NC, A> where NC: hyper::net:
 /// Finish a turn-based match. Each player should make this call once, after all results are in. Only the player whose turn it is may make the first call to Finish, and can pass in the final match state.
 ///
 /// A builder for the *finish* method supported by a *turnBasedMatche* resource.
-/// It is not used directly, but through a `TurnBasedMatcheMethods`.
+/// It is not used directly, but through a `TurnBasedMatcheMethods` instance.
 ///
 /// # Example
 ///
@@ -10490,7 +10670,7 @@ impl<'a, C, NC, A> TurnBasedMatcheFinishCall<'a, C, NC, A> where NC: hyper::net:
         for &field in ["alt", "matchId", "language"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -10547,7 +10727,7 @@ impl<'a, C, NC, A> TurnBasedMatcheFinishCall<'a, C, NC, A> where NC: hyper::net:
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -10563,7 +10743,6 @@ impl<'a, C, NC, A> TurnBasedMatcheFinishCall<'a, C, NC, A> where NC: hyper::net:
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -10573,7 +10752,7 @@ impl<'a, C, NC, A> TurnBasedMatcheFinishCall<'a, C, NC, A> where NC: hyper::net:
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -10584,7 +10763,7 @@ impl<'a, C, NC, A> TurnBasedMatcheFinishCall<'a, C, NC, A> where NC: hyper::net:
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -10593,13 +10772,13 @@ impl<'a, C, NC, A> TurnBasedMatcheFinishCall<'a, C, NC, A> where NC: hyper::net:
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -10620,7 +10799,7 @@ impl<'a, C, NC, A> TurnBasedMatcheFinishCall<'a, C, NC, A> where NC: hyper::net:
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The ID of the match.    
+    /// The ID of the match.
     pub fn match_id(mut self, new_value: &str) -> TurnBasedMatcheFinishCall<'a, C, NC, A> {
         self._match_id = new_value.to_string();
         self
@@ -10628,7 +10807,7 @@ impl<'a, C, NC, A> TurnBasedMatcheFinishCall<'a, C, NC, A> where NC: hyper::net:
     /// Sets the *language* query property to the given value.
     ///
     /// 
-    /// The preferred language to use for strings returned by this method.    
+    /// The preferred language to use for strings returned by this method.
     pub fn language(mut self, new_value: &str) -> TurnBasedMatcheFinishCall<'a, C, NC, A> {
         self._language = Some(new_value.to_string());
         self
@@ -10689,7 +10868,7 @@ impl<'a, C, NC, A> TurnBasedMatcheFinishCall<'a, C, NC, A> where NC: hyper::net:
 /// Leave a turn-based match when it is not the current player's turn, without canceling the match.
 ///
 /// A builder for the *leave* method supported by a *turnBasedMatche* resource.
-/// It is not used directly, but through a `TurnBasedMatcheMethods`.
+/// It is not used directly, but through a `TurnBasedMatcheMethods` instance.
 ///
 /// # Example
 ///
@@ -10752,7 +10931,7 @@ impl<'a, C, NC, A> TurnBasedMatcheLeaveCall<'a, C, NC, A> where NC: hyper::net::
         for &field in ["alt", "matchId", "language"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -10805,7 +10984,7 @@ impl<'a, C, NC, A> TurnBasedMatcheLeaveCall<'a, C, NC, A> where NC: hyper::net::
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -10817,7 +10996,6 @@ impl<'a, C, NC, A> TurnBasedMatcheLeaveCall<'a, C, NC, A> where NC: hyper::net::
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -10827,7 +11005,7 @@ impl<'a, C, NC, A> TurnBasedMatcheLeaveCall<'a, C, NC, A> where NC: hyper::net::
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -10838,7 +11016,7 @@ impl<'a, C, NC, A> TurnBasedMatcheLeaveCall<'a, C, NC, A> where NC: hyper::net::
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -10847,13 +11025,13 @@ impl<'a, C, NC, A> TurnBasedMatcheLeaveCall<'a, C, NC, A> where NC: hyper::net::
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -10865,7 +11043,7 @@ impl<'a, C, NC, A> TurnBasedMatcheLeaveCall<'a, C, NC, A> where NC: hyper::net::
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The ID of the match.    
+    /// The ID of the match.
     pub fn match_id(mut self, new_value: &str) -> TurnBasedMatcheLeaveCall<'a, C, NC, A> {
         self._match_id = new_value.to_string();
         self
@@ -10873,7 +11051,7 @@ impl<'a, C, NC, A> TurnBasedMatcheLeaveCall<'a, C, NC, A> where NC: hyper::net::
     /// Sets the *language* query property to the given value.
     ///
     /// 
-    /// The preferred language to use for strings returned by this method.    
+    /// The preferred language to use for strings returned by this method.
     pub fn language(mut self, new_value: &str) -> TurnBasedMatcheLeaveCall<'a, C, NC, A> {
         self._language = Some(new_value.to_string());
         self
@@ -10934,7 +11112,7 @@ impl<'a, C, NC, A> TurnBasedMatcheLeaveCall<'a, C, NC, A> where NC: hyper::net::
 /// Returns turn-based matches the player is or was involved in.
 ///
 /// A builder for the *list* method supported by a *turnBasedMatche* resource.
-/// It is not used directly, but through a `TurnBasedMatcheMethods`.
+/// It is not used directly, but through a `TurnBasedMatcheMethods` instance.
 ///
 /// # Example
 ///
@@ -11015,7 +11193,7 @@ impl<'a, C, NC, A> TurnBasedMatcheListCall<'a, C, NC, A> where NC: hyper::net::N
         for &field in ["alt", "pageToken", "maxResults", "maxCompletedMatches", "language", "includeMatchData"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -11044,7 +11222,7 @@ impl<'a, C, NC, A> TurnBasedMatcheListCall<'a, C, NC, A> where NC: hyper::net::N
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -11056,7 +11234,6 @@ impl<'a, C, NC, A> TurnBasedMatcheListCall<'a, C, NC, A> where NC: hyper::net::N
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -11066,7 +11243,7 @@ impl<'a, C, NC, A> TurnBasedMatcheListCall<'a, C, NC, A> where NC: hyper::net::N
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -11077,7 +11254,7 @@ impl<'a, C, NC, A> TurnBasedMatcheListCall<'a, C, NC, A> where NC: hyper::net::N
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -11086,13 +11263,13 @@ impl<'a, C, NC, A> TurnBasedMatcheListCall<'a, C, NC, A> where NC: hyper::net::N
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -11102,7 +11279,7 @@ impl<'a, C, NC, A> TurnBasedMatcheListCall<'a, C, NC, A> where NC: hyper::net::N
     /// Sets the *page token* query property to the given value.
     ///
     /// 
-    /// The token returned by the previous request.    
+    /// The token returned by the previous request.
     pub fn page_token(mut self, new_value: &str) -> TurnBasedMatcheListCall<'a, C, NC, A> {
         self._page_token = Some(new_value.to_string());
         self
@@ -11110,7 +11287,7 @@ impl<'a, C, NC, A> TurnBasedMatcheListCall<'a, C, NC, A> where NC: hyper::net::N
     /// Sets the *max results* query property to the given value.
     ///
     /// 
-    /// The maximum number of matches to return in the response, used for paging. For any response, the actual number of matches to return may be less than the specified maxResults.    
+    /// The maximum number of matches to return in the response, used for paging. For any response, the actual number of matches to return may be less than the specified maxResults.
     pub fn max_results(mut self, new_value: i32) -> TurnBasedMatcheListCall<'a, C, NC, A> {
         self._max_results = Some(new_value);
         self
@@ -11118,7 +11295,7 @@ impl<'a, C, NC, A> TurnBasedMatcheListCall<'a, C, NC, A> where NC: hyper::net::N
     /// Sets the *max completed matches* query property to the given value.
     ///
     /// 
-    /// The maximum number of completed or canceled matches to return in the response. If not set, all matches returned could be completed or canceled.    
+    /// The maximum number of completed or canceled matches to return in the response. If not set, all matches returned could be completed or canceled.
     pub fn max_completed_matches(mut self, new_value: i32) -> TurnBasedMatcheListCall<'a, C, NC, A> {
         self._max_completed_matches = Some(new_value);
         self
@@ -11126,7 +11303,7 @@ impl<'a, C, NC, A> TurnBasedMatcheListCall<'a, C, NC, A> where NC: hyper::net::N
     /// Sets the *language* query property to the given value.
     ///
     /// 
-    /// The preferred language to use for strings returned by this method.    
+    /// The preferred language to use for strings returned by this method.
     pub fn language(mut self, new_value: &str) -> TurnBasedMatcheListCall<'a, C, NC, A> {
         self._language = Some(new_value.to_string());
         self
@@ -11134,7 +11311,7 @@ impl<'a, C, NC, A> TurnBasedMatcheListCall<'a, C, NC, A> where NC: hyper::net::N
     /// Sets the *include match data* query property to the given value.
     ///
     /// 
-    /// True if match data should be returned in the response. Note that not all data will necessarily be returned if include_match_data is true; the server may decide to only return data for some of the matches to limit download size for the client. The remainder of the data for these matches will be retrievable on request.    
+    /// True if match data should be returned in the response. Note that not all data will necessarily be returned if include_match_data is true; the server may decide to only return data for some of the matches to limit download size for the client. The remainder of the data for these matches will be retrievable on request.
     pub fn include_match_data(mut self, new_value: bool) -> TurnBasedMatcheListCall<'a, C, NC, A> {
         self._include_match_data = Some(new_value);
         self
@@ -11195,7 +11372,7 @@ impl<'a, C, NC, A> TurnBasedMatcheListCall<'a, C, NC, A> where NC: hyper::net::N
 /// Commit the results of a player turn.
 ///
 /// A builder for the *takeTurn* method supported by a *turnBasedMatche* resource.
-/// It is not used directly, but through a `TurnBasedMatcheMethods`.
+/// It is not used directly, but through a `TurnBasedMatcheMethods` instance.
 ///
 /// # Example
 ///
@@ -11265,7 +11442,7 @@ impl<'a, C, NC, A> TurnBasedMatcheTakeTurnCall<'a, C, NC, A> where NC: hyper::ne
         for &field in ["alt", "matchId", "language"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -11322,7 +11499,7 @@ impl<'a, C, NC, A> TurnBasedMatcheTakeTurnCall<'a, C, NC, A> where NC: hyper::ne
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -11338,7 +11515,6 @@ impl<'a, C, NC, A> TurnBasedMatcheTakeTurnCall<'a, C, NC, A> where NC: hyper::ne
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -11348,7 +11524,7 @@ impl<'a, C, NC, A> TurnBasedMatcheTakeTurnCall<'a, C, NC, A> where NC: hyper::ne
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -11359,7 +11535,7 @@ impl<'a, C, NC, A> TurnBasedMatcheTakeTurnCall<'a, C, NC, A> where NC: hyper::ne
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -11368,13 +11544,13 @@ impl<'a, C, NC, A> TurnBasedMatcheTakeTurnCall<'a, C, NC, A> where NC: hyper::ne
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -11395,7 +11571,7 @@ impl<'a, C, NC, A> TurnBasedMatcheTakeTurnCall<'a, C, NC, A> where NC: hyper::ne
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The ID of the match.    
+    /// The ID of the match.
     pub fn match_id(mut self, new_value: &str) -> TurnBasedMatcheTakeTurnCall<'a, C, NC, A> {
         self._match_id = new_value.to_string();
         self
@@ -11403,7 +11579,7 @@ impl<'a, C, NC, A> TurnBasedMatcheTakeTurnCall<'a, C, NC, A> where NC: hyper::ne
     /// Sets the *language* query property to the given value.
     ///
     /// 
-    /// The preferred language to use for strings returned by this method.    
+    /// The preferred language to use for strings returned by this method.
     pub fn language(mut self, new_value: &str) -> TurnBasedMatcheTakeTurnCall<'a, C, NC, A> {
         self._language = Some(new_value.to_string());
         self
@@ -11464,7 +11640,7 @@ impl<'a, C, NC, A> TurnBasedMatcheTakeTurnCall<'a, C, NC, A> where NC: hyper::ne
 /// Create a rematch of a match that was previously completed, with the same participants. This can be called by only one player on a match still in their list; the player must have called Finish first. Returns the newly created match; it will be the caller's turn.
 ///
 /// A builder for the *rematch* method supported by a *turnBasedMatche* resource.
-/// It is not used directly, but through a `TurnBasedMatcheMethods`.
+/// It is not used directly, but through a `TurnBasedMatcheMethods` instance.
 ///
 /// # Example
 ///
@@ -11532,7 +11708,7 @@ impl<'a, C, NC, A> TurnBasedMatcheRematchCall<'a, C, NC, A> where NC: hyper::net
         for &field in ["alt", "matchId", "requestId", "language"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -11585,7 +11761,7 @@ impl<'a, C, NC, A> TurnBasedMatcheRematchCall<'a, C, NC, A> where NC: hyper::net
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -11597,7 +11773,6 @@ impl<'a, C, NC, A> TurnBasedMatcheRematchCall<'a, C, NC, A> where NC: hyper::net
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -11607,7 +11782,7 @@ impl<'a, C, NC, A> TurnBasedMatcheRematchCall<'a, C, NC, A> where NC: hyper::net
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -11618,7 +11793,7 @@ impl<'a, C, NC, A> TurnBasedMatcheRematchCall<'a, C, NC, A> where NC: hyper::net
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -11627,13 +11802,13 @@ impl<'a, C, NC, A> TurnBasedMatcheRematchCall<'a, C, NC, A> where NC: hyper::net
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -11645,7 +11820,7 @@ impl<'a, C, NC, A> TurnBasedMatcheRematchCall<'a, C, NC, A> where NC: hyper::net
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The ID of the match.    
+    /// The ID of the match.
     pub fn match_id(mut self, new_value: &str) -> TurnBasedMatcheRematchCall<'a, C, NC, A> {
         self._match_id = new_value.to_string();
         self
@@ -11653,7 +11828,7 @@ impl<'a, C, NC, A> TurnBasedMatcheRematchCall<'a, C, NC, A> where NC: hyper::net
     /// Sets the *request id* query property to the given value.
     ///
     /// 
-    /// A randomly generated numeric ID for each request specified by the caller. This number is used at the server to ensure that the request is handled correctly across retries.    
+    /// A randomly generated numeric ID for each request specified by the caller. This number is used at the server to ensure that the request is handled correctly across retries.
     pub fn request_id(mut self, new_value: &str) -> TurnBasedMatcheRematchCall<'a, C, NC, A> {
         self._request_id = Some(new_value.to_string());
         self
@@ -11661,7 +11836,7 @@ impl<'a, C, NC, A> TurnBasedMatcheRematchCall<'a, C, NC, A> where NC: hyper::net
     /// Sets the *language* query property to the given value.
     ///
     /// 
-    /// The preferred language to use for strings returned by this method.    
+    /// The preferred language to use for strings returned by this method.
     pub fn language(mut self, new_value: &str) -> TurnBasedMatcheRematchCall<'a, C, NC, A> {
         self._language = Some(new_value.to_string());
         self
@@ -11722,7 +11897,7 @@ impl<'a, C, NC, A> TurnBasedMatcheRematchCall<'a, C, NC, A> where NC: hyper::net
 /// Retrieves the metadata of the application with the given ID. If the requested application is not available for the specified platformType, the returned response will not include any instance data.
 ///
 /// A builder for the *get* method supported by a *application* resource.
-/// It is not used directly, but through a `ApplicationMethods`.
+/// It is not used directly, but through a `ApplicationMethods` instance.
 ///
 /// # Example
 ///
@@ -11790,7 +11965,7 @@ impl<'a, C, NC, A> ApplicationGetCall<'a, C, NC, A> where NC: hyper::net::Networ
         for &field in ["alt", "applicationId", "platformType", "language"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -11843,7 +12018,7 @@ impl<'a, C, NC, A> ApplicationGetCall<'a, C, NC, A> where NC: hyper::net::Networ
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -11855,7 +12030,6 @@ impl<'a, C, NC, A> ApplicationGetCall<'a, C, NC, A> where NC: hyper::net::Networ
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -11865,7 +12039,7 @@ impl<'a, C, NC, A> ApplicationGetCall<'a, C, NC, A> where NC: hyper::net::Networ
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -11876,7 +12050,7 @@ impl<'a, C, NC, A> ApplicationGetCall<'a, C, NC, A> where NC: hyper::net::Networ
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -11885,13 +12059,13 @@ impl<'a, C, NC, A> ApplicationGetCall<'a, C, NC, A> where NC: hyper::net::Networ
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -11903,7 +12077,7 @@ impl<'a, C, NC, A> ApplicationGetCall<'a, C, NC, A> where NC: hyper::net::Networ
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The application ID from the Google Play developer console.    
+    /// The application ID from the Google Play developer console.
     pub fn application_id(mut self, new_value: &str) -> ApplicationGetCall<'a, C, NC, A> {
         self._application_id = new_value.to_string();
         self
@@ -11911,7 +12085,7 @@ impl<'a, C, NC, A> ApplicationGetCall<'a, C, NC, A> where NC: hyper::net::Networ
     /// Sets the *platform type* query property to the given value.
     ///
     /// 
-    /// Restrict application details returned to the specific platform.    
+    /// Restrict application details returned to the specific platform.
     pub fn platform_type(mut self, new_value: &str) -> ApplicationGetCall<'a, C, NC, A> {
         self._platform_type = Some(new_value.to_string());
         self
@@ -11919,7 +12093,7 @@ impl<'a, C, NC, A> ApplicationGetCall<'a, C, NC, A> where NC: hyper::net::Networ
     /// Sets the *language* query property to the given value.
     ///
     /// 
-    /// The preferred language to use for strings returned by this method.    
+    /// The preferred language to use for strings returned by this method.
     pub fn language(mut self, new_value: &str) -> ApplicationGetCall<'a, C, NC, A> {
         self._language = Some(new_value.to_string());
         self
@@ -11980,7 +12154,7 @@ impl<'a, C, NC, A> ApplicationGetCall<'a, C, NC, A> where NC: hyper::net::Networ
 /// Indicate that the the currently authenticated user is playing your application.
 ///
 /// A builder for the *played* method supported by a *application* resource.
-/// It is not used directly, but through a `ApplicationMethods`.
+/// It is not used directly, but through a `ApplicationMethods` instance.
 ///
 /// # Example
 ///
@@ -12036,7 +12210,7 @@ impl<'a, C, NC, A> ApplicationPlayedCall<'a, C, NC, A> where NC: hyper::net::Net
         for &field in [].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -12064,7 +12238,7 @@ impl<'a, C, NC, A> ApplicationPlayedCall<'a, C, NC, A> where NC: hyper::net::Net
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -12076,7 +12250,6 @@ impl<'a, C, NC, A> ApplicationPlayedCall<'a, C, NC, A> where NC: hyper::net::Net
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -12086,7 +12259,7 @@ impl<'a, C, NC, A> ApplicationPlayedCall<'a, C, NC, A> where NC: hyper::net::Net
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -12097,12 +12270,12 @@ impl<'a, C, NC, A> ApplicationPlayedCall<'a, C, NC, A> where NC: hyper::net::Net
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = res;
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -12165,7 +12338,7 @@ impl<'a, C, NC, A> ApplicationPlayedCall<'a, C, NC, A> where NC: hyper::net::Net
 /// Get the data for a room.
 ///
 /// A builder for the *get* method supported by a *room* resource.
-/// It is not used directly, but through a `RoomMethods`.
+/// It is not used directly, but through a `RoomMethods` instance.
 ///
 /// # Example
 ///
@@ -12228,7 +12401,7 @@ impl<'a, C, NC, A> RoomGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnec
         for &field in ["alt", "roomId", "language"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -12281,7 +12454,7 @@ impl<'a, C, NC, A> RoomGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnec
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -12293,7 +12466,6 @@ impl<'a, C, NC, A> RoomGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnec
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -12303,7 +12475,7 @@ impl<'a, C, NC, A> RoomGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnec
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -12314,7 +12486,7 @@ impl<'a, C, NC, A> RoomGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnec
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -12323,13 +12495,13 @@ impl<'a, C, NC, A> RoomGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnec
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -12341,7 +12513,7 @@ impl<'a, C, NC, A> RoomGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnec
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The ID of the room.    
+    /// The ID of the room.
     pub fn room_id(mut self, new_value: &str) -> RoomGetCall<'a, C, NC, A> {
         self._room_id = new_value.to_string();
         self
@@ -12349,7 +12521,7 @@ impl<'a, C, NC, A> RoomGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnec
     /// Sets the *language* query property to the given value.
     ///
     /// 
-    /// The preferred language to use for strings returned by this method.    
+    /// The preferred language to use for strings returned by this method.
     pub fn language(mut self, new_value: &str) -> RoomGetCall<'a, C, NC, A> {
         self._language = Some(new_value.to_string());
         self
@@ -12410,7 +12582,7 @@ impl<'a, C, NC, A> RoomGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnec
 /// Leave a room. For internal use by the Games SDK only. Calling this method directly is unsupported.
 ///
 /// A builder for the *leave* method supported by a *room* resource.
-/// It is not used directly, but through a `RoomMethods`.
+/// It is not used directly, but through a `RoomMethods` instance.
 ///
 /// # Example
 ///
@@ -12480,7 +12652,7 @@ impl<'a, C, NC, A> RoomLeaveCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
         for &field in ["alt", "roomId", "language"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -12537,7 +12709,7 @@ impl<'a, C, NC, A> RoomLeaveCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -12553,7 +12725,6 @@ impl<'a, C, NC, A> RoomLeaveCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -12563,7 +12734,7 @@ impl<'a, C, NC, A> RoomLeaveCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -12574,7 +12745,7 @@ impl<'a, C, NC, A> RoomLeaveCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -12583,13 +12754,13 @@ impl<'a, C, NC, A> RoomLeaveCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -12610,7 +12781,7 @@ impl<'a, C, NC, A> RoomLeaveCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The ID of the room.    
+    /// The ID of the room.
     pub fn room_id(mut self, new_value: &str) -> RoomLeaveCall<'a, C, NC, A> {
         self._room_id = new_value.to_string();
         self
@@ -12618,7 +12789,7 @@ impl<'a, C, NC, A> RoomLeaveCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     /// Sets the *language* query property to the given value.
     ///
     /// 
-    /// The preferred language to use for strings returned by this method.    
+    /// The preferred language to use for strings returned by this method.
     pub fn language(mut self, new_value: &str) -> RoomLeaveCall<'a, C, NC, A> {
         self._language = Some(new_value.to_string());
         self
@@ -12679,7 +12850,7 @@ impl<'a, C, NC, A> RoomLeaveCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
 /// Returns invitations to join rooms.
 ///
 /// A builder for the *list* method supported by a *room* resource.
-/// It is not used directly, but through a `RoomMethods`.
+/// It is not used directly, but through a `RoomMethods` instance.
 ///
 /// # Example
 ///
@@ -12750,7 +12921,7 @@ impl<'a, C, NC, A> RoomListCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
         for &field in ["alt", "pageToken", "maxResults", "language"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -12779,7 +12950,7 @@ impl<'a, C, NC, A> RoomListCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -12791,7 +12962,6 @@ impl<'a, C, NC, A> RoomListCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -12801,7 +12971,7 @@ impl<'a, C, NC, A> RoomListCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -12812,7 +12982,7 @@ impl<'a, C, NC, A> RoomListCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -12821,13 +12991,13 @@ impl<'a, C, NC, A> RoomListCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -12837,7 +13007,7 @@ impl<'a, C, NC, A> RoomListCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
     /// Sets the *page token* query property to the given value.
     ///
     /// 
-    /// The token returned by the previous request.    
+    /// The token returned by the previous request.
     pub fn page_token(mut self, new_value: &str) -> RoomListCall<'a, C, NC, A> {
         self._page_token = Some(new_value.to_string());
         self
@@ -12845,7 +13015,7 @@ impl<'a, C, NC, A> RoomListCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
     /// Sets the *max results* query property to the given value.
     ///
     /// 
-    /// The maximum number of rooms to return in the response, used for paging. For any response, the actual number of rooms to return may be less than the specified maxResults.    
+    /// The maximum number of rooms to return in the response, used for paging. For any response, the actual number of rooms to return may be less than the specified maxResults.
     pub fn max_results(mut self, new_value: i32) -> RoomListCall<'a, C, NC, A> {
         self._max_results = Some(new_value);
         self
@@ -12853,7 +13023,7 @@ impl<'a, C, NC, A> RoomListCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
     /// Sets the *language* query property to the given value.
     ///
     /// 
-    /// The preferred language to use for strings returned by this method.    
+    /// The preferred language to use for strings returned by this method.
     pub fn language(mut self, new_value: &str) -> RoomListCall<'a, C, NC, A> {
         self._language = Some(new_value.to_string());
         self
@@ -12914,7 +13084,7 @@ impl<'a, C, NC, A> RoomListCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
 /// Updates sent by a client reporting the status of peers in a room. For internal use by the Games SDK only. Calling this method directly is unsupported.
 ///
 /// A builder for the *reportStatus* method supported by a *room* resource.
-/// It is not used directly, but through a `RoomMethods`.
+/// It is not used directly, but through a `RoomMethods` instance.
 ///
 /// # Example
 ///
@@ -12984,7 +13154,7 @@ impl<'a, C, NC, A> RoomReportStatuCall<'a, C, NC, A> where NC: hyper::net::Netwo
         for &field in ["alt", "roomId", "language"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -13041,7 +13211,7 @@ impl<'a, C, NC, A> RoomReportStatuCall<'a, C, NC, A> where NC: hyper::net::Netwo
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -13057,7 +13227,6 @@ impl<'a, C, NC, A> RoomReportStatuCall<'a, C, NC, A> where NC: hyper::net::Netwo
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -13067,7 +13236,7 @@ impl<'a, C, NC, A> RoomReportStatuCall<'a, C, NC, A> where NC: hyper::net::Netwo
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -13078,7 +13247,7 @@ impl<'a, C, NC, A> RoomReportStatuCall<'a, C, NC, A> where NC: hyper::net::Netwo
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -13087,13 +13256,13 @@ impl<'a, C, NC, A> RoomReportStatuCall<'a, C, NC, A> where NC: hyper::net::Netwo
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -13114,7 +13283,7 @@ impl<'a, C, NC, A> RoomReportStatuCall<'a, C, NC, A> where NC: hyper::net::Netwo
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The ID of the room.    
+    /// The ID of the room.
     pub fn room_id(mut self, new_value: &str) -> RoomReportStatuCall<'a, C, NC, A> {
         self._room_id = new_value.to_string();
         self
@@ -13122,7 +13291,7 @@ impl<'a, C, NC, A> RoomReportStatuCall<'a, C, NC, A> where NC: hyper::net::Netwo
     /// Sets the *language* query property to the given value.
     ///
     /// 
-    /// The preferred language to use for strings returned by this method.    
+    /// The preferred language to use for strings returned by this method.
     pub fn language(mut self, new_value: &str) -> RoomReportStatuCall<'a, C, NC, A> {
         self._language = Some(new_value.to_string());
         self
@@ -13183,7 +13352,7 @@ impl<'a, C, NC, A> RoomReportStatuCall<'a, C, NC, A> where NC: hyper::net::Netwo
 /// Create a room. For internal use by the Games SDK only. Calling this method directly is unsupported.
 ///
 /// A builder for the *create* method supported by a *room* resource.
-/// It is not used directly, but through a `RoomMethods`.
+/// It is not used directly, but through a `RoomMethods` instance.
 ///
 /// # Example
 ///
@@ -13251,7 +13420,7 @@ impl<'a, C, NC, A> RoomCreateCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
         for &field in ["alt", "language"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -13284,7 +13453,7 @@ impl<'a, C, NC, A> RoomCreateCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -13300,7 +13469,6 @@ impl<'a, C, NC, A> RoomCreateCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -13310,7 +13478,7 @@ impl<'a, C, NC, A> RoomCreateCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -13321,7 +13489,7 @@ impl<'a, C, NC, A> RoomCreateCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -13330,13 +13498,13 @@ impl<'a, C, NC, A> RoomCreateCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -13355,7 +13523,7 @@ impl<'a, C, NC, A> RoomCreateCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// Sets the *language* query property to the given value.
     ///
     /// 
-    /// The preferred language to use for strings returned by this method.    
+    /// The preferred language to use for strings returned by this method.
     pub fn language(mut self, new_value: &str) -> RoomCreateCall<'a, C, NC, A> {
         self._language = Some(new_value.to_string());
         self
@@ -13416,7 +13584,7 @@ impl<'a, C, NC, A> RoomCreateCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
 /// Decline an invitation to join a room. For internal use by the Games SDK only. Calling this method directly is unsupported.
 ///
 /// A builder for the *decline* method supported by a *room* resource.
-/// It is not used directly, but through a `RoomMethods`.
+/// It is not used directly, but through a `RoomMethods` instance.
 ///
 /// # Example
 ///
@@ -13479,7 +13647,7 @@ impl<'a, C, NC, A> RoomDeclineCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
         for &field in ["alt", "roomId", "language"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -13532,7 +13700,7 @@ impl<'a, C, NC, A> RoomDeclineCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -13544,7 +13712,6 @@ impl<'a, C, NC, A> RoomDeclineCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -13554,7 +13721,7 @@ impl<'a, C, NC, A> RoomDeclineCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -13565,7 +13732,7 @@ impl<'a, C, NC, A> RoomDeclineCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -13574,13 +13741,13 @@ impl<'a, C, NC, A> RoomDeclineCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -13592,7 +13759,7 @@ impl<'a, C, NC, A> RoomDeclineCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The ID of the room.    
+    /// The ID of the room.
     pub fn room_id(mut self, new_value: &str) -> RoomDeclineCall<'a, C, NC, A> {
         self._room_id = new_value.to_string();
         self
@@ -13600,7 +13767,7 @@ impl<'a, C, NC, A> RoomDeclineCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// Sets the *language* query property to the given value.
     ///
     /// 
-    /// The preferred language to use for strings returned by this method.    
+    /// The preferred language to use for strings returned by this method.
     pub fn language(mut self, new_value: &str) -> RoomDeclineCall<'a, C, NC, A> {
         self._language = Some(new_value.to_string());
         self
@@ -13661,7 +13828,7 @@ impl<'a, C, NC, A> RoomDeclineCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
 /// Dismiss an invitation to join a room. For internal use by the Games SDK only. Calling this method directly is unsupported.
 ///
 /// A builder for the *dismiss* method supported by a *room* resource.
-/// It is not used directly, but through a `RoomMethods`.
+/// It is not used directly, but through a `RoomMethods` instance.
 ///
 /// # Example
 ///
@@ -13719,7 +13886,7 @@ impl<'a, C, NC, A> RoomDismisCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
         for &field in ["roomId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -13771,7 +13938,7 @@ impl<'a, C, NC, A> RoomDismisCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -13783,7 +13950,6 @@ impl<'a, C, NC, A> RoomDismisCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -13793,7 +13959,7 @@ impl<'a, C, NC, A> RoomDismisCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -13804,12 +13970,12 @@ impl<'a, C, NC, A> RoomDismisCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = res;
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -13821,7 +13987,7 @@ impl<'a, C, NC, A> RoomDismisCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The ID of the room.    
+    /// The ID of the room.
     pub fn room_id(mut self, new_value: &str) -> RoomDismisCall<'a, C, NC, A> {
         self._room_id = new_value.to_string();
         self
@@ -13882,7 +14048,7 @@ impl<'a, C, NC, A> RoomDismisCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
 /// Join a room. For internal use by the Games SDK only. Calling this method directly is unsupported.
 ///
 /// A builder for the *join* method supported by a *room* resource.
-/// It is not used directly, but through a `RoomMethods`.
+/// It is not used directly, but through a `RoomMethods` instance.
 ///
 /// # Example
 ///
@@ -13952,7 +14118,7 @@ impl<'a, C, NC, A> RoomJoinCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
         for &field in ["alt", "roomId", "language"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -14009,7 +14175,7 @@ impl<'a, C, NC, A> RoomJoinCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -14025,7 +14191,6 @@ impl<'a, C, NC, A> RoomJoinCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -14035,7 +14200,7 @@ impl<'a, C, NC, A> RoomJoinCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -14046,7 +14211,7 @@ impl<'a, C, NC, A> RoomJoinCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -14055,13 +14220,13 @@ impl<'a, C, NC, A> RoomJoinCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -14082,7 +14247,7 @@ impl<'a, C, NC, A> RoomJoinCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The ID of the room.    
+    /// The ID of the room.
     pub fn room_id(mut self, new_value: &str) -> RoomJoinCall<'a, C, NC, A> {
         self._room_id = new_value.to_string();
         self
@@ -14090,7 +14255,7 @@ impl<'a, C, NC, A> RoomJoinCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
     /// Sets the *language* query property to the given value.
     ///
     /// 
-    /// The preferred language to use for strings returned by this method.    
+    /// The preferred language to use for strings returned by this method.
     pub fn language(mut self, new_value: &str) -> RoomJoinCall<'a, C, NC, A> {
         self._language = Some(new_value.to_string());
         self
@@ -14151,7 +14316,7 @@ impl<'a, C, NC, A> RoomJoinCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
 /// Submits a score to the specified leaderboard.
 ///
 /// A builder for the *submit* method supported by a *score* resource.
-/// It is not used directly, but through a `ScoreMethods`.
+/// It is not used directly, but through a `ScoreMethods` instance.
 ///
 /// # Example
 ///
@@ -14221,7 +14386,7 @@ impl<'a, C, NC, A> ScoreSubmitCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
         for &field in ["alt", "leaderboardId", "score", "scoreTag", "language"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -14274,7 +14439,7 @@ impl<'a, C, NC, A> ScoreSubmitCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -14286,7 +14451,6 @@ impl<'a, C, NC, A> ScoreSubmitCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -14296,7 +14460,7 @@ impl<'a, C, NC, A> ScoreSubmitCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -14307,7 +14471,7 @@ impl<'a, C, NC, A> ScoreSubmitCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -14316,13 +14480,13 @@ impl<'a, C, NC, A> ScoreSubmitCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -14334,7 +14498,7 @@ impl<'a, C, NC, A> ScoreSubmitCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The ID of the leaderboard.    
+    /// The ID of the leaderboard.
     pub fn leaderboard_id(mut self, new_value: &str) -> ScoreSubmitCall<'a, C, NC, A> {
         self._leaderboard_id = new_value.to_string();
         self
@@ -14344,7 +14508,7 @@ impl<'a, C, NC, A> ScoreSubmitCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The score you're submitting. The submitted score is ignored if it is worse than a previously submitted score, where worse depends on the leaderboard sort order. The meaning of the score value depends on the leaderboard format type. For fixed-point, the score represents the raw value. For time, the score represents elapsed time in milliseconds. For currency, the score represents a value in micro units.    
+    /// The score you're submitting. The submitted score is ignored if it is worse than a previously submitted score, where worse depends on the leaderboard sort order. The meaning of the score value depends on the leaderboard format type. For fixed-point, the score represents the raw value. For time, the score represents elapsed time in milliseconds. For currency, the score represents a value in micro units.
     pub fn score(mut self, new_value: &str) -> ScoreSubmitCall<'a, C, NC, A> {
         self._score = new_value.to_string();
         self
@@ -14352,7 +14516,7 @@ impl<'a, C, NC, A> ScoreSubmitCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// Sets the *score tag* query property to the given value.
     ///
     /// 
-    /// Additional information about the score you're submitting. Values must contain no more than 64 URI-safe characters as defined by section 2.3 of RFC 3986.    
+    /// Additional information about the score you're submitting. Values must contain no more than 64 URI-safe characters as defined by section 2.3 of RFC 3986.
     pub fn score_tag(mut self, new_value: &str) -> ScoreSubmitCall<'a, C, NC, A> {
         self._score_tag = Some(new_value.to_string());
         self
@@ -14360,7 +14524,7 @@ impl<'a, C, NC, A> ScoreSubmitCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// Sets the *language* query property to the given value.
     ///
     /// 
-    /// The preferred language to use for strings returned by this method.    
+    /// The preferred language to use for strings returned by this method.
     pub fn language(mut self, new_value: &str) -> ScoreSubmitCall<'a, C, NC, A> {
         self._language = Some(new_value.to_string());
         self
@@ -14421,7 +14585,7 @@ impl<'a, C, NC, A> ScoreSubmitCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
 /// Lists the scores in a leaderboard, starting from the top.
 ///
 /// A builder for the *list* method supported by a *score* resource.
-/// It is not used directly, but through a `ScoreMethods`.
+/// It is not used directly, but through a `ScoreMethods` instance.
 ///
 /// # Example
 ///
@@ -14498,7 +14662,7 @@ impl<'a, C, NC, A> ScoreListCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
         for &field in ["alt", "leaderboardId", "collection", "timeSpan", "pageToken", "maxResults", "language"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -14551,7 +14715,7 @@ impl<'a, C, NC, A> ScoreListCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -14563,7 +14727,6 @@ impl<'a, C, NC, A> ScoreListCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -14573,7 +14736,7 @@ impl<'a, C, NC, A> ScoreListCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -14584,7 +14747,7 @@ impl<'a, C, NC, A> ScoreListCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -14593,13 +14756,13 @@ impl<'a, C, NC, A> ScoreListCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -14611,7 +14774,7 @@ impl<'a, C, NC, A> ScoreListCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The ID of the leaderboard.    
+    /// The ID of the leaderboard.
     pub fn leaderboard_id(mut self, new_value: &str) -> ScoreListCall<'a, C, NC, A> {
         self._leaderboard_id = new_value.to_string();
         self
@@ -14621,7 +14784,7 @@ impl<'a, C, NC, A> ScoreListCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The collection of scores you're requesting.    
+    /// The collection of scores you're requesting.
     pub fn collection(mut self, new_value: &str) -> ScoreListCall<'a, C, NC, A> {
         self._collection = new_value.to_string();
         self
@@ -14631,7 +14794,7 @@ impl<'a, C, NC, A> ScoreListCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The time span for the scores and ranks you're requesting.    
+    /// The time span for the scores and ranks you're requesting.
     pub fn time_span(mut self, new_value: &str) -> ScoreListCall<'a, C, NC, A> {
         self._time_span = new_value.to_string();
         self
@@ -14639,7 +14802,7 @@ impl<'a, C, NC, A> ScoreListCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     /// Sets the *page token* query property to the given value.
     ///
     /// 
-    /// The token returned by the previous request.    
+    /// The token returned by the previous request.
     pub fn page_token(mut self, new_value: &str) -> ScoreListCall<'a, C, NC, A> {
         self._page_token = Some(new_value.to_string());
         self
@@ -14647,7 +14810,7 @@ impl<'a, C, NC, A> ScoreListCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     /// Sets the *max results* query property to the given value.
     ///
     /// 
-    /// The maximum number of leaderboard scores to return in the response. For any response, the actual number of leaderboard scores returned may be less than the specified maxResults.    
+    /// The maximum number of leaderboard scores to return in the response. For any response, the actual number of leaderboard scores returned may be less than the specified maxResults.
     pub fn max_results(mut self, new_value: i32) -> ScoreListCall<'a, C, NC, A> {
         self._max_results = Some(new_value);
         self
@@ -14655,7 +14818,7 @@ impl<'a, C, NC, A> ScoreListCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     /// Sets the *language* query property to the given value.
     ///
     /// 
-    /// The preferred language to use for strings returned by this method.    
+    /// The preferred language to use for strings returned by this method.
     pub fn language(mut self, new_value: &str) -> ScoreListCall<'a, C, NC, A> {
         self._language = Some(new_value.to_string());
         self
@@ -14717,7 +14880,7 @@ impl<'a, C, NC, A> ScoreListCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
 /// NOTE: You cannot ask for 'ALL' leaderboards and 'ALL' timeSpans in the same request; only one parameter may be set to 'ALL'.
 ///
 /// A builder for the *get* method supported by a *score* resource.
-/// It is not used directly, but through a `ScoreMethods`.
+/// It is not used directly, but through a `ScoreMethods` instance.
 ///
 /// # Example
 ///
@@ -14799,7 +14962,7 @@ impl<'a, C, NC, A> ScoreGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
         for &field in ["alt", "playerId", "leaderboardId", "timeSpan", "pageToken", "maxResults", "language", "includeRankType"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -14852,7 +15015,7 @@ impl<'a, C, NC, A> ScoreGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -14864,7 +15027,6 @@ impl<'a, C, NC, A> ScoreGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -14874,7 +15036,7 @@ impl<'a, C, NC, A> ScoreGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -14885,7 +15047,7 @@ impl<'a, C, NC, A> ScoreGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -14894,13 +15056,13 @@ impl<'a, C, NC, A> ScoreGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -14912,7 +15074,7 @@ impl<'a, C, NC, A> ScoreGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// A player ID. A value of me may be used in place of the authenticated player's ID.    
+    /// A player ID. A value of me may be used in place of the authenticated player's ID.
     pub fn player_id(mut self, new_value: &str) -> ScoreGetCall<'a, C, NC, A> {
         self._player_id = new_value.to_string();
         self
@@ -14922,7 +15084,7 @@ impl<'a, C, NC, A> ScoreGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The ID of the leaderboard. Can be set to 'ALL' to retrieve data for all leaderboards for this application.    
+    /// The ID of the leaderboard. Can be set to 'ALL' to retrieve data for all leaderboards for this application.
     pub fn leaderboard_id(mut self, new_value: &str) -> ScoreGetCall<'a, C, NC, A> {
         self._leaderboard_id = new_value.to_string();
         self
@@ -14932,7 +15094,7 @@ impl<'a, C, NC, A> ScoreGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The time span for the scores and ranks you're requesting.    
+    /// The time span for the scores and ranks you're requesting.
     pub fn time_span(mut self, new_value: &str) -> ScoreGetCall<'a, C, NC, A> {
         self._time_span = new_value.to_string();
         self
@@ -14940,7 +15102,7 @@ impl<'a, C, NC, A> ScoreGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
     /// Sets the *page token* query property to the given value.
     ///
     /// 
-    /// The token returned by the previous request.    
+    /// The token returned by the previous request.
     pub fn page_token(mut self, new_value: &str) -> ScoreGetCall<'a, C, NC, A> {
         self._page_token = Some(new_value.to_string());
         self
@@ -14948,7 +15110,7 @@ impl<'a, C, NC, A> ScoreGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
     /// Sets the *max results* query property to the given value.
     ///
     /// 
-    /// The maximum number of leaderboard scores to return in the response. For any response, the actual number of leaderboard scores returned may be less than the specified maxResults.    
+    /// The maximum number of leaderboard scores to return in the response. For any response, the actual number of leaderboard scores returned may be less than the specified maxResults.
     pub fn max_results(mut self, new_value: i32) -> ScoreGetCall<'a, C, NC, A> {
         self._max_results = Some(new_value);
         self
@@ -14956,7 +15118,7 @@ impl<'a, C, NC, A> ScoreGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
     /// Sets the *language* query property to the given value.
     ///
     /// 
-    /// The preferred language to use for strings returned by this method.    
+    /// The preferred language to use for strings returned by this method.
     pub fn language(mut self, new_value: &str) -> ScoreGetCall<'a, C, NC, A> {
         self._language = Some(new_value.to_string());
         self
@@ -14964,7 +15126,7 @@ impl<'a, C, NC, A> ScoreGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
     /// Sets the *include rank type* query property to the given value.
     ///
     /// 
-    /// The types of ranks to return. If the parameter is omitted, no ranks will be returned.    
+    /// The types of ranks to return. If the parameter is omitted, no ranks will be returned.
     pub fn include_rank_type(mut self, new_value: &str) -> ScoreGetCall<'a, C, NC, A> {
         self._include_rank_type = Some(new_value.to_string());
         self
@@ -15025,7 +15187,7 @@ impl<'a, C, NC, A> ScoreGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
 /// Submits multiple scores to leaderboards.
 ///
 /// A builder for the *submitMultiple* method supported by a *score* resource.
-/// It is not used directly, but through a `ScoreMethods`.
+/// It is not used directly, but through a `ScoreMethods` instance.
 ///
 /// # Example
 ///
@@ -15093,7 +15255,7 @@ impl<'a, C, NC, A> ScoreSubmitMultipleCall<'a, C, NC, A> where NC: hyper::net::N
         for &field in ["alt", "language"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -15126,7 +15288,7 @@ impl<'a, C, NC, A> ScoreSubmitMultipleCall<'a, C, NC, A> where NC: hyper::net::N
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -15142,7 +15304,6 @@ impl<'a, C, NC, A> ScoreSubmitMultipleCall<'a, C, NC, A> where NC: hyper::net::N
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -15152,7 +15313,7 @@ impl<'a, C, NC, A> ScoreSubmitMultipleCall<'a, C, NC, A> where NC: hyper::net::N
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -15163,7 +15324,7 @@ impl<'a, C, NC, A> ScoreSubmitMultipleCall<'a, C, NC, A> where NC: hyper::net::N
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -15172,13 +15333,13 @@ impl<'a, C, NC, A> ScoreSubmitMultipleCall<'a, C, NC, A> where NC: hyper::net::N
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -15197,7 +15358,7 @@ impl<'a, C, NC, A> ScoreSubmitMultipleCall<'a, C, NC, A> where NC: hyper::net::N
     /// Sets the *language* query property to the given value.
     ///
     /// 
-    /// The preferred language to use for strings returned by this method.    
+    /// The preferred language to use for strings returned by this method.
     pub fn language(mut self, new_value: &str) -> ScoreSubmitMultipleCall<'a, C, NC, A> {
         self._language = Some(new_value.to_string());
         self
@@ -15258,7 +15419,7 @@ impl<'a, C, NC, A> ScoreSubmitMultipleCall<'a, C, NC, A> where NC: hyper::net::N
 /// Lists the scores in a leaderboard around (and including) a player's score.
 ///
 /// A builder for the *listWindow* method supported by a *score* resource.
-/// It is not used directly, but through a `ScoreMethods`.
+/// It is not used directly, but through a `ScoreMethods` instance.
 ///
 /// # Example
 ///
@@ -15345,7 +15506,7 @@ impl<'a, C, NC, A> ScoreListWindowCall<'a, C, NC, A> where NC: hyper::net::Netwo
         for &field in ["alt", "leaderboardId", "collection", "timeSpan", "returnTopIfAbsent", "resultsAbove", "pageToken", "maxResults", "language"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -15398,7 +15559,7 @@ impl<'a, C, NC, A> ScoreListWindowCall<'a, C, NC, A> where NC: hyper::net::Netwo
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -15410,7 +15571,6 @@ impl<'a, C, NC, A> ScoreListWindowCall<'a, C, NC, A> where NC: hyper::net::Netwo
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -15420,7 +15580,7 @@ impl<'a, C, NC, A> ScoreListWindowCall<'a, C, NC, A> where NC: hyper::net::Netwo
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -15431,7 +15591,7 @@ impl<'a, C, NC, A> ScoreListWindowCall<'a, C, NC, A> where NC: hyper::net::Netwo
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -15440,13 +15600,13 @@ impl<'a, C, NC, A> ScoreListWindowCall<'a, C, NC, A> where NC: hyper::net::Netwo
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -15458,7 +15618,7 @@ impl<'a, C, NC, A> ScoreListWindowCall<'a, C, NC, A> where NC: hyper::net::Netwo
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The ID of the leaderboard.    
+    /// The ID of the leaderboard.
     pub fn leaderboard_id(mut self, new_value: &str) -> ScoreListWindowCall<'a, C, NC, A> {
         self._leaderboard_id = new_value.to_string();
         self
@@ -15468,7 +15628,7 @@ impl<'a, C, NC, A> ScoreListWindowCall<'a, C, NC, A> where NC: hyper::net::Netwo
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The collection of scores you're requesting.    
+    /// The collection of scores you're requesting.
     pub fn collection(mut self, new_value: &str) -> ScoreListWindowCall<'a, C, NC, A> {
         self._collection = new_value.to_string();
         self
@@ -15478,7 +15638,7 @@ impl<'a, C, NC, A> ScoreListWindowCall<'a, C, NC, A> where NC: hyper::net::Netwo
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The time span for the scores and ranks you're requesting.    
+    /// The time span for the scores and ranks you're requesting.
     pub fn time_span(mut self, new_value: &str) -> ScoreListWindowCall<'a, C, NC, A> {
         self._time_span = new_value.to_string();
         self
@@ -15486,7 +15646,7 @@ impl<'a, C, NC, A> ScoreListWindowCall<'a, C, NC, A> where NC: hyper::net::Netwo
     /// Sets the *return top if absent* query property to the given value.
     ///
     /// 
-    /// True if the top scores should be returned when the player is not in the leaderboard. Defaults to true.    
+    /// True if the top scores should be returned when the player is not in the leaderboard. Defaults to true.
     pub fn return_top_if_absent(mut self, new_value: bool) -> ScoreListWindowCall<'a, C, NC, A> {
         self._return_top_if_absent = Some(new_value);
         self
@@ -15494,7 +15654,7 @@ impl<'a, C, NC, A> ScoreListWindowCall<'a, C, NC, A> where NC: hyper::net::Netwo
     /// Sets the *results above* query property to the given value.
     ///
     /// 
-    /// The preferred number of scores to return above the player's score. More scores may be returned if the player is at the bottom of the leaderboard; fewer may be returned if the player is at the top. Must be less than or equal to maxResults.    
+    /// The preferred number of scores to return above the player's score. More scores may be returned if the player is at the bottom of the leaderboard; fewer may be returned if the player is at the top. Must be less than or equal to maxResults.
     pub fn results_above(mut self, new_value: i32) -> ScoreListWindowCall<'a, C, NC, A> {
         self._results_above = Some(new_value);
         self
@@ -15502,7 +15662,7 @@ impl<'a, C, NC, A> ScoreListWindowCall<'a, C, NC, A> where NC: hyper::net::Netwo
     /// Sets the *page token* query property to the given value.
     ///
     /// 
-    /// The token returned by the previous request.    
+    /// The token returned by the previous request.
     pub fn page_token(mut self, new_value: &str) -> ScoreListWindowCall<'a, C, NC, A> {
         self._page_token = Some(new_value.to_string());
         self
@@ -15510,7 +15670,7 @@ impl<'a, C, NC, A> ScoreListWindowCall<'a, C, NC, A> where NC: hyper::net::Netwo
     /// Sets the *max results* query property to the given value.
     ///
     /// 
-    /// The maximum number of leaderboard scores to return in the response. For any response, the actual number of leaderboard scores returned may be less than the specified maxResults.    
+    /// The maximum number of leaderboard scores to return in the response. For any response, the actual number of leaderboard scores returned may be less than the specified maxResults.
     pub fn max_results(mut self, new_value: i32) -> ScoreListWindowCall<'a, C, NC, A> {
         self._max_results = Some(new_value);
         self
@@ -15518,7 +15678,7 @@ impl<'a, C, NC, A> ScoreListWindowCall<'a, C, NC, A> where NC: hyper::net::Netwo
     /// Sets the *language* query property to the given value.
     ///
     /// 
-    /// The preferred language to use for strings returned by this method.    
+    /// The preferred language to use for strings returned by this method.
     pub fn language(mut self, new_value: &str) -> ScoreListWindowCall<'a, C, NC, A> {
         self._language = Some(new_value.to_string());
         self
@@ -15579,7 +15739,7 @@ impl<'a, C, NC, A> ScoreListWindowCall<'a, C, NC, A> where NC: hyper::net::Netwo
 /// Removes a push token for the current user and application. Removing a non-existent push token will report success.
 ///
 /// A builder for the *remove* method supported by a *pushtoken* resource.
-/// It is not used directly, but through a `PushtokenMethods`.
+/// It is not used directly, but through a `PushtokenMethods` instance.
 ///
 /// # Example
 ///
@@ -15642,7 +15802,7 @@ impl<'a, C, NC, A> PushtokenRemoveCall<'a, C, NC, A> where NC: hyper::net::Netwo
         for &field in [].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -15674,7 +15834,7 @@ impl<'a, C, NC, A> PushtokenRemoveCall<'a, C, NC, A> where NC: hyper::net::Netwo
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -15690,7 +15850,6 @@ impl<'a, C, NC, A> PushtokenRemoveCall<'a, C, NC, A> where NC: hyper::net::Netwo
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -15700,7 +15859,7 @@ impl<'a, C, NC, A> PushtokenRemoveCall<'a, C, NC, A> where NC: hyper::net::Netwo
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -15711,12 +15870,12 @@ impl<'a, C, NC, A> PushtokenRemoveCall<'a, C, NC, A> where NC: hyper::net::Netwo
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = res;
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -15788,7 +15947,7 @@ impl<'a, C, NC, A> PushtokenRemoveCall<'a, C, NC, A> where NC: hyper::net::Netwo
 /// Registers a push token for the current user and application.
 ///
 /// A builder for the *update* method supported by a *pushtoken* resource.
-/// It is not used directly, but through a `PushtokenMethods`.
+/// It is not used directly, but through a `PushtokenMethods` instance.
 ///
 /// # Example
 ///
@@ -15851,7 +16010,7 @@ impl<'a, C, NC, A> PushtokenUpdateCall<'a, C, NC, A> where NC: hyper::net::Netwo
         for &field in [].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -15883,7 +16042,7 @@ impl<'a, C, NC, A> PushtokenUpdateCall<'a, C, NC, A> where NC: hyper::net::Netwo
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -15899,7 +16058,6 @@ impl<'a, C, NC, A> PushtokenUpdateCall<'a, C, NC, A> where NC: hyper::net::Netwo
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -15909,7 +16067,7 @@ impl<'a, C, NC, A> PushtokenUpdateCall<'a, C, NC, A> where NC: hyper::net::Netwo
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -15920,12 +16078,12 @@ impl<'a, C, NC, A> PushtokenUpdateCall<'a, C, NC, A> where NC: hyper::net::Netwo
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = res;
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -15997,7 +16155,7 @@ impl<'a, C, NC, A> PushtokenUpdateCall<'a, C, NC, A> where NC: hyper::net::Netwo
 /// Checks whether the games client is out of date.
 ///
 /// A builder for the *check* method supported by a *revision* resource.
-/// It is not used directly, but through a `RevisionMethods`.
+/// It is not used directly, but through a `RevisionMethods` instance.
 ///
 /// # Example
 ///
@@ -16055,7 +16213,7 @@ impl<'a, C, NC, A> RevisionCheckCall<'a, C, NC, A> where NC: hyper::net::Network
         for &field in ["alt", "clientRevision"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -16084,7 +16242,7 @@ impl<'a, C, NC, A> RevisionCheckCall<'a, C, NC, A> where NC: hyper::net::Network
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -16096,7 +16254,6 @@ impl<'a, C, NC, A> RevisionCheckCall<'a, C, NC, A> where NC: hyper::net::Network
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -16106,7 +16263,7 @@ impl<'a, C, NC, A> RevisionCheckCall<'a, C, NC, A> where NC: hyper::net::Network
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -16117,7 +16274,7 @@ impl<'a, C, NC, A> RevisionCheckCall<'a, C, NC, A> where NC: hyper::net::Network
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -16126,13 +16283,13 @@ impl<'a, C, NC, A> RevisionCheckCall<'a, C, NC, A> where NC: hyper::net::Network
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -16210,7 +16367,7 @@ impl<'a, C, NC, A> RevisionCheckCall<'a, C, NC, A> where NC: hyper::net::Network
 /// Returns a list of the event definitions in this application.
 ///
 /// A builder for the *listDefinitions* method supported by a *event* resource.
-/// It is not used directly, but through a `EventMethods`.
+/// It is not used directly, but through a `EventMethods` instance.
 ///
 /// # Example
 ///
@@ -16281,7 +16438,7 @@ impl<'a, C, NC, A> EventListDefinitionCall<'a, C, NC, A> where NC: hyper::net::N
         for &field in ["alt", "pageToken", "maxResults", "language"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -16310,7 +16467,7 @@ impl<'a, C, NC, A> EventListDefinitionCall<'a, C, NC, A> where NC: hyper::net::N
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -16322,7 +16479,6 @@ impl<'a, C, NC, A> EventListDefinitionCall<'a, C, NC, A> where NC: hyper::net::N
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -16332,7 +16488,7 @@ impl<'a, C, NC, A> EventListDefinitionCall<'a, C, NC, A> where NC: hyper::net::N
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -16343,7 +16499,7 @@ impl<'a, C, NC, A> EventListDefinitionCall<'a, C, NC, A> where NC: hyper::net::N
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -16352,13 +16508,13 @@ impl<'a, C, NC, A> EventListDefinitionCall<'a, C, NC, A> where NC: hyper::net::N
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -16368,7 +16524,7 @@ impl<'a, C, NC, A> EventListDefinitionCall<'a, C, NC, A> where NC: hyper::net::N
     /// Sets the *page token* query property to the given value.
     ///
     /// 
-    /// The token returned by the previous request.    
+    /// The token returned by the previous request.
     pub fn page_token(mut self, new_value: &str) -> EventListDefinitionCall<'a, C, NC, A> {
         self._page_token = Some(new_value.to_string());
         self
@@ -16376,7 +16532,7 @@ impl<'a, C, NC, A> EventListDefinitionCall<'a, C, NC, A> where NC: hyper::net::N
     /// Sets the *max results* query property to the given value.
     ///
     /// 
-    /// The maximum number of event definitions to return in the response, used for paging. For any response, the actual number of event definitions to return may be less than the specified maxResults.    
+    /// The maximum number of event definitions to return in the response, used for paging. For any response, the actual number of event definitions to return may be less than the specified maxResults.
     pub fn max_results(mut self, new_value: i32) -> EventListDefinitionCall<'a, C, NC, A> {
         self._max_results = Some(new_value);
         self
@@ -16384,7 +16540,7 @@ impl<'a, C, NC, A> EventListDefinitionCall<'a, C, NC, A> where NC: hyper::net::N
     /// Sets the *language* query property to the given value.
     ///
     /// 
-    /// The preferred language to use for strings returned by this method.    
+    /// The preferred language to use for strings returned by this method.
     pub fn language(mut self, new_value: &str) -> EventListDefinitionCall<'a, C, NC, A> {
         self._language = Some(new_value.to_string());
         self
@@ -16445,7 +16601,7 @@ impl<'a, C, NC, A> EventListDefinitionCall<'a, C, NC, A> where NC: hyper::net::N
 /// Records a batch of changes to the number of times events have occurred for the currently authenticated user of this application.
 ///
 /// A builder for the *record* method supported by a *event* resource.
-/// It is not used directly, but through a `EventMethods`.
+/// It is not used directly, but through a `EventMethods` instance.
 ///
 /// # Example
 ///
@@ -16513,7 +16669,7 @@ impl<'a, C, NC, A> EventRecordCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
         for &field in ["alt", "language"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -16546,7 +16702,7 @@ impl<'a, C, NC, A> EventRecordCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -16562,7 +16718,6 @@ impl<'a, C, NC, A> EventRecordCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -16572,7 +16727,7 @@ impl<'a, C, NC, A> EventRecordCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -16583,7 +16738,7 @@ impl<'a, C, NC, A> EventRecordCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -16592,13 +16747,13 @@ impl<'a, C, NC, A> EventRecordCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -16617,7 +16772,7 @@ impl<'a, C, NC, A> EventRecordCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// Sets the *language* query property to the given value.
     ///
     /// 
-    /// The preferred language to use for strings returned by this method.    
+    /// The preferred language to use for strings returned by this method.
     pub fn language(mut self, new_value: &str) -> EventRecordCall<'a, C, NC, A> {
         self._language = Some(new_value.to_string());
         self
@@ -16678,7 +16833,7 @@ impl<'a, C, NC, A> EventRecordCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
 /// Returns a list showing the current progress on events in this application for the currently authenticated user.
 ///
 /// A builder for the *listByPlayer* method supported by a *event* resource.
-/// It is not used directly, but through a `EventMethods`.
+/// It is not used directly, but through a `EventMethods` instance.
 ///
 /// # Example
 ///
@@ -16749,7 +16904,7 @@ impl<'a, C, NC, A> EventListByPlayerCall<'a, C, NC, A> where NC: hyper::net::Net
         for &field in ["alt", "pageToken", "maxResults", "language"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -16778,7 +16933,7 @@ impl<'a, C, NC, A> EventListByPlayerCall<'a, C, NC, A> where NC: hyper::net::Net
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -16790,7 +16945,6 @@ impl<'a, C, NC, A> EventListByPlayerCall<'a, C, NC, A> where NC: hyper::net::Net
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -16800,7 +16954,7 @@ impl<'a, C, NC, A> EventListByPlayerCall<'a, C, NC, A> where NC: hyper::net::Net
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -16811,7 +16965,7 @@ impl<'a, C, NC, A> EventListByPlayerCall<'a, C, NC, A> where NC: hyper::net::Net
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -16820,13 +16974,13 @@ impl<'a, C, NC, A> EventListByPlayerCall<'a, C, NC, A> where NC: hyper::net::Net
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -16836,7 +16990,7 @@ impl<'a, C, NC, A> EventListByPlayerCall<'a, C, NC, A> where NC: hyper::net::Net
     /// Sets the *page token* query property to the given value.
     ///
     /// 
-    /// The token returned by the previous request.    
+    /// The token returned by the previous request.
     pub fn page_token(mut self, new_value: &str) -> EventListByPlayerCall<'a, C, NC, A> {
         self._page_token = Some(new_value.to_string());
         self
@@ -16844,7 +16998,7 @@ impl<'a, C, NC, A> EventListByPlayerCall<'a, C, NC, A> where NC: hyper::net::Net
     /// Sets the *max results* query property to the given value.
     ///
     /// 
-    /// The maximum number of events to return in the response, used for paging. For any response, the actual number of events to return may be less than the specified maxResults.    
+    /// The maximum number of events to return in the response, used for paging. For any response, the actual number of events to return may be less than the specified maxResults.
     pub fn max_results(mut self, new_value: i32) -> EventListByPlayerCall<'a, C, NC, A> {
         self._max_results = Some(new_value);
         self
@@ -16852,7 +17006,7 @@ impl<'a, C, NC, A> EventListByPlayerCall<'a, C, NC, A> where NC: hyper::net::Net
     /// Sets the *language* query property to the given value.
     ///
     /// 
-    /// The preferred language to use for strings returned by this method.    
+    /// The preferred language to use for strings returned by this method.
     pub fn language(mut self, new_value: &str) -> EventListByPlayerCall<'a, C, NC, A> {
         self._language = Some(new_value.to_string());
         self
@@ -16913,7 +17067,7 @@ impl<'a, C, NC, A> EventListByPlayerCall<'a, C, NC, A> where NC: hyper::net::Net
 /// Report that a reward for the milestone corresponding to milestoneId for the quest corresponding to questId has been claimed by the currently authorized user.
 ///
 /// A builder for the *claim* method supported by a *questMilestone* resource.
-/// It is not used directly, but through a `QuestMilestoneMethods`.
+/// It is not used directly, but through a `QuestMilestoneMethods` instance.
 ///
 /// # Example
 ///
@@ -16975,7 +17129,7 @@ impl<'a, C, NC, A> QuestMilestoneClaimCall<'a, C, NC, A> where NC: hyper::net::N
         for &field in ["questId", "milestoneId", "requestId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -17027,7 +17181,7 @@ impl<'a, C, NC, A> QuestMilestoneClaimCall<'a, C, NC, A> where NC: hyper::net::N
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -17039,7 +17193,6 @@ impl<'a, C, NC, A> QuestMilestoneClaimCall<'a, C, NC, A> where NC: hyper::net::N
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -17049,7 +17202,7 @@ impl<'a, C, NC, A> QuestMilestoneClaimCall<'a, C, NC, A> where NC: hyper::net::N
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -17060,12 +17213,12 @@ impl<'a, C, NC, A> QuestMilestoneClaimCall<'a, C, NC, A> where NC: hyper::net::N
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = res;
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -17077,7 +17230,7 @@ impl<'a, C, NC, A> QuestMilestoneClaimCall<'a, C, NC, A> where NC: hyper::net::N
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The ID of the quest.    
+    /// The ID of the quest.
     pub fn quest_id(mut self, new_value: &str) -> QuestMilestoneClaimCall<'a, C, NC, A> {
         self._quest_id = new_value.to_string();
         self
@@ -17087,7 +17240,7 @@ impl<'a, C, NC, A> QuestMilestoneClaimCall<'a, C, NC, A> where NC: hyper::net::N
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The ID of the milestone.    
+    /// The ID of the milestone.
     pub fn milestone_id(mut self, new_value: &str) -> QuestMilestoneClaimCall<'a, C, NC, A> {
         self._milestone_id = new_value.to_string();
         self
@@ -17097,7 +17250,7 @@ impl<'a, C, NC, A> QuestMilestoneClaimCall<'a, C, NC, A> where NC: hyper::net::N
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// A numeric ID to ensure that the request is handled correctly across retries. Your client application must generate this ID randomly.    
+    /// A numeric ID to ensure that the request is handled correctly across retries. Your client application must generate this ID randomly.
     pub fn request_id(mut self, new_value: &str) -> QuestMilestoneClaimCall<'a, C, NC, A> {
         self._request_id = new_value.to_string();
         self
@@ -17158,7 +17311,7 @@ impl<'a, C, NC, A> QuestMilestoneClaimCall<'a, C, NC, A> where NC: hyper::net::N
 /// Lists all the achievement definitions for your application.
 ///
 /// A builder for the *list* method supported by a *achievementDefinition* resource.
-/// It is not used directly, but through a `AchievementDefinitionMethods`.
+/// It is not used directly, but through a `AchievementDefinitionMethods` instance.
 ///
 /// # Example
 ///
@@ -17229,7 +17382,7 @@ impl<'a, C, NC, A> AchievementDefinitionListCall<'a, C, NC, A> where NC: hyper::
         for &field in ["alt", "pageToken", "maxResults", "language"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -17258,7 +17411,7 @@ impl<'a, C, NC, A> AchievementDefinitionListCall<'a, C, NC, A> where NC: hyper::
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -17270,7 +17423,6 @@ impl<'a, C, NC, A> AchievementDefinitionListCall<'a, C, NC, A> where NC: hyper::
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -17280,7 +17432,7 @@ impl<'a, C, NC, A> AchievementDefinitionListCall<'a, C, NC, A> where NC: hyper::
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -17291,7 +17443,7 @@ impl<'a, C, NC, A> AchievementDefinitionListCall<'a, C, NC, A> where NC: hyper::
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -17300,13 +17452,13 @@ impl<'a, C, NC, A> AchievementDefinitionListCall<'a, C, NC, A> where NC: hyper::
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -17316,7 +17468,7 @@ impl<'a, C, NC, A> AchievementDefinitionListCall<'a, C, NC, A> where NC: hyper::
     /// Sets the *page token* query property to the given value.
     ///
     /// 
-    /// The token returned by the previous request.    
+    /// The token returned by the previous request.
     pub fn page_token(mut self, new_value: &str) -> AchievementDefinitionListCall<'a, C, NC, A> {
         self._page_token = Some(new_value.to_string());
         self
@@ -17324,7 +17476,7 @@ impl<'a, C, NC, A> AchievementDefinitionListCall<'a, C, NC, A> where NC: hyper::
     /// Sets the *max results* query property to the given value.
     ///
     /// 
-    /// The maximum number of achievement resources to return in the response, used for paging. For any response, the actual number of achievement resources returned may be less than the specified maxResults.    
+    /// The maximum number of achievement resources to return in the response, used for paging. For any response, the actual number of achievement resources returned may be less than the specified maxResults.
     pub fn max_results(mut self, new_value: i32) -> AchievementDefinitionListCall<'a, C, NC, A> {
         self._max_results = Some(new_value);
         self
@@ -17332,7 +17484,7 @@ impl<'a, C, NC, A> AchievementDefinitionListCall<'a, C, NC, A> where NC: hyper::
     /// Sets the *language* query property to the given value.
     ///
     /// 
-    /// The preferred language to use for strings returned by this method.    
+    /// The preferred language to use for strings returned by this method.
     pub fn language(mut self, new_value: &str) -> AchievementDefinitionListCall<'a, C, NC, A> {
         self._language = Some(new_value.to_string());
         self

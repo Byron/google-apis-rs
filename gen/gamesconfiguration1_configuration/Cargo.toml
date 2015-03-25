@@ -4,7 +4,7 @@
 [package]
 
 name = "google-gamesconfiguration1_configuration"
-version = "0.1.1+20150309"
+version = "0.1.2+20150316"
 authors = ["Sebastian Thiel <byronimo@gmail>"]
 description = "A complete library to interact with Games Configuration (protocol v1configuration)"
 repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/gamesconfiguration1_configuration"
@@ -16,7 +16,7 @@ keywords = ["gamesConfiguration", "google", "protocol", "web", "api"]
 [dependencies]
 hyper = "*"
 mime = "*"
+yup-oauth2 = "*"
 url = "*"
 serde = "*"
 serde_macros = "*"
-yup-oauth2 = "*"

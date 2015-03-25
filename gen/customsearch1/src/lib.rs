@@ -1,8 +1,8 @@
 // DO NOT EDIT !
-// This file was generated automatically from 'src/mako/lib.rs.mako'
+// This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *customsearch* crate version *0.1.1+20131205*, where *20131205* is the exact revision of the *customsearch:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.1*.
+//! This documentation was generated from *customsearch* crate version *0.1.2+20131205*, where *20131205* is the exact revision of the *customsearch:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.2*.
 //! 
 //! Everything else about the *customsearch* *v1* API can be found at the
 //! [official documentation site](https://developers.google.com/custom-search/v1/using_rest).
@@ -25,6 +25,8 @@
 //! 
 //! * **[Hub](struct.Customsearch.html)**
 //!     * a central object to maintain state and allow accessing all *Activities*
+//!     * creates [*Method Builders*](trait.MethodsBuilder.html) which in turn
+//!       allow access to individual [*Call Builders*](trait.CallBuilder.html)
 //! * **[Resources](trait.Resource.html)**
 //!     * primary types that you can apply *Activities* to
 //!     * a collection of properties and *Parts*
@@ -33,6 +35,8 @@
 //!         * never directly used in *Activities*
 //! * **[Activities](trait.CallBuilder.html)**
 //!     * operations to apply to *Resources*
+//! 
+//! All *structures* are marked with applicable traits to further categorize them and ease browsing.
 //! 
 //! Generally speaking, you can invoke *Activities* like this:
 //! 
@@ -68,7 +72,7 @@
 //! extern crate hyper;
 //! extern crate "yup-oauth2" as oauth2;
 //! extern crate "google-customsearch1" as customsearch1;
-//! use customsearch1::Result;
+//! use customsearch1::{Result, Error};
 //! # #[test] fn egal() {
 //! use std::default::Default;
 //! use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -124,15 +128,17 @@
 //!              .doit();
 //! 
 //! match result {
-//!     Result::HttpError(err) => println!("HTTPERROR: {:?}", err),
-//!     Result::MissingAPIKey => println!("Auth: Missing API Key - used if there are no scopes"),
-//!     Result::MissingToken => println!("OAuth2: Missing Token"),
-//!     Result::Cancelled => println!("Operation cancelled by user"),
-//!     Result::UploadSizeLimitExceeded(size, max_size) => println!("Upload size too big: {} of {}", size, max_size),
-//!     Result::Failure(_) => println!("General Failure (hyper::client::Response doesn't print)"),
-//!     Result::FieldClash(clashed_field) => println!("You added custom parameter which is part of builder: {:?}", clashed_field),
-//!     Result::JsonDecodeError(err) => println!("Couldn't understand server reply - maybe API needs update: {:?}", err),
-//!     Result::Success(_) => println!("Success (value doesn't print)"),
+//!     Err(e) => match e {
+//!         Error::HttpError(err) => println!("HTTPERROR: {:?}", err),
+//!         Error::MissingAPIKey => println!("Auth: Missing API Key - used if there are no scopes"),
+//!         Error::MissingToken => println!("OAuth2: Missing Token"),
+//!         Error::Cancelled => println!("Operation canceled by user"),
+//!         Error::UploadSizeLimitExceeded(size, max_size) => println!("Upload size too big: {} of {}", size, max_size),
+//!         Error::Failure(_) => println!("General Failure (hyper::client::Response doesn't print)"),
+//!         Error::FieldClash(clashed_field) => println!("You added custom parameter which is part of builder: {:?}", clashed_field),
+//!         Error::JsonDecodeError(err) => println!("Couldn't understand server reply - maybe API needs update: {:?}", err),
+//!     },
+//!     Ok(_) => println!("Success (value doesn't print)"),
 //! }
 //! # }
 //! ```
@@ -145,7 +151,7 @@
 //! When delegates handle errors or intermediate values, they may have a chance to instruct the system to retry. This 
 //! makes the system potentially resilient to all kinds of errors.
 //! 
-//! ## Uploads and Downlods
+//! ## Uploads and Downloads
 //! If a method supports downloads, the response body, which is part of the [Result](enum.Result.html), should be
 //! read by you to obtain the media.
 //! If such a method also supports a [Response Result](trait.ResponseResult.html), it will return that by default.
@@ -168,8 +174,9 @@
 //! ## Optional Parts in Server-Requests
 //! 
 //! All structures provided by this library are made to be [enocodable](trait.RequestValue.html) and 
-//! [decodable](trait.ResponseResult.html) via json. Optionals are used to indicate that partial requests are responses are valid.
-//! Most optionals are are considered [Parts](trait.Part.html) which are identifyable by name, which will be sent to 
+//! [decodable](trait.ResponseResult.html) via *json*. Optionals are used to indicate that partial requests are responses 
+//! are valid.
+//! Most optionals are are considered [Parts](trait.Part.html) which are identifiable by name, which will be sent to 
 //! the server to indicate either the set parts of the request or the desired parts in the response.
 //! 
 //! ## Builder Arguments
@@ -218,7 +225,7 @@ use std::io;
 use std::fs;
 use std::thread::sleep;
 
-pub use cmn::{MultiPartReader, ToParts, MethodInfo, Result, CallBuilder, Hub, ReadSeek, Part, ResponseResult, RequestValue, NestedType, Delegate, DefaultDelegate, ResourceMethodsBuilder, Resource, JsonServerError};
+pub use cmn::{MultiPartReader, ToParts, MethodInfo, Result, Error, CallBuilder, Hub, ReadSeek, Part, ResponseResult, RequestValue, NestedType, Delegate, DefaultDelegate, MethodsBuilder, Resource, JsonServerError};
 
 
 // ##############
@@ -242,7 +249,7 @@ pub use cmn::{MultiPartReader, ToParts, MethodInfo, Result, CallBuilder, Hub, Re
 /// extern crate hyper;
 /// extern crate "yup-oauth2" as oauth2;
 /// extern crate "google-customsearch1" as customsearch1;
-/// use customsearch1::Result;
+/// use customsearch1::{Result, Error};
 /// # #[test] fn egal() {
 /// use std::default::Default;
 /// use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -298,15 +305,17 @@ pub use cmn::{MultiPartReader, ToParts, MethodInfo, Result, CallBuilder, Hub, Re
 ///              .doit();
 /// 
 /// match result {
-///     Result::HttpError(err) => println!("HTTPERROR: {:?}", err),
-///     Result::MissingAPIKey => println!("Auth: Missing API Key - used if there are no scopes"),
-///     Result::MissingToken => println!("OAuth2: Missing Token"),
-///     Result::Cancelled => println!("Operation cancelled by user"),
-///     Result::UploadSizeLimitExceeded(size, max_size) => println!("Upload size too big: {} of {}", size, max_size),
-///     Result::Failure(_) => println!("General Failure (hyper::client::Response doesn't print)"),
-///     Result::FieldClash(clashed_field) => println!("You added custom parameter which is part of builder: {:?}", clashed_field),
-///     Result::JsonDecodeError(err) => println!("Couldn't understand server reply - maybe API needs update: {:?}", err),
-///     Result::Success(_) => println!("Success (value doesn't print)"),
+///     Err(e) => match e {
+///         Error::HttpError(err) => println!("HTTPERROR: {:?}", err),
+///         Error::MissingAPIKey => println!("Auth: Missing API Key - used if there are no scopes"),
+///         Error::MissingToken => println!("OAuth2: Missing Token"),
+///         Error::Cancelled => println!("Operation canceled by user"),
+///         Error::UploadSizeLimitExceeded(size, max_size) => println!("Upload size too big: {} of {}", size, max_size),
+///         Error::Failure(_) => println!("General Failure (hyper::client::Response doesn't print)"),
+///         Error::FieldClash(clashed_field) => println!("You added custom parameter which is part of builder: {:?}", clashed_field),
+///         Error::JsonDecodeError(err) => println!("Couldn't understand server reply - maybe API needs update: {:?}", err),
+///     },
+///     Ok(_) => println!("Success (value doesn't print)"),
 /// }
 /// # }
 /// ```
@@ -327,7 +336,7 @@ impl<'a, C, NC, A> Customsearch<C, NC, A>
         Customsearch {
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/0.1.1".to_string(),
+            _user_agent: "google-api-rust-client/0.1.2".to_string(),
             _m: PhantomData
         }
     }
@@ -337,7 +346,7 @@ impl<'a, C, NC, A> Customsearch<C, NC, A>
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/0.1.1`.
+    /// It defaults to `google-api-rust-client/0.1.2`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -357,24 +366,24 @@ impl<'a, C, NC, A> Customsearch<C, NC, A>
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct ResultImage {
-    /// no description provided    
+    /// no description provided
     pub width: i32,
-    /// no description provided    
+    /// no description provided
     #[serde(alias="contextLink")]
     pub context_link: String,
-    /// no description provided    
+    /// no description provided
     #[serde(alias="thumbnailWidth")]
     pub thumbnail_width: i32,
-    /// no description provided    
+    /// no description provided
     #[serde(alias="thumbnailLink")]
     pub thumbnail_link: String,
-    /// no description provided    
+    /// no description provided
     #[serde(alias="byteSize")]
     pub byte_size: i32,
-    /// no description provided    
+    /// no description provided
     #[serde(alias="thumbnailHeight")]
     pub thumbnail_height: i32,
-    /// no description provided    
+    /// no description provided
     pub height: i32,
 }
 
@@ -393,21 +402,21 @@ impl Part for ResultImage {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct Search {
-    /// no description provided    
+    /// no description provided
     pub promotions: Vec<Promotion>,
-    /// no description provided    
+    /// no description provided
     pub kind: String,
-    /// no description provided    
+    /// no description provided
     pub url: SearchUrl,
-    /// no description provided    
+    /// no description provided
     pub items: Vec<ResultType>,
-    /// no description provided    
+    /// no description provided
     pub context: Context,
-    /// no description provided    
+    /// no description provided
     pub queries: HashMap<String, Vec<Query>>,
-    /// no description provided    
+    /// no description provided
     pub spelling: SearchSpelling,
-    /// no description provided    
+    /// no description provided
     #[serde(alias="searchInformation")]
     pub search_information: SearchSearchInformation,
 }
@@ -421,11 +430,11 @@ impl ResponseResult for Search {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct PromotionImage {
-    /// no description provided    
+    /// no description provided
     pub source: String,
-    /// no description provided    
+    /// no description provided
     pub height: i32,
-    /// no description provided    
+    /// no description provided
     pub width: i32,
 }
 
@@ -439,10 +448,10 @@ impl Part for PromotionImage {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct SearchUrl {
-    /// no description provided    
+    /// no description provided
     #[serde(alias="type")]
     pub type_: String,
-    /// no description provided    
+    /// no description provided
     pub template: String,
 }
 
@@ -456,10 +465,10 @@ impl Part for SearchUrl {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct SearchSpelling {
-    /// no description provided    
+    /// no description provided
     #[serde(alias="correctedQuery")]
     pub corrected_query: String,
-    /// no description provided    
+    /// no description provided
     #[serde(alias="htmlCorrectedQuery")]
     pub html_corrected_query: String,
 }
@@ -474,14 +483,14 @@ impl Part for SearchSpelling {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct PromotionBodyLines {
-    /// no description provided    
+    /// no description provided
     pub url: String,
-    /// no description provided    
+    /// no description provided
     #[serde(alias="htmlTitle")]
     pub html_title: String,
-    /// no description provided    
+    /// no description provided
     pub link: String,
-    /// no description provided    
+    /// no description provided
     pub title: String,
 }
 
@@ -495,41 +504,41 @@ impl Part for PromotionBodyLines {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct ResultType {
-    /// no description provided    
+    /// no description provided
     pub kind: String,
-    /// no description provided    
+    /// no description provided
     pub labels: Vec<ResultLabels>,
-    /// no description provided    
+    /// no description provided
     pub title: String,
-    /// no description provided    
+    /// no description provided
     #[serde(alias="displayLink")]
     pub display_link: String,
-    /// no description provided    
+    /// no description provided
     #[serde(alias="cacheId")]
     pub cache_id: String,
-    /// no description provided    
+    /// no description provided
     #[serde(alias="formattedUrl")]
     pub formatted_url: String,
-    /// no description provided    
+    /// no description provided
     #[serde(alias="htmlFormattedUrl")]
     pub html_formatted_url: String,
-    /// no description provided    
+    /// no description provided
     pub pagemap: HashMap<String, Vec<HashMap<String, String>>>,
-    /// no description provided    
+    /// no description provided
     #[serde(alias="fileFormat")]
     pub file_format: String,
-    /// no description provided    
+    /// no description provided
     pub snippet: String,
-    /// no description provided    
+    /// no description provided
     #[serde(alias="htmlSnippet")]
     pub html_snippet: String,
-    /// no description provided    
+    /// no description provided
     pub link: String,
-    /// no description provided    
+    /// no description provided
     pub image: ResultImage,
-    /// no description provided    
+    /// no description provided
     pub mime: String,
-    /// no description provided    
+    /// no description provided
     #[serde(alias="htmlTitle")]
     pub html_title: String,
 }
@@ -543,9 +552,9 @@ impl Part for ResultType {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct Context {
-    /// no description provided    
+    /// no description provided
     pub facets: Vec<Vec<ContextFacets>>,
-    /// no description provided    
+    /// no description provided
     pub title: String,
 }
 
@@ -558,11 +567,11 @@ impl Part for Context {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct ContextFacets {
-    /// no description provided    
+    /// no description provided
     pub label_with_op: String,
-    /// no description provided    
+    /// no description provided
     pub anchor: String,
-    /// no description provided    
+    /// no description provided
     pub label: String,
 }
 
@@ -576,102 +585,102 @@ impl Part for ContextFacets {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct Query {
-    /// no description provided    
+    /// no description provided
     #[serde(alias="dateRestrict")]
     pub date_restrict: String,
-    /// no description provided    
+    /// no description provided
     #[serde(alias="inputEncoding")]
     pub input_encoding: String,
-    /// no description provided    
+    /// no description provided
     #[serde(alias="orTerms")]
     pub or_terms: String,
-    /// no description provided    
+    /// no description provided
     #[serde(alias="highRange")]
     pub high_range: String,
-    /// no description provided    
+    /// no description provided
     pub cx: String,
-    /// no description provided    
+    /// no description provided
     #[serde(alias="startPage")]
     pub start_page: i32,
-    /// no description provided    
+    /// no description provided
     #[serde(alias="disableCnTwTranslation")]
     pub disable_cn_tw_translation: String,
-    /// no description provided    
+    /// no description provided
     pub cr: String,
-    /// no description provided    
+    /// no description provided
     #[serde(alias="imgType")]
     pub img_type: String,
-    /// no description provided    
+    /// no description provided
     #[serde(alias="relatedSite")]
     pub related_site: String,
-    /// no description provided    
+    /// no description provided
     pub gl: String,
-    /// no description provided    
+    /// no description provided
     #[serde(alias="searchType")]
     pub search_type: String,
-    /// no description provided    
+    /// no description provided
     pub title: String,
-    /// no description provided    
+    /// no description provided
     #[serde(alias="googleHost")]
     pub google_host: String,
-    /// no description provided    
+    /// no description provided
     #[serde(alias="fileType")]
     pub file_type: String,
-    /// no description provided    
+    /// no description provided
     #[serde(alias="imgDominantColor")]
     pub img_dominant_color: String,
-    /// no description provided    
+    /// no description provided
     #[serde(alias="siteSearch")]
     pub site_search: String,
-    /// no description provided    
+    /// no description provided
     pub cref: String,
-    /// no description provided    
+    /// no description provided
     pub sort: String,
-    /// no description provided    
+    /// no description provided
     pub hq: String,
-    /// no description provided    
+    /// no description provided
     #[serde(alias="outputEncoding")]
     pub output_encoding: String,
-    /// no description provided    
+    /// no description provided
     pub safe: String,
-    /// no description provided    
+    /// no description provided
     #[serde(alias="searchTerms")]
     pub search_terms: String,
-    /// no description provided    
+    /// no description provided
     #[serde(alias="exactTerms")]
     pub exact_terms: String,
-    /// no description provided    
+    /// no description provided
     #[serde(alias="imgColorType")]
     pub img_color_type: String,
-    /// no description provided    
+    /// no description provided
     pub hl: String,
-    /// no description provided    
+    /// no description provided
     #[serde(alias="totalResults")]
     pub total_results: String,
-    /// no description provided    
+    /// no description provided
     #[serde(alias="lowRange")]
     pub low_range: String,
-    /// no description provided    
+    /// no description provided
     pub count: i32,
-    /// no description provided    
+    /// no description provided
     #[serde(alias="imgSize")]
     pub img_size: String,
-    /// no description provided    
+    /// no description provided
     pub language: String,
-    /// no description provided    
+    /// no description provided
     pub rights: String,
-    /// no description provided    
+    /// no description provided
     #[serde(alias="startIndex")]
     pub start_index: i32,
-    /// no description provided    
+    /// no description provided
     #[serde(alias="excludeTerms")]
     pub exclude_terms: String,
-    /// no description provided    
+    /// no description provided
     pub filter: String,
-    /// no description provided    
+    /// no description provided
     #[serde(alias="linkSite")]
     pub link_site: String,
-    /// no description provided    
+    /// no description provided
     #[serde(alias="siteSearchFilter")]
     pub site_search_filter: String,
 }
@@ -685,20 +694,20 @@ impl Part for Query {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct Promotion {
-    /// no description provided    
+    /// no description provided
     #[serde(alias="bodyLines")]
     pub body_lines: Vec<PromotionBodyLines>,
-    /// no description provided    
+    /// no description provided
     pub title: String,
-    /// no description provided    
+    /// no description provided
     pub link: String,
-    /// no description provided    
+    /// no description provided
     #[serde(alias="displayLink")]
     pub display_link: String,
-    /// no description provided    
+    /// no description provided
     #[serde(alias="htmlTitle")]
     pub html_title: String,
-    /// no description provided    
+    /// no description provided
     pub image: PromotionImage,
 }
 
@@ -711,16 +720,16 @@ impl Part for Promotion {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct SearchSearchInformation {
-    /// no description provided    
+    /// no description provided
     #[serde(alias="formattedSearchTime")]
     pub formatted_search_time: String,
-    /// no description provided    
+    /// no description provided
     #[serde(alias="formattedTotalResults")]
     pub formatted_total_results: String,
-    /// no description provided    
+    /// no description provided
     #[serde(alias="totalResults")]
     pub total_results: String,
-    /// no description provided    
+    /// no description provided
     #[serde(alias="searchTime")]
     pub search_time: f64,
 }
@@ -735,12 +744,12 @@ impl Part for SearchSearchInformation {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct ResultLabels {
-    /// no description provided    
+    /// no description provided
     #[serde(alias="displayName")]
     pub display_name: String,
-    /// no description provided    
+    /// no description provided
     pub label_with_op: String,
-    /// no description provided    
+    /// no description provided
     pub name: String,
 }
 
@@ -787,13 +796,17 @@ pub struct CseMethods<'a, C, NC, A>
     hub: &'a Customsearch<C, NC, A>,
 }
 
-impl<'a, C, NC, A> ResourceMethodsBuilder for CseMethods<'a, C, NC, A> {}
+impl<'a, C, NC, A> MethodsBuilder for CseMethods<'a, C, NC, A> {}
 
 impl<'a, C, NC, A> CseMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Returns metadata about the search performed, metadata about the custom search engine used for the search, and the search results.    
+    /// Returns metadata about the search performed, metadata about the custom search engine used for the search, and the search results.
+    /// 
+    /// # Arguments
+    ///
+    /// * `q` - Query
     pub fn list(&self, q: &str) -> CseListCall<'a, C, NC, A> {
         CseListCall {
             hub: self.hub,
@@ -846,7 +859,7 @@ impl<'a, C, NC, A> CseMethods<'a, C, NC, A> {
 /// Returns metadata about the search performed, metadata about the custom search engine used for the search, and the search results.
 ///
 /// A builder for the *list* method supported by a *cse* resource.
-/// It is not used directly, but through a `CseMethods`.
+/// It is not used directly, but through a `CseMethods` instance.
 ///
 /// # Example
 ///
@@ -1058,7 +1071,7 @@ impl<'a, C, NC, A> CseListCall<'a, C, NC, A> where NC: hyper::net::NetworkConnec
         for &field in ["alt", "q", "start", "sort", "siteSearchFilter", "siteSearch", "searchType", "safe", "rights", "relatedSite", "orTerms", "num", "lr", "lowRange", "linkSite", "imgType", "imgSize", "imgDominantColor", "imgColorType", "hq", "hl", "highRange", "googlehost", "gl", "filter", "fileType", "excludeTerms", "exactTerms", "dateRestrict", "cx", "cref", "cr", "c2coff"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -1077,7 +1090,7 @@ impl<'a, C, NC, A> CseListCall<'a, C, NC, A> where NC: hyper::net::NetworkConnec
             Some(value) => params.push(("key", value)),
             None => {
                 dlg.finished(false);
-                return Result::MissingAPIKey
+                return Err(Error::MissingAPIKey)
             }
         }
 
@@ -1097,7 +1110,6 @@ impl<'a, C, NC, A> CseListCall<'a, C, NC, A> where NC: hyper::net::NetworkConnec
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -1107,7 +1119,7 @@ impl<'a, C, NC, A> CseListCall<'a, C, NC, A> where NC: hyper::net::NetworkConnec
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -1118,7 +1130,7 @@ impl<'a, C, NC, A> CseListCall<'a, C, NC, A> where NC: hyper::net::NetworkConnec
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -1127,13 +1139,13 @@ impl<'a, C, NC, A> CseListCall<'a, C, NC, A> where NC: hyper::net::NetworkConnec
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -1145,7 +1157,7 @@ impl<'a, C, NC, A> CseListCall<'a, C, NC, A> where NC: hyper::net::NetworkConnec
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Query    
+    /// Query
     pub fn q(mut self, new_value: &str) -> CseListCall<'a, C, NC, A> {
         self._q = new_value.to_string();
         self
@@ -1153,7 +1165,7 @@ impl<'a, C, NC, A> CseListCall<'a, C, NC, A> where NC: hyper::net::NetworkConnec
     /// Sets the *start* query property to the given value.
     ///
     /// 
-    /// The index of the first result to return    
+    /// The index of the first result to return
     pub fn start(mut self, new_value: u32) -> CseListCall<'a, C, NC, A> {
         self._start = Some(new_value);
         self
@@ -1161,7 +1173,7 @@ impl<'a, C, NC, A> CseListCall<'a, C, NC, A> where NC: hyper::net::NetworkConnec
     /// Sets the *sort* query property to the given value.
     ///
     /// 
-    /// The sort expression to apply to the results    
+    /// The sort expression to apply to the results
     pub fn sort(mut self, new_value: &str) -> CseListCall<'a, C, NC, A> {
         self._sort = Some(new_value.to_string());
         self
@@ -1169,7 +1181,7 @@ impl<'a, C, NC, A> CseListCall<'a, C, NC, A> where NC: hyper::net::NetworkConnec
     /// Sets the *site search filter* query property to the given value.
     ///
     /// 
-    /// Controls whether to include or exclude results from the site named in the as_sitesearch parameter    
+    /// Controls whether to include or exclude results from the site named in the as_sitesearch parameter
     pub fn site_search_filter(mut self, new_value: &str) -> CseListCall<'a, C, NC, A> {
         self._site_search_filter = Some(new_value.to_string());
         self
@@ -1177,7 +1189,7 @@ impl<'a, C, NC, A> CseListCall<'a, C, NC, A> where NC: hyper::net::NetworkConnec
     /// Sets the *site search* query property to the given value.
     ///
     /// 
-    /// Specifies all search results should be pages from a given site    
+    /// Specifies all search results should be pages from a given site
     pub fn site_search(mut self, new_value: &str) -> CseListCall<'a, C, NC, A> {
         self._site_search = Some(new_value.to_string());
         self
@@ -1185,7 +1197,7 @@ impl<'a, C, NC, A> CseListCall<'a, C, NC, A> where NC: hyper::net::NetworkConnec
     /// Sets the *search type* query property to the given value.
     ///
     /// 
-    /// Specifies the search type: image.    
+    /// Specifies the search type: image.
     pub fn search_type(mut self, new_value: &str) -> CseListCall<'a, C, NC, A> {
         self._search_type = Some(new_value.to_string());
         self
@@ -1193,7 +1205,7 @@ impl<'a, C, NC, A> CseListCall<'a, C, NC, A> where NC: hyper::net::NetworkConnec
     /// Sets the *safe* query property to the given value.
     ///
     /// 
-    /// Search safety level    
+    /// Search safety level
     pub fn safe(mut self, new_value: &str) -> CseListCall<'a, C, NC, A> {
         self._safe = Some(new_value.to_string());
         self
@@ -1201,7 +1213,7 @@ impl<'a, C, NC, A> CseListCall<'a, C, NC, A> where NC: hyper::net::NetworkConnec
     /// Sets the *rights* query property to the given value.
     ///
     /// 
-    /// Filters based on licensing. Supported values include: cc_publicdomain, cc_attribute, cc_sharealike, cc_noncommercial, cc_nonderived and combinations of these.    
+    /// Filters based on licensing. Supported values include: cc_publicdomain, cc_attribute, cc_sharealike, cc_noncommercial, cc_nonderived and combinations of these.
     pub fn rights(mut self, new_value: &str) -> CseListCall<'a, C, NC, A> {
         self._rights = Some(new_value.to_string());
         self
@@ -1209,7 +1221,7 @@ impl<'a, C, NC, A> CseListCall<'a, C, NC, A> where NC: hyper::net::NetworkConnec
     /// Sets the *related site* query property to the given value.
     ///
     /// 
-    /// Specifies that all search results should be pages that are related to the specified URL    
+    /// Specifies that all search results should be pages that are related to the specified URL
     pub fn related_site(mut self, new_value: &str) -> CseListCall<'a, C, NC, A> {
         self._related_site = Some(new_value.to_string());
         self
@@ -1217,7 +1229,7 @@ impl<'a, C, NC, A> CseListCall<'a, C, NC, A> where NC: hyper::net::NetworkConnec
     /// Sets the *or terms* query property to the given value.
     ///
     /// 
-    /// Provides additional search terms to check for in a document, where each document in the search results must contain at least one of the additional search terms    
+    /// Provides additional search terms to check for in a document, where each document in the search results must contain at least one of the additional search terms
     pub fn or_terms(mut self, new_value: &str) -> CseListCall<'a, C, NC, A> {
         self._or_terms = Some(new_value.to_string());
         self
@@ -1225,7 +1237,7 @@ impl<'a, C, NC, A> CseListCall<'a, C, NC, A> where NC: hyper::net::NetworkConnec
     /// Sets the *num* query property to the given value.
     ///
     /// 
-    /// Number of search results to return    
+    /// Number of search results to return
     pub fn num(mut self, new_value: u32) -> CseListCall<'a, C, NC, A> {
         self._num = Some(new_value);
         self
@@ -1233,7 +1245,7 @@ impl<'a, C, NC, A> CseListCall<'a, C, NC, A> where NC: hyper::net::NetworkConnec
     /// Sets the *lr* query property to the given value.
     ///
     /// 
-    /// The language restriction for the search results    
+    /// The language restriction for the search results
     pub fn lr(mut self, new_value: &str) -> CseListCall<'a, C, NC, A> {
         self._lr = Some(new_value.to_string());
         self
@@ -1241,7 +1253,7 @@ impl<'a, C, NC, A> CseListCall<'a, C, NC, A> where NC: hyper::net::NetworkConnec
     /// Sets the *low range* query property to the given value.
     ///
     /// 
-    /// Creates a range in form as_nlo value..as_nhi value and attempts to append it to query    
+    /// Creates a range in form as_nlo value..as_nhi value and attempts to append it to query
     pub fn low_range(mut self, new_value: &str) -> CseListCall<'a, C, NC, A> {
         self._low_range = Some(new_value.to_string());
         self
@@ -1249,7 +1261,7 @@ impl<'a, C, NC, A> CseListCall<'a, C, NC, A> where NC: hyper::net::NetworkConnec
     /// Sets the *link site* query property to the given value.
     ///
     /// 
-    /// Specifies that all search results should contain a link to a particular URL    
+    /// Specifies that all search results should contain a link to a particular URL
     pub fn link_site(mut self, new_value: &str) -> CseListCall<'a, C, NC, A> {
         self._link_site = Some(new_value.to_string());
         self
@@ -1257,7 +1269,7 @@ impl<'a, C, NC, A> CseListCall<'a, C, NC, A> where NC: hyper::net::NetworkConnec
     /// Sets the *img type* query property to the given value.
     ///
     /// 
-    /// Returns images of a type, which can be one of: clipart, face, lineart, news, and photo.    
+    /// Returns images of a type, which can be one of: clipart, face, lineart, news, and photo.
     pub fn img_type(mut self, new_value: &str) -> CseListCall<'a, C, NC, A> {
         self._img_type = Some(new_value.to_string());
         self
@@ -1265,7 +1277,7 @@ impl<'a, C, NC, A> CseListCall<'a, C, NC, A> where NC: hyper::net::NetworkConnec
     /// Sets the *img size* query property to the given value.
     ///
     /// 
-    /// Returns images of a specified size, where size can be one of: icon, small, medium, large, xlarge, xxlarge, and huge.    
+    /// Returns images of a specified size, where size can be one of: icon, small, medium, large, xlarge, xxlarge, and huge.
     pub fn img_size(mut self, new_value: &str) -> CseListCall<'a, C, NC, A> {
         self._img_size = Some(new_value.to_string());
         self
@@ -1273,7 +1285,7 @@ impl<'a, C, NC, A> CseListCall<'a, C, NC, A> where NC: hyper::net::NetworkConnec
     /// Sets the *img dominant color* query property to the given value.
     ///
     /// 
-    /// Returns images of a specific dominant color: yellow, green, teal, blue, purple, pink, white, gray, black and brown.    
+    /// Returns images of a specific dominant color: yellow, green, teal, blue, purple, pink, white, gray, black and brown.
     pub fn img_dominant_color(mut self, new_value: &str) -> CseListCall<'a, C, NC, A> {
         self._img_dominant_color = Some(new_value.to_string());
         self
@@ -1281,7 +1293,7 @@ impl<'a, C, NC, A> CseListCall<'a, C, NC, A> where NC: hyper::net::NetworkConnec
     /// Sets the *img color type* query property to the given value.
     ///
     /// 
-    /// Returns black and white, grayscale, or color images: mono, gray, and color.    
+    /// Returns black and white, grayscale, or color images: mono, gray, and color.
     pub fn img_color_type(mut self, new_value: &str) -> CseListCall<'a, C, NC, A> {
         self._img_color_type = Some(new_value.to_string());
         self
@@ -1289,7 +1301,7 @@ impl<'a, C, NC, A> CseListCall<'a, C, NC, A> where NC: hyper::net::NetworkConnec
     /// Sets the *hq* query property to the given value.
     ///
     /// 
-    /// Appends the extra query terms to the query.    
+    /// Appends the extra query terms to the query.
     pub fn hq(mut self, new_value: &str) -> CseListCall<'a, C, NC, A> {
         self._hq = Some(new_value.to_string());
         self
@@ -1297,7 +1309,7 @@ impl<'a, C, NC, A> CseListCall<'a, C, NC, A> where NC: hyper::net::NetworkConnec
     /// Sets the *hl* query property to the given value.
     ///
     /// 
-    /// Sets the user interface language.    
+    /// Sets the user interface language.
     pub fn hl(mut self, new_value: &str) -> CseListCall<'a, C, NC, A> {
         self._hl = Some(new_value.to_string());
         self
@@ -1305,7 +1317,7 @@ impl<'a, C, NC, A> CseListCall<'a, C, NC, A> where NC: hyper::net::NetworkConnec
     /// Sets the *high range* query property to the given value.
     ///
     /// 
-    /// Creates a range in form as_nlo value..as_nhi value and attempts to append it to query    
+    /// Creates a range in form as_nlo value..as_nhi value and attempts to append it to query
     pub fn high_range(mut self, new_value: &str) -> CseListCall<'a, C, NC, A> {
         self._high_range = Some(new_value.to_string());
         self
@@ -1313,7 +1325,7 @@ impl<'a, C, NC, A> CseListCall<'a, C, NC, A> where NC: hyper::net::NetworkConnec
     /// Sets the *googlehost* query property to the given value.
     ///
     /// 
-    /// The local Google domain to use to perform the search.    
+    /// The local Google domain to use to perform the search.
     pub fn googlehost(mut self, new_value: &str) -> CseListCall<'a, C, NC, A> {
         self._googlehost = Some(new_value.to_string());
         self
@@ -1321,7 +1333,7 @@ impl<'a, C, NC, A> CseListCall<'a, C, NC, A> where NC: hyper::net::NetworkConnec
     /// Sets the *gl* query property to the given value.
     ///
     /// 
-    /// Geolocation of end user.    
+    /// Geolocation of end user.
     pub fn gl(mut self, new_value: &str) -> CseListCall<'a, C, NC, A> {
         self._gl = Some(new_value.to_string());
         self
@@ -1329,7 +1341,7 @@ impl<'a, C, NC, A> CseListCall<'a, C, NC, A> where NC: hyper::net::NetworkConnec
     /// Sets the *filter* query property to the given value.
     ///
     /// 
-    /// Controls turning on or off the duplicate content filter.    
+    /// Controls turning on or off the duplicate content filter.
     pub fn filter(mut self, new_value: &str) -> CseListCall<'a, C, NC, A> {
         self._filter = Some(new_value.to_string());
         self
@@ -1337,7 +1349,7 @@ impl<'a, C, NC, A> CseListCall<'a, C, NC, A> where NC: hyper::net::NetworkConnec
     /// Sets the *file type* query property to the given value.
     ///
     /// 
-    /// Returns images of a specified type. Some of the allowed values are: bmp, gif, png, jpg, svg, pdf, ...    
+    /// Returns images of a specified type. Some of the allowed values are: bmp, gif, png, jpg, svg, pdf, ...
     pub fn file_type(mut self, new_value: &str) -> CseListCall<'a, C, NC, A> {
         self._file_type = Some(new_value.to_string());
         self
@@ -1345,7 +1357,7 @@ impl<'a, C, NC, A> CseListCall<'a, C, NC, A> where NC: hyper::net::NetworkConnec
     /// Sets the *exclude terms* query property to the given value.
     ///
     /// 
-    /// Identifies a word or phrase that should not appear in any documents in the search results    
+    /// Identifies a word or phrase that should not appear in any documents in the search results
     pub fn exclude_terms(mut self, new_value: &str) -> CseListCall<'a, C, NC, A> {
         self._exclude_terms = Some(new_value.to_string());
         self
@@ -1353,7 +1365,7 @@ impl<'a, C, NC, A> CseListCall<'a, C, NC, A> where NC: hyper::net::NetworkConnec
     /// Sets the *exact terms* query property to the given value.
     ///
     /// 
-    /// Identifies a phrase that all documents in the search results must contain    
+    /// Identifies a phrase that all documents in the search results must contain
     pub fn exact_terms(mut self, new_value: &str) -> CseListCall<'a, C, NC, A> {
         self._exact_terms = Some(new_value.to_string());
         self
@@ -1361,7 +1373,7 @@ impl<'a, C, NC, A> CseListCall<'a, C, NC, A> where NC: hyper::net::NetworkConnec
     /// Sets the *date restrict* query property to the given value.
     ///
     /// 
-    /// Specifies all search results are from a time period    
+    /// Specifies all search results are from a time period
     pub fn date_restrict(mut self, new_value: &str) -> CseListCall<'a, C, NC, A> {
         self._date_restrict = Some(new_value.to_string());
         self
@@ -1369,7 +1381,7 @@ impl<'a, C, NC, A> CseListCall<'a, C, NC, A> where NC: hyper::net::NetworkConnec
     /// Sets the *cx* query property to the given value.
     ///
     /// 
-    /// The custom search engine ID to scope this search query    
+    /// The custom search engine ID to scope this search query
     pub fn cx(mut self, new_value: &str) -> CseListCall<'a, C, NC, A> {
         self._cx = Some(new_value.to_string());
         self
@@ -1377,7 +1389,7 @@ impl<'a, C, NC, A> CseListCall<'a, C, NC, A> where NC: hyper::net::NetworkConnec
     /// Sets the *cref* query property to the given value.
     ///
     /// 
-    /// The URL of a linked custom search engine    
+    /// The URL of a linked custom search engine
     pub fn cref(mut self, new_value: &str) -> CseListCall<'a, C, NC, A> {
         self._cref = Some(new_value.to_string());
         self
@@ -1385,7 +1397,7 @@ impl<'a, C, NC, A> CseListCall<'a, C, NC, A> where NC: hyper::net::NetworkConnec
     /// Sets the *cr* query property to the given value.
     ///
     /// 
-    /// Country restrict(s).    
+    /// Country restrict(s).
     pub fn cr(mut self, new_value: &str) -> CseListCall<'a, C, NC, A> {
         self._cr = Some(new_value.to_string());
         self
@@ -1393,7 +1405,7 @@ impl<'a, C, NC, A> CseListCall<'a, C, NC, A> where NC: hyper::net::NetworkConnec
     /// Sets the *c2coff* query property to the given value.
     ///
     /// 
-    /// Turns off the translation between zh-CN and zh-TW.    
+    /// Turns off the translation between zh-CN and zh-TW.
     pub fn c2coff(mut self, new_value: &str) -> CseListCall<'a, C, NC, A> {
         self._c2coff = Some(new_value.to_string());
         self

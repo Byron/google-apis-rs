@@ -4,7 +4,7 @@
 [package]
 
 name = "google-translate2"
-version = "0.1.1+20141123"
+version = "0.1.2+20141123"
 authors = ["Sebastian Thiel <byronimo@gmail>"]
 description = "A complete library to interact with translate (protocol v2)"
 repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/translate2"
@@ -16,7 +16,7 @@ keywords = ["translate", "google", "protocol", "web", "api"]
 [dependencies]
 hyper = "*"
 mime = "*"
+yup-oauth2 = "*"
 url = "*"
 serde = "*"
 serde_macros = "*"
-yup-oauth2 = "*"

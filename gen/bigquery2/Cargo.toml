@@ -4,7 +4,7 @@
 [package]
 
 name = "google-bigquery2"
-version = "0.1.1+20141112"
+version = "0.1.2+20150303"
 authors = ["Sebastian Thiel <byronimo@gmail>"]
 description = "A complete library to interact with bigquery (protocol v2)"
 repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/bigquery2"
@@ -16,7 +16,7 @@ keywords = ["bigquery", "google", "protocol", "web", "api"]
 [dependencies]
 hyper = "*"
 mime = "*"
+yup-oauth2 = "*"
 url = "*"
 serde = "*"
 serde_macros = "*"
-yup-oauth2 = "*"

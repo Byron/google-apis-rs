@@ -1,8 +1,8 @@
 // DO NOT EDIT !
-// This file was generated automatically from 'src/mako/lib.rs.mako'
+// This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *Android Publisher* crate version *0.1.1+20150128*, where *20150128* is the exact revision of the *androidpublisher:v2* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.1*.
+//! This documentation was generated from *Android Publisher* crate version *0.1.2+20150128*, where *20150128* is the exact revision of the *androidpublisher:v2* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.2*.
 //! 
 //! Everything else about the *Android Publisher* *v2* API can be found at the
 //! [official documentation site](https://developers.google.com/android-publisher).
@@ -35,6 +35,8 @@
 //! 
 //! * **[Hub](struct.AndroidPublisher.html)**
 //!     * a central object to maintain state and allow accessing all *Activities*
+//!     * creates [*Method Builders*](trait.MethodsBuilder.html) which in turn
+//!       allow access to individual [*Call Builders*](trait.CallBuilder.html)
 //! * **[Resources](trait.Resource.html)**
 //!     * primary types that you can apply *Activities* to
 //!     * a collection of properties and *Parts*
@@ -43,6 +45,8 @@
 //!         * never directly used in *Activities*
 //! * **[Activities](trait.CallBuilder.html)**
 //!     * operations to apply to *Resources*
+//! 
+//! All *structures* are marked with applicable traits to further categorize them and ease browsing.
 //! 
 //! Generally speaking, you can invoke *Activities* like this:
 //! 
@@ -82,7 +86,7 @@
 //! extern crate "yup-oauth2" as oauth2;
 //! extern crate "google-androidpublisher2" as androidpublisher2;
 //! use androidpublisher2::InAppProduct;
-//! use androidpublisher2::Result;
+//! use androidpublisher2::{Result, Error};
 //! # #[test] fn egal() {
 //! use std::default::Default;
 //! use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -113,15 +117,17 @@
 //!              .doit();
 //! 
 //! match result {
-//!     Result::HttpError(err) => println!("HTTPERROR: {:?}", err),
-//!     Result::MissingAPIKey => println!("Auth: Missing API Key - used if there are no scopes"),
-//!     Result::MissingToken => println!("OAuth2: Missing Token"),
-//!     Result::Cancelled => println!("Operation cancelled by user"),
-//!     Result::UploadSizeLimitExceeded(size, max_size) => println!("Upload size too big: {} of {}", size, max_size),
-//!     Result::Failure(_) => println!("General Failure (hyper::client::Response doesn't print)"),
-//!     Result::FieldClash(clashed_field) => println!("You added custom parameter which is part of builder: {:?}", clashed_field),
-//!     Result::JsonDecodeError(err) => println!("Couldn't understand server reply - maybe API needs update: {:?}", err),
-//!     Result::Success(_) => println!("Success (value doesn't print)"),
+//!     Err(e) => match e {
+//!         Error::HttpError(err) => println!("HTTPERROR: {:?}", err),
+//!         Error::MissingAPIKey => println!("Auth: Missing API Key - used if there are no scopes"),
+//!         Error::MissingToken => println!("OAuth2: Missing Token"),
+//!         Error::Cancelled => println!("Operation canceled by user"),
+//!         Error::UploadSizeLimitExceeded(size, max_size) => println!("Upload size too big: {} of {}", size, max_size),
+//!         Error::Failure(_) => println!("General Failure (hyper::client::Response doesn't print)"),
+//!         Error::FieldClash(clashed_field) => println!("You added custom parameter which is part of builder: {:?}", clashed_field),
+//!         Error::JsonDecodeError(err) => println!("Couldn't understand server reply - maybe API needs update: {:?}", err),
+//!     },
+//!     Ok(_) => println!("Success (value doesn't print)"),
 //! }
 //! # }
 //! ```
@@ -134,7 +140,7 @@
 //! When delegates handle errors or intermediate values, they may have a chance to instruct the system to retry. This 
 //! makes the system potentially resilient to all kinds of errors.
 //! 
-//! ## Uploads and Downlods
+//! ## Uploads and Downloads
 //! If a method supports downloads, the response body, which is part of the [Result](enum.Result.html), should be
 //! read by you to obtain the media.
 //! If such a method also supports a [Response Result](trait.ResponseResult.html), it will return that by default.
@@ -157,8 +163,9 @@
 //! ## Optional Parts in Server-Requests
 //! 
 //! All structures provided by this library are made to be [enocodable](trait.RequestValue.html) and 
-//! [decodable](trait.ResponseResult.html) via json. Optionals are used to indicate that partial requests are responses are valid.
-//! Most optionals are are considered [Parts](trait.Part.html) which are identifyable by name, which will be sent to 
+//! [decodable](trait.ResponseResult.html) via *json*. Optionals are used to indicate that partial requests are responses 
+//! are valid.
+//! Most optionals are are considered [Parts](trait.Part.html) which are identifiable by name, which will be sent to 
 //! the server to indicate either the set parts of the request or the desired parts in the response.
 //! 
 //! ## Builder Arguments
@@ -207,7 +214,7 @@ use std::io;
 use std::fs;
 use std::thread::sleep;
 
-pub use cmn::{MultiPartReader, ToParts, MethodInfo, Result, CallBuilder, Hub, ReadSeek, Part, ResponseResult, RequestValue, NestedType, Delegate, DefaultDelegate, ResourceMethodsBuilder, Resource, JsonServerError};
+pub use cmn::{MultiPartReader, ToParts, MethodInfo, Result, Error, CallBuilder, Hub, ReadSeek, Part, ResponseResult, RequestValue, NestedType, Delegate, DefaultDelegate, MethodsBuilder, Resource, JsonServerError};
 
 
 // ##############
@@ -254,7 +261,7 @@ impl Default for Scope {
 /// extern crate "yup-oauth2" as oauth2;
 /// extern crate "google-androidpublisher2" as androidpublisher2;
 /// use androidpublisher2::InAppProduct;
-/// use androidpublisher2::Result;
+/// use androidpublisher2::{Result, Error};
 /// # #[test] fn egal() {
 /// use std::default::Default;
 /// use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -285,15 +292,17 @@ impl Default for Scope {
 ///              .doit();
 /// 
 /// match result {
-///     Result::HttpError(err) => println!("HTTPERROR: {:?}", err),
-///     Result::MissingAPIKey => println!("Auth: Missing API Key - used if there are no scopes"),
-///     Result::MissingToken => println!("OAuth2: Missing Token"),
-///     Result::Cancelled => println!("Operation cancelled by user"),
-///     Result::UploadSizeLimitExceeded(size, max_size) => println!("Upload size too big: {} of {}", size, max_size),
-///     Result::Failure(_) => println!("General Failure (hyper::client::Response doesn't print)"),
-///     Result::FieldClash(clashed_field) => println!("You added custom parameter which is part of builder: {:?}", clashed_field),
-///     Result::JsonDecodeError(err) => println!("Couldn't understand server reply - maybe API needs update: {:?}", err),
-///     Result::Success(_) => println!("Success (value doesn't print)"),
+///     Err(e) => match e {
+///         Error::HttpError(err) => println!("HTTPERROR: {:?}", err),
+///         Error::MissingAPIKey => println!("Auth: Missing API Key - used if there are no scopes"),
+///         Error::MissingToken => println!("OAuth2: Missing Token"),
+///         Error::Cancelled => println!("Operation canceled by user"),
+///         Error::UploadSizeLimitExceeded(size, max_size) => println!("Upload size too big: {} of {}", size, max_size),
+///         Error::Failure(_) => println!("General Failure (hyper::client::Response doesn't print)"),
+///         Error::FieldClash(clashed_field) => println!("You added custom parameter which is part of builder: {:?}", clashed_field),
+///         Error::JsonDecodeError(err) => println!("Couldn't understand server reply - maybe API needs update: {:?}", err),
+///     },
+///     Ok(_) => println!("Success (value doesn't print)"),
 /// }
 /// # }
 /// ```
@@ -314,7 +323,7 @@ impl<'a, C, NC, A> AndroidPublisher<C, NC, A>
         AndroidPublisher {
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/0.1.1".to_string(),
+            _user_agent: "google-api-rust-client/0.1.2".to_string(),
             _m: PhantomData
         }
     }
@@ -330,7 +339,7 @@ impl<'a, C, NC, A> AndroidPublisher<C, NC, A>
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/0.1.1`.
+    /// It defaults to `google-api-rust-client/0.1.2`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -350,7 +359,7 @@ impl<'a, C, NC, A> AndroidPublisher<C, NC, A>
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct InappproductsUpdateResponse {
-    /// no description provided    
+    /// no description provided
     pub inappproduct: InAppProduct,
 }
 
@@ -371,32 +380,32 @@ impl Part for InappproductsUpdateResponse {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct InAppProduct {
-    /// The stock-keeping-unit (SKU) of the product, unique within an app.    
+    /// The stock-keeping-unit (SKU) of the product, unique within an app.
     pub sku: Option<String>,
-    /// no description provided    
+    /// no description provided
     pub status: Option<String>,
-    /// The period of the subscription (if any), i.e. period at which payments must happen. Defined as ISO 8601 duration, i.e. "P1M" for 1 month period.    
+    /// The period of the subscription (if any), i.e. period at which payments must happen. Defined as ISO 8601 duration, i.e. "P1M" for 1 month period.
     #[serde(alias="subscriptionPeriod")]
     pub subscription_period: Option<String>,
-    /// Definition of a season for a seasonal subscription. Can be defined only for yearly subscriptions.    
+    /// Definition of a season for a seasonal subscription. Can be defined only for yearly subscriptions.
     pub season: Option<Season>,
-    /// The package name of the parent app.    
+    /// The package name of the parent app.
     #[serde(alias="packageName")]
     pub package_name: Option<String>,
-    /// List of localized title and description data.    
+    /// List of localized title and description data.
     pub listings: Option<HashMap<String, InAppProductListing>>,
-    /// Trial period, specified in ISO 8601 format. Acceptable values are anything between "P7D" (seven days) and "P999D" (999 days). Seasonal subscriptions cannot have a trial period.    
+    /// Trial period, specified in ISO 8601 format. Acceptable values are anything between "P7D" (seven days) and "P999D" (999 days). Seasonal subscriptions cannot have a trial period.
     #[serde(alias="trialPeriod")]
     pub trial_period: Option<String>,
-    /// Purchase type enum value. Unmodifiable after creation.    
+    /// Purchase type enum value. Unmodifiable after creation.
     #[serde(alias="purchaseType")]
     pub purchase_type: Option<String>,
-    /// The default language of the localized data, as defined by BCP 47. e.g. "en-US", "en-GB".    
+    /// The default language of the localized data, as defined by BCP 47. e.g. "en-US", "en-GB".
     #[serde(alias="defaultLanguage")]
     pub default_language: Option<String>,
-    /// Prices per buyer region. None of these prices should be zero. In-app products can never be free.    
+    /// Prices per buyer region. None of these prices should be zero. In-app products can never be free.
     pub prices: Option<HashMap<String, Price>>,
-    /// Default price cannot be zero. In-app products can never be free. Default price is always in the developer's Checkout merchant currency.    
+    /// Default price cannot be zero. In-app products can never be free. Default price is always in the developer's Checkout merchant currency.
     #[serde(alias="defaultPrice")]
     pub default_price: Option<Price>,
 }
@@ -417,7 +426,7 @@ impl ResponseResult for InAppProduct {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct ImagesListResponse {
-    /// no description provided    
+    /// no description provided
     pub images: Vec<Image>,
 }
 
@@ -435,7 +444,7 @@ impl ResponseResult for ImagesListResponse {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct ExpansionFilesUploadResponse {
-    /// no description provided    
+    /// no description provided
     #[serde(alias="expansionFile")]
     pub expansion_file: ExpansionFile,
 }
@@ -449,10 +458,10 @@ impl ResponseResult for ExpansionFilesUploadResponse {}
 /// 
 #[derive(Default, Clone, Debug, Serialize)]
 pub struct SubscriptionDeferralInfo {
-    /// The expected expiry time for the subscription. If the current expiry time for the subscription is not the value specified here, the deferral will not occur.    
+    /// The expected expiry time for the subscription. If the current expiry time for the subscription is not the value specified here, the deferral will not occur.
     #[serde(alias="expectedExpiryTimeMillis")]
     pub expected_expiry_time_millis: String,
-    /// The desired next expiry time for the subscription in milliseconds since Epoch. The given time must be after the current expiry time for the subscription.    
+    /// The desired next expiry time for the subscription in milliseconds since Epoch. The given time must be after the current expiry time for the subscription.
     #[serde(alias="desiredExpiryTimeMillis")]
     pub desired_expiry_time_millis: String,
 }
@@ -473,17 +482,17 @@ impl Part for SubscriptionDeferralInfo {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Listing {
-    /// URL of a promotional YouTube video for the app.    
+    /// URL of a promotional YouTube video for the app.
     pub video: Option<String>,
-    /// Short description of the app (previously known as promo text); this may be up to 80 characters in length.    
+    /// Short description of the app (previously known as promo text); this may be up to 80 characters in length.
     #[serde(alias="shortDescription")]
     pub short_description: Option<String>,
-    /// Full description of the app; this may be up to 4000 characters in length.    
+    /// Full description of the app; this may be up to 4000 characters in length.
     #[serde(alias="fullDescription")]
     pub full_description: Option<String>,
-    /// Language localization code (for example, "de-AT" for Austrian German).    
+    /// Language localization code (for example, "de-AT" for Austrian German).
     pub language: Option<String>,
-    /// App's localized title.    
+    /// App's localized title.
     pub title: Option<String>,
 }
 
@@ -502,7 +511,7 @@ impl ResponseResult for Listing {}
 /// 
 #[derive(Default, Clone, Debug, Serialize)]
 pub struct InappproductsBatchRequest {
-    /// no description provided    
+    /// no description provided
     pub entrys: Option<Vec<InappproductsBatchRequestEntry>>,
 }
 
@@ -515,9 +524,9 @@ impl RequestValue for InappproductsBatchRequest {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct MonthDay {
-    /// Day of a month, value in [1, 31] range. Valid range depends on the specified month.    
+    /// Day of a month, value in [1, 31] range. Valid range depends on the specified month.
     pub day: u32,
-    /// Month of a year. e.g. 1 = JAN, 2 = FEB etc.    
+    /// Month of a year. e.g. 1 = JAN, 2 = FEB etc.
     pub month: u32,
 }
 
@@ -540,12 +549,12 @@ pub struct ProductPurchase {
     /// - Consumed
     #[serde(alias="consumptionState")]
     pub consumption_state: i32,
-    /// A developer-specified string that contains supplemental information about an order.    
+    /// A developer-specified string that contains supplemental information about an order.
     #[serde(alias="developerPayload")]
     pub developer_payload: String,
-    /// This kind represents an inappPurchase object in the androidpublisher service.    
+    /// This kind represents an inappPurchase object in the androidpublisher service.
     pub kind: String,
-    /// The time the product was purchased, in milliseconds since the epoch (Jan 1, 1970).    
+    /// The time the product was purchased, in milliseconds since the epoch (Jan 1, 1970).
     #[serde(alias="purchaseTimeMillis")]
     pub purchase_time_millis: String,
     /// The purchase state of the order. Possible values are:  
@@ -569,9 +578,9 @@ impl ResponseResult for ProductPurchase {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct ApkListingsListResponse {
-    /// Identifies what kind of resource this is. Value: the fixed string "androidpublisher#apkListingsListResponse".    
+    /// Identifies what kind of resource this is. Value: the fixed string "androidpublisher#apkListingsListResponse".
     pub kind: String,
-    /// no description provided    
+    /// no description provided
     pub listings: Vec<ApkListing>,
 }
 
@@ -589,7 +598,7 @@ impl ResponseResult for ApkListingsListResponse {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct ImagesDeleteAllResponse {
-    /// no description provided    
+    /// no description provided
     pub deleted: Vec<Image>,
 }
 
@@ -609,12 +618,12 @@ impl ResponseResult for ImagesDeleteAllResponse {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Track {
-    /// no description provided    
+    /// no description provided
     pub track: Option<String>,
-    /// no description provided    
+    /// no description provided
     #[serde(alias="userFraction")]
     pub user_fraction: Option<f64>,
-    /// no description provided    
+    /// no description provided
     #[serde(alias="versionCodes")]
     pub version_codes: Option<Vec<i32>>,
 }
@@ -629,9 +638,9 @@ impl ResponseResult for Track {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Season {
-    /// Inclusive start date of the recurrence period.    
+    /// Inclusive start date of the recurrence period.
     pub start: MonthDay,
-    /// Inclusive end date of the recurrence period.    
+    /// Inclusive end date of the recurrence period.
     pub end: MonthDay,
 }
 
@@ -644,9 +653,9 @@ impl Part for Season {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct InAppProductListing {
-    /// no description provided    
+    /// no description provided
     pub description: String,
-    /// no description provided    
+    /// no description provided
     pub title: String,
 }
 
@@ -664,7 +673,7 @@ impl Part for InAppProductListing {}
 /// 
 #[derive(Default, Clone, Debug, Serialize)]
 pub struct SubscriptionPurchasesDeferRequest {
-    /// The information about the new desired expiry time for the subscription.    
+    /// The information about the new desired expiry time for the subscription.
     #[serde(alias="deferralInfo")]
     pub deferral_info: Option<SubscriptionDeferralInfo>,
 }
@@ -678,7 +687,7 @@ impl RequestValue for SubscriptionPurchasesDeferRequest {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct InappproductsInsertResponse {
-    /// no description provided    
+    /// no description provided
     pub inappproduct: InAppProduct,
 }
 
@@ -691,49 +700,49 @@ impl Part for InappproductsInsertResponse {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ExternallyHostedApk {
-    /// The icon image from the APK, as a base64 encoded byte array.    
+    /// The icon image from the APK, as a base64 encoded byte array.
     #[serde(alias="iconBase64")]
     pub icon_base64: String,
-    /// A certificate (or array of certificates if a certificate-chain is used) used to signed this APK, represented as a base64 encoded byte array.    
+    /// A certificate (or array of certificates if a certificate-chain is used) used to signed this APK, represented as a base64 encoded byte array.
     #[serde(alias="certificateBase64s")]
     pub certificate_base64s: Vec<String>,
-    /// The URL at which the APK is hosted. This must be an https URL.    
+    /// The URL at which the APK is hosted. This must be an https URL.
     #[serde(alias="externallyHostedUrl")]
     pub externally_hosted_url: String,
-    /// The maximum SDK supported by this APK (optional).    
+    /// The maximum SDK supported by this APK (optional).
     #[serde(alias="maximumSdk")]
     pub maximum_sdk: i32,
-    /// The SHA256 checksum of this APK, represented as a base64 encoded byte array.    
+    /// The SHA256 checksum of this APK, represented as a base64 encoded byte array.
     #[serde(alias="fileSha256Base64")]
     pub file_sha256_base64: String,
-    /// The permissions requested by this APK.    
+    /// The permissions requested by this APK.
     #[serde(alias="usesPermissions")]
     pub uses_permissions: Vec<ExternallyHostedApkUsesPermission>,
-    /// The SHA1 checksum of this APK, represented as a base64 encoded byte array.    
+    /// The SHA1 checksum of this APK, represented as a base64 encoded byte array.
     #[serde(alias="fileSha1Base64")]
     pub file_sha1_base64: String,
-    /// The features required by this APK (optional).    
+    /// The features required by this APK (optional).
     #[serde(alias="usesFeatures")]
     pub uses_features: Vec<String>,
-    /// The native code environments supported by this APK (optional).    
+    /// The native code environments supported by this APK (optional).
     #[serde(alias="nativeCodes")]
     pub native_codes: Vec<String>,
-    /// The file size in bytes of this APK.    
+    /// The file size in bytes of this APK.
     #[serde(alias="fileSize")]
     pub file_size: String,
-    /// The version name of this APK.    
+    /// The version name of this APK.
     #[serde(alias="versionName")]
     pub version_name: String,
-    /// The version code of this APK.    
+    /// The version code of this APK.
     #[serde(alias="versionCode")]
     pub version_code: i32,
-    /// The minimum SDK targeted by this APK.    
+    /// The minimum SDK targeted by this APK.
     #[serde(alias="minimumSdk")]
     pub minimum_sdk: i32,
-    /// The application label.    
+    /// The application label.
     #[serde(alias="applicationLabel")]
     pub application_label: String,
-    /// The package name.    
+    /// The package name.
     #[serde(alias="packageName")]
     pub package_name: String,
 }
@@ -754,16 +763,16 @@ impl Part for ExternallyHostedApk {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct AppDetails {
-    /// The user-visible support email for this app.    
+    /// The user-visible support email for this app.
     #[serde(alias="contactEmail")]
     pub contact_email: Option<String>,
-    /// The user-visible support telephone number for this app.    
+    /// The user-visible support telephone number for this app.
     #[serde(alias="contactPhone")]
     pub contact_phone: Option<String>,
-    /// The user-visible website for this app.    
+    /// The user-visible website for this app.
     #[serde(alias="contactWebsite")]
     pub contact_website: Option<String>,
-    /// Default language code, in BCP 47 format (eg "en-US").    
+    /// Default language code, in BCP 47 format (eg "en-US").
     #[serde(alias="defaultLanguage")]
     pub default_language: Option<String>,
 }
@@ -778,12 +787,12 @@ impl ResponseResult for AppDetails {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct InappproductsBatchResponseEntry {
-    /// no description provided    
+    /// no description provided
     #[serde(alias="batchId")]
     pub batch_id: u32,
-    /// no description provided    
+    /// no description provided
     pub inappproductsinsertresponse: InappproductsInsertResponse,
-    /// no description provided    
+    /// no description provided
     pub inappproductsupdateresponse: InappproductsUpdateResponse,
 }
 
@@ -796,7 +805,7 @@ impl Part for InappproductsBatchResponseEntry {}
 /// 
 #[derive(Default, Clone, Debug, Serialize)]
 pub struct InappproductsInsertRequest {
-    /// no description provided    
+    /// no description provided
     pub inappproduct: InAppProduct,
 }
 
@@ -809,10 +818,10 @@ impl Part for InappproductsInsertRequest {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ExternallyHostedApkUsesPermission {
-    /// Optionally, the maximum SDK version for which the permission is required.    
+    /// Optionally, the maximum SDK version for which the permission is required.
     #[serde(alias="maxSdkVersion")]
     pub max_sdk_version: i32,
-    /// The name of the permission requested.    
+    /// The name of the permission requested.
     pub name: String,
 }
 
@@ -825,15 +834,15 @@ impl Part for ExternallyHostedApkUsesPermission {}
 /// 
 #[derive(Default, Clone, Debug, Serialize)]
 pub struct InappproductsBatchRequestEntry {
-    /// no description provided    
+    /// no description provided
     #[serde(alias="batchId")]
     pub batch_id: u32,
-    /// no description provided    
+    /// no description provided
     pub inappproductsinsertrequest: InappproductsInsertRequest,
-    /// no description provided    
+    /// no description provided
     #[serde(alias="methodName")]
     pub method_name: String,
-    /// no description provided    
+    /// no description provided
     pub inappproductsupdaterequest: InappproductsUpdateRequest,
 }
 
@@ -851,9 +860,9 @@ impl Part for InappproductsBatchRequestEntry {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct TracksListResponse {
-    /// Identifies what kind of resource this is. Value: the fixed string "androidpublisher#tracksListResponse".    
+    /// Identifies what kind of resource this is. Value: the fixed string "androidpublisher#tracksListResponse".
     pub kind: String,
-    /// no description provided    
+    /// no description provided
     pub tracks: Vec<Track>,
 }
 
@@ -871,7 +880,7 @@ impl ResponseResult for TracksListResponse {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct SubscriptionPurchasesDeferResponse {
-    /// The new expiry time for the subscription in milliseconds since the Epoch.    
+    /// The new expiry time for the subscription in milliseconds since the Epoch.
     #[serde(alias="newExpiryTimeMillis")]
     pub new_expiry_time_millis: String,
 }
@@ -890,15 +899,15 @@ impl ResponseResult for SubscriptionPurchasesDeferResponse {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct InappproductsListResponse {
-    /// Identifies what kind of resource this is. Value: the fixed string "androidpublisher#inappproductsListResponse".    
+    /// Identifies what kind of resource this is. Value: the fixed string "androidpublisher#inappproductsListResponse".
     pub kind: String,
-    /// no description provided    
+    /// no description provided
     #[serde(alias="tokenPagination")]
     pub token_pagination: TokenPagination,
-    /// no description provided    
+    /// no description provided
     #[serde(alias="pageInfo")]
     pub page_info: PageInfo,
-    /// no description provided    
+    /// no description provided
     pub inappproduct: Vec<InAppProduct>,
 }
 
@@ -911,10 +920,10 @@ impl ResponseResult for InappproductsListResponse {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct TokenPagination {
-    /// no description provided    
+    /// no description provided
     #[serde(alias="nextPageToken")]
     pub next_page_token: String,
-    /// no description provided    
+    /// no description provided
     #[serde(alias="previousPageToken")]
     pub previous_page_token: String,
 }
@@ -935,10 +944,10 @@ impl Part for TokenPagination {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ApkListing {
-    /// Describe what's new in your APK.    
+    /// Describe what's new in your APK.
     #[serde(alias="recentChanges")]
     pub recent_changes: Option<String>,
-    /// The language code, in BCP 47 format (eg "en-US").    
+    /// The language code, in BCP 47 format (eg "en-US").
     pub language: Option<String>,
 }
 
@@ -959,10 +968,10 @@ impl ResponseResult for ApkListing {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Testers {
-    /// no description provided    
+    /// no description provided
     #[serde(alias="googleGroups")]
     pub google_groups: Option<Vec<String>>,
-    /// no description provided    
+    /// no description provided
     #[serde(alias="googlePlusCommunities")]
     pub google_plus_communities: Option<Vec<String>>,
 }
@@ -984,10 +993,10 @@ impl ResponseResult for Testers {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ExpansionFile {
-    /// If set this APK's Expansion File references another APK's Expansion File. The file_size field will not be set.    
+    /// If set this APK's Expansion File references another APK's Expansion File. The file_size field will not be set.
     #[serde(alias="referencesVersion")]
     pub references_version: Option<i32>,
-    /// If set this field indicates that this APK has an Expansion File uploaded to it: this APK does not reference another APK's Expansion File. The field's value is the size of the uploaded Expansion File in bytes.    
+    /// If set this field indicates that this APK has an Expansion File uploaded to it: this APK does not reference another APK's Expansion File. The field's value is the size of the uploaded Expansion File in bytes.
     #[serde(alias="fileSize")]
     pub file_size: Option<String>,
 }
@@ -1007,7 +1016,7 @@ impl ResponseResult for ExpansionFile {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct ApksAddExternallyHostedResponse {
-    /// The definition of the externally-hosted APK and where it is located.    
+    /// The definition of the externally-hosted APK and where it is located.
     #[serde(alias="externallyHostedApk")]
     pub externally_hosted_apk: ExternallyHostedApk,
 }
@@ -1026,15 +1035,15 @@ impl ResponseResult for ApksAddExternallyHostedResponse {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct SubscriptionPurchase {
-    /// Whether the subscription will automatically be renewed when it reaches its current expiry time.    
+    /// Whether the subscription will automatically be renewed when it reaches its current expiry time.
     #[serde(alias="autoRenewing")]
     pub auto_renewing: bool,
-    /// This kind represents a subscriptionPurchase object in the androidpublisher service.    
+    /// This kind represents a subscriptionPurchase object in the androidpublisher service.
     pub kind: String,
-    /// Time at which the subscription will expire, in milliseconds since Epoch.    
+    /// Time at which the subscription will expire, in milliseconds since Epoch.
     #[serde(alias="expiryTimeMillis")]
     pub expiry_time_millis: String,
-    /// Time at which the subscription was granted, in milliseconds since Epoch.    
+    /// Time at which the subscription was granted, in milliseconds since Epoch.
     #[serde(alias="startTimeMillis")]
     pub start_time_millis: String,
 }
@@ -1056,10 +1065,10 @@ impl ResponseResult for SubscriptionPurchase {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct AppEdit {
-    /// The time at which the edit will expire and will be no longer valid for use in any subsequent API calls (encoded as seconds since the Epoch).    
+    /// The time at which the edit will expire and will be no longer valid for use in any subsequent API calls (encoded as seconds since the Epoch).
     #[serde(alias="expiryTimeSeconds")]
     pub expiry_time_seconds: Option<String>,
-    /// The ID of the edit that can be used in subsequent API calls.    
+    /// The ID of the edit that can be used in subsequent API calls.
     pub id: Option<String>,
 }
 
@@ -1078,9 +1087,9 @@ impl ResponseResult for AppEdit {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct ApksListResponse {
-    /// no description provided    
+    /// no description provided
     pub apks: Vec<Apk>,
-    /// Identifies what kind of resource this is. Value: the fixed string "androidpublisher#apksListResponse".    
+    /// Identifies what kind of resource this is. Value: the fixed string "androidpublisher#apksListResponse".
     pub kind: String,
 }
 
@@ -1093,7 +1102,7 @@ impl ResponseResult for ApksListResponse {}
 /// 
 #[derive(Default, Clone, Debug, Serialize)]
 pub struct InappproductsUpdateRequest {
-    /// no description provided    
+    /// no description provided
     pub inappproduct: InAppProduct,
 }
 
@@ -1106,13 +1115,13 @@ impl Part for InappproductsUpdateRequest {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct PageInfo {
-    /// no description provided    
+    /// no description provided
     #[serde(alias="resultPerPage")]
     pub result_per_page: i32,
-    /// no description provided    
+    /// no description provided
     #[serde(alias="startIndex")]
     pub start_index: i32,
-    /// no description provided    
+    /// no description provided
     #[serde(alias="totalResults")]
     pub total_results: i32,
 }
@@ -1131,7 +1140,7 @@ impl Part for PageInfo {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct ImagesUploadResponse {
-    /// no description provided    
+    /// no description provided
     pub image: Image,
 }
 
@@ -1149,10 +1158,10 @@ impl ResponseResult for ImagesUploadResponse {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct Apk {
-    /// The version code of the APK, as specified in the APK's manifest file.    
+    /// The version code of the APK, as specified in the APK's manifest file.
     #[serde(alias="versionCode")]
     pub version_code: i32,
-    /// Information about the binary payload of this APK.    
+    /// Information about the binary payload of this APK.
     pub binary: ApkBinary,
 }
 
@@ -1170,9 +1179,9 @@ impl ResponseResult for Apk {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct InappproductsBatchResponse {
-    /// no description provided    
+    /// no description provided
     pub entrys: Vec<InappproductsBatchResponseEntry>,
-    /// Identifies what kind of resource this is. Value: the fixed string "androidpublisher#inappproductsBatchResponse".    
+    /// Identifies what kind of resource this is. Value: the fixed string "androidpublisher#inappproductsBatchResponse".
     pub kind: String,
 }
 
@@ -1185,11 +1194,11 @@ impl ResponseResult for InappproductsBatchResponse {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct Image {
-    /// A URL that will serve a preview of the image.    
+    /// A URL that will serve a preview of the image.
     pub url: String,
-    /// A sha1 hash of the image that was uploaded.    
+    /// A sha1 hash of the image that was uploaded.
     pub sha1: String,
-    /// A unique id representing this image.    
+    /// A unique id representing this image.
     pub id: String,
 }
 
@@ -1207,7 +1216,7 @@ impl Part for Image {}
 /// 
 #[derive(Default, Clone, Debug, Serialize)]
 pub struct ApksAddExternallyHostedRequest {
-    /// The definition of the externally-hosted APK and where it is located.    
+    /// The definition of the externally-hosted APK and where it is located.
     #[serde(alias="externallyHostedApk")]
     pub externally_hosted_apk: Option<ExternallyHostedApk>,
 }
@@ -1221,7 +1230,7 @@ impl RequestValue for ApksAddExternallyHostedRequest {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct ApkBinary {
-    /// A sha1 hash of the APK payload, encoded as a hex string and matching the output of the sha1sum command.    
+    /// A sha1 hash of the APK payload, encoded as a hex string and matching the output of the sha1sum command.
     pub sha1: String,
 }
 
@@ -1234,9 +1243,9 @@ impl Part for ApkBinary {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Price {
-    /// 3 letter Currency code, as defined by ISO 4217.    
+    /// 3 letter Currency code, as defined by ISO 4217.
     pub currency: String,
-    /// The price in millionths of the currency base unit represented as a string.    
+    /// The price in millionths of the currency base unit represented as a string.
     #[serde(alias="priceMicros")]
     pub price_micros: String,
 }
@@ -1255,9 +1264,9 @@ impl Part for Price {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct ListingsListResponse {
-    /// Identifies what kind of resource this is. Value: the fixed string "androidpublisher#listingsListResponse".    
+    /// Identifies what kind of resource this is. Value: the fixed string "androidpublisher#listingsListResponse".
     pub kind: String,
-    /// no description provided    
+    /// no description provided
     pub listings: Vec<Listing>,
 }
 
@@ -1303,13 +1312,19 @@ pub struct PurchaseMethods<'a, C, NC, A>
     hub: &'a AndroidPublisher<C, NC, A>,
 }
 
-impl<'a, C, NC, A> ResourceMethodsBuilder for PurchaseMethods<'a, C, NC, A> {}
+impl<'a, C, NC, A> MethodsBuilder for PurchaseMethods<'a, C, NC, A> {}
 
 impl<'a, C, NC, A> PurchaseMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Refunds and immediately revokes a user's subscription purchase. Access to the subscription will be terminated immediately and it will stop recurring.    
+    /// Refunds and immediately revokes a user's subscription purchase. Access to the subscription will be terminated immediately and it will stop recurring.
+    /// 
+    /// # Arguments
+    ///
+    /// * `packageName` - The package name of the application for which this subscription was purchased (for example, 'com.some.thing').
+    /// * `subscriptionId` - The purchased subscription ID (for example, 'monthly001').
+    /// * `token` - The token provided to the user's device when the subscription was purchased.
     pub fn subscriptions_revoke(&self, package_name: &str, subscription_id: &str, token: &str) -> PurchaseSubscriptionRevokeCall<'a, C, NC, A> {
         PurchaseSubscriptionRevokeCall {
             hub: self.hub,
@@ -1324,7 +1339,13 @@ impl<'a, C, NC, A> PurchaseMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Checks the purchase and consumption status of an inapp item.    
+    /// Checks the purchase and consumption status of an inapp item.
+    /// 
+    /// # Arguments
+    ///
+    /// * `packageName` - The package name of the application the inapp product was sold in (for example, 'com.some.thing').
+    /// * `productId` - The inapp product SKU (for example, 'com.some.thing.inapp1').
+    /// * `token` - The token provided to the user's device when the inapp product was purchased.
     pub fn products_get(&self, package_name: &str, product_id: &str, token: &str) -> PurchaseProductGetCall<'a, C, NC, A> {
         PurchaseProductGetCall {
             hub: self.hub,
@@ -1339,7 +1360,13 @@ impl<'a, C, NC, A> PurchaseMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Checks whether a user's subscription purchase is valid and returns its expiry time.    
+    /// Checks whether a user's subscription purchase is valid and returns its expiry time.
+    /// 
+    /// # Arguments
+    ///
+    /// * `packageName` - The package name of the application for which this subscription was purchased (for example, 'com.some.thing').
+    /// * `subscriptionId` - The purchased subscription ID (for example, 'monthly001').
+    /// * `token` - The token provided to the user's device when the subscription was purchased.
     pub fn subscriptions_get(&self, package_name: &str, subscription_id: &str, token: &str) -> PurchaseSubscriptionGetCall<'a, C, NC, A> {
         PurchaseSubscriptionGetCall {
             hub: self.hub,
@@ -1354,7 +1381,13 @@ impl<'a, C, NC, A> PurchaseMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Cancels a user's subscription purchase. The subscription remains valid until its expiration time.    
+    /// Cancels a user's subscription purchase. The subscription remains valid until its expiration time.
+    /// 
+    /// # Arguments
+    ///
+    /// * `packageName` - The package name of the application for which this subscription was purchased (for example, 'com.some.thing').
+    /// * `subscriptionId` - The purchased subscription ID (for example, 'monthly001').
+    /// * `token` - The token provided to the user's device when the subscription was purchased.
     pub fn subscriptions_cancel(&self, package_name: &str, subscription_id: &str, token: &str) -> PurchaseSubscriptionCancelCall<'a, C, NC, A> {
         PurchaseSubscriptionCancelCall {
             hub: self.hub,
@@ -1369,7 +1402,13 @@ impl<'a, C, NC, A> PurchaseMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Refunds a user's subscription purchase, but the subscription remains valid until its expiration time and it will continue to recur.    
+    /// Refunds a user's subscription purchase, but the subscription remains valid until its expiration time and it will continue to recur.
+    /// 
+    /// # Arguments
+    ///
+    /// * `packageName` - The package name of the application for which this subscription was purchased (for example, 'com.some.thing').
+    /// * `subscriptionId` - The purchased subscription ID (for example, 'monthly001').
+    /// * `token` - The token provided to the user's device when the subscription was purchased.
     pub fn subscriptions_refund(&self, package_name: &str, subscription_id: &str, token: &str) -> PurchaseSubscriptionRefundCall<'a, C, NC, A> {
         PurchaseSubscriptionRefundCall {
             hub: self.hub,
@@ -1384,7 +1423,14 @@ impl<'a, C, NC, A> PurchaseMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Defers a user's subscription purchase until a specified future expiration time.    
+    /// Defers a user's subscription purchase until a specified future expiration time.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `packageName` - The package name of the application for which this subscription was purchased (for example, 'com.some.thing').
+    /// * `subscriptionId` - The purchased subscription ID (for example, 'monthly001').
+    /// * `token` - The token provided to the user's device when the subscription was purchased.
     pub fn subscriptions_defer(&self, request: &SubscriptionPurchasesDeferRequest, package_name: &str, subscription_id: &str, token: &str) -> PurchaseSubscriptionDeferCall<'a, C, NC, A> {
         PurchaseSubscriptionDeferCall {
             hub: self.hub,
@@ -1435,13 +1481,20 @@ pub struct EditMethods<'a, C, NC, A>
     hub: &'a AndroidPublisher<C, NC, A>,
 }
 
-impl<'a, C, NC, A> ResourceMethodsBuilder for EditMethods<'a, C, NC, A> {}
+impl<'a, C, NC, A> MethodsBuilder for EditMethods<'a, C, NC, A> {}
 
 impl<'a, C, NC, A> EditMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Uploads a new image and adds it to the list of images for the specified language and image type.    
+    /// Uploads a new image and adds it to the list of images for the specified language and image type.
+    /// 
+    /// # Arguments
+    ///
+    /// * `packageName` - Unique identifier for the Android app that is being updated; for example, "com.spiffygame".
+    /// * `editId` - Unique identifier for this edit.
+    /// * `language` - The language code (a BCP-47 language tag) of the localized listing whose images are to read or modified. For example, to select Austrian German, pass "de-AT".
+    /// * `imageType` - No description provided.
     pub fn images_upload(&self, package_name: &str, edit_id: &str, language: &str, image_type: &str) -> EditImageUploadCall<'a, C, NC, A> {
         EditImageUploadCall {
             hub: self.hub,
@@ -1457,7 +1510,15 @@ impl<'a, C, NC, A> EditMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Updates the APK's Expansion File configuration to reference another APK's Expansion Files. To add a new Expansion File use the Upload method.    
+    /// Updates the APK's Expansion File configuration to reference another APK's Expansion Files. To add a new Expansion File use the Upload method.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `packageName` - Unique identifier for the Android app that is being updated; for example, "com.spiffygame".
+    /// * `editId` - Unique identifier for this edit.
+    /// * `apkVersionCode` - The version code of the APK whose Expansion File configuration is being read or modified.
+    /// * `expansionFileType` - No description provided.
     pub fn expansionfiles_update(&self, request: &ExpansionFile, package_name: &str, edit_id: &str, apk_version_code: i32, expansion_file_type: &str) -> EditExpansionfileUpdateCall<'a, C, NC, A> {
         EditExpansionfileUpdateCall {
             hub: self.hub,
@@ -1474,7 +1535,12 @@ impl<'a, C, NC, A> EditMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Fetches app details for this edit. This includes the default language and developer support contact information.    
+    /// Fetches app details for this edit. This includes the default language and developer support contact information.
+    /// 
+    /// # Arguments
+    ///
+    /// * `packageName` - Unique identifier for the Android app that is being updated; for example, "com.spiffygame".
+    /// * `editId` - Unique identifier for this edit.
     pub fn details_get(&self, package_name: &str, edit_id: &str) -> EditDetailGetCall<'a, C, NC, A> {
         EditDetailGetCall {
             hub: self.hub,
@@ -1488,7 +1554,14 @@ impl<'a, C, NC, A> EditMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Deletes the APK-specific localized listing for a specified APK and language code.    
+    /// Deletes the APK-specific localized listing for a specified APK and language code.
+    /// 
+    /// # Arguments
+    ///
+    /// * `packageName` - Unique identifier for the Android app that is being updated; for example, "com.spiffygame".
+    /// * `editId` - Unique identifier for this edit.
+    /// * `apkVersionCode` - The APK version code whose APK-specific listings should be read or modified.
+    /// * `language` - The language code (a BCP-47 language tag) of the APK-specific localized listing to read or modify. For example, to select Austrian German, pass "de-AT".
     pub fn apklistings_delete(&self, package_name: &str, edit_id: &str, apk_version_code: i32, language: &str) -> EditApklistingDeleteCall<'a, C, NC, A> {
         EditApklistingDeleteCall {
             hub: self.hub,
@@ -1504,7 +1577,12 @@ impl<'a, C, NC, A> EditMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Deletes all localized listings from an edit.    
+    /// Deletes all localized listings from an edit.
+    /// 
+    /// # Arguments
+    ///
+    /// * `packageName` - Unique identifier for the Android app that is being updated; for example, "com.spiffygame".
+    /// * `editId` - Unique identifier for this edit.
     pub fn listings_deleteall(&self, package_name: &str, edit_id: &str) -> EditListingDeleteallCall<'a, C, NC, A> {
         EditListingDeleteallCall {
             hub: self.hub,
@@ -1518,7 +1596,13 @@ impl<'a, C, NC, A> EditMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Creates a new APK without uploading the APK itself to Google Play, instead hosting the APK at a specified URL. This function is only available to enterprises using Google Play for work whose application is configured to restrict distribution to the enterprise domain.    
+    /// Creates a new APK without uploading the APK itself to Google Play, instead hosting the APK at a specified URL. This function is only available to enterprises using Google Play for work whose application is configured to restrict distribution to the enterprise domain.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `packageName` - Unique identifier for the Android app that is being updated; for example, "com.spiffygame".
+    /// * `editId` - Unique identifier for this edit.
     pub fn apks_addexternallyhosted(&self, request: &ApksAddExternallyHostedRequest, package_name: &str, edit_id: &str) -> EditApkAddexternallyhostedCall<'a, C, NC, A> {
         EditApkAddexternallyhostedCall {
             hub: self.hub,
@@ -1533,7 +1617,13 @@ impl<'a, C, NC, A> EditMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Deletes all the APK-specific localized listings for a specified APK.    
+    /// Deletes all the APK-specific localized listings for a specified APK.
+    /// 
+    /// # Arguments
+    ///
+    /// * `packageName` - Unique identifier for the Android app that is being updated; for example, "com.spiffygame".
+    /// * `editId` - Unique identifier for this edit.
+    /// * `apkVersionCode` - The APK version code whose APK-specific listings should be read or modified.
     pub fn apklistings_deleteall(&self, package_name: &str, edit_id: &str, apk_version_code: i32) -> EditApklistingDeleteallCall<'a, C, NC, A> {
         EditApklistingDeleteallCall {
             hub: self.hub,
@@ -1548,7 +1638,13 @@ impl<'a, C, NC, A> EditMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Updates app details for this edit.    
+    /// Updates app details for this edit.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `packageName` - Unique identifier for the Android app that is being updated; for example, "com.spiffygame".
+    /// * `editId` - Unique identifier for this edit.
     pub fn details_update(&self, request: &AppDetails, package_name: &str, edit_id: &str) -> EditDetailUpdateCall<'a, C, NC, A> {
         EditDetailUpdateCall {
             hub: self.hub,
@@ -1563,7 +1659,13 @@ impl<'a, C, NC, A> EditMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Fetches the track configuration for the specified track type. Includes the APK version codes that are in this track.    
+    /// Fetches the track configuration for the specified track type. Includes the APK version codes that are in this track.
+    /// 
+    /// # Arguments
+    ///
+    /// * `packageName` - Unique identifier for the Android app that is being updated; for example, "com.spiffygame".
+    /// * `editId` - Unique identifier for this edit.
+    /// * `track` - The track type to read or modify.
     pub fn tracks_get(&self, package_name: &str, edit_id: &str, track: &str) -> EditTrackGetCall<'a, C, NC, A> {
         EditTrackGetCall {
             hub: self.hub,
@@ -1578,7 +1680,15 @@ impl<'a, C, NC, A> EditMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Updates the APK's Expansion File configuration to reference another APK's Expansion Files. To add a new Expansion File use the Upload method. This method supports patch semantics.    
+    /// Updates the APK's Expansion File configuration to reference another APK's Expansion Files. To add a new Expansion File use the Upload method. This method supports patch semantics.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `packageName` - Unique identifier for the Android app that is being updated; for example, "com.spiffygame".
+    /// * `editId` - Unique identifier for this edit.
+    /// * `apkVersionCode` - The version code of the APK whose Expansion File configuration is being read or modified.
+    /// * `expansionFileType` - No description provided.
     pub fn expansionfiles_patch(&self, request: &ExpansionFile, package_name: &str, edit_id: &str, apk_version_code: i32, expansion_file_type: &str) -> EditExpansionfilePatchCall<'a, C, NC, A> {
         EditExpansionfilePatchCall {
             hub: self.hub,
@@ -1595,7 +1705,14 @@ impl<'a, C, NC, A> EditMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Lists all images for the specified language and image type.    
+    /// Lists all images for the specified language and image type.
+    /// 
+    /// # Arguments
+    ///
+    /// * `packageName` - Unique identifier for the Android app that is being updated; for example, "com.spiffygame".
+    /// * `editId` - Unique identifier for this edit.
+    /// * `language` - The language code (a BCP-47 language tag) of the localized listing whose images are to read or modified. For example, to select Austrian German, pass "de-AT".
+    /// * `imageType` - No description provided.
     pub fn images_list(&self, package_name: &str, edit_id: &str, language: &str, image_type: &str) -> EditImageListCall<'a, C, NC, A> {
         EditImageListCall {
             hub: self.hub,
@@ -1611,7 +1728,14 @@ impl<'a, C, NC, A> EditMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Updates the track configuration for the specified track type. When halted, the rollout track cannot be updated without adding new APKs, and adding new APKs will cause it to resume.    
+    /// Updates the track configuration for the specified track type. When halted, the rollout track cannot be updated without adding new APKs, and adding new APKs will cause it to resume.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `packageName` - Unique identifier for the Android app that is being updated; for example, "com.spiffygame".
+    /// * `editId` - Unique identifier for this edit.
+    /// * `track` - The track type to read or modify.
     pub fn tracks_update(&self, request: &Track, package_name: &str, edit_id: &str, track: &str) -> EditTrackUpdateCall<'a, C, NC, A> {
         EditTrackUpdateCall {
             hub: self.hub,
@@ -1627,7 +1751,14 @@ impl<'a, C, NC, A> EditMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Creates or updates a localized store listing. This method supports patch semantics.    
+    /// Creates or updates a localized store listing. This method supports patch semantics.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `packageName` - Unique identifier for the Android app that is being updated; for example, "com.spiffygame".
+    /// * `editId` - Unique identifier for this edit.
+    /// * `language` - The language code (a BCP-47 language tag) of the localized listing to read or modify. For example, to select Austrian German, pass "de-AT".
     pub fn listings_patch(&self, request: &Listing, package_name: &str, edit_id: &str, language: &str) -> EditListingPatchCall<'a, C, NC, A> {
         EditListingPatchCall {
             hub: self.hub,
@@ -1643,7 +1774,12 @@ impl<'a, C, NC, A> EditMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Returns information about the edit specified. Calls will fail if the edit is no long active (e.g. has been deleted, superseded or expired).    
+    /// Returns information about the edit specified. Calls will fail if the edit is no long active (e.g. has been deleted, superseded or expired).
+    /// 
+    /// # Arguments
+    ///
+    /// * `packageName` - Unique identifier for the Android app that is being updated; for example, "com.spiffygame".
+    /// * `editId` - Unique identifier for this edit.
     pub fn get(&self, package_name: &str, edit_id: &str) -> EditGetCall<'a, C, NC, A> {
         EditGetCall {
             hub: self.hub,
@@ -1657,7 +1793,15 @@ impl<'a, C, NC, A> EditMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Deletes the image (specified by id) from the edit.    
+    /// Deletes the image (specified by id) from the edit.
+    /// 
+    /// # Arguments
+    ///
+    /// * `packageName` - Unique identifier for the Android app that is being updated; for example, "com.spiffygame".
+    /// * `editId` - Unique identifier for this edit.
+    /// * `language` - The language code (a BCP-47 language tag) of the localized listing whose images are to read or modified. For example, to select Austrian German, pass "de-AT".
+    /// * `imageType` - No description provided.
+    /// * `imageId` - Unique identifier an image within the set of images attached to this edit.
     pub fn images_delete(&self, package_name: &str, edit_id: &str, language: &str, image_type: &str, image_id: &str) -> EditImageDeleteCall<'a, C, NC, A> {
         EditImageDeleteCall {
             hub: self.hub,
@@ -1672,6 +1816,11 @@ impl<'a, C, NC, A> EditMethods<'a, C, NC, A> {
         }
     }
     
+    /// 
+    /// # Arguments
+    ///
+    /// * `packageName` - Unique identifier for the Android app that is being updated; for example, "com.spiffygame".
+    /// * `editId` - Unique identifier for this edit.
     pub fn apks_upload(&self, package_name: &str, edit_id: &str) -> EditApkUploadCall<'a, C, NC, A> {
         EditApkUploadCall {
             hub: self.hub,
@@ -1685,7 +1834,15 @@ impl<'a, C, NC, A> EditMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Updates or creates the APK-specific localized listing for a specified APK and language code.    
+    /// Updates or creates the APK-specific localized listing for a specified APK and language code.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `packageName` - Unique identifier for the Android app that is being updated; for example, "com.spiffygame".
+    /// * `editId` - Unique identifier for this edit.
+    /// * `apkVersionCode` - The APK version code whose APK-specific listings should be read or modified.
+    /// * `language` - The language code (a BCP-47 language tag) of the APK-specific localized listing to read or modify. For example, to select Austrian German, pass "de-AT".
     pub fn apklistings_update(&self, request: &ApkListing, package_name: &str, edit_id: &str, apk_version_code: i32, language: &str) -> EditApklistingUpdateCall<'a, C, NC, A> {
         EditApklistingUpdateCall {
             hub: self.hub,
@@ -1700,6 +1857,11 @@ impl<'a, C, NC, A> EditMethods<'a, C, NC, A> {
         }
     }
     
+    /// 
+    /// # Arguments
+    ///
+    /// * `packageName` - Unique identifier for the Android app that is being updated; for example, "com.spiffygame".
+    /// * `editId` - Unique identifier for this edit.
     pub fn apks_list(&self, package_name: &str, edit_id: &str) -> EditApkListCall<'a, C, NC, A> {
         EditApkListCall {
             hub: self.hub,
@@ -1713,7 +1875,15 @@ impl<'a, C, NC, A> EditMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Updates or creates the APK-specific localized listing for a specified APK and language code. This method supports patch semantics.    
+    /// Updates or creates the APK-specific localized listing for a specified APK and language code. This method supports patch semantics.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `packageName` - Unique identifier for the Android app that is being updated; for example, "com.spiffygame".
+    /// * `editId` - Unique identifier for this edit.
+    /// * `apkVersionCode` - The APK version code whose APK-specific listings should be read or modified.
+    /// * `language` - The language code (a BCP-47 language tag) of the APK-specific localized listing to read or modify. For example, to select Austrian German, pass "de-AT".
     pub fn apklistings_patch(&self, request: &ApkListing, package_name: &str, edit_id: &str, apk_version_code: i32, language: &str) -> EditApklistingPatchCall<'a, C, NC, A> {
         EditApklistingPatchCall {
             hub: self.hub,
@@ -1730,7 +1900,13 @@ impl<'a, C, NC, A> EditMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Fetches information about a localized store listing.    
+    /// Fetches information about a localized store listing.
+    /// 
+    /// # Arguments
+    ///
+    /// * `packageName` - Unique identifier for the Android app that is being updated; for example, "com.spiffygame".
+    /// * `editId` - Unique identifier for this edit.
+    /// * `language` - The language code (a BCP-47 language tag) of the localized listing to read or modify. For example, to select Austrian German, pass "de-AT".
     pub fn listings_get(&self, package_name: &str, edit_id: &str, language: &str) -> EditListingGetCall<'a, C, NC, A> {
         EditListingGetCall {
             hub: self.hub,
@@ -1743,6 +1919,12 @@ impl<'a, C, NC, A> EditMethods<'a, C, NC, A> {
         }
     }
     
+    /// 
+    /// # Arguments
+    ///
+    /// * `packageName` - Unique identifier for the Android app that is being updated; for example, "com.spiffygame".
+    /// * `editId` - Unique identifier for this edit.
+    /// * `track` - No description provided.
     pub fn testers_get(&self, package_name: &str, edit_id: &str, track: &str) -> EditTesterGetCall<'a, C, NC, A> {
         EditTesterGetCall {
             hub: self.hub,
@@ -1757,7 +1939,12 @@ impl<'a, C, NC, A> EditMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Deletes an edit for an app. Creating a new edit will automatically delete any of your previous edits so this method need only be called if you want to preemptively abandon an edit.    
+    /// Deletes an edit for an app. Creating a new edit will automatically delete any of your previous edits so this method need only be called if you want to preemptively abandon an edit.
+    /// 
+    /// # Arguments
+    ///
+    /// * `packageName` - Unique identifier for the Android app that is being updated; for example, "com.spiffygame".
+    /// * `editId` - Unique identifier for this edit.
     pub fn delete(&self, package_name: &str, edit_id: &str) -> EditDeleteCall<'a, C, NC, A> {
         EditDeleteCall {
             hub: self.hub,
@@ -1771,7 +1958,14 @@ impl<'a, C, NC, A> EditMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Uploads and attaches a new Expansion File to the APK specified.    
+    /// Uploads and attaches a new Expansion File to the APK specified.
+    /// 
+    /// # Arguments
+    ///
+    /// * `packageName` - Unique identifier for the Android app that is being updated; for example, "com.spiffygame".
+    /// * `editId` - Unique identifier for this edit.
+    /// * `apkVersionCode` - The version code of the APK whose Expansion File configuration is being read or modified.
+    /// * `expansionFileType` - No description provided.
     pub fn expansionfiles_upload(&self, package_name: &str, edit_id: &str, apk_version_code: i32, expansion_file_type: &str) -> EditExpansionfileUploadCall<'a, C, NC, A> {
         EditExpansionfileUploadCall {
             hub: self.hub,
@@ -1787,7 +1981,12 @@ impl<'a, C, NC, A> EditMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Creates a new edit for an app, populated with the app's current state.    
+    /// Creates a new edit for an app, populated with the app's current state.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `packageName` - Unique identifier for the Android app that is being updated; for example, "com.spiffygame".
     pub fn insert(&self, request: &AppEdit, package_name: &str) -> EditInsertCall<'a, C, NC, A> {
         EditInsertCall {
             hub: self.hub,
@@ -1801,7 +2000,12 @@ impl<'a, C, NC, A> EditMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Returns all of the localized store listings attached to this edit.    
+    /// Returns all of the localized store listings attached to this edit.
+    /// 
+    /// # Arguments
+    ///
+    /// * `packageName` - Unique identifier for the Android app that is being updated; for example, "com.spiffygame".
+    /// * `editId` - Unique identifier for this edit.
     pub fn listings_list(&self, package_name: &str, edit_id: &str) -> EditListingListCall<'a, C, NC, A> {
         EditListingListCall {
             hub: self.hub,
@@ -1813,6 +2017,13 @@ impl<'a, C, NC, A> EditMethods<'a, C, NC, A> {
         }
     }
     
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `packageName` - Unique identifier for the Android app that is being updated; for example, "com.spiffygame".
+    /// * `editId` - Unique identifier for this edit.
+    /// * `track` - No description provided.
     pub fn testers_patch(&self, request: &Testers, package_name: &str, edit_id: &str, track: &str) -> EditTesterPatchCall<'a, C, NC, A> {
         EditTesterPatchCall {
             hub: self.hub,
@@ -1828,7 +2039,12 @@ impl<'a, C, NC, A> EditMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Commits/applies the changes made in this edit back to the app.    
+    /// Commits/applies the changes made in this edit back to the app.
+    /// 
+    /// # Arguments
+    ///
+    /// * `packageName` - Unique identifier for the Android app that is being updated; for example, "com.spiffygame".
+    /// * `editId` - Unique identifier for this edit.
     pub fn commit(&self, package_name: &str, edit_id: &str) -> EditCommitCall<'a, C, NC, A> {
         EditCommitCall {
             hub: self.hub,
@@ -1842,7 +2058,12 @@ impl<'a, C, NC, A> EditMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Lists all the track configurations for this edit.    
+    /// Lists all the track configurations for this edit.
+    /// 
+    /// # Arguments
+    ///
+    /// * `packageName` - Unique identifier for the Android app that is being updated; for example, "com.spiffygame".
+    /// * `editId` - Unique identifier for this edit.
     pub fn tracks_list(&self, package_name: &str, edit_id: &str) -> EditTrackListCall<'a, C, NC, A> {
         EditTrackListCall {
             hub: self.hub,
@@ -1856,7 +2077,12 @@ impl<'a, C, NC, A> EditMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Checks that the edit can be successfully committed. The edit's changes are not applied to the live app.    
+    /// Checks that the edit can be successfully committed. The edit's changes are not applied to the live app.
+    /// 
+    /// # Arguments
+    ///
+    /// * `packageName` - Unique identifier for the Android app that is being updated; for example, "com.spiffygame".
+    /// * `editId` - Unique identifier for this edit.
     pub fn validate(&self, package_name: &str, edit_id: &str) -> EditValidateCall<'a, C, NC, A> {
         EditValidateCall {
             hub: self.hub,
@@ -1870,7 +2096,14 @@ impl<'a, C, NC, A> EditMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Creates or updates a localized store listing.    
+    /// Creates or updates a localized store listing.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `packageName` - Unique identifier for the Android app that is being updated; for example, "com.spiffygame".
+    /// * `editId` - Unique identifier for this edit.
+    /// * `language` - The language code (a BCP-47 language tag) of the localized listing to read or modify. For example, to select Austrian German, pass "de-AT".
     pub fn listings_update(&self, request: &Listing, package_name: &str, edit_id: &str, language: &str) -> EditListingUpdateCall<'a, C, NC, A> {
         EditListingUpdateCall {
             hub: self.hub,
@@ -1886,7 +2119,14 @@ impl<'a, C, NC, A> EditMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Fetches the Expansion File configuration for the APK specified.    
+    /// Fetches the Expansion File configuration for the APK specified.
+    /// 
+    /// # Arguments
+    ///
+    /// * `packageName` - Unique identifier for the Android app that is being updated; for example, "com.spiffygame".
+    /// * `editId` - Unique identifier for this edit.
+    /// * `apkVersionCode` - The version code of the APK whose Expansion File configuration is being read or modified.
+    /// * `expansionFileType` - No description provided.
     pub fn expansionfiles_get(&self, package_name: &str, edit_id: &str, apk_version_code: i32, expansion_file_type: &str) -> EditExpansionfileGetCall<'a, C, NC, A> {
         EditExpansionfileGetCall {
             hub: self.hub,
@@ -1902,7 +2142,14 @@ impl<'a, C, NC, A> EditMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Deletes all images for the specified language and image type.    
+    /// Deletes all images for the specified language and image type.
+    /// 
+    /// # Arguments
+    ///
+    /// * `packageName` - Unique identifier for the Android app that is being updated; for example, "com.spiffygame".
+    /// * `editId` - Unique identifier for this edit.
+    /// * `language` - The language code (a BCP-47 language tag) of the localized listing whose images are to read or modified. For example, to select Austrian German, pass "de-AT".
+    /// * `imageType` - No description provided.
     pub fn images_deleteall(&self, package_name: &str, edit_id: &str, language: &str, image_type: &str) -> EditImageDeleteallCall<'a, C, NC, A> {
         EditImageDeleteallCall {
             hub: self.hub,
@@ -1918,7 +2165,13 @@ impl<'a, C, NC, A> EditMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Updates app details for this edit. This method supports patch semantics.    
+    /// Updates app details for this edit. This method supports patch semantics.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `packageName` - Unique identifier for the Android app that is being updated; for example, "com.spiffygame".
+    /// * `editId` - Unique identifier for this edit.
     pub fn details_patch(&self, request: &AppDetails, package_name: &str, edit_id: &str) -> EditDetailPatchCall<'a, C, NC, A> {
         EditDetailPatchCall {
             hub: self.hub,
@@ -1933,7 +2186,14 @@ impl<'a, C, NC, A> EditMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Updates the track configuration for the specified track type. When halted, the rollout track cannot be updated without adding new APKs, and adding new APKs will cause it to resume. This method supports patch semantics.    
+    /// Updates the track configuration for the specified track type. When halted, the rollout track cannot be updated without adding new APKs, and adding new APKs will cause it to resume. This method supports patch semantics.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `packageName` - Unique identifier for the Android app that is being updated; for example, "com.spiffygame".
+    /// * `editId` - Unique identifier for this edit.
+    /// * `track` - The track type to read or modify.
     pub fn tracks_patch(&self, request: &Track, package_name: &str, edit_id: &str, track: &str) -> EditTrackPatchCall<'a, C, NC, A> {
         EditTrackPatchCall {
             hub: self.hub,
@@ -1949,7 +2209,13 @@ impl<'a, C, NC, A> EditMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Deletes the specified localized store listing from an edit.    
+    /// Deletes the specified localized store listing from an edit.
+    /// 
+    /// # Arguments
+    ///
+    /// * `packageName` - Unique identifier for the Android app that is being updated; for example, "com.spiffygame".
+    /// * `editId` - Unique identifier for this edit.
+    /// * `language` - The language code (a BCP-47 language tag) of the localized listing to read or modify. For example, to select Austrian German, pass "de-AT".
     pub fn listings_delete(&self, package_name: &str, edit_id: &str, language: &str) -> EditListingDeleteCall<'a, C, NC, A> {
         EditListingDeleteCall {
             hub: self.hub,
@@ -1964,7 +2230,14 @@ impl<'a, C, NC, A> EditMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Fetches the APK-specific localized listing for a specified APK and language code.    
+    /// Fetches the APK-specific localized listing for a specified APK and language code.
+    /// 
+    /// # Arguments
+    ///
+    /// * `packageName` - Unique identifier for the Android app that is being updated; for example, "com.spiffygame".
+    /// * `editId` - Unique identifier for this edit.
+    /// * `apkVersionCode` - The APK version code whose APK-specific listings should be read or modified.
+    /// * `language` - The language code (a BCP-47 language tag) of the APK-specific localized listing to read or modify. For example, to select Austrian German, pass "de-AT".
     pub fn apklistings_get(&self, package_name: &str, edit_id: &str, apk_version_code: i32, language: &str) -> EditApklistingGetCall<'a, C, NC, A> {
         EditApklistingGetCall {
             hub: self.hub,
@@ -1978,6 +2251,13 @@ impl<'a, C, NC, A> EditMethods<'a, C, NC, A> {
         }
     }
     
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `packageName` - Unique identifier for the Android app that is being updated; for example, "com.spiffygame".
+    /// * `editId` - Unique identifier for this edit.
+    /// * `track` - No description provided.
     pub fn testers_update(&self, request: &Testers, package_name: &str, edit_id: &str, track: &str) -> EditTesterUpdateCall<'a, C, NC, A> {
         EditTesterUpdateCall {
             hub: self.hub,
@@ -1993,7 +2273,13 @@ impl<'a, C, NC, A> EditMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Lists all the APK-specific localized listings for a specified APK.    
+    /// Lists all the APK-specific localized listings for a specified APK.
+    /// 
+    /// # Arguments
+    ///
+    /// * `packageName` - Unique identifier for the Android app that is being updated; for example, "com.spiffygame".
+    /// * `editId` - Unique identifier for this edit.
+    /// * `apkVersionCode` - The APK version code whose APK-specific listings should be read or modified.
     pub fn apklistings_list(&self, package_name: &str, edit_id: &str, apk_version_code: i32) -> EditApklistingListCall<'a, C, NC, A> {
         EditApklistingListCall {
             hub: self.hub,
@@ -2043,10 +2329,14 @@ pub struct InappproductMethods<'a, C, NC, A>
     hub: &'a AndroidPublisher<C, NC, A>,
 }
 
-impl<'a, C, NC, A> ResourceMethodsBuilder for InappproductMethods<'a, C, NC, A> {}
+impl<'a, C, NC, A> MethodsBuilder for InappproductMethods<'a, C, NC, A> {}
 
 impl<'a, C, NC, A> InappproductMethods<'a, C, NC, A> {
     
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
     pub fn batch(&self, request: &InappproductsBatchRequest) -> InappproductBatchCall<'a, C, NC, A> {
         InappproductBatchCall {
             hub: self.hub,
@@ -2059,7 +2349,11 @@ impl<'a, C, NC, A> InappproductMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// List all the in-app products for an Android app, both subscriptions and managed in-app products..    
+    /// List all the in-app products for an Android app, both subscriptions and managed in-app products..
+    /// 
+    /// # Arguments
+    ///
+    /// * `packageName` - Unique identifier for the Android app with in-app products; for example, "com.spiffygame".
     pub fn list(&self, package_name: &str) -> InappproductListCall<'a, C, NC, A> {
         InappproductListCall {
             hub: self.hub,
@@ -2075,7 +2369,12 @@ impl<'a, C, NC, A> InappproductMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Creates a new in-app product for an app.    
+    /// Creates a new in-app product for an app.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `packageName` - Unique identifier for the Android app; for example, "com.spiffygame".
     pub fn insert(&self, request: &InAppProduct, package_name: &str) -> InappproductInsertCall<'a, C, NC, A> {
         InappproductInsertCall {
             hub: self.hub,
@@ -2090,7 +2389,12 @@ impl<'a, C, NC, A> InappproductMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Delete an in-app product for an app.    
+    /// Delete an in-app product for an app.
+    /// 
+    /// # Arguments
+    ///
+    /// * `packageName` - Unique identifier for the Android app with the in-app product; for example, "com.spiffygame".
+    /// * `sku` - Unique identifier for the in-app product.
     pub fn delete(&self, package_name: &str, sku: &str) -> InappproductDeleteCall<'a, C, NC, A> {
         InappproductDeleteCall {
             hub: self.hub,
@@ -2104,7 +2408,12 @@ impl<'a, C, NC, A> InappproductMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Returns information about the in-app product specified.    
+    /// Returns information about the in-app product specified.
+    /// 
+    /// # Arguments
+    ///
+    /// * `packageName` - No description provided.
+    /// * `sku` - Unique identifier for the in-app product.
     pub fn get(&self, package_name: &str, sku: &str) -> InappproductGetCall<'a, C, NC, A> {
         InappproductGetCall {
             hub: self.hub,
@@ -2118,7 +2427,13 @@ impl<'a, C, NC, A> InappproductMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Updates the details of an in-app product.    
+    /// Updates the details of an in-app product.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `packageName` - Unique identifier for the Android app with the in-app product; for example, "com.spiffygame".
+    /// * `sku` - Unique identifier for the in-app product.
     pub fn update(&self, request: &InAppProduct, package_name: &str, sku: &str) -> InappproductUpdateCall<'a, C, NC, A> {
         InappproductUpdateCall {
             hub: self.hub,
@@ -2134,7 +2449,13 @@ impl<'a, C, NC, A> InappproductMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Updates the details of an in-app product. This method supports patch semantics.    
+    /// Updates the details of an in-app product. This method supports patch semantics.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `packageName` - Unique identifier for the Android app with the in-app product; for example, "com.spiffygame".
+    /// * `sku` - Unique identifier for the in-app product.
     pub fn patch(&self, request: &InAppProduct, package_name: &str, sku: &str) -> InappproductPatchCall<'a, C, NC, A> {
         InappproductPatchCall {
             hub: self.hub,
@@ -2160,7 +2481,7 @@ impl<'a, C, NC, A> InappproductMethods<'a, C, NC, A> {
 /// Refunds and immediately revokes a user's subscription purchase. Access to the subscription will be terminated immediately and it will stop recurring.
 ///
 /// A builder for the *subscriptions.revoke* method supported by a *purchase* resource.
-/// It is not used directly, but through a `PurchaseMethods`.
+/// It is not used directly, but through a `PurchaseMethods` instance.
 ///
 /// # Example
 ///
@@ -2222,7 +2543,7 @@ impl<'a, C, NC, A> PurchaseSubscriptionRevokeCall<'a, C, NC, A> where NC: hyper:
         for &field in ["packageName", "subscriptionId", "token"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -2274,7 +2595,7 @@ impl<'a, C, NC, A> PurchaseSubscriptionRevokeCall<'a, C, NC, A> where NC: hyper:
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -2286,7 +2607,6 @@ impl<'a, C, NC, A> PurchaseSubscriptionRevokeCall<'a, C, NC, A> where NC: hyper:
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -2296,7 +2616,7 @@ impl<'a, C, NC, A> PurchaseSubscriptionRevokeCall<'a, C, NC, A> where NC: hyper:
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -2307,12 +2627,12 @@ impl<'a, C, NC, A> PurchaseSubscriptionRevokeCall<'a, C, NC, A> where NC: hyper:
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = res;
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -2324,7 +2644,7 @@ impl<'a, C, NC, A> PurchaseSubscriptionRevokeCall<'a, C, NC, A> where NC: hyper:
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The package name of the application for which this subscription was purchased (for example, 'com.some.thing').    
+    /// The package name of the application for which this subscription was purchased (for example, 'com.some.thing').
     pub fn package_name(mut self, new_value: &str) -> PurchaseSubscriptionRevokeCall<'a, C, NC, A> {
         self._package_name = new_value.to_string();
         self
@@ -2334,7 +2654,7 @@ impl<'a, C, NC, A> PurchaseSubscriptionRevokeCall<'a, C, NC, A> where NC: hyper:
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The purchased subscription ID (for example, 'monthly001').    
+    /// The purchased subscription ID (for example, 'monthly001').
     pub fn subscription_id(mut self, new_value: &str) -> PurchaseSubscriptionRevokeCall<'a, C, NC, A> {
         self._subscription_id = new_value.to_string();
         self
@@ -2344,7 +2664,7 @@ impl<'a, C, NC, A> PurchaseSubscriptionRevokeCall<'a, C, NC, A> where NC: hyper:
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The token provided to the user's device when the subscription was purchased.    
+    /// The token provided to the user's device when the subscription was purchased.
     pub fn token(mut self, new_value: &str) -> PurchaseSubscriptionRevokeCall<'a, C, NC, A> {
         self._token = new_value.to_string();
         self
@@ -2405,7 +2725,7 @@ impl<'a, C, NC, A> PurchaseSubscriptionRevokeCall<'a, C, NC, A> where NC: hyper:
 /// Checks the purchase and consumption status of an inapp item.
 ///
 /// A builder for the *products.get* method supported by a *purchase* resource.
-/// It is not used directly, but through a `PurchaseMethods`.
+/// It is not used directly, but through a `PurchaseMethods` instance.
 ///
 /// # Example
 ///
@@ -2467,7 +2787,7 @@ impl<'a, C, NC, A> PurchaseProductGetCall<'a, C, NC, A> where NC: hyper::net::Ne
         for &field in ["alt", "packageName", "productId", "token"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -2520,7 +2840,7 @@ impl<'a, C, NC, A> PurchaseProductGetCall<'a, C, NC, A> where NC: hyper::net::Ne
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -2532,7 +2852,6 @@ impl<'a, C, NC, A> PurchaseProductGetCall<'a, C, NC, A> where NC: hyper::net::Ne
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -2542,7 +2861,7 @@ impl<'a, C, NC, A> PurchaseProductGetCall<'a, C, NC, A> where NC: hyper::net::Ne
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -2553,7 +2872,7 @@ impl<'a, C, NC, A> PurchaseProductGetCall<'a, C, NC, A> where NC: hyper::net::Ne
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -2562,13 +2881,13 @@ impl<'a, C, NC, A> PurchaseProductGetCall<'a, C, NC, A> where NC: hyper::net::Ne
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -2580,7 +2899,7 @@ impl<'a, C, NC, A> PurchaseProductGetCall<'a, C, NC, A> where NC: hyper::net::Ne
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The package name of the application the inapp product was sold in (for example, 'com.some.thing').    
+    /// The package name of the application the inapp product was sold in (for example, 'com.some.thing').
     pub fn package_name(mut self, new_value: &str) -> PurchaseProductGetCall<'a, C, NC, A> {
         self._package_name = new_value.to_string();
         self
@@ -2590,7 +2909,7 @@ impl<'a, C, NC, A> PurchaseProductGetCall<'a, C, NC, A> where NC: hyper::net::Ne
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The inapp product SKU (for example, 'com.some.thing.inapp1').    
+    /// The inapp product SKU (for example, 'com.some.thing.inapp1').
     pub fn product_id(mut self, new_value: &str) -> PurchaseProductGetCall<'a, C, NC, A> {
         self._product_id = new_value.to_string();
         self
@@ -2600,7 +2919,7 @@ impl<'a, C, NC, A> PurchaseProductGetCall<'a, C, NC, A> where NC: hyper::net::Ne
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The token provided to the user's device when the inapp product was purchased.    
+    /// The token provided to the user's device when the inapp product was purchased.
     pub fn token(mut self, new_value: &str) -> PurchaseProductGetCall<'a, C, NC, A> {
         self._token = new_value.to_string();
         self
@@ -2661,7 +2980,7 @@ impl<'a, C, NC, A> PurchaseProductGetCall<'a, C, NC, A> where NC: hyper::net::Ne
 /// Checks whether a user's subscription purchase is valid and returns its expiry time.
 ///
 /// A builder for the *subscriptions.get* method supported by a *purchase* resource.
-/// It is not used directly, but through a `PurchaseMethods`.
+/// It is not used directly, but through a `PurchaseMethods` instance.
 ///
 /// # Example
 ///
@@ -2723,7 +3042,7 @@ impl<'a, C, NC, A> PurchaseSubscriptionGetCall<'a, C, NC, A> where NC: hyper::ne
         for &field in ["alt", "packageName", "subscriptionId", "token"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -2776,7 +3095,7 @@ impl<'a, C, NC, A> PurchaseSubscriptionGetCall<'a, C, NC, A> where NC: hyper::ne
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -2788,7 +3107,6 @@ impl<'a, C, NC, A> PurchaseSubscriptionGetCall<'a, C, NC, A> where NC: hyper::ne
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -2798,7 +3116,7 @@ impl<'a, C, NC, A> PurchaseSubscriptionGetCall<'a, C, NC, A> where NC: hyper::ne
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -2809,7 +3127,7 @@ impl<'a, C, NC, A> PurchaseSubscriptionGetCall<'a, C, NC, A> where NC: hyper::ne
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -2818,13 +3136,13 @@ impl<'a, C, NC, A> PurchaseSubscriptionGetCall<'a, C, NC, A> where NC: hyper::ne
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -2836,7 +3154,7 @@ impl<'a, C, NC, A> PurchaseSubscriptionGetCall<'a, C, NC, A> where NC: hyper::ne
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The package name of the application for which this subscription was purchased (for example, 'com.some.thing').    
+    /// The package name of the application for which this subscription was purchased (for example, 'com.some.thing').
     pub fn package_name(mut self, new_value: &str) -> PurchaseSubscriptionGetCall<'a, C, NC, A> {
         self._package_name = new_value.to_string();
         self
@@ -2846,7 +3164,7 @@ impl<'a, C, NC, A> PurchaseSubscriptionGetCall<'a, C, NC, A> where NC: hyper::ne
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The purchased subscription ID (for example, 'monthly001').    
+    /// The purchased subscription ID (for example, 'monthly001').
     pub fn subscription_id(mut self, new_value: &str) -> PurchaseSubscriptionGetCall<'a, C, NC, A> {
         self._subscription_id = new_value.to_string();
         self
@@ -2856,7 +3174,7 @@ impl<'a, C, NC, A> PurchaseSubscriptionGetCall<'a, C, NC, A> where NC: hyper::ne
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The token provided to the user's device when the subscription was purchased.    
+    /// The token provided to the user's device when the subscription was purchased.
     pub fn token(mut self, new_value: &str) -> PurchaseSubscriptionGetCall<'a, C, NC, A> {
         self._token = new_value.to_string();
         self
@@ -2917,7 +3235,7 @@ impl<'a, C, NC, A> PurchaseSubscriptionGetCall<'a, C, NC, A> where NC: hyper::ne
 /// Cancels a user's subscription purchase. The subscription remains valid until its expiration time.
 ///
 /// A builder for the *subscriptions.cancel* method supported by a *purchase* resource.
-/// It is not used directly, but through a `PurchaseMethods`.
+/// It is not used directly, but through a `PurchaseMethods` instance.
 ///
 /// # Example
 ///
@@ -2979,7 +3297,7 @@ impl<'a, C, NC, A> PurchaseSubscriptionCancelCall<'a, C, NC, A> where NC: hyper:
         for &field in ["packageName", "subscriptionId", "token"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -3031,7 +3349,7 @@ impl<'a, C, NC, A> PurchaseSubscriptionCancelCall<'a, C, NC, A> where NC: hyper:
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -3043,7 +3361,6 @@ impl<'a, C, NC, A> PurchaseSubscriptionCancelCall<'a, C, NC, A> where NC: hyper:
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -3053,7 +3370,7 @@ impl<'a, C, NC, A> PurchaseSubscriptionCancelCall<'a, C, NC, A> where NC: hyper:
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -3064,12 +3381,12 @@ impl<'a, C, NC, A> PurchaseSubscriptionCancelCall<'a, C, NC, A> where NC: hyper:
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = res;
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -3081,7 +3398,7 @@ impl<'a, C, NC, A> PurchaseSubscriptionCancelCall<'a, C, NC, A> where NC: hyper:
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The package name of the application for which this subscription was purchased (for example, 'com.some.thing').    
+    /// The package name of the application for which this subscription was purchased (for example, 'com.some.thing').
     pub fn package_name(mut self, new_value: &str) -> PurchaseSubscriptionCancelCall<'a, C, NC, A> {
         self._package_name = new_value.to_string();
         self
@@ -3091,7 +3408,7 @@ impl<'a, C, NC, A> PurchaseSubscriptionCancelCall<'a, C, NC, A> where NC: hyper:
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The purchased subscription ID (for example, 'monthly001').    
+    /// The purchased subscription ID (for example, 'monthly001').
     pub fn subscription_id(mut self, new_value: &str) -> PurchaseSubscriptionCancelCall<'a, C, NC, A> {
         self._subscription_id = new_value.to_string();
         self
@@ -3101,7 +3418,7 @@ impl<'a, C, NC, A> PurchaseSubscriptionCancelCall<'a, C, NC, A> where NC: hyper:
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The token provided to the user's device when the subscription was purchased.    
+    /// The token provided to the user's device when the subscription was purchased.
     pub fn token(mut self, new_value: &str) -> PurchaseSubscriptionCancelCall<'a, C, NC, A> {
         self._token = new_value.to_string();
         self
@@ -3162,7 +3479,7 @@ impl<'a, C, NC, A> PurchaseSubscriptionCancelCall<'a, C, NC, A> where NC: hyper:
 /// Refunds a user's subscription purchase, but the subscription remains valid until its expiration time and it will continue to recur.
 ///
 /// A builder for the *subscriptions.refund* method supported by a *purchase* resource.
-/// It is not used directly, but through a `PurchaseMethods`.
+/// It is not used directly, but through a `PurchaseMethods` instance.
 ///
 /// # Example
 ///
@@ -3224,7 +3541,7 @@ impl<'a, C, NC, A> PurchaseSubscriptionRefundCall<'a, C, NC, A> where NC: hyper:
         for &field in ["packageName", "subscriptionId", "token"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -3276,7 +3593,7 @@ impl<'a, C, NC, A> PurchaseSubscriptionRefundCall<'a, C, NC, A> where NC: hyper:
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -3288,7 +3605,6 @@ impl<'a, C, NC, A> PurchaseSubscriptionRefundCall<'a, C, NC, A> where NC: hyper:
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -3298,7 +3614,7 @@ impl<'a, C, NC, A> PurchaseSubscriptionRefundCall<'a, C, NC, A> where NC: hyper:
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -3309,12 +3625,12 @@ impl<'a, C, NC, A> PurchaseSubscriptionRefundCall<'a, C, NC, A> where NC: hyper:
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = res;
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -3326,7 +3642,7 @@ impl<'a, C, NC, A> PurchaseSubscriptionRefundCall<'a, C, NC, A> where NC: hyper:
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The package name of the application for which this subscription was purchased (for example, 'com.some.thing').    
+    /// The package name of the application for which this subscription was purchased (for example, 'com.some.thing').
     pub fn package_name(mut self, new_value: &str) -> PurchaseSubscriptionRefundCall<'a, C, NC, A> {
         self._package_name = new_value.to_string();
         self
@@ -3336,7 +3652,7 @@ impl<'a, C, NC, A> PurchaseSubscriptionRefundCall<'a, C, NC, A> where NC: hyper:
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The purchased subscription ID (for example, 'monthly001').    
+    /// The purchased subscription ID (for example, 'monthly001').
     pub fn subscription_id(mut self, new_value: &str) -> PurchaseSubscriptionRefundCall<'a, C, NC, A> {
         self._subscription_id = new_value.to_string();
         self
@@ -3346,7 +3662,7 @@ impl<'a, C, NC, A> PurchaseSubscriptionRefundCall<'a, C, NC, A> where NC: hyper:
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The token provided to the user's device when the subscription was purchased.    
+    /// The token provided to the user's device when the subscription was purchased.
     pub fn token(mut self, new_value: &str) -> PurchaseSubscriptionRefundCall<'a, C, NC, A> {
         self._token = new_value.to_string();
         self
@@ -3407,7 +3723,7 @@ impl<'a, C, NC, A> PurchaseSubscriptionRefundCall<'a, C, NC, A> where NC: hyper:
 /// Defers a user's subscription purchase until a specified future expiration time.
 ///
 /// A builder for the *subscriptions.defer* method supported by a *purchase* resource.
-/// It is not used directly, but through a `PurchaseMethods`.
+/// It is not used directly, but through a `PurchaseMethods` instance.
 ///
 /// # Example
 ///
@@ -3476,7 +3792,7 @@ impl<'a, C, NC, A> PurchaseSubscriptionDeferCall<'a, C, NC, A> where NC: hyper::
         for &field in ["alt", "packageName", "subscriptionId", "token"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -3533,7 +3849,7 @@ impl<'a, C, NC, A> PurchaseSubscriptionDeferCall<'a, C, NC, A> where NC: hyper::
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -3549,7 +3865,6 @@ impl<'a, C, NC, A> PurchaseSubscriptionDeferCall<'a, C, NC, A> where NC: hyper::
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -3559,7 +3874,7 @@ impl<'a, C, NC, A> PurchaseSubscriptionDeferCall<'a, C, NC, A> where NC: hyper::
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -3570,7 +3885,7 @@ impl<'a, C, NC, A> PurchaseSubscriptionDeferCall<'a, C, NC, A> where NC: hyper::
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -3579,13 +3894,13 @@ impl<'a, C, NC, A> PurchaseSubscriptionDeferCall<'a, C, NC, A> where NC: hyper::
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -3606,7 +3921,7 @@ impl<'a, C, NC, A> PurchaseSubscriptionDeferCall<'a, C, NC, A> where NC: hyper::
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The package name of the application for which this subscription was purchased (for example, 'com.some.thing').    
+    /// The package name of the application for which this subscription was purchased (for example, 'com.some.thing').
     pub fn package_name(mut self, new_value: &str) -> PurchaseSubscriptionDeferCall<'a, C, NC, A> {
         self._package_name = new_value.to_string();
         self
@@ -3616,7 +3931,7 @@ impl<'a, C, NC, A> PurchaseSubscriptionDeferCall<'a, C, NC, A> where NC: hyper::
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The purchased subscription ID (for example, 'monthly001').    
+    /// The purchased subscription ID (for example, 'monthly001').
     pub fn subscription_id(mut self, new_value: &str) -> PurchaseSubscriptionDeferCall<'a, C, NC, A> {
         self._subscription_id = new_value.to_string();
         self
@@ -3626,7 +3941,7 @@ impl<'a, C, NC, A> PurchaseSubscriptionDeferCall<'a, C, NC, A> where NC: hyper::
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The token provided to the user's device when the subscription was purchased.    
+    /// The token provided to the user's device when the subscription was purchased.
     pub fn token(mut self, new_value: &str) -> PurchaseSubscriptionDeferCall<'a, C, NC, A> {
         self._token = new_value.to_string();
         self
@@ -3687,7 +4002,7 @@ impl<'a, C, NC, A> PurchaseSubscriptionDeferCall<'a, C, NC, A> where NC: hyper::
 /// Uploads a new image and adds it to the list of images for the specified language and image type.
 ///
 /// A builder for the *images.upload* method supported by a *edit* resource.
-/// It is not used directly, but through a `EditMethods`.
+/// It is not used directly, but through a `EditMethods` instance.
 ///
 /// # Example
 ///
@@ -3753,7 +4068,7 @@ impl<'a, C, NC, A> EditImageUploadCall<'a, C, NC, A> where NC: hyper::net::Netwo
         for &field in ["alt", "packageName", "editId", "language", "imageType"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -3816,7 +4131,7 @@ impl<'a, C, NC, A> EditImageUploadCall<'a, C, NC, A> where NC: hyper::net::Netwo
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -3842,7 +4157,7 @@ impl<'a, C, NC, A> EditImageUploadCall<'a, C, NC, A> where NC: hyper::net::Netwo
                         let size = reader.seek(io::SeekFrom::End(0)).unwrap();
                     reader.seek(io::SeekFrom::Start(0)).unwrap();
                     if size > 15728640 {
-                    	return Result::UploadSizeLimitExceeded(size, 15728640)
+                    	return Err(Error::UploadSizeLimitExceeded(size, 15728640))
                     }
                         req = req.header(ContentType(reader_mime_type.clone()))
                                  .header(ContentLength(size))
@@ -3855,7 +4170,6 @@ impl<'a, C, NC, A> EditImageUploadCall<'a, C, NC, A> where NC: hyper::net::Netwo
     
                     dlg.pre_request();
                     req.send()
-    
                 }
             };
 
@@ -3866,7 +4180,7 @@ impl<'a, C, NC, A> EditImageUploadCall<'a, C, NC, A> where NC: hyper::net::Netwo
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -3877,13 +4191,13 @@ impl<'a, C, NC, A> EditImageUploadCall<'a, C, NC, A> where NC: hyper::net::Netwo
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     if protocol == "resumable" {
                         let size = reader.seek(io::SeekFrom::End(0)).unwrap();
                         reader.seek(io::SeekFrom::Start(0)).unwrap();
                         if size > 15728640 {
-                        	return Result::UploadSizeLimitExceeded(size, 15728640)
+                        	return Err(Error::UploadSizeLimitExceeded(size, 15728640))
                         }
                         let mut client = &mut *self.hub.client.borrow_mut();
                         let upload_result = {
@@ -3908,17 +4222,17 @@ impl<'a, C, NC, A> EditImageUploadCall<'a, C, NC, A> where NC: hyper::net::Netwo
                         match upload_result {
                             None => {
                                 dlg.finished(false);
-                                return Result::Cancelled
+                                return Err(Error::Cancelled)
                             }
                             Some(Err(err)) => {
                                 dlg.finished(false);
-                                return Result::HttpError(err)
+                                return Err(Error::HttpError(err))
                             }
                             Some(Ok(upload_result)) => {
                                 res = upload_result;
                                 if !res.status.is_success() {
                                     dlg.finished(false);
-                                    return Result::Failure(res)
+                                    return Err(Error::Failure(res))
                                 }
                             }
                         }
@@ -3930,13 +4244,13 @@ impl<'a, C, NC, A> EditImageUploadCall<'a, C, NC, A> where NC: hyper::net::Netwo
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -3952,11 +4266,14 @@ impl<'a, C, NC, A> EditImageUploadCall<'a, C, NC, A> where NC: hyper::net::Netwo
                 where RS: ReadSeek {
         self.doit(stream, mime_type, "simple")
     }
-    /// Upload media in a resumeable fashion.
+    /// Upload media in a resumable fashion.
     /// Even if the upload fails or is interrupted, it can be resumed for a 
     /// certain amount of time as the server maintains state temporarily.
     /// 
-    /// TODO: Write more about how delegation works in this particular case.
+    /// The delegate will be asked for an `upload_url()`, and if not provided, will be asked to store an upload URL 
+    /// that was provided by the server, using `store_upload_url(...)`. The upload will be done in chunks, the delegate
+    /// may specify the `chunk_size()` and may cancel the operation before each chunk is uploaded, using
+    /// `cancel_chunk_upload(...)`.
     ///
     /// * *max size*: 15MB
     /// * *multipart*: yes
@@ -3971,7 +4288,7 @@ impl<'a, C, NC, A> EditImageUploadCall<'a, C, NC, A> where NC: hyper::net::Netwo
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Unique identifier for the Android app that is being updated; for example, "com.spiffygame".    
+    /// Unique identifier for the Android app that is being updated; for example, "com.spiffygame".
     pub fn package_name(mut self, new_value: &str) -> EditImageUploadCall<'a, C, NC, A> {
         self._package_name = new_value.to_string();
         self
@@ -3981,7 +4298,7 @@ impl<'a, C, NC, A> EditImageUploadCall<'a, C, NC, A> where NC: hyper::net::Netwo
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Unique identifier for this edit.    
+    /// Unique identifier for this edit.
     pub fn edit_id(mut self, new_value: &str) -> EditImageUploadCall<'a, C, NC, A> {
         self._edit_id = new_value.to_string();
         self
@@ -3991,7 +4308,7 @@ impl<'a, C, NC, A> EditImageUploadCall<'a, C, NC, A> where NC: hyper::net::Netwo
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The language code (a BCP-47 language tag) of the localized listing whose images are to read or modified. For example, to select Austrian German, pass "de-AT".    
+    /// The language code (a BCP-47 language tag) of the localized listing whose images are to read or modified. For example, to select Austrian German, pass "de-AT".
     pub fn language(mut self, new_value: &str) -> EditImageUploadCall<'a, C, NC, A> {
         self._language = new_value.to_string();
         self
@@ -4061,7 +4378,7 @@ impl<'a, C, NC, A> EditImageUploadCall<'a, C, NC, A> where NC: hyper::net::Netwo
 /// Updates the APK's Expansion File configuration to reference another APK's Expansion Files. To add a new Expansion File use the Upload method.
 ///
 /// A builder for the *expansionfiles.update* method supported by a *edit* resource.
-/// It is not used directly, but through a `EditMethods`.
+/// It is not used directly, but through a `EditMethods` instance.
 ///
 /// # Example
 ///
@@ -4132,7 +4449,7 @@ impl<'a, C, NC, A> EditExpansionfileUpdateCall<'a, C, NC, A> where NC: hyper::ne
         for &field in ["alt", "packageName", "editId", "apkVersionCode", "expansionFileType"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -4189,7 +4506,7 @@ impl<'a, C, NC, A> EditExpansionfileUpdateCall<'a, C, NC, A> where NC: hyper::ne
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -4205,7 +4522,6 @@ impl<'a, C, NC, A> EditExpansionfileUpdateCall<'a, C, NC, A> where NC: hyper::ne
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -4215,7 +4531,7 @@ impl<'a, C, NC, A> EditExpansionfileUpdateCall<'a, C, NC, A> where NC: hyper::ne
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -4226,7 +4542,7 @@ impl<'a, C, NC, A> EditExpansionfileUpdateCall<'a, C, NC, A> where NC: hyper::ne
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -4235,13 +4551,13 @@ impl<'a, C, NC, A> EditExpansionfileUpdateCall<'a, C, NC, A> where NC: hyper::ne
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -4262,7 +4578,7 @@ impl<'a, C, NC, A> EditExpansionfileUpdateCall<'a, C, NC, A> where NC: hyper::ne
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Unique identifier for the Android app that is being updated; for example, "com.spiffygame".    
+    /// Unique identifier for the Android app that is being updated; for example, "com.spiffygame".
     pub fn package_name(mut self, new_value: &str) -> EditExpansionfileUpdateCall<'a, C, NC, A> {
         self._package_name = new_value.to_string();
         self
@@ -4272,7 +4588,7 @@ impl<'a, C, NC, A> EditExpansionfileUpdateCall<'a, C, NC, A> where NC: hyper::ne
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Unique identifier for this edit.    
+    /// Unique identifier for this edit.
     pub fn edit_id(mut self, new_value: &str) -> EditExpansionfileUpdateCall<'a, C, NC, A> {
         self._edit_id = new_value.to_string();
         self
@@ -4282,7 +4598,7 @@ impl<'a, C, NC, A> EditExpansionfileUpdateCall<'a, C, NC, A> where NC: hyper::ne
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The version code of the APK whose Expansion File configuration is being read or modified.    
+    /// The version code of the APK whose Expansion File configuration is being read or modified.
     pub fn apk_version_code(mut self, new_value: i32) -> EditExpansionfileUpdateCall<'a, C, NC, A> {
         self._apk_version_code = new_value;
         self
@@ -4352,7 +4668,7 @@ impl<'a, C, NC, A> EditExpansionfileUpdateCall<'a, C, NC, A> where NC: hyper::ne
 /// Fetches app details for this edit. This includes the default language and developer support contact information.
 ///
 /// A builder for the *details.get* method supported by a *edit* resource.
-/// It is not used directly, but through a `EditMethods`.
+/// It is not used directly, but through a `EditMethods` instance.
 ///
 /// # Example
 ///
@@ -4412,7 +4728,7 @@ impl<'a, C, NC, A> EditDetailGetCall<'a, C, NC, A> where NC: hyper::net::Network
         for &field in ["alt", "packageName", "editId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -4465,7 +4781,7 @@ impl<'a, C, NC, A> EditDetailGetCall<'a, C, NC, A> where NC: hyper::net::Network
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -4477,7 +4793,6 @@ impl<'a, C, NC, A> EditDetailGetCall<'a, C, NC, A> where NC: hyper::net::Network
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -4487,7 +4802,7 @@ impl<'a, C, NC, A> EditDetailGetCall<'a, C, NC, A> where NC: hyper::net::Network
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -4498,7 +4813,7 @@ impl<'a, C, NC, A> EditDetailGetCall<'a, C, NC, A> where NC: hyper::net::Network
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -4507,13 +4822,13 @@ impl<'a, C, NC, A> EditDetailGetCall<'a, C, NC, A> where NC: hyper::net::Network
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -4525,7 +4840,7 @@ impl<'a, C, NC, A> EditDetailGetCall<'a, C, NC, A> where NC: hyper::net::Network
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Unique identifier for the Android app that is being updated; for example, "com.spiffygame".    
+    /// Unique identifier for the Android app that is being updated; for example, "com.spiffygame".
     pub fn package_name(mut self, new_value: &str) -> EditDetailGetCall<'a, C, NC, A> {
         self._package_name = new_value.to_string();
         self
@@ -4535,7 +4850,7 @@ impl<'a, C, NC, A> EditDetailGetCall<'a, C, NC, A> where NC: hyper::net::Network
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Unique identifier for this edit.    
+    /// Unique identifier for this edit.
     pub fn edit_id(mut self, new_value: &str) -> EditDetailGetCall<'a, C, NC, A> {
         self._edit_id = new_value.to_string();
         self
@@ -4596,7 +4911,7 @@ impl<'a, C, NC, A> EditDetailGetCall<'a, C, NC, A> where NC: hyper::net::Network
 /// Deletes the APK-specific localized listing for a specified APK and language code.
 ///
 /// A builder for the *apklistings.delete* method supported by a *edit* resource.
-/// It is not used directly, but through a `EditMethods`.
+/// It is not used directly, but through a `EditMethods` instance.
 ///
 /// # Example
 ///
@@ -4660,7 +4975,7 @@ impl<'a, C, NC, A> EditApklistingDeleteCall<'a, C, NC, A> where NC: hyper::net::
         for &field in ["packageName", "editId", "apkVersionCode", "language"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -4712,7 +5027,7 @@ impl<'a, C, NC, A> EditApklistingDeleteCall<'a, C, NC, A> where NC: hyper::net::
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -4724,7 +5039,6 @@ impl<'a, C, NC, A> EditApklistingDeleteCall<'a, C, NC, A> where NC: hyper::net::
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -4734,7 +5048,7 @@ impl<'a, C, NC, A> EditApklistingDeleteCall<'a, C, NC, A> where NC: hyper::net::
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -4745,12 +5059,12 @@ impl<'a, C, NC, A> EditApklistingDeleteCall<'a, C, NC, A> where NC: hyper::net::
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = res;
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -4762,7 +5076,7 @@ impl<'a, C, NC, A> EditApklistingDeleteCall<'a, C, NC, A> where NC: hyper::net::
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Unique identifier for the Android app that is being updated; for example, "com.spiffygame".    
+    /// Unique identifier for the Android app that is being updated; for example, "com.spiffygame".
     pub fn package_name(mut self, new_value: &str) -> EditApklistingDeleteCall<'a, C, NC, A> {
         self._package_name = new_value.to_string();
         self
@@ -4772,7 +5086,7 @@ impl<'a, C, NC, A> EditApklistingDeleteCall<'a, C, NC, A> where NC: hyper::net::
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Unique identifier for this edit.    
+    /// Unique identifier for this edit.
     pub fn edit_id(mut self, new_value: &str) -> EditApklistingDeleteCall<'a, C, NC, A> {
         self._edit_id = new_value.to_string();
         self
@@ -4782,7 +5096,7 @@ impl<'a, C, NC, A> EditApklistingDeleteCall<'a, C, NC, A> where NC: hyper::net::
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The APK version code whose APK-specific listings should be read or modified.    
+    /// The APK version code whose APK-specific listings should be read or modified.
     pub fn apk_version_code(mut self, new_value: i32) -> EditApklistingDeleteCall<'a, C, NC, A> {
         self._apk_version_code = new_value;
         self
@@ -4792,7 +5106,7 @@ impl<'a, C, NC, A> EditApklistingDeleteCall<'a, C, NC, A> where NC: hyper::net::
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The language code (a BCP-47 language tag) of the APK-specific localized listing to read or modify. For example, to select Austrian German, pass "de-AT".    
+    /// The language code (a BCP-47 language tag) of the APK-specific localized listing to read or modify. For example, to select Austrian German, pass "de-AT".
     pub fn language(mut self, new_value: &str) -> EditApklistingDeleteCall<'a, C, NC, A> {
         self._language = new_value.to_string();
         self
@@ -4853,7 +5167,7 @@ impl<'a, C, NC, A> EditApklistingDeleteCall<'a, C, NC, A> where NC: hyper::net::
 /// Deletes all localized listings from an edit.
 ///
 /// A builder for the *listings.deleteall* method supported by a *edit* resource.
-/// It is not used directly, but through a `EditMethods`.
+/// It is not used directly, but through a `EditMethods` instance.
 ///
 /// # Example
 ///
@@ -4913,7 +5227,7 @@ impl<'a, C, NC, A> EditListingDeleteallCall<'a, C, NC, A> where NC: hyper::net::
         for &field in ["packageName", "editId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -4965,7 +5279,7 @@ impl<'a, C, NC, A> EditListingDeleteallCall<'a, C, NC, A> where NC: hyper::net::
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -4977,7 +5291,6 @@ impl<'a, C, NC, A> EditListingDeleteallCall<'a, C, NC, A> where NC: hyper::net::
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -4987,7 +5300,7 @@ impl<'a, C, NC, A> EditListingDeleteallCall<'a, C, NC, A> where NC: hyper::net::
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -4998,12 +5311,12 @@ impl<'a, C, NC, A> EditListingDeleteallCall<'a, C, NC, A> where NC: hyper::net::
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = res;
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -5015,7 +5328,7 @@ impl<'a, C, NC, A> EditListingDeleteallCall<'a, C, NC, A> where NC: hyper::net::
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Unique identifier for the Android app that is being updated; for example, "com.spiffygame".    
+    /// Unique identifier for the Android app that is being updated; for example, "com.spiffygame".
     pub fn package_name(mut self, new_value: &str) -> EditListingDeleteallCall<'a, C, NC, A> {
         self._package_name = new_value.to_string();
         self
@@ -5025,7 +5338,7 @@ impl<'a, C, NC, A> EditListingDeleteallCall<'a, C, NC, A> where NC: hyper::net::
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Unique identifier for this edit.    
+    /// Unique identifier for this edit.
     pub fn edit_id(mut self, new_value: &str) -> EditListingDeleteallCall<'a, C, NC, A> {
         self._edit_id = new_value.to_string();
         self
@@ -5086,7 +5399,7 @@ impl<'a, C, NC, A> EditListingDeleteallCall<'a, C, NC, A> where NC: hyper::net::
 /// Creates a new APK without uploading the APK itself to Google Play, instead hosting the APK at a specified URL. This function is only available to enterprises using Google Play for work whose application is configured to restrict distribution to the enterprise domain.
 ///
 /// A builder for the *apks.addexternallyhosted* method supported by a *edit* resource.
-/// It is not used directly, but through a `EditMethods`.
+/// It is not used directly, but through a `EditMethods` instance.
 ///
 /// # Example
 ///
@@ -5153,7 +5466,7 @@ impl<'a, C, NC, A> EditApkAddexternallyhostedCall<'a, C, NC, A> where NC: hyper:
         for &field in ["alt", "packageName", "editId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -5210,7 +5523,7 @@ impl<'a, C, NC, A> EditApkAddexternallyhostedCall<'a, C, NC, A> where NC: hyper:
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -5226,7 +5539,6 @@ impl<'a, C, NC, A> EditApkAddexternallyhostedCall<'a, C, NC, A> where NC: hyper:
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -5236,7 +5548,7 @@ impl<'a, C, NC, A> EditApkAddexternallyhostedCall<'a, C, NC, A> where NC: hyper:
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -5247,7 +5559,7 @@ impl<'a, C, NC, A> EditApkAddexternallyhostedCall<'a, C, NC, A> where NC: hyper:
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -5256,13 +5568,13 @@ impl<'a, C, NC, A> EditApkAddexternallyhostedCall<'a, C, NC, A> where NC: hyper:
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -5283,7 +5595,7 @@ impl<'a, C, NC, A> EditApkAddexternallyhostedCall<'a, C, NC, A> where NC: hyper:
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Unique identifier for the Android app that is being updated; for example, "com.spiffygame".    
+    /// Unique identifier for the Android app that is being updated; for example, "com.spiffygame".
     pub fn package_name(mut self, new_value: &str) -> EditApkAddexternallyhostedCall<'a, C, NC, A> {
         self._package_name = new_value.to_string();
         self
@@ -5293,7 +5605,7 @@ impl<'a, C, NC, A> EditApkAddexternallyhostedCall<'a, C, NC, A> where NC: hyper:
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Unique identifier for this edit.    
+    /// Unique identifier for this edit.
     pub fn edit_id(mut self, new_value: &str) -> EditApkAddexternallyhostedCall<'a, C, NC, A> {
         self._edit_id = new_value.to_string();
         self
@@ -5354,7 +5666,7 @@ impl<'a, C, NC, A> EditApkAddexternallyhostedCall<'a, C, NC, A> where NC: hyper:
 /// Deletes all the APK-specific localized listings for a specified APK.
 ///
 /// A builder for the *apklistings.deleteall* method supported by a *edit* resource.
-/// It is not used directly, but through a `EditMethods`.
+/// It is not used directly, but through a `EditMethods` instance.
 ///
 /// # Example
 ///
@@ -5416,7 +5728,7 @@ impl<'a, C, NC, A> EditApklistingDeleteallCall<'a, C, NC, A> where NC: hyper::ne
         for &field in ["packageName", "editId", "apkVersionCode"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -5468,7 +5780,7 @@ impl<'a, C, NC, A> EditApklistingDeleteallCall<'a, C, NC, A> where NC: hyper::ne
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -5480,7 +5792,6 @@ impl<'a, C, NC, A> EditApklistingDeleteallCall<'a, C, NC, A> where NC: hyper::ne
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -5490,7 +5801,7 @@ impl<'a, C, NC, A> EditApklistingDeleteallCall<'a, C, NC, A> where NC: hyper::ne
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -5501,12 +5812,12 @@ impl<'a, C, NC, A> EditApklistingDeleteallCall<'a, C, NC, A> where NC: hyper::ne
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = res;
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -5518,7 +5829,7 @@ impl<'a, C, NC, A> EditApklistingDeleteallCall<'a, C, NC, A> where NC: hyper::ne
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Unique identifier for the Android app that is being updated; for example, "com.spiffygame".    
+    /// Unique identifier for the Android app that is being updated; for example, "com.spiffygame".
     pub fn package_name(mut self, new_value: &str) -> EditApklistingDeleteallCall<'a, C, NC, A> {
         self._package_name = new_value.to_string();
         self
@@ -5528,7 +5839,7 @@ impl<'a, C, NC, A> EditApklistingDeleteallCall<'a, C, NC, A> where NC: hyper::ne
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Unique identifier for this edit.    
+    /// Unique identifier for this edit.
     pub fn edit_id(mut self, new_value: &str) -> EditApklistingDeleteallCall<'a, C, NC, A> {
         self._edit_id = new_value.to_string();
         self
@@ -5538,7 +5849,7 @@ impl<'a, C, NC, A> EditApklistingDeleteallCall<'a, C, NC, A> where NC: hyper::ne
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The APK version code whose APK-specific listings should be read or modified.    
+    /// The APK version code whose APK-specific listings should be read or modified.
     pub fn apk_version_code(mut self, new_value: i32) -> EditApklistingDeleteallCall<'a, C, NC, A> {
         self._apk_version_code = new_value;
         self
@@ -5599,7 +5910,7 @@ impl<'a, C, NC, A> EditApklistingDeleteallCall<'a, C, NC, A> where NC: hyper::ne
 /// Updates app details for this edit.
 ///
 /// A builder for the *details.update* method supported by a *edit* resource.
-/// It is not used directly, but through a `EditMethods`.
+/// It is not used directly, but through a `EditMethods` instance.
 ///
 /// # Example
 ///
@@ -5666,7 +5977,7 @@ impl<'a, C, NC, A> EditDetailUpdateCall<'a, C, NC, A> where NC: hyper::net::Netw
         for &field in ["alt", "packageName", "editId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -5723,7 +6034,7 @@ impl<'a, C, NC, A> EditDetailUpdateCall<'a, C, NC, A> where NC: hyper::net::Netw
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -5739,7 +6050,6 @@ impl<'a, C, NC, A> EditDetailUpdateCall<'a, C, NC, A> where NC: hyper::net::Netw
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -5749,7 +6059,7 @@ impl<'a, C, NC, A> EditDetailUpdateCall<'a, C, NC, A> where NC: hyper::net::Netw
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -5760,7 +6070,7 @@ impl<'a, C, NC, A> EditDetailUpdateCall<'a, C, NC, A> where NC: hyper::net::Netw
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -5769,13 +6079,13 @@ impl<'a, C, NC, A> EditDetailUpdateCall<'a, C, NC, A> where NC: hyper::net::Netw
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -5796,7 +6106,7 @@ impl<'a, C, NC, A> EditDetailUpdateCall<'a, C, NC, A> where NC: hyper::net::Netw
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Unique identifier for the Android app that is being updated; for example, "com.spiffygame".    
+    /// Unique identifier for the Android app that is being updated; for example, "com.spiffygame".
     pub fn package_name(mut self, new_value: &str) -> EditDetailUpdateCall<'a, C, NC, A> {
         self._package_name = new_value.to_string();
         self
@@ -5806,7 +6116,7 @@ impl<'a, C, NC, A> EditDetailUpdateCall<'a, C, NC, A> where NC: hyper::net::Netw
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Unique identifier for this edit.    
+    /// Unique identifier for this edit.
     pub fn edit_id(mut self, new_value: &str) -> EditDetailUpdateCall<'a, C, NC, A> {
         self._edit_id = new_value.to_string();
         self
@@ -5867,7 +6177,7 @@ impl<'a, C, NC, A> EditDetailUpdateCall<'a, C, NC, A> where NC: hyper::net::Netw
 /// Fetches the track configuration for the specified track type. Includes the APK version codes that are in this track.
 ///
 /// A builder for the *tracks.get* method supported by a *edit* resource.
-/// It is not used directly, but through a `EditMethods`.
+/// It is not used directly, but through a `EditMethods` instance.
 ///
 /// # Example
 ///
@@ -5929,7 +6239,7 @@ impl<'a, C, NC, A> EditTrackGetCall<'a, C, NC, A> where NC: hyper::net::NetworkC
         for &field in ["alt", "packageName", "editId", "track"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -5982,7 +6292,7 @@ impl<'a, C, NC, A> EditTrackGetCall<'a, C, NC, A> where NC: hyper::net::NetworkC
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -5994,7 +6304,6 @@ impl<'a, C, NC, A> EditTrackGetCall<'a, C, NC, A> where NC: hyper::net::NetworkC
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -6004,7 +6313,7 @@ impl<'a, C, NC, A> EditTrackGetCall<'a, C, NC, A> where NC: hyper::net::NetworkC
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -6015,7 +6324,7 @@ impl<'a, C, NC, A> EditTrackGetCall<'a, C, NC, A> where NC: hyper::net::NetworkC
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -6024,13 +6333,13 @@ impl<'a, C, NC, A> EditTrackGetCall<'a, C, NC, A> where NC: hyper::net::NetworkC
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -6042,7 +6351,7 @@ impl<'a, C, NC, A> EditTrackGetCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Unique identifier for the Android app that is being updated; for example, "com.spiffygame".    
+    /// Unique identifier for the Android app that is being updated; for example, "com.spiffygame".
     pub fn package_name(mut self, new_value: &str) -> EditTrackGetCall<'a, C, NC, A> {
         self._package_name = new_value.to_string();
         self
@@ -6052,7 +6361,7 @@ impl<'a, C, NC, A> EditTrackGetCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Unique identifier for this edit.    
+    /// Unique identifier for this edit.
     pub fn edit_id(mut self, new_value: &str) -> EditTrackGetCall<'a, C, NC, A> {
         self._edit_id = new_value.to_string();
         self
@@ -6062,7 +6371,7 @@ impl<'a, C, NC, A> EditTrackGetCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The track type to read or modify.    
+    /// The track type to read or modify.
     pub fn track(mut self, new_value: &str) -> EditTrackGetCall<'a, C, NC, A> {
         self._track = new_value.to_string();
         self
@@ -6123,7 +6432,7 @@ impl<'a, C, NC, A> EditTrackGetCall<'a, C, NC, A> where NC: hyper::net::NetworkC
 /// Updates the APK's Expansion File configuration to reference another APK's Expansion Files. To add a new Expansion File use the Upload method. This method supports patch semantics.
 ///
 /// A builder for the *expansionfiles.patch* method supported by a *edit* resource.
-/// It is not used directly, but through a `EditMethods`.
+/// It is not used directly, but through a `EditMethods` instance.
 ///
 /// # Example
 ///
@@ -6194,7 +6503,7 @@ impl<'a, C, NC, A> EditExpansionfilePatchCall<'a, C, NC, A> where NC: hyper::net
         for &field in ["alt", "packageName", "editId", "apkVersionCode", "expansionFileType"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -6251,7 +6560,7 @@ impl<'a, C, NC, A> EditExpansionfilePatchCall<'a, C, NC, A> where NC: hyper::net
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -6267,7 +6576,6 @@ impl<'a, C, NC, A> EditExpansionfilePatchCall<'a, C, NC, A> where NC: hyper::net
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -6277,7 +6585,7 @@ impl<'a, C, NC, A> EditExpansionfilePatchCall<'a, C, NC, A> where NC: hyper::net
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -6288,7 +6596,7 @@ impl<'a, C, NC, A> EditExpansionfilePatchCall<'a, C, NC, A> where NC: hyper::net
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -6297,13 +6605,13 @@ impl<'a, C, NC, A> EditExpansionfilePatchCall<'a, C, NC, A> where NC: hyper::net
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -6324,7 +6632,7 @@ impl<'a, C, NC, A> EditExpansionfilePatchCall<'a, C, NC, A> where NC: hyper::net
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Unique identifier for the Android app that is being updated; for example, "com.spiffygame".    
+    /// Unique identifier for the Android app that is being updated; for example, "com.spiffygame".
     pub fn package_name(mut self, new_value: &str) -> EditExpansionfilePatchCall<'a, C, NC, A> {
         self._package_name = new_value.to_string();
         self
@@ -6334,7 +6642,7 @@ impl<'a, C, NC, A> EditExpansionfilePatchCall<'a, C, NC, A> where NC: hyper::net
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Unique identifier for this edit.    
+    /// Unique identifier for this edit.
     pub fn edit_id(mut self, new_value: &str) -> EditExpansionfilePatchCall<'a, C, NC, A> {
         self._edit_id = new_value.to_string();
         self
@@ -6344,7 +6652,7 @@ impl<'a, C, NC, A> EditExpansionfilePatchCall<'a, C, NC, A> where NC: hyper::net
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The version code of the APK whose Expansion File configuration is being read or modified.    
+    /// The version code of the APK whose Expansion File configuration is being read or modified.
     pub fn apk_version_code(mut self, new_value: i32) -> EditExpansionfilePatchCall<'a, C, NC, A> {
         self._apk_version_code = new_value;
         self
@@ -6414,7 +6722,7 @@ impl<'a, C, NC, A> EditExpansionfilePatchCall<'a, C, NC, A> where NC: hyper::net
 /// Lists all images for the specified language and image type.
 ///
 /// A builder for the *images.list* method supported by a *edit* resource.
-/// It is not used directly, but through a `EditMethods`.
+/// It is not used directly, but through a `EditMethods` instance.
 ///
 /// # Example
 ///
@@ -6478,7 +6786,7 @@ impl<'a, C, NC, A> EditImageListCall<'a, C, NC, A> where NC: hyper::net::Network
         for &field in ["alt", "packageName", "editId", "language", "imageType"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -6531,7 +6839,7 @@ impl<'a, C, NC, A> EditImageListCall<'a, C, NC, A> where NC: hyper::net::Network
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -6543,7 +6851,6 @@ impl<'a, C, NC, A> EditImageListCall<'a, C, NC, A> where NC: hyper::net::Network
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -6553,7 +6860,7 @@ impl<'a, C, NC, A> EditImageListCall<'a, C, NC, A> where NC: hyper::net::Network
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -6564,7 +6871,7 @@ impl<'a, C, NC, A> EditImageListCall<'a, C, NC, A> where NC: hyper::net::Network
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -6573,13 +6880,13 @@ impl<'a, C, NC, A> EditImageListCall<'a, C, NC, A> where NC: hyper::net::Network
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -6591,7 +6898,7 @@ impl<'a, C, NC, A> EditImageListCall<'a, C, NC, A> where NC: hyper::net::Network
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Unique identifier for the Android app that is being updated; for example, "com.spiffygame".    
+    /// Unique identifier for the Android app that is being updated; for example, "com.spiffygame".
     pub fn package_name(mut self, new_value: &str) -> EditImageListCall<'a, C, NC, A> {
         self._package_name = new_value.to_string();
         self
@@ -6601,7 +6908,7 @@ impl<'a, C, NC, A> EditImageListCall<'a, C, NC, A> where NC: hyper::net::Network
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Unique identifier for this edit.    
+    /// Unique identifier for this edit.
     pub fn edit_id(mut self, new_value: &str) -> EditImageListCall<'a, C, NC, A> {
         self._edit_id = new_value.to_string();
         self
@@ -6611,7 +6918,7 @@ impl<'a, C, NC, A> EditImageListCall<'a, C, NC, A> where NC: hyper::net::Network
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The language code (a BCP-47 language tag) of the localized listing whose images are to read or modified. For example, to select Austrian German, pass "de-AT".    
+    /// The language code (a BCP-47 language tag) of the localized listing whose images are to read or modified. For example, to select Austrian German, pass "de-AT".
     pub fn language(mut self, new_value: &str) -> EditImageListCall<'a, C, NC, A> {
         self._language = new_value.to_string();
         self
@@ -6681,7 +6988,7 @@ impl<'a, C, NC, A> EditImageListCall<'a, C, NC, A> where NC: hyper::net::Network
 /// Updates the track configuration for the specified track type. When halted, the rollout track cannot be updated without adding new APKs, and adding new APKs will cause it to resume.
 ///
 /// A builder for the *tracks.update* method supported by a *edit* resource.
-/// It is not used directly, but through a `EditMethods`.
+/// It is not used directly, but through a `EditMethods` instance.
 ///
 /// # Example
 ///
@@ -6750,7 +7057,7 @@ impl<'a, C, NC, A> EditTrackUpdateCall<'a, C, NC, A> where NC: hyper::net::Netwo
         for &field in ["alt", "packageName", "editId", "track"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -6807,7 +7114,7 @@ impl<'a, C, NC, A> EditTrackUpdateCall<'a, C, NC, A> where NC: hyper::net::Netwo
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -6823,7 +7130,6 @@ impl<'a, C, NC, A> EditTrackUpdateCall<'a, C, NC, A> where NC: hyper::net::Netwo
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -6833,7 +7139,7 @@ impl<'a, C, NC, A> EditTrackUpdateCall<'a, C, NC, A> where NC: hyper::net::Netwo
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -6844,7 +7150,7 @@ impl<'a, C, NC, A> EditTrackUpdateCall<'a, C, NC, A> where NC: hyper::net::Netwo
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -6853,13 +7159,13 @@ impl<'a, C, NC, A> EditTrackUpdateCall<'a, C, NC, A> where NC: hyper::net::Netwo
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -6880,7 +7186,7 @@ impl<'a, C, NC, A> EditTrackUpdateCall<'a, C, NC, A> where NC: hyper::net::Netwo
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Unique identifier for the Android app that is being updated; for example, "com.spiffygame".    
+    /// Unique identifier for the Android app that is being updated; for example, "com.spiffygame".
     pub fn package_name(mut self, new_value: &str) -> EditTrackUpdateCall<'a, C, NC, A> {
         self._package_name = new_value.to_string();
         self
@@ -6890,7 +7196,7 @@ impl<'a, C, NC, A> EditTrackUpdateCall<'a, C, NC, A> where NC: hyper::net::Netwo
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Unique identifier for this edit.    
+    /// Unique identifier for this edit.
     pub fn edit_id(mut self, new_value: &str) -> EditTrackUpdateCall<'a, C, NC, A> {
         self._edit_id = new_value.to_string();
         self
@@ -6900,7 +7206,7 @@ impl<'a, C, NC, A> EditTrackUpdateCall<'a, C, NC, A> where NC: hyper::net::Netwo
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The track type to read or modify.    
+    /// The track type to read or modify.
     pub fn track(mut self, new_value: &str) -> EditTrackUpdateCall<'a, C, NC, A> {
         self._track = new_value.to_string();
         self
@@ -6961,7 +7267,7 @@ impl<'a, C, NC, A> EditTrackUpdateCall<'a, C, NC, A> where NC: hyper::net::Netwo
 /// Creates or updates a localized store listing. This method supports patch semantics.
 ///
 /// A builder for the *listings.patch* method supported by a *edit* resource.
-/// It is not used directly, but through a `EditMethods`.
+/// It is not used directly, but through a `EditMethods` instance.
 ///
 /// # Example
 ///
@@ -7030,7 +7336,7 @@ impl<'a, C, NC, A> EditListingPatchCall<'a, C, NC, A> where NC: hyper::net::Netw
         for &field in ["alt", "packageName", "editId", "language"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -7087,7 +7393,7 @@ impl<'a, C, NC, A> EditListingPatchCall<'a, C, NC, A> where NC: hyper::net::Netw
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -7103,7 +7409,6 @@ impl<'a, C, NC, A> EditListingPatchCall<'a, C, NC, A> where NC: hyper::net::Netw
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -7113,7 +7418,7 @@ impl<'a, C, NC, A> EditListingPatchCall<'a, C, NC, A> where NC: hyper::net::Netw
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -7124,7 +7429,7 @@ impl<'a, C, NC, A> EditListingPatchCall<'a, C, NC, A> where NC: hyper::net::Netw
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -7133,13 +7438,13 @@ impl<'a, C, NC, A> EditListingPatchCall<'a, C, NC, A> where NC: hyper::net::Netw
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -7160,7 +7465,7 @@ impl<'a, C, NC, A> EditListingPatchCall<'a, C, NC, A> where NC: hyper::net::Netw
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Unique identifier for the Android app that is being updated; for example, "com.spiffygame".    
+    /// Unique identifier for the Android app that is being updated; for example, "com.spiffygame".
     pub fn package_name(mut self, new_value: &str) -> EditListingPatchCall<'a, C, NC, A> {
         self._package_name = new_value.to_string();
         self
@@ -7170,7 +7475,7 @@ impl<'a, C, NC, A> EditListingPatchCall<'a, C, NC, A> where NC: hyper::net::Netw
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Unique identifier for this edit.    
+    /// Unique identifier for this edit.
     pub fn edit_id(mut self, new_value: &str) -> EditListingPatchCall<'a, C, NC, A> {
         self._edit_id = new_value.to_string();
         self
@@ -7180,7 +7485,7 @@ impl<'a, C, NC, A> EditListingPatchCall<'a, C, NC, A> where NC: hyper::net::Netw
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The language code (a BCP-47 language tag) of the localized listing to read or modify. For example, to select Austrian German, pass "de-AT".    
+    /// The language code (a BCP-47 language tag) of the localized listing to read or modify. For example, to select Austrian German, pass "de-AT".
     pub fn language(mut self, new_value: &str) -> EditListingPatchCall<'a, C, NC, A> {
         self._language = new_value.to_string();
         self
@@ -7241,7 +7546,7 @@ impl<'a, C, NC, A> EditListingPatchCall<'a, C, NC, A> where NC: hyper::net::Netw
 /// Returns information about the edit specified. Calls will fail if the edit is no long active (e.g. has been deleted, superseded or expired).
 ///
 /// A builder for the *get* method supported by a *edit* resource.
-/// It is not used directly, but through a `EditMethods`.
+/// It is not used directly, but through a `EditMethods` instance.
 ///
 /// # Example
 ///
@@ -7301,7 +7606,7 @@ impl<'a, C, NC, A> EditGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnec
         for &field in ["alt", "packageName", "editId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -7354,7 +7659,7 @@ impl<'a, C, NC, A> EditGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnec
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -7366,7 +7671,6 @@ impl<'a, C, NC, A> EditGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnec
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -7376,7 +7680,7 @@ impl<'a, C, NC, A> EditGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnec
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -7387,7 +7691,7 @@ impl<'a, C, NC, A> EditGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnec
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -7396,13 +7700,13 @@ impl<'a, C, NC, A> EditGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnec
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -7414,7 +7718,7 @@ impl<'a, C, NC, A> EditGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnec
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Unique identifier for the Android app that is being updated; for example, "com.spiffygame".    
+    /// Unique identifier for the Android app that is being updated; for example, "com.spiffygame".
     pub fn package_name(mut self, new_value: &str) -> EditGetCall<'a, C, NC, A> {
         self._package_name = new_value.to_string();
         self
@@ -7424,7 +7728,7 @@ impl<'a, C, NC, A> EditGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnec
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Unique identifier for this edit.    
+    /// Unique identifier for this edit.
     pub fn edit_id(mut self, new_value: &str) -> EditGetCall<'a, C, NC, A> {
         self._edit_id = new_value.to_string();
         self
@@ -7485,7 +7789,7 @@ impl<'a, C, NC, A> EditGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnec
 /// Deletes the image (specified by id) from the edit.
 ///
 /// A builder for the *images.delete* method supported by a *edit* resource.
-/// It is not used directly, but through a `EditMethods`.
+/// It is not used directly, but through a `EditMethods` instance.
 ///
 /// # Example
 ///
@@ -7551,7 +7855,7 @@ impl<'a, C, NC, A> EditImageDeleteCall<'a, C, NC, A> where NC: hyper::net::Netwo
         for &field in ["packageName", "editId", "language", "imageType", "imageId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -7603,7 +7907,7 @@ impl<'a, C, NC, A> EditImageDeleteCall<'a, C, NC, A> where NC: hyper::net::Netwo
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -7615,7 +7919,6 @@ impl<'a, C, NC, A> EditImageDeleteCall<'a, C, NC, A> where NC: hyper::net::Netwo
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -7625,7 +7928,7 @@ impl<'a, C, NC, A> EditImageDeleteCall<'a, C, NC, A> where NC: hyper::net::Netwo
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -7636,12 +7939,12 @@ impl<'a, C, NC, A> EditImageDeleteCall<'a, C, NC, A> where NC: hyper::net::Netwo
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = res;
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -7653,7 +7956,7 @@ impl<'a, C, NC, A> EditImageDeleteCall<'a, C, NC, A> where NC: hyper::net::Netwo
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Unique identifier for the Android app that is being updated; for example, "com.spiffygame".    
+    /// Unique identifier for the Android app that is being updated; for example, "com.spiffygame".
     pub fn package_name(mut self, new_value: &str) -> EditImageDeleteCall<'a, C, NC, A> {
         self._package_name = new_value.to_string();
         self
@@ -7663,7 +7966,7 @@ impl<'a, C, NC, A> EditImageDeleteCall<'a, C, NC, A> where NC: hyper::net::Netwo
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Unique identifier for this edit.    
+    /// Unique identifier for this edit.
     pub fn edit_id(mut self, new_value: &str) -> EditImageDeleteCall<'a, C, NC, A> {
         self._edit_id = new_value.to_string();
         self
@@ -7673,7 +7976,7 @@ impl<'a, C, NC, A> EditImageDeleteCall<'a, C, NC, A> where NC: hyper::net::Netwo
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The language code (a BCP-47 language tag) of the localized listing whose images are to read or modified. For example, to select Austrian German, pass "de-AT".    
+    /// The language code (a BCP-47 language tag) of the localized listing whose images are to read or modified. For example, to select Austrian German, pass "de-AT".
     pub fn language(mut self, new_value: &str) -> EditImageDeleteCall<'a, C, NC, A> {
         self._language = new_value.to_string();
         self
@@ -7692,7 +7995,7 @@ impl<'a, C, NC, A> EditImageDeleteCall<'a, C, NC, A> where NC: hyper::net::Netwo
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Unique identifier an image within the set of images attached to this edit.    
+    /// Unique identifier an image within the set of images attached to this edit.
     pub fn image_id(mut self, new_value: &str) -> EditImageDeleteCall<'a, C, NC, A> {
         self._image_id = new_value.to_string();
         self
@@ -7751,7 +8054,7 @@ impl<'a, C, NC, A> EditImageDeleteCall<'a, C, NC, A> where NC: hyper::net::Netwo
 
 
 /// A builder for the *apks.upload* method supported by a *edit* resource.
-/// It is not used directly, but through a `EditMethods`.
+/// It is not used directly, but through a `EditMethods` instance.
 ///
 /// # Example
 ///
@@ -7813,7 +8116,7 @@ impl<'a, C, NC, A> EditApkUploadCall<'a, C, NC, A> where NC: hyper::net::Network
         for &field in ["alt", "packageName", "editId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -7876,7 +8179,7 @@ impl<'a, C, NC, A> EditApkUploadCall<'a, C, NC, A> where NC: hyper::net::Network
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -7902,7 +8205,7 @@ impl<'a, C, NC, A> EditApkUploadCall<'a, C, NC, A> where NC: hyper::net::Network
                         let size = reader.seek(io::SeekFrom::End(0)).unwrap();
                     reader.seek(io::SeekFrom::Start(0)).unwrap();
                     if size > 1073741824 {
-                    	return Result::UploadSizeLimitExceeded(size, 1073741824)
+                    	return Err(Error::UploadSizeLimitExceeded(size, 1073741824))
                     }
                         req = req.header(ContentType(reader_mime_type.clone()))
                                  .header(ContentLength(size))
@@ -7915,7 +8218,6 @@ impl<'a, C, NC, A> EditApkUploadCall<'a, C, NC, A> where NC: hyper::net::Network
     
                     dlg.pre_request();
                     req.send()
-    
                 }
             };
 
@@ -7926,7 +8228,7 @@ impl<'a, C, NC, A> EditApkUploadCall<'a, C, NC, A> where NC: hyper::net::Network
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -7937,13 +8239,13 @@ impl<'a, C, NC, A> EditApkUploadCall<'a, C, NC, A> where NC: hyper::net::Network
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     if protocol == "resumable" {
                         let size = reader.seek(io::SeekFrom::End(0)).unwrap();
                         reader.seek(io::SeekFrom::Start(0)).unwrap();
                         if size > 1073741824 {
-                        	return Result::UploadSizeLimitExceeded(size, 1073741824)
+                        	return Err(Error::UploadSizeLimitExceeded(size, 1073741824))
                         }
                         let mut client = &mut *self.hub.client.borrow_mut();
                         let upload_result = {
@@ -7968,17 +8270,17 @@ impl<'a, C, NC, A> EditApkUploadCall<'a, C, NC, A> where NC: hyper::net::Network
                         match upload_result {
                             None => {
                                 dlg.finished(false);
-                                return Result::Cancelled
+                                return Err(Error::Cancelled)
                             }
                             Some(Err(err)) => {
                                 dlg.finished(false);
-                                return Result::HttpError(err)
+                                return Err(Error::HttpError(err))
                             }
                             Some(Ok(upload_result)) => {
                                 res = upload_result;
                                 if !res.status.is_success() {
                                     dlg.finished(false);
-                                    return Result::Failure(res)
+                                    return Err(Error::Failure(res))
                                 }
                             }
                         }
@@ -7990,13 +8292,13 @@ impl<'a, C, NC, A> EditApkUploadCall<'a, C, NC, A> where NC: hyper::net::Network
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -8012,11 +8314,14 @@ impl<'a, C, NC, A> EditApkUploadCall<'a, C, NC, A> where NC: hyper::net::Network
                 where RS: ReadSeek {
         self.doit(stream, mime_type, "simple")
     }
-    /// Upload media in a resumeable fashion.
+    /// Upload media in a resumable fashion.
     /// Even if the upload fails or is interrupted, it can be resumed for a 
     /// certain amount of time as the server maintains state temporarily.
     /// 
-    /// TODO: Write more about how delegation works in this particular case.
+    /// The delegate will be asked for an `upload_url()`, and if not provided, will be asked to store an upload URL 
+    /// that was provided by the server, using `store_upload_url(...)`. The upload will be done in chunks, the delegate
+    /// may specify the `chunk_size()` and may cancel the operation before each chunk is uploaded, using
+    /// `cancel_chunk_upload(...)`.
     ///
     /// * *max size*: 1GB
     /// * *multipart*: yes
@@ -8031,7 +8336,7 @@ impl<'a, C, NC, A> EditApkUploadCall<'a, C, NC, A> where NC: hyper::net::Network
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Unique identifier for the Android app that is being updated; for example, "com.spiffygame".    
+    /// Unique identifier for the Android app that is being updated; for example, "com.spiffygame".
     pub fn package_name(mut self, new_value: &str) -> EditApkUploadCall<'a, C, NC, A> {
         self._package_name = new_value.to_string();
         self
@@ -8041,7 +8346,7 @@ impl<'a, C, NC, A> EditApkUploadCall<'a, C, NC, A> where NC: hyper::net::Network
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Unique identifier for this edit.    
+    /// Unique identifier for this edit.
     pub fn edit_id(mut self, new_value: &str) -> EditApkUploadCall<'a, C, NC, A> {
         self._edit_id = new_value.to_string();
         self
@@ -8102,7 +8407,7 @@ impl<'a, C, NC, A> EditApkUploadCall<'a, C, NC, A> where NC: hyper::net::Network
 /// Updates or creates the APK-specific localized listing for a specified APK and language code.
 ///
 /// A builder for the *apklistings.update* method supported by a *edit* resource.
-/// It is not used directly, but through a `EditMethods`.
+/// It is not used directly, but through a `EditMethods` instance.
 ///
 /// # Example
 ///
@@ -8173,7 +8478,7 @@ impl<'a, C, NC, A> EditApklistingUpdateCall<'a, C, NC, A> where NC: hyper::net::
         for &field in ["alt", "packageName", "editId", "apkVersionCode", "language"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -8230,7 +8535,7 @@ impl<'a, C, NC, A> EditApklistingUpdateCall<'a, C, NC, A> where NC: hyper::net::
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -8246,7 +8551,6 @@ impl<'a, C, NC, A> EditApklistingUpdateCall<'a, C, NC, A> where NC: hyper::net::
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -8256,7 +8560,7 @@ impl<'a, C, NC, A> EditApklistingUpdateCall<'a, C, NC, A> where NC: hyper::net::
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -8267,7 +8571,7 @@ impl<'a, C, NC, A> EditApklistingUpdateCall<'a, C, NC, A> where NC: hyper::net::
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -8276,13 +8580,13 @@ impl<'a, C, NC, A> EditApklistingUpdateCall<'a, C, NC, A> where NC: hyper::net::
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -8303,7 +8607,7 @@ impl<'a, C, NC, A> EditApklistingUpdateCall<'a, C, NC, A> where NC: hyper::net::
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Unique identifier for the Android app that is being updated; for example, "com.spiffygame".    
+    /// Unique identifier for the Android app that is being updated; for example, "com.spiffygame".
     pub fn package_name(mut self, new_value: &str) -> EditApklistingUpdateCall<'a, C, NC, A> {
         self._package_name = new_value.to_string();
         self
@@ -8313,7 +8617,7 @@ impl<'a, C, NC, A> EditApklistingUpdateCall<'a, C, NC, A> where NC: hyper::net::
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Unique identifier for this edit.    
+    /// Unique identifier for this edit.
     pub fn edit_id(mut self, new_value: &str) -> EditApklistingUpdateCall<'a, C, NC, A> {
         self._edit_id = new_value.to_string();
         self
@@ -8323,7 +8627,7 @@ impl<'a, C, NC, A> EditApklistingUpdateCall<'a, C, NC, A> where NC: hyper::net::
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The APK version code whose APK-specific listings should be read or modified.    
+    /// The APK version code whose APK-specific listings should be read or modified.
     pub fn apk_version_code(mut self, new_value: i32) -> EditApklistingUpdateCall<'a, C, NC, A> {
         self._apk_version_code = new_value;
         self
@@ -8333,7 +8637,7 @@ impl<'a, C, NC, A> EditApklistingUpdateCall<'a, C, NC, A> where NC: hyper::net::
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The language code (a BCP-47 language tag) of the APK-specific localized listing to read or modify. For example, to select Austrian German, pass "de-AT".    
+    /// The language code (a BCP-47 language tag) of the APK-specific localized listing to read or modify. For example, to select Austrian German, pass "de-AT".
     pub fn language(mut self, new_value: &str) -> EditApklistingUpdateCall<'a, C, NC, A> {
         self._language = new_value.to_string();
         self
@@ -8392,7 +8696,7 @@ impl<'a, C, NC, A> EditApklistingUpdateCall<'a, C, NC, A> where NC: hyper::net::
 
 
 /// A builder for the *apks.list* method supported by a *edit* resource.
-/// It is not used directly, but through a `EditMethods`.
+/// It is not used directly, but through a `EditMethods` instance.
 ///
 /// # Example
 ///
@@ -8452,7 +8756,7 @@ impl<'a, C, NC, A> EditApkListCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
         for &field in ["alt", "packageName", "editId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -8505,7 +8809,7 @@ impl<'a, C, NC, A> EditApkListCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -8517,7 +8821,6 @@ impl<'a, C, NC, A> EditApkListCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -8527,7 +8830,7 @@ impl<'a, C, NC, A> EditApkListCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -8538,7 +8841,7 @@ impl<'a, C, NC, A> EditApkListCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -8547,13 +8850,13 @@ impl<'a, C, NC, A> EditApkListCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -8565,7 +8868,7 @@ impl<'a, C, NC, A> EditApkListCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Unique identifier for the Android app that is being updated; for example, "com.spiffygame".    
+    /// Unique identifier for the Android app that is being updated; for example, "com.spiffygame".
     pub fn package_name(mut self, new_value: &str) -> EditApkListCall<'a, C, NC, A> {
         self._package_name = new_value.to_string();
         self
@@ -8575,7 +8878,7 @@ impl<'a, C, NC, A> EditApkListCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Unique identifier for this edit.    
+    /// Unique identifier for this edit.
     pub fn edit_id(mut self, new_value: &str) -> EditApkListCall<'a, C, NC, A> {
         self._edit_id = new_value.to_string();
         self
@@ -8636,7 +8939,7 @@ impl<'a, C, NC, A> EditApkListCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
 /// Updates or creates the APK-specific localized listing for a specified APK and language code. This method supports patch semantics.
 ///
 /// A builder for the *apklistings.patch* method supported by a *edit* resource.
-/// It is not used directly, but through a `EditMethods`.
+/// It is not used directly, but through a `EditMethods` instance.
 ///
 /// # Example
 ///
@@ -8707,7 +9010,7 @@ impl<'a, C, NC, A> EditApklistingPatchCall<'a, C, NC, A> where NC: hyper::net::N
         for &field in ["alt", "packageName", "editId", "apkVersionCode", "language"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -8764,7 +9067,7 @@ impl<'a, C, NC, A> EditApklistingPatchCall<'a, C, NC, A> where NC: hyper::net::N
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -8780,7 +9083,6 @@ impl<'a, C, NC, A> EditApklistingPatchCall<'a, C, NC, A> where NC: hyper::net::N
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -8790,7 +9092,7 @@ impl<'a, C, NC, A> EditApklistingPatchCall<'a, C, NC, A> where NC: hyper::net::N
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -8801,7 +9103,7 @@ impl<'a, C, NC, A> EditApklistingPatchCall<'a, C, NC, A> where NC: hyper::net::N
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -8810,13 +9112,13 @@ impl<'a, C, NC, A> EditApklistingPatchCall<'a, C, NC, A> where NC: hyper::net::N
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -8837,7 +9139,7 @@ impl<'a, C, NC, A> EditApklistingPatchCall<'a, C, NC, A> where NC: hyper::net::N
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Unique identifier for the Android app that is being updated; for example, "com.spiffygame".    
+    /// Unique identifier for the Android app that is being updated; for example, "com.spiffygame".
     pub fn package_name(mut self, new_value: &str) -> EditApklistingPatchCall<'a, C, NC, A> {
         self._package_name = new_value.to_string();
         self
@@ -8847,7 +9149,7 @@ impl<'a, C, NC, A> EditApklistingPatchCall<'a, C, NC, A> where NC: hyper::net::N
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Unique identifier for this edit.    
+    /// Unique identifier for this edit.
     pub fn edit_id(mut self, new_value: &str) -> EditApklistingPatchCall<'a, C, NC, A> {
         self._edit_id = new_value.to_string();
         self
@@ -8857,7 +9159,7 @@ impl<'a, C, NC, A> EditApklistingPatchCall<'a, C, NC, A> where NC: hyper::net::N
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The APK version code whose APK-specific listings should be read or modified.    
+    /// The APK version code whose APK-specific listings should be read or modified.
     pub fn apk_version_code(mut self, new_value: i32) -> EditApklistingPatchCall<'a, C, NC, A> {
         self._apk_version_code = new_value;
         self
@@ -8867,7 +9169,7 @@ impl<'a, C, NC, A> EditApklistingPatchCall<'a, C, NC, A> where NC: hyper::net::N
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The language code (a BCP-47 language tag) of the APK-specific localized listing to read or modify. For example, to select Austrian German, pass "de-AT".    
+    /// The language code (a BCP-47 language tag) of the APK-specific localized listing to read or modify. For example, to select Austrian German, pass "de-AT".
     pub fn language(mut self, new_value: &str) -> EditApklistingPatchCall<'a, C, NC, A> {
         self._language = new_value.to_string();
         self
@@ -8928,7 +9230,7 @@ impl<'a, C, NC, A> EditApklistingPatchCall<'a, C, NC, A> where NC: hyper::net::N
 /// Fetches information about a localized store listing.
 ///
 /// A builder for the *listings.get* method supported by a *edit* resource.
-/// It is not used directly, but through a `EditMethods`.
+/// It is not used directly, but through a `EditMethods` instance.
 ///
 /// # Example
 ///
@@ -8990,7 +9292,7 @@ impl<'a, C, NC, A> EditListingGetCall<'a, C, NC, A> where NC: hyper::net::Networ
         for &field in ["alt", "packageName", "editId", "language"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -9043,7 +9345,7 @@ impl<'a, C, NC, A> EditListingGetCall<'a, C, NC, A> where NC: hyper::net::Networ
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -9055,7 +9357,6 @@ impl<'a, C, NC, A> EditListingGetCall<'a, C, NC, A> where NC: hyper::net::Networ
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -9065,7 +9366,7 @@ impl<'a, C, NC, A> EditListingGetCall<'a, C, NC, A> where NC: hyper::net::Networ
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -9076,7 +9377,7 @@ impl<'a, C, NC, A> EditListingGetCall<'a, C, NC, A> where NC: hyper::net::Networ
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -9085,13 +9386,13 @@ impl<'a, C, NC, A> EditListingGetCall<'a, C, NC, A> where NC: hyper::net::Networ
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -9103,7 +9404,7 @@ impl<'a, C, NC, A> EditListingGetCall<'a, C, NC, A> where NC: hyper::net::Networ
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Unique identifier for the Android app that is being updated; for example, "com.spiffygame".    
+    /// Unique identifier for the Android app that is being updated; for example, "com.spiffygame".
     pub fn package_name(mut self, new_value: &str) -> EditListingGetCall<'a, C, NC, A> {
         self._package_name = new_value.to_string();
         self
@@ -9113,7 +9414,7 @@ impl<'a, C, NC, A> EditListingGetCall<'a, C, NC, A> where NC: hyper::net::Networ
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Unique identifier for this edit.    
+    /// Unique identifier for this edit.
     pub fn edit_id(mut self, new_value: &str) -> EditListingGetCall<'a, C, NC, A> {
         self._edit_id = new_value.to_string();
         self
@@ -9123,7 +9424,7 @@ impl<'a, C, NC, A> EditListingGetCall<'a, C, NC, A> where NC: hyper::net::Networ
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The language code (a BCP-47 language tag) of the localized listing to read or modify. For example, to select Austrian German, pass "de-AT".    
+    /// The language code (a BCP-47 language tag) of the localized listing to read or modify. For example, to select Austrian German, pass "de-AT".
     pub fn language(mut self, new_value: &str) -> EditListingGetCall<'a, C, NC, A> {
         self._language = new_value.to_string();
         self
@@ -9182,7 +9483,7 @@ impl<'a, C, NC, A> EditListingGetCall<'a, C, NC, A> where NC: hyper::net::Networ
 
 
 /// A builder for the *testers.get* method supported by a *edit* resource.
-/// It is not used directly, but through a `EditMethods`.
+/// It is not used directly, but through a `EditMethods` instance.
 ///
 /// # Example
 ///
@@ -9244,7 +9545,7 @@ impl<'a, C, NC, A> EditTesterGetCall<'a, C, NC, A> where NC: hyper::net::Network
         for &field in ["alt", "packageName", "editId", "track"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -9297,7 +9598,7 @@ impl<'a, C, NC, A> EditTesterGetCall<'a, C, NC, A> where NC: hyper::net::Network
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -9309,7 +9610,6 @@ impl<'a, C, NC, A> EditTesterGetCall<'a, C, NC, A> where NC: hyper::net::Network
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -9319,7 +9619,7 @@ impl<'a, C, NC, A> EditTesterGetCall<'a, C, NC, A> where NC: hyper::net::Network
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -9330,7 +9630,7 @@ impl<'a, C, NC, A> EditTesterGetCall<'a, C, NC, A> where NC: hyper::net::Network
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -9339,13 +9639,13 @@ impl<'a, C, NC, A> EditTesterGetCall<'a, C, NC, A> where NC: hyper::net::Network
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -9357,7 +9657,7 @@ impl<'a, C, NC, A> EditTesterGetCall<'a, C, NC, A> where NC: hyper::net::Network
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Unique identifier for the Android app that is being updated; for example, "com.spiffygame".    
+    /// Unique identifier for the Android app that is being updated; for example, "com.spiffygame".
     pub fn package_name(mut self, new_value: &str) -> EditTesterGetCall<'a, C, NC, A> {
         self._package_name = new_value.to_string();
         self
@@ -9367,7 +9667,7 @@ impl<'a, C, NC, A> EditTesterGetCall<'a, C, NC, A> where NC: hyper::net::Network
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Unique identifier for this edit.    
+    /// Unique identifier for this edit.
     pub fn edit_id(mut self, new_value: &str) -> EditTesterGetCall<'a, C, NC, A> {
         self._edit_id = new_value.to_string();
         self
@@ -9437,7 +9737,7 @@ impl<'a, C, NC, A> EditTesterGetCall<'a, C, NC, A> where NC: hyper::net::Network
 /// Deletes an edit for an app. Creating a new edit will automatically delete any of your previous edits so this method need only be called if you want to preemptively abandon an edit.
 ///
 /// A builder for the *delete* method supported by a *edit* resource.
-/// It is not used directly, but through a `EditMethods`.
+/// It is not used directly, but through a `EditMethods` instance.
 ///
 /// # Example
 ///
@@ -9497,7 +9797,7 @@ impl<'a, C, NC, A> EditDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
         for &field in ["packageName", "editId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -9549,7 +9849,7 @@ impl<'a, C, NC, A> EditDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -9561,7 +9861,6 @@ impl<'a, C, NC, A> EditDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -9571,7 +9870,7 @@ impl<'a, C, NC, A> EditDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -9582,12 +9881,12 @@ impl<'a, C, NC, A> EditDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = res;
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -9599,7 +9898,7 @@ impl<'a, C, NC, A> EditDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Unique identifier for the Android app that is being updated; for example, "com.spiffygame".    
+    /// Unique identifier for the Android app that is being updated; for example, "com.spiffygame".
     pub fn package_name(mut self, new_value: &str) -> EditDeleteCall<'a, C, NC, A> {
         self._package_name = new_value.to_string();
         self
@@ -9609,7 +9908,7 @@ impl<'a, C, NC, A> EditDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Unique identifier for this edit.    
+    /// Unique identifier for this edit.
     pub fn edit_id(mut self, new_value: &str) -> EditDeleteCall<'a, C, NC, A> {
         self._edit_id = new_value.to_string();
         self
@@ -9670,7 +9969,7 @@ impl<'a, C, NC, A> EditDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
 /// Uploads and attaches a new Expansion File to the APK specified.
 ///
 /// A builder for the *expansionfiles.upload* method supported by a *edit* resource.
-/// It is not used directly, but through a `EditMethods`.
+/// It is not used directly, but through a `EditMethods` instance.
 ///
 /// # Example
 ///
@@ -9736,7 +10035,7 @@ impl<'a, C, NC, A> EditExpansionfileUploadCall<'a, C, NC, A> where NC: hyper::ne
         for &field in ["alt", "packageName", "editId", "apkVersionCode", "expansionFileType"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -9799,7 +10098,7 @@ impl<'a, C, NC, A> EditExpansionfileUploadCall<'a, C, NC, A> where NC: hyper::ne
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -9825,7 +10124,7 @@ impl<'a, C, NC, A> EditExpansionfileUploadCall<'a, C, NC, A> where NC: hyper::ne
                         let size = reader.seek(io::SeekFrom::End(0)).unwrap();
                     reader.seek(io::SeekFrom::Start(0)).unwrap();
                     if size > 2147483648 {
-                    	return Result::UploadSizeLimitExceeded(size, 2147483648)
+                    	return Err(Error::UploadSizeLimitExceeded(size, 2147483648))
                     }
                         req = req.header(ContentType(reader_mime_type.clone()))
                                  .header(ContentLength(size))
@@ -9838,7 +10137,6 @@ impl<'a, C, NC, A> EditExpansionfileUploadCall<'a, C, NC, A> where NC: hyper::ne
     
                     dlg.pre_request();
                     req.send()
-    
                 }
             };
 
@@ -9849,7 +10147,7 @@ impl<'a, C, NC, A> EditExpansionfileUploadCall<'a, C, NC, A> where NC: hyper::ne
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -9860,13 +10158,13 @@ impl<'a, C, NC, A> EditExpansionfileUploadCall<'a, C, NC, A> where NC: hyper::ne
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     if protocol == "resumable" {
                         let size = reader.seek(io::SeekFrom::End(0)).unwrap();
                         reader.seek(io::SeekFrom::Start(0)).unwrap();
                         if size > 2147483648 {
-                        	return Result::UploadSizeLimitExceeded(size, 2147483648)
+                        	return Err(Error::UploadSizeLimitExceeded(size, 2147483648))
                         }
                         let mut client = &mut *self.hub.client.borrow_mut();
                         let upload_result = {
@@ -9891,17 +10189,17 @@ impl<'a, C, NC, A> EditExpansionfileUploadCall<'a, C, NC, A> where NC: hyper::ne
                         match upload_result {
                             None => {
                                 dlg.finished(false);
-                                return Result::Cancelled
+                                return Err(Error::Cancelled)
                             }
                             Some(Err(err)) => {
                                 dlg.finished(false);
-                                return Result::HttpError(err)
+                                return Err(Error::HttpError(err))
                             }
                             Some(Ok(upload_result)) => {
                                 res = upload_result;
                                 if !res.status.is_success() {
                                     dlg.finished(false);
-                                    return Result::Failure(res)
+                                    return Err(Error::Failure(res))
                                 }
                             }
                         }
@@ -9913,13 +10211,13 @@ impl<'a, C, NC, A> EditExpansionfileUploadCall<'a, C, NC, A> where NC: hyper::ne
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -9935,11 +10233,14 @@ impl<'a, C, NC, A> EditExpansionfileUploadCall<'a, C, NC, A> where NC: hyper::ne
                 where RS: ReadSeek {
         self.doit(stream, mime_type, "simple")
     }
-    /// Upload media in a resumeable fashion.
+    /// Upload media in a resumable fashion.
     /// Even if the upload fails or is interrupted, it can be resumed for a 
     /// certain amount of time as the server maintains state temporarily.
     /// 
-    /// TODO: Write more about how delegation works in this particular case.
+    /// The delegate will be asked for an `upload_url()`, and if not provided, will be asked to store an upload URL 
+    /// that was provided by the server, using `store_upload_url(...)`. The upload will be done in chunks, the delegate
+    /// may specify the `chunk_size()` and may cancel the operation before each chunk is uploaded, using
+    /// `cancel_chunk_upload(...)`.
     ///
     /// * *max size*: 2048MB
     /// * *multipart*: yes
@@ -9954,7 +10255,7 @@ impl<'a, C, NC, A> EditExpansionfileUploadCall<'a, C, NC, A> where NC: hyper::ne
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Unique identifier for the Android app that is being updated; for example, "com.spiffygame".    
+    /// Unique identifier for the Android app that is being updated; for example, "com.spiffygame".
     pub fn package_name(mut self, new_value: &str) -> EditExpansionfileUploadCall<'a, C, NC, A> {
         self._package_name = new_value.to_string();
         self
@@ -9964,7 +10265,7 @@ impl<'a, C, NC, A> EditExpansionfileUploadCall<'a, C, NC, A> where NC: hyper::ne
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Unique identifier for this edit.    
+    /// Unique identifier for this edit.
     pub fn edit_id(mut self, new_value: &str) -> EditExpansionfileUploadCall<'a, C, NC, A> {
         self._edit_id = new_value.to_string();
         self
@@ -9974,7 +10275,7 @@ impl<'a, C, NC, A> EditExpansionfileUploadCall<'a, C, NC, A> where NC: hyper::ne
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The version code of the APK whose Expansion File configuration is being read or modified.    
+    /// The version code of the APK whose Expansion File configuration is being read or modified.
     pub fn apk_version_code(mut self, new_value: i32) -> EditExpansionfileUploadCall<'a, C, NC, A> {
         self._apk_version_code = new_value;
         self
@@ -10044,7 +10345,7 @@ impl<'a, C, NC, A> EditExpansionfileUploadCall<'a, C, NC, A> where NC: hyper::ne
 /// Creates a new edit for an app, populated with the app's current state.
 ///
 /// A builder for the *insert* method supported by a *edit* resource.
-/// It is not used directly, but through a `EditMethods`.
+/// It is not used directly, but through a `EditMethods` instance.
 ///
 /// # Example
 ///
@@ -10109,7 +10410,7 @@ impl<'a, C, NC, A> EditInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
         for &field in ["alt", "packageName"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -10166,7 +10467,7 @@ impl<'a, C, NC, A> EditInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -10182,7 +10483,6 @@ impl<'a, C, NC, A> EditInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -10192,7 +10492,7 @@ impl<'a, C, NC, A> EditInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -10203,7 +10503,7 @@ impl<'a, C, NC, A> EditInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -10212,13 +10512,13 @@ impl<'a, C, NC, A> EditInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -10239,7 +10539,7 @@ impl<'a, C, NC, A> EditInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Unique identifier for the Android app that is being updated; for example, "com.spiffygame".    
+    /// Unique identifier for the Android app that is being updated; for example, "com.spiffygame".
     pub fn package_name(mut self, new_value: &str) -> EditInsertCall<'a, C, NC, A> {
         self._package_name = new_value.to_string();
         self
@@ -10300,7 +10600,7 @@ impl<'a, C, NC, A> EditInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
 /// Returns all of the localized store listings attached to this edit.
 ///
 /// A builder for the *listings.list* method supported by a *edit* resource.
-/// It is not used directly, but through a `EditMethods`.
+/// It is not used directly, but through a `EditMethods` instance.
 ///
 /// # Example
 ///
@@ -10360,7 +10660,7 @@ impl<'a, C, NC, A> EditListingListCall<'a, C, NC, A> where NC: hyper::net::Netwo
         for &field in ["alt", "packageName", "editId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -10413,7 +10713,7 @@ impl<'a, C, NC, A> EditListingListCall<'a, C, NC, A> where NC: hyper::net::Netwo
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -10425,7 +10725,6 @@ impl<'a, C, NC, A> EditListingListCall<'a, C, NC, A> where NC: hyper::net::Netwo
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -10435,7 +10734,7 @@ impl<'a, C, NC, A> EditListingListCall<'a, C, NC, A> where NC: hyper::net::Netwo
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -10446,7 +10745,7 @@ impl<'a, C, NC, A> EditListingListCall<'a, C, NC, A> where NC: hyper::net::Netwo
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -10455,13 +10754,13 @@ impl<'a, C, NC, A> EditListingListCall<'a, C, NC, A> where NC: hyper::net::Netwo
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -10473,7 +10772,7 @@ impl<'a, C, NC, A> EditListingListCall<'a, C, NC, A> where NC: hyper::net::Netwo
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Unique identifier for the Android app that is being updated; for example, "com.spiffygame".    
+    /// Unique identifier for the Android app that is being updated; for example, "com.spiffygame".
     pub fn package_name(mut self, new_value: &str) -> EditListingListCall<'a, C, NC, A> {
         self._package_name = new_value.to_string();
         self
@@ -10483,7 +10782,7 @@ impl<'a, C, NC, A> EditListingListCall<'a, C, NC, A> where NC: hyper::net::Netwo
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Unique identifier for this edit.    
+    /// Unique identifier for this edit.
     pub fn edit_id(mut self, new_value: &str) -> EditListingListCall<'a, C, NC, A> {
         self._edit_id = new_value.to_string();
         self
@@ -10542,7 +10841,7 @@ impl<'a, C, NC, A> EditListingListCall<'a, C, NC, A> where NC: hyper::net::Netwo
 
 
 /// A builder for the *testers.patch* method supported by a *edit* resource.
-/// It is not used directly, but through a `EditMethods`.
+/// It is not used directly, but through a `EditMethods` instance.
 ///
 /// # Example
 ///
@@ -10611,7 +10910,7 @@ impl<'a, C, NC, A> EditTesterPatchCall<'a, C, NC, A> where NC: hyper::net::Netwo
         for &field in ["alt", "packageName", "editId", "track"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -10668,7 +10967,7 @@ impl<'a, C, NC, A> EditTesterPatchCall<'a, C, NC, A> where NC: hyper::net::Netwo
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -10684,7 +10983,6 @@ impl<'a, C, NC, A> EditTesterPatchCall<'a, C, NC, A> where NC: hyper::net::Netwo
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -10694,7 +10992,7 @@ impl<'a, C, NC, A> EditTesterPatchCall<'a, C, NC, A> where NC: hyper::net::Netwo
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -10705,7 +11003,7 @@ impl<'a, C, NC, A> EditTesterPatchCall<'a, C, NC, A> where NC: hyper::net::Netwo
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -10714,13 +11012,13 @@ impl<'a, C, NC, A> EditTesterPatchCall<'a, C, NC, A> where NC: hyper::net::Netwo
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -10741,7 +11039,7 @@ impl<'a, C, NC, A> EditTesterPatchCall<'a, C, NC, A> where NC: hyper::net::Netwo
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Unique identifier for the Android app that is being updated; for example, "com.spiffygame".    
+    /// Unique identifier for the Android app that is being updated; for example, "com.spiffygame".
     pub fn package_name(mut self, new_value: &str) -> EditTesterPatchCall<'a, C, NC, A> {
         self._package_name = new_value.to_string();
         self
@@ -10751,7 +11049,7 @@ impl<'a, C, NC, A> EditTesterPatchCall<'a, C, NC, A> where NC: hyper::net::Netwo
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Unique identifier for this edit.    
+    /// Unique identifier for this edit.
     pub fn edit_id(mut self, new_value: &str) -> EditTesterPatchCall<'a, C, NC, A> {
         self._edit_id = new_value.to_string();
         self
@@ -10821,7 +11119,7 @@ impl<'a, C, NC, A> EditTesterPatchCall<'a, C, NC, A> where NC: hyper::net::Netwo
 /// Commits/applies the changes made in this edit back to the app.
 ///
 /// A builder for the *commit* method supported by a *edit* resource.
-/// It is not used directly, but through a `EditMethods`.
+/// It is not used directly, but through a `EditMethods` instance.
 ///
 /// # Example
 ///
@@ -10881,7 +11179,7 @@ impl<'a, C, NC, A> EditCommitCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
         for &field in ["alt", "packageName", "editId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -10934,7 +11232,7 @@ impl<'a, C, NC, A> EditCommitCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -10946,7 +11244,6 @@ impl<'a, C, NC, A> EditCommitCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -10956,7 +11253,7 @@ impl<'a, C, NC, A> EditCommitCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -10967,7 +11264,7 @@ impl<'a, C, NC, A> EditCommitCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -10976,13 +11273,13 @@ impl<'a, C, NC, A> EditCommitCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -10994,7 +11291,7 @@ impl<'a, C, NC, A> EditCommitCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Unique identifier for the Android app that is being updated; for example, "com.spiffygame".    
+    /// Unique identifier for the Android app that is being updated; for example, "com.spiffygame".
     pub fn package_name(mut self, new_value: &str) -> EditCommitCall<'a, C, NC, A> {
         self._package_name = new_value.to_string();
         self
@@ -11004,7 +11301,7 @@ impl<'a, C, NC, A> EditCommitCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Unique identifier for this edit.    
+    /// Unique identifier for this edit.
     pub fn edit_id(mut self, new_value: &str) -> EditCommitCall<'a, C, NC, A> {
         self._edit_id = new_value.to_string();
         self
@@ -11065,7 +11362,7 @@ impl<'a, C, NC, A> EditCommitCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
 /// Lists all the track configurations for this edit.
 ///
 /// A builder for the *tracks.list* method supported by a *edit* resource.
-/// It is not used directly, but through a `EditMethods`.
+/// It is not used directly, but through a `EditMethods` instance.
 ///
 /// # Example
 ///
@@ -11125,7 +11422,7 @@ impl<'a, C, NC, A> EditTrackListCall<'a, C, NC, A> where NC: hyper::net::Network
         for &field in ["alt", "packageName", "editId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -11178,7 +11475,7 @@ impl<'a, C, NC, A> EditTrackListCall<'a, C, NC, A> where NC: hyper::net::Network
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -11190,7 +11487,6 @@ impl<'a, C, NC, A> EditTrackListCall<'a, C, NC, A> where NC: hyper::net::Network
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -11200,7 +11496,7 @@ impl<'a, C, NC, A> EditTrackListCall<'a, C, NC, A> where NC: hyper::net::Network
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -11211,7 +11507,7 @@ impl<'a, C, NC, A> EditTrackListCall<'a, C, NC, A> where NC: hyper::net::Network
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -11220,13 +11516,13 @@ impl<'a, C, NC, A> EditTrackListCall<'a, C, NC, A> where NC: hyper::net::Network
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -11238,7 +11534,7 @@ impl<'a, C, NC, A> EditTrackListCall<'a, C, NC, A> where NC: hyper::net::Network
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Unique identifier for the Android app that is being updated; for example, "com.spiffygame".    
+    /// Unique identifier for the Android app that is being updated; for example, "com.spiffygame".
     pub fn package_name(mut self, new_value: &str) -> EditTrackListCall<'a, C, NC, A> {
         self._package_name = new_value.to_string();
         self
@@ -11248,7 +11544,7 @@ impl<'a, C, NC, A> EditTrackListCall<'a, C, NC, A> where NC: hyper::net::Network
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Unique identifier for this edit.    
+    /// Unique identifier for this edit.
     pub fn edit_id(mut self, new_value: &str) -> EditTrackListCall<'a, C, NC, A> {
         self._edit_id = new_value.to_string();
         self
@@ -11309,7 +11605,7 @@ impl<'a, C, NC, A> EditTrackListCall<'a, C, NC, A> where NC: hyper::net::Network
 /// Checks that the edit can be successfully committed. The edit's changes are not applied to the live app.
 ///
 /// A builder for the *validate* method supported by a *edit* resource.
-/// It is not used directly, but through a `EditMethods`.
+/// It is not used directly, but through a `EditMethods` instance.
 ///
 /// # Example
 ///
@@ -11369,7 +11665,7 @@ impl<'a, C, NC, A> EditValidateCall<'a, C, NC, A> where NC: hyper::net::NetworkC
         for &field in ["alt", "packageName", "editId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -11422,7 +11718,7 @@ impl<'a, C, NC, A> EditValidateCall<'a, C, NC, A> where NC: hyper::net::NetworkC
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -11434,7 +11730,6 @@ impl<'a, C, NC, A> EditValidateCall<'a, C, NC, A> where NC: hyper::net::NetworkC
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -11444,7 +11739,7 @@ impl<'a, C, NC, A> EditValidateCall<'a, C, NC, A> where NC: hyper::net::NetworkC
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -11455,7 +11750,7 @@ impl<'a, C, NC, A> EditValidateCall<'a, C, NC, A> where NC: hyper::net::NetworkC
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -11464,13 +11759,13 @@ impl<'a, C, NC, A> EditValidateCall<'a, C, NC, A> where NC: hyper::net::NetworkC
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -11482,7 +11777,7 @@ impl<'a, C, NC, A> EditValidateCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Unique identifier for the Android app that is being updated; for example, "com.spiffygame".    
+    /// Unique identifier for the Android app that is being updated; for example, "com.spiffygame".
     pub fn package_name(mut self, new_value: &str) -> EditValidateCall<'a, C, NC, A> {
         self._package_name = new_value.to_string();
         self
@@ -11492,7 +11787,7 @@ impl<'a, C, NC, A> EditValidateCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Unique identifier for this edit.    
+    /// Unique identifier for this edit.
     pub fn edit_id(mut self, new_value: &str) -> EditValidateCall<'a, C, NC, A> {
         self._edit_id = new_value.to_string();
         self
@@ -11553,7 +11848,7 @@ impl<'a, C, NC, A> EditValidateCall<'a, C, NC, A> where NC: hyper::net::NetworkC
 /// Creates or updates a localized store listing.
 ///
 /// A builder for the *listings.update* method supported by a *edit* resource.
-/// It is not used directly, but through a `EditMethods`.
+/// It is not used directly, but through a `EditMethods` instance.
 ///
 /// # Example
 ///
@@ -11622,7 +11917,7 @@ impl<'a, C, NC, A> EditListingUpdateCall<'a, C, NC, A> where NC: hyper::net::Net
         for &field in ["alt", "packageName", "editId", "language"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -11679,7 +11974,7 @@ impl<'a, C, NC, A> EditListingUpdateCall<'a, C, NC, A> where NC: hyper::net::Net
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -11695,7 +11990,6 @@ impl<'a, C, NC, A> EditListingUpdateCall<'a, C, NC, A> where NC: hyper::net::Net
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -11705,7 +11999,7 @@ impl<'a, C, NC, A> EditListingUpdateCall<'a, C, NC, A> where NC: hyper::net::Net
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -11716,7 +12010,7 @@ impl<'a, C, NC, A> EditListingUpdateCall<'a, C, NC, A> where NC: hyper::net::Net
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -11725,13 +12019,13 @@ impl<'a, C, NC, A> EditListingUpdateCall<'a, C, NC, A> where NC: hyper::net::Net
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -11752,7 +12046,7 @@ impl<'a, C, NC, A> EditListingUpdateCall<'a, C, NC, A> where NC: hyper::net::Net
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Unique identifier for the Android app that is being updated; for example, "com.spiffygame".    
+    /// Unique identifier for the Android app that is being updated; for example, "com.spiffygame".
     pub fn package_name(mut self, new_value: &str) -> EditListingUpdateCall<'a, C, NC, A> {
         self._package_name = new_value.to_string();
         self
@@ -11762,7 +12056,7 @@ impl<'a, C, NC, A> EditListingUpdateCall<'a, C, NC, A> where NC: hyper::net::Net
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Unique identifier for this edit.    
+    /// Unique identifier for this edit.
     pub fn edit_id(mut self, new_value: &str) -> EditListingUpdateCall<'a, C, NC, A> {
         self._edit_id = new_value.to_string();
         self
@@ -11772,7 +12066,7 @@ impl<'a, C, NC, A> EditListingUpdateCall<'a, C, NC, A> where NC: hyper::net::Net
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The language code (a BCP-47 language tag) of the localized listing to read or modify. For example, to select Austrian German, pass "de-AT".    
+    /// The language code (a BCP-47 language tag) of the localized listing to read or modify. For example, to select Austrian German, pass "de-AT".
     pub fn language(mut self, new_value: &str) -> EditListingUpdateCall<'a, C, NC, A> {
         self._language = new_value.to_string();
         self
@@ -11833,7 +12127,7 @@ impl<'a, C, NC, A> EditListingUpdateCall<'a, C, NC, A> where NC: hyper::net::Net
 /// Fetches the Expansion File configuration for the APK specified.
 ///
 /// A builder for the *expansionfiles.get* method supported by a *edit* resource.
-/// It is not used directly, but through a `EditMethods`.
+/// It is not used directly, but through a `EditMethods` instance.
 ///
 /// # Example
 ///
@@ -11897,7 +12191,7 @@ impl<'a, C, NC, A> EditExpansionfileGetCall<'a, C, NC, A> where NC: hyper::net::
         for &field in ["alt", "packageName", "editId", "apkVersionCode", "expansionFileType"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -11950,7 +12244,7 @@ impl<'a, C, NC, A> EditExpansionfileGetCall<'a, C, NC, A> where NC: hyper::net::
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -11962,7 +12256,6 @@ impl<'a, C, NC, A> EditExpansionfileGetCall<'a, C, NC, A> where NC: hyper::net::
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -11972,7 +12265,7 @@ impl<'a, C, NC, A> EditExpansionfileGetCall<'a, C, NC, A> where NC: hyper::net::
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -11983,7 +12276,7 @@ impl<'a, C, NC, A> EditExpansionfileGetCall<'a, C, NC, A> where NC: hyper::net::
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -11992,13 +12285,13 @@ impl<'a, C, NC, A> EditExpansionfileGetCall<'a, C, NC, A> where NC: hyper::net::
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -12010,7 +12303,7 @@ impl<'a, C, NC, A> EditExpansionfileGetCall<'a, C, NC, A> where NC: hyper::net::
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Unique identifier for the Android app that is being updated; for example, "com.spiffygame".    
+    /// Unique identifier for the Android app that is being updated; for example, "com.spiffygame".
     pub fn package_name(mut self, new_value: &str) -> EditExpansionfileGetCall<'a, C, NC, A> {
         self._package_name = new_value.to_string();
         self
@@ -12020,7 +12313,7 @@ impl<'a, C, NC, A> EditExpansionfileGetCall<'a, C, NC, A> where NC: hyper::net::
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Unique identifier for this edit.    
+    /// Unique identifier for this edit.
     pub fn edit_id(mut self, new_value: &str) -> EditExpansionfileGetCall<'a, C, NC, A> {
         self._edit_id = new_value.to_string();
         self
@@ -12030,7 +12323,7 @@ impl<'a, C, NC, A> EditExpansionfileGetCall<'a, C, NC, A> where NC: hyper::net::
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The version code of the APK whose Expansion File configuration is being read or modified.    
+    /// The version code of the APK whose Expansion File configuration is being read or modified.
     pub fn apk_version_code(mut self, new_value: i32) -> EditExpansionfileGetCall<'a, C, NC, A> {
         self._apk_version_code = new_value;
         self
@@ -12100,7 +12393,7 @@ impl<'a, C, NC, A> EditExpansionfileGetCall<'a, C, NC, A> where NC: hyper::net::
 /// Deletes all images for the specified language and image type.
 ///
 /// A builder for the *images.deleteall* method supported by a *edit* resource.
-/// It is not used directly, but through a `EditMethods`.
+/// It is not used directly, but through a `EditMethods` instance.
 ///
 /// # Example
 ///
@@ -12164,7 +12457,7 @@ impl<'a, C, NC, A> EditImageDeleteallCall<'a, C, NC, A> where NC: hyper::net::Ne
         for &field in ["alt", "packageName", "editId", "language", "imageType"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -12217,7 +12510,7 @@ impl<'a, C, NC, A> EditImageDeleteallCall<'a, C, NC, A> where NC: hyper::net::Ne
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -12229,7 +12522,6 @@ impl<'a, C, NC, A> EditImageDeleteallCall<'a, C, NC, A> where NC: hyper::net::Ne
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -12239,7 +12531,7 @@ impl<'a, C, NC, A> EditImageDeleteallCall<'a, C, NC, A> where NC: hyper::net::Ne
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -12250,7 +12542,7 @@ impl<'a, C, NC, A> EditImageDeleteallCall<'a, C, NC, A> where NC: hyper::net::Ne
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -12259,13 +12551,13 @@ impl<'a, C, NC, A> EditImageDeleteallCall<'a, C, NC, A> where NC: hyper::net::Ne
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -12277,7 +12569,7 @@ impl<'a, C, NC, A> EditImageDeleteallCall<'a, C, NC, A> where NC: hyper::net::Ne
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Unique identifier for the Android app that is being updated; for example, "com.spiffygame".    
+    /// Unique identifier for the Android app that is being updated; for example, "com.spiffygame".
     pub fn package_name(mut self, new_value: &str) -> EditImageDeleteallCall<'a, C, NC, A> {
         self._package_name = new_value.to_string();
         self
@@ -12287,7 +12579,7 @@ impl<'a, C, NC, A> EditImageDeleteallCall<'a, C, NC, A> where NC: hyper::net::Ne
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Unique identifier for this edit.    
+    /// Unique identifier for this edit.
     pub fn edit_id(mut self, new_value: &str) -> EditImageDeleteallCall<'a, C, NC, A> {
         self._edit_id = new_value.to_string();
         self
@@ -12297,7 +12589,7 @@ impl<'a, C, NC, A> EditImageDeleteallCall<'a, C, NC, A> where NC: hyper::net::Ne
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The language code (a BCP-47 language tag) of the localized listing whose images are to read or modified. For example, to select Austrian German, pass "de-AT".    
+    /// The language code (a BCP-47 language tag) of the localized listing whose images are to read or modified. For example, to select Austrian German, pass "de-AT".
     pub fn language(mut self, new_value: &str) -> EditImageDeleteallCall<'a, C, NC, A> {
         self._language = new_value.to_string();
         self
@@ -12367,7 +12659,7 @@ impl<'a, C, NC, A> EditImageDeleteallCall<'a, C, NC, A> where NC: hyper::net::Ne
 /// Updates app details for this edit. This method supports patch semantics.
 ///
 /// A builder for the *details.patch* method supported by a *edit* resource.
-/// It is not used directly, but through a `EditMethods`.
+/// It is not used directly, but through a `EditMethods` instance.
 ///
 /// # Example
 ///
@@ -12434,7 +12726,7 @@ impl<'a, C, NC, A> EditDetailPatchCall<'a, C, NC, A> where NC: hyper::net::Netwo
         for &field in ["alt", "packageName", "editId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -12491,7 +12783,7 @@ impl<'a, C, NC, A> EditDetailPatchCall<'a, C, NC, A> where NC: hyper::net::Netwo
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -12507,7 +12799,6 @@ impl<'a, C, NC, A> EditDetailPatchCall<'a, C, NC, A> where NC: hyper::net::Netwo
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -12517,7 +12808,7 @@ impl<'a, C, NC, A> EditDetailPatchCall<'a, C, NC, A> where NC: hyper::net::Netwo
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -12528,7 +12819,7 @@ impl<'a, C, NC, A> EditDetailPatchCall<'a, C, NC, A> where NC: hyper::net::Netwo
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -12537,13 +12828,13 @@ impl<'a, C, NC, A> EditDetailPatchCall<'a, C, NC, A> where NC: hyper::net::Netwo
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -12564,7 +12855,7 @@ impl<'a, C, NC, A> EditDetailPatchCall<'a, C, NC, A> where NC: hyper::net::Netwo
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Unique identifier for the Android app that is being updated; for example, "com.spiffygame".    
+    /// Unique identifier for the Android app that is being updated; for example, "com.spiffygame".
     pub fn package_name(mut self, new_value: &str) -> EditDetailPatchCall<'a, C, NC, A> {
         self._package_name = new_value.to_string();
         self
@@ -12574,7 +12865,7 @@ impl<'a, C, NC, A> EditDetailPatchCall<'a, C, NC, A> where NC: hyper::net::Netwo
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Unique identifier for this edit.    
+    /// Unique identifier for this edit.
     pub fn edit_id(mut self, new_value: &str) -> EditDetailPatchCall<'a, C, NC, A> {
         self._edit_id = new_value.to_string();
         self
@@ -12635,7 +12926,7 @@ impl<'a, C, NC, A> EditDetailPatchCall<'a, C, NC, A> where NC: hyper::net::Netwo
 /// Updates the track configuration for the specified track type. When halted, the rollout track cannot be updated without adding new APKs, and adding new APKs will cause it to resume. This method supports patch semantics.
 ///
 /// A builder for the *tracks.patch* method supported by a *edit* resource.
-/// It is not used directly, but through a `EditMethods`.
+/// It is not used directly, but through a `EditMethods` instance.
 ///
 /// # Example
 ///
@@ -12704,7 +12995,7 @@ impl<'a, C, NC, A> EditTrackPatchCall<'a, C, NC, A> where NC: hyper::net::Networ
         for &field in ["alt", "packageName", "editId", "track"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -12761,7 +13052,7 @@ impl<'a, C, NC, A> EditTrackPatchCall<'a, C, NC, A> where NC: hyper::net::Networ
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -12777,7 +13068,6 @@ impl<'a, C, NC, A> EditTrackPatchCall<'a, C, NC, A> where NC: hyper::net::Networ
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -12787,7 +13077,7 @@ impl<'a, C, NC, A> EditTrackPatchCall<'a, C, NC, A> where NC: hyper::net::Networ
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -12798,7 +13088,7 @@ impl<'a, C, NC, A> EditTrackPatchCall<'a, C, NC, A> where NC: hyper::net::Networ
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -12807,13 +13097,13 @@ impl<'a, C, NC, A> EditTrackPatchCall<'a, C, NC, A> where NC: hyper::net::Networ
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -12834,7 +13124,7 @@ impl<'a, C, NC, A> EditTrackPatchCall<'a, C, NC, A> where NC: hyper::net::Networ
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Unique identifier for the Android app that is being updated; for example, "com.spiffygame".    
+    /// Unique identifier for the Android app that is being updated; for example, "com.spiffygame".
     pub fn package_name(mut self, new_value: &str) -> EditTrackPatchCall<'a, C, NC, A> {
         self._package_name = new_value.to_string();
         self
@@ -12844,7 +13134,7 @@ impl<'a, C, NC, A> EditTrackPatchCall<'a, C, NC, A> where NC: hyper::net::Networ
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Unique identifier for this edit.    
+    /// Unique identifier for this edit.
     pub fn edit_id(mut self, new_value: &str) -> EditTrackPatchCall<'a, C, NC, A> {
         self._edit_id = new_value.to_string();
         self
@@ -12854,7 +13144,7 @@ impl<'a, C, NC, A> EditTrackPatchCall<'a, C, NC, A> where NC: hyper::net::Networ
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The track type to read or modify.    
+    /// The track type to read or modify.
     pub fn track(mut self, new_value: &str) -> EditTrackPatchCall<'a, C, NC, A> {
         self._track = new_value.to_string();
         self
@@ -12915,7 +13205,7 @@ impl<'a, C, NC, A> EditTrackPatchCall<'a, C, NC, A> where NC: hyper::net::Networ
 /// Deletes the specified localized store listing from an edit.
 ///
 /// A builder for the *listings.delete* method supported by a *edit* resource.
-/// It is not used directly, but through a `EditMethods`.
+/// It is not used directly, but through a `EditMethods` instance.
 ///
 /// # Example
 ///
@@ -12977,7 +13267,7 @@ impl<'a, C, NC, A> EditListingDeleteCall<'a, C, NC, A> where NC: hyper::net::Net
         for &field in ["packageName", "editId", "language"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -13029,7 +13319,7 @@ impl<'a, C, NC, A> EditListingDeleteCall<'a, C, NC, A> where NC: hyper::net::Net
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -13041,7 +13331,6 @@ impl<'a, C, NC, A> EditListingDeleteCall<'a, C, NC, A> where NC: hyper::net::Net
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -13051,7 +13340,7 @@ impl<'a, C, NC, A> EditListingDeleteCall<'a, C, NC, A> where NC: hyper::net::Net
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -13062,12 +13351,12 @@ impl<'a, C, NC, A> EditListingDeleteCall<'a, C, NC, A> where NC: hyper::net::Net
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = res;
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -13079,7 +13368,7 @@ impl<'a, C, NC, A> EditListingDeleteCall<'a, C, NC, A> where NC: hyper::net::Net
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Unique identifier for the Android app that is being updated; for example, "com.spiffygame".    
+    /// Unique identifier for the Android app that is being updated; for example, "com.spiffygame".
     pub fn package_name(mut self, new_value: &str) -> EditListingDeleteCall<'a, C, NC, A> {
         self._package_name = new_value.to_string();
         self
@@ -13089,7 +13378,7 @@ impl<'a, C, NC, A> EditListingDeleteCall<'a, C, NC, A> where NC: hyper::net::Net
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Unique identifier for this edit.    
+    /// Unique identifier for this edit.
     pub fn edit_id(mut self, new_value: &str) -> EditListingDeleteCall<'a, C, NC, A> {
         self._edit_id = new_value.to_string();
         self
@@ -13099,7 +13388,7 @@ impl<'a, C, NC, A> EditListingDeleteCall<'a, C, NC, A> where NC: hyper::net::Net
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The language code (a BCP-47 language tag) of the localized listing to read or modify. For example, to select Austrian German, pass "de-AT".    
+    /// The language code (a BCP-47 language tag) of the localized listing to read or modify. For example, to select Austrian German, pass "de-AT".
     pub fn language(mut self, new_value: &str) -> EditListingDeleteCall<'a, C, NC, A> {
         self._language = new_value.to_string();
         self
@@ -13160,7 +13449,7 @@ impl<'a, C, NC, A> EditListingDeleteCall<'a, C, NC, A> where NC: hyper::net::Net
 /// Fetches the APK-specific localized listing for a specified APK and language code.
 ///
 /// A builder for the *apklistings.get* method supported by a *edit* resource.
-/// It is not used directly, but through a `EditMethods`.
+/// It is not used directly, but through a `EditMethods` instance.
 ///
 /// # Example
 ///
@@ -13224,7 +13513,7 @@ impl<'a, C, NC, A> EditApklistingGetCall<'a, C, NC, A> where NC: hyper::net::Net
         for &field in ["alt", "packageName", "editId", "apkVersionCode", "language"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -13277,7 +13566,7 @@ impl<'a, C, NC, A> EditApklistingGetCall<'a, C, NC, A> where NC: hyper::net::Net
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -13289,7 +13578,6 @@ impl<'a, C, NC, A> EditApklistingGetCall<'a, C, NC, A> where NC: hyper::net::Net
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -13299,7 +13587,7 @@ impl<'a, C, NC, A> EditApklistingGetCall<'a, C, NC, A> where NC: hyper::net::Net
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -13310,7 +13598,7 @@ impl<'a, C, NC, A> EditApklistingGetCall<'a, C, NC, A> where NC: hyper::net::Net
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -13319,13 +13607,13 @@ impl<'a, C, NC, A> EditApklistingGetCall<'a, C, NC, A> where NC: hyper::net::Net
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -13337,7 +13625,7 @@ impl<'a, C, NC, A> EditApklistingGetCall<'a, C, NC, A> where NC: hyper::net::Net
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Unique identifier for the Android app that is being updated; for example, "com.spiffygame".    
+    /// Unique identifier for the Android app that is being updated; for example, "com.spiffygame".
     pub fn package_name(mut self, new_value: &str) -> EditApklistingGetCall<'a, C, NC, A> {
         self._package_name = new_value.to_string();
         self
@@ -13347,7 +13635,7 @@ impl<'a, C, NC, A> EditApklistingGetCall<'a, C, NC, A> where NC: hyper::net::Net
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Unique identifier for this edit.    
+    /// Unique identifier for this edit.
     pub fn edit_id(mut self, new_value: &str) -> EditApklistingGetCall<'a, C, NC, A> {
         self._edit_id = new_value.to_string();
         self
@@ -13357,7 +13645,7 @@ impl<'a, C, NC, A> EditApklistingGetCall<'a, C, NC, A> where NC: hyper::net::Net
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The APK version code whose APK-specific listings should be read or modified.    
+    /// The APK version code whose APK-specific listings should be read or modified.
     pub fn apk_version_code(mut self, new_value: i32) -> EditApklistingGetCall<'a, C, NC, A> {
         self._apk_version_code = new_value;
         self
@@ -13367,7 +13655,7 @@ impl<'a, C, NC, A> EditApklistingGetCall<'a, C, NC, A> where NC: hyper::net::Net
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The language code (a BCP-47 language tag) of the APK-specific localized listing to read or modify. For example, to select Austrian German, pass "de-AT".    
+    /// The language code (a BCP-47 language tag) of the APK-specific localized listing to read or modify. For example, to select Austrian German, pass "de-AT".
     pub fn language(mut self, new_value: &str) -> EditApklistingGetCall<'a, C, NC, A> {
         self._language = new_value.to_string();
         self
@@ -13426,7 +13714,7 @@ impl<'a, C, NC, A> EditApklistingGetCall<'a, C, NC, A> where NC: hyper::net::Net
 
 
 /// A builder for the *testers.update* method supported by a *edit* resource.
-/// It is not used directly, but through a `EditMethods`.
+/// It is not used directly, but through a `EditMethods` instance.
 ///
 /// # Example
 ///
@@ -13495,7 +13783,7 @@ impl<'a, C, NC, A> EditTesterUpdateCall<'a, C, NC, A> where NC: hyper::net::Netw
         for &field in ["alt", "packageName", "editId", "track"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -13552,7 +13840,7 @@ impl<'a, C, NC, A> EditTesterUpdateCall<'a, C, NC, A> where NC: hyper::net::Netw
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -13568,7 +13856,6 @@ impl<'a, C, NC, A> EditTesterUpdateCall<'a, C, NC, A> where NC: hyper::net::Netw
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -13578,7 +13865,7 @@ impl<'a, C, NC, A> EditTesterUpdateCall<'a, C, NC, A> where NC: hyper::net::Netw
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -13589,7 +13876,7 @@ impl<'a, C, NC, A> EditTesterUpdateCall<'a, C, NC, A> where NC: hyper::net::Netw
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -13598,13 +13885,13 @@ impl<'a, C, NC, A> EditTesterUpdateCall<'a, C, NC, A> where NC: hyper::net::Netw
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -13625,7 +13912,7 @@ impl<'a, C, NC, A> EditTesterUpdateCall<'a, C, NC, A> where NC: hyper::net::Netw
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Unique identifier for the Android app that is being updated; for example, "com.spiffygame".    
+    /// Unique identifier for the Android app that is being updated; for example, "com.spiffygame".
     pub fn package_name(mut self, new_value: &str) -> EditTesterUpdateCall<'a, C, NC, A> {
         self._package_name = new_value.to_string();
         self
@@ -13635,7 +13922,7 @@ impl<'a, C, NC, A> EditTesterUpdateCall<'a, C, NC, A> where NC: hyper::net::Netw
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Unique identifier for this edit.    
+    /// Unique identifier for this edit.
     pub fn edit_id(mut self, new_value: &str) -> EditTesterUpdateCall<'a, C, NC, A> {
         self._edit_id = new_value.to_string();
         self
@@ -13705,7 +13992,7 @@ impl<'a, C, NC, A> EditTesterUpdateCall<'a, C, NC, A> where NC: hyper::net::Netw
 /// Lists all the APK-specific localized listings for a specified APK.
 ///
 /// A builder for the *apklistings.list* method supported by a *edit* resource.
-/// It is not used directly, but through a `EditMethods`.
+/// It is not used directly, but through a `EditMethods` instance.
 ///
 /// # Example
 ///
@@ -13767,7 +14054,7 @@ impl<'a, C, NC, A> EditApklistingListCall<'a, C, NC, A> where NC: hyper::net::Ne
         for &field in ["alt", "packageName", "editId", "apkVersionCode"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -13820,7 +14107,7 @@ impl<'a, C, NC, A> EditApklistingListCall<'a, C, NC, A> where NC: hyper::net::Ne
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -13832,7 +14119,6 @@ impl<'a, C, NC, A> EditApklistingListCall<'a, C, NC, A> where NC: hyper::net::Ne
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -13842,7 +14128,7 @@ impl<'a, C, NC, A> EditApklistingListCall<'a, C, NC, A> where NC: hyper::net::Ne
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -13853,7 +14139,7 @@ impl<'a, C, NC, A> EditApklistingListCall<'a, C, NC, A> where NC: hyper::net::Ne
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -13862,13 +14148,13 @@ impl<'a, C, NC, A> EditApklistingListCall<'a, C, NC, A> where NC: hyper::net::Ne
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -13880,7 +14166,7 @@ impl<'a, C, NC, A> EditApklistingListCall<'a, C, NC, A> where NC: hyper::net::Ne
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Unique identifier for the Android app that is being updated; for example, "com.spiffygame".    
+    /// Unique identifier for the Android app that is being updated; for example, "com.spiffygame".
     pub fn package_name(mut self, new_value: &str) -> EditApklistingListCall<'a, C, NC, A> {
         self._package_name = new_value.to_string();
         self
@@ -13890,7 +14176,7 @@ impl<'a, C, NC, A> EditApklistingListCall<'a, C, NC, A> where NC: hyper::net::Ne
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Unique identifier for this edit.    
+    /// Unique identifier for this edit.
     pub fn edit_id(mut self, new_value: &str) -> EditApklistingListCall<'a, C, NC, A> {
         self._edit_id = new_value.to_string();
         self
@@ -13900,7 +14186,7 @@ impl<'a, C, NC, A> EditApklistingListCall<'a, C, NC, A> where NC: hyper::net::Ne
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The APK version code whose APK-specific listings should be read or modified.    
+    /// The APK version code whose APK-specific listings should be read or modified.
     pub fn apk_version_code(mut self, new_value: i32) -> EditApklistingListCall<'a, C, NC, A> {
         self._apk_version_code = new_value;
         self
@@ -13959,7 +14245,7 @@ impl<'a, C, NC, A> EditApklistingListCall<'a, C, NC, A> where NC: hyper::net::Ne
 
 
 /// A builder for the *batch* method supported by a *inappproduct* resource.
-/// It is not used directly, but through a `InappproductMethods`.
+/// It is not used directly, but through a `InappproductMethods` instance.
 ///
 /// # Example
 ///
@@ -14022,7 +14308,7 @@ impl<'a, C, NC, A> InappproductBatchCall<'a, C, NC, A> where NC: hyper::net::Net
         for &field in ["alt"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -14055,7 +14341,7 @@ impl<'a, C, NC, A> InappproductBatchCall<'a, C, NC, A> where NC: hyper::net::Net
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -14071,7 +14357,6 @@ impl<'a, C, NC, A> InappproductBatchCall<'a, C, NC, A> where NC: hyper::net::Net
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -14081,7 +14366,7 @@ impl<'a, C, NC, A> InappproductBatchCall<'a, C, NC, A> where NC: hyper::net::Net
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -14092,7 +14377,7 @@ impl<'a, C, NC, A> InappproductBatchCall<'a, C, NC, A> where NC: hyper::net::Net
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -14101,13 +14386,13 @@ impl<'a, C, NC, A> InappproductBatchCall<'a, C, NC, A> where NC: hyper::net::Net
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -14179,7 +14464,7 @@ impl<'a, C, NC, A> InappproductBatchCall<'a, C, NC, A> where NC: hyper::net::Net
 /// List all the in-app products for an Android app, both subscriptions and managed in-app products..
 ///
 /// A builder for the *list* method supported by a *inappproduct* resource.
-/// It is not used directly, but through a `InappproductMethods`.
+/// It is not used directly, but through a `InappproductMethods` instance.
 ///
 /// # Example
 ///
@@ -14252,7 +14537,7 @@ impl<'a, C, NC, A> InappproductListCall<'a, C, NC, A> where NC: hyper::net::Netw
         for &field in ["alt", "packageName", "token", "startIndex", "maxResults"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -14305,7 +14590,7 @@ impl<'a, C, NC, A> InappproductListCall<'a, C, NC, A> where NC: hyper::net::Netw
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -14317,7 +14602,6 @@ impl<'a, C, NC, A> InappproductListCall<'a, C, NC, A> where NC: hyper::net::Netw
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -14327,7 +14611,7 @@ impl<'a, C, NC, A> InappproductListCall<'a, C, NC, A> where NC: hyper::net::Netw
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -14338,7 +14622,7 @@ impl<'a, C, NC, A> InappproductListCall<'a, C, NC, A> where NC: hyper::net::Netw
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -14347,13 +14631,13 @@ impl<'a, C, NC, A> InappproductListCall<'a, C, NC, A> where NC: hyper::net::Netw
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -14365,7 +14649,7 @@ impl<'a, C, NC, A> InappproductListCall<'a, C, NC, A> where NC: hyper::net::Netw
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Unique identifier for the Android app with in-app products; for example, "com.spiffygame".    
+    /// Unique identifier for the Android app with in-app products; for example, "com.spiffygame".
     pub fn package_name(mut self, new_value: &str) -> InappproductListCall<'a, C, NC, A> {
         self._package_name = new_value.to_string();
         self
@@ -14447,7 +14731,7 @@ impl<'a, C, NC, A> InappproductListCall<'a, C, NC, A> where NC: hyper::net::Netw
 /// Creates a new in-app product for an app.
 ///
 /// A builder for the *insert* method supported by a *inappproduct* resource.
-/// It is not used directly, but through a `InappproductMethods`.
+/// It is not used directly, but through a `InappproductMethods` instance.
 ///
 /// # Example
 ///
@@ -14517,7 +14801,7 @@ impl<'a, C, NC, A> InappproductInsertCall<'a, C, NC, A> where NC: hyper::net::Ne
         for &field in ["alt", "packageName", "autoConvertMissingPrices"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -14574,7 +14858,7 @@ impl<'a, C, NC, A> InappproductInsertCall<'a, C, NC, A> where NC: hyper::net::Ne
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -14590,7 +14874,6 @@ impl<'a, C, NC, A> InappproductInsertCall<'a, C, NC, A> where NC: hyper::net::Ne
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -14600,7 +14883,7 @@ impl<'a, C, NC, A> InappproductInsertCall<'a, C, NC, A> where NC: hyper::net::Ne
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -14611,7 +14894,7 @@ impl<'a, C, NC, A> InappproductInsertCall<'a, C, NC, A> where NC: hyper::net::Ne
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -14620,13 +14903,13 @@ impl<'a, C, NC, A> InappproductInsertCall<'a, C, NC, A> where NC: hyper::net::Ne
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -14647,7 +14930,7 @@ impl<'a, C, NC, A> InappproductInsertCall<'a, C, NC, A> where NC: hyper::net::Ne
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Unique identifier for the Android app; for example, "com.spiffygame".    
+    /// Unique identifier for the Android app; for example, "com.spiffygame".
     pub fn package_name(mut self, new_value: &str) -> InappproductInsertCall<'a, C, NC, A> {
         self._package_name = new_value.to_string();
         self
@@ -14655,7 +14938,7 @@ impl<'a, C, NC, A> InappproductInsertCall<'a, C, NC, A> where NC: hyper::net::Ne
     /// Sets the *auto convert missing prices* query property to the given value.
     ///
     /// 
-    /// If true the prices for all regions targeted by the parent app that don't have a price specified for this in-app product will be auto converted to the target currency based on the default price. Defaults to false.    
+    /// If true the prices for all regions targeted by the parent app that don't have a price specified for this in-app product will be auto converted to the target currency based on the default price. Defaults to false.
     pub fn auto_convert_missing_prices(mut self, new_value: bool) -> InappproductInsertCall<'a, C, NC, A> {
         self._auto_convert_missing_prices = Some(new_value);
         self
@@ -14716,7 +14999,7 @@ impl<'a, C, NC, A> InappproductInsertCall<'a, C, NC, A> where NC: hyper::net::Ne
 /// Delete an in-app product for an app.
 ///
 /// A builder for the *delete* method supported by a *inappproduct* resource.
-/// It is not used directly, but through a `InappproductMethods`.
+/// It is not used directly, but through a `InappproductMethods` instance.
 ///
 /// # Example
 ///
@@ -14776,7 +15059,7 @@ impl<'a, C, NC, A> InappproductDeleteCall<'a, C, NC, A> where NC: hyper::net::Ne
         for &field in ["packageName", "sku"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -14828,7 +15111,7 @@ impl<'a, C, NC, A> InappproductDeleteCall<'a, C, NC, A> where NC: hyper::net::Ne
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -14840,7 +15123,6 @@ impl<'a, C, NC, A> InappproductDeleteCall<'a, C, NC, A> where NC: hyper::net::Ne
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -14850,7 +15132,7 @@ impl<'a, C, NC, A> InappproductDeleteCall<'a, C, NC, A> where NC: hyper::net::Ne
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -14861,12 +15143,12 @@ impl<'a, C, NC, A> InappproductDeleteCall<'a, C, NC, A> where NC: hyper::net::Ne
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = res;
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -14878,7 +15160,7 @@ impl<'a, C, NC, A> InappproductDeleteCall<'a, C, NC, A> where NC: hyper::net::Ne
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Unique identifier for the Android app with the in-app product; for example, "com.spiffygame".    
+    /// Unique identifier for the Android app with the in-app product; for example, "com.spiffygame".
     pub fn package_name(mut self, new_value: &str) -> InappproductDeleteCall<'a, C, NC, A> {
         self._package_name = new_value.to_string();
         self
@@ -14888,7 +15170,7 @@ impl<'a, C, NC, A> InappproductDeleteCall<'a, C, NC, A> where NC: hyper::net::Ne
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Unique identifier for the in-app product.    
+    /// Unique identifier for the in-app product.
     pub fn sku(mut self, new_value: &str) -> InappproductDeleteCall<'a, C, NC, A> {
         self._sku = new_value.to_string();
         self
@@ -14949,7 +15231,7 @@ impl<'a, C, NC, A> InappproductDeleteCall<'a, C, NC, A> where NC: hyper::net::Ne
 /// Returns information about the in-app product specified.
 ///
 /// A builder for the *get* method supported by a *inappproduct* resource.
-/// It is not used directly, but through a `InappproductMethods`.
+/// It is not used directly, but through a `InappproductMethods` instance.
 ///
 /// # Example
 ///
@@ -15009,7 +15291,7 @@ impl<'a, C, NC, A> InappproductGetCall<'a, C, NC, A> where NC: hyper::net::Netwo
         for &field in ["alt", "packageName", "sku"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -15062,7 +15344,7 @@ impl<'a, C, NC, A> InappproductGetCall<'a, C, NC, A> where NC: hyper::net::Netwo
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -15074,7 +15356,6 @@ impl<'a, C, NC, A> InappproductGetCall<'a, C, NC, A> where NC: hyper::net::Netwo
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -15084,7 +15365,7 @@ impl<'a, C, NC, A> InappproductGetCall<'a, C, NC, A> where NC: hyper::net::Netwo
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -15095,7 +15376,7 @@ impl<'a, C, NC, A> InappproductGetCall<'a, C, NC, A> where NC: hyper::net::Netwo
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -15104,13 +15385,13 @@ impl<'a, C, NC, A> InappproductGetCall<'a, C, NC, A> where NC: hyper::net::Netwo
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -15131,7 +15412,7 @@ impl<'a, C, NC, A> InappproductGetCall<'a, C, NC, A> where NC: hyper::net::Netwo
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Unique identifier for the in-app product.    
+    /// Unique identifier for the in-app product.
     pub fn sku(mut self, new_value: &str) -> InappproductGetCall<'a, C, NC, A> {
         self._sku = new_value.to_string();
         self
@@ -15192,7 +15473,7 @@ impl<'a, C, NC, A> InappproductGetCall<'a, C, NC, A> where NC: hyper::net::Netwo
 /// Updates the details of an in-app product.
 ///
 /// A builder for the *update* method supported by a *inappproduct* resource.
-/// It is not used directly, but through a `InappproductMethods`.
+/// It is not used directly, but through a `InappproductMethods` instance.
 ///
 /// # Example
 ///
@@ -15264,7 +15545,7 @@ impl<'a, C, NC, A> InappproductUpdateCall<'a, C, NC, A> where NC: hyper::net::Ne
         for &field in ["alt", "packageName", "sku", "autoConvertMissingPrices"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -15321,7 +15602,7 @@ impl<'a, C, NC, A> InappproductUpdateCall<'a, C, NC, A> where NC: hyper::net::Ne
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -15337,7 +15618,6 @@ impl<'a, C, NC, A> InappproductUpdateCall<'a, C, NC, A> where NC: hyper::net::Ne
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -15347,7 +15627,7 @@ impl<'a, C, NC, A> InappproductUpdateCall<'a, C, NC, A> where NC: hyper::net::Ne
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -15358,7 +15638,7 @@ impl<'a, C, NC, A> InappproductUpdateCall<'a, C, NC, A> where NC: hyper::net::Ne
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -15367,13 +15647,13 @@ impl<'a, C, NC, A> InappproductUpdateCall<'a, C, NC, A> where NC: hyper::net::Ne
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -15394,7 +15674,7 @@ impl<'a, C, NC, A> InappproductUpdateCall<'a, C, NC, A> where NC: hyper::net::Ne
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Unique identifier for the Android app with the in-app product; for example, "com.spiffygame".    
+    /// Unique identifier for the Android app with the in-app product; for example, "com.spiffygame".
     pub fn package_name(mut self, new_value: &str) -> InappproductUpdateCall<'a, C, NC, A> {
         self._package_name = new_value.to_string();
         self
@@ -15404,7 +15684,7 @@ impl<'a, C, NC, A> InappproductUpdateCall<'a, C, NC, A> where NC: hyper::net::Ne
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Unique identifier for the in-app product.    
+    /// Unique identifier for the in-app product.
     pub fn sku(mut self, new_value: &str) -> InappproductUpdateCall<'a, C, NC, A> {
         self._sku = new_value.to_string();
         self
@@ -15412,7 +15692,7 @@ impl<'a, C, NC, A> InappproductUpdateCall<'a, C, NC, A> where NC: hyper::net::Ne
     /// Sets the *auto convert missing prices* query property to the given value.
     ///
     /// 
-    /// If true the prices for all regions targeted by the parent app that don't have a price specified for this in-app product will be auto converted to the target currency based on the default price. Defaults to false.    
+    /// If true the prices for all regions targeted by the parent app that don't have a price specified for this in-app product will be auto converted to the target currency based on the default price. Defaults to false.
     pub fn auto_convert_missing_prices(mut self, new_value: bool) -> InappproductUpdateCall<'a, C, NC, A> {
         self._auto_convert_missing_prices = Some(new_value);
         self
@@ -15473,7 +15753,7 @@ impl<'a, C, NC, A> InappproductUpdateCall<'a, C, NC, A> where NC: hyper::net::Ne
 /// Updates the details of an in-app product. This method supports patch semantics.
 ///
 /// A builder for the *patch* method supported by a *inappproduct* resource.
-/// It is not used directly, but through a `InappproductMethods`.
+/// It is not used directly, but through a `InappproductMethods` instance.
 ///
 /// # Example
 ///
@@ -15545,7 +15825,7 @@ impl<'a, C, NC, A> InappproductPatchCall<'a, C, NC, A> where NC: hyper::net::Net
         for &field in ["alt", "packageName", "sku", "autoConvertMissingPrices"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -15602,7 +15882,7 @@ impl<'a, C, NC, A> InappproductPatchCall<'a, C, NC, A> where NC: hyper::net::Net
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -15618,7 +15898,6 @@ impl<'a, C, NC, A> InappproductPatchCall<'a, C, NC, A> where NC: hyper::net::Net
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -15628,7 +15907,7 @@ impl<'a, C, NC, A> InappproductPatchCall<'a, C, NC, A> where NC: hyper::net::Net
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -15639,7 +15918,7 @@ impl<'a, C, NC, A> InappproductPatchCall<'a, C, NC, A> where NC: hyper::net::Net
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -15648,13 +15927,13 @@ impl<'a, C, NC, A> InappproductPatchCall<'a, C, NC, A> where NC: hyper::net::Net
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -15675,7 +15954,7 @@ impl<'a, C, NC, A> InappproductPatchCall<'a, C, NC, A> where NC: hyper::net::Net
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Unique identifier for the Android app with the in-app product; for example, "com.spiffygame".    
+    /// Unique identifier for the Android app with the in-app product; for example, "com.spiffygame".
     pub fn package_name(mut self, new_value: &str) -> InappproductPatchCall<'a, C, NC, A> {
         self._package_name = new_value.to_string();
         self
@@ -15685,7 +15964,7 @@ impl<'a, C, NC, A> InappproductPatchCall<'a, C, NC, A> where NC: hyper::net::Net
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Unique identifier for the in-app product.    
+    /// Unique identifier for the in-app product.
     pub fn sku(mut self, new_value: &str) -> InappproductPatchCall<'a, C, NC, A> {
         self._sku = new_value.to_string();
         self
@@ -15693,7 +15972,7 @@ impl<'a, C, NC, A> InappproductPatchCall<'a, C, NC, A> where NC: hyper::net::Net
     /// Sets the *auto convert missing prices* query property to the given value.
     ///
     /// 
-    /// If true the prices for all regions targeted by the parent app that don't have a price specified for this in-app product will be auto converted to the target currency based on the default price. Defaults to false.    
+    /// If true the prices for all regions targeted by the parent app that don't have a price specified for this in-app product will be auto converted to the target currency based on the default price. Defaults to false.
     pub fn auto_convert_missing_prices(mut self, new_value: bool) -> InappproductPatchCall<'a, C, NC, A> {
         self._auto_convert_missing_prices = Some(new_value);
         self

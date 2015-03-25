@@ -1,8 +1,8 @@
 // DO NOT EDIT !
-// This file was generated automatically from 'src/mako/lib.rs.mako'
+// This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *resourceviews* crate version *0.1.1+20140904*, where *20140904* is the exact revision of the *resourceviews:v1beta2* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.1*.
+//! This documentation was generated from *resourceviews* crate version *0.1.2+20140904*, where *20140904* is the exact revision of the *resourceviews:v1beta2* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.2*.
 //! 
 //! Everything else about the *resourceviews* *v1_beta2* API can be found at the
 //! [official documentation site](https://developers.google.com/compute/).
@@ -27,6 +27,8 @@
 //! 
 //! * **[Hub](struct.Resourceviews.html)**
 //!     * a central object to maintain state and allow accessing all *Activities*
+//!     * creates [*Method Builders*](trait.MethodsBuilder.html) which in turn
+//!       allow access to individual [*Call Builders*](trait.CallBuilder.html)
 //! * **[Resources](trait.Resource.html)**
 //!     * primary types that you can apply *Activities* to
 //!     * a collection of properties and *Parts*
@@ -35,6 +37,8 @@
 //!         * never directly used in *Activities*
 //! * **[Activities](trait.CallBuilder.html)**
 //!     * operations to apply to *Resources*
+//! 
+//! All *structures* are marked with applicable traits to further categorize them and ease browsing.
 //! 
 //! Generally speaking, you can invoke *Activities* like this:
 //! 
@@ -76,7 +80,7 @@
 //! extern crate "yup-oauth2" as oauth2;
 //! extern crate "google-resourceviews1_beta2" as resourceviews1_beta2;
 //! use resourceviews1_beta2::ZoneViewsRemoveResourcesRequest;
-//! use resourceviews1_beta2::Result;
+//! use resourceviews1_beta2::{Result, Error};
 //! # #[test] fn egal() {
 //! use std::default::Default;
 //! use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -106,15 +110,17 @@
 //!              .doit();
 //! 
 //! match result {
-//!     Result::HttpError(err) => println!("HTTPERROR: {:?}", err),
-//!     Result::MissingAPIKey => println!("Auth: Missing API Key - used if there are no scopes"),
-//!     Result::MissingToken => println!("OAuth2: Missing Token"),
-//!     Result::Cancelled => println!("Operation cancelled by user"),
-//!     Result::UploadSizeLimitExceeded(size, max_size) => println!("Upload size too big: {} of {}", size, max_size),
-//!     Result::Failure(_) => println!("General Failure (hyper::client::Response doesn't print)"),
-//!     Result::FieldClash(clashed_field) => println!("You added custom parameter which is part of builder: {:?}", clashed_field),
-//!     Result::JsonDecodeError(err) => println!("Couldn't understand server reply - maybe API needs update: {:?}", err),
-//!     Result::Success(_) => println!("Success (value doesn't print)"),
+//!     Err(e) => match e {
+//!         Error::HttpError(err) => println!("HTTPERROR: {:?}", err),
+//!         Error::MissingAPIKey => println!("Auth: Missing API Key - used if there are no scopes"),
+//!         Error::MissingToken => println!("OAuth2: Missing Token"),
+//!         Error::Cancelled => println!("Operation canceled by user"),
+//!         Error::UploadSizeLimitExceeded(size, max_size) => println!("Upload size too big: {} of {}", size, max_size),
+//!         Error::Failure(_) => println!("General Failure (hyper::client::Response doesn't print)"),
+//!         Error::FieldClash(clashed_field) => println!("You added custom parameter which is part of builder: {:?}", clashed_field),
+//!         Error::JsonDecodeError(err) => println!("Couldn't understand server reply - maybe API needs update: {:?}", err),
+//!     },
+//!     Ok(_) => println!("Success (value doesn't print)"),
 //! }
 //! # }
 //! ```
@@ -127,7 +133,7 @@
 //! When delegates handle errors or intermediate values, they may have a chance to instruct the system to retry. This 
 //! makes the system potentially resilient to all kinds of errors.
 //! 
-//! ## Uploads and Downlods
+//! ## Uploads and Downloads
 //! If a method supports downloads, the response body, which is part of the [Result](enum.Result.html), should be
 //! read by you to obtain the media.
 //! If such a method also supports a [Response Result](trait.ResponseResult.html), it will return that by default.
@@ -150,8 +156,9 @@
 //! ## Optional Parts in Server-Requests
 //! 
 //! All structures provided by this library are made to be [enocodable](trait.RequestValue.html) and 
-//! [decodable](trait.ResponseResult.html) via json. Optionals are used to indicate that partial requests are responses are valid.
-//! Most optionals are are considered [Parts](trait.Part.html) which are identifyable by name, which will be sent to 
+//! [decodable](trait.ResponseResult.html) via *json*. Optionals are used to indicate that partial requests are responses 
+//! are valid.
+//! Most optionals are are considered [Parts](trait.Part.html) which are identifiable by name, which will be sent to 
 //! the server to indicate either the set parts of the request or the desired parts in the response.
 //! 
 //! ## Builder Arguments
@@ -200,7 +207,7 @@ use std::io;
 use std::fs;
 use std::thread::sleep;
 
-pub use cmn::{MultiPartReader, ToParts, MethodInfo, Result, CallBuilder, Hub, ReadSeek, Part, ResponseResult, RequestValue, NestedType, Delegate, DefaultDelegate, ResourceMethodsBuilder, Resource, JsonServerError};
+pub use cmn::{MultiPartReader, ToParts, MethodInfo, Result, Error, CallBuilder, Hub, ReadSeek, Part, ResponseResult, RequestValue, NestedType, Delegate, DefaultDelegate, MethodsBuilder, Resource, JsonServerError};
 
 
 // ##############
@@ -263,7 +270,7 @@ impl Default for Scope {
 /// extern crate "yup-oauth2" as oauth2;
 /// extern crate "google-resourceviews1_beta2" as resourceviews1_beta2;
 /// use resourceviews1_beta2::ZoneViewsRemoveResourcesRequest;
-/// use resourceviews1_beta2::Result;
+/// use resourceviews1_beta2::{Result, Error};
 /// # #[test] fn egal() {
 /// use std::default::Default;
 /// use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -293,15 +300,17 @@ impl Default for Scope {
 ///              .doit();
 /// 
 /// match result {
-///     Result::HttpError(err) => println!("HTTPERROR: {:?}", err),
-///     Result::MissingAPIKey => println!("Auth: Missing API Key - used if there are no scopes"),
-///     Result::MissingToken => println!("OAuth2: Missing Token"),
-///     Result::Cancelled => println!("Operation cancelled by user"),
-///     Result::UploadSizeLimitExceeded(size, max_size) => println!("Upload size too big: {} of {}", size, max_size),
-///     Result::Failure(_) => println!("General Failure (hyper::client::Response doesn't print)"),
-///     Result::FieldClash(clashed_field) => println!("You added custom parameter which is part of builder: {:?}", clashed_field),
-///     Result::JsonDecodeError(err) => println!("Couldn't understand server reply - maybe API needs update: {:?}", err),
-///     Result::Success(_) => println!("Success (value doesn't print)"),
+///     Err(e) => match e {
+///         Error::HttpError(err) => println!("HTTPERROR: {:?}", err),
+///         Error::MissingAPIKey => println!("Auth: Missing API Key - used if there are no scopes"),
+///         Error::MissingToken => println!("OAuth2: Missing Token"),
+///         Error::Cancelled => println!("Operation canceled by user"),
+///         Error::UploadSizeLimitExceeded(size, max_size) => println!("Upload size too big: {} of {}", size, max_size),
+///         Error::Failure(_) => println!("General Failure (hyper::client::Response doesn't print)"),
+///         Error::FieldClash(clashed_field) => println!("You added custom parameter which is part of builder: {:?}", clashed_field),
+///         Error::JsonDecodeError(err) => println!("Couldn't understand server reply - maybe API needs update: {:?}", err),
+///     },
+///     Ok(_) => println!("Success (value doesn't print)"),
 /// }
 /// # }
 /// ```
@@ -322,7 +331,7 @@ impl<'a, C, NC, A> Resourceviews<C, NC, A>
         Resourceviews {
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/0.1.1".to_string(),
+            _user_agent: "google-api-rust-client/0.1.2".to_string(),
             _m: PhantomData
         }
     }
@@ -335,7 +344,7 @@ impl<'a, C, NC, A> Resourceviews<C, NC, A>
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/0.1.1`.
+    /// It defaults to `google-api-rust-client/0.1.2`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -360,12 +369,12 @@ impl<'a, C, NC, A> Resourceviews<C, NC, A>
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct ZoneViewsListResourcesResponse {
-    /// A token used for pagination.    
+    /// A token used for pagination.
     #[serde(alias="nextPageToken")]
     pub next_page_token: String,
-    /// The formatted JSON that is requested by the user.    
+    /// The formatted JSON that is requested by the user.
     pub items: Vec<ListResourceResponseItem>,
-    /// The URL of a Compute Engine network to which the resources in the view belong.    
+    /// The URL of a Compute Engine network to which the resources in the view belong.
     pub network: String,
 }
 
@@ -383,14 +392,14 @@ impl ResponseResult for ZoneViewsListResourcesResponse {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct ZoneViewsList {
-    /// A token used for pagination.    
+    /// A token used for pagination.
     #[serde(alias="nextPageToken")]
     pub next_page_token: String,
-    /// The result that contains all resource views that meet the criteria.    
+    /// The result that contains all resource views that meet the criteria.
     pub items: Vec<ResourceView>,
-    /// Type of resource.    
+    /// Type of resource.
     pub kind: String,
-    /// Server defined URL for this resource (output only).    
+    /// Server defined URL for this resource (output only).
     #[serde(alias="selfLink")]
     pub self_link: String,
 }
@@ -409,7 +418,7 @@ impl ResponseResult for ZoneViewsList {}
 /// 
 #[derive(Default, Clone, Debug, Serialize)]
 pub struct ZoneViewsRemoveResourcesRequest {
-    /// The list of resources to be removed.    
+    /// The list of resources to be removed.
     pub resources: Option<Vec<String>>,
 }
 
@@ -427,7 +436,7 @@ impl RequestValue for ZoneViewsRemoveResourcesRequest {}
 /// 
 #[derive(Default, Clone, Debug, Serialize)]
 pub struct ZoneViewsAddResourcesRequest {
-    /// The list of resources to be added.    
+    /// The list of resources to be added.
     pub resources: Option<Vec<String>>,
 }
 
@@ -440,11 +449,11 @@ impl RequestValue for ZoneViewsAddResourcesRequest {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct OperationWarnings {
-    /// [Output only] Optional human-readable details for this warning.    
+    /// [Output only] Optional human-readable details for this warning.
     pub message: String,
-    /// [Output only] The warning type identifier for this warning.    
+    /// [Output only] The warning type identifier for this warning.
     pub code: String,
-    /// [Output only] Metadata for this warning in key:value format.    
+    /// [Output only] Metadata for this warning in key:value format.
     pub data: Vec<OperationWarningsData>,
 }
 
@@ -463,16 +472,16 @@ impl Part for OperationWarnings {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct OperationList {
-    /// A token used to continue a truncated list request (output only).    
+    /// A token used to continue a truncated list request (output only).
     #[serde(alias="nextPageToken")]
     pub next_page_token: String,
-    /// The operation resources.    
+    /// The operation resources.
     pub items: Vec<Operation>,
-    /// Type of resource.    
+    /// Type of resource.
     pub kind: String,
-    /// Unique identifier for the resource; defined by the server (output only).    
+    /// Unique identifier for the resource; defined by the server (output only).
     pub id: String,
-    /// Server defined URL for this resource (output only).    
+    /// Server defined URL for this resource (output only).
     #[serde(alias="selfLink")]
     pub self_link: String,
 }
@@ -492,31 +501,31 @@ impl ResponseResult for OperationList {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ResourceView {
-    /// Type of the resource.    
+    /// Type of the resource.
     pub kind: Option<String>,
-    /// The URL of a Compute Engine network to which the resources in the view belong.    
+    /// The URL of a Compute Engine network to which the resources in the view belong.
     pub network: Option<String>,
-    /// The detailed description of the resource view.    
+    /// The detailed description of the resource view.
     pub description: Option<String>,
-    /// The labels for events.    
+    /// The labels for events.
     pub labels: Option<Vec<Label>>,
-    /// The name of the resource view.    
+    /// The name of the resource view.
     pub name: Option<String>,
-    /// A list of all resources in the resource view.    
+    /// A list of all resources in the resource view.
     pub resources: Option<Vec<String>>,
-    /// The fingerprint of the service endpoint information.    
+    /// The fingerprint of the service endpoint information.
     pub fingerprint: Option<String>,
-    /// Services endpoint information.    
+    /// Services endpoint information.
     pub endpoints: Option<Vec<ServiceEndpoint>>,
-    /// The creation time of the resource view.    
+    /// The creation time of the resource view.
     #[serde(alias="creationTimestamp")]
     pub creation_timestamp: Option<String>,
-    /// [Output Only] The ID of the resource view.    
+    /// [Output Only] The ID of the resource view.
     pub id: Option<String>,
-    /// [Output Only] A self-link to the resource view.    
+    /// [Output Only] A self-link to the resource view.
     #[serde(alias="selfLink")]
     pub self_link: Option<String>,
-    /// The total number of resources in the resource view.    
+    /// The total number of resources in the resource view.
     pub size: Option<u32>,
 }
 
@@ -530,9 +539,9 @@ impl ResponseResult for ResourceView {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct ListResourceResponseItem {
-    /// The list of service end points on the resource.    
+    /// The list of service end points on the resource.
     pub endpoints: HashMap<String, Vec<i32>>,
-    /// The full URL of the resource.    
+    /// The full URL of the resource.
     pub resource: String,
 }
 
@@ -545,11 +554,11 @@ impl Part for ListResourceResponseItem {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct OperationErrorErrors {
-    /// [Output Only] An optional, human-readable error message.    
+    /// [Output Only] An optional, human-readable error message.
     pub message: String,
-    /// [Output Only] The error type identifier for this error.    
+    /// [Output Only] The error type identifier for this error.
     pub code: String,
-    /// [Output Only] Indicates the field in the request which caused the error. This property is optional.    
+    /// [Output Only] Indicates the field in the request which caused the error. This property is optional.
     pub location: String,
 }
 
@@ -563,9 +572,9 @@ impl Part for OperationErrorErrors {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Label {
-    /// Key of the label.    
+    /// Key of the label.
     pub key: String,
-    /// Value of the label.    
+    /// Value of the label.
     pub value: String,
 }
 
@@ -578,7 +587,7 @@ impl Part for Label {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct OperationError {
-    /// [Output Only] The array of errors encountered while processing this operation.    
+    /// [Output Only] The array of errors encountered while processing this operation.
     pub errors: Vec<OperationErrorErrors>,
 }
 
@@ -597,12 +606,12 @@ impl Part for OperationError {}
 /// 
 #[derive(Default, Clone, Debug, Serialize)]
 pub struct ZoneViewsSetServiceRequest {
-    /// The name of the resource if user wants to update the service information of the resource.    
+    /// The name of the resource if user wants to update the service information of the resource.
     #[serde(alias="resourceName")]
     pub resource_name: Option<String>,
-    /// The service information to be updated.    
+    /// The service information to be updated.
     pub endpoints: Option<Vec<ServiceEndpoint>>,
-    /// Fingerprint of the service information; a hash of the contents. This field is used for optimistic locking when updating the service entries.    
+    /// Fingerprint of the service information; a hash of the contents. This field is used for optimistic locking when updating the service entries.
     pub fingerprint: Option<String>,
 }
 
@@ -620,9 +629,9 @@ impl RequestValue for ZoneViewsSetServiceRequest {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct ZoneViewsGetServiceResponse {
-    /// The service information.    
+    /// The service information.
     pub endpoints: Vec<ServiceEndpoint>,
-    /// The fingerprint of the service information.    
+    /// The fingerprint of the service information.
     pub fingerprint: String,
 }
 
@@ -645,61 +654,61 @@ impl ResponseResult for ZoneViewsGetServiceResponse {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct Operation {
-    /// [Output Only] Status of the operation.    
+    /// [Output Only] Status of the operation.
     pub status: String,
-    /// [Output Only] The time that this operation was requested, in RFC3339 text format.    
+    /// [Output Only] The time that this operation was requested, in RFC3339 text format.
     #[serde(alias="insertTime")]
     pub insert_time: String,
-    /// [Output Only] If there are issues with this operation, a warning is returned.    
+    /// [Output Only] If there are issues with this operation, a warning is returned.
     pub warnings: Vec<OperationWarnings>,
-    /// [Output Only] If errors occurred during processing of this operation, this field will be populated.    
+    /// [Output Only] If errors occurred during processing of this operation, this field will be populated.
     pub error: OperationError,
-    /// [Output Only] Unique target ID which identifies a particular incarnation of the target.    
+    /// [Output Only] Unique target ID which identifies a particular incarnation of the target.
     #[serde(alias="targetId")]
     pub target_id: String,
-    /// [Output only] URL of the resource the operation is mutating.    
+    /// [Output only] URL of the resource the operation is mutating.
     #[serde(alias="targetLink")]
     pub target_link: String,
-    /// [Output Only] The time that this operation was started by the server, in RFC3339 text format.    
+    /// [Output Only] The time that this operation was started by the server, in RFC3339 text format.
     #[serde(alias="startTime")]
     pub start_time: String,
-    /// [Output only] An optional identifier specified by the client when the mutation was initiated. Must be unique for all operation resources in the project.    
+    /// [Output only] An optional identifier specified by the client when the mutation was initiated. Must be unique for all operation resources in the project.
     #[serde(alias="clientOperationId")]
     pub client_operation_id: String,
-    /// [Output Only] The time that this operation was requested, in RFC3339 text format.    
+    /// [Output Only] The time that this operation was requested, in RFC3339 text format.
     #[serde(alias="creationTimestamp")]
     pub creation_timestamp: String,
-    /// [Output Only] Unique identifier for the resource, generated by the server.    
+    /// [Output Only] Unique identifier for the resource, generated by the server.
     pub id: String,
-    /// [Output only] Type of the resource.    
+    /// [Output only] Type of the resource.
     pub kind: String,
-    /// [Output Only] Name of the resource.    
+    /// [Output Only] Name of the resource.
     pub name: String,
-    /// [Output Only] URL of the zone where the operation resides. Only available when performing per-zone operations.    
+    /// [Output Only] URL of the zone where the operation resides. Only available when performing per-zone operations.
     pub zone: String,
-    /// [Output Only] URL of the region where the operation resides. Only available when performing regional operations.    
+    /// [Output Only] URL of the region where the operation resides. Only available when performing regional operations.
     pub region: String,
-    /// [Output Only] Server-defined fully-qualified URL for this resource.    
+    /// [Output Only] Server-defined fully-qualified URL for this resource.
     #[serde(alias="selfLink")]
     pub self_link: String,
-    /// [Output only] Type of the operation. Operations include insert, update, and delete.    
+    /// [Output only] Type of the operation. Operations include insert, update, and delete.
     #[serde(alias="operationType")]
     pub operation_type: String,
-    /// [Output only] If operation fails, the HTTP error message returned.    
+    /// [Output only] If operation fails, the HTTP error message returned.
     #[serde(alias="httpErrorMessage")]
     pub http_error_message: String,
-    /// [Output only] An optional progress indicator that ranges from 0 to 100. There is no requirement that this be linear or support any granularity of operations. This should not be used to guess at when the operation will be complete. This number should be monotonically increasing as the operation progresses.    
+    /// [Output only] An optional progress indicator that ranges from 0 to 100. There is no requirement that this be linear or support any granularity of operations. This should not be used to guess at when the operation will be complete. This number should be monotonically increasing as the operation progresses.
     pub progress: i32,
-    /// [Output Only] The time that this operation was completed, in RFC3339 text format.    
+    /// [Output Only] The time that this operation was completed, in RFC3339 text format.
     #[serde(alias="endTime")]
     pub end_time: String,
-    /// [Output only] If operation fails, the HTTP error status code returned.    
+    /// [Output only] If operation fails, the HTTP error status code returned.
     #[serde(alias="httpErrorStatusCode")]
     pub http_error_status_code: i32,
-    /// [Output Only] An optional textual description of the current status of the operation.    
+    /// [Output Only] An optional textual description of the current status of the operation.
     #[serde(alias="statusMessage")]
     pub status_message: String,
-    /// [Output Only] User who requested the operation, for example: user@example.com.    
+    /// [Output Only] User who requested the operation, for example: user@example.com.
     pub user: String,
 }
 
@@ -712,9 +721,9 @@ impl ResponseResult for Operation {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ServiceEndpoint {
-    /// The name of the service endpoint.    
+    /// The name of the service endpoint.
     pub name: String,
-    /// The port of the service endpoint.    
+    /// The port of the service endpoint.
     pub port: i32,
 }
 
@@ -727,9 +736,9 @@ impl Part for ServiceEndpoint {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct OperationWarningsData {
-    /// [Output Only] Metadata key for this warning.    
+    /// [Output Only] Metadata key for this warning.
     pub key: String,
-    /// [Output Only] Metadata value for this warning.    
+    /// [Output Only] Metadata value for this warning.
     pub value: String,
 }
 
@@ -776,13 +785,20 @@ pub struct ZoneViewMethods<'a, C, NC, A>
     hub: &'a Resourceviews<C, NC, A>,
 }
 
-impl<'a, C, NC, A> ResourceMethodsBuilder for ZoneViewMethods<'a, C, NC, A> {}
+impl<'a, C, NC, A> MethodsBuilder for ZoneViewMethods<'a, C, NC, A> {}
 
 impl<'a, C, NC, A> ZoneViewMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Remove resources from the view.    
+    /// Remove resources from the view.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `project` - The project name of the resource view.
+    /// * `zone` - The zone name of the resource view.
+    /// * `resourceView` - The name of the resource view.
     pub fn remove_resources(&self, request: &ZoneViewsRemoveResourcesRequest, project: &str, zone: &str, resource_view: &str) -> ZoneViewRemoveResourceCall<'a, C, NC, A> {
         ZoneViewRemoveResourceCall {
             hub: self.hub,
@@ -798,7 +814,14 @@ impl<'a, C, NC, A> ZoneViewMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Add resources to the view.    
+    /// Add resources to the view.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `project` - The project name of the resource view.
+    /// * `zone` - The zone name of the resource view.
+    /// * `resourceView` - The name of the resource view.
     pub fn add_resources(&self, request: &ZoneViewsAddResourcesRequest, project: &str, zone: &str, resource_view: &str) -> ZoneViewAddResourceCall<'a, C, NC, A> {
         ZoneViewAddResourceCall {
             hub: self.hub,
@@ -814,7 +837,13 @@ impl<'a, C, NC, A> ZoneViewMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// List the resources of the resource view.    
+    /// List the resources of the resource view.
+    /// 
+    /// # Arguments
+    ///
+    /// * `project` - The project name of the resource view.
+    /// * `zone` - The zone name of the resource view.
+    /// * `resourceView` - The name of the resource view.
     pub fn list_resources(&self, project: &str, zone: &str, resource_view: &str) -> ZoneViewListResourceCall<'a, C, NC, A> {
         ZoneViewListResourceCall {
             hub: self.hub,
@@ -834,7 +863,13 @@ impl<'a, C, NC, A> ZoneViewMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Get the information of a zonal resource view.    
+    /// Get the information of a zonal resource view.
+    /// 
+    /// # Arguments
+    ///
+    /// * `project` - The project name of the resource view.
+    /// * `zone` - The zone name of the resource view.
+    /// * `resourceView` - The name of the resource view.
     pub fn get(&self, project: &str, zone: &str, resource_view: &str) -> ZoneViewGetCall<'a, C, NC, A> {
         ZoneViewGetCall {
             hub: self.hub,
@@ -849,7 +884,12 @@ impl<'a, C, NC, A> ZoneViewMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// List resource views.    
+    /// List resource views.
+    /// 
+    /// # Arguments
+    ///
+    /// * `project` - The project name of the resource view.
+    /// * `zone` - The zone name of the resource view.
     pub fn list(&self, project: &str, zone: &str) -> ZoneViewListCall<'a, C, NC, A> {
         ZoneViewListCall {
             hub: self.hub,
@@ -865,7 +905,13 @@ impl<'a, C, NC, A> ZoneViewMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Create a resource view.    
+    /// Create a resource view.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `project` - The project name of the resource view.
+    /// * `zone` - The zone name of the resource view.
     pub fn insert(&self, request: &ResourceView, project: &str, zone: &str) -> ZoneViewInsertCall<'a, C, NC, A> {
         ZoneViewInsertCall {
             hub: self.hub,
@@ -880,7 +926,13 @@ impl<'a, C, NC, A> ZoneViewMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Delete a resource view.    
+    /// Delete a resource view.
+    /// 
+    /// # Arguments
+    ///
+    /// * `project` - The project name of the resource view.
+    /// * `zone` - The zone name of the resource view.
+    /// * `resourceView` - The name of the resource view.
     pub fn delete(&self, project: &str, zone: &str, resource_view: &str) -> ZoneViewDeleteCall<'a, C, NC, A> {
         ZoneViewDeleteCall {
             hub: self.hub,
@@ -895,7 +947,14 @@ impl<'a, C, NC, A> ZoneViewMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Update the service information of a resource view or a resource.    
+    /// Update the service information of a resource view or a resource.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `project` - The project name of the resource view.
+    /// * `zone` - The zone name of the resource view.
+    /// * `resourceView` - The name of the resource view.
     pub fn set_service(&self, request: &ZoneViewsSetServiceRequest, project: &str, zone: &str, resource_view: &str) -> ZoneViewSetServiceCall<'a, C, NC, A> {
         ZoneViewSetServiceCall {
             hub: self.hub,
@@ -911,7 +970,13 @@ impl<'a, C, NC, A> ZoneViewMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Get the service information of a resource view or a resource.    
+    /// Get the service information of a resource view or a resource.
+    /// 
+    /// # Arguments
+    ///
+    /// * `project` - The project name of the resource view.
+    /// * `zone` - The zone name of the resource view.
+    /// * `resourceView` - The name of the resource view.
     pub fn get_service(&self, project: &str, zone: &str, resource_view: &str) -> ZoneViewGetServiceCall<'a, C, NC, A> {
         ZoneViewGetServiceCall {
             hub: self.hub,
@@ -962,13 +1027,19 @@ pub struct ZoneOperationMethods<'a, C, NC, A>
     hub: &'a Resourceviews<C, NC, A>,
 }
 
-impl<'a, C, NC, A> ResourceMethodsBuilder for ZoneOperationMethods<'a, C, NC, A> {}
+impl<'a, C, NC, A> MethodsBuilder for ZoneOperationMethods<'a, C, NC, A> {}
 
 impl<'a, C, NC, A> ZoneOperationMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Retrieves the specified zone-specific operation resource.    
+    /// Retrieves the specified zone-specific operation resource.
+    /// 
+    /// # Arguments
+    ///
+    /// * `project` - Name of the project scoping this request.
+    /// * `zone` - Name of the zone scoping this request.
+    /// * `operation` - Name of the operation resource to return.
     pub fn get(&self, project: &str, zone: &str, operation: &str) -> ZoneOperationGetCall<'a, C, NC, A> {
         ZoneOperationGetCall {
             hub: self.hub,
@@ -983,7 +1054,12 @@ impl<'a, C, NC, A> ZoneOperationMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Retrieves the list of operation resources contained within the specified zone.    
+    /// Retrieves the list of operation resources contained within the specified zone.
+    /// 
+    /// # Arguments
+    ///
+    /// * `project` - Name of the project scoping this request.
+    /// * `zone` - Name of the zone scoping this request.
     pub fn list(&self, project: &str, zone: &str) -> ZoneOperationListCall<'a, C, NC, A> {
         ZoneOperationListCall {
             hub: self.hub,
@@ -1010,7 +1086,7 @@ impl<'a, C, NC, A> ZoneOperationMethods<'a, C, NC, A> {
 /// Remove resources from the view.
 ///
 /// A builder for the *removeResources* method supported by a *zoneView* resource.
-/// It is not used directly, but through a `ZoneViewMethods`.
+/// It is not used directly, but through a `ZoneViewMethods` instance.
 ///
 /// # Example
 ///
@@ -1079,7 +1155,7 @@ impl<'a, C, NC, A> ZoneViewRemoveResourceCall<'a, C, NC, A> where NC: hyper::net
         for &field in ["alt", "project", "zone", "resourceView"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -1136,7 +1212,7 @@ impl<'a, C, NC, A> ZoneViewRemoveResourceCall<'a, C, NC, A> where NC: hyper::net
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -1152,7 +1228,6 @@ impl<'a, C, NC, A> ZoneViewRemoveResourceCall<'a, C, NC, A> where NC: hyper::net
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -1162,7 +1237,7 @@ impl<'a, C, NC, A> ZoneViewRemoveResourceCall<'a, C, NC, A> where NC: hyper::net
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -1173,7 +1248,7 @@ impl<'a, C, NC, A> ZoneViewRemoveResourceCall<'a, C, NC, A> where NC: hyper::net
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -1182,13 +1257,13 @@ impl<'a, C, NC, A> ZoneViewRemoveResourceCall<'a, C, NC, A> where NC: hyper::net
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -1209,7 +1284,7 @@ impl<'a, C, NC, A> ZoneViewRemoveResourceCall<'a, C, NC, A> where NC: hyper::net
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The project name of the resource view.    
+    /// The project name of the resource view.
     pub fn project(mut self, new_value: &str) -> ZoneViewRemoveResourceCall<'a, C, NC, A> {
         self._project = new_value.to_string();
         self
@@ -1219,7 +1294,7 @@ impl<'a, C, NC, A> ZoneViewRemoveResourceCall<'a, C, NC, A> where NC: hyper::net
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The zone name of the resource view.    
+    /// The zone name of the resource view.
     pub fn zone(mut self, new_value: &str) -> ZoneViewRemoveResourceCall<'a, C, NC, A> {
         self._zone = new_value.to_string();
         self
@@ -1229,7 +1304,7 @@ impl<'a, C, NC, A> ZoneViewRemoveResourceCall<'a, C, NC, A> where NC: hyper::net
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The name of the resource view.    
+    /// The name of the resource view.
     pub fn resource_view(mut self, new_value: &str) -> ZoneViewRemoveResourceCall<'a, C, NC, A> {
         self._resource_view = new_value.to_string();
         self
@@ -1290,7 +1365,7 @@ impl<'a, C, NC, A> ZoneViewRemoveResourceCall<'a, C, NC, A> where NC: hyper::net
 /// Add resources to the view.
 ///
 /// A builder for the *addResources* method supported by a *zoneView* resource.
-/// It is not used directly, but through a `ZoneViewMethods`.
+/// It is not used directly, but through a `ZoneViewMethods` instance.
 ///
 /// # Example
 ///
@@ -1359,7 +1434,7 @@ impl<'a, C, NC, A> ZoneViewAddResourceCall<'a, C, NC, A> where NC: hyper::net::N
         for &field in ["alt", "project", "zone", "resourceView"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -1416,7 +1491,7 @@ impl<'a, C, NC, A> ZoneViewAddResourceCall<'a, C, NC, A> where NC: hyper::net::N
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -1432,7 +1507,6 @@ impl<'a, C, NC, A> ZoneViewAddResourceCall<'a, C, NC, A> where NC: hyper::net::N
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -1442,7 +1516,7 @@ impl<'a, C, NC, A> ZoneViewAddResourceCall<'a, C, NC, A> where NC: hyper::net::N
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -1453,7 +1527,7 @@ impl<'a, C, NC, A> ZoneViewAddResourceCall<'a, C, NC, A> where NC: hyper::net::N
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -1462,13 +1536,13 @@ impl<'a, C, NC, A> ZoneViewAddResourceCall<'a, C, NC, A> where NC: hyper::net::N
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -1489,7 +1563,7 @@ impl<'a, C, NC, A> ZoneViewAddResourceCall<'a, C, NC, A> where NC: hyper::net::N
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The project name of the resource view.    
+    /// The project name of the resource view.
     pub fn project(mut self, new_value: &str) -> ZoneViewAddResourceCall<'a, C, NC, A> {
         self._project = new_value.to_string();
         self
@@ -1499,7 +1573,7 @@ impl<'a, C, NC, A> ZoneViewAddResourceCall<'a, C, NC, A> where NC: hyper::net::N
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The zone name of the resource view.    
+    /// The zone name of the resource view.
     pub fn zone(mut self, new_value: &str) -> ZoneViewAddResourceCall<'a, C, NC, A> {
         self._zone = new_value.to_string();
         self
@@ -1509,7 +1583,7 @@ impl<'a, C, NC, A> ZoneViewAddResourceCall<'a, C, NC, A> where NC: hyper::net::N
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The name of the resource view.    
+    /// The name of the resource view.
     pub fn resource_view(mut self, new_value: &str) -> ZoneViewAddResourceCall<'a, C, NC, A> {
         self._resource_view = new_value.to_string();
         self
@@ -1570,7 +1644,7 @@ impl<'a, C, NC, A> ZoneViewAddResourceCall<'a, C, NC, A> where NC: hyper::net::N
 /// List the resources of the resource view.
 ///
 /// A builder for the *listResources* method supported by a *zoneView* resource.
-/// It is not used directly, but through a `ZoneViewMethods`.
+/// It is not used directly, but through a `ZoneViewMethods` instance.
 ///
 /// # Example
 ///
@@ -1657,7 +1731,7 @@ impl<'a, C, NC, A> ZoneViewListResourceCall<'a, C, NC, A> where NC: hyper::net::
         for &field in ["alt", "project", "zone", "resourceView", "serviceName", "pageToken", "maxResults", "listState", "format"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -1710,7 +1784,7 @@ impl<'a, C, NC, A> ZoneViewListResourceCall<'a, C, NC, A> where NC: hyper::net::
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -1722,7 +1796,6 @@ impl<'a, C, NC, A> ZoneViewListResourceCall<'a, C, NC, A> where NC: hyper::net::
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -1732,7 +1805,7 @@ impl<'a, C, NC, A> ZoneViewListResourceCall<'a, C, NC, A> where NC: hyper::net::
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -1743,7 +1816,7 @@ impl<'a, C, NC, A> ZoneViewListResourceCall<'a, C, NC, A> where NC: hyper::net::
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -1752,13 +1825,13 @@ impl<'a, C, NC, A> ZoneViewListResourceCall<'a, C, NC, A> where NC: hyper::net::
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -1770,7 +1843,7 @@ impl<'a, C, NC, A> ZoneViewListResourceCall<'a, C, NC, A> where NC: hyper::net::
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The project name of the resource view.    
+    /// The project name of the resource view.
     pub fn project(mut self, new_value: &str) -> ZoneViewListResourceCall<'a, C, NC, A> {
         self._project = new_value.to_string();
         self
@@ -1780,7 +1853,7 @@ impl<'a, C, NC, A> ZoneViewListResourceCall<'a, C, NC, A> where NC: hyper::net::
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The zone name of the resource view.    
+    /// The zone name of the resource view.
     pub fn zone(mut self, new_value: &str) -> ZoneViewListResourceCall<'a, C, NC, A> {
         self._zone = new_value.to_string();
         self
@@ -1790,7 +1863,7 @@ impl<'a, C, NC, A> ZoneViewListResourceCall<'a, C, NC, A> where NC: hyper::net::
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The name of the resource view.    
+    /// The name of the resource view.
     pub fn resource_view(mut self, new_value: &str) -> ZoneViewListResourceCall<'a, C, NC, A> {
         self._resource_view = new_value.to_string();
         self
@@ -1798,7 +1871,7 @@ impl<'a, C, NC, A> ZoneViewListResourceCall<'a, C, NC, A> where NC: hyper::net::
     /// Sets the *service name* query property to the given value.
     ///
     /// 
-    /// The service name to return in the response. It is optional and if it is not set, all the service end points will be returned.    
+    /// The service name to return in the response. It is optional and if it is not set, all the service end points will be returned.
     pub fn service_name(mut self, new_value: &str) -> ZoneViewListResourceCall<'a, C, NC, A> {
         self._service_name = Some(new_value.to_string());
         self
@@ -1806,7 +1879,7 @@ impl<'a, C, NC, A> ZoneViewListResourceCall<'a, C, NC, A> where NC: hyper::net::
     /// Sets the *page token* query property to the given value.
     ///
     /// 
-    /// Specifies a nextPageToken returned by a previous list request. This token can be used to request the next page of results from a previous list request.    
+    /// Specifies a nextPageToken returned by a previous list request. This token can be used to request the next page of results from a previous list request.
     pub fn page_token(mut self, new_value: &str) -> ZoneViewListResourceCall<'a, C, NC, A> {
         self._page_token = Some(new_value.to_string());
         self
@@ -1814,7 +1887,7 @@ impl<'a, C, NC, A> ZoneViewListResourceCall<'a, C, NC, A> where NC: hyper::net::
     /// Sets the *max results* query property to the given value.
     ///
     /// 
-    /// Maximum count of results to be returned. Acceptable values are 0 to 5000, inclusive. (Default: 5000)    
+    /// Maximum count of results to be returned. Acceptable values are 0 to 5000, inclusive. (Default: 5000)
     pub fn max_results(mut self, new_value: i32) -> ZoneViewListResourceCall<'a, C, NC, A> {
         self._max_results = Some(new_value);
         self
@@ -1822,7 +1895,7 @@ impl<'a, C, NC, A> ZoneViewListResourceCall<'a, C, NC, A> where NC: hyper::net::
     /// Sets the *list state* query property to the given value.
     ///
     /// 
-    /// The state of the instance to list. By default, it lists all instances.    
+    /// The state of the instance to list. By default, it lists all instances.
     pub fn list_state(mut self, new_value: &str) -> ZoneViewListResourceCall<'a, C, NC, A> {
         self._list_state = Some(new_value.to_string());
         self
@@ -1830,7 +1903,7 @@ impl<'a, C, NC, A> ZoneViewListResourceCall<'a, C, NC, A> where NC: hyper::net::
     /// Sets the *format* query property to the given value.
     ///
     /// 
-    /// The requested format of the return value. It can be URL or URL_PORT. A JSON object will be included in the response based on the format. The default format is NONE, which results in no JSON in the response.    
+    /// The requested format of the return value. It can be URL or URL_PORT. A JSON object will be included in the response based on the format. The default format is NONE, which results in no JSON in the response.
     pub fn format(mut self, new_value: &str) -> ZoneViewListResourceCall<'a, C, NC, A> {
         self._format = Some(new_value.to_string());
         self
@@ -1891,7 +1964,7 @@ impl<'a, C, NC, A> ZoneViewListResourceCall<'a, C, NC, A> where NC: hyper::net::
 /// Get the information of a zonal resource view.
 ///
 /// A builder for the *get* method supported by a *zoneView* resource.
-/// It is not used directly, but through a `ZoneViewMethods`.
+/// It is not used directly, but through a `ZoneViewMethods` instance.
 ///
 /// # Example
 ///
@@ -1953,7 +2026,7 @@ impl<'a, C, NC, A> ZoneViewGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
         for &field in ["alt", "project", "zone", "resourceView"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -2006,7 +2079,7 @@ impl<'a, C, NC, A> ZoneViewGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -2018,7 +2091,6 @@ impl<'a, C, NC, A> ZoneViewGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -2028,7 +2100,7 @@ impl<'a, C, NC, A> ZoneViewGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -2039,7 +2111,7 @@ impl<'a, C, NC, A> ZoneViewGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -2048,13 +2120,13 @@ impl<'a, C, NC, A> ZoneViewGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -2066,7 +2138,7 @@ impl<'a, C, NC, A> ZoneViewGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The project name of the resource view.    
+    /// The project name of the resource view.
     pub fn project(mut self, new_value: &str) -> ZoneViewGetCall<'a, C, NC, A> {
         self._project = new_value.to_string();
         self
@@ -2076,7 +2148,7 @@ impl<'a, C, NC, A> ZoneViewGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The zone name of the resource view.    
+    /// The zone name of the resource view.
     pub fn zone(mut self, new_value: &str) -> ZoneViewGetCall<'a, C, NC, A> {
         self._zone = new_value.to_string();
         self
@@ -2086,7 +2158,7 @@ impl<'a, C, NC, A> ZoneViewGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The name of the resource view.    
+    /// The name of the resource view.
     pub fn resource_view(mut self, new_value: &str) -> ZoneViewGetCall<'a, C, NC, A> {
         self._resource_view = new_value.to_string();
         self
@@ -2147,7 +2219,7 @@ impl<'a, C, NC, A> ZoneViewGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
 /// List resource views.
 ///
 /// A builder for the *list* method supported by a *zoneView* resource.
-/// It is not used directly, but through a `ZoneViewMethods`.
+/// It is not used directly, but through a `ZoneViewMethods` instance.
 ///
 /// # Example
 ///
@@ -2217,7 +2289,7 @@ impl<'a, C, NC, A> ZoneViewListCall<'a, C, NC, A> where NC: hyper::net::NetworkC
         for &field in ["alt", "project", "zone", "pageToken", "maxResults"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -2270,7 +2342,7 @@ impl<'a, C, NC, A> ZoneViewListCall<'a, C, NC, A> where NC: hyper::net::NetworkC
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -2282,7 +2354,6 @@ impl<'a, C, NC, A> ZoneViewListCall<'a, C, NC, A> where NC: hyper::net::NetworkC
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -2292,7 +2363,7 @@ impl<'a, C, NC, A> ZoneViewListCall<'a, C, NC, A> where NC: hyper::net::NetworkC
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -2303,7 +2374,7 @@ impl<'a, C, NC, A> ZoneViewListCall<'a, C, NC, A> where NC: hyper::net::NetworkC
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -2312,13 +2383,13 @@ impl<'a, C, NC, A> ZoneViewListCall<'a, C, NC, A> where NC: hyper::net::NetworkC
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -2330,7 +2401,7 @@ impl<'a, C, NC, A> ZoneViewListCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The project name of the resource view.    
+    /// The project name of the resource view.
     pub fn project(mut self, new_value: &str) -> ZoneViewListCall<'a, C, NC, A> {
         self._project = new_value.to_string();
         self
@@ -2340,7 +2411,7 @@ impl<'a, C, NC, A> ZoneViewListCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The zone name of the resource view.    
+    /// The zone name of the resource view.
     pub fn zone(mut self, new_value: &str) -> ZoneViewListCall<'a, C, NC, A> {
         self._zone = new_value.to_string();
         self
@@ -2348,7 +2419,7 @@ impl<'a, C, NC, A> ZoneViewListCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// Sets the *page token* query property to the given value.
     ///
     /// 
-    /// Specifies a nextPageToken returned by a previous list request. This token can be used to request the next page of results from a previous list request.    
+    /// Specifies a nextPageToken returned by a previous list request. This token can be used to request the next page of results from a previous list request.
     pub fn page_token(mut self, new_value: &str) -> ZoneViewListCall<'a, C, NC, A> {
         self._page_token = Some(new_value.to_string());
         self
@@ -2356,7 +2427,7 @@ impl<'a, C, NC, A> ZoneViewListCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// Sets the *max results* query property to the given value.
     ///
     /// 
-    /// Maximum count of results to be returned. Acceptable values are 0 to 5000, inclusive. (Default: 5000)    
+    /// Maximum count of results to be returned. Acceptable values are 0 to 5000, inclusive. (Default: 5000)
     pub fn max_results(mut self, new_value: i32) -> ZoneViewListCall<'a, C, NC, A> {
         self._max_results = Some(new_value);
         self
@@ -2417,7 +2488,7 @@ impl<'a, C, NC, A> ZoneViewListCall<'a, C, NC, A> where NC: hyper::net::NetworkC
 /// Create a resource view.
 ///
 /// A builder for the *insert* method supported by a *zoneView* resource.
-/// It is not used directly, but through a `ZoneViewMethods`.
+/// It is not used directly, but through a `ZoneViewMethods` instance.
 ///
 /// # Example
 ///
@@ -2484,7 +2555,7 @@ impl<'a, C, NC, A> ZoneViewInsertCall<'a, C, NC, A> where NC: hyper::net::Networ
         for &field in ["alt", "project", "zone"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -2541,7 +2612,7 @@ impl<'a, C, NC, A> ZoneViewInsertCall<'a, C, NC, A> where NC: hyper::net::Networ
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -2557,7 +2628,6 @@ impl<'a, C, NC, A> ZoneViewInsertCall<'a, C, NC, A> where NC: hyper::net::Networ
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -2567,7 +2637,7 @@ impl<'a, C, NC, A> ZoneViewInsertCall<'a, C, NC, A> where NC: hyper::net::Networ
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -2578,7 +2648,7 @@ impl<'a, C, NC, A> ZoneViewInsertCall<'a, C, NC, A> where NC: hyper::net::Networ
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -2587,13 +2657,13 @@ impl<'a, C, NC, A> ZoneViewInsertCall<'a, C, NC, A> where NC: hyper::net::Networ
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -2614,7 +2684,7 @@ impl<'a, C, NC, A> ZoneViewInsertCall<'a, C, NC, A> where NC: hyper::net::Networ
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The project name of the resource view.    
+    /// The project name of the resource view.
     pub fn project(mut self, new_value: &str) -> ZoneViewInsertCall<'a, C, NC, A> {
         self._project = new_value.to_string();
         self
@@ -2624,7 +2694,7 @@ impl<'a, C, NC, A> ZoneViewInsertCall<'a, C, NC, A> where NC: hyper::net::Networ
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The zone name of the resource view.    
+    /// The zone name of the resource view.
     pub fn zone(mut self, new_value: &str) -> ZoneViewInsertCall<'a, C, NC, A> {
         self._zone = new_value.to_string();
         self
@@ -2685,7 +2755,7 @@ impl<'a, C, NC, A> ZoneViewInsertCall<'a, C, NC, A> where NC: hyper::net::Networ
 /// Delete a resource view.
 ///
 /// A builder for the *delete* method supported by a *zoneView* resource.
-/// It is not used directly, but through a `ZoneViewMethods`.
+/// It is not used directly, but through a `ZoneViewMethods` instance.
 ///
 /// # Example
 ///
@@ -2747,7 +2817,7 @@ impl<'a, C, NC, A> ZoneViewDeleteCall<'a, C, NC, A> where NC: hyper::net::Networ
         for &field in ["alt", "project", "zone", "resourceView"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -2800,7 +2870,7 @@ impl<'a, C, NC, A> ZoneViewDeleteCall<'a, C, NC, A> where NC: hyper::net::Networ
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -2812,7 +2882,6 @@ impl<'a, C, NC, A> ZoneViewDeleteCall<'a, C, NC, A> where NC: hyper::net::Networ
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -2822,7 +2891,7 @@ impl<'a, C, NC, A> ZoneViewDeleteCall<'a, C, NC, A> where NC: hyper::net::Networ
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -2833,7 +2902,7 @@ impl<'a, C, NC, A> ZoneViewDeleteCall<'a, C, NC, A> where NC: hyper::net::Networ
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -2842,13 +2911,13 @@ impl<'a, C, NC, A> ZoneViewDeleteCall<'a, C, NC, A> where NC: hyper::net::Networ
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -2860,7 +2929,7 @@ impl<'a, C, NC, A> ZoneViewDeleteCall<'a, C, NC, A> where NC: hyper::net::Networ
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The project name of the resource view.    
+    /// The project name of the resource view.
     pub fn project(mut self, new_value: &str) -> ZoneViewDeleteCall<'a, C, NC, A> {
         self._project = new_value.to_string();
         self
@@ -2870,7 +2939,7 @@ impl<'a, C, NC, A> ZoneViewDeleteCall<'a, C, NC, A> where NC: hyper::net::Networ
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The zone name of the resource view.    
+    /// The zone name of the resource view.
     pub fn zone(mut self, new_value: &str) -> ZoneViewDeleteCall<'a, C, NC, A> {
         self._zone = new_value.to_string();
         self
@@ -2880,7 +2949,7 @@ impl<'a, C, NC, A> ZoneViewDeleteCall<'a, C, NC, A> where NC: hyper::net::Networ
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The name of the resource view.    
+    /// The name of the resource view.
     pub fn resource_view(mut self, new_value: &str) -> ZoneViewDeleteCall<'a, C, NC, A> {
         self._resource_view = new_value.to_string();
         self
@@ -2941,7 +3010,7 @@ impl<'a, C, NC, A> ZoneViewDeleteCall<'a, C, NC, A> where NC: hyper::net::Networ
 /// Update the service information of a resource view or a resource.
 ///
 /// A builder for the *setService* method supported by a *zoneView* resource.
-/// It is not used directly, but through a `ZoneViewMethods`.
+/// It is not used directly, but through a `ZoneViewMethods` instance.
 ///
 /// # Example
 ///
@@ -3010,7 +3079,7 @@ impl<'a, C, NC, A> ZoneViewSetServiceCall<'a, C, NC, A> where NC: hyper::net::Ne
         for &field in ["alt", "project", "zone", "resourceView"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -3067,7 +3136,7 @@ impl<'a, C, NC, A> ZoneViewSetServiceCall<'a, C, NC, A> where NC: hyper::net::Ne
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -3083,7 +3152,6 @@ impl<'a, C, NC, A> ZoneViewSetServiceCall<'a, C, NC, A> where NC: hyper::net::Ne
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -3093,7 +3161,7 @@ impl<'a, C, NC, A> ZoneViewSetServiceCall<'a, C, NC, A> where NC: hyper::net::Ne
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -3104,7 +3172,7 @@ impl<'a, C, NC, A> ZoneViewSetServiceCall<'a, C, NC, A> where NC: hyper::net::Ne
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -3113,13 +3181,13 @@ impl<'a, C, NC, A> ZoneViewSetServiceCall<'a, C, NC, A> where NC: hyper::net::Ne
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -3140,7 +3208,7 @@ impl<'a, C, NC, A> ZoneViewSetServiceCall<'a, C, NC, A> where NC: hyper::net::Ne
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The project name of the resource view.    
+    /// The project name of the resource view.
     pub fn project(mut self, new_value: &str) -> ZoneViewSetServiceCall<'a, C, NC, A> {
         self._project = new_value.to_string();
         self
@@ -3150,7 +3218,7 @@ impl<'a, C, NC, A> ZoneViewSetServiceCall<'a, C, NC, A> where NC: hyper::net::Ne
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The zone name of the resource view.    
+    /// The zone name of the resource view.
     pub fn zone(mut self, new_value: &str) -> ZoneViewSetServiceCall<'a, C, NC, A> {
         self._zone = new_value.to_string();
         self
@@ -3160,7 +3228,7 @@ impl<'a, C, NC, A> ZoneViewSetServiceCall<'a, C, NC, A> where NC: hyper::net::Ne
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The name of the resource view.    
+    /// The name of the resource view.
     pub fn resource_view(mut self, new_value: &str) -> ZoneViewSetServiceCall<'a, C, NC, A> {
         self._resource_view = new_value.to_string();
         self
@@ -3221,7 +3289,7 @@ impl<'a, C, NC, A> ZoneViewSetServiceCall<'a, C, NC, A> where NC: hyper::net::Ne
 /// Get the service information of a resource view or a resource.
 ///
 /// A builder for the *getService* method supported by a *zoneView* resource.
-/// It is not used directly, but through a `ZoneViewMethods`.
+/// It is not used directly, but through a `ZoneViewMethods` instance.
 ///
 /// # Example
 ///
@@ -3288,7 +3356,7 @@ impl<'a, C, NC, A> ZoneViewGetServiceCall<'a, C, NC, A> where NC: hyper::net::Ne
         for &field in ["alt", "project", "zone", "resourceView", "resourceName"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -3341,7 +3409,7 @@ impl<'a, C, NC, A> ZoneViewGetServiceCall<'a, C, NC, A> where NC: hyper::net::Ne
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -3353,7 +3421,6 @@ impl<'a, C, NC, A> ZoneViewGetServiceCall<'a, C, NC, A> where NC: hyper::net::Ne
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -3363,7 +3430,7 @@ impl<'a, C, NC, A> ZoneViewGetServiceCall<'a, C, NC, A> where NC: hyper::net::Ne
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -3374,7 +3441,7 @@ impl<'a, C, NC, A> ZoneViewGetServiceCall<'a, C, NC, A> where NC: hyper::net::Ne
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -3383,13 +3450,13 @@ impl<'a, C, NC, A> ZoneViewGetServiceCall<'a, C, NC, A> where NC: hyper::net::Ne
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -3401,7 +3468,7 @@ impl<'a, C, NC, A> ZoneViewGetServiceCall<'a, C, NC, A> where NC: hyper::net::Ne
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The project name of the resource view.    
+    /// The project name of the resource view.
     pub fn project(mut self, new_value: &str) -> ZoneViewGetServiceCall<'a, C, NC, A> {
         self._project = new_value.to_string();
         self
@@ -3411,7 +3478,7 @@ impl<'a, C, NC, A> ZoneViewGetServiceCall<'a, C, NC, A> where NC: hyper::net::Ne
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The zone name of the resource view.    
+    /// The zone name of the resource view.
     pub fn zone(mut self, new_value: &str) -> ZoneViewGetServiceCall<'a, C, NC, A> {
         self._zone = new_value.to_string();
         self
@@ -3421,7 +3488,7 @@ impl<'a, C, NC, A> ZoneViewGetServiceCall<'a, C, NC, A> where NC: hyper::net::Ne
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The name of the resource view.    
+    /// The name of the resource view.
     pub fn resource_view(mut self, new_value: &str) -> ZoneViewGetServiceCall<'a, C, NC, A> {
         self._resource_view = new_value.to_string();
         self
@@ -3429,7 +3496,7 @@ impl<'a, C, NC, A> ZoneViewGetServiceCall<'a, C, NC, A> where NC: hyper::net::Ne
     /// Sets the *resource name* query property to the given value.
     ///
     /// 
-    /// The name of the resource if user wants to get the service information of the resource.    
+    /// The name of the resource if user wants to get the service information of the resource.
     pub fn resource_name(mut self, new_value: &str) -> ZoneViewGetServiceCall<'a, C, NC, A> {
         self._resource_name = Some(new_value.to_string());
         self
@@ -3490,7 +3557,7 @@ impl<'a, C, NC, A> ZoneViewGetServiceCall<'a, C, NC, A> where NC: hyper::net::Ne
 /// Retrieves the specified zone-specific operation resource.
 ///
 /// A builder for the *get* method supported by a *zoneOperation* resource.
-/// It is not used directly, but through a `ZoneOperationMethods`.
+/// It is not used directly, but through a `ZoneOperationMethods` instance.
 ///
 /// # Example
 ///
@@ -3552,7 +3619,7 @@ impl<'a, C, NC, A> ZoneOperationGetCall<'a, C, NC, A> where NC: hyper::net::Netw
         for &field in ["alt", "project", "zone", "operation"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -3605,7 +3672,7 @@ impl<'a, C, NC, A> ZoneOperationGetCall<'a, C, NC, A> where NC: hyper::net::Netw
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -3617,7 +3684,6 @@ impl<'a, C, NC, A> ZoneOperationGetCall<'a, C, NC, A> where NC: hyper::net::Netw
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -3627,7 +3693,7 @@ impl<'a, C, NC, A> ZoneOperationGetCall<'a, C, NC, A> where NC: hyper::net::Netw
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -3638,7 +3704,7 @@ impl<'a, C, NC, A> ZoneOperationGetCall<'a, C, NC, A> where NC: hyper::net::Netw
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -3647,13 +3713,13 @@ impl<'a, C, NC, A> ZoneOperationGetCall<'a, C, NC, A> where NC: hyper::net::Netw
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -3665,7 +3731,7 @@ impl<'a, C, NC, A> ZoneOperationGetCall<'a, C, NC, A> where NC: hyper::net::Netw
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Name of the project scoping this request.    
+    /// Name of the project scoping this request.
     pub fn project(mut self, new_value: &str) -> ZoneOperationGetCall<'a, C, NC, A> {
         self._project = new_value.to_string();
         self
@@ -3675,7 +3741,7 @@ impl<'a, C, NC, A> ZoneOperationGetCall<'a, C, NC, A> where NC: hyper::net::Netw
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Name of the zone scoping this request.    
+    /// Name of the zone scoping this request.
     pub fn zone(mut self, new_value: &str) -> ZoneOperationGetCall<'a, C, NC, A> {
         self._zone = new_value.to_string();
         self
@@ -3685,7 +3751,7 @@ impl<'a, C, NC, A> ZoneOperationGetCall<'a, C, NC, A> where NC: hyper::net::Netw
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Name of the operation resource to return.    
+    /// Name of the operation resource to return.
     pub fn operation(mut self, new_value: &str) -> ZoneOperationGetCall<'a, C, NC, A> {
         self._operation = new_value.to_string();
         self
@@ -3746,7 +3812,7 @@ impl<'a, C, NC, A> ZoneOperationGetCall<'a, C, NC, A> where NC: hyper::net::Netw
 /// Retrieves the list of operation resources contained within the specified zone.
 ///
 /// A builder for the *list* method supported by a *zoneOperation* resource.
-/// It is not used directly, but through a `ZoneOperationMethods`.
+/// It is not used directly, but through a `ZoneOperationMethods` instance.
 ///
 /// # Example
 ///
@@ -3821,7 +3887,7 @@ impl<'a, C, NC, A> ZoneOperationListCall<'a, C, NC, A> where NC: hyper::net::Net
         for &field in ["alt", "project", "zone", "pageToken", "maxResults", "filter"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -3874,7 +3940,7 @@ impl<'a, C, NC, A> ZoneOperationListCall<'a, C, NC, A> where NC: hyper::net::Net
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -3886,7 +3952,6 @@ impl<'a, C, NC, A> ZoneOperationListCall<'a, C, NC, A> where NC: hyper::net::Net
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -3896,7 +3961,7 @@ impl<'a, C, NC, A> ZoneOperationListCall<'a, C, NC, A> where NC: hyper::net::Net
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -3907,7 +3972,7 @@ impl<'a, C, NC, A> ZoneOperationListCall<'a, C, NC, A> where NC: hyper::net::Net
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -3916,13 +3981,13 @@ impl<'a, C, NC, A> ZoneOperationListCall<'a, C, NC, A> where NC: hyper::net::Net
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -3934,7 +3999,7 @@ impl<'a, C, NC, A> ZoneOperationListCall<'a, C, NC, A> where NC: hyper::net::Net
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Name of the project scoping this request.    
+    /// Name of the project scoping this request.
     pub fn project(mut self, new_value: &str) -> ZoneOperationListCall<'a, C, NC, A> {
         self._project = new_value.to_string();
         self
@@ -3944,7 +4009,7 @@ impl<'a, C, NC, A> ZoneOperationListCall<'a, C, NC, A> where NC: hyper::net::Net
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Name of the zone scoping this request.    
+    /// Name of the zone scoping this request.
     pub fn zone(mut self, new_value: &str) -> ZoneOperationListCall<'a, C, NC, A> {
         self._zone = new_value.to_string();
         self
@@ -3952,7 +4017,7 @@ impl<'a, C, NC, A> ZoneOperationListCall<'a, C, NC, A> where NC: hyper::net::Net
     /// Sets the *page token* query property to the given value.
     ///
     /// 
-    /// Optional. Tag returned by a previous list request truncated by maxResults. Used to continue a previous list request.    
+    /// Optional. Tag returned by a previous list request truncated by maxResults. Used to continue a previous list request.
     pub fn page_token(mut self, new_value: &str) -> ZoneOperationListCall<'a, C, NC, A> {
         self._page_token = Some(new_value.to_string());
         self
@@ -3960,7 +4025,7 @@ impl<'a, C, NC, A> ZoneOperationListCall<'a, C, NC, A> where NC: hyper::net::Net
     /// Sets the *max results* query property to the given value.
     ///
     /// 
-    /// Optional. Maximum count of results to be returned. Maximum value is 500 and default value is 500.    
+    /// Optional. Maximum count of results to be returned. Maximum value is 500 and default value is 500.
     pub fn max_results(mut self, new_value: u32) -> ZoneOperationListCall<'a, C, NC, A> {
         self._max_results = Some(new_value);
         self
@@ -3968,7 +4033,7 @@ impl<'a, C, NC, A> ZoneOperationListCall<'a, C, NC, A> where NC: hyper::net::Net
     /// Sets the *filter* query property to the given value.
     ///
     /// 
-    /// Optional. Filter expression for filtering listed resources.    
+    /// Optional. Filter expression for filtering listed resources.
     pub fn filter(mut self, new_value: &str) -> ZoneOperationListCall<'a, C, NC, A> {
         self._filter = Some(new_value.to_string());
         self

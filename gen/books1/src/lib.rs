@@ -1,8 +1,8 @@
 // DO NOT EDIT !
-// This file was generated automatically from 'src/mako/lib.rs.mako'
+// This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *books* crate version *0.1.1+20150309*, where *20150309* is the exact revision of the *books:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.1*.
+//! This documentation was generated from *books* crate version *0.1.2+20150309*, where *20150309* is the exact revision of the *books:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.2*.
 //! 
 //! Everything else about the *books* *v1* API can be found at the
 //! [official documentation site](https://developers.google.com/books/docs/v1/getting_started).
@@ -41,6 +41,8 @@
 //! 
 //! * **[Hub](struct.Books.html)**
 //!     * a central object to maintain state and allow accessing all *Activities*
+//!     * creates [*Method Builders*](trait.MethodsBuilder.html) which in turn
+//!       allow access to individual [*Call Builders*](trait.CallBuilder.html)
 //! * **[Resources](trait.Resource.html)**
 //!     * primary types that you can apply *Activities* to
 //!     * a collection of properties and *Parts*
@@ -49,6 +51,8 @@
 //!         * never directly used in *Activities*
 //! * **[Activities](trait.CallBuilder.html)**
 //!     * operations to apply to *Resources*
+//! 
+//! All *structures* are marked with applicable traits to further categorize them and ease browsing.
 //! 
 //! Generally speaking, you can invoke *Activities* like this:
 //! 
@@ -91,7 +95,7 @@
 //! extern crate hyper;
 //! extern crate "yup-oauth2" as oauth2;
 //! extern crate "google-books1" as books1;
-//! use books1::Result;
+//! use books1::{Result, Error};
 //! # #[test] fn egal() {
 //! use std::default::Default;
 //! use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -128,15 +132,17 @@
 //!              .doit();
 //! 
 //! match result {
-//!     Result::HttpError(err) => println!("HTTPERROR: {:?}", err),
-//!     Result::MissingAPIKey => println!("Auth: Missing API Key - used if there are no scopes"),
-//!     Result::MissingToken => println!("OAuth2: Missing Token"),
-//!     Result::Cancelled => println!("Operation cancelled by user"),
-//!     Result::UploadSizeLimitExceeded(size, max_size) => println!("Upload size too big: {} of {}", size, max_size),
-//!     Result::Failure(_) => println!("General Failure (hyper::client::Response doesn't print)"),
-//!     Result::FieldClash(clashed_field) => println!("You added custom parameter which is part of builder: {:?}", clashed_field),
-//!     Result::JsonDecodeError(err) => println!("Couldn't understand server reply - maybe API needs update: {:?}", err),
-//!     Result::Success(_) => println!("Success (value doesn't print)"),
+//!     Err(e) => match e {
+//!         Error::HttpError(err) => println!("HTTPERROR: {:?}", err),
+//!         Error::MissingAPIKey => println!("Auth: Missing API Key - used if there are no scopes"),
+//!         Error::MissingToken => println!("OAuth2: Missing Token"),
+//!         Error::Cancelled => println!("Operation canceled by user"),
+//!         Error::UploadSizeLimitExceeded(size, max_size) => println!("Upload size too big: {} of {}", size, max_size),
+//!         Error::Failure(_) => println!("General Failure (hyper::client::Response doesn't print)"),
+//!         Error::FieldClash(clashed_field) => println!("You added custom parameter which is part of builder: {:?}", clashed_field),
+//!         Error::JsonDecodeError(err) => println!("Couldn't understand server reply - maybe API needs update: {:?}", err),
+//!     },
+//!     Ok(_) => println!("Success (value doesn't print)"),
 //! }
 //! # }
 //! ```
@@ -149,7 +155,7 @@
 //! When delegates handle errors or intermediate values, they may have a chance to instruct the system to retry. This 
 //! makes the system potentially resilient to all kinds of errors.
 //! 
-//! ## Uploads and Downlods
+//! ## Uploads and Downloads
 //! If a method supports downloads, the response body, which is part of the [Result](enum.Result.html), should be
 //! read by you to obtain the media.
 //! If such a method also supports a [Response Result](trait.ResponseResult.html), it will return that by default.
@@ -172,8 +178,9 @@
 //! ## Optional Parts in Server-Requests
 //! 
 //! All structures provided by this library are made to be [enocodable](trait.RequestValue.html) and 
-//! [decodable](trait.ResponseResult.html) via json. Optionals are used to indicate that partial requests are responses are valid.
-//! Most optionals are are considered [Parts](trait.Part.html) which are identifyable by name, which will be sent to 
+//! [decodable](trait.ResponseResult.html) via *json*. Optionals are used to indicate that partial requests are responses 
+//! are valid.
+//! Most optionals are are considered [Parts](trait.Part.html) which are identifiable by name, which will be sent to 
 //! the server to indicate either the set parts of the request or the desired parts in the response.
 //! 
 //! ## Builder Arguments
@@ -222,7 +229,7 @@ use std::io;
 use std::fs;
 use std::thread::sleep;
 
-pub use cmn::{MultiPartReader, ToParts, MethodInfo, Result, CallBuilder, Hub, ReadSeek, Part, ResponseResult, RequestValue, NestedType, Delegate, DefaultDelegate, ResourceMethodsBuilder, Resource, JsonServerError};
+pub use cmn::{MultiPartReader, ToParts, MethodInfo, Result, Error, CallBuilder, Hub, ReadSeek, Part, ResponseResult, RequestValue, NestedType, Delegate, DefaultDelegate, MethodsBuilder, Resource, JsonServerError};
 
 
 // ##############
@@ -268,7 +275,7 @@ impl Default for Scope {
 /// extern crate hyper;
 /// extern crate "yup-oauth2" as oauth2;
 /// extern crate "google-books1" as books1;
-/// use books1::Result;
+/// use books1::{Result, Error};
 /// # #[test] fn egal() {
 /// use std::default::Default;
 /// use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -305,15 +312,17 @@ impl Default for Scope {
 ///              .doit();
 /// 
 /// match result {
-///     Result::HttpError(err) => println!("HTTPERROR: {:?}", err),
-///     Result::MissingAPIKey => println!("Auth: Missing API Key - used if there are no scopes"),
-///     Result::MissingToken => println!("OAuth2: Missing Token"),
-///     Result::Cancelled => println!("Operation cancelled by user"),
-///     Result::UploadSizeLimitExceeded(size, max_size) => println!("Upload size too big: {} of {}", size, max_size),
-///     Result::Failure(_) => println!("General Failure (hyper::client::Response doesn't print)"),
-///     Result::FieldClash(clashed_field) => println!("You added custom parameter which is part of builder: {:?}", clashed_field),
-///     Result::JsonDecodeError(err) => println!("Couldn't understand server reply - maybe API needs update: {:?}", err),
-///     Result::Success(_) => println!("Success (value doesn't print)"),
+///     Err(e) => match e {
+///         Error::HttpError(err) => println!("HTTPERROR: {:?}", err),
+///         Error::MissingAPIKey => println!("Auth: Missing API Key - used if there are no scopes"),
+///         Error::MissingToken => println!("OAuth2: Missing Token"),
+///         Error::Cancelled => println!("Operation canceled by user"),
+///         Error::UploadSizeLimitExceeded(size, max_size) => println!("Upload size too big: {} of {}", size, max_size),
+///         Error::Failure(_) => println!("General Failure (hyper::client::Response doesn't print)"),
+///         Error::FieldClash(clashed_field) => println!("You added custom parameter which is part of builder: {:?}", clashed_field),
+///         Error::JsonDecodeError(err) => println!("Couldn't understand server reply - maybe API needs update: {:?}", err),
+///     },
+///     Ok(_) => println!("Success (value doesn't print)"),
 /// }
 /// # }
 /// ```
@@ -334,7 +343,7 @@ impl<'a, C, NC, A> Books<C, NC, A>
         Books {
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/0.1.1".to_string(),
+            _user_agent: "google-api-rust-client/0.1.2".to_string(),
             _m: PhantomData
         }
     }
@@ -368,7 +377,7 @@ impl<'a, C, NC, A> Books<C, NC, A>
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/0.1.1`.
+    /// It defaults to `google-api-rust-client/0.1.2`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -393,9 +402,9 @@ impl<'a, C, NC, A> Books<C, NC, A>
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct Category {
-    /// A list of onboarding categories.    
+    /// A list of onboarding categories.
     pub items: Vec<CategoryItems>,
-    /// Resource type.    
+    /// Resource type.
     pub kind: String,
 }
 
@@ -408,13 +417,13 @@ impl ResponseResult for Category {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct CategoryItems {
-    /// no description provided    
+    /// no description provided
     #[serde(alias="badgeUrl")]
     pub badge_url: String,
-    /// no description provided    
+    /// no description provided
     #[serde(alias="categoryId")]
     pub category_id: String,
-    /// no description provided    
+    /// no description provided
     pub name: String,
 }
 
@@ -428,32 +437,32 @@ impl Part for CategoryItems {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct ConcurrentAccessRestriction {
-    /// Client nonce for verification. Download access and client-validation only.    
+    /// Client nonce for verification. Download access and client-validation only.
     pub nonce: String,
-    /// Resource type.    
+    /// Resource type.
     pub kind: String,
-    /// Whether this volume has any concurrent access restrictions.    
+    /// Whether this volume has any concurrent access restrictions.
     pub restricted: bool,
-    /// Identifies the volume for which this entry applies.    
+    /// Identifies the volume for which this entry applies.
     #[serde(alias="volumeId")]
     pub volume_id: String,
-    /// The maximum number of concurrent access licenses for this volume.    
+    /// The maximum number of concurrent access licenses for this volume.
     #[serde(alias="maxConcurrentDevices")]
     pub max_concurrent_devices: i32,
-    /// Whether access is granted for this (user, device, volume).    
+    /// Whether access is granted for this (user, device, volume).
     #[serde(alias="deviceAllowed")]
     pub device_allowed: bool,
-    /// Client app identifier for verification. Download access and client-validation only.    
+    /// Client app identifier for verification. Download access and client-validation only.
     pub source: String,
-    /// Time in seconds for license auto-expiration.    
+    /// Time in seconds for license auto-expiration.
     #[serde(alias="timeWindowSeconds")]
     pub time_window_seconds: i32,
-    /// Response signature.    
+    /// Response signature.
     pub signature: String,
-    /// Error/warning reason code.    
+    /// Error/warning reason code.
     #[serde(alias="reasonCode")]
     pub reason_code: String,
-    /// Error/warning message.    
+    /// Error/warning message.
     pub message: String,
 }
 
@@ -466,11 +475,11 @@ impl Part for ConcurrentAccessRestriction {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct VolumeVolumeInfoDimensions {
-    /// Width of this volume (in cm).    
+    /// Width of this volume (in cm).
     pub width: String,
-    /// Height or length of this volume (in cm).    
+    /// Height or length of this volume (in cm).
     pub height: String,
-    /// Thickness of this volume (in cm).    
+    /// Thickness of this volume (in cm).
     pub thickness: String,
 }
 
@@ -484,65 +493,65 @@ impl Part for VolumeVolumeInfoDimensions {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct VolumeVolumeInfo {
-    /// Volume subtitle. (In LITE projection.)    
+    /// Volume subtitle. (In LITE projection.)
     pub subtitle: String,
-    /// A synopsis of the volume. The text of the description is formatted in HTML and includes simple formatting elements, such as b, i, and br tags. (In LITE projection.)    
+    /// A synopsis of the volume. The text of the description is formatted in HTML and includes simple formatting elements, such as b, i, and br tags. (In LITE projection.)
     pub description: String,
-    /// Total number of pages as per publisher metadata.    
+    /// Total number of pages as per publisher metadata.
     #[serde(alias="pageCount")]
     pub page_count: i32,
-    /// A list of image links for all the sizes that are available. (In LITE projection.)    
+    /// A list of image links for all the sizes that are available. (In LITE projection.)
     #[serde(alias="imageLinks")]
     pub image_links: VolumeVolumeInfoImageLinks,
-    /// The number of review ratings for this volume.    
+    /// The number of review ratings for this volume.
     #[serde(alias="ratingsCount")]
     pub ratings_count: i32,
-    /// The main category to which this volume belongs. It will be the category from the categories list returned below that has the highest weight.    
+    /// The main category to which this volume belongs. It will be the category from the categories list returned below that has the highest weight.
     #[serde(alias="mainCategory")]
     pub main_category: String,
-    /// The names of the authors and/or editors for this volume. (In LITE projection)    
+    /// The names of the authors and/or editors for this volume. (In LITE projection)
     pub authors: Vec<String>,
-    /// A list of subject categories, such as "Fiction", "Suspense", etc.    
+    /// A list of subject categories, such as "Fiction", "Suspense", etc.
     pub categories: Vec<String>,
-    /// Publisher of this volume. (In LITE projection.)    
+    /// Publisher of this volume. (In LITE projection.)
     pub publisher: String,
-    /// Physical dimensions of this volume.    
+    /// Physical dimensions of this volume.
     pub dimensions: VolumeVolumeInfoDimensions,
-    /// Best language for this volume (based on content). It is the two-letter ISO 639-1 code such as 'fr', 'en', etc.    
+    /// Best language for this volume (based on content). It is the two-letter ISO 639-1 code such as 'fr', 'en', etc.
     pub language: String,
-    /// URL to preview this volume on the Google Books site.    
+    /// URL to preview this volume on the Google Books site.
     #[serde(alias="previewLink")]
     pub preview_link: String,
-    /// The reading modes available for this volume.    
+    /// The reading modes available for this volume.
     #[serde(alias="readingModes")]
     pub reading_modes: String,
-    /// Date of publication. (In LITE projection.)    
+    /// Date of publication. (In LITE projection.)
     #[serde(alias="publishedDate")]
     pub published_date: String,
-    /// Type of publication of this volume. Possible values are BOOK or MAGAZINE.    
+    /// Type of publication of this volume. Possible values are BOOK or MAGAZINE.
     #[serde(alias="printType")]
     pub print_type: String,
-    /// Total number of sample pages as per publisher metadata.    
+    /// Total number of sample pages as per publisher metadata.
     #[serde(alias="samplePageCount")]
     pub sample_page_count: i32,
-    /// An identifier for the version of the volume content (text & images). (In LITE projection)    
+    /// An identifier for the version of the volume content (text & images). (In LITE projection)
     #[serde(alias="contentVersion")]
     pub content_version: String,
-    /// Total number of printed pages in generated pdf representation.    
+    /// Total number of printed pages in generated pdf representation.
     #[serde(alias="printedPageCount")]
     pub printed_page_count: i32,
-    /// Industry standard identifiers for this volume.    
+    /// Industry standard identifiers for this volume.
     #[serde(alias="industryIdentifiers")]
     pub industry_identifiers: Vec<VolumeVolumeInfoIndustryIdentifiers>,
-    /// Volume title. (In LITE projection.)    
+    /// Volume title. (In LITE projection.)
     pub title: String,
-    /// The mean review rating for this volume. (min = 1.0, max = 5.0)    
+    /// The mean review rating for this volume. (min = 1.0, max = 5.0)
     #[serde(alias="averageRating")]
     pub average_rating: f64,
-    /// URL to view information about this volume on the Google Books site. (In LITE projection)    
+    /// URL to view information about this volume on the Google Books site. (In LITE projection)
     #[serde(alias="infoLink")]
     pub info_link: String,
-    /// Canonical URL for a volume. (In LITE projection.)    
+    /// Canonical URL for a volume. (In LITE projection.)
     #[serde(alias="canonicalVolumeLink")]
     pub canonical_volume_link: String,
 }
@@ -557,19 +566,19 @@ impl Part for VolumeVolumeInfo {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct AnnotationClientVersionRanges {
-    /// Range in image CFI format for this annotation sent by client.    
+    /// Range in image CFI format for this annotation sent by client.
     #[serde(alias="imageCfiRange")]
     pub image_cfi_range: BooksAnnotationsRange,
-    /// Range in GB text format for this annotation sent by client.    
+    /// Range in GB text format for this annotation sent by client.
     #[serde(alias="gbTextRange")]
     pub gb_text_range: BooksAnnotationsRange,
-    /// Content version the client sent in.    
+    /// Content version the client sent in.
     #[serde(alias="contentVersion")]
     pub content_version: String,
-    /// Range in CFI format for this annotation sent by client.    
+    /// Range in CFI format for this annotation sent by client.
     #[serde(alias="cfiRange")]
     pub cfi_range: BooksAnnotationsRange,
-    /// Range in GB image format for this annotation sent by client.    
+    /// Range in GB image format for this annotation sent by client.
     #[serde(alias="gbImageRange")]
     pub gb_image_range: BooksAnnotationsRange,
 }
@@ -589,12 +598,12 @@ impl Part for AnnotationClientVersionRanges {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct RequestAccess {
-    /// A download access response.    
+    /// A download access response.
     #[serde(alias="downloadAccess")]
     pub download_access: DownloadAccessRestriction,
-    /// Resource type.    
+    /// Resource type.
     pub kind: String,
-    /// A concurrent access response.    
+    /// A concurrent access response.
     #[serde(alias="concurrentAccess")]
     pub concurrent_access: ConcurrentAccessRestriction,
 }
@@ -608,19 +617,19 @@ impl ResponseResult for RequestAccess {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct OffersItemsItems {
-    /// no description provided    
+    /// no description provided
     pub description: String,
-    /// no description provided    
+    /// no description provided
     pub author: String,
-    /// no description provided    
+    /// no description provided
     pub title: String,
-    /// no description provided    
+    /// no description provided
     #[serde(alias="coverUrl")]
     pub cover_url: String,
-    /// no description provided    
+    /// no description provided
     #[serde(alias="volumeId")]
     pub volume_id: String,
-    /// no description provided    
+    /// no description provided
     #[serde(alias="canonicalVolumeLink")]
     pub canonical_volume_link: String,
 }
@@ -640,14 +649,14 @@ impl Part for OffersItemsItems {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct Annotations {
-    /// Token to pass in for pagination for the next page. This will not be present if this request does not have more results.    
+    /// Token to pass in for pagination for the next page. This will not be present if this request does not have more results.
     #[serde(alias="nextPageToken")]
     pub next_page_token: String,
-    /// A list of annotations.    
+    /// A list of annotations.
     pub items: Vec<Annotation>,
-    /// Resource type.    
+    /// Resource type.
     pub kind: String,
-    /// Total number of annotations found. This may be greater than the number of notes returned in this response if results have been paginated.    
+    /// Total number of annotations found. This may be greater than the number of notes returned in this response if results have been paginated.
     #[serde(alias="totalItems")]
     pub total_items: i32,
 }
@@ -661,16 +670,16 @@ impl ResponseResult for Annotations {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct VolumeSaleInfoOffers {
-    /// The rental duration (for rental offers only).    
+    /// The rental duration (for rental offers only).
     #[serde(alias="rentalDuration")]
     pub rental_duration: VolumeSaleInfoOffersRentalDuration,
-    /// Offer retail (=discounted) price in Micros    
+    /// Offer retail (=discounted) price in Micros
     #[serde(alias="retailPrice")]
     pub retail_price: VolumeSaleInfoOffersRetailPrice,
-    /// Offer list (=undiscounted) price in Micros.    
+    /// Offer list (=undiscounted) price in Micros.
     #[serde(alias="listPrice")]
     pub list_price: VolumeSaleInfoOffersListPrice,
-    /// The finsky offer type (e.g., PURCHASE=0 RENTAL=3)    
+    /// The finsky offer type (e.g., PURCHASE=0 RENTAL=3)
     #[serde(alias="finskyOfferType")]
     pub finsky_offer_type: i32,
 }
@@ -690,9 +699,9 @@ impl Part for VolumeSaleInfoOffers {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct Metadata {
-    /// A list of offline dictionary metadata.    
+    /// A list of offline dictionary metadata.
     pub items: Vec<MetadataItems>,
-    /// Resource type.    
+    /// Resource type.
     pub kind: String,
 }
 
@@ -716,34 +725,34 @@ impl ResponseResult for Metadata {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct Volume {
-    /// Resource type for a volume. (In LITE projection.)    
+    /// Resource type for a volume. (In LITE projection.)
     pub kind: String,
-    /// Any information about a volume related to reading or obtaining that volume text. This information can depend on country (books may be public domain in one country but not in another, e.g.).    
+    /// Any information about a volume related to reading or obtaining that volume text. This information can depend on country (books may be public domain in one country but not in another, e.g.).
     #[serde(alias="accessInfo")]
     pub access_info: VolumeAccessInfo,
-    /// Search result information related to this volume.    
+    /// Search result information related to this volume.
     #[serde(alias="searchInfo")]
     pub search_info: VolumeSearchInfo,
-    /// Any information about a volume related to the eBookstore and/or purchaseability. This information can depend on the country where the request originates from (i.e. books may not be for sale in certain countries).    
+    /// Any information about a volume related to the eBookstore and/or purchaseability. This information can depend on the country where the request originates from (i.e. books may not be for sale in certain countries).
     #[serde(alias="saleInfo")]
     pub sale_info: VolumeSaleInfo,
-    /// Opaque identifier for a specific version of a volume resource. (In LITE projection)    
+    /// Opaque identifier for a specific version of a volume resource. (In LITE projection)
     pub etag: String,
-    /// What layers exist in this volume and high level information about them.    
+    /// What layers exist in this volume and high level information about them.
     #[serde(alias="layerInfo")]
     pub layer_info: VolumeLayerInfo,
-    /// General volume information.    
+    /// General volume information.
     #[serde(alias="volumeInfo")]
     pub volume_info: VolumeVolumeInfo,
-    /// Recommendation related information for this volume.    
+    /// Recommendation related information for this volume.
     #[serde(alias="recommendedInfo")]
     pub recommended_info: VolumeRecommendedInfo,
-    /// Unique identifier for a volume. (In LITE projection.)    
+    /// Unique identifier for a volume. (In LITE projection.)
     pub id: String,
-    /// URL to this resource. (In LITE projection.)    
+    /// URL to this resource. (In LITE projection.)
     #[serde(alias="selfLink")]
     pub self_link: String,
-    /// User specific information related to this volume. (e.g. page this user last read or whether they purchased this book)    
+    /// User specific information related to this volume. (e.g. page this user last read or whether they purchased this book)
     #[serde(alias="userInfo")]
     pub user_info: VolumeUserInfo,
 }
@@ -758,7 +767,7 @@ impl ResponseResult for Volume {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct VolumeLayerInfo {
-    /// A layer should appear here if and only if the layer exists for this book.    
+    /// A layer should appear here if and only if the layer exists for this book.
     pub layers: Vec<VolumeLayerInfoLayers>,
 }
 
@@ -778,9 +787,9 @@ impl Part for VolumeLayerInfo {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Usersettings {
-    /// Resource type.    
+    /// Resource type.
     pub kind: Option<String>,
-    /// User settings in sub-objects, each for different purposes.    
+    /// User settings in sub-objects, each for different purposes.
     #[serde(alias="notesExport")]
     pub notes_export: Option<UsersettingsNotesExport>,
 }
@@ -795,7 +804,7 @@ impl ResponseResult for Usersettings {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct VolumeRecommendedInfo {
-    /// A text explaining why this volume is recommended.    
+    /// A text explaining why this volume is recommended.
     pub explanation: String,
 }
 
@@ -809,15 +818,15 @@ impl Part for VolumeRecommendedInfo {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct MetadataItems {
-    /// no description provided    
+    /// no description provided
     pub encrypted_key: String,
-    /// no description provided    
+    /// no description provided
     pub version: String,
-    /// no description provided    
+    /// no description provided
     pub download_url: String,
-    /// no description provided    
+    /// no description provided
     pub language: String,
-    /// no description provided    
+    /// no description provided
     pub size: String,
 }
 
@@ -831,7 +840,7 @@ impl Part for MetadataItems {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct ReviewAuthor {
-    /// Name of this person.    
+    /// Name of this person.
     #[serde(alias="displayName")]
     pub display_name: String,
 }
@@ -852,27 +861,27 @@ impl Part for ReviewAuthor {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct Bookshelf {
-    /// Resource type for bookshelf metadata.    
+    /// Resource type for bookshelf metadata.
     pub kind: String,
-    /// Description of this bookshelf.    
+    /// Description of this bookshelf.
     pub description: String,
-    /// Title of this bookshelf.    
+    /// Title of this bookshelf.
     pub title: String,
-    /// Number of volumes in this bookshelf.    
+    /// Number of volumes in this bookshelf.
     #[serde(alias="volumeCount")]
     pub volume_count: i32,
-    /// Created time for this bookshelf (formatted UTC timestamp with millisecond resolution).    
+    /// Created time for this bookshelf (formatted UTC timestamp with millisecond resolution).
     pub created: String,
-    /// Last modified time of this bookshelf (formatted UTC timestamp with millisecond resolution).    
+    /// Last modified time of this bookshelf (formatted UTC timestamp with millisecond resolution).
     pub updated: String,
-    /// Whether this bookshelf is PUBLIC or PRIVATE.    
+    /// Whether this bookshelf is PUBLIC or PRIVATE.
     pub access: String,
-    /// Last time a volume was added or removed from this bookshelf (formatted UTC timestamp with millisecond resolution).    
+    /// Last time a volume was added or removed from this bookshelf (formatted UTC timestamp with millisecond resolution).
     #[serde(alias="volumesLastUpdated")]
     pub volumes_last_updated: String,
-    /// Id of this bookshelf, only unique by user.    
+    /// Id of this bookshelf, only unique by user.
     pub id: i32,
-    /// URL to this resource.    
+    /// URL to this resource.
     #[serde(alias="selfLink")]
     pub self_link: String,
 }
@@ -886,10 +895,10 @@ impl ResponseResult for Bookshelf {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct UsersettingsNotesExport {
-    /// no description provided    
+    /// no description provided
     #[serde(alias="isEnabled")]
     pub is_enabled: bool,
-    /// no description provided    
+    /// no description provided
     #[serde(alias="folderName")]
     pub folder_name: String,
 }
@@ -910,49 +919,49 @@ impl Part for UsersettingsNotesExport {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Annotation {
-    /// Timestamp for the last time this annotation was modified.    
+    /// Timestamp for the last time this annotation was modified.
     pub updated: Option<String>,
-    /// Indicates that this annotation is deleted.    
+    /// Indicates that this annotation is deleted.
     pub deleted: Option<bool>,
-    /// Selection ranges for the most recent content version.    
+    /// Selection ranges for the most recent content version.
     #[serde(alias="currentVersionRanges")]
     pub current_version_ranges: Option<AnnotationCurrentVersionRanges>,
-    /// Anchor text after excerpt. For requests, if the user bookmarked a screen that has no flowing text on it, then this field should be empty.    
+    /// Anchor text after excerpt. For requests, if the user bookmarked a screen that has no flowing text on it, then this field should be empty.
     #[serde(alias="afterSelectedText")]
     pub after_selected_text: Option<String>,
-    /// The volume that this annotation belongs to.    
+    /// The volume that this annotation belongs to.
     #[serde(alias="volumeId")]
     pub volume_id: Option<String>,
-    /// Excerpt from the volume.    
+    /// Excerpt from the volume.
     #[serde(alias="selectedText")]
     pub selected_text: Option<String>,
-    /// User-created data for this annotation.    
+    /// User-created data for this annotation.
     pub data: Option<String>,
-    /// Id of this annotation, in the form of a GUID.    
+    /// Id of this annotation, in the form of a GUID.
     pub id: Option<String>,
-    /// Resource type.    
+    /// Resource type.
     pub kind: Option<String>,
-    /// Timestamp for the created time of this annotation.    
+    /// Timestamp for the created time of this annotation.
     pub created: Option<String>,
-    /// Anchor text before excerpt. For requests, if the user bookmarked a screen that has no flowing text on it, then this field should be empty.    
+    /// Anchor text before excerpt. For requests, if the user bookmarked a screen that has no flowing text on it, then this field should be empty.
     #[serde(alias="beforeSelectedText")]
     pub before_selected_text: Option<String>,
-    /// Selection ranges sent from the client.    
+    /// Selection ranges sent from the client.
     #[serde(alias="clientVersionRanges")]
     pub client_version_ranges: Option<AnnotationClientVersionRanges>,
-    /// Pages that this annotation spans.    
+    /// Pages that this annotation spans.
     #[serde(alias="pageIds")]
     pub page_ids: Option<Vec<String>>,
-    /// The layer this annotation is for.    
+    /// The layer this annotation is for.
     #[serde(alias="layerId")]
     pub layer_id: Option<String>,
-    /// The highlight style for this annotation.    
+    /// The highlight style for this annotation.
     #[serde(alias="highlightStyle")]
     pub highlight_style: Option<String>,
-    /// no description provided    
+    /// no description provided
     #[serde(alias="layerSummary")]
     pub layer_summary: Option<AnnotationLayerSummary>,
-    /// URL to this resource.    
+    /// URL to this resource.
     #[serde(alias="selfLink")]
     pub self_link: Option<String>,
 }
@@ -967,27 +976,27 @@ impl ResponseResult for Annotation {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct Review {
-    /// Star rating for this review. Possible values are ONE, TWO, THREE, FOUR, FIVE or NOT_RATED.    
+    /// Star rating for this review. Possible values are ONE, TWO, THREE, FOUR, FIVE or NOT_RATED.
     pub rating: String,
-    /// Resource type for a review.    
+    /// Resource type for a review.
     pub kind: String,
-    /// Title for this review.    
+    /// Title for this review.
     pub title: String,
-    /// Author of this review.    
+    /// Author of this review.
     pub author: ReviewAuthor,
-    /// Volume that this review is for.    
+    /// Volume that this review is for.
     #[serde(alias="volumeId")]
     pub volume_id: String,
-    /// Review text.    
+    /// Review text.
     pub content: String,
-    /// Information regarding the source of this review, when the review is not from a Google Books user.    
+    /// Information regarding the source of this review, when the review is not from a Google Books user.
     pub source: ReviewSource,
-    /// Date of this review.    
+    /// Date of this review.
     pub date: String,
-    /// Source type for this review. Possible values are EDITORIAL, WEB_USER or GOOGLE_USER.    
+    /// Source type for this review. Possible values are EDITORIAL, WEB_USER or GOOGLE_USER.
     #[serde(alias="type")]
     pub type_: String,
-    /// URL for the full review text, for reviews gathered from the web.    
+    /// URL for the full review text, for reviews gathered from the web.
     #[serde(alias="fullTextUrl")]
     pub full_text_url: String,
 }
@@ -1001,35 +1010,35 @@ impl Part for Review {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct DownloadAccessRestriction {
-    /// Client nonce for verification. Download access and client-validation only.    
+    /// Client nonce for verification. Download access and client-validation only.
     pub nonce: String,
-    /// Resource type.    
+    /// Resource type.
     pub kind: String,
-    /// If deviceAllowed, whether access was just acquired with this request.    
+    /// If deviceAllowed, whether access was just acquired with this request.
     #[serde(alias="justAcquired")]
     pub just_acquired: bool,
-    /// If restricted, the maximum number of content download licenses for this volume.    
+    /// If restricted, the maximum number of content download licenses for this volume.
     #[serde(alias="maxDownloadDevices")]
     pub max_download_devices: i32,
-    /// If restricted, the number of content download licenses already acquired (including the requesting client, if licensed).    
+    /// If restricted, the number of content download licenses already acquired (including the requesting client, if licensed).
     #[serde(alias="downloadsAcquired")]
     pub downloads_acquired: i32,
-    /// Identifies the volume for which this entry applies.    
+    /// Identifies the volume for which this entry applies.
     #[serde(alias="volumeId")]
     pub volume_id: String,
-    /// If restricted, whether access is granted for this (user, device, volume).    
+    /// If restricted, whether access is granted for this (user, device, volume).
     #[serde(alias="deviceAllowed")]
     pub device_allowed: bool,
-    /// Client app identifier for verification. Download access and client-validation only.    
+    /// Client app identifier for verification. Download access and client-validation only.
     pub source: String,
-    /// Response signature.    
+    /// Response signature.
     pub signature: String,
-    /// Error/warning reason code. Additional codes may be added in the future. 0 OK 100 ACCESS_DENIED_PUBLISHER_LIMIT 101 ACCESS_DENIED_LIMIT 200 WARNING_USED_LAST_ACCESS    
+    /// Error/warning reason code. Additional codes may be added in the future. 0 OK 100 ACCESS_DENIED_PUBLISHER_LIMIT 101 ACCESS_DENIED_LIMIT 200 WARNING_USED_LAST_ACCESS
     #[serde(alias="reasonCode")]
     pub reason_code: String,
-    /// Error/warning message.    
+    /// Error/warning message.
     pub message: String,
-    /// Whether this volume has any download access restrictions.    
+    /// Whether this volume has any download access restrictions.
     pub restricted: bool,
 }
 
@@ -1047,10 +1056,10 @@ impl Part for DownloadAccessRestriction {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct DownloadAccesses {
-    /// A list of download access responses.    
+    /// A list of download access responses.
     #[serde(alias="downloadAccessList")]
     pub download_access_list: Vec<DownloadAccessRestriction>,
-    /// Resource type.    
+    /// Resource type.
     pub kind: String,
 }
 
@@ -1063,12 +1072,12 @@ impl ResponseResult for DownloadAccesses {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct ReviewSource {
-    /// Extra text about the source of the review.    
+    /// Extra text about the source of the review.
     #[serde(alias="extraDescription")]
     pub extra_description: String,
-    /// URL of the source of the review.    
+    /// URL of the source of the review.
     pub url: String,
-    /// Name of the source.    
+    /// Name of the source.
     pub description: String,
 }
 
@@ -1087,23 +1096,23 @@ impl Part for ReviewSource {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct ReadingPosition {
-    /// Position in a PDF file.    
+    /// Position in a PDF file.
     #[serde(alias="pdfPosition")]
     pub pdf_position: String,
-    /// Resource type for a reading position.    
+    /// Resource type for a reading position.
     pub kind: String,
-    /// Position in a volume for image-based content.    
+    /// Position in a volume for image-based content.
     #[serde(alias="gbImagePosition")]
     pub gb_image_position: String,
-    /// Position in a volume for text-based content.    
+    /// Position in a volume for text-based content.
     #[serde(alias="gbTextPosition")]
     pub gb_text_position: String,
-    /// Position in an EPUB as a CFI.    
+    /// Position in an EPUB as a CFI.
     #[serde(alias="epubCfiPosition")]
     pub epub_cfi_position: String,
-    /// Timestamp when this reading position was last updated (formatted UTC timestamp with millisecond resolution).    
+    /// Timestamp when this reading position was last updated (formatted UTC timestamp with millisecond resolution).
     pub updated: String,
-    /// Volume id associated with this reading position.    
+    /// Volume id associated with this reading position.
     #[serde(alias="volumeId")]
     pub volume_id: String,
 }
@@ -1117,10 +1126,10 @@ impl ResponseResult for ReadingPosition {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct VolumeSaleInfoOffersRetailPrice {
-    /// no description provided    
+    /// no description provided
     #[serde(alias="currencyCode")]
     pub currency_code: String,
-    /// no description provided    
+    /// no description provided
     #[serde(alias="amountInMicros")]
     pub amount_in_micros: f64,
 }
@@ -1135,7 +1144,7 @@ impl Part for VolumeSaleInfoOffersRetailPrice {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct VolumeSearchInfo {
-    /// A text snippet containing the search query.    
+    /// A text snippet containing the search query.
     #[serde(alias="textSnippet")]
     pub text_snippet: String,
 }
@@ -1150,18 +1159,18 @@ impl Part for VolumeSearchInfo {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct AnnotationsSummaryLayers {
-    /// no description provided    
+    /// no description provided
     #[serde(alias="limitType")]
     pub limit_type: String,
-    /// no description provided    
+    /// no description provided
     #[serde(alias="remainingCharacterCount")]
     pub remaining_character_count: i32,
-    /// no description provided    
+    /// no description provided
     pub updated: String,
-    /// no description provided    
+    /// no description provided
     #[serde(alias="allowedCharacterCount")]
     pub allowed_character_count: i32,
-    /// no description provided    
+    /// no description provided
     #[serde(alias="layerId")]
     pub layer_id: String,
 }
@@ -1181,26 +1190,26 @@ impl Part for AnnotationsSummaryLayers {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct Annotationdata {
-    /// The type of annotation this data is for.    
+    /// The type of annotation this data is for.
     #[serde(alias="annotationType")]
     pub annotation_type: String,
-    /// Resource Type    
+    /// Resource Type
     pub kind: String,
-    /// Timestamp for the last time this data was updated. (RFC 3339 UTC date-time format).    
+    /// Timestamp for the last time this data was updated. (RFC 3339 UTC date-time format).
     pub updated: String,
-    /// The volume id for this data. *    
+    /// The volume id for this data. *
     #[serde(alias="volumeId")]
     pub volume_id: String,
-    /// Base64 encoded data for this annotation data.    
+    /// Base64 encoded data for this annotation data.
     pub encoded_data: String,
-    /// The Layer id for this data. *    
+    /// The Layer id for this data. *
     #[serde(alias="layerId")]
     pub layer_id: String,
-    /// no description provided    
+    /// no description provided
     pub data: String,
-    /// Unique id for this annotation data.    
+    /// Unique id for this annotation data.
     pub id: String,
-    /// URL for this resource. *    
+    /// URL for this resource. *
     #[serde(alias="selfLink")]
     pub self_link: String,
 }
@@ -1214,19 +1223,19 @@ impl ResponseResult for Annotationdata {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct VolumeVolumeInfoImageLinks {
-    /// Image link for large size (width of ~800 pixels). (In LITE projection)    
+    /// Image link for large size (width of ~800 pixels). (In LITE projection)
     pub large: String,
-    /// Image link for extra large size (width of ~1280 pixels). (In LITE projection)    
+    /// Image link for extra large size (width of ~1280 pixels). (In LITE projection)
     #[serde(alias="extraLarge")]
     pub extra_large: String,
-    /// Image link for medium size (width of ~575 pixels). (In LITE projection)    
+    /// Image link for medium size (width of ~575 pixels). (In LITE projection)
     pub medium: String,
-    /// Image link for small thumbnail size (width of ~80 pixels). (In LITE projection)    
+    /// Image link for small thumbnail size (width of ~80 pixels). (In LITE projection)
     #[serde(alias="smallThumbnail")]
     pub small_thumbnail: String,
-    /// Image link for small size (width of ~300 pixels). (In LITE projection)    
+    /// Image link for small size (width of ~300 pixels). (In LITE projection)
     pub small: String,
-    /// Image link for thumbnail size (width of ~128 pixels). (In LITE projection)    
+    /// Image link for thumbnail size (width of ~128 pixels). (In LITE projection)
     pub thumbnail: String,
 }
 
@@ -1240,9 +1249,9 @@ impl Part for VolumeVolumeInfoImageLinks {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct VolumeSaleInfoRetailPrice {
-    /// Amount in the currency listed below. (In LITE projection.)    
+    /// Amount in the currency listed below. (In LITE projection.)
     pub amount: f64,
-    /// An ISO 4217, three-letter currency code. (In LITE projection.)    
+    /// An ISO 4217, three-letter currency code. (In LITE projection.)
     #[serde(alias="currencyCode")]
     pub currency_code: String,
 }
@@ -1262,40 +1271,40 @@ impl Part for VolumeSaleInfoRetailPrice {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct Layersummary {
-    /// Resource Type    
+    /// Resource Type
     pub kind: String,
-    /// The number of annotations for this layer.    
+    /// The number of annotations for this layer.
     #[serde(alias="annotationCount")]
     pub annotation_count: i32,
-    /// The number of data items for this layer.    
+    /// The number of data items for this layer.
     #[serde(alias="dataCount")]
     pub data_count: i32,
-    /// The list of annotation types contained for this layer.    
+    /// The list of annotation types contained for this layer.
     #[serde(alias="annotationTypes")]
     pub annotation_types: Vec<String>,
-    /// Timestamp for the last time an item in this layer was updated. (RFC 3339 UTC date-time format).    
+    /// Timestamp for the last time an item in this layer was updated. (RFC 3339 UTC date-time format).
     pub updated: String,
-    /// The volume id this resource is for.    
+    /// The volume id this resource is for.
     #[serde(alias="volumeId")]
     pub volume_id: String,
-    /// Link to get data for this annotation.    
+    /// Link to get data for this annotation.
     #[serde(alias="annotationsDataLink")]
     pub annotations_data_link: String,
-    /// The link to get the annotations for this layer.    
+    /// The link to get the annotations for this layer.
     #[serde(alias="annotationsLink")]
     pub annotations_link: String,
-    /// The content version this resource is for.    
+    /// The content version this resource is for.
     #[serde(alias="contentVersion")]
     pub content_version: String,
-    /// The layer id for this summary.    
+    /// The layer id for this summary.
     #[serde(alias="layerId")]
     pub layer_id: String,
-    /// The current version of this layer's volume annotations. Note that this version applies only to the data in the books.layers.volumeAnnotations.* responses. The actual annotation data is versioned separately.    
+    /// The current version of this layer's volume annotations. Note that this version applies only to the data in the books.layers.volumeAnnotations.* responses. The actual annotation data is versioned separately.
     #[serde(alias="volumeAnnotationsVersion")]
     pub volume_annotations_version: String,
-    /// Unique id of this layer summary.    
+    /// Unique id of this layer summary.
     pub id: String,
-    /// URL to this resource.    
+    /// URL to this resource.
     #[serde(alias="selfLink")]
     pub self_link: String,
 }
@@ -1309,10 +1318,10 @@ impl ResponseResult for Layersummary {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct VolumeSaleInfoOffersListPrice {
-    /// no description provided    
+    /// no description provided
     #[serde(alias="currencyCode")]
     pub currency_code: String,
-    /// no description provided    
+    /// no description provided
     #[serde(alias="amountInMicros")]
     pub amount_in_micros: f64,
 }
@@ -1332,41 +1341,41 @@ impl Part for VolumeSaleInfoOffersListPrice {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct Volumeannotation {
-    /// The type of annotation this is.    
+    /// The type of annotation this is.
     #[serde(alias="annotationType")]
     pub annotation_type: String,
-    /// Resource Type    
+    /// Resource Type
     pub kind: String,
-    /// Indicates that this annotation is deleted.    
+    /// Indicates that this annotation is deleted.
     pub deleted: bool,
-    /// The content ranges to identify the selected text.    
+    /// The content ranges to identify the selected text.
     #[serde(alias="contentRanges")]
     pub content_ranges: VolumeannotationContentRanges,
-    /// Timestamp for the last time this anntoation was updated. (RFC 3339 UTC date-time format).    
+    /// Timestamp for the last time this anntoation was updated. (RFC 3339 UTC date-time format).
     pub updated: String,
-    /// The Volume this annotation is for.    
+    /// The Volume this annotation is for.
     #[serde(alias="volumeId")]
     pub volume_id: String,
-    /// The annotation data id for this volume annotation.    
+    /// The annotation data id for this volume annotation.
     #[serde(alias="annotationDataId")]
     pub annotation_data_id: String,
-    /// Link to get data for this annotation.    
+    /// Link to get data for this annotation.
     #[serde(alias="annotationDataLink")]
     pub annotation_data_link: String,
-    /// Pages the annotation spans.    
+    /// Pages the annotation spans.
     #[serde(alias="pageIds")]
     pub page_ids: Vec<String>,
-    /// The Layer this annotation is for.    
+    /// The Layer this annotation is for.
     #[serde(alias="layerId")]
     pub layer_id: String,
-    /// Excerpt from the volume.    
+    /// Excerpt from the volume.
     #[serde(alias="selectedText")]
     pub selected_text: String,
-    /// Data for this annotation.    
+    /// Data for this annotation.
     pub data: String,
-    /// Unique id of this volume annotation.    
+    /// Unique id of this volume annotation.
     pub id: String,
-    /// URL to this resource.    
+    /// URL to this resource.
     #[serde(alias="selfLink")]
     pub self_link: String,
 }
@@ -1385,16 +1394,16 @@ impl ResponseResult for Volumeannotation {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct Volumeannotations {
-    /// Token to pass in for pagination for the next page. This will not be present if this request does not have more results.    
+    /// Token to pass in for pagination for the next page. This will not be present if this request does not have more results.
     #[serde(alias="nextPageToken")]
     pub next_page_token: String,
-    /// A list of volume annotations.    
+    /// A list of volume annotations.
     pub items: Vec<Volumeannotation>,
-    /// Resource type    
+    /// Resource type
     pub kind: String,
-    /// The version string for all of the volume annotations in this layer (not just the ones in this response). Note: the version string doesn't apply to the annotation data, just the information in this response (e.g. the location of annotations in the book).    
+    /// The version string for all of the volume annotations in this layer (not just the ones in this response). Note: the version string doesn't apply to the annotation data, just the information in this response (e.g. the location of annotations in the book).
     pub version: String,
-    /// The total number of volume annotations found.    
+    /// The total number of volume annotations found.
     #[serde(alias="totalItems")]
     pub total_items: i32,
 }
@@ -1413,14 +1422,14 @@ impl ResponseResult for Volumeannotations {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct Annotationsdata {
-    /// Token to pass in for pagination for the next page. This will not be present if this request does not have more results.    
+    /// Token to pass in for pagination for the next page. This will not be present if this request does not have more results.
     #[serde(alias="nextPageToken")]
     pub next_page_token: String,
-    /// A list of Annotation Data.    
+    /// A list of Annotation Data.
     pub items: Vec<Annotationdata>,
-    /// Resource type    
+    /// Resource type
     pub kind: String,
-    /// The total number of volume annotations found.    
+    /// The total number of volume annotations found.
     #[serde(alias="totalItems")]
     pub total_items: i32,
 }
@@ -1434,9 +1443,9 @@ impl ResponseResult for Annotationsdata {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct VolumeVolumeInfoIndustryIdentifiers {
-    /// Industry specific volume identifier.    
+    /// Industry specific volume identifier.
     pub identifier: String,
-    /// Identifier type. Possible values are ISBN_10, ISBN_13, ISSN and OTHER.    
+    /// Identifier type. Possible values are ISBN_10, ISBN_13, ISSN and OTHER.
     #[serde(alias="type")]
     pub type_: String,
 }
@@ -1451,13 +1460,13 @@ impl Part for VolumeVolumeInfoIndustryIdentifiers {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct AnnotationLayerSummary {
-    /// Type of limitation on this layer. "limited" or "unlimited" for the "copy" layer.    
+    /// Type of limitation on this layer. "limited" or "unlimited" for the "copy" layer.
     #[serde(alias="limitType")]
     pub limit_type: String,
-    /// Remaining allowed characters on this layer, especially for the "copy" layer.    
+    /// Remaining allowed characters on this layer, especially for the "copy" layer.
     #[serde(alias="remainingCharacterCount")]
     pub remaining_character_count: i32,
-    /// Maximum allowed characters on this layer, especially for the "copy" layer.    
+    /// Maximum allowed characters on this layer, especially for the "copy" layer.
     #[serde(alias="allowedCharacterCount")]
     pub allowed_character_count: i32,
 }
@@ -1477,9 +1486,9 @@ impl Part for AnnotationLayerSummary {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct Offers {
-    /// A list of offers.    
+    /// A list of offers.
     pub items: Vec<OffersItems>,
-    /// Resource type.    
+    /// Resource type.
     pub kind: String,
 }
 
@@ -1492,13 +1501,13 @@ impl ResponseResult for Offers {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct VolumeAccessInfoEpub {
-    /// Is a flowing text epub available either as public domain or for purchase. (In LITE projection.)    
+    /// Is a flowing text epub available either as public domain or for purchase. (In LITE projection.)
     #[serde(alias="isAvailable")]
     pub is_available: bool,
-    /// URL to download epub. (In LITE projection.)    
+    /// URL to download epub. (In LITE projection.)
     #[serde(alias="downloadLink")]
     pub download_link: String,
-    /// URL to retrieve ACS token for epub download. (In LITE projection.)    
+    /// URL to retrieve ACS token for epub download. (In LITE projection.)
     #[serde(alias="acsTokenLink")]
     pub acs_token_link: String,
 }
@@ -1518,12 +1527,12 @@ impl Part for VolumeAccessInfoEpub {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct Volume2 {
-    /// no description provided    
+    /// no description provided
     #[serde(alias="nextPageToken")]
     pub next_page_token: String,
-    /// A list of volumes.    
+    /// A list of volumes.
     pub items: Vec<Volume>,
-    /// Resource type.    
+    /// Resource type.
     pub kind: String,
 }
 
@@ -1536,13 +1545,13 @@ impl ResponseResult for Volume2 {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct VolumeAccessInfoPdf {
-    /// Is a scanned image pdf available either as public domain or for purchase. (In LITE projection.)    
+    /// Is a scanned image pdf available either as public domain or for purchase. (In LITE projection.)
     #[serde(alias="isAvailable")]
     pub is_available: bool,
-    /// URL to download pdf. (In LITE projection.)    
+    /// URL to download pdf. (In LITE projection.)
     #[serde(alias="downloadLink")]
     pub download_link: String,
-    /// URL to retrieve ACS token for pdf download. (In LITE projection.)    
+    /// URL to retrieve ACS token for pdf download. (In LITE projection.)
     #[serde(alias="acsTokenLink")]
     pub acs_token_link: String,
 }
@@ -1562,9 +1571,9 @@ impl Part for VolumeAccessInfoPdf {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct AnnotationsSummary {
-    /// no description provided    
+    /// no description provided
     pub layers: Vec<AnnotationsSummaryLayers>,
-    /// no description provided    
+    /// no description provided
     pub kind: String,
 }
 
@@ -1583,9 +1592,9 @@ impl ResponseResult for AnnotationsSummary {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct Bookshelves {
-    /// A list of bookshelves.    
+    /// A list of bookshelves.
     pub items: Vec<Bookshelf>,
-    /// Resource type.    
+    /// Resource type.
     pub kind: String,
 }
 
@@ -1598,10 +1607,10 @@ impl ResponseResult for Bookshelves {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct VolumeLayerInfoLayers {
-    /// The current version of this layer's volume annotations. Note that this version applies only to the data in the books.layers.volumeAnnotations.* responses. The actual annotation data is versioned separately.    
+    /// The current version of this layer's volume annotations. Note that this version applies only to the data in the books.layers.volumeAnnotations.* responses. The actual annotation data is versioned separately.
     #[serde(alias="volumeAnnotationsVersion")]
     pub volume_annotations_version: String,
-    /// The layer id of this layer (e.g. "geo").    
+    /// The layer id of this layer (e.g. "geo").
     #[serde(alias="layerId")]
     pub layer_id: String,
 }
@@ -1621,12 +1630,12 @@ impl Part for VolumeLayerInfoLayers {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct Layersummaries {
-    /// The total number of layer summaries found.    
+    /// The total number of layer summaries found.
     #[serde(alias="totalItems")]
     pub total_items: i32,
-    /// A list of layer summary items.    
+    /// A list of layer summary items.
     pub items: Vec<Layersummary>,
-    /// Resource type.    
+    /// Resource type.
     pub kind: String,
 }
 
@@ -1639,15 +1648,15 @@ impl ResponseResult for Layersummaries {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct OffersItems {
-    /// no description provided    
+    /// no description provided
     #[serde(alias="gservicesKey")]
     pub gservices_key: String,
-    /// no description provided    
+    /// no description provided
     pub items: Vec<OffersItemsItems>,
-    /// no description provided    
+    /// no description provided
     #[serde(alias="artUrl")]
     pub art_url: String,
-    /// no description provided    
+    /// no description provided
     pub id: String,
 }
 
@@ -1661,15 +1670,15 @@ impl Part for OffersItems {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct VolumeUserInfoCopy {
-    /// no description provided    
+    /// no description provided
     #[serde(alias="limitType")]
     pub limit_type: String,
-    /// no description provided    
+    /// no description provided
     #[serde(alias="remainingCharacterCount")]
     pub remaining_character_count: i32,
-    /// no description provided    
+    /// no description provided
     pub updated: String,
-    /// no description provided    
+    /// no description provided
     #[serde(alias="allowedCharacterCount")]
     pub allowed_character_count: i32,
 }
@@ -1689,7 +1698,7 @@ impl Part for VolumeUserInfoCopy {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct BooksVolumesRecommendedRateResponse {
-    /// no description provided    
+    /// no description provided
     pub consistency_token: String,
 }
 
@@ -1702,34 +1711,34 @@ impl ResponseResult for BooksVolumesRecommendedRateResponse {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct VolumeUserInfo {
-    /// Whether or not this volume is currently in "my books."    
+    /// Whether or not this volume is currently in "my books."
     #[serde(alias="isInMyBooks")]
     pub is_in_my_books: bool,
-    /// Period during this book is/was a valid rental.    
+    /// Period during this book is/was a valid rental.
     #[serde(alias="rentalPeriod")]
     pub rental_period: VolumeUserInfoRentalPeriod,
-    /// Timestamp when this volume was last modified by a user action, such as a reading position update, volume purchase or writing a review. (RFC 3339 UTC date-time format).    
+    /// Timestamp when this volume was last modified by a user action, such as a reading position update, volume purchase or writing a review. (RFC 3339 UTC date-time format).
     pub updated: String,
-    /// no description provided    
+    /// no description provided
     #[serde(alias="userUploadedVolumeInfo")]
     pub user_uploaded_volume_info: VolumeUserInfoUserUploadedVolumeInfo,
-    /// Whether this book is an active or an expired rental.    
+    /// Whether this book is an active or an expired rental.
     #[serde(alias="rentalState")]
     pub rental_state: String,
-    /// Whether or not this volume was purchased by the authenticated user making the request. (In LITE projection.)    
+    /// Whether or not this volume was purchased by the authenticated user making the request. (In LITE projection.)
     #[serde(alias="isPurchased")]
     pub is_purchased: bool,
-    /// The user's current reading position in the volume, if one is available. (In LITE projection.)    
+    /// The user's current reading position in the volume, if one is available. (In LITE projection.)
     #[serde(alias="readingPosition")]
     pub reading_position: ReadingPosition,
-    /// Whether or not this volume was pre-ordered by the authenticated user making the request. (In LITE projection.)    
+    /// Whether or not this volume was pre-ordered by the authenticated user making the request. (In LITE projection.)
     #[serde(alias="isPreordered")]
     pub is_preordered: bool,
-    /// Copy/Paste accounting information.    
+    /// Copy/Paste accounting information.
     pub copy: VolumeUserInfoCopy,
-    /// This user's review of this volume, if one exists.    
+    /// This user's review of this volume, if one exists.
     pub review: Review,
-    /// Whether or not this volume was user uploaded.    
+    /// Whether or not this volume was user uploaded.
     #[serde(alias="isUploaded")]
     pub is_uploaded: bool,
 }
@@ -1750,15 +1759,15 @@ impl Part for VolumeUserInfo {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct BooksCloudloadingResource {
-    /// no description provided    
+    /// no description provided
     pub author: Option<String>,
-    /// no description provided    
+    /// no description provided
     #[serde(alias="processingState")]
     pub processing_state: Option<String>,
-    /// no description provided    
+    /// no description provided
     #[serde(alias="volumeId")]
     pub volume_id: Option<String>,
-    /// no description provided    
+    /// no description provided
     pub title: Option<String>,
 }
 
@@ -1772,7 +1781,7 @@ impl ResponseResult for BooksCloudloadingResource {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct VolumeUserInfoUserUploadedVolumeInfo {
-    /// no description provided    
+    /// no description provided
     #[serde(alias="processingState")]
     pub processing_state: String,
 }
@@ -1787,9 +1796,9 @@ impl Part for VolumeUserInfoUserUploadedVolumeInfo {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct VolumeSaleInfoListPrice {
-    /// Amount in the currency listed below. (In LITE projection.)    
+    /// Amount in the currency listed below. (In LITE projection.)
     pub amount: f64,
-    /// An ISO 4217, three-letter currency code. (In LITE projection.)    
+    /// An ISO 4217, three-letter currency code. (In LITE projection.)
     #[serde(alias="currencyCode")]
     pub currency_code: String,
 }
@@ -1804,16 +1813,16 @@ impl Part for VolumeSaleInfoListPrice {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct BooksAnnotationsRange {
-    /// The starting position for the range.    
+    /// The starting position for the range.
     #[serde(alias="startPosition")]
     pub start_position: String,
-    /// The ending position for the range.    
+    /// The ending position for the range.
     #[serde(alias="endPosition")]
     pub end_position: String,
-    /// The offset from the starting position.    
+    /// The offset from the starting position.
     #[serde(alias="startOffset")]
     pub start_offset: String,
-    /// The offset from the ending position.    
+    /// The offset from the ending position.
     #[serde(alias="endOffset")]
     pub end_offset: String,
 }
@@ -1827,41 +1836,41 @@ impl Part for BooksAnnotationsRange {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct VolumeAccessInfo {
-    /// URL to read this volume on the Google Books site. Link will not allow users to read non-viewable volumes.    
+    /// URL to read this volume on the Google Books site. Link will not allow users to read non-viewable volumes.
     #[serde(alias="webReaderLink")]
     pub web_reader_link: String,
-    /// Whether or not this book is public domain in the country listed above.    
+    /// Whether or not this book is public domain in the country listed above.
     #[serde(alias="publicDomain")]
     pub public_domain: bool,
-    /// Whether this volume requires that the client explicitly request offline download license rather than have it done automatically when loading the content, if the client supports it.    
+    /// Whether this volume requires that the client explicitly request offline download license rather than have it done automatically when loading the content, if the client supports it.
     #[serde(alias="explicitOfflineLicenseManagement")]
     pub explicit_offline_license_management: bool,
-    /// Whether this volume can be embedded in a viewport using the Embedded Viewer API.    
+    /// Whether this volume can be embedded in a viewport using the Embedded Viewer API.
     pub embeddable: bool,
-    /// Information about a volume's download license access restrictions.    
+    /// Information about a volume's download license access restrictions.
     #[serde(alias="downloadAccess")]
     pub download_access: DownloadAccessRestriction,
-    /// The two-letter ISO_3166-1 country code for which this access information is valid. (In LITE projection.)    
+    /// The two-letter ISO_3166-1 country code for which this access information is valid. (In LITE projection.)
     pub country: String,
-    /// For ordered but not yet processed orders, we give a URL that can be used to go to the appropriate Google Wallet page.    
+    /// For ordered but not yet processed orders, we give a URL that can be used to go to the appropriate Google Wallet page.
     #[serde(alias="viewOrderUrl")]
     pub view_order_url: String,
-    /// Whether text-to-speech is permitted for this volume. Values can be ALLOWED, ALLOWED_FOR_ACCESSIBILITY, or NOT_ALLOWED.    
+    /// Whether text-to-speech is permitted for this volume. Values can be ALLOWED, ALLOWED_FOR_ACCESSIBILITY, or NOT_ALLOWED.
     #[serde(alias="textToSpeechPermission")]
     pub text_to_speech_permission: String,
-    /// URL to the Google Drive viewer if this volume is uploaded by the user by selecting the file from Google Drive.    
+    /// URL to the Google Drive viewer if this volume is uploaded by the user by selecting the file from Google Drive.
     #[serde(alias="driveImportedContentLink")]
     pub drive_imported_content_link: String,
-    /// Information about pdf content. (In LITE projection.)    
+    /// Information about pdf content. (In LITE projection.)
     pub pdf: VolumeAccessInfoPdf,
-    /// Whether quote sharing is allowed for this volume.    
+    /// Whether quote sharing is allowed for this volume.
     #[serde(alias="quoteSharingAllowed")]
     pub quote_sharing_allowed: bool,
-    /// The read access of a volume. Possible values are PARTIAL, ALL_PAGES, NO_PAGES or UNKNOWN. This value depends on the country listed above. A value of PARTIAL means that the publisher has allowed some portion of the volume to be viewed publicly, without purchase. This can apply to eBooks as well as non-eBooks. Public domain books will always have a value of ALL_PAGES.    
+    /// The read access of a volume. Possible values are PARTIAL, ALL_PAGES, NO_PAGES or UNKNOWN. This value depends on the country listed above. A value of PARTIAL means that the publisher has allowed some portion of the volume to be viewed publicly, without purchase. This can apply to eBooks as well as non-eBooks. Public domain books will always have a value of ALL_PAGES.
     pub viewability: String,
-    /// Information about epub content. (In LITE projection.)    
+    /// Information about epub content. (In LITE projection.)
     pub epub: VolumeAccessInfoEpub,
-    /// Combines the access and viewability of this volume into a single status field for this user. Values can be FULL_PURCHASED, FULL_PUBLIC_DOMAIN, SAMPLE or NONE. (In LITE projection.)    
+    /// Combines the access and viewability of this volume into a single status field for this user. Values can be FULL_PURCHASED, FULL_PUBLIC_DOMAIN, SAMPLE or NONE. (In LITE projection.)
     #[serde(alias="accessViewStatus")]
     pub access_view_status: String,
 }
@@ -1876,19 +1885,19 @@ impl Part for VolumeAccessInfo {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct AnnotationCurrentVersionRanges {
-    /// Range in image CFI format for this annotation for version above.    
+    /// Range in image CFI format for this annotation for version above.
     #[serde(alias="imageCfiRange")]
     pub image_cfi_range: BooksAnnotationsRange,
-    /// Range in GB text format for this annotation for version above.    
+    /// Range in GB text format for this annotation for version above.
     #[serde(alias="gbTextRange")]
     pub gb_text_range: BooksAnnotationsRange,
-    /// Content version applicable to ranges below.    
+    /// Content version applicable to ranges below.
     #[serde(alias="contentVersion")]
     pub content_version: String,
-    /// Range in CFI format for this annotation for version above.    
+    /// Range in CFI format for this annotation for version above.
     #[serde(alias="cfiRange")]
     pub cfi_range: BooksAnnotationsRange,
-    /// Range in GB image format for this annotation for version above.    
+    /// Range in GB image format for this annotation for version above.
     #[serde(alias="gbImageRange")]
     pub gb_image_range: BooksAnnotationsRange,
 }
@@ -1903,25 +1912,25 @@ impl Part for AnnotationCurrentVersionRanges {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct VolumeSaleInfo {
-    /// The two-letter ISO_3166-1 country code for which this sale information is valid. (In LITE projection.)    
+    /// The two-letter ISO_3166-1 country code for which this sale information is valid. (In LITE projection.)
     pub country: String,
-    /// The actual selling price of the book. This is the same as the suggested retail or list price unless there are offers or discounts on this volume. (In LITE projection.)    
+    /// The actual selling price of the book. This is the same as the suggested retail or list price unless there are offers or discounts on this volume. (In LITE projection.)
     #[serde(alias="retailPrice")]
     pub retail_price: VolumeSaleInfoRetailPrice,
-    /// Whether or not this volume is an eBook (can be added to the My eBooks shelf).    
+    /// Whether or not this volume is an eBook (can be added to the My eBooks shelf).
     #[serde(alias="isEbook")]
     pub is_ebook: bool,
-    /// Offers available for this volume (sales and rentals).    
+    /// Offers available for this volume (sales and rentals).
     pub offers: Vec<VolumeSaleInfoOffers>,
-    /// Whether or not this book is available for sale or offered for free in the Google eBookstore for the country listed above. Possible values are FOR_SALE, FOR_RENTAL_ONLY, FOR_SALE_AND_RENTAL, FREE, NOT_FOR_SALE, or FOR_PREORDER.    
+    /// Whether or not this book is available for sale or offered for free in the Google eBookstore for the country listed above. Possible values are FOR_SALE, FOR_RENTAL_ONLY, FOR_SALE_AND_RENTAL, FREE, NOT_FOR_SALE, or FOR_PREORDER.
     pub saleability: String,
-    /// URL to purchase this volume on the Google Books site. (In LITE projection)    
+    /// URL to purchase this volume on the Google Books site. (In LITE projection)
     #[serde(alias="buyLink")]
     pub buy_link: String,
-    /// The date on which this book is available for sale.    
+    /// The date on which this book is available for sale.
     #[serde(alias="onSaleDate")]
     pub on_sale_date: String,
-    /// Suggested retail price. (In LITE projection.)    
+    /// Suggested retail price. (In LITE projection.)
     #[serde(alias="listPrice")]
     pub list_price: VolumeSaleInfoListPrice,
 }
@@ -1948,12 +1957,12 @@ impl Part for VolumeSaleInfo {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct Volumes {
-    /// Total number of volumes found. This might be greater than the number of volumes returned in this response if results have been paginated.    
+    /// Total number of volumes found. This might be greater than the number of volumes returned in this response if results have been paginated.
     #[serde(alias="totalItems")]
     pub total_items: i32,
-    /// A list of volumes.    
+    /// A list of volumes.
     pub items: Vec<Volume>,
-    /// Resource type.    
+    /// Resource type.
     pub kind: String,
 }
 
@@ -1966,10 +1975,10 @@ impl ResponseResult for Volumes {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct VolumeUserInfoRentalPeriod {
-    /// no description provided    
+    /// no description provided
     #[serde(alias="startUtcSec")]
     pub start_utc_sec: String,
-    /// no description provided    
+    /// no description provided
     #[serde(alias="endUtcSec")]
     pub end_utc_sec: String,
 }
@@ -1984,16 +1993,16 @@ impl Part for VolumeUserInfoRentalPeriod {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct VolumeannotationContentRanges {
-    /// Range in GB image format for this annotation for version above.    
+    /// Range in GB image format for this annotation for version above.
     #[serde(alias="gbImageRange")]
     pub gb_image_range: BooksAnnotationsRange,
-    /// Range in GB text format for this annotation for version above.    
+    /// Range in GB text format for this annotation for version above.
     #[serde(alias="gbTextRange")]
     pub gb_text_range: BooksAnnotationsRange,
-    /// Content version applicable to ranges below.    
+    /// Content version applicable to ranges below.
     #[serde(alias="contentVersion")]
     pub content_version: String,
-    /// Range in CFI format for this annotation for version above.    
+    /// Range in CFI format for this annotation for version above.
     #[serde(alias="cfiRange")]
     pub cfi_range: BooksAnnotationsRange,
 }
@@ -2008,9 +2017,9 @@ impl Part for VolumeannotationContentRanges {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct VolumeSaleInfoOffersRentalDuration {
-    /// no description provided    
+    /// no description provided
     pub count: f64,
-    /// no description provided    
+    /// no description provided
     pub unit: String,
 }
 
@@ -2057,13 +2066,20 @@ pub struct LayerMethods<'a, C, NC, A>
     hub: &'a Books<C, NC, A>,
 }
 
-impl<'a, C, NC, A> ResourceMethodsBuilder for LayerMethods<'a, C, NC, A> {}
+impl<'a, C, NC, A> MethodsBuilder for LayerMethods<'a, C, NC, A> {}
 
 impl<'a, C, NC, A> LayerMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Gets the annotation data.    
+    /// Gets the annotation data.
+    /// 
+    /// # Arguments
+    ///
+    /// * `volumeId` - The volume to retrieve annotations for.
+    /// * `layerId` - The ID for the layer to get the annotations.
+    /// * `annotationDataId` - The ID of the annotation data to retrieve.
+    /// * `contentVersion` - The content version for the volume you are trying to retrieve.
     pub fn annotation_data_get(&self, volume_id: &str, layer_id: &str, annotation_data_id: &str, content_version: &str) -> LayerAnnotationDataGetCall<'a, C, NC, A> {
         LayerAnnotationDataGetCall {
             hub: self.hub,
@@ -2085,7 +2101,13 @@ impl<'a, C, NC, A> LayerMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Gets the volume annotation.    
+    /// Gets the volume annotation.
+    /// 
+    /// # Arguments
+    ///
+    /// * `volumeId` - The volume to retrieve annotations for.
+    /// * `layerId` - The ID for the layer to get the annotations.
+    /// * `annotationId` - The ID of the volume annotation to retrieve.
     pub fn volume_annotations_get(&self, volume_id: &str, layer_id: &str, annotation_id: &str) -> LayerVolumeAnnotationGetCall<'a, C, NC, A> {
         LayerVolumeAnnotationGetCall {
             hub: self.hub,
@@ -2102,7 +2124,11 @@ impl<'a, C, NC, A> LayerMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// List the layer summaries for a volume.    
+    /// List the layer summaries for a volume.
+    /// 
+    /// # Arguments
+    ///
+    /// * `volumeId` - The volume to retrieve layers for.
     pub fn list(&self, volume_id: &str) -> LayerListCall<'a, C, NC, A> {
         LayerListCall {
             hub: self.hub,
@@ -2119,7 +2145,12 @@ impl<'a, C, NC, A> LayerMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Gets the layer summary for a volume.    
+    /// Gets the layer summary for a volume.
+    /// 
+    /// # Arguments
+    ///
+    /// * `volumeId` - The volume to retrieve layers for.
+    /// * `summaryId` - The ID for the layer to get the summary for.
     pub fn get(&self, volume_id: &str, summary_id: &str) -> LayerGetCall<'a, C, NC, A> {
         LayerGetCall {
             hub: self.hub,
@@ -2135,7 +2166,13 @@ impl<'a, C, NC, A> LayerMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Gets the volume annotations for a volume and layer.    
+    /// Gets the volume annotations for a volume and layer.
+    /// 
+    /// # Arguments
+    ///
+    /// * `volumeId` - The volume to retrieve annotations for.
+    /// * `layerId` - The ID for the layer to get the annotations.
+    /// * `contentVersion` - The content version for the requested volume.
     pub fn volume_annotations_list(&self, volume_id: &str, layer_id: &str, content_version: &str) -> LayerVolumeAnnotationListCall<'a, C, NC, A> {
         LayerVolumeAnnotationListCall {
             hub: self.hub,
@@ -2162,7 +2199,13 @@ impl<'a, C, NC, A> LayerMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Gets the annotation data for a volume and layer.    
+    /// Gets the annotation data for a volume and layer.
+    /// 
+    /// # Arguments
+    ///
+    /// * `volumeId` - The volume to retrieve annotation data for.
+    /// * `layerId` - The ID for the layer to get the annotation data.
+    /// * `contentVersion` - The content version for the requested volume.
     pub fn annotation_data_list(&self, volume_id: &str, layer_id: &str, content_version: &str) -> LayerAnnotationDataListCall<'a, C, NC, A> {
         LayerAnnotationDataListCall {
             hub: self.hub,
@@ -2222,13 +2265,18 @@ pub struct VolumeMethods<'a, C, NC, A>
     hub: &'a Books<C, NC, A>,
 }
 
-impl<'a, C, NC, A> ResourceMethodsBuilder for VolumeMethods<'a, C, NC, A> {}
+impl<'a, C, NC, A> MethodsBuilder for VolumeMethods<'a, C, NC, A> {}
 
 impl<'a, C, NC, A> VolumeMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Rate a recommended book for the current user.    
+    /// Rate a recommended book for the current user.
+    /// 
+    /// # Arguments
+    ///
+    /// * `rating` - Rating to be given to the volume.
+    /// * `volumeId` - ID of the source volume.
     pub fn recommended_rate(&self, rating: &str, volume_id: &str) -> VolumeRecommendedRateCall<'a, C, NC, A> {
         VolumeRecommendedRateCall {
             hub: self.hub,
@@ -2244,7 +2292,7 @@ impl<'a, C, NC, A> VolumeMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Return a list of books in My Library.    
+    /// Return a list of books in My Library.
     pub fn mybooks_list(&self) -> VolumeMybookListCall<'a, C, NC, A> {
         VolumeMybookListCall {
             hub: self.hub,
@@ -2262,7 +2310,11 @@ impl<'a, C, NC, A> VolumeMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Performs a book search.    
+    /// Performs a book search.
+    /// 
+    /// # Arguments
+    ///
+    /// * `q` - Full-text search query string.
     pub fn list(&self, q: &str) -> VolumeListCall<'a, C, NC, A> {
         VolumeListCall {
             hub: self.hub,
@@ -2287,7 +2339,7 @@ impl<'a, C, NC, A> VolumeMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Return a list of books uploaded by the current user.    
+    /// Return a list of books uploaded by the current user.
     pub fn useruploaded_list(&self) -> VolumeUseruploadedListCall<'a, C, NC, A> {
         VolumeUseruploadedListCall {
             hub: self.hub,
@@ -2305,7 +2357,11 @@ impl<'a, C, NC, A> VolumeMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Return a list of associated books.    
+    /// Return a list of associated books.
+    /// 
+    /// # Arguments
+    ///
+    /// * `volumeId` - ID of the source volume.
     pub fn associated_list(&self, volume_id: &str) -> VolumeAssociatedListCall<'a, C, NC, A> {
         VolumeAssociatedListCall {
             hub: self.hub,
@@ -2321,7 +2377,11 @@ impl<'a, C, NC, A> VolumeMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Gets volume information for a single volume.    
+    /// Gets volume information for a single volume.
+    /// 
+    /// # Arguments
+    ///
+    /// * `volumeId` - ID of volume to retrieve.
     pub fn get(&self, volume_id: &str) -> VolumeGetCall<'a, C, NC, A> {
         VolumeGetCall {
             hub: self.hub,
@@ -2339,7 +2399,7 @@ impl<'a, C, NC, A> VolumeMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Return a list of recommended books for the current user.    
+    /// Return a list of recommended books for the current user.
     pub fn recommended_list(&self) -> VolumeRecommendedListCall<'a, C, NC, A> {
         VolumeRecommendedListCall {
             hub: self.hub,
@@ -2388,13 +2448,17 @@ pub struct DictionaryMethods<'a, C, NC, A>
     hub: &'a Books<C, NC, A>,
 }
 
-impl<'a, C, NC, A> ResourceMethodsBuilder for DictionaryMethods<'a, C, NC, A> {}
+impl<'a, C, NC, A> MethodsBuilder for DictionaryMethods<'a, C, NC, A> {}
 
 impl<'a, C, NC, A> DictionaryMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Returns a list of offline dictionary meatadata available    
+    /// Returns a list of offline dictionary meatadata available
+    /// 
+    /// # Arguments
+    ///
+    /// * `cpksver` - The device/version ID from which to request the data.
     pub fn list_offline_metadata(&self, cpksver: &str) -> DictionaryListOfflineMetadataCall<'a, C, NC, A> {
         DictionaryListOfflineMetadataCall {
             hub: self.hub,
@@ -2442,13 +2506,18 @@ pub struct BookshelveMethods<'a, C, NC, A>
     hub: &'a Books<C, NC, A>,
 }
 
-impl<'a, C, NC, A> ResourceMethodsBuilder for BookshelveMethods<'a, C, NC, A> {}
+impl<'a, C, NC, A> MethodsBuilder for BookshelveMethods<'a, C, NC, A> {}
 
 impl<'a, C, NC, A> BookshelveMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Retrieves volumes in a specific bookshelf for the specified user.    
+    /// Retrieves volumes in a specific bookshelf for the specified user.
+    /// 
+    /// # Arguments
+    ///
+    /// * `userId` - ID of user for whom to retrieve bookshelf volumes.
+    /// * `shelf` - ID of bookshelf to retrieve volumes.
     pub fn volumes_list(&self, user_id: &str, shelf: &str) -> BookshelveVolumeListCall<'a, C, NC, A> {
         BookshelveVolumeListCall {
             hub: self.hub,
@@ -2466,7 +2535,11 @@ impl<'a, C, NC, A> BookshelveMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Retrieves a list of public bookshelves for the specified user.    
+    /// Retrieves a list of public bookshelves for the specified user.
+    /// 
+    /// # Arguments
+    ///
+    /// * `userId` - ID of user for whom to retrieve bookshelves.
     pub fn list(&self, user_id: &str) -> BookshelveListCall<'a, C, NC, A> {
         BookshelveListCall {
             hub: self.hub,
@@ -2480,7 +2553,12 @@ impl<'a, C, NC, A> BookshelveMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Retrieves metadata for a specific bookshelf for the specified user.    
+    /// Retrieves metadata for a specific bookshelf for the specified user.
+    /// 
+    /// # Arguments
+    ///
+    /// * `userId` - ID of user for whom to retrieve bookshelves.
+    /// * `shelf` - ID of bookshelf to retrieve.
     pub fn get(&self, user_id: &str, shelf: &str) -> BookshelveGetCall<'a, C, NC, A> {
         BookshelveGetCall {
             hub: self.hub,
@@ -2530,13 +2608,13 @@ pub struct PromoofferMethods<'a, C, NC, A>
     hub: &'a Books<C, NC, A>,
 }
 
-impl<'a, C, NC, A> ResourceMethodsBuilder for PromoofferMethods<'a, C, NC, A> {}
+impl<'a, C, NC, A> MethodsBuilder for PromoofferMethods<'a, C, NC, A> {}
 
 impl<'a, C, NC, A> PromoofferMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    ///     
+    /// 
     pub fn accept(&self) -> PromoofferAcceptCall<'a, C, NC, A> {
         PromoofferAcceptCall {
             hub: self.hub,
@@ -2556,7 +2634,7 @@ impl<'a, C, NC, A> PromoofferMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    ///     
+    /// 
     pub fn dismiss(&self) -> PromoofferDismisCall<'a, C, NC, A> {
         PromoofferDismisCall {
             hub: self.hub,
@@ -2575,7 +2653,7 @@ impl<'a, C, NC, A> PromoofferMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Returns a list of promo offers available to the user    
+    /// Returns a list of promo offers available to the user
     pub fn get(&self) -> PromoofferGetCall<'a, C, NC, A> {
         PromoofferGetCall {
             hub: self.hub,
@@ -2628,13 +2706,13 @@ pub struct OnboardingMethods<'a, C, NC, A>
     hub: &'a Books<C, NC, A>,
 }
 
-impl<'a, C, NC, A> ResourceMethodsBuilder for OnboardingMethods<'a, C, NC, A> {}
+impl<'a, C, NC, A> MethodsBuilder for OnboardingMethods<'a, C, NC, A> {}
 
 impl<'a, C, NC, A> OnboardingMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// List categories for onboarding experience.    
+    /// List categories for onboarding experience.
     pub fn list_categories(&self) -> OnboardingListCategoryCall<'a, C, NC, A> {
         OnboardingListCategoryCall {
             hub: self.hub,
@@ -2647,7 +2725,7 @@ impl<'a, C, NC, A> OnboardingMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// List available volumes under categories for onboarding experience.    
+    /// List available volumes under categories for onboarding experience.
     pub fn list_category_volumes(&self) -> OnboardingListCategoryVolumeCall<'a, C, NC, A> {
         OnboardingListCategoryVolumeCall {
             hub: self.hub,
@@ -2698,13 +2776,20 @@ pub struct MyconfigMethods<'a, C, NC, A>
     hub: &'a Books<C, NC, A>,
 }
 
-impl<'a, C, NC, A> ResourceMethodsBuilder for MyconfigMethods<'a, C, NC, A> {}
+impl<'a, C, NC, A> MethodsBuilder for MyconfigMethods<'a, C, NC, A> {}
 
 impl<'a, C, NC, A> MyconfigMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Request concurrent and download access restrictions.    
+    /// Request concurrent and download access restrictions.
+    /// 
+    /// # Arguments
+    ///
+    /// * `source` - String to identify the originator of this request.
+    /// * `volumeId` - The volume to request concurrent/download restrictions for.
+    /// * `nonce` - The client nonce value.
+    /// * `cpksver` - The device/version ID from which to request the restrictions.
     pub fn request_access(&self, source: &str, volume_id: &str, nonce: &str, cpksver: &str) -> MyconfigRequestAccesCall<'a, C, NC, A> {
         MyconfigRequestAccesCall {
             hub: self.hub,
@@ -2722,7 +2807,12 @@ impl<'a, C, NC, A> MyconfigMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Release downloaded content access restriction.    
+    /// Release downloaded content access restriction.
+    /// 
+    /// # Arguments
+    ///
+    /// * `volumeIds` - The volume(s) to release restrictions for.
+    /// * `cpksver` - The device/version ID from which to release the restriction.
     pub fn release_download_access(&self, volume_ids: &Vec<String>, cpksver: &str) -> MyconfigReleaseDownloadAccesCall<'a, C, NC, A> {
         MyconfigReleaseDownloadAccesCall {
             hub: self.hub,
@@ -2738,7 +2828,13 @@ impl<'a, C, NC, A> MyconfigMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Request downloaded content access for specified volumes on the My eBooks shelf.    
+    /// Request downloaded content access for specified volumes on the My eBooks shelf.
+    /// 
+    /// # Arguments
+    ///
+    /// * `source` - String to identify the originator of this request.
+    /// * `nonce` - The client nonce value.
+    /// * `cpksver` - The device/version ID from which to release the restriction.
     pub fn sync_volume_licenses(&self, source: &str, nonce: &str, cpksver: &str) -> MyconfigSyncVolumeLicenseCall<'a, C, NC, A> {
         MyconfigSyncVolumeLicenseCall {
             hub: self.hub,
@@ -2757,7 +2853,7 @@ impl<'a, C, NC, A> MyconfigMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Gets the current settings for the user.    
+    /// Gets the current settings for the user.
     pub fn get_user_settings(&self) -> MyconfigGetUserSettingCall<'a, C, NC, A> {
         MyconfigGetUserSettingCall {
             hub: self.hub,
@@ -2769,7 +2865,11 @@ impl<'a, C, NC, A> MyconfigMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Sets the settings for the user. Unspecified sub-objects will retain the existing value.    
+    /// Sets the settings for the user. Unspecified sub-objects will retain the existing value.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
     pub fn update_user_settings(&self, request: &Usersettings) -> MyconfigUpdateUserSettingCall<'a, C, NC, A> {
         MyconfigUpdateUserSettingCall {
             hub: self.hub,
@@ -2817,13 +2917,17 @@ pub struct MylibraryMethods<'a, C, NC, A>
     hub: &'a Books<C, NC, A>,
 }
 
-impl<'a, C, NC, A> ResourceMethodsBuilder for MylibraryMethods<'a, C, NC, A> {}
+impl<'a, C, NC, A> MethodsBuilder for MylibraryMethods<'a, C, NC, A> {}
 
 impl<'a, C, NC, A> MylibraryMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Clears all volumes from a bookshelf.    
+    /// Clears all volumes from a bookshelf.
+    /// 
+    /// # Arguments
+    ///
+    /// * `shelf` - ID of bookshelf from which to remove a volume.
     pub fn bookshelves_clear_volumes(&self, shelf: &str) -> MylibraryBookshelveClearVolumeCall<'a, C, NC, A> {
         MylibraryBookshelveClearVolumeCall {
             hub: self.hub,
@@ -2837,7 +2941,13 @@ impl<'a, C, NC, A> MylibraryMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Moves a volume within a bookshelf.    
+    /// Moves a volume within a bookshelf.
+    /// 
+    /// # Arguments
+    ///
+    /// * `shelf` - ID of bookshelf with the volume.
+    /// * `volumeId` - ID of volume to move.
+    /// * `volumePosition` - Position on shelf to move the item (0 puts the item before the current first item, 1 puts it between the first and the second and so on.)
     pub fn bookshelves_move_volume(&self, shelf: &str, volume_id: &str, volume_position: i32) -> MylibraryBookshelveMoveVolumeCall<'a, C, NC, A> {
         MylibraryBookshelveMoveVolumeCall {
             hub: self.hub,
@@ -2853,7 +2963,11 @@ impl<'a, C, NC, A> MylibraryMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Gets volume information for volumes on a bookshelf.    
+    /// Gets volume information for volumes on a bookshelf.
+    /// 
+    /// # Arguments
+    ///
+    /// * `shelf` - The bookshelf ID or name retrieve volumes for.
     pub fn bookshelves_volumes_list(&self, shelf: &str) -> MylibraryBookshelveVolumeListCall<'a, C, NC, A> {
         MylibraryBookshelveVolumeListCall {
             hub: self.hub,
@@ -2873,7 +2987,12 @@ impl<'a, C, NC, A> MylibraryMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Gets the summary of specified layers.    
+    /// Gets the summary of specified layers.
+    /// 
+    /// # Arguments
+    ///
+    /// * `layerIds` - Array of layer IDs to get the summary for.
+    /// * `volumeId` - Volume id to get the summary for.
     pub fn annotations_summary(&self, layer_ids: &Vec<String>, volume_id: &str) -> MylibraryAnnotationSummaryCall<'a, C, NC, A> {
         MylibraryAnnotationSummaryCall {
             hub: self.hub,
@@ -2887,7 +3006,11 @@ impl<'a, C, NC, A> MylibraryMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Deletes an annotation.    
+    /// Deletes an annotation.
+    /// 
+    /// # Arguments
+    ///
+    /// * `annotationId` - The ID for the annotation to delete.
     pub fn annotations_delete(&self, annotation_id: &str) -> MylibraryAnnotationDeleteCall<'a, C, NC, A> {
         MylibraryAnnotationDeleteCall {
             hub: self.hub,
@@ -2901,7 +3024,12 @@ impl<'a, C, NC, A> MylibraryMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Adds a volume to a bookshelf.    
+    /// Adds a volume to a bookshelf.
+    /// 
+    /// # Arguments
+    ///
+    /// * `shelf` - ID of bookshelf to which to add a volume.
+    /// * `volumeId` - ID of volume to add.
     pub fn bookshelves_add_volume(&self, shelf: &str, volume_id: &str) -> MylibraryBookshelveAddVolumeCall<'a, C, NC, A> {
         MylibraryBookshelveAddVolumeCall {
             hub: self.hub,
@@ -2917,7 +3045,11 @@ impl<'a, C, NC, A> MylibraryMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Inserts a new annotation.    
+    /// Inserts a new annotation.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
     pub fn annotations_insert(&self, request: &Annotation) -> MylibraryAnnotationInsertCall<'a, C, NC, A> {
         MylibraryAnnotationInsertCall {
             hub: self.hub,
@@ -2933,7 +3065,12 @@ impl<'a, C, NC, A> MylibraryMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Removes a volume from a bookshelf.    
+    /// Removes a volume from a bookshelf.
+    /// 
+    /// # Arguments
+    ///
+    /// * `shelf` - ID of bookshelf from which to remove a volume.
+    /// * `volumeId` - ID of volume to remove.
     pub fn bookshelves_remove_volume(&self, shelf: &str, volume_id: &str) -> MylibraryBookshelveRemoveVolumeCall<'a, C, NC, A> {
         MylibraryBookshelveRemoveVolumeCall {
             hub: self.hub,
@@ -2949,7 +3086,7 @@ impl<'a, C, NC, A> MylibraryMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Retrieves a list of annotations, possibly filtered.    
+    /// Retrieves a list of annotations, possibly filtered.
     pub fn annotations_list(&self) -> MylibraryAnnotationListCall<'a, C, NC, A> {
         MylibraryAnnotationListCall {
             hub: self.hub,
@@ -2971,7 +3108,12 @@ impl<'a, C, NC, A> MylibraryMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Updates an existing annotation.    
+    /// Updates an existing annotation.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `annotationId` - The ID for the annotation to update.
     pub fn annotations_update(&self, request: &Annotation, annotation_id: &str) -> MylibraryAnnotationUpdateCall<'a, C, NC, A> {
         MylibraryAnnotationUpdateCall {
             hub: self.hub,
@@ -2986,7 +3128,13 @@ impl<'a, C, NC, A> MylibraryMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Sets my reading position information for a volume.    
+    /// Sets my reading position information for a volume.
+    /// 
+    /// # Arguments
+    ///
+    /// * `volumeId` - ID of volume for which to update the reading position.
+    /// * `timestamp` - RFC 3339 UTC format timestamp associated with this reading position.
+    /// * `position` - Position string for the new volume reading position.
     pub fn readingpositions_set_position(&self, volume_id: &str, timestamp: &str, position: &str) -> MylibraryReadingpositionSetPositionCall<'a, C, NC, A> {
         MylibraryReadingpositionSetPositionCall {
             hub: self.hub,
@@ -3005,7 +3153,11 @@ impl<'a, C, NC, A> MylibraryMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Retrieves metadata for a specific bookshelf belonging to the authenticated user.    
+    /// Retrieves metadata for a specific bookshelf belonging to the authenticated user.
+    /// 
+    /// # Arguments
+    ///
+    /// * `shelf` - ID of bookshelf to retrieve.
     pub fn bookshelves_get(&self, shelf: &str) -> MylibraryBookshelveGetCall<'a, C, NC, A> {
         MylibraryBookshelveGetCall {
             hub: self.hub,
@@ -3019,7 +3171,7 @@ impl<'a, C, NC, A> MylibraryMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Retrieves a list of bookshelves belonging to the authenticated user.    
+    /// Retrieves a list of bookshelves belonging to the authenticated user.
     pub fn bookshelves_list(&self) -> MylibraryBookshelveListCall<'a, C, NC, A> {
         MylibraryBookshelveListCall {
             hub: self.hub,
@@ -3032,7 +3184,11 @@ impl<'a, C, NC, A> MylibraryMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Retrieves my reading position information for a volume.    
+    /// Retrieves my reading position information for a volume.
+    /// 
+    /// # Arguments
+    ///
+    /// * `volumeId` - ID of volume for which to retrieve a reading position.
     pub fn readingpositions_get(&self, volume_id: &str) -> MylibraryReadingpositionGetCall<'a, C, NC, A> {
         MylibraryReadingpositionGetCall {
             hub: self.hub,
@@ -3082,13 +3238,13 @@ pub struct CloudloadingMethods<'a, C, NC, A>
     hub: &'a Books<C, NC, A>,
 }
 
-impl<'a, C, NC, A> ResourceMethodsBuilder for CloudloadingMethods<'a, C, NC, A> {}
+impl<'a, C, NC, A> MethodsBuilder for CloudloadingMethods<'a, C, NC, A> {}
 
 impl<'a, C, NC, A> CloudloadingMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    ///     
+    /// 
     pub fn add_book(&self) -> CloudloadingAddBookCall<'a, C, NC, A> {
         CloudloadingAddBookCall {
             hub: self.hub,
@@ -3104,7 +3260,11 @@ impl<'a, C, NC, A> CloudloadingMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    ///     
+    /// 
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
     pub fn update_book(&self, request: &BooksCloudloadingResource) -> CloudloadingUpdateBookCall<'a, C, NC, A> {
         CloudloadingUpdateBookCall {
             hub: self.hub,
@@ -3117,7 +3277,11 @@ impl<'a, C, NC, A> CloudloadingMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Remove the book and its contents    
+    /// Remove the book and its contents
+    /// 
+    /// # Arguments
+    ///
+    /// * `volumeId` - The id of the book to be removed.
     pub fn delete_book(&self, volume_id: &str) -> CloudloadingDeleteBookCall<'a, C, NC, A> {
         CloudloadingDeleteBookCall {
             hub: self.hub,
@@ -3140,7 +3304,7 @@ impl<'a, C, NC, A> CloudloadingMethods<'a, C, NC, A> {
 /// Gets the annotation data.
 ///
 /// A builder for the *annotationData.get* method supported by a *layer* resource.
-/// It is not used directly, but through a `LayerMethods`.
+/// It is not used directly, but through a `LayerMethods` instance.
 ///
 /// # Example
 ///
@@ -3234,7 +3398,7 @@ impl<'a, C, NC, A> LayerAnnotationDataGetCall<'a, C, NC, A> where NC: hyper::net
         for &field in ["alt", "volumeId", "layerId", "annotationDataId", "contentVersion", "w", "source", "scale", "locale", "h", "allowWebDefinitions"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -3287,7 +3451,7 @@ impl<'a, C, NC, A> LayerAnnotationDataGetCall<'a, C, NC, A> where NC: hyper::net
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -3299,7 +3463,6 @@ impl<'a, C, NC, A> LayerAnnotationDataGetCall<'a, C, NC, A> where NC: hyper::net
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -3309,7 +3472,7 @@ impl<'a, C, NC, A> LayerAnnotationDataGetCall<'a, C, NC, A> where NC: hyper::net
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -3320,7 +3483,7 @@ impl<'a, C, NC, A> LayerAnnotationDataGetCall<'a, C, NC, A> where NC: hyper::net
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -3329,13 +3492,13 @@ impl<'a, C, NC, A> LayerAnnotationDataGetCall<'a, C, NC, A> where NC: hyper::net
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -3347,7 +3510,7 @@ impl<'a, C, NC, A> LayerAnnotationDataGetCall<'a, C, NC, A> where NC: hyper::net
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The volume to retrieve annotations for.    
+    /// The volume to retrieve annotations for.
     pub fn volume_id(mut self, new_value: &str) -> LayerAnnotationDataGetCall<'a, C, NC, A> {
         self._volume_id = new_value.to_string();
         self
@@ -3357,7 +3520,7 @@ impl<'a, C, NC, A> LayerAnnotationDataGetCall<'a, C, NC, A> where NC: hyper::net
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The ID for the layer to get the annotations.    
+    /// The ID for the layer to get the annotations.
     pub fn layer_id(mut self, new_value: &str) -> LayerAnnotationDataGetCall<'a, C, NC, A> {
         self._layer_id = new_value.to_string();
         self
@@ -3367,7 +3530,7 @@ impl<'a, C, NC, A> LayerAnnotationDataGetCall<'a, C, NC, A> where NC: hyper::net
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The ID of the annotation data to retrieve.    
+    /// The ID of the annotation data to retrieve.
     pub fn annotation_data_id(mut self, new_value: &str) -> LayerAnnotationDataGetCall<'a, C, NC, A> {
         self._annotation_data_id = new_value.to_string();
         self
@@ -3377,7 +3540,7 @@ impl<'a, C, NC, A> LayerAnnotationDataGetCall<'a, C, NC, A> where NC: hyper::net
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The content version for the volume you are trying to retrieve.    
+    /// The content version for the volume you are trying to retrieve.
     pub fn content_version(mut self, new_value: &str) -> LayerAnnotationDataGetCall<'a, C, NC, A> {
         self._content_version = new_value.to_string();
         self
@@ -3385,7 +3548,7 @@ impl<'a, C, NC, A> LayerAnnotationDataGetCall<'a, C, NC, A> where NC: hyper::net
     /// Sets the *w* query property to the given value.
     ///
     /// 
-    /// The requested pixel width for any images. If width is provided height must also be provided.    
+    /// The requested pixel width for any images. If width is provided height must also be provided.
     pub fn w(mut self, new_value: i32) -> LayerAnnotationDataGetCall<'a, C, NC, A> {
         self._w = Some(new_value);
         self
@@ -3393,7 +3556,7 @@ impl<'a, C, NC, A> LayerAnnotationDataGetCall<'a, C, NC, A> where NC: hyper::net
     /// Sets the *source* query property to the given value.
     ///
     /// 
-    /// String to identify the originator of this request.    
+    /// String to identify the originator of this request.
     pub fn source(mut self, new_value: &str) -> LayerAnnotationDataGetCall<'a, C, NC, A> {
         self._source = Some(new_value.to_string());
         self
@@ -3401,7 +3564,7 @@ impl<'a, C, NC, A> LayerAnnotationDataGetCall<'a, C, NC, A> where NC: hyper::net
     /// Sets the *scale* query property to the given value.
     ///
     /// 
-    /// The requested scale for the image.    
+    /// The requested scale for the image.
     pub fn scale(mut self, new_value: i32) -> LayerAnnotationDataGetCall<'a, C, NC, A> {
         self._scale = Some(new_value);
         self
@@ -3409,7 +3572,7 @@ impl<'a, C, NC, A> LayerAnnotationDataGetCall<'a, C, NC, A> where NC: hyper::net
     /// Sets the *locale* query property to the given value.
     ///
     /// 
-    /// The locale information for the data. ISO-639-1 language and ISO-3166-1 country code. Ex: 'en_US'.    
+    /// The locale information for the data. ISO-639-1 language and ISO-3166-1 country code. Ex: 'en_US'.
     pub fn locale(mut self, new_value: &str) -> LayerAnnotationDataGetCall<'a, C, NC, A> {
         self._locale = Some(new_value.to_string());
         self
@@ -3417,7 +3580,7 @@ impl<'a, C, NC, A> LayerAnnotationDataGetCall<'a, C, NC, A> where NC: hyper::net
     /// Sets the *h* query property to the given value.
     ///
     /// 
-    /// The requested pixel height for any images. If height is provided width must also be provided.    
+    /// The requested pixel height for any images. If height is provided width must also be provided.
     pub fn h(mut self, new_value: i32) -> LayerAnnotationDataGetCall<'a, C, NC, A> {
         self._h = Some(new_value);
         self
@@ -3425,7 +3588,7 @@ impl<'a, C, NC, A> LayerAnnotationDataGetCall<'a, C, NC, A> where NC: hyper::net
     /// Sets the *allow web definitions* query property to the given value.
     ///
     /// 
-    /// For the dictionary layer. Whether or not to allow web definitions.    
+    /// For the dictionary layer. Whether or not to allow web definitions.
     pub fn allow_web_definitions(mut self, new_value: bool) -> LayerAnnotationDataGetCall<'a, C, NC, A> {
         self._allow_web_definitions = Some(new_value);
         self
@@ -3486,7 +3649,7 @@ impl<'a, C, NC, A> LayerAnnotationDataGetCall<'a, C, NC, A> where NC: hyper::net
 /// Gets the volume annotation.
 ///
 /// A builder for the *volumeAnnotations.get* method supported by a *layer* resource.
-/// It is not used directly, but through a `LayerMethods`.
+/// It is not used directly, but through a `LayerMethods` instance.
 ///
 /// # Example
 ///
@@ -3558,7 +3721,7 @@ impl<'a, C, NC, A> LayerVolumeAnnotationGetCall<'a, C, NC, A> where NC: hyper::n
         for &field in ["alt", "volumeId", "layerId", "annotationId", "source", "locale"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -3611,7 +3774,7 @@ impl<'a, C, NC, A> LayerVolumeAnnotationGetCall<'a, C, NC, A> where NC: hyper::n
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -3623,7 +3786,6 @@ impl<'a, C, NC, A> LayerVolumeAnnotationGetCall<'a, C, NC, A> where NC: hyper::n
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -3633,7 +3795,7 @@ impl<'a, C, NC, A> LayerVolumeAnnotationGetCall<'a, C, NC, A> where NC: hyper::n
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -3644,7 +3806,7 @@ impl<'a, C, NC, A> LayerVolumeAnnotationGetCall<'a, C, NC, A> where NC: hyper::n
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -3653,13 +3815,13 @@ impl<'a, C, NC, A> LayerVolumeAnnotationGetCall<'a, C, NC, A> where NC: hyper::n
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -3671,7 +3833,7 @@ impl<'a, C, NC, A> LayerVolumeAnnotationGetCall<'a, C, NC, A> where NC: hyper::n
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The volume to retrieve annotations for.    
+    /// The volume to retrieve annotations for.
     pub fn volume_id(mut self, new_value: &str) -> LayerVolumeAnnotationGetCall<'a, C, NC, A> {
         self._volume_id = new_value.to_string();
         self
@@ -3681,7 +3843,7 @@ impl<'a, C, NC, A> LayerVolumeAnnotationGetCall<'a, C, NC, A> where NC: hyper::n
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The ID for the layer to get the annotations.    
+    /// The ID for the layer to get the annotations.
     pub fn layer_id(mut self, new_value: &str) -> LayerVolumeAnnotationGetCall<'a, C, NC, A> {
         self._layer_id = new_value.to_string();
         self
@@ -3691,7 +3853,7 @@ impl<'a, C, NC, A> LayerVolumeAnnotationGetCall<'a, C, NC, A> where NC: hyper::n
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The ID of the volume annotation to retrieve.    
+    /// The ID of the volume annotation to retrieve.
     pub fn annotation_id(mut self, new_value: &str) -> LayerVolumeAnnotationGetCall<'a, C, NC, A> {
         self._annotation_id = new_value.to_string();
         self
@@ -3699,7 +3861,7 @@ impl<'a, C, NC, A> LayerVolumeAnnotationGetCall<'a, C, NC, A> where NC: hyper::n
     /// Sets the *source* query property to the given value.
     ///
     /// 
-    /// String to identify the originator of this request.    
+    /// String to identify the originator of this request.
     pub fn source(mut self, new_value: &str) -> LayerVolumeAnnotationGetCall<'a, C, NC, A> {
         self._source = Some(new_value.to_string());
         self
@@ -3707,7 +3869,7 @@ impl<'a, C, NC, A> LayerVolumeAnnotationGetCall<'a, C, NC, A> where NC: hyper::n
     /// Sets the *locale* query property to the given value.
     ///
     /// 
-    /// The locale information for the data. ISO-639-1 language and ISO-3166-1 country code. Ex: 'en_US'.    
+    /// The locale information for the data. ISO-639-1 language and ISO-3166-1 country code. Ex: 'en_US'.
     pub fn locale(mut self, new_value: &str) -> LayerVolumeAnnotationGetCall<'a, C, NC, A> {
         self._locale = Some(new_value.to_string());
         self
@@ -3768,7 +3930,7 @@ impl<'a, C, NC, A> LayerVolumeAnnotationGetCall<'a, C, NC, A> where NC: hyper::n
 /// List the layer summaries for a volume.
 ///
 /// A builder for the *list* method supported by a *layer* resource.
-/// It is not used directly, but through a `LayerMethods`.
+/// It is not used directly, but through a `LayerMethods` instance.
 ///
 /// # Example
 ///
@@ -3846,7 +4008,7 @@ impl<'a, C, NC, A> LayerListCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
         for &field in ["alt", "volumeId", "source", "pageToken", "maxResults", "contentVersion"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -3899,7 +4061,7 @@ impl<'a, C, NC, A> LayerListCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -3911,7 +4073,6 @@ impl<'a, C, NC, A> LayerListCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -3921,7 +4082,7 @@ impl<'a, C, NC, A> LayerListCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -3932,7 +4093,7 @@ impl<'a, C, NC, A> LayerListCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -3941,13 +4102,13 @@ impl<'a, C, NC, A> LayerListCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -3959,7 +4120,7 @@ impl<'a, C, NC, A> LayerListCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The volume to retrieve layers for.    
+    /// The volume to retrieve layers for.
     pub fn volume_id(mut self, new_value: &str) -> LayerListCall<'a, C, NC, A> {
         self._volume_id = new_value.to_string();
         self
@@ -3967,7 +4128,7 @@ impl<'a, C, NC, A> LayerListCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     /// Sets the *source* query property to the given value.
     ///
     /// 
-    /// String to identify the originator of this request.    
+    /// String to identify the originator of this request.
     pub fn source(mut self, new_value: &str) -> LayerListCall<'a, C, NC, A> {
         self._source = Some(new_value.to_string());
         self
@@ -3975,7 +4136,7 @@ impl<'a, C, NC, A> LayerListCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     /// Sets the *page token* query property to the given value.
     ///
     /// 
-    /// The value of the nextToken from the previous page.    
+    /// The value of the nextToken from the previous page.
     pub fn page_token(mut self, new_value: &str) -> LayerListCall<'a, C, NC, A> {
         self._page_token = Some(new_value.to_string());
         self
@@ -3983,7 +4144,7 @@ impl<'a, C, NC, A> LayerListCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     /// Sets the *max results* query property to the given value.
     ///
     /// 
-    /// Maximum number of results to return    
+    /// Maximum number of results to return
     pub fn max_results(mut self, new_value: u32) -> LayerListCall<'a, C, NC, A> {
         self._max_results = Some(new_value);
         self
@@ -3991,7 +4152,7 @@ impl<'a, C, NC, A> LayerListCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     /// Sets the *content version* query property to the given value.
     ///
     /// 
-    /// The content version for the requested volume.    
+    /// The content version for the requested volume.
     pub fn content_version(mut self, new_value: &str) -> LayerListCall<'a, C, NC, A> {
         self._content_version = Some(new_value.to_string());
         self
@@ -4052,7 +4213,7 @@ impl<'a, C, NC, A> LayerListCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
 /// Gets the layer summary for a volume.
 ///
 /// A builder for the *get* method supported by a *layer* resource.
-/// It is not used directly, but through a `LayerMethods`.
+/// It is not used directly, but through a `LayerMethods` instance.
 ///
 /// # Example
 ///
@@ -4122,7 +4283,7 @@ impl<'a, C, NC, A> LayerGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
         for &field in ["alt", "volumeId", "summaryId", "source", "contentVersion"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -4175,7 +4336,7 @@ impl<'a, C, NC, A> LayerGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -4187,7 +4348,6 @@ impl<'a, C, NC, A> LayerGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -4197,7 +4357,7 @@ impl<'a, C, NC, A> LayerGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -4208,7 +4368,7 @@ impl<'a, C, NC, A> LayerGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -4217,13 +4377,13 @@ impl<'a, C, NC, A> LayerGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -4235,7 +4395,7 @@ impl<'a, C, NC, A> LayerGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The volume to retrieve layers for.    
+    /// The volume to retrieve layers for.
     pub fn volume_id(mut self, new_value: &str) -> LayerGetCall<'a, C, NC, A> {
         self._volume_id = new_value.to_string();
         self
@@ -4245,7 +4405,7 @@ impl<'a, C, NC, A> LayerGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The ID for the layer to get the summary for.    
+    /// The ID for the layer to get the summary for.
     pub fn summary_id(mut self, new_value: &str) -> LayerGetCall<'a, C, NC, A> {
         self._summary_id = new_value.to_string();
         self
@@ -4253,7 +4413,7 @@ impl<'a, C, NC, A> LayerGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
     /// Sets the *source* query property to the given value.
     ///
     /// 
-    /// String to identify the originator of this request.    
+    /// String to identify the originator of this request.
     pub fn source(mut self, new_value: &str) -> LayerGetCall<'a, C, NC, A> {
         self._source = Some(new_value.to_string());
         self
@@ -4261,7 +4421,7 @@ impl<'a, C, NC, A> LayerGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
     /// Sets the *content version* query property to the given value.
     ///
     /// 
-    /// The content version for the requested volume.    
+    /// The content version for the requested volume.
     pub fn content_version(mut self, new_value: &str) -> LayerGetCall<'a, C, NC, A> {
         self._content_version = Some(new_value.to_string());
         self
@@ -4322,7 +4482,7 @@ impl<'a, C, NC, A> LayerGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
 /// Gets the volume annotations for a volume and layer.
 ///
 /// A builder for the *volumeAnnotations.list* method supported by a *layer* resource.
-/// It is not used directly, but through a `LayerMethods`.
+/// It is not used directly, but through a `LayerMethods` instance.
 ///
 /// # Example
 ///
@@ -4444,7 +4604,7 @@ impl<'a, C, NC, A> LayerVolumeAnnotationListCall<'a, C, NC, A> where NC: hyper::
         for &field in ["alt", "volumeId", "layerId", "contentVersion", "volumeAnnotationsVersion", "updatedMin", "updatedMax", "startPosition", "startOffset", "source", "showDeleted", "pageToken", "maxResults", "locale", "endPosition", "endOffset"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -4497,7 +4657,7 @@ impl<'a, C, NC, A> LayerVolumeAnnotationListCall<'a, C, NC, A> where NC: hyper::
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -4509,7 +4669,6 @@ impl<'a, C, NC, A> LayerVolumeAnnotationListCall<'a, C, NC, A> where NC: hyper::
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -4519,7 +4678,7 @@ impl<'a, C, NC, A> LayerVolumeAnnotationListCall<'a, C, NC, A> where NC: hyper::
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -4530,7 +4689,7 @@ impl<'a, C, NC, A> LayerVolumeAnnotationListCall<'a, C, NC, A> where NC: hyper::
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -4539,13 +4698,13 @@ impl<'a, C, NC, A> LayerVolumeAnnotationListCall<'a, C, NC, A> where NC: hyper::
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -4557,7 +4716,7 @@ impl<'a, C, NC, A> LayerVolumeAnnotationListCall<'a, C, NC, A> where NC: hyper::
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The volume to retrieve annotations for.    
+    /// The volume to retrieve annotations for.
     pub fn volume_id(mut self, new_value: &str) -> LayerVolumeAnnotationListCall<'a, C, NC, A> {
         self._volume_id = new_value.to_string();
         self
@@ -4567,7 +4726,7 @@ impl<'a, C, NC, A> LayerVolumeAnnotationListCall<'a, C, NC, A> where NC: hyper::
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The ID for the layer to get the annotations.    
+    /// The ID for the layer to get the annotations.
     pub fn layer_id(mut self, new_value: &str) -> LayerVolumeAnnotationListCall<'a, C, NC, A> {
         self._layer_id = new_value.to_string();
         self
@@ -4577,7 +4736,7 @@ impl<'a, C, NC, A> LayerVolumeAnnotationListCall<'a, C, NC, A> where NC: hyper::
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The content version for the requested volume.    
+    /// The content version for the requested volume.
     pub fn content_version(mut self, new_value: &str) -> LayerVolumeAnnotationListCall<'a, C, NC, A> {
         self._content_version = new_value.to_string();
         self
@@ -4585,7 +4744,7 @@ impl<'a, C, NC, A> LayerVolumeAnnotationListCall<'a, C, NC, A> where NC: hyper::
     /// Sets the *volume annotations version* query property to the given value.
     ///
     /// 
-    /// The version of the volume annotations that you are requesting.    
+    /// The version of the volume annotations that you are requesting.
     pub fn volume_annotations_version(mut self, new_value: &str) -> LayerVolumeAnnotationListCall<'a, C, NC, A> {
         self._volume_annotations_version = Some(new_value.to_string());
         self
@@ -4593,7 +4752,7 @@ impl<'a, C, NC, A> LayerVolumeAnnotationListCall<'a, C, NC, A> where NC: hyper::
     /// Sets the *updated min* query property to the given value.
     ///
     /// 
-    /// RFC 3339 timestamp to restrict to items updated since this timestamp (inclusive).    
+    /// RFC 3339 timestamp to restrict to items updated since this timestamp (inclusive).
     pub fn updated_min(mut self, new_value: &str) -> LayerVolumeAnnotationListCall<'a, C, NC, A> {
         self._updated_min = Some(new_value.to_string());
         self
@@ -4601,7 +4760,7 @@ impl<'a, C, NC, A> LayerVolumeAnnotationListCall<'a, C, NC, A> where NC: hyper::
     /// Sets the *updated max* query property to the given value.
     ///
     /// 
-    /// RFC 3339 timestamp to restrict to items updated prior to this timestamp (exclusive).    
+    /// RFC 3339 timestamp to restrict to items updated prior to this timestamp (exclusive).
     pub fn updated_max(mut self, new_value: &str) -> LayerVolumeAnnotationListCall<'a, C, NC, A> {
         self._updated_max = Some(new_value.to_string());
         self
@@ -4609,7 +4768,7 @@ impl<'a, C, NC, A> LayerVolumeAnnotationListCall<'a, C, NC, A> where NC: hyper::
     /// Sets the *start position* query property to the given value.
     ///
     /// 
-    /// The start position to start retrieving data from.    
+    /// The start position to start retrieving data from.
     pub fn start_position(mut self, new_value: &str) -> LayerVolumeAnnotationListCall<'a, C, NC, A> {
         self._start_position = Some(new_value.to_string());
         self
@@ -4617,7 +4776,7 @@ impl<'a, C, NC, A> LayerVolumeAnnotationListCall<'a, C, NC, A> where NC: hyper::
     /// Sets the *start offset* query property to the given value.
     ///
     /// 
-    /// The start offset to start retrieving data from.    
+    /// The start offset to start retrieving data from.
     pub fn start_offset(mut self, new_value: &str) -> LayerVolumeAnnotationListCall<'a, C, NC, A> {
         self._start_offset = Some(new_value.to_string());
         self
@@ -4625,7 +4784,7 @@ impl<'a, C, NC, A> LayerVolumeAnnotationListCall<'a, C, NC, A> where NC: hyper::
     /// Sets the *source* query property to the given value.
     ///
     /// 
-    /// String to identify the originator of this request.    
+    /// String to identify the originator of this request.
     pub fn source(mut self, new_value: &str) -> LayerVolumeAnnotationListCall<'a, C, NC, A> {
         self._source = Some(new_value.to_string());
         self
@@ -4633,7 +4792,7 @@ impl<'a, C, NC, A> LayerVolumeAnnotationListCall<'a, C, NC, A> where NC: hyper::
     /// Sets the *show deleted* query property to the given value.
     ///
     /// 
-    /// Set to true to return deleted annotations. updatedMin must be in the request to use this. Defaults to false.    
+    /// Set to true to return deleted annotations. updatedMin must be in the request to use this. Defaults to false.
     pub fn show_deleted(mut self, new_value: bool) -> LayerVolumeAnnotationListCall<'a, C, NC, A> {
         self._show_deleted = Some(new_value);
         self
@@ -4641,7 +4800,7 @@ impl<'a, C, NC, A> LayerVolumeAnnotationListCall<'a, C, NC, A> where NC: hyper::
     /// Sets the *page token* query property to the given value.
     ///
     /// 
-    /// The value of the nextToken from the previous page.    
+    /// The value of the nextToken from the previous page.
     pub fn page_token(mut self, new_value: &str) -> LayerVolumeAnnotationListCall<'a, C, NC, A> {
         self._page_token = Some(new_value.to_string());
         self
@@ -4649,7 +4808,7 @@ impl<'a, C, NC, A> LayerVolumeAnnotationListCall<'a, C, NC, A> where NC: hyper::
     /// Sets the *max results* query property to the given value.
     ///
     /// 
-    /// Maximum number of results to return    
+    /// Maximum number of results to return
     pub fn max_results(mut self, new_value: u32) -> LayerVolumeAnnotationListCall<'a, C, NC, A> {
         self._max_results = Some(new_value);
         self
@@ -4657,7 +4816,7 @@ impl<'a, C, NC, A> LayerVolumeAnnotationListCall<'a, C, NC, A> where NC: hyper::
     /// Sets the *locale* query property to the given value.
     ///
     /// 
-    /// The locale information for the data. ISO-639-1 language and ISO-3166-1 country code. Ex: 'en_US'.    
+    /// The locale information for the data. ISO-639-1 language and ISO-3166-1 country code. Ex: 'en_US'.
     pub fn locale(mut self, new_value: &str) -> LayerVolumeAnnotationListCall<'a, C, NC, A> {
         self._locale = Some(new_value.to_string());
         self
@@ -4665,7 +4824,7 @@ impl<'a, C, NC, A> LayerVolumeAnnotationListCall<'a, C, NC, A> where NC: hyper::
     /// Sets the *end position* query property to the given value.
     ///
     /// 
-    /// The end position to end retrieving data from.    
+    /// The end position to end retrieving data from.
     pub fn end_position(mut self, new_value: &str) -> LayerVolumeAnnotationListCall<'a, C, NC, A> {
         self._end_position = Some(new_value.to_string());
         self
@@ -4673,7 +4832,7 @@ impl<'a, C, NC, A> LayerVolumeAnnotationListCall<'a, C, NC, A> where NC: hyper::
     /// Sets the *end offset* query property to the given value.
     ///
     /// 
-    /// The end offset to end retrieving data from.    
+    /// The end offset to end retrieving data from.
     pub fn end_offset(mut self, new_value: &str) -> LayerVolumeAnnotationListCall<'a, C, NC, A> {
         self._end_offset = Some(new_value.to_string());
         self
@@ -4734,7 +4893,7 @@ impl<'a, C, NC, A> LayerVolumeAnnotationListCall<'a, C, NC, A> where NC: hyper::
 /// Gets the annotation data for a volume and layer.
 ///
 /// A builder for the *annotationData.list* method supported by a *layer* resource.
-/// It is not used directly, but through a `LayerMethods`.
+/// It is not used directly, but through a `LayerMethods` instance.
 ///
 /// # Example
 ///
@@ -4850,7 +5009,7 @@ impl<'a, C, NC, A> LayerAnnotationDataListCall<'a, C, NC, A> where NC: hyper::ne
         for &field in ["alt", "volumeId", "layerId", "contentVersion", "w", "updatedMin", "updatedMax", "source", "scale", "pageToken", "maxResults", "locale", "h", "annotationDataId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -4903,7 +5062,7 @@ impl<'a, C, NC, A> LayerAnnotationDataListCall<'a, C, NC, A> where NC: hyper::ne
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -4915,7 +5074,6 @@ impl<'a, C, NC, A> LayerAnnotationDataListCall<'a, C, NC, A> where NC: hyper::ne
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -4925,7 +5083,7 @@ impl<'a, C, NC, A> LayerAnnotationDataListCall<'a, C, NC, A> where NC: hyper::ne
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -4936,7 +5094,7 @@ impl<'a, C, NC, A> LayerAnnotationDataListCall<'a, C, NC, A> where NC: hyper::ne
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -4945,13 +5103,13 @@ impl<'a, C, NC, A> LayerAnnotationDataListCall<'a, C, NC, A> where NC: hyper::ne
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -4963,7 +5121,7 @@ impl<'a, C, NC, A> LayerAnnotationDataListCall<'a, C, NC, A> where NC: hyper::ne
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The volume to retrieve annotation data for.    
+    /// The volume to retrieve annotation data for.
     pub fn volume_id(mut self, new_value: &str) -> LayerAnnotationDataListCall<'a, C, NC, A> {
         self._volume_id = new_value.to_string();
         self
@@ -4973,7 +5131,7 @@ impl<'a, C, NC, A> LayerAnnotationDataListCall<'a, C, NC, A> where NC: hyper::ne
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The ID for the layer to get the annotation data.    
+    /// The ID for the layer to get the annotation data.
     pub fn layer_id(mut self, new_value: &str) -> LayerAnnotationDataListCall<'a, C, NC, A> {
         self._layer_id = new_value.to_string();
         self
@@ -4983,7 +5141,7 @@ impl<'a, C, NC, A> LayerAnnotationDataListCall<'a, C, NC, A> where NC: hyper::ne
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The content version for the requested volume.    
+    /// The content version for the requested volume.
     pub fn content_version(mut self, new_value: &str) -> LayerAnnotationDataListCall<'a, C, NC, A> {
         self._content_version = new_value.to_string();
         self
@@ -4991,7 +5149,7 @@ impl<'a, C, NC, A> LayerAnnotationDataListCall<'a, C, NC, A> where NC: hyper::ne
     /// Sets the *w* query property to the given value.
     ///
     /// 
-    /// The requested pixel width for any images. If width is provided height must also be provided.    
+    /// The requested pixel width for any images. If width is provided height must also be provided.
     pub fn w(mut self, new_value: i32) -> LayerAnnotationDataListCall<'a, C, NC, A> {
         self._w = Some(new_value);
         self
@@ -4999,7 +5157,7 @@ impl<'a, C, NC, A> LayerAnnotationDataListCall<'a, C, NC, A> where NC: hyper::ne
     /// Sets the *updated min* query property to the given value.
     ///
     /// 
-    /// RFC 3339 timestamp to restrict to items updated since this timestamp (inclusive).    
+    /// RFC 3339 timestamp to restrict to items updated since this timestamp (inclusive).
     pub fn updated_min(mut self, new_value: &str) -> LayerAnnotationDataListCall<'a, C, NC, A> {
         self._updated_min = Some(new_value.to_string());
         self
@@ -5007,7 +5165,7 @@ impl<'a, C, NC, A> LayerAnnotationDataListCall<'a, C, NC, A> where NC: hyper::ne
     /// Sets the *updated max* query property to the given value.
     ///
     /// 
-    /// RFC 3339 timestamp to restrict to items updated prior to this timestamp (exclusive).    
+    /// RFC 3339 timestamp to restrict to items updated prior to this timestamp (exclusive).
     pub fn updated_max(mut self, new_value: &str) -> LayerAnnotationDataListCall<'a, C, NC, A> {
         self._updated_max = Some(new_value.to_string());
         self
@@ -5015,7 +5173,7 @@ impl<'a, C, NC, A> LayerAnnotationDataListCall<'a, C, NC, A> where NC: hyper::ne
     /// Sets the *source* query property to the given value.
     ///
     /// 
-    /// String to identify the originator of this request.    
+    /// String to identify the originator of this request.
     pub fn source(mut self, new_value: &str) -> LayerAnnotationDataListCall<'a, C, NC, A> {
         self._source = Some(new_value.to_string());
         self
@@ -5023,7 +5181,7 @@ impl<'a, C, NC, A> LayerAnnotationDataListCall<'a, C, NC, A> where NC: hyper::ne
     /// Sets the *scale* query property to the given value.
     ///
     /// 
-    /// The requested scale for the image.    
+    /// The requested scale for the image.
     pub fn scale(mut self, new_value: i32) -> LayerAnnotationDataListCall<'a, C, NC, A> {
         self._scale = Some(new_value);
         self
@@ -5031,7 +5189,7 @@ impl<'a, C, NC, A> LayerAnnotationDataListCall<'a, C, NC, A> where NC: hyper::ne
     /// Sets the *page token* query property to the given value.
     ///
     /// 
-    /// The value of the nextToken from the previous page.    
+    /// The value of the nextToken from the previous page.
     pub fn page_token(mut self, new_value: &str) -> LayerAnnotationDataListCall<'a, C, NC, A> {
         self._page_token = Some(new_value.to_string());
         self
@@ -5039,7 +5197,7 @@ impl<'a, C, NC, A> LayerAnnotationDataListCall<'a, C, NC, A> where NC: hyper::ne
     /// Sets the *max results* query property to the given value.
     ///
     /// 
-    /// Maximum number of results to return    
+    /// Maximum number of results to return
     pub fn max_results(mut self, new_value: u32) -> LayerAnnotationDataListCall<'a, C, NC, A> {
         self._max_results = Some(new_value);
         self
@@ -5047,7 +5205,7 @@ impl<'a, C, NC, A> LayerAnnotationDataListCall<'a, C, NC, A> where NC: hyper::ne
     /// Sets the *locale* query property to the given value.
     ///
     /// 
-    /// The locale information for the data. ISO-639-1 language and ISO-3166-1 country code. Ex: 'en_US'.    
+    /// The locale information for the data. ISO-639-1 language and ISO-3166-1 country code. Ex: 'en_US'.
     pub fn locale(mut self, new_value: &str) -> LayerAnnotationDataListCall<'a, C, NC, A> {
         self._locale = Some(new_value.to_string());
         self
@@ -5055,7 +5213,7 @@ impl<'a, C, NC, A> LayerAnnotationDataListCall<'a, C, NC, A> where NC: hyper::ne
     /// Sets the *h* query property to the given value.
     ///
     /// 
-    /// The requested pixel height for any images. If height is provided width must also be provided.    
+    /// The requested pixel height for any images. If height is provided width must also be provided.
     pub fn h(mut self, new_value: i32) -> LayerAnnotationDataListCall<'a, C, NC, A> {
         self._h = Some(new_value);
         self
@@ -5064,7 +5222,7 @@ impl<'a, C, NC, A> LayerAnnotationDataListCall<'a, C, NC, A> where NC: hyper::ne
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
     ///
     /// 
-    /// The list of Annotation Data Ids to retrieve. Pagination is ignored if this is set.    
+    /// The list of Annotation Data Ids to retrieve. Pagination is ignored if this is set.
     pub fn add_annotation_data_id(mut self, new_value: &str) -> LayerAnnotationDataListCall<'a, C, NC, A> {
         self._annotation_data_id.push(new_value.to_string());
         self
@@ -5125,7 +5283,7 @@ impl<'a, C, NC, A> LayerAnnotationDataListCall<'a, C, NC, A> where NC: hyper::ne
 /// Rate a recommended book for the current user.
 ///
 /// A builder for the *recommended.rate* method supported by a *volume* resource.
-/// It is not used directly, but through a `VolumeMethods`.
+/// It is not used directly, but through a `VolumeMethods` instance.
 ///
 /// # Example
 ///
@@ -5195,7 +5353,7 @@ impl<'a, C, NC, A> VolumeRecommendedRateCall<'a, C, NC, A> where NC: hyper::net:
         for &field in ["alt", "rating", "volumeId", "source", "locale"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -5224,7 +5382,7 @@ impl<'a, C, NC, A> VolumeRecommendedRateCall<'a, C, NC, A> where NC: hyper::net:
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -5236,7 +5394,6 @@ impl<'a, C, NC, A> VolumeRecommendedRateCall<'a, C, NC, A> where NC: hyper::net:
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -5246,7 +5403,7 @@ impl<'a, C, NC, A> VolumeRecommendedRateCall<'a, C, NC, A> where NC: hyper::net:
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -5257,7 +5414,7 @@ impl<'a, C, NC, A> VolumeRecommendedRateCall<'a, C, NC, A> where NC: hyper::net:
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -5266,13 +5423,13 @@ impl<'a, C, NC, A> VolumeRecommendedRateCall<'a, C, NC, A> where NC: hyper::net:
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -5284,7 +5441,7 @@ impl<'a, C, NC, A> VolumeRecommendedRateCall<'a, C, NC, A> where NC: hyper::net:
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Rating to be given to the volume.    
+    /// Rating to be given to the volume.
     pub fn rating(mut self, new_value: &str) -> VolumeRecommendedRateCall<'a, C, NC, A> {
         self._rating = new_value.to_string();
         self
@@ -5294,7 +5451,7 @@ impl<'a, C, NC, A> VolumeRecommendedRateCall<'a, C, NC, A> where NC: hyper::net:
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// ID of the source volume.    
+    /// ID of the source volume.
     pub fn volume_id(mut self, new_value: &str) -> VolumeRecommendedRateCall<'a, C, NC, A> {
         self._volume_id = new_value.to_string();
         self
@@ -5302,7 +5459,7 @@ impl<'a, C, NC, A> VolumeRecommendedRateCall<'a, C, NC, A> where NC: hyper::net:
     /// Sets the *source* query property to the given value.
     ///
     /// 
-    /// String to identify the originator of this request.    
+    /// String to identify the originator of this request.
     pub fn source(mut self, new_value: &str) -> VolumeRecommendedRateCall<'a, C, NC, A> {
         self._source = Some(new_value.to_string());
         self
@@ -5310,7 +5467,7 @@ impl<'a, C, NC, A> VolumeRecommendedRateCall<'a, C, NC, A> where NC: hyper::net:
     /// Sets the *locale* query property to the given value.
     ///
     /// 
-    /// ISO-639-1 language and ISO-3166-1 country code. Ex: 'en_US'. Used for generating recommendations.    
+    /// ISO-639-1 language and ISO-3166-1 country code. Ex: 'en_US'. Used for generating recommendations.
     pub fn locale(mut self, new_value: &str) -> VolumeRecommendedRateCall<'a, C, NC, A> {
         self._locale = Some(new_value.to_string());
         self
@@ -5371,7 +5528,7 @@ impl<'a, C, NC, A> VolumeRecommendedRateCall<'a, C, NC, A> where NC: hyper::net:
 /// Return a list of books in My Library.
 ///
 /// A builder for the *mybooks.list* method supported by a *volume* resource.
-/// It is not used directly, but through a `VolumeMethods`.
+/// It is not used directly, but through a `VolumeMethods` instance.
 ///
 /// # Example
 ///
@@ -5465,7 +5622,7 @@ impl<'a, C, NC, A> VolumeMybookListCall<'a, C, NC, A> where NC: hyper::net::Netw
         for &field in ["alt", "startIndex", "source", "processingState", "maxResults", "locale", "acquireMethod"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -5494,7 +5651,7 @@ impl<'a, C, NC, A> VolumeMybookListCall<'a, C, NC, A> where NC: hyper::net::Netw
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -5506,7 +5663,6 @@ impl<'a, C, NC, A> VolumeMybookListCall<'a, C, NC, A> where NC: hyper::net::Netw
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -5516,7 +5672,7 @@ impl<'a, C, NC, A> VolumeMybookListCall<'a, C, NC, A> where NC: hyper::net::Netw
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -5527,7 +5683,7 @@ impl<'a, C, NC, A> VolumeMybookListCall<'a, C, NC, A> where NC: hyper::net::Netw
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -5536,13 +5692,13 @@ impl<'a, C, NC, A> VolumeMybookListCall<'a, C, NC, A> where NC: hyper::net::Netw
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -5552,7 +5708,7 @@ impl<'a, C, NC, A> VolumeMybookListCall<'a, C, NC, A> where NC: hyper::net::Netw
     /// Sets the *start index* query property to the given value.
     ///
     /// 
-    /// Index of the first result to return (starts at 0)    
+    /// Index of the first result to return (starts at 0)
     pub fn start_index(mut self, new_value: u32) -> VolumeMybookListCall<'a, C, NC, A> {
         self._start_index = Some(new_value);
         self
@@ -5560,7 +5716,7 @@ impl<'a, C, NC, A> VolumeMybookListCall<'a, C, NC, A> where NC: hyper::net::Netw
     /// Sets the *source* query property to the given value.
     ///
     /// 
-    /// String to identify the originator of this request.    
+    /// String to identify the originator of this request.
     pub fn source(mut self, new_value: &str) -> VolumeMybookListCall<'a, C, NC, A> {
         self._source = Some(new_value.to_string());
         self
@@ -5569,7 +5725,7 @@ impl<'a, C, NC, A> VolumeMybookListCall<'a, C, NC, A> where NC: hyper::net::Netw
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
     ///
     /// 
-    /// The processing state of the user uploaded volumes to be returned. Applicable only if the UPLOADED is specified in the acquireMethod.    
+    /// The processing state of the user uploaded volumes to be returned. Applicable only if the UPLOADED is specified in the acquireMethod.
     pub fn add_processing_state(mut self, new_value: &str) -> VolumeMybookListCall<'a, C, NC, A> {
         self._processing_state.push(new_value.to_string());
         self
@@ -5577,7 +5733,7 @@ impl<'a, C, NC, A> VolumeMybookListCall<'a, C, NC, A> where NC: hyper::net::Netw
     /// Sets the *max results* query property to the given value.
     ///
     /// 
-    /// Maximum number of results to return.    
+    /// Maximum number of results to return.
     pub fn max_results(mut self, new_value: u32) -> VolumeMybookListCall<'a, C, NC, A> {
         self._max_results = Some(new_value);
         self
@@ -5585,7 +5741,7 @@ impl<'a, C, NC, A> VolumeMybookListCall<'a, C, NC, A> where NC: hyper::net::Netw
     /// Sets the *locale* query property to the given value.
     ///
     /// 
-    /// ISO-639-1 language and ISO-3166-1 country code. Ex:'en_US'. Used for generating recommendations.    
+    /// ISO-639-1 language and ISO-3166-1 country code. Ex:'en_US'. Used for generating recommendations.
     pub fn locale(mut self, new_value: &str) -> VolumeMybookListCall<'a, C, NC, A> {
         self._locale = Some(new_value.to_string());
         self
@@ -5594,7 +5750,7 @@ impl<'a, C, NC, A> VolumeMybookListCall<'a, C, NC, A> where NC: hyper::net::Netw
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
     ///
     /// 
-    /// How the book was aquired    
+    /// How the book was aquired
     pub fn add_acquire_method(mut self, new_value: &str) -> VolumeMybookListCall<'a, C, NC, A> {
         self._acquire_method.push(new_value.to_string());
         self
@@ -5655,7 +5811,7 @@ impl<'a, C, NC, A> VolumeMybookListCall<'a, C, NC, A> where NC: hyper::net::Netw
 /// Performs a book search.
 ///
 /// A builder for the *list* method supported by a *volume* resource.
-/// It is not used directly, but through a `VolumeMethods`.
+/// It is not used directly, but through a `VolumeMethods` instance.
 ///
 /// # Example
 ///
@@ -5773,7 +5929,7 @@ impl<'a, C, NC, A> VolumeListCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
         for &field in ["alt", "q", "startIndex", "source", "showPreorders", "projection", "printType", "partner", "orderBy", "maxResults", "libraryRestrict", "langRestrict", "filter", "download"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -5802,7 +5958,7 @@ impl<'a, C, NC, A> VolumeListCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -5814,7 +5970,6 @@ impl<'a, C, NC, A> VolumeListCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -5824,7 +5979,7 @@ impl<'a, C, NC, A> VolumeListCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -5835,7 +5990,7 @@ impl<'a, C, NC, A> VolumeListCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -5844,13 +5999,13 @@ impl<'a, C, NC, A> VolumeListCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -5862,7 +6017,7 @@ impl<'a, C, NC, A> VolumeListCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Full-text search query string.    
+    /// Full-text search query string.
     pub fn q(mut self, new_value: &str) -> VolumeListCall<'a, C, NC, A> {
         self._q = new_value.to_string();
         self
@@ -5870,7 +6025,7 @@ impl<'a, C, NC, A> VolumeListCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// Sets the *start index* query property to the given value.
     ///
     /// 
-    /// Index of the first result to return (starts at 0)    
+    /// Index of the first result to return (starts at 0)
     pub fn start_index(mut self, new_value: u32) -> VolumeListCall<'a, C, NC, A> {
         self._start_index = Some(new_value);
         self
@@ -5878,7 +6033,7 @@ impl<'a, C, NC, A> VolumeListCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// Sets the *source* query property to the given value.
     ///
     /// 
-    /// String to identify the originator of this request.    
+    /// String to identify the originator of this request.
     pub fn source(mut self, new_value: &str) -> VolumeListCall<'a, C, NC, A> {
         self._source = Some(new_value.to_string());
         self
@@ -5886,7 +6041,7 @@ impl<'a, C, NC, A> VolumeListCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// Sets the *show preorders* query property to the given value.
     ///
     /// 
-    /// Set to true to show books available for preorder. Defaults to false.    
+    /// Set to true to show books available for preorder. Defaults to false.
     pub fn show_preorders(mut self, new_value: bool) -> VolumeListCall<'a, C, NC, A> {
         self._show_preorders = Some(new_value);
         self
@@ -5894,7 +6049,7 @@ impl<'a, C, NC, A> VolumeListCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// Sets the *projection* query property to the given value.
     ///
     /// 
-    /// Restrict information returned to a set of selected fields.    
+    /// Restrict information returned to a set of selected fields.
     pub fn projection(mut self, new_value: &str) -> VolumeListCall<'a, C, NC, A> {
         self._projection = Some(new_value.to_string());
         self
@@ -5902,7 +6057,7 @@ impl<'a, C, NC, A> VolumeListCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// Sets the *print type* query property to the given value.
     ///
     /// 
-    /// Restrict to books or magazines.    
+    /// Restrict to books or magazines.
     pub fn print_type(mut self, new_value: &str) -> VolumeListCall<'a, C, NC, A> {
         self._print_type = Some(new_value.to_string());
         self
@@ -5910,7 +6065,7 @@ impl<'a, C, NC, A> VolumeListCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// Sets the *partner* query property to the given value.
     ///
     /// 
-    /// Restrict and brand results for partner ID.    
+    /// Restrict and brand results for partner ID.
     pub fn partner(mut self, new_value: &str) -> VolumeListCall<'a, C, NC, A> {
         self._partner = Some(new_value.to_string());
         self
@@ -5918,7 +6073,7 @@ impl<'a, C, NC, A> VolumeListCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// Sets the *order by* query property to the given value.
     ///
     /// 
-    /// Sort search results.    
+    /// Sort search results.
     pub fn order_by(mut self, new_value: &str) -> VolumeListCall<'a, C, NC, A> {
         self._order_by = Some(new_value.to_string());
         self
@@ -5926,7 +6081,7 @@ impl<'a, C, NC, A> VolumeListCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// Sets the *max results* query property to the given value.
     ///
     /// 
-    /// Maximum number of results to return.    
+    /// Maximum number of results to return.
     pub fn max_results(mut self, new_value: u32) -> VolumeListCall<'a, C, NC, A> {
         self._max_results = Some(new_value);
         self
@@ -5934,7 +6089,7 @@ impl<'a, C, NC, A> VolumeListCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// Sets the *library restrict* query property to the given value.
     ///
     /// 
-    /// Restrict search to this user's library.    
+    /// Restrict search to this user's library.
     pub fn library_restrict(mut self, new_value: &str) -> VolumeListCall<'a, C, NC, A> {
         self._library_restrict = Some(new_value.to_string());
         self
@@ -5942,7 +6097,7 @@ impl<'a, C, NC, A> VolumeListCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// Sets the *lang restrict* query property to the given value.
     ///
     /// 
-    /// Restrict results to books with this language code.    
+    /// Restrict results to books with this language code.
     pub fn lang_restrict(mut self, new_value: &str) -> VolumeListCall<'a, C, NC, A> {
         self._lang_restrict = Some(new_value.to_string());
         self
@@ -5950,7 +6105,7 @@ impl<'a, C, NC, A> VolumeListCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// Sets the *filter* query property to the given value.
     ///
     /// 
-    /// Filter search results.    
+    /// Filter search results.
     pub fn filter(mut self, new_value: &str) -> VolumeListCall<'a, C, NC, A> {
         self._filter = Some(new_value.to_string());
         self
@@ -5958,7 +6113,7 @@ impl<'a, C, NC, A> VolumeListCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// Sets the *download* query property to the given value.
     ///
     /// 
-    /// Restrict to volumes by download availability.    
+    /// Restrict to volumes by download availability.
     pub fn download(mut self, new_value: &str) -> VolumeListCall<'a, C, NC, A> {
         self._download = Some(new_value.to_string());
         self
@@ -6019,7 +6174,7 @@ impl<'a, C, NC, A> VolumeListCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
 /// Return a list of books uploaded by the current user.
 ///
 /// A builder for the *useruploaded.list* method supported by a *volume* resource.
-/// It is not used directly, but through a `VolumeMethods`.
+/// It is not used directly, but through a `VolumeMethods` instance.
 ///
 /// # Example
 ///
@@ -6113,7 +6268,7 @@ impl<'a, C, NC, A> VolumeUseruploadedListCall<'a, C, NC, A> where NC: hyper::net
         for &field in ["alt", "volumeId", "startIndex", "source", "processingState", "maxResults", "locale"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -6142,7 +6297,7 @@ impl<'a, C, NC, A> VolumeUseruploadedListCall<'a, C, NC, A> where NC: hyper::net
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -6154,7 +6309,6 @@ impl<'a, C, NC, A> VolumeUseruploadedListCall<'a, C, NC, A> where NC: hyper::net
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -6164,7 +6318,7 @@ impl<'a, C, NC, A> VolumeUseruploadedListCall<'a, C, NC, A> where NC: hyper::net
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -6175,7 +6329,7 @@ impl<'a, C, NC, A> VolumeUseruploadedListCall<'a, C, NC, A> where NC: hyper::net
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -6184,13 +6338,13 @@ impl<'a, C, NC, A> VolumeUseruploadedListCall<'a, C, NC, A> where NC: hyper::net
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -6201,7 +6355,7 @@ impl<'a, C, NC, A> VolumeUseruploadedListCall<'a, C, NC, A> where NC: hyper::net
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
     ///
     /// 
-    /// The ids of the volumes to be returned. If not specified all that match the processingState are returned.    
+    /// The ids of the volumes to be returned. If not specified all that match the processingState are returned.
     pub fn add_volume_id(mut self, new_value: &str) -> VolumeUseruploadedListCall<'a, C, NC, A> {
         self._volume_id.push(new_value.to_string());
         self
@@ -6209,7 +6363,7 @@ impl<'a, C, NC, A> VolumeUseruploadedListCall<'a, C, NC, A> where NC: hyper::net
     /// Sets the *start index* query property to the given value.
     ///
     /// 
-    /// Index of the first result to return (starts at 0)    
+    /// Index of the first result to return (starts at 0)
     pub fn start_index(mut self, new_value: u32) -> VolumeUseruploadedListCall<'a, C, NC, A> {
         self._start_index = Some(new_value);
         self
@@ -6217,7 +6371,7 @@ impl<'a, C, NC, A> VolumeUseruploadedListCall<'a, C, NC, A> where NC: hyper::net
     /// Sets the *source* query property to the given value.
     ///
     /// 
-    /// String to identify the originator of this request.    
+    /// String to identify the originator of this request.
     pub fn source(mut self, new_value: &str) -> VolumeUseruploadedListCall<'a, C, NC, A> {
         self._source = Some(new_value.to_string());
         self
@@ -6226,7 +6380,7 @@ impl<'a, C, NC, A> VolumeUseruploadedListCall<'a, C, NC, A> where NC: hyper::net
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
     ///
     /// 
-    /// The processing state of the user uploaded volumes to be returned.    
+    /// The processing state of the user uploaded volumes to be returned.
     pub fn add_processing_state(mut self, new_value: &str) -> VolumeUseruploadedListCall<'a, C, NC, A> {
         self._processing_state.push(new_value.to_string());
         self
@@ -6234,7 +6388,7 @@ impl<'a, C, NC, A> VolumeUseruploadedListCall<'a, C, NC, A> where NC: hyper::net
     /// Sets the *max results* query property to the given value.
     ///
     /// 
-    /// Maximum number of results to return.    
+    /// Maximum number of results to return.
     pub fn max_results(mut self, new_value: u32) -> VolumeUseruploadedListCall<'a, C, NC, A> {
         self._max_results = Some(new_value);
         self
@@ -6242,7 +6396,7 @@ impl<'a, C, NC, A> VolumeUseruploadedListCall<'a, C, NC, A> where NC: hyper::net
     /// Sets the *locale* query property to the given value.
     ///
     /// 
-    /// ISO-639-1 language and ISO-3166-1 country code. Ex: 'en_US'. Used for generating recommendations.    
+    /// ISO-639-1 language and ISO-3166-1 country code. Ex: 'en_US'. Used for generating recommendations.
     pub fn locale(mut self, new_value: &str) -> VolumeUseruploadedListCall<'a, C, NC, A> {
         self._locale = Some(new_value.to_string());
         self
@@ -6303,7 +6457,7 @@ impl<'a, C, NC, A> VolumeUseruploadedListCall<'a, C, NC, A> where NC: hyper::net
 /// Return a list of associated books.
 ///
 /// A builder for the *associated.list* method supported by a *volume* resource.
-/// It is not used directly, but through a `VolumeMethods`.
+/// It is not used directly, but through a `VolumeMethods` instance.
 ///
 /// # Example
 ///
@@ -6376,7 +6530,7 @@ impl<'a, C, NC, A> VolumeAssociatedListCall<'a, C, NC, A> where NC: hyper::net::
         for &field in ["alt", "volumeId", "source", "locale", "association"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -6429,7 +6583,7 @@ impl<'a, C, NC, A> VolumeAssociatedListCall<'a, C, NC, A> where NC: hyper::net::
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -6441,7 +6595,6 @@ impl<'a, C, NC, A> VolumeAssociatedListCall<'a, C, NC, A> where NC: hyper::net::
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -6451,7 +6604,7 @@ impl<'a, C, NC, A> VolumeAssociatedListCall<'a, C, NC, A> where NC: hyper::net::
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -6462,7 +6615,7 @@ impl<'a, C, NC, A> VolumeAssociatedListCall<'a, C, NC, A> where NC: hyper::net::
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -6471,13 +6624,13 @@ impl<'a, C, NC, A> VolumeAssociatedListCall<'a, C, NC, A> where NC: hyper::net::
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -6489,7 +6642,7 @@ impl<'a, C, NC, A> VolumeAssociatedListCall<'a, C, NC, A> where NC: hyper::net::
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// ID of the source volume.    
+    /// ID of the source volume.
     pub fn volume_id(mut self, new_value: &str) -> VolumeAssociatedListCall<'a, C, NC, A> {
         self._volume_id = new_value.to_string();
         self
@@ -6497,7 +6650,7 @@ impl<'a, C, NC, A> VolumeAssociatedListCall<'a, C, NC, A> where NC: hyper::net::
     /// Sets the *source* query property to the given value.
     ///
     /// 
-    /// String to identify the originator of this request.    
+    /// String to identify the originator of this request.
     pub fn source(mut self, new_value: &str) -> VolumeAssociatedListCall<'a, C, NC, A> {
         self._source = Some(new_value.to_string());
         self
@@ -6505,7 +6658,7 @@ impl<'a, C, NC, A> VolumeAssociatedListCall<'a, C, NC, A> where NC: hyper::net::
     /// Sets the *locale* query property to the given value.
     ///
     /// 
-    /// ISO-639-1 language and ISO-3166-1 country code. Ex: 'en_US'. Used for generating recommendations.    
+    /// ISO-639-1 language and ISO-3166-1 country code. Ex: 'en_US'. Used for generating recommendations.
     pub fn locale(mut self, new_value: &str) -> VolumeAssociatedListCall<'a, C, NC, A> {
         self._locale = Some(new_value.to_string());
         self
@@ -6513,7 +6666,7 @@ impl<'a, C, NC, A> VolumeAssociatedListCall<'a, C, NC, A> where NC: hyper::net::
     /// Sets the *association* query property to the given value.
     ///
     /// 
-    /// Association type.    
+    /// Association type.
     pub fn association(mut self, new_value: &str) -> VolumeAssociatedListCall<'a, C, NC, A> {
         self._association = Some(new_value.to_string());
         self
@@ -6574,7 +6727,7 @@ impl<'a, C, NC, A> VolumeAssociatedListCall<'a, C, NC, A> where NC: hyper::net::
 /// Gets volume information for a single volume.
 ///
 /// A builder for the *get* method supported by a *volume* resource.
-/// It is not used directly, but through a `VolumeMethods`.
+/// It is not used directly, but through a `VolumeMethods` instance.
 ///
 /// # Example
 ///
@@ -6657,7 +6810,7 @@ impl<'a, C, NC, A> VolumeGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
         for &field in ["alt", "volumeId", "user_library_consistent_read", "source", "projection", "partner", "country"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -6710,7 +6863,7 @@ impl<'a, C, NC, A> VolumeGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -6722,7 +6875,6 @@ impl<'a, C, NC, A> VolumeGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -6732,7 +6884,7 @@ impl<'a, C, NC, A> VolumeGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -6743,7 +6895,7 @@ impl<'a, C, NC, A> VolumeGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -6752,13 +6904,13 @@ impl<'a, C, NC, A> VolumeGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -6770,7 +6922,7 @@ impl<'a, C, NC, A> VolumeGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// ID of volume to retrieve.    
+    /// ID of volume to retrieve.
     pub fn volume_id(mut self, new_value: &str) -> VolumeGetCall<'a, C, NC, A> {
         self._volume_id = new_value.to_string();
         self
@@ -6785,7 +6937,7 @@ impl<'a, C, NC, A> VolumeGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     /// Sets the *source* query property to the given value.
     ///
     /// 
-    /// String to identify the originator of this request.    
+    /// String to identify the originator of this request.
     pub fn source(mut self, new_value: &str) -> VolumeGetCall<'a, C, NC, A> {
         self._source = Some(new_value.to_string());
         self
@@ -6793,7 +6945,7 @@ impl<'a, C, NC, A> VolumeGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     /// Sets the *projection* query property to the given value.
     ///
     /// 
-    /// Restrict information returned to a set of selected fields.    
+    /// Restrict information returned to a set of selected fields.
     pub fn projection(mut self, new_value: &str) -> VolumeGetCall<'a, C, NC, A> {
         self._projection = Some(new_value.to_string());
         self
@@ -6801,7 +6953,7 @@ impl<'a, C, NC, A> VolumeGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     /// Sets the *partner* query property to the given value.
     ///
     /// 
-    /// Brand results for partner ID.    
+    /// Brand results for partner ID.
     pub fn partner(mut self, new_value: &str) -> VolumeGetCall<'a, C, NC, A> {
         self._partner = Some(new_value.to_string());
         self
@@ -6809,7 +6961,7 @@ impl<'a, C, NC, A> VolumeGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     /// Sets the *country* query property to the given value.
     ///
     /// 
-    /// ISO-3166-1 code to override the IP-based location.    
+    /// ISO-3166-1 code to override the IP-based location.
     pub fn country(mut self, new_value: &str) -> VolumeGetCall<'a, C, NC, A> {
         self._country = Some(new_value.to_string());
         self
@@ -6870,7 +7022,7 @@ impl<'a, C, NC, A> VolumeGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
 /// Return a list of recommended books for the current user.
 ///
 /// A builder for the *recommended.list* method supported by a *volume* resource.
-/// It is not used directly, but through a `VolumeMethods`.
+/// It is not used directly, but through a `VolumeMethods` instance.
 ///
 /// # Example
 ///
@@ -6936,7 +7088,7 @@ impl<'a, C, NC, A> VolumeRecommendedListCall<'a, C, NC, A> where NC: hyper::net:
         for &field in ["alt", "source", "locale"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -6965,7 +7117,7 @@ impl<'a, C, NC, A> VolumeRecommendedListCall<'a, C, NC, A> where NC: hyper::net:
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -6977,7 +7129,6 @@ impl<'a, C, NC, A> VolumeRecommendedListCall<'a, C, NC, A> where NC: hyper::net:
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -6987,7 +7138,7 @@ impl<'a, C, NC, A> VolumeRecommendedListCall<'a, C, NC, A> where NC: hyper::net:
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -6998,7 +7149,7 @@ impl<'a, C, NC, A> VolumeRecommendedListCall<'a, C, NC, A> where NC: hyper::net:
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -7007,13 +7158,13 @@ impl<'a, C, NC, A> VolumeRecommendedListCall<'a, C, NC, A> where NC: hyper::net:
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -7023,7 +7174,7 @@ impl<'a, C, NC, A> VolumeRecommendedListCall<'a, C, NC, A> where NC: hyper::net:
     /// Sets the *source* query property to the given value.
     ///
     /// 
-    /// String to identify the originator of this request.    
+    /// String to identify the originator of this request.
     pub fn source(mut self, new_value: &str) -> VolumeRecommendedListCall<'a, C, NC, A> {
         self._source = Some(new_value.to_string());
         self
@@ -7031,7 +7182,7 @@ impl<'a, C, NC, A> VolumeRecommendedListCall<'a, C, NC, A> where NC: hyper::net:
     /// Sets the *locale* query property to the given value.
     ///
     /// 
-    /// ISO-639-1 language and ISO-3166-1 country code. Ex: 'en_US'. Used for generating recommendations.    
+    /// ISO-639-1 language and ISO-3166-1 country code. Ex: 'en_US'. Used for generating recommendations.
     pub fn locale(mut self, new_value: &str) -> VolumeRecommendedListCall<'a, C, NC, A> {
         self._locale = Some(new_value.to_string());
         self
@@ -7092,7 +7243,7 @@ impl<'a, C, NC, A> VolumeRecommendedListCall<'a, C, NC, A> where NC: hyper::net:
 /// Returns a list of offline dictionary meatadata available
 ///
 /// A builder for the *listOfflineMetadata* method supported by a *dictionary* resource.
-/// It is not used directly, but through a `DictionaryMethods`.
+/// It is not used directly, but through a `DictionaryMethods` instance.
 ///
 /// # Example
 ///
@@ -7150,7 +7301,7 @@ impl<'a, C, NC, A> DictionaryListOfflineMetadataCall<'a, C, NC, A> where NC: hyp
         for &field in ["alt", "cpksver"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -7179,7 +7330,7 @@ impl<'a, C, NC, A> DictionaryListOfflineMetadataCall<'a, C, NC, A> where NC: hyp
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -7191,7 +7342,6 @@ impl<'a, C, NC, A> DictionaryListOfflineMetadataCall<'a, C, NC, A> where NC: hyp
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -7201,7 +7351,7 @@ impl<'a, C, NC, A> DictionaryListOfflineMetadataCall<'a, C, NC, A> where NC: hyp
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -7212,7 +7362,7 @@ impl<'a, C, NC, A> DictionaryListOfflineMetadataCall<'a, C, NC, A> where NC: hyp
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -7221,13 +7371,13 @@ impl<'a, C, NC, A> DictionaryListOfflineMetadataCall<'a, C, NC, A> where NC: hyp
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -7239,7 +7389,7 @@ impl<'a, C, NC, A> DictionaryListOfflineMetadataCall<'a, C, NC, A> where NC: hyp
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The device/version ID from which to request the data.    
+    /// The device/version ID from which to request the data.
     pub fn cpksver(mut self, new_value: &str) -> DictionaryListOfflineMetadataCall<'a, C, NC, A> {
         self._cpksver = new_value.to_string();
         self
@@ -7300,7 +7450,7 @@ impl<'a, C, NC, A> DictionaryListOfflineMetadataCall<'a, C, NC, A> where NC: hyp
 /// Retrieves volumes in a specific bookshelf for the specified user.
 ///
 /// A builder for the *volumes.list* method supported by a *bookshelve* resource.
-/// It is not used directly, but through a `BookshelveMethods`.
+/// It is not used directly, but through a `BookshelveMethods` instance.
 ///
 /// # Example
 ///
@@ -7380,7 +7530,7 @@ impl<'a, C, NC, A> BookshelveVolumeListCall<'a, C, NC, A> where NC: hyper::net::
         for &field in ["alt", "userId", "shelf", "startIndex", "source", "showPreorders", "maxResults"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -7433,7 +7583,7 @@ impl<'a, C, NC, A> BookshelveVolumeListCall<'a, C, NC, A> where NC: hyper::net::
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -7445,7 +7595,6 @@ impl<'a, C, NC, A> BookshelveVolumeListCall<'a, C, NC, A> where NC: hyper::net::
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -7455,7 +7604,7 @@ impl<'a, C, NC, A> BookshelveVolumeListCall<'a, C, NC, A> where NC: hyper::net::
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -7466,7 +7615,7 @@ impl<'a, C, NC, A> BookshelveVolumeListCall<'a, C, NC, A> where NC: hyper::net::
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -7475,13 +7624,13 @@ impl<'a, C, NC, A> BookshelveVolumeListCall<'a, C, NC, A> where NC: hyper::net::
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -7493,7 +7642,7 @@ impl<'a, C, NC, A> BookshelveVolumeListCall<'a, C, NC, A> where NC: hyper::net::
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// ID of user for whom to retrieve bookshelf volumes.    
+    /// ID of user for whom to retrieve bookshelf volumes.
     pub fn user_id(mut self, new_value: &str) -> BookshelveVolumeListCall<'a, C, NC, A> {
         self._user_id = new_value.to_string();
         self
@@ -7503,7 +7652,7 @@ impl<'a, C, NC, A> BookshelveVolumeListCall<'a, C, NC, A> where NC: hyper::net::
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// ID of bookshelf to retrieve volumes.    
+    /// ID of bookshelf to retrieve volumes.
     pub fn shelf(mut self, new_value: &str) -> BookshelveVolumeListCall<'a, C, NC, A> {
         self._shelf = new_value.to_string();
         self
@@ -7511,7 +7660,7 @@ impl<'a, C, NC, A> BookshelveVolumeListCall<'a, C, NC, A> where NC: hyper::net::
     /// Sets the *start index* query property to the given value.
     ///
     /// 
-    /// Index of the first element to return (starts at 0)    
+    /// Index of the first element to return (starts at 0)
     pub fn start_index(mut self, new_value: u32) -> BookshelveVolumeListCall<'a, C, NC, A> {
         self._start_index = Some(new_value);
         self
@@ -7519,7 +7668,7 @@ impl<'a, C, NC, A> BookshelveVolumeListCall<'a, C, NC, A> where NC: hyper::net::
     /// Sets the *source* query property to the given value.
     ///
     /// 
-    /// String to identify the originator of this request.    
+    /// String to identify the originator of this request.
     pub fn source(mut self, new_value: &str) -> BookshelveVolumeListCall<'a, C, NC, A> {
         self._source = Some(new_value.to_string());
         self
@@ -7527,7 +7676,7 @@ impl<'a, C, NC, A> BookshelveVolumeListCall<'a, C, NC, A> where NC: hyper::net::
     /// Sets the *show preorders* query property to the given value.
     ///
     /// 
-    /// Set to true to show pre-ordered books. Defaults to false.    
+    /// Set to true to show pre-ordered books. Defaults to false.
     pub fn show_preorders(mut self, new_value: bool) -> BookshelveVolumeListCall<'a, C, NC, A> {
         self._show_preorders = Some(new_value);
         self
@@ -7535,7 +7684,7 @@ impl<'a, C, NC, A> BookshelveVolumeListCall<'a, C, NC, A> where NC: hyper::net::
     /// Sets the *max results* query property to the given value.
     ///
     /// 
-    /// Maximum number of results to return    
+    /// Maximum number of results to return
     pub fn max_results(mut self, new_value: u32) -> BookshelveVolumeListCall<'a, C, NC, A> {
         self._max_results = Some(new_value);
         self
@@ -7596,7 +7745,7 @@ impl<'a, C, NC, A> BookshelveVolumeListCall<'a, C, NC, A> where NC: hyper::net::
 /// Retrieves a list of public bookshelves for the specified user.
 ///
 /// A builder for the *list* method supported by a *bookshelve* resource.
-/// It is not used directly, but through a `BookshelveMethods`.
+/// It is not used directly, but through a `BookshelveMethods` instance.
 ///
 /// # Example
 ///
@@ -7659,7 +7808,7 @@ impl<'a, C, NC, A> BookshelveListCall<'a, C, NC, A> where NC: hyper::net::Networ
         for &field in ["alt", "userId", "source"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -7712,7 +7861,7 @@ impl<'a, C, NC, A> BookshelveListCall<'a, C, NC, A> where NC: hyper::net::Networ
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -7724,7 +7873,6 @@ impl<'a, C, NC, A> BookshelveListCall<'a, C, NC, A> where NC: hyper::net::Networ
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -7734,7 +7882,7 @@ impl<'a, C, NC, A> BookshelveListCall<'a, C, NC, A> where NC: hyper::net::Networ
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -7745,7 +7893,7 @@ impl<'a, C, NC, A> BookshelveListCall<'a, C, NC, A> where NC: hyper::net::Networ
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -7754,13 +7902,13 @@ impl<'a, C, NC, A> BookshelveListCall<'a, C, NC, A> where NC: hyper::net::Networ
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -7772,7 +7920,7 @@ impl<'a, C, NC, A> BookshelveListCall<'a, C, NC, A> where NC: hyper::net::Networ
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// ID of user for whom to retrieve bookshelves.    
+    /// ID of user for whom to retrieve bookshelves.
     pub fn user_id(mut self, new_value: &str) -> BookshelveListCall<'a, C, NC, A> {
         self._user_id = new_value.to_string();
         self
@@ -7780,7 +7928,7 @@ impl<'a, C, NC, A> BookshelveListCall<'a, C, NC, A> where NC: hyper::net::Networ
     /// Sets the *source* query property to the given value.
     ///
     /// 
-    /// String to identify the originator of this request.    
+    /// String to identify the originator of this request.
     pub fn source(mut self, new_value: &str) -> BookshelveListCall<'a, C, NC, A> {
         self._source = Some(new_value.to_string());
         self
@@ -7841,7 +7989,7 @@ impl<'a, C, NC, A> BookshelveListCall<'a, C, NC, A> where NC: hyper::net::Networ
 /// Retrieves metadata for a specific bookshelf for the specified user.
 ///
 /// A builder for the *get* method supported by a *bookshelve* resource.
-/// It is not used directly, but through a `BookshelveMethods`.
+/// It is not used directly, but through a `BookshelveMethods` instance.
 ///
 /// # Example
 ///
@@ -7906,7 +8054,7 @@ impl<'a, C, NC, A> BookshelveGetCall<'a, C, NC, A> where NC: hyper::net::Network
         for &field in ["alt", "userId", "shelf", "source"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -7959,7 +8107,7 @@ impl<'a, C, NC, A> BookshelveGetCall<'a, C, NC, A> where NC: hyper::net::Network
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -7971,7 +8119,6 @@ impl<'a, C, NC, A> BookshelveGetCall<'a, C, NC, A> where NC: hyper::net::Network
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -7981,7 +8128,7 @@ impl<'a, C, NC, A> BookshelveGetCall<'a, C, NC, A> where NC: hyper::net::Network
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -7992,7 +8139,7 @@ impl<'a, C, NC, A> BookshelveGetCall<'a, C, NC, A> where NC: hyper::net::Network
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -8001,13 +8148,13 @@ impl<'a, C, NC, A> BookshelveGetCall<'a, C, NC, A> where NC: hyper::net::Network
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -8019,7 +8166,7 @@ impl<'a, C, NC, A> BookshelveGetCall<'a, C, NC, A> where NC: hyper::net::Network
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// ID of user for whom to retrieve bookshelves.    
+    /// ID of user for whom to retrieve bookshelves.
     pub fn user_id(mut self, new_value: &str) -> BookshelveGetCall<'a, C, NC, A> {
         self._user_id = new_value.to_string();
         self
@@ -8029,7 +8176,7 @@ impl<'a, C, NC, A> BookshelveGetCall<'a, C, NC, A> where NC: hyper::net::Network
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// ID of bookshelf to retrieve.    
+    /// ID of bookshelf to retrieve.
     pub fn shelf(mut self, new_value: &str) -> BookshelveGetCall<'a, C, NC, A> {
         self._shelf = new_value.to_string();
         self
@@ -8037,7 +8184,7 @@ impl<'a, C, NC, A> BookshelveGetCall<'a, C, NC, A> where NC: hyper::net::Network
     /// Sets the *source* query property to the given value.
     ///
     /// 
-    /// String to identify the originator of this request.    
+    /// String to identify the originator of this request.
     pub fn source(mut self, new_value: &str) -> BookshelveGetCall<'a, C, NC, A> {
         self._source = Some(new_value.to_string());
         self
@@ -8098,7 +8245,7 @@ impl<'a, C, NC, A> BookshelveGetCall<'a, C, NC, A> where NC: hyper::net::Network
 /// 
 ///
 /// A builder for the *accept* method supported by a *promooffer* resource.
-/// It is not used directly, but through a `PromoofferMethods`.
+/// It is not used directly, but through a `PromoofferMethods` instance.
 ///
 /// # Example
 ///
@@ -8194,7 +8341,7 @@ impl<'a, C, NC, A> PromoofferAcceptCall<'a, C, NC, A> where NC: hyper::net::Netw
         for &field in ["volumeId", "serial", "product", "offerId", "model", "manufacturer", "device", "androidId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -8222,7 +8369,7 @@ impl<'a, C, NC, A> PromoofferAcceptCall<'a, C, NC, A> where NC: hyper::net::Netw
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -8234,7 +8381,6 @@ impl<'a, C, NC, A> PromoofferAcceptCall<'a, C, NC, A> where NC: hyper::net::Netw
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -8244,7 +8390,7 @@ impl<'a, C, NC, A> PromoofferAcceptCall<'a, C, NC, A> where NC: hyper::net::Netw
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -8255,12 +8401,12 @@ impl<'a, C, NC, A> PromoofferAcceptCall<'a, C, NC, A> where NC: hyper::net::Netw
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = res;
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -8270,7 +8416,7 @@ impl<'a, C, NC, A> PromoofferAcceptCall<'a, C, NC, A> where NC: hyper::net::Netw
     /// Sets the *volume id* query property to the given value.
     ///
     /// 
-    /// Volume id to exercise the offer    
+    /// Volume id to exercise the offer
     pub fn volume_id(mut self, new_value: &str) -> PromoofferAcceptCall<'a, C, NC, A> {
         self._volume_id = Some(new_value.to_string());
         self
@@ -8278,7 +8424,7 @@ impl<'a, C, NC, A> PromoofferAcceptCall<'a, C, NC, A> where NC: hyper::net::Netw
     /// Sets the *serial* query property to the given value.
     ///
     /// 
-    /// device serial    
+    /// device serial
     pub fn serial(mut self, new_value: &str) -> PromoofferAcceptCall<'a, C, NC, A> {
         self._serial = Some(new_value.to_string());
         self
@@ -8286,7 +8432,7 @@ impl<'a, C, NC, A> PromoofferAcceptCall<'a, C, NC, A> where NC: hyper::net::Netw
     /// Sets the *product* query property to the given value.
     ///
     /// 
-    /// device product    
+    /// device product
     pub fn product(mut self, new_value: &str) -> PromoofferAcceptCall<'a, C, NC, A> {
         self._product = Some(new_value.to_string());
         self
@@ -8301,7 +8447,7 @@ impl<'a, C, NC, A> PromoofferAcceptCall<'a, C, NC, A> where NC: hyper::net::Netw
     /// Sets the *model* query property to the given value.
     ///
     /// 
-    /// device model    
+    /// device model
     pub fn model(mut self, new_value: &str) -> PromoofferAcceptCall<'a, C, NC, A> {
         self._model = Some(new_value.to_string());
         self
@@ -8309,7 +8455,7 @@ impl<'a, C, NC, A> PromoofferAcceptCall<'a, C, NC, A> where NC: hyper::net::Netw
     /// Sets the *manufacturer* query property to the given value.
     ///
     /// 
-    /// device manufacturer    
+    /// device manufacturer
     pub fn manufacturer(mut self, new_value: &str) -> PromoofferAcceptCall<'a, C, NC, A> {
         self._manufacturer = Some(new_value.to_string());
         self
@@ -8317,7 +8463,7 @@ impl<'a, C, NC, A> PromoofferAcceptCall<'a, C, NC, A> where NC: hyper::net::Netw
     /// Sets the *device* query property to the given value.
     ///
     /// 
-    /// device device    
+    /// device device
     pub fn device(mut self, new_value: &str) -> PromoofferAcceptCall<'a, C, NC, A> {
         self._device = Some(new_value.to_string());
         self
@@ -8325,7 +8471,7 @@ impl<'a, C, NC, A> PromoofferAcceptCall<'a, C, NC, A> where NC: hyper::net::Netw
     /// Sets the *android id* query property to the given value.
     ///
     /// 
-    /// device android_id    
+    /// device android_id
     pub fn android_id(mut self, new_value: &str) -> PromoofferAcceptCall<'a, C, NC, A> {
         self._android_id = Some(new_value.to_string());
         self
@@ -8386,7 +8532,7 @@ impl<'a, C, NC, A> PromoofferAcceptCall<'a, C, NC, A> where NC: hyper::net::Netw
 /// 
 ///
 /// A builder for the *dismiss* method supported by a *promooffer* resource.
-/// It is not used directly, but through a `PromoofferMethods`.
+/// It is not used directly, but through a `PromoofferMethods` instance.
 ///
 /// # Example
 ///
@@ -8477,7 +8623,7 @@ impl<'a, C, NC, A> PromoofferDismisCall<'a, C, NC, A> where NC: hyper::net::Netw
         for &field in ["serial", "product", "offerId", "model", "manufacturer", "device", "androidId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -8505,7 +8651,7 @@ impl<'a, C, NC, A> PromoofferDismisCall<'a, C, NC, A> where NC: hyper::net::Netw
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -8517,7 +8663,6 @@ impl<'a, C, NC, A> PromoofferDismisCall<'a, C, NC, A> where NC: hyper::net::Netw
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -8527,7 +8672,7 @@ impl<'a, C, NC, A> PromoofferDismisCall<'a, C, NC, A> where NC: hyper::net::Netw
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -8538,12 +8683,12 @@ impl<'a, C, NC, A> PromoofferDismisCall<'a, C, NC, A> where NC: hyper::net::Netw
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = res;
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -8553,7 +8698,7 @@ impl<'a, C, NC, A> PromoofferDismisCall<'a, C, NC, A> where NC: hyper::net::Netw
     /// Sets the *serial* query property to the given value.
     ///
     /// 
-    /// device serial    
+    /// device serial
     pub fn serial(mut self, new_value: &str) -> PromoofferDismisCall<'a, C, NC, A> {
         self._serial = Some(new_value.to_string());
         self
@@ -8561,7 +8706,7 @@ impl<'a, C, NC, A> PromoofferDismisCall<'a, C, NC, A> where NC: hyper::net::Netw
     /// Sets the *product* query property to the given value.
     ///
     /// 
-    /// device product    
+    /// device product
     pub fn product(mut self, new_value: &str) -> PromoofferDismisCall<'a, C, NC, A> {
         self._product = Some(new_value.to_string());
         self
@@ -8569,7 +8714,7 @@ impl<'a, C, NC, A> PromoofferDismisCall<'a, C, NC, A> where NC: hyper::net::Netw
     /// Sets the *offer id* query property to the given value.
     ///
     /// 
-    /// Offer to dimiss    
+    /// Offer to dimiss
     pub fn offer_id(mut self, new_value: &str) -> PromoofferDismisCall<'a, C, NC, A> {
         self._offer_id = Some(new_value.to_string());
         self
@@ -8577,7 +8722,7 @@ impl<'a, C, NC, A> PromoofferDismisCall<'a, C, NC, A> where NC: hyper::net::Netw
     /// Sets the *model* query property to the given value.
     ///
     /// 
-    /// device model    
+    /// device model
     pub fn model(mut self, new_value: &str) -> PromoofferDismisCall<'a, C, NC, A> {
         self._model = Some(new_value.to_string());
         self
@@ -8585,7 +8730,7 @@ impl<'a, C, NC, A> PromoofferDismisCall<'a, C, NC, A> where NC: hyper::net::Netw
     /// Sets the *manufacturer* query property to the given value.
     ///
     /// 
-    /// device manufacturer    
+    /// device manufacturer
     pub fn manufacturer(mut self, new_value: &str) -> PromoofferDismisCall<'a, C, NC, A> {
         self._manufacturer = Some(new_value.to_string());
         self
@@ -8593,7 +8738,7 @@ impl<'a, C, NC, A> PromoofferDismisCall<'a, C, NC, A> where NC: hyper::net::Netw
     /// Sets the *device* query property to the given value.
     ///
     /// 
-    /// device device    
+    /// device device
     pub fn device(mut self, new_value: &str) -> PromoofferDismisCall<'a, C, NC, A> {
         self._device = Some(new_value.to_string());
         self
@@ -8601,7 +8746,7 @@ impl<'a, C, NC, A> PromoofferDismisCall<'a, C, NC, A> where NC: hyper::net::Netw
     /// Sets the *android id* query property to the given value.
     ///
     /// 
-    /// device android_id    
+    /// device android_id
     pub fn android_id(mut self, new_value: &str) -> PromoofferDismisCall<'a, C, NC, A> {
         self._android_id = Some(new_value.to_string());
         self
@@ -8662,7 +8807,7 @@ impl<'a, C, NC, A> PromoofferDismisCall<'a, C, NC, A> where NC: hyper::net::Netw
 /// Returns a list of promo offers available to the user
 ///
 /// A builder for the *get* method supported by a *promooffer* resource.
-/// It is not used directly, but through a `PromoofferMethods`.
+/// It is not used directly, but through a `PromoofferMethods` instance.
 ///
 /// # Example
 ///
@@ -8748,7 +8893,7 @@ impl<'a, C, NC, A> PromoofferGetCall<'a, C, NC, A> where NC: hyper::net::Network
         for &field in ["alt", "serial", "product", "model", "manufacturer", "device", "androidId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -8777,7 +8922,7 @@ impl<'a, C, NC, A> PromoofferGetCall<'a, C, NC, A> where NC: hyper::net::Network
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -8789,7 +8934,6 @@ impl<'a, C, NC, A> PromoofferGetCall<'a, C, NC, A> where NC: hyper::net::Network
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -8799,7 +8943,7 @@ impl<'a, C, NC, A> PromoofferGetCall<'a, C, NC, A> where NC: hyper::net::Network
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -8810,7 +8954,7 @@ impl<'a, C, NC, A> PromoofferGetCall<'a, C, NC, A> where NC: hyper::net::Network
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -8819,13 +8963,13 @@ impl<'a, C, NC, A> PromoofferGetCall<'a, C, NC, A> where NC: hyper::net::Network
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -8835,7 +8979,7 @@ impl<'a, C, NC, A> PromoofferGetCall<'a, C, NC, A> where NC: hyper::net::Network
     /// Sets the *serial* query property to the given value.
     ///
     /// 
-    /// device serial    
+    /// device serial
     pub fn serial(mut self, new_value: &str) -> PromoofferGetCall<'a, C, NC, A> {
         self._serial = Some(new_value.to_string());
         self
@@ -8843,7 +8987,7 @@ impl<'a, C, NC, A> PromoofferGetCall<'a, C, NC, A> where NC: hyper::net::Network
     /// Sets the *product* query property to the given value.
     ///
     /// 
-    /// device product    
+    /// device product
     pub fn product(mut self, new_value: &str) -> PromoofferGetCall<'a, C, NC, A> {
         self._product = Some(new_value.to_string());
         self
@@ -8851,7 +8995,7 @@ impl<'a, C, NC, A> PromoofferGetCall<'a, C, NC, A> where NC: hyper::net::Network
     /// Sets the *model* query property to the given value.
     ///
     /// 
-    /// device model    
+    /// device model
     pub fn model(mut self, new_value: &str) -> PromoofferGetCall<'a, C, NC, A> {
         self._model = Some(new_value.to_string());
         self
@@ -8859,7 +9003,7 @@ impl<'a, C, NC, A> PromoofferGetCall<'a, C, NC, A> where NC: hyper::net::Network
     /// Sets the *manufacturer* query property to the given value.
     ///
     /// 
-    /// device manufacturer    
+    /// device manufacturer
     pub fn manufacturer(mut self, new_value: &str) -> PromoofferGetCall<'a, C, NC, A> {
         self._manufacturer = Some(new_value.to_string());
         self
@@ -8867,7 +9011,7 @@ impl<'a, C, NC, A> PromoofferGetCall<'a, C, NC, A> where NC: hyper::net::Network
     /// Sets the *device* query property to the given value.
     ///
     /// 
-    /// device device    
+    /// device device
     pub fn device(mut self, new_value: &str) -> PromoofferGetCall<'a, C, NC, A> {
         self._device = Some(new_value.to_string());
         self
@@ -8875,7 +9019,7 @@ impl<'a, C, NC, A> PromoofferGetCall<'a, C, NC, A> where NC: hyper::net::Network
     /// Sets the *android id* query property to the given value.
     ///
     /// 
-    /// device android_id    
+    /// device android_id
     pub fn android_id(mut self, new_value: &str) -> PromoofferGetCall<'a, C, NC, A> {
         self._android_id = Some(new_value.to_string());
         self
@@ -8936,7 +9080,7 @@ impl<'a, C, NC, A> PromoofferGetCall<'a, C, NC, A> where NC: hyper::net::Network
 /// List categories for onboarding experience.
 ///
 /// A builder for the *listCategories* method supported by a *onboarding* resource.
-/// It is not used directly, but through a `OnboardingMethods`.
+/// It is not used directly, but through a `OnboardingMethods` instance.
 ///
 /// # Example
 ///
@@ -8997,7 +9141,7 @@ impl<'a, C, NC, A> OnboardingListCategoryCall<'a, C, NC, A> where NC: hyper::net
         for &field in ["alt", "locale"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -9026,7 +9170,7 @@ impl<'a, C, NC, A> OnboardingListCategoryCall<'a, C, NC, A> where NC: hyper::net
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -9038,7 +9182,6 @@ impl<'a, C, NC, A> OnboardingListCategoryCall<'a, C, NC, A> where NC: hyper::net
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -9048,7 +9191,7 @@ impl<'a, C, NC, A> OnboardingListCategoryCall<'a, C, NC, A> where NC: hyper::net
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -9059,7 +9202,7 @@ impl<'a, C, NC, A> OnboardingListCategoryCall<'a, C, NC, A> where NC: hyper::net
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -9068,13 +9211,13 @@ impl<'a, C, NC, A> OnboardingListCategoryCall<'a, C, NC, A> where NC: hyper::net
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -9084,7 +9227,7 @@ impl<'a, C, NC, A> OnboardingListCategoryCall<'a, C, NC, A> where NC: hyper::net
     /// Sets the *locale* query property to the given value.
     ///
     /// 
-    /// ISO-639-1 language and ISO-3166-1 country code. Default is en-US if unset.    
+    /// ISO-639-1 language and ISO-3166-1 country code. Default is en-US if unset.
     pub fn locale(mut self, new_value: &str) -> OnboardingListCategoryCall<'a, C, NC, A> {
         self._locale = Some(new_value.to_string());
         self
@@ -9145,7 +9288,7 @@ impl<'a, C, NC, A> OnboardingListCategoryCall<'a, C, NC, A> where NC: hyper::net
 /// List available volumes under categories for onboarding experience.
 ///
 /// A builder for the *listCategoryVolumes* method supported by a *onboarding* resource.
-/// It is not used directly, but through a `OnboardingMethods`.
+/// It is not used directly, but through a `OnboardingMethods` instance.
 ///
 /// # Example
 ///
@@ -9225,7 +9368,7 @@ impl<'a, C, NC, A> OnboardingListCategoryVolumeCall<'a, C, NC, A> where NC: hype
         for &field in ["alt", "pageToken", "pageSize", "locale", "categoryId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -9254,7 +9397,7 @@ impl<'a, C, NC, A> OnboardingListCategoryVolumeCall<'a, C, NC, A> where NC: hype
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -9266,7 +9409,6 @@ impl<'a, C, NC, A> OnboardingListCategoryVolumeCall<'a, C, NC, A> where NC: hype
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -9276,7 +9418,7 @@ impl<'a, C, NC, A> OnboardingListCategoryVolumeCall<'a, C, NC, A> where NC: hype
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -9287,7 +9429,7 @@ impl<'a, C, NC, A> OnboardingListCategoryVolumeCall<'a, C, NC, A> where NC: hype
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -9296,13 +9438,13 @@ impl<'a, C, NC, A> OnboardingListCategoryVolumeCall<'a, C, NC, A> where NC: hype
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -9312,7 +9454,7 @@ impl<'a, C, NC, A> OnboardingListCategoryVolumeCall<'a, C, NC, A> where NC: hype
     /// Sets the *page token* query property to the given value.
     ///
     /// 
-    /// The value of the nextToken from the previous page.    
+    /// The value of the nextToken from the previous page.
     pub fn page_token(mut self, new_value: &str) -> OnboardingListCategoryVolumeCall<'a, C, NC, A> {
         self._page_token = Some(new_value.to_string());
         self
@@ -9320,7 +9462,7 @@ impl<'a, C, NC, A> OnboardingListCategoryVolumeCall<'a, C, NC, A> where NC: hype
     /// Sets the *page size* query property to the given value.
     ///
     /// 
-    /// Number of maximum results per page to be included in the response.    
+    /// Number of maximum results per page to be included in the response.
     pub fn page_size(mut self, new_value: u32) -> OnboardingListCategoryVolumeCall<'a, C, NC, A> {
         self._page_size = Some(new_value);
         self
@@ -9328,7 +9470,7 @@ impl<'a, C, NC, A> OnboardingListCategoryVolumeCall<'a, C, NC, A> where NC: hype
     /// Sets the *locale* query property to the given value.
     ///
     /// 
-    /// ISO-639-1 language and ISO-3166-1 country code. Default is en-US if unset.    
+    /// ISO-639-1 language and ISO-3166-1 country code. Default is en-US if unset.
     pub fn locale(mut self, new_value: &str) -> OnboardingListCategoryVolumeCall<'a, C, NC, A> {
         self._locale = Some(new_value.to_string());
         self
@@ -9337,7 +9479,7 @@ impl<'a, C, NC, A> OnboardingListCategoryVolumeCall<'a, C, NC, A> where NC: hype
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
     ///
     /// 
-    /// List of category ids requested.    
+    /// List of category ids requested.
     pub fn add_category_id(mut self, new_value: &str) -> OnboardingListCategoryVolumeCall<'a, C, NC, A> {
         self._category_id.push(new_value.to_string());
         self
@@ -9398,7 +9540,7 @@ impl<'a, C, NC, A> OnboardingListCategoryVolumeCall<'a, C, NC, A> where NC: hype
 /// Request concurrent and download access restrictions.
 ///
 /// A builder for the *requestAccess* method supported by a *myconfig* resource.
-/// It is not used directly, but through a `MyconfigMethods`.
+/// It is not used directly, but through a `MyconfigMethods` instance.
 ///
 /// # Example
 ///
@@ -9472,7 +9614,7 @@ impl<'a, C, NC, A> MyconfigRequestAccesCall<'a, C, NC, A> where NC: hyper::net::
         for &field in ["alt", "source", "volumeId", "nonce", "cpksver", "locale", "licenseTypes"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -9501,7 +9643,7 @@ impl<'a, C, NC, A> MyconfigRequestAccesCall<'a, C, NC, A> where NC: hyper::net::
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -9513,7 +9655,6 @@ impl<'a, C, NC, A> MyconfigRequestAccesCall<'a, C, NC, A> where NC: hyper::net::
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -9523,7 +9664,7 @@ impl<'a, C, NC, A> MyconfigRequestAccesCall<'a, C, NC, A> where NC: hyper::net::
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -9534,7 +9675,7 @@ impl<'a, C, NC, A> MyconfigRequestAccesCall<'a, C, NC, A> where NC: hyper::net::
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -9543,13 +9684,13 @@ impl<'a, C, NC, A> MyconfigRequestAccesCall<'a, C, NC, A> where NC: hyper::net::
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -9561,7 +9702,7 @@ impl<'a, C, NC, A> MyconfigRequestAccesCall<'a, C, NC, A> where NC: hyper::net::
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// String to identify the originator of this request.    
+    /// String to identify the originator of this request.
     pub fn source(mut self, new_value: &str) -> MyconfigRequestAccesCall<'a, C, NC, A> {
         self._source = new_value.to_string();
         self
@@ -9571,7 +9712,7 @@ impl<'a, C, NC, A> MyconfigRequestAccesCall<'a, C, NC, A> where NC: hyper::net::
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The volume to request concurrent/download restrictions for.    
+    /// The volume to request concurrent/download restrictions for.
     pub fn volume_id(mut self, new_value: &str) -> MyconfigRequestAccesCall<'a, C, NC, A> {
         self._volume_id = new_value.to_string();
         self
@@ -9581,7 +9722,7 @@ impl<'a, C, NC, A> MyconfigRequestAccesCall<'a, C, NC, A> where NC: hyper::net::
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The client nonce value.    
+    /// The client nonce value.
     pub fn nonce(mut self, new_value: &str) -> MyconfigRequestAccesCall<'a, C, NC, A> {
         self._nonce = new_value.to_string();
         self
@@ -9591,7 +9732,7 @@ impl<'a, C, NC, A> MyconfigRequestAccesCall<'a, C, NC, A> where NC: hyper::net::
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The device/version ID from which to request the restrictions.    
+    /// The device/version ID from which to request the restrictions.
     pub fn cpksver(mut self, new_value: &str) -> MyconfigRequestAccesCall<'a, C, NC, A> {
         self._cpksver = new_value.to_string();
         self
@@ -9599,7 +9740,7 @@ impl<'a, C, NC, A> MyconfigRequestAccesCall<'a, C, NC, A> where NC: hyper::net::
     /// Sets the *locale* query property to the given value.
     ///
     /// 
-    /// ISO-639-1, ISO-3166-1 codes for message localization, i.e. en_US.    
+    /// ISO-639-1, ISO-3166-1 codes for message localization, i.e. en_US.
     pub fn locale(mut self, new_value: &str) -> MyconfigRequestAccesCall<'a, C, NC, A> {
         self._locale = Some(new_value.to_string());
         self
@@ -9607,7 +9748,7 @@ impl<'a, C, NC, A> MyconfigRequestAccesCall<'a, C, NC, A> where NC: hyper::net::
     /// Sets the *license types* query property to the given value.
     ///
     /// 
-    /// The type of access license to request. If not specified, the default is BOTH.    
+    /// The type of access license to request. If not specified, the default is BOTH.
     pub fn license_types(mut self, new_value: &str) -> MyconfigRequestAccesCall<'a, C, NC, A> {
         self._license_types = Some(new_value.to_string());
         self
@@ -9668,7 +9809,7 @@ impl<'a, C, NC, A> MyconfigRequestAccesCall<'a, C, NC, A> where NC: hyper::net::
 /// Release downloaded content access restriction.
 ///
 /// A builder for the *releaseDownloadAccess* method supported by a *myconfig* resource.
-/// It is not used directly, but through a `MyconfigMethods`.
+/// It is not used directly, but through a `MyconfigMethods` instance.
 ///
 /// # Example
 ///
@@ -9744,7 +9885,7 @@ impl<'a, C, NC, A> MyconfigReleaseDownloadAccesCall<'a, C, NC, A> where NC: hype
         for &field in ["alt", "volumeIds", "cpksver", "source", "locale"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -9773,7 +9914,7 @@ impl<'a, C, NC, A> MyconfigReleaseDownloadAccesCall<'a, C, NC, A> where NC: hype
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -9785,7 +9926,6 @@ impl<'a, C, NC, A> MyconfigReleaseDownloadAccesCall<'a, C, NC, A> where NC: hype
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -9795,7 +9935,7 @@ impl<'a, C, NC, A> MyconfigReleaseDownloadAccesCall<'a, C, NC, A> where NC: hype
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -9806,7 +9946,7 @@ impl<'a, C, NC, A> MyconfigReleaseDownloadAccesCall<'a, C, NC, A> where NC: hype
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -9815,13 +9955,13 @@ impl<'a, C, NC, A> MyconfigReleaseDownloadAccesCall<'a, C, NC, A> where NC: hype
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -9834,7 +9974,7 @@ impl<'a, C, NC, A> MyconfigReleaseDownloadAccesCall<'a, C, NC, A> where NC: hype
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The volume(s) to release restrictions for.    
+    /// The volume(s) to release restrictions for.
     pub fn add_volume_ids(mut self, new_value: &str) -> MyconfigReleaseDownloadAccesCall<'a, C, NC, A> {
         self._volume_ids.push(new_value.to_string());
         self
@@ -9844,7 +9984,7 @@ impl<'a, C, NC, A> MyconfigReleaseDownloadAccesCall<'a, C, NC, A> where NC: hype
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The device/version ID from which to release the restriction.    
+    /// The device/version ID from which to release the restriction.
     pub fn cpksver(mut self, new_value: &str) -> MyconfigReleaseDownloadAccesCall<'a, C, NC, A> {
         self._cpksver = new_value.to_string();
         self
@@ -9852,7 +9992,7 @@ impl<'a, C, NC, A> MyconfigReleaseDownloadAccesCall<'a, C, NC, A> where NC: hype
     /// Sets the *source* query property to the given value.
     ///
     /// 
-    /// String to identify the originator of this request.    
+    /// String to identify the originator of this request.
     pub fn source(mut self, new_value: &str) -> MyconfigReleaseDownloadAccesCall<'a, C, NC, A> {
         self._source = Some(new_value.to_string());
         self
@@ -9860,7 +10000,7 @@ impl<'a, C, NC, A> MyconfigReleaseDownloadAccesCall<'a, C, NC, A> where NC: hype
     /// Sets the *locale* query property to the given value.
     ///
     /// 
-    /// ISO-639-1, ISO-3166-1 codes for message localization, i.e. en_US.    
+    /// ISO-639-1, ISO-3166-1 codes for message localization, i.e. en_US.
     pub fn locale(mut self, new_value: &str) -> MyconfigReleaseDownloadAccesCall<'a, C, NC, A> {
         self._locale = Some(new_value.to_string());
         self
@@ -9921,7 +10061,7 @@ impl<'a, C, NC, A> MyconfigReleaseDownloadAccesCall<'a, C, NC, A> where NC: hype
 /// Request downloaded content access for specified volumes on the My eBooks shelf.
 ///
 /// A builder for the *syncVolumeLicenses* method supported by a *myconfig* resource.
-/// It is not used directly, but through a `MyconfigMethods`.
+/// It is not used directly, but through a `MyconfigMethods` instance.
 ///
 /// # Example
 ///
@@ -10011,7 +10151,7 @@ impl<'a, C, NC, A> MyconfigSyncVolumeLicenseCall<'a, C, NC, A> where NC: hyper::
         for &field in ["alt", "source", "nonce", "cpksver", "volumeIds", "showPreorders", "locale", "features"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -10040,7 +10180,7 @@ impl<'a, C, NC, A> MyconfigSyncVolumeLicenseCall<'a, C, NC, A> where NC: hyper::
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -10052,7 +10192,6 @@ impl<'a, C, NC, A> MyconfigSyncVolumeLicenseCall<'a, C, NC, A> where NC: hyper::
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -10062,7 +10201,7 @@ impl<'a, C, NC, A> MyconfigSyncVolumeLicenseCall<'a, C, NC, A> where NC: hyper::
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -10073,7 +10212,7 @@ impl<'a, C, NC, A> MyconfigSyncVolumeLicenseCall<'a, C, NC, A> where NC: hyper::
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -10082,13 +10221,13 @@ impl<'a, C, NC, A> MyconfigSyncVolumeLicenseCall<'a, C, NC, A> where NC: hyper::
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -10100,7 +10239,7 @@ impl<'a, C, NC, A> MyconfigSyncVolumeLicenseCall<'a, C, NC, A> where NC: hyper::
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// String to identify the originator of this request.    
+    /// String to identify the originator of this request.
     pub fn source(mut self, new_value: &str) -> MyconfigSyncVolumeLicenseCall<'a, C, NC, A> {
         self._source = new_value.to_string();
         self
@@ -10110,7 +10249,7 @@ impl<'a, C, NC, A> MyconfigSyncVolumeLicenseCall<'a, C, NC, A> where NC: hyper::
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The client nonce value.    
+    /// The client nonce value.
     pub fn nonce(mut self, new_value: &str) -> MyconfigSyncVolumeLicenseCall<'a, C, NC, A> {
         self._nonce = new_value.to_string();
         self
@@ -10120,7 +10259,7 @@ impl<'a, C, NC, A> MyconfigSyncVolumeLicenseCall<'a, C, NC, A> where NC: hyper::
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The device/version ID from which to release the restriction.    
+    /// The device/version ID from which to release the restriction.
     pub fn cpksver(mut self, new_value: &str) -> MyconfigSyncVolumeLicenseCall<'a, C, NC, A> {
         self._cpksver = new_value.to_string();
         self
@@ -10129,7 +10268,7 @@ impl<'a, C, NC, A> MyconfigSyncVolumeLicenseCall<'a, C, NC, A> where NC: hyper::
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
     ///
     /// 
-    /// The volume(s) to request download restrictions for.    
+    /// The volume(s) to request download restrictions for.
     pub fn add_volume_ids(mut self, new_value: &str) -> MyconfigSyncVolumeLicenseCall<'a, C, NC, A> {
         self._volume_ids.push(new_value.to_string());
         self
@@ -10137,7 +10276,7 @@ impl<'a, C, NC, A> MyconfigSyncVolumeLicenseCall<'a, C, NC, A> where NC: hyper::
     /// Sets the *show preorders* query property to the given value.
     ///
     /// 
-    /// Set to true to show pre-ordered books. Defaults to false.    
+    /// Set to true to show pre-ordered books. Defaults to false.
     pub fn show_preorders(mut self, new_value: bool) -> MyconfigSyncVolumeLicenseCall<'a, C, NC, A> {
         self._show_preorders = Some(new_value);
         self
@@ -10145,7 +10284,7 @@ impl<'a, C, NC, A> MyconfigSyncVolumeLicenseCall<'a, C, NC, A> where NC: hyper::
     /// Sets the *locale* query property to the given value.
     ///
     /// 
-    /// ISO-639-1, ISO-3166-1 codes for message localization, i.e. en_US.    
+    /// ISO-639-1, ISO-3166-1 codes for message localization, i.e. en_US.
     pub fn locale(mut self, new_value: &str) -> MyconfigSyncVolumeLicenseCall<'a, C, NC, A> {
         self._locale = Some(new_value.to_string());
         self
@@ -10154,7 +10293,7 @@ impl<'a, C, NC, A> MyconfigSyncVolumeLicenseCall<'a, C, NC, A> where NC: hyper::
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
     ///
     /// 
-    /// List of features supported by the client, i.e., 'RENTALS'    
+    /// List of features supported by the client, i.e., 'RENTALS'
     pub fn add_features(mut self, new_value: &str) -> MyconfigSyncVolumeLicenseCall<'a, C, NC, A> {
         self._features.push(new_value.to_string());
         self
@@ -10215,7 +10354,7 @@ impl<'a, C, NC, A> MyconfigSyncVolumeLicenseCall<'a, C, NC, A> where NC: hyper::
 /// Gets the current settings for the user.
 ///
 /// A builder for the *getUserSettings* method supported by a *myconfig* resource.
-/// It is not used directly, but through a `MyconfigMethods`.
+/// It is not used directly, but through a `MyconfigMethods` instance.
 ///
 /// # Example
 ///
@@ -10271,7 +10410,7 @@ impl<'a, C, NC, A> MyconfigGetUserSettingCall<'a, C, NC, A> where NC: hyper::net
         for &field in ["alt"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -10300,7 +10439,7 @@ impl<'a, C, NC, A> MyconfigGetUserSettingCall<'a, C, NC, A> where NC: hyper::net
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -10312,7 +10451,6 @@ impl<'a, C, NC, A> MyconfigGetUserSettingCall<'a, C, NC, A> where NC: hyper::net
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -10322,7 +10460,7 @@ impl<'a, C, NC, A> MyconfigGetUserSettingCall<'a, C, NC, A> where NC: hyper::net
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -10333,7 +10471,7 @@ impl<'a, C, NC, A> MyconfigGetUserSettingCall<'a, C, NC, A> where NC: hyper::net
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -10342,13 +10480,13 @@ impl<'a, C, NC, A> MyconfigGetUserSettingCall<'a, C, NC, A> where NC: hyper::net
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -10411,7 +10549,7 @@ impl<'a, C, NC, A> MyconfigGetUserSettingCall<'a, C, NC, A> where NC: hyper::net
 /// Sets the settings for the user. Unspecified sub-objects will retain the existing value.
 ///
 /// A builder for the *updateUserSettings* method supported by a *myconfig* resource.
-/// It is not used directly, but through a `MyconfigMethods`.
+/// It is not used directly, but through a `MyconfigMethods` instance.
 ///
 /// # Example
 ///
@@ -10474,7 +10612,7 @@ impl<'a, C, NC, A> MyconfigUpdateUserSettingCall<'a, C, NC, A> where NC: hyper::
         for &field in ["alt"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -10507,7 +10645,7 @@ impl<'a, C, NC, A> MyconfigUpdateUserSettingCall<'a, C, NC, A> where NC: hyper::
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -10523,7 +10661,6 @@ impl<'a, C, NC, A> MyconfigUpdateUserSettingCall<'a, C, NC, A> where NC: hyper::
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -10533,7 +10670,7 @@ impl<'a, C, NC, A> MyconfigUpdateUserSettingCall<'a, C, NC, A> where NC: hyper::
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -10544,7 +10681,7 @@ impl<'a, C, NC, A> MyconfigUpdateUserSettingCall<'a, C, NC, A> where NC: hyper::
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -10553,13 +10690,13 @@ impl<'a, C, NC, A> MyconfigUpdateUserSettingCall<'a, C, NC, A> where NC: hyper::
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -10631,7 +10768,7 @@ impl<'a, C, NC, A> MyconfigUpdateUserSettingCall<'a, C, NC, A> where NC: hyper::
 /// Clears all volumes from a bookshelf.
 ///
 /// A builder for the *bookshelves.clearVolumes* method supported by a *mylibrary* resource.
-/// It is not used directly, but through a `MylibraryMethods`.
+/// It is not used directly, but through a `MylibraryMethods` instance.
 ///
 /// # Example
 ///
@@ -10694,7 +10831,7 @@ impl<'a, C, NC, A> MylibraryBookshelveClearVolumeCall<'a, C, NC, A> where NC: hy
         for &field in ["shelf", "source"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -10746,7 +10883,7 @@ impl<'a, C, NC, A> MylibraryBookshelveClearVolumeCall<'a, C, NC, A> where NC: hy
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -10758,7 +10895,6 @@ impl<'a, C, NC, A> MylibraryBookshelveClearVolumeCall<'a, C, NC, A> where NC: hy
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -10768,7 +10904,7 @@ impl<'a, C, NC, A> MylibraryBookshelveClearVolumeCall<'a, C, NC, A> where NC: hy
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -10779,12 +10915,12 @@ impl<'a, C, NC, A> MylibraryBookshelveClearVolumeCall<'a, C, NC, A> where NC: hy
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = res;
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -10796,7 +10932,7 @@ impl<'a, C, NC, A> MylibraryBookshelveClearVolumeCall<'a, C, NC, A> where NC: hy
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// ID of bookshelf from which to remove a volume.    
+    /// ID of bookshelf from which to remove a volume.
     pub fn shelf(mut self, new_value: &str) -> MylibraryBookshelveClearVolumeCall<'a, C, NC, A> {
         self._shelf = new_value.to_string();
         self
@@ -10804,7 +10940,7 @@ impl<'a, C, NC, A> MylibraryBookshelveClearVolumeCall<'a, C, NC, A> where NC: hy
     /// Sets the *source* query property to the given value.
     ///
     /// 
-    /// String to identify the originator of this request.    
+    /// String to identify the originator of this request.
     pub fn source(mut self, new_value: &str) -> MylibraryBookshelveClearVolumeCall<'a, C, NC, A> {
         self._source = Some(new_value.to_string());
         self
@@ -10865,7 +11001,7 @@ impl<'a, C, NC, A> MylibraryBookshelveClearVolumeCall<'a, C, NC, A> where NC: hy
 /// Moves a volume within a bookshelf.
 ///
 /// A builder for the *bookshelves.moveVolume* method supported by a *mylibrary* resource.
-/// It is not used directly, but through a `MylibraryMethods`.
+/// It is not used directly, but through a `MylibraryMethods` instance.
 ///
 /// # Example
 ///
@@ -10932,7 +11068,7 @@ impl<'a, C, NC, A> MylibraryBookshelveMoveVolumeCall<'a, C, NC, A> where NC: hyp
         for &field in ["shelf", "volumeId", "volumePosition", "source"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -10984,7 +11120,7 @@ impl<'a, C, NC, A> MylibraryBookshelveMoveVolumeCall<'a, C, NC, A> where NC: hyp
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -10996,7 +11132,6 @@ impl<'a, C, NC, A> MylibraryBookshelveMoveVolumeCall<'a, C, NC, A> where NC: hyp
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -11006,7 +11141,7 @@ impl<'a, C, NC, A> MylibraryBookshelveMoveVolumeCall<'a, C, NC, A> where NC: hyp
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -11017,12 +11152,12 @@ impl<'a, C, NC, A> MylibraryBookshelveMoveVolumeCall<'a, C, NC, A> where NC: hyp
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = res;
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -11034,7 +11169,7 @@ impl<'a, C, NC, A> MylibraryBookshelveMoveVolumeCall<'a, C, NC, A> where NC: hyp
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// ID of bookshelf with the volume.    
+    /// ID of bookshelf with the volume.
     pub fn shelf(mut self, new_value: &str) -> MylibraryBookshelveMoveVolumeCall<'a, C, NC, A> {
         self._shelf = new_value.to_string();
         self
@@ -11044,7 +11179,7 @@ impl<'a, C, NC, A> MylibraryBookshelveMoveVolumeCall<'a, C, NC, A> where NC: hyp
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// ID of volume to move.    
+    /// ID of volume to move.
     pub fn volume_id(mut self, new_value: &str) -> MylibraryBookshelveMoveVolumeCall<'a, C, NC, A> {
         self._volume_id = new_value.to_string();
         self
@@ -11054,7 +11189,7 @@ impl<'a, C, NC, A> MylibraryBookshelveMoveVolumeCall<'a, C, NC, A> where NC: hyp
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Position on shelf to move the item (0 puts the item before the current first item, 1 puts it between the first and the second and so on.)    
+    /// Position on shelf to move the item (0 puts the item before the current first item, 1 puts it between the first and the second and so on.)
     pub fn volume_position(mut self, new_value: i32) -> MylibraryBookshelveMoveVolumeCall<'a, C, NC, A> {
         self._volume_position = new_value;
         self
@@ -11062,7 +11197,7 @@ impl<'a, C, NC, A> MylibraryBookshelveMoveVolumeCall<'a, C, NC, A> where NC: hyp
     /// Sets the *source* query property to the given value.
     ///
     /// 
-    /// String to identify the originator of this request.    
+    /// String to identify the originator of this request.
     pub fn source(mut self, new_value: &str) -> MylibraryBookshelveMoveVolumeCall<'a, C, NC, A> {
         self._source = Some(new_value.to_string());
         self
@@ -11123,7 +11258,7 @@ impl<'a, C, NC, A> MylibraryBookshelveMoveVolumeCall<'a, C, NC, A> where NC: hyp
 /// Gets volume information for volumes on a bookshelf.
 ///
 /// A builder for the *bookshelves.volumes.list* method supported by a *mylibrary* resource.
-/// It is not used directly, but through a `MylibraryMethods`.
+/// It is not used directly, but through a `MylibraryMethods` instance.
 ///
 /// # Example
 ///
@@ -11216,7 +11351,7 @@ impl<'a, C, NC, A> MylibraryBookshelveVolumeListCall<'a, C, NC, A> where NC: hyp
         for &field in ["alt", "shelf", "startIndex", "source", "showPreorders", "q", "projection", "maxResults", "country"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -11269,7 +11404,7 @@ impl<'a, C, NC, A> MylibraryBookshelveVolumeListCall<'a, C, NC, A> where NC: hyp
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -11281,7 +11416,6 @@ impl<'a, C, NC, A> MylibraryBookshelveVolumeListCall<'a, C, NC, A> where NC: hyp
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -11291,7 +11425,7 @@ impl<'a, C, NC, A> MylibraryBookshelveVolumeListCall<'a, C, NC, A> where NC: hyp
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -11302,7 +11436,7 @@ impl<'a, C, NC, A> MylibraryBookshelveVolumeListCall<'a, C, NC, A> where NC: hyp
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -11311,13 +11445,13 @@ impl<'a, C, NC, A> MylibraryBookshelveVolumeListCall<'a, C, NC, A> where NC: hyp
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -11329,7 +11463,7 @@ impl<'a, C, NC, A> MylibraryBookshelveVolumeListCall<'a, C, NC, A> where NC: hyp
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The bookshelf ID or name retrieve volumes for.    
+    /// The bookshelf ID or name retrieve volumes for.
     pub fn shelf(mut self, new_value: &str) -> MylibraryBookshelveVolumeListCall<'a, C, NC, A> {
         self._shelf = new_value.to_string();
         self
@@ -11337,7 +11471,7 @@ impl<'a, C, NC, A> MylibraryBookshelveVolumeListCall<'a, C, NC, A> where NC: hyp
     /// Sets the *start index* query property to the given value.
     ///
     /// 
-    /// Index of the first element to return (starts at 0)    
+    /// Index of the first element to return (starts at 0)
     pub fn start_index(mut self, new_value: u32) -> MylibraryBookshelveVolumeListCall<'a, C, NC, A> {
         self._start_index = Some(new_value);
         self
@@ -11345,7 +11479,7 @@ impl<'a, C, NC, A> MylibraryBookshelveVolumeListCall<'a, C, NC, A> where NC: hyp
     /// Sets the *source* query property to the given value.
     ///
     /// 
-    /// String to identify the originator of this request.    
+    /// String to identify the originator of this request.
     pub fn source(mut self, new_value: &str) -> MylibraryBookshelveVolumeListCall<'a, C, NC, A> {
         self._source = Some(new_value.to_string());
         self
@@ -11353,7 +11487,7 @@ impl<'a, C, NC, A> MylibraryBookshelveVolumeListCall<'a, C, NC, A> where NC: hyp
     /// Sets the *show preorders* query property to the given value.
     ///
     /// 
-    /// Set to true to show pre-ordered books. Defaults to false.    
+    /// Set to true to show pre-ordered books. Defaults to false.
     pub fn show_preorders(mut self, new_value: bool) -> MylibraryBookshelveVolumeListCall<'a, C, NC, A> {
         self._show_preorders = Some(new_value);
         self
@@ -11361,7 +11495,7 @@ impl<'a, C, NC, A> MylibraryBookshelveVolumeListCall<'a, C, NC, A> where NC: hyp
     /// Sets the *q* query property to the given value.
     ///
     /// 
-    /// Full-text search query string in this bookshelf.    
+    /// Full-text search query string in this bookshelf.
     pub fn q(mut self, new_value: &str) -> MylibraryBookshelveVolumeListCall<'a, C, NC, A> {
         self._q = Some(new_value.to_string());
         self
@@ -11369,7 +11503,7 @@ impl<'a, C, NC, A> MylibraryBookshelveVolumeListCall<'a, C, NC, A> where NC: hyp
     /// Sets the *projection* query property to the given value.
     ///
     /// 
-    /// Restrict information returned to a set of selected fields.    
+    /// Restrict information returned to a set of selected fields.
     pub fn projection(mut self, new_value: &str) -> MylibraryBookshelveVolumeListCall<'a, C, NC, A> {
         self._projection = Some(new_value.to_string());
         self
@@ -11377,7 +11511,7 @@ impl<'a, C, NC, A> MylibraryBookshelveVolumeListCall<'a, C, NC, A> where NC: hyp
     /// Sets the *max results* query property to the given value.
     ///
     /// 
-    /// Maximum number of results to return    
+    /// Maximum number of results to return
     pub fn max_results(mut self, new_value: u32) -> MylibraryBookshelveVolumeListCall<'a, C, NC, A> {
         self._max_results = Some(new_value);
         self
@@ -11385,7 +11519,7 @@ impl<'a, C, NC, A> MylibraryBookshelveVolumeListCall<'a, C, NC, A> where NC: hyp
     /// Sets the *country* query property to the given value.
     ///
     /// 
-    /// ISO-3166-1 code to override the IP-based location.    
+    /// ISO-3166-1 code to override the IP-based location.
     pub fn country(mut self, new_value: &str) -> MylibraryBookshelveVolumeListCall<'a, C, NC, A> {
         self._country = Some(new_value.to_string());
         self
@@ -11446,7 +11580,7 @@ impl<'a, C, NC, A> MylibraryBookshelveVolumeListCall<'a, C, NC, A> where NC: hyp
 /// Gets the summary of specified layers.
 ///
 /// A builder for the *annotations.summary* method supported by a *mylibrary* resource.
-/// It is not used directly, but through a `MylibraryMethods`.
+/// It is not used directly, but through a `MylibraryMethods` instance.
 ///
 /// # Example
 ///
@@ -11512,7 +11646,7 @@ impl<'a, C, NC, A> MylibraryAnnotationSummaryCall<'a, C, NC, A> where NC: hyper:
         for &field in ["alt", "layerIds", "volumeId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -11541,7 +11675,7 @@ impl<'a, C, NC, A> MylibraryAnnotationSummaryCall<'a, C, NC, A> where NC: hyper:
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -11553,7 +11687,6 @@ impl<'a, C, NC, A> MylibraryAnnotationSummaryCall<'a, C, NC, A> where NC: hyper:
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -11563,7 +11696,7 @@ impl<'a, C, NC, A> MylibraryAnnotationSummaryCall<'a, C, NC, A> where NC: hyper:
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -11574,7 +11707,7 @@ impl<'a, C, NC, A> MylibraryAnnotationSummaryCall<'a, C, NC, A> where NC: hyper:
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -11583,13 +11716,13 @@ impl<'a, C, NC, A> MylibraryAnnotationSummaryCall<'a, C, NC, A> where NC: hyper:
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -11602,7 +11735,7 @@ impl<'a, C, NC, A> MylibraryAnnotationSummaryCall<'a, C, NC, A> where NC: hyper:
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Array of layer IDs to get the summary for.    
+    /// Array of layer IDs to get the summary for.
     pub fn add_layer_ids(mut self, new_value: &str) -> MylibraryAnnotationSummaryCall<'a, C, NC, A> {
         self._layer_ids.push(new_value.to_string());
         self
@@ -11612,7 +11745,7 @@ impl<'a, C, NC, A> MylibraryAnnotationSummaryCall<'a, C, NC, A> where NC: hyper:
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Volume id to get the summary for.    
+    /// Volume id to get the summary for.
     pub fn volume_id(mut self, new_value: &str) -> MylibraryAnnotationSummaryCall<'a, C, NC, A> {
         self._volume_id = new_value.to_string();
         self
@@ -11673,7 +11806,7 @@ impl<'a, C, NC, A> MylibraryAnnotationSummaryCall<'a, C, NC, A> where NC: hyper:
 /// Deletes an annotation.
 ///
 /// A builder for the *annotations.delete* method supported by a *mylibrary* resource.
-/// It is not used directly, but through a `MylibraryMethods`.
+/// It is not used directly, but through a `MylibraryMethods` instance.
 ///
 /// # Example
 ///
@@ -11736,7 +11869,7 @@ impl<'a, C, NC, A> MylibraryAnnotationDeleteCall<'a, C, NC, A> where NC: hyper::
         for &field in ["annotationId", "source"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -11788,7 +11921,7 @@ impl<'a, C, NC, A> MylibraryAnnotationDeleteCall<'a, C, NC, A> where NC: hyper::
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -11800,7 +11933,6 @@ impl<'a, C, NC, A> MylibraryAnnotationDeleteCall<'a, C, NC, A> where NC: hyper::
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -11810,7 +11942,7 @@ impl<'a, C, NC, A> MylibraryAnnotationDeleteCall<'a, C, NC, A> where NC: hyper::
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -11821,12 +11953,12 @@ impl<'a, C, NC, A> MylibraryAnnotationDeleteCall<'a, C, NC, A> where NC: hyper::
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = res;
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -11838,7 +11970,7 @@ impl<'a, C, NC, A> MylibraryAnnotationDeleteCall<'a, C, NC, A> where NC: hyper::
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The ID for the annotation to delete.    
+    /// The ID for the annotation to delete.
     pub fn annotation_id(mut self, new_value: &str) -> MylibraryAnnotationDeleteCall<'a, C, NC, A> {
         self._annotation_id = new_value.to_string();
         self
@@ -11846,7 +11978,7 @@ impl<'a, C, NC, A> MylibraryAnnotationDeleteCall<'a, C, NC, A> where NC: hyper::
     /// Sets the *source* query property to the given value.
     ///
     /// 
-    /// String to identify the originator of this request.    
+    /// String to identify the originator of this request.
     pub fn source(mut self, new_value: &str) -> MylibraryAnnotationDeleteCall<'a, C, NC, A> {
         self._source = Some(new_value.to_string());
         self
@@ -11907,7 +12039,7 @@ impl<'a, C, NC, A> MylibraryAnnotationDeleteCall<'a, C, NC, A> where NC: hyper::
 /// Adds a volume to a bookshelf.
 ///
 /// A builder for the *bookshelves.addVolume* method supported by a *mylibrary* resource.
-/// It is not used directly, but through a `MylibraryMethods`.
+/// It is not used directly, but through a `MylibraryMethods` instance.
 ///
 /// # Example
 ///
@@ -11977,7 +12109,7 @@ impl<'a, C, NC, A> MylibraryBookshelveAddVolumeCall<'a, C, NC, A> where NC: hype
         for &field in ["shelf", "volumeId", "source", "reason"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -12029,7 +12161,7 @@ impl<'a, C, NC, A> MylibraryBookshelveAddVolumeCall<'a, C, NC, A> where NC: hype
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -12041,7 +12173,6 @@ impl<'a, C, NC, A> MylibraryBookshelveAddVolumeCall<'a, C, NC, A> where NC: hype
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -12051,7 +12182,7 @@ impl<'a, C, NC, A> MylibraryBookshelveAddVolumeCall<'a, C, NC, A> where NC: hype
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -12062,12 +12193,12 @@ impl<'a, C, NC, A> MylibraryBookshelveAddVolumeCall<'a, C, NC, A> where NC: hype
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = res;
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -12079,7 +12210,7 @@ impl<'a, C, NC, A> MylibraryBookshelveAddVolumeCall<'a, C, NC, A> where NC: hype
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// ID of bookshelf to which to add a volume.    
+    /// ID of bookshelf to which to add a volume.
     pub fn shelf(mut self, new_value: &str) -> MylibraryBookshelveAddVolumeCall<'a, C, NC, A> {
         self._shelf = new_value.to_string();
         self
@@ -12089,7 +12220,7 @@ impl<'a, C, NC, A> MylibraryBookshelveAddVolumeCall<'a, C, NC, A> where NC: hype
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// ID of volume to add.    
+    /// ID of volume to add.
     pub fn volume_id(mut self, new_value: &str) -> MylibraryBookshelveAddVolumeCall<'a, C, NC, A> {
         self._volume_id = new_value.to_string();
         self
@@ -12097,7 +12228,7 @@ impl<'a, C, NC, A> MylibraryBookshelveAddVolumeCall<'a, C, NC, A> where NC: hype
     /// Sets the *source* query property to the given value.
     ///
     /// 
-    /// String to identify the originator of this request.    
+    /// String to identify the originator of this request.
     pub fn source(mut self, new_value: &str) -> MylibraryBookshelveAddVolumeCall<'a, C, NC, A> {
         self._source = Some(new_value.to_string());
         self
@@ -12105,7 +12236,7 @@ impl<'a, C, NC, A> MylibraryBookshelveAddVolumeCall<'a, C, NC, A> where NC: hype
     /// Sets the *reason* query property to the given value.
     ///
     /// 
-    /// The reason for which the book is added to the library.    
+    /// The reason for which the book is added to the library.
     pub fn reason(mut self, new_value: &str) -> MylibraryBookshelveAddVolumeCall<'a, C, NC, A> {
         self._reason = Some(new_value.to_string());
         self
@@ -12166,7 +12297,7 @@ impl<'a, C, NC, A> MylibraryBookshelveAddVolumeCall<'a, C, NC, A> where NC: hype
 /// Inserts a new annotation.
 ///
 /// A builder for the *annotations.insert* method supported by a *mylibrary* resource.
-/// It is not used directly, but through a `MylibraryMethods`.
+/// It is not used directly, but through a `MylibraryMethods` instance.
 ///
 /// # Example
 ///
@@ -12244,7 +12375,7 @@ impl<'a, C, NC, A> MylibraryAnnotationInsertCall<'a, C, NC, A> where NC: hyper::
         for &field in ["alt", "source", "showOnlySummaryInResponse", "country"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -12277,7 +12408,7 @@ impl<'a, C, NC, A> MylibraryAnnotationInsertCall<'a, C, NC, A> where NC: hyper::
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -12293,7 +12424,6 @@ impl<'a, C, NC, A> MylibraryAnnotationInsertCall<'a, C, NC, A> where NC: hyper::
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -12303,7 +12433,7 @@ impl<'a, C, NC, A> MylibraryAnnotationInsertCall<'a, C, NC, A> where NC: hyper::
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -12314,7 +12444,7 @@ impl<'a, C, NC, A> MylibraryAnnotationInsertCall<'a, C, NC, A> where NC: hyper::
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -12323,13 +12453,13 @@ impl<'a, C, NC, A> MylibraryAnnotationInsertCall<'a, C, NC, A> where NC: hyper::
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -12348,7 +12478,7 @@ impl<'a, C, NC, A> MylibraryAnnotationInsertCall<'a, C, NC, A> where NC: hyper::
     /// Sets the *source* query property to the given value.
     ///
     /// 
-    /// String to identify the originator of this request.    
+    /// String to identify the originator of this request.
     pub fn source(mut self, new_value: &str) -> MylibraryAnnotationInsertCall<'a, C, NC, A> {
         self._source = Some(new_value.to_string());
         self
@@ -12356,7 +12486,7 @@ impl<'a, C, NC, A> MylibraryAnnotationInsertCall<'a, C, NC, A> where NC: hyper::
     /// Sets the *show only summary in response* query property to the given value.
     ///
     /// 
-    /// Requests that only the summary of the specified layer be provided in the response.    
+    /// Requests that only the summary of the specified layer be provided in the response.
     pub fn show_only_summary_in_response(mut self, new_value: bool) -> MylibraryAnnotationInsertCall<'a, C, NC, A> {
         self._show_only_summary_in_response = Some(new_value);
         self
@@ -12364,7 +12494,7 @@ impl<'a, C, NC, A> MylibraryAnnotationInsertCall<'a, C, NC, A> where NC: hyper::
     /// Sets the *country* query property to the given value.
     ///
     /// 
-    /// ISO-3166-1 code to override the IP-based location.    
+    /// ISO-3166-1 code to override the IP-based location.
     pub fn country(mut self, new_value: &str) -> MylibraryAnnotationInsertCall<'a, C, NC, A> {
         self._country = Some(new_value.to_string());
         self
@@ -12425,7 +12555,7 @@ impl<'a, C, NC, A> MylibraryAnnotationInsertCall<'a, C, NC, A> where NC: hyper::
 /// Removes a volume from a bookshelf.
 ///
 /// A builder for the *bookshelves.removeVolume* method supported by a *mylibrary* resource.
-/// It is not used directly, but through a `MylibraryMethods`.
+/// It is not used directly, but through a `MylibraryMethods` instance.
 ///
 /// # Example
 ///
@@ -12495,7 +12625,7 @@ impl<'a, C, NC, A> MylibraryBookshelveRemoveVolumeCall<'a, C, NC, A> where NC: h
         for &field in ["shelf", "volumeId", "source", "reason"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -12547,7 +12677,7 @@ impl<'a, C, NC, A> MylibraryBookshelveRemoveVolumeCall<'a, C, NC, A> where NC: h
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -12559,7 +12689,6 @@ impl<'a, C, NC, A> MylibraryBookshelveRemoveVolumeCall<'a, C, NC, A> where NC: h
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -12569,7 +12698,7 @@ impl<'a, C, NC, A> MylibraryBookshelveRemoveVolumeCall<'a, C, NC, A> where NC: h
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -12580,12 +12709,12 @@ impl<'a, C, NC, A> MylibraryBookshelveRemoveVolumeCall<'a, C, NC, A> where NC: h
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = res;
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -12597,7 +12726,7 @@ impl<'a, C, NC, A> MylibraryBookshelveRemoveVolumeCall<'a, C, NC, A> where NC: h
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// ID of bookshelf from which to remove a volume.    
+    /// ID of bookshelf from which to remove a volume.
     pub fn shelf(mut self, new_value: &str) -> MylibraryBookshelveRemoveVolumeCall<'a, C, NC, A> {
         self._shelf = new_value.to_string();
         self
@@ -12607,7 +12736,7 @@ impl<'a, C, NC, A> MylibraryBookshelveRemoveVolumeCall<'a, C, NC, A> where NC: h
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// ID of volume to remove.    
+    /// ID of volume to remove.
     pub fn volume_id(mut self, new_value: &str) -> MylibraryBookshelveRemoveVolumeCall<'a, C, NC, A> {
         self._volume_id = new_value.to_string();
         self
@@ -12615,7 +12744,7 @@ impl<'a, C, NC, A> MylibraryBookshelveRemoveVolumeCall<'a, C, NC, A> where NC: h
     /// Sets the *source* query property to the given value.
     ///
     /// 
-    /// String to identify the originator of this request.    
+    /// String to identify the originator of this request.
     pub fn source(mut self, new_value: &str) -> MylibraryBookshelveRemoveVolumeCall<'a, C, NC, A> {
         self._source = Some(new_value.to_string());
         self
@@ -12623,7 +12752,7 @@ impl<'a, C, NC, A> MylibraryBookshelveRemoveVolumeCall<'a, C, NC, A> where NC: h
     /// Sets the *reason* query property to the given value.
     ///
     /// 
-    /// The reason for which the book is removed from the library.    
+    /// The reason for which the book is removed from the library.
     pub fn reason(mut self, new_value: &str) -> MylibraryBookshelveRemoveVolumeCall<'a, C, NC, A> {
         self._reason = Some(new_value.to_string());
         self
@@ -12684,7 +12813,7 @@ impl<'a, C, NC, A> MylibraryBookshelveRemoveVolumeCall<'a, C, NC, A> where NC: h
 /// Retrieves a list of annotations, possibly filtered.
 ///
 /// A builder for the *annotations.list* method supported by a *mylibrary* resource.
-/// It is not used directly, but through a `MylibraryMethods`.
+/// It is not used directly, but through a `MylibraryMethods` instance.
 ///
 /// # Example
 ///
@@ -12794,7 +12923,7 @@ impl<'a, C, NC, A> MylibraryAnnotationListCall<'a, C, NC, A> where NC: hyper::ne
         for &field in ["alt", "volumeId", "updatedMin", "updatedMax", "source", "showDeleted", "pageToken", "maxResults", "layerIds", "layerId", "contentVersion"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -12823,7 +12952,7 @@ impl<'a, C, NC, A> MylibraryAnnotationListCall<'a, C, NC, A> where NC: hyper::ne
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -12835,7 +12964,6 @@ impl<'a, C, NC, A> MylibraryAnnotationListCall<'a, C, NC, A> where NC: hyper::ne
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -12845,7 +12973,7 @@ impl<'a, C, NC, A> MylibraryAnnotationListCall<'a, C, NC, A> where NC: hyper::ne
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -12856,7 +12984,7 @@ impl<'a, C, NC, A> MylibraryAnnotationListCall<'a, C, NC, A> where NC: hyper::ne
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -12865,13 +12993,13 @@ impl<'a, C, NC, A> MylibraryAnnotationListCall<'a, C, NC, A> where NC: hyper::ne
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -12881,7 +13009,7 @@ impl<'a, C, NC, A> MylibraryAnnotationListCall<'a, C, NC, A> where NC: hyper::ne
     /// Sets the *volume id* query property to the given value.
     ///
     /// 
-    /// The volume to restrict annotations to.    
+    /// The volume to restrict annotations to.
     pub fn volume_id(mut self, new_value: &str) -> MylibraryAnnotationListCall<'a, C, NC, A> {
         self._volume_id = Some(new_value.to_string());
         self
@@ -12889,7 +13017,7 @@ impl<'a, C, NC, A> MylibraryAnnotationListCall<'a, C, NC, A> where NC: hyper::ne
     /// Sets the *updated min* query property to the given value.
     ///
     /// 
-    /// RFC 3339 timestamp to restrict to items updated since this timestamp (inclusive).    
+    /// RFC 3339 timestamp to restrict to items updated since this timestamp (inclusive).
     pub fn updated_min(mut self, new_value: &str) -> MylibraryAnnotationListCall<'a, C, NC, A> {
         self._updated_min = Some(new_value.to_string());
         self
@@ -12897,7 +13025,7 @@ impl<'a, C, NC, A> MylibraryAnnotationListCall<'a, C, NC, A> where NC: hyper::ne
     /// Sets the *updated max* query property to the given value.
     ///
     /// 
-    /// RFC 3339 timestamp to restrict to items updated prior to this timestamp (exclusive).    
+    /// RFC 3339 timestamp to restrict to items updated prior to this timestamp (exclusive).
     pub fn updated_max(mut self, new_value: &str) -> MylibraryAnnotationListCall<'a, C, NC, A> {
         self._updated_max = Some(new_value.to_string());
         self
@@ -12905,7 +13033,7 @@ impl<'a, C, NC, A> MylibraryAnnotationListCall<'a, C, NC, A> where NC: hyper::ne
     /// Sets the *source* query property to the given value.
     ///
     /// 
-    /// String to identify the originator of this request.    
+    /// String to identify the originator of this request.
     pub fn source(mut self, new_value: &str) -> MylibraryAnnotationListCall<'a, C, NC, A> {
         self._source = Some(new_value.to_string());
         self
@@ -12913,7 +13041,7 @@ impl<'a, C, NC, A> MylibraryAnnotationListCall<'a, C, NC, A> where NC: hyper::ne
     /// Sets the *show deleted* query property to the given value.
     ///
     /// 
-    /// Set to true to return deleted annotations. updatedMin must be in the request to use this. Defaults to false.    
+    /// Set to true to return deleted annotations. updatedMin must be in the request to use this. Defaults to false.
     pub fn show_deleted(mut self, new_value: bool) -> MylibraryAnnotationListCall<'a, C, NC, A> {
         self._show_deleted = Some(new_value);
         self
@@ -12921,7 +13049,7 @@ impl<'a, C, NC, A> MylibraryAnnotationListCall<'a, C, NC, A> where NC: hyper::ne
     /// Sets the *page token* query property to the given value.
     ///
     /// 
-    /// The value of the nextToken from the previous page.    
+    /// The value of the nextToken from the previous page.
     pub fn page_token(mut self, new_value: &str) -> MylibraryAnnotationListCall<'a, C, NC, A> {
         self._page_token = Some(new_value.to_string());
         self
@@ -12929,7 +13057,7 @@ impl<'a, C, NC, A> MylibraryAnnotationListCall<'a, C, NC, A> where NC: hyper::ne
     /// Sets the *max results* query property to the given value.
     ///
     /// 
-    /// Maximum number of results to return    
+    /// Maximum number of results to return
     pub fn max_results(mut self, new_value: u32) -> MylibraryAnnotationListCall<'a, C, NC, A> {
         self._max_results = Some(new_value);
         self
@@ -12938,7 +13066,7 @@ impl<'a, C, NC, A> MylibraryAnnotationListCall<'a, C, NC, A> where NC: hyper::ne
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
     ///
     /// 
-    /// The layer ID(s) to limit annotation by.    
+    /// The layer ID(s) to limit annotation by.
     pub fn add_layer_ids(mut self, new_value: &str) -> MylibraryAnnotationListCall<'a, C, NC, A> {
         self._layer_ids.push(new_value.to_string());
         self
@@ -12946,7 +13074,7 @@ impl<'a, C, NC, A> MylibraryAnnotationListCall<'a, C, NC, A> where NC: hyper::ne
     /// Sets the *layer id* query property to the given value.
     ///
     /// 
-    /// The layer ID to limit annotation by.    
+    /// The layer ID to limit annotation by.
     pub fn layer_id(mut self, new_value: &str) -> MylibraryAnnotationListCall<'a, C, NC, A> {
         self._layer_id = Some(new_value.to_string());
         self
@@ -12954,7 +13082,7 @@ impl<'a, C, NC, A> MylibraryAnnotationListCall<'a, C, NC, A> where NC: hyper::ne
     /// Sets the *content version* query property to the given value.
     ///
     /// 
-    /// The content version for the requested volume.    
+    /// The content version for the requested volume.
     pub fn content_version(mut self, new_value: &str) -> MylibraryAnnotationListCall<'a, C, NC, A> {
         self._content_version = Some(new_value.to_string());
         self
@@ -13015,7 +13143,7 @@ impl<'a, C, NC, A> MylibraryAnnotationListCall<'a, C, NC, A> where NC: hyper::ne
 /// Updates an existing annotation.
 ///
 /// A builder for the *annotations.update* method supported by a *mylibrary* resource.
-/// It is not used directly, but through a `MylibraryMethods`.
+/// It is not used directly, but through a `MylibraryMethods` instance.
 ///
 /// # Example
 ///
@@ -13085,7 +13213,7 @@ impl<'a, C, NC, A> MylibraryAnnotationUpdateCall<'a, C, NC, A> where NC: hyper::
         for &field in ["alt", "annotationId", "source"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -13142,7 +13270,7 @@ impl<'a, C, NC, A> MylibraryAnnotationUpdateCall<'a, C, NC, A> where NC: hyper::
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -13158,7 +13286,6 @@ impl<'a, C, NC, A> MylibraryAnnotationUpdateCall<'a, C, NC, A> where NC: hyper::
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -13168,7 +13295,7 @@ impl<'a, C, NC, A> MylibraryAnnotationUpdateCall<'a, C, NC, A> where NC: hyper::
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -13179,7 +13306,7 @@ impl<'a, C, NC, A> MylibraryAnnotationUpdateCall<'a, C, NC, A> where NC: hyper::
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -13188,13 +13315,13 @@ impl<'a, C, NC, A> MylibraryAnnotationUpdateCall<'a, C, NC, A> where NC: hyper::
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -13215,7 +13342,7 @@ impl<'a, C, NC, A> MylibraryAnnotationUpdateCall<'a, C, NC, A> where NC: hyper::
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The ID for the annotation to update.    
+    /// The ID for the annotation to update.
     pub fn annotation_id(mut self, new_value: &str) -> MylibraryAnnotationUpdateCall<'a, C, NC, A> {
         self._annotation_id = new_value.to_string();
         self
@@ -13223,7 +13350,7 @@ impl<'a, C, NC, A> MylibraryAnnotationUpdateCall<'a, C, NC, A> where NC: hyper::
     /// Sets the *source* query property to the given value.
     ///
     /// 
-    /// String to identify the originator of this request.    
+    /// String to identify the originator of this request.
     pub fn source(mut self, new_value: &str) -> MylibraryAnnotationUpdateCall<'a, C, NC, A> {
         self._source = Some(new_value.to_string());
         self
@@ -13284,7 +13411,7 @@ impl<'a, C, NC, A> MylibraryAnnotationUpdateCall<'a, C, NC, A> where NC: hyper::
 /// Sets my reading position information for a volume.
 ///
 /// A builder for the *readingpositions.setPosition* method supported by a *mylibrary* resource.
-/// It is not used directly, but through a `MylibraryMethods`.
+/// It is not used directly, but through a `MylibraryMethods` instance.
 ///
 /// # Example
 ///
@@ -13366,7 +13493,7 @@ impl<'a, C, NC, A> MylibraryReadingpositionSetPositionCall<'a, C, NC, A> where N
         for &field in ["volumeId", "timestamp", "position", "source", "deviceCookie", "contentVersion", "action"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -13418,7 +13545,7 @@ impl<'a, C, NC, A> MylibraryReadingpositionSetPositionCall<'a, C, NC, A> where N
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -13430,7 +13557,6 @@ impl<'a, C, NC, A> MylibraryReadingpositionSetPositionCall<'a, C, NC, A> where N
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -13440,7 +13566,7 @@ impl<'a, C, NC, A> MylibraryReadingpositionSetPositionCall<'a, C, NC, A> where N
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -13451,12 +13577,12 @@ impl<'a, C, NC, A> MylibraryReadingpositionSetPositionCall<'a, C, NC, A> where N
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = res;
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -13468,7 +13594,7 @@ impl<'a, C, NC, A> MylibraryReadingpositionSetPositionCall<'a, C, NC, A> where N
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// ID of volume for which to update the reading position.    
+    /// ID of volume for which to update the reading position.
     pub fn volume_id(mut self, new_value: &str) -> MylibraryReadingpositionSetPositionCall<'a, C, NC, A> {
         self._volume_id = new_value.to_string();
         self
@@ -13478,7 +13604,7 @@ impl<'a, C, NC, A> MylibraryReadingpositionSetPositionCall<'a, C, NC, A> where N
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// RFC 3339 UTC format timestamp associated with this reading position.    
+    /// RFC 3339 UTC format timestamp associated with this reading position.
     pub fn timestamp(mut self, new_value: &str) -> MylibraryReadingpositionSetPositionCall<'a, C, NC, A> {
         self._timestamp = new_value.to_string();
         self
@@ -13488,7 +13614,7 @@ impl<'a, C, NC, A> MylibraryReadingpositionSetPositionCall<'a, C, NC, A> where N
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Position string for the new volume reading position.    
+    /// Position string for the new volume reading position.
     pub fn position(mut self, new_value: &str) -> MylibraryReadingpositionSetPositionCall<'a, C, NC, A> {
         self._position = new_value.to_string();
         self
@@ -13496,7 +13622,7 @@ impl<'a, C, NC, A> MylibraryReadingpositionSetPositionCall<'a, C, NC, A> where N
     /// Sets the *source* query property to the given value.
     ///
     /// 
-    /// String to identify the originator of this request.    
+    /// String to identify the originator of this request.
     pub fn source(mut self, new_value: &str) -> MylibraryReadingpositionSetPositionCall<'a, C, NC, A> {
         self._source = Some(new_value.to_string());
         self
@@ -13504,7 +13630,7 @@ impl<'a, C, NC, A> MylibraryReadingpositionSetPositionCall<'a, C, NC, A> where N
     /// Sets the *device cookie* query property to the given value.
     ///
     /// 
-    /// Random persistent device cookie optional on set position.    
+    /// Random persistent device cookie optional on set position.
     pub fn device_cookie(mut self, new_value: &str) -> MylibraryReadingpositionSetPositionCall<'a, C, NC, A> {
         self._device_cookie = Some(new_value.to_string());
         self
@@ -13512,7 +13638,7 @@ impl<'a, C, NC, A> MylibraryReadingpositionSetPositionCall<'a, C, NC, A> where N
     /// Sets the *content version* query property to the given value.
     ///
     /// 
-    /// Volume content version for which this reading position applies.    
+    /// Volume content version for which this reading position applies.
     pub fn content_version(mut self, new_value: &str) -> MylibraryReadingpositionSetPositionCall<'a, C, NC, A> {
         self._content_version = Some(new_value.to_string());
         self
@@ -13520,7 +13646,7 @@ impl<'a, C, NC, A> MylibraryReadingpositionSetPositionCall<'a, C, NC, A> where N
     /// Sets the *action* query property to the given value.
     ///
     /// 
-    /// Action that caused this reading position to be set.    
+    /// Action that caused this reading position to be set.
     pub fn action(mut self, new_value: &str) -> MylibraryReadingpositionSetPositionCall<'a, C, NC, A> {
         self._action = Some(new_value.to_string());
         self
@@ -13581,7 +13707,7 @@ impl<'a, C, NC, A> MylibraryReadingpositionSetPositionCall<'a, C, NC, A> where N
 /// Retrieves metadata for a specific bookshelf belonging to the authenticated user.
 ///
 /// A builder for the *bookshelves.get* method supported by a *mylibrary* resource.
-/// It is not used directly, but through a `MylibraryMethods`.
+/// It is not used directly, but through a `MylibraryMethods` instance.
 ///
 /// # Example
 ///
@@ -13644,7 +13770,7 @@ impl<'a, C, NC, A> MylibraryBookshelveGetCall<'a, C, NC, A> where NC: hyper::net
         for &field in ["alt", "shelf", "source"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -13697,7 +13823,7 @@ impl<'a, C, NC, A> MylibraryBookshelveGetCall<'a, C, NC, A> where NC: hyper::net
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -13709,7 +13835,6 @@ impl<'a, C, NC, A> MylibraryBookshelveGetCall<'a, C, NC, A> where NC: hyper::net
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -13719,7 +13844,7 @@ impl<'a, C, NC, A> MylibraryBookshelveGetCall<'a, C, NC, A> where NC: hyper::net
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -13730,7 +13855,7 @@ impl<'a, C, NC, A> MylibraryBookshelveGetCall<'a, C, NC, A> where NC: hyper::net
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -13739,13 +13864,13 @@ impl<'a, C, NC, A> MylibraryBookshelveGetCall<'a, C, NC, A> where NC: hyper::net
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -13757,7 +13882,7 @@ impl<'a, C, NC, A> MylibraryBookshelveGetCall<'a, C, NC, A> where NC: hyper::net
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// ID of bookshelf to retrieve.    
+    /// ID of bookshelf to retrieve.
     pub fn shelf(mut self, new_value: &str) -> MylibraryBookshelveGetCall<'a, C, NC, A> {
         self._shelf = new_value.to_string();
         self
@@ -13765,7 +13890,7 @@ impl<'a, C, NC, A> MylibraryBookshelveGetCall<'a, C, NC, A> where NC: hyper::net
     /// Sets the *source* query property to the given value.
     ///
     /// 
-    /// String to identify the originator of this request.    
+    /// String to identify the originator of this request.
     pub fn source(mut self, new_value: &str) -> MylibraryBookshelveGetCall<'a, C, NC, A> {
         self._source = Some(new_value.to_string());
         self
@@ -13826,7 +13951,7 @@ impl<'a, C, NC, A> MylibraryBookshelveGetCall<'a, C, NC, A> where NC: hyper::net
 /// Retrieves a list of bookshelves belonging to the authenticated user.
 ///
 /// A builder for the *bookshelves.list* method supported by a *mylibrary* resource.
-/// It is not used directly, but through a `MylibraryMethods`.
+/// It is not used directly, but through a `MylibraryMethods` instance.
 ///
 /// # Example
 ///
@@ -13887,7 +14012,7 @@ impl<'a, C, NC, A> MylibraryBookshelveListCall<'a, C, NC, A> where NC: hyper::ne
         for &field in ["alt", "source"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -13916,7 +14041,7 @@ impl<'a, C, NC, A> MylibraryBookshelveListCall<'a, C, NC, A> where NC: hyper::ne
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -13928,7 +14053,6 @@ impl<'a, C, NC, A> MylibraryBookshelveListCall<'a, C, NC, A> where NC: hyper::ne
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -13938,7 +14062,7 @@ impl<'a, C, NC, A> MylibraryBookshelveListCall<'a, C, NC, A> where NC: hyper::ne
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -13949,7 +14073,7 @@ impl<'a, C, NC, A> MylibraryBookshelveListCall<'a, C, NC, A> where NC: hyper::ne
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -13958,13 +14082,13 @@ impl<'a, C, NC, A> MylibraryBookshelveListCall<'a, C, NC, A> where NC: hyper::ne
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -13974,7 +14098,7 @@ impl<'a, C, NC, A> MylibraryBookshelveListCall<'a, C, NC, A> where NC: hyper::ne
     /// Sets the *source* query property to the given value.
     ///
     /// 
-    /// String to identify the originator of this request.    
+    /// String to identify the originator of this request.
     pub fn source(mut self, new_value: &str) -> MylibraryBookshelveListCall<'a, C, NC, A> {
         self._source = Some(new_value.to_string());
         self
@@ -14035,7 +14159,7 @@ impl<'a, C, NC, A> MylibraryBookshelveListCall<'a, C, NC, A> where NC: hyper::ne
 /// Retrieves my reading position information for a volume.
 ///
 /// A builder for the *readingpositions.get* method supported by a *mylibrary* resource.
-/// It is not used directly, but through a `MylibraryMethods`.
+/// It is not used directly, but through a `MylibraryMethods` instance.
 ///
 /// # Example
 ///
@@ -14103,7 +14227,7 @@ impl<'a, C, NC, A> MylibraryReadingpositionGetCall<'a, C, NC, A> where NC: hyper
         for &field in ["alt", "volumeId", "source", "contentVersion"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -14156,7 +14280,7 @@ impl<'a, C, NC, A> MylibraryReadingpositionGetCall<'a, C, NC, A> where NC: hyper
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -14168,7 +14292,6 @@ impl<'a, C, NC, A> MylibraryReadingpositionGetCall<'a, C, NC, A> where NC: hyper
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -14178,7 +14301,7 @@ impl<'a, C, NC, A> MylibraryReadingpositionGetCall<'a, C, NC, A> where NC: hyper
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -14189,7 +14312,7 @@ impl<'a, C, NC, A> MylibraryReadingpositionGetCall<'a, C, NC, A> where NC: hyper
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -14198,13 +14321,13 @@ impl<'a, C, NC, A> MylibraryReadingpositionGetCall<'a, C, NC, A> where NC: hyper
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -14216,7 +14339,7 @@ impl<'a, C, NC, A> MylibraryReadingpositionGetCall<'a, C, NC, A> where NC: hyper
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// ID of volume for which to retrieve a reading position.    
+    /// ID of volume for which to retrieve a reading position.
     pub fn volume_id(mut self, new_value: &str) -> MylibraryReadingpositionGetCall<'a, C, NC, A> {
         self._volume_id = new_value.to_string();
         self
@@ -14224,7 +14347,7 @@ impl<'a, C, NC, A> MylibraryReadingpositionGetCall<'a, C, NC, A> where NC: hyper
     /// Sets the *source* query property to the given value.
     ///
     /// 
-    /// String to identify the originator of this request.    
+    /// String to identify the originator of this request.
     pub fn source(mut self, new_value: &str) -> MylibraryReadingpositionGetCall<'a, C, NC, A> {
         self._source = Some(new_value.to_string());
         self
@@ -14232,7 +14355,7 @@ impl<'a, C, NC, A> MylibraryReadingpositionGetCall<'a, C, NC, A> where NC: hyper
     /// Sets the *content version* query property to the given value.
     ///
     /// 
-    /// Volume content version for which this reading position is requested.    
+    /// Volume content version for which this reading position is requested.
     pub fn content_version(mut self, new_value: &str) -> MylibraryReadingpositionGetCall<'a, C, NC, A> {
         self._content_version = Some(new_value.to_string());
         self
@@ -14293,7 +14416,7 @@ impl<'a, C, NC, A> MylibraryReadingpositionGetCall<'a, C, NC, A> where NC: hyper
 /// 
 ///
 /// A builder for the *addBook* method supported by a *cloudloading* resource.
-/// It is not used directly, but through a `CloudloadingMethods`.
+/// It is not used directly, but through a `CloudloadingMethods` instance.
 ///
 /// # Example
 ///
@@ -14369,7 +14492,7 @@ impl<'a, C, NC, A> CloudloadingAddBookCall<'a, C, NC, A> where NC: hyper::net::N
         for &field in ["alt", "upload_client_token", "name", "mime_type", "drive_document_id"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -14398,7 +14521,7 @@ impl<'a, C, NC, A> CloudloadingAddBookCall<'a, C, NC, A> where NC: hyper::net::N
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -14410,7 +14533,6 @@ impl<'a, C, NC, A> CloudloadingAddBookCall<'a, C, NC, A> where NC: hyper::net::N
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -14420,7 +14542,7 @@ impl<'a, C, NC, A> CloudloadingAddBookCall<'a, C, NC, A> where NC: hyper::net::N
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -14431,7 +14553,7 @@ impl<'a, C, NC, A> CloudloadingAddBookCall<'a, C, NC, A> where NC: hyper::net::N
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -14440,13 +14562,13 @@ impl<'a, C, NC, A> CloudloadingAddBookCall<'a, C, NC, A> where NC: hyper::net::N
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -14463,7 +14585,7 @@ impl<'a, C, NC, A> CloudloadingAddBookCall<'a, C, NC, A> where NC: hyper::net::N
     /// Sets the *name* query property to the given value.
     ///
     /// 
-    /// The document name. It can be set only if the drive_document_id is set.    
+    /// The document name. It can be set only if the drive_document_id is set.
     pub fn name(mut self, new_value: &str) -> CloudloadingAddBookCall<'a, C, NC, A> {
         self._name = Some(new_value.to_string());
         self
@@ -14471,7 +14593,7 @@ impl<'a, C, NC, A> CloudloadingAddBookCall<'a, C, NC, A> where NC: hyper::net::N
     /// Sets the *mime_type* query property to the given value.
     ///
     /// 
-    /// The document MIME type. It can be set only if the drive_document_id is set.    
+    /// The document MIME type. It can be set only if the drive_document_id is set.
     pub fn mime_type(mut self, new_value: &str) -> CloudloadingAddBookCall<'a, C, NC, A> {
         self._mime_type = Some(new_value.to_string());
         self
@@ -14479,7 +14601,7 @@ impl<'a, C, NC, A> CloudloadingAddBookCall<'a, C, NC, A> where NC: hyper::net::N
     /// Sets the *drive_document_id* query property to the given value.
     ///
     /// 
-    /// A drive document id. The upload_client_token must not be set.    
+    /// A drive document id. The upload_client_token must not be set.
     pub fn drive_document_id(mut self, new_value: &str) -> CloudloadingAddBookCall<'a, C, NC, A> {
         self._drive_document_id = Some(new_value.to_string());
         self
@@ -14540,7 +14662,7 @@ impl<'a, C, NC, A> CloudloadingAddBookCall<'a, C, NC, A> where NC: hyper::net::N
 /// 
 ///
 /// A builder for the *updateBook* method supported by a *cloudloading* resource.
-/// It is not used directly, but through a `CloudloadingMethods`.
+/// It is not used directly, but through a `CloudloadingMethods` instance.
 ///
 /// # Example
 ///
@@ -14603,7 +14725,7 @@ impl<'a, C, NC, A> CloudloadingUpdateBookCall<'a, C, NC, A> where NC: hyper::net
         for &field in ["alt"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -14636,7 +14758,7 @@ impl<'a, C, NC, A> CloudloadingUpdateBookCall<'a, C, NC, A> where NC: hyper::net
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -14652,7 +14774,6 @@ impl<'a, C, NC, A> CloudloadingUpdateBookCall<'a, C, NC, A> where NC: hyper::net
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -14662,7 +14783,7 @@ impl<'a, C, NC, A> CloudloadingUpdateBookCall<'a, C, NC, A> where NC: hyper::net
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -14673,7 +14794,7 @@ impl<'a, C, NC, A> CloudloadingUpdateBookCall<'a, C, NC, A> where NC: hyper::net
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -14682,13 +14803,13 @@ impl<'a, C, NC, A> CloudloadingUpdateBookCall<'a, C, NC, A> where NC: hyper::net
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -14760,7 +14881,7 @@ impl<'a, C, NC, A> CloudloadingUpdateBookCall<'a, C, NC, A> where NC: hyper::net
 /// Remove the book and its contents
 ///
 /// A builder for the *deleteBook* method supported by a *cloudloading* resource.
-/// It is not used directly, but through a `CloudloadingMethods`.
+/// It is not used directly, but through a `CloudloadingMethods` instance.
 ///
 /// # Example
 ///
@@ -14818,7 +14939,7 @@ impl<'a, C, NC, A> CloudloadingDeleteBookCall<'a, C, NC, A> where NC: hyper::net
         for &field in ["volumeId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -14846,7 +14967,7 @@ impl<'a, C, NC, A> CloudloadingDeleteBookCall<'a, C, NC, A> where NC: hyper::net
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -14858,7 +14979,6 @@ impl<'a, C, NC, A> CloudloadingDeleteBookCall<'a, C, NC, A> where NC: hyper::net
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -14868,7 +14988,7 @@ impl<'a, C, NC, A> CloudloadingDeleteBookCall<'a, C, NC, A> where NC: hyper::net
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -14879,12 +14999,12 @@ impl<'a, C, NC, A> CloudloadingDeleteBookCall<'a, C, NC, A> where NC: hyper::net
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = res;
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -14896,7 +15016,7 @@ impl<'a, C, NC, A> CloudloadingDeleteBookCall<'a, C, NC, A> where NC: hyper::net
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The id of the book to be removed.    
+    /// The id of the book to be removed.
     pub fn volume_id(mut self, new_value: &str) -> CloudloadingDeleteBookCall<'a, C, NC, A> {
         self._volume_id = new_value.to_string();
         self

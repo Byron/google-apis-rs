@@ -1,8 +1,8 @@
 // DO NOT EDIT !
-// This file was generated automatically from 'src/mako/lib.rs.mako'
+// This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *gmail* crate version *0.1.1+20150313*, where *20150313* is the exact revision of the *gmail:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.1*.
+//! This documentation was generated from *gmail* crate version *0.1.2+20150313*, where *20150313* is the exact revision of the *gmail:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.2*.
 //! 
 //! Everything else about the *gmail* *v1* API can be found at the
 //! [official documentation site](https://developers.google.com/gmail/api/).
@@ -34,6 +34,8 @@
 //! 
 //! * **[Hub](struct.Gmail.html)**
 //!     * a central object to maintain state and allow accessing all *Activities*
+//!     * creates [*Method Builders*](trait.MethodsBuilder.html) which in turn
+//!       allow access to individual [*Call Builders*](trait.CallBuilder.html)
 //! * **[Resources](trait.Resource.html)**
 //!     * primary types that you can apply *Activities* to
 //!     * a collection of properties and *Parts*
@@ -42,6 +44,8 @@
 //!         * never directly used in *Activities*
 //! * **[Activities](trait.CallBuilder.html)**
 //!     * operations to apply to *Resources*
+//! 
+//! All *structures* are marked with applicable traits to further categorize them and ease browsing.
 //! 
 //! Generally speaking, you can invoke *Activities* like this:
 //! 
@@ -85,7 +89,7 @@
 //! extern crate "yup-oauth2" as oauth2;
 //! extern crate "google-gmail1" as gmail1;
 //! use gmail1::Message;
-//! use gmail1::Result;
+//! use gmail1::{Result, Error};
 //! use std::fs;
 //! # #[test] fn egal() {
 //! use std::default::Default;
@@ -120,15 +124,17 @@
 //!              .upload(fs::File::open("file.ext").unwrap(), "application/octet-stream".parse().unwrap());
 //! 
 //! match result {
-//!     Result::HttpError(err) => println!("HTTPERROR: {:?}", err),
-//!     Result::MissingAPIKey => println!("Auth: Missing API Key - used if there are no scopes"),
-//!     Result::MissingToken => println!("OAuth2: Missing Token"),
-//!     Result::Cancelled => println!("Operation cancelled by user"),
-//!     Result::UploadSizeLimitExceeded(size, max_size) => println!("Upload size too big: {} of {}", size, max_size),
-//!     Result::Failure(_) => println!("General Failure (hyper::client::Response doesn't print)"),
-//!     Result::FieldClash(clashed_field) => println!("You added custom parameter which is part of builder: {:?}", clashed_field),
-//!     Result::JsonDecodeError(err) => println!("Couldn't understand server reply - maybe API needs update: {:?}", err),
-//!     Result::Success(_) => println!("Success (value doesn't print)"),
+//!     Err(e) => match e {
+//!         Error::HttpError(err) => println!("HTTPERROR: {:?}", err),
+//!         Error::MissingAPIKey => println!("Auth: Missing API Key - used if there are no scopes"),
+//!         Error::MissingToken => println!("OAuth2: Missing Token"),
+//!         Error::Cancelled => println!("Operation canceled by user"),
+//!         Error::UploadSizeLimitExceeded(size, max_size) => println!("Upload size too big: {} of {}", size, max_size),
+//!         Error::Failure(_) => println!("General Failure (hyper::client::Response doesn't print)"),
+//!         Error::FieldClash(clashed_field) => println!("You added custom parameter which is part of builder: {:?}", clashed_field),
+//!         Error::JsonDecodeError(err) => println!("Couldn't understand server reply - maybe API needs update: {:?}", err),
+//!     },
+//!     Ok(_) => println!("Success (value doesn't print)"),
 //! }
 //! # }
 //! ```
@@ -141,7 +147,7 @@
 //! When delegates handle errors or intermediate values, they may have a chance to instruct the system to retry. This 
 //! makes the system potentially resilient to all kinds of errors.
 //! 
-//! ## Uploads and Downlods
+//! ## Uploads and Downloads
 //! If a method supports downloads, the response body, which is part of the [Result](enum.Result.html), should be
 //! read by you to obtain the media.
 //! If such a method also supports a [Response Result](trait.ResponseResult.html), it will return that by default.
@@ -164,8 +170,9 @@
 //! ## Optional Parts in Server-Requests
 //! 
 //! All structures provided by this library are made to be [enocodable](trait.RequestValue.html) and 
-//! [decodable](trait.ResponseResult.html) via json. Optionals are used to indicate that partial requests are responses are valid.
-//! Most optionals are are considered [Parts](trait.Part.html) which are identifyable by name, which will be sent to 
+//! [decodable](trait.ResponseResult.html) via *json*. Optionals are used to indicate that partial requests are responses 
+//! are valid.
+//! Most optionals are are considered [Parts](trait.Part.html) which are identifiable by name, which will be sent to 
 //! the server to indicate either the set parts of the request or the desired parts in the response.
 //! 
 //! ## Builder Arguments
@@ -214,7 +221,7 @@ use std::io;
 use std::fs;
 use std::thread::sleep;
 
-pub use cmn::{MultiPartReader, ToParts, MethodInfo, Result, CallBuilder, Hub, ReadSeek, Part, ResponseResult, RequestValue, NestedType, Delegate, DefaultDelegate, ResourceMethodsBuilder, Resource, JsonServerError};
+pub use cmn::{MultiPartReader, ToParts, MethodInfo, Result, Error, CallBuilder, Hub, ReadSeek, Part, ResponseResult, RequestValue, NestedType, Delegate, DefaultDelegate, MethodsBuilder, Resource, JsonServerError};
 
 
 // ##############
@@ -273,7 +280,7 @@ impl Default for Scope {
 /// extern crate "yup-oauth2" as oauth2;
 /// extern crate "google-gmail1" as gmail1;
 /// use gmail1::Message;
-/// use gmail1::Result;
+/// use gmail1::{Result, Error};
 /// use std::fs;
 /// # #[test] fn egal() {
 /// use std::default::Default;
@@ -308,15 +315,17 @@ impl Default for Scope {
 ///              .upload(fs::File::open("file.ext").unwrap(), "application/octet-stream".parse().unwrap());
 /// 
 /// match result {
-///     Result::HttpError(err) => println!("HTTPERROR: {:?}", err),
-///     Result::MissingAPIKey => println!("Auth: Missing API Key - used if there are no scopes"),
-///     Result::MissingToken => println!("OAuth2: Missing Token"),
-///     Result::Cancelled => println!("Operation cancelled by user"),
-///     Result::UploadSizeLimitExceeded(size, max_size) => println!("Upload size too big: {} of {}", size, max_size),
-///     Result::Failure(_) => println!("General Failure (hyper::client::Response doesn't print)"),
-///     Result::FieldClash(clashed_field) => println!("You added custom parameter which is part of builder: {:?}", clashed_field),
-///     Result::JsonDecodeError(err) => println!("Couldn't understand server reply - maybe API needs update: {:?}", err),
-///     Result::Success(_) => println!("Success (value doesn't print)"),
+///     Err(e) => match e {
+///         Error::HttpError(err) => println!("HTTPERROR: {:?}", err),
+///         Error::MissingAPIKey => println!("Auth: Missing API Key - used if there are no scopes"),
+///         Error::MissingToken => println!("OAuth2: Missing Token"),
+///         Error::Cancelled => println!("Operation canceled by user"),
+///         Error::UploadSizeLimitExceeded(size, max_size) => println!("Upload size too big: {} of {}", size, max_size),
+///         Error::Failure(_) => println!("General Failure (hyper::client::Response doesn't print)"),
+///         Error::FieldClash(clashed_field) => println!("You added custom parameter which is part of builder: {:?}", clashed_field),
+///         Error::JsonDecodeError(err) => println!("Couldn't understand server reply - maybe API needs update: {:?}", err),
+///     },
+///     Ok(_) => println!("Success (value doesn't print)"),
 /// }
 /// # }
 /// ```
@@ -337,7 +346,7 @@ impl<'a, C, NC, A> Gmail<C, NC, A>
         Gmail {
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/0.1.1".to_string(),
+            _user_agent: "google-api-rust-client/0.1.2".to_string(),
             _m: PhantomData
         }
     }
@@ -347,7 +356,7 @@ impl<'a, C, NC, A> Gmail<C, NC, A>
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/0.1.1`.
+    /// It defaults to `google-api-rust-client/0.1.2`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -367,9 +376,9 @@ impl<'a, C, NC, A> Gmail<C, NC, A>
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct MessagePartHeader {
-    /// The name of the header before the : separator. For example, To.    
+    /// The name of the header before the : separator. For example, To.
     pub name: String,
-    /// The value of the header after the : separator. For example, someuser@example.com.    
+    /// The value of the header after the : separator. For example, someuser@example.com.
     pub value: String,
 }
 
@@ -387,12 +396,12 @@ impl Part for MessagePartHeader {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct MessagePartBody {
-    /// When present, contains the ID of an external attachment that can be retrieved in a separate messages.attachments.get request. When not present, the entire content of the message part body is contained in the data field.    
+    /// When present, contains the ID of an external attachment that can be retrieved in a separate messages.attachments.get request. When not present, the entire content of the message part body is contained in the data field.
     #[serde(alias="attachmentId")]
     pub attachment_id: String,
-    /// The body data of a MIME message part. May be empty for MIME container types that have no message body or when the body data is sent as a separate attachment. An attachment ID is present if the body data is contained in a separate attachment.    
+    /// The body data of a MIME message part. May be empty for MIME container types that have no message body or when the body data is sent as a separate attachment. An attachment ID is present if the body data is contained in a separate attachment.
     pub data: String,
-    /// Total number of bytes in the body of the message part.    
+    /// Total number of bytes in the body of the message part.
     pub size: i32,
 }
 
@@ -413,13 +422,13 @@ impl ResponseResult for MessagePartBody {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct Thread {
-    /// A short part of the message text.    
+    /// A short part of the message text.
     pub snippet: String,
-    /// The list of messages in the thread.    
+    /// The list of messages in the thread.
     pub messages: Vec<Message>,
-    /// The unique ID of the thread.    
+    /// The unique ID of the thread.
     pub id: String,
-    /// The ID of the last history record that modified this thread.    
+    /// The ID of the last history record that modified this thread.
     #[serde(alias="historyId")]
     pub history_id: String,
 }
@@ -433,7 +442,7 @@ impl ResponseResult for Thread {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct HistoryMessageAdded {
-    /// no description provided    
+    /// no description provided
     pub message: Message,
 }
 
@@ -454,29 +463,29 @@ impl Part for HistoryMessageAdded {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Label {
-    /// The display name of the label.    
+    /// The display name of the label.
     pub name: Option<String>,
-    /// The total number of messages with the label.    
+    /// The total number of messages with the label.
     #[serde(alias="messagesTotal")]
     pub messages_total: Option<i32>,
-    /// The visibility of the label in the message list in the Gmail web interface.    
+    /// The visibility of the label in the message list in the Gmail web interface.
     #[serde(alias="messageListVisibility")]
     pub message_list_visibility: Option<String>,
-    /// The total number of threads with the label.    
+    /// The total number of threads with the label.
     #[serde(alias="threadsTotal")]
     pub threads_total: Option<i32>,
-    /// The visibility of the label in the label list in the Gmail web interface.    
+    /// The visibility of the label in the label list in the Gmail web interface.
     #[serde(alias="labelListVisibility")]
     pub label_list_visibility: Option<String>,
-    /// The number of unread threads with the label.    
+    /// The number of unread threads with the label.
     #[serde(alias="threadsUnread")]
     pub threads_unread: Option<i32>,
-    /// The owner type for the label. User labels are created by the user and can be modified and deleted by the user and can be applied to any message or thread. System labels are internally created and cannot be added, modified, or deleted. System labels may be able to be applied to or removed from messages and threads under some circumstances but this is not guaranteed. For example, users can apply and remove the INBOX and UNREAD labels from messages and threads, but cannot apply or remove the DRAFTS or SENT labels from messages or threads.    
+    /// The owner type for the label. User labels are created by the user and can be modified and deleted by the user and can be applied to any message or thread. System labels are internally created and cannot be added, modified, or deleted. System labels may be able to be applied to or removed from messages and threads under some circumstances but this is not guaranteed. For example, users can apply and remove the INBOX and UNREAD labels from messages and threads, but cannot apply or remove the DRAFTS or SENT labels from messages or threads.
     #[serde(alias="type")]
     pub type_: Option<String>,
-    /// The immutable ID of the label.    
+    /// The immutable ID of the label.
     pub id: Option<String>,
-    /// The number of unread messages with the label.    
+    /// The number of unread messages with the label.
     #[serde(alias="messagesUnread")]
     pub messages_unread: Option<i32>,
 }
@@ -496,13 +505,13 @@ impl ResponseResult for Label {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct ListHistoryResponse {
-    /// Page token to retrieve the next page of results in the list.    
+    /// Page token to retrieve the next page of results in the list.
     #[serde(alias="nextPageToken")]
     pub next_page_token: String,
-    /// The ID of the mailbox's current history record.    
+    /// The ID of the mailbox's current history record.
     #[serde(alias="historyId")]
     pub history_id: String,
-    /// List of history records. Any messages contained in the response will typically only have id and threadId fields populated.    
+    /// List of history records. Any messages contained in the response will typically only have id and threadId fields populated.
     pub history: Vec<History>,
 }
 
@@ -523,9 +532,9 @@ impl ResponseResult for ListHistoryResponse {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Draft {
-    /// The message content of the draft.    
+    /// The message content of the draft.
     pub message: Option<Message>,
-    /// The immutable ID of the draft.    
+    /// The immutable ID of the draft.
     pub id: Option<String>,
 }
 
@@ -539,19 +548,19 @@ impl ResponseResult for Draft {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct MessagePart {
-    /// The message part body for this part, which may be empty for container MIME message parts.    
+    /// The message part body for this part, which may be empty for container MIME message parts.
     pub body: MessagePartBody,
-    /// The MIME type of the message part.    
+    /// The MIME type of the message part.
     #[serde(alias="mimeType")]
     pub mime_type: String,
-    /// The child MIME message parts of this part. This only applies to container MIME message parts, for example multipart/*. For non- container MIME message part types, such as text/plain, this field is empty. For more information, see RFC 1521.    
+    /// The child MIME message parts of this part. This only applies to container MIME message parts, for example multipart/*. For non- container MIME message part types, such as text/plain, this field is empty. For more information, see RFC 1521.
     pub parts: Vec<MessagePart>,
-    /// The immutable ID of the message part.    
+    /// The immutable ID of the message part.
     #[serde(alias="partId")]
     pub part_id: String,
-    /// List of headers on this message part. For the top-level message part, representing the entire message payload, it will contain the standard RFC 2822 email headers such as To, From, and Subject.    
+    /// List of headers on this message part. For the top-level message part, representing the entire message payload, it will contain the standard RFC 2822 email headers such as To, From, and Subject.
     pub headers: Vec<MessagePartHeader>,
-    /// The filename of the attachment. Only present if this message part represents an attachment.    
+    /// The filename of the attachment. Only present if this message part represents an attachment.
     pub filename: String,
 }
 
@@ -569,10 +578,10 @@ impl Part for MessagePart {}
 /// 
 #[derive(Default, Clone, Debug, Serialize)]
 pub struct ModifyMessageRequest {
-    /// A list of IDs of labels to add to this message.    
+    /// A list of IDs of labels to add to this message.
     #[serde(alias="addLabelIds")]
     pub add_label_ids: Option<Vec<String>>,
-    /// A list IDs of labels to remove from this message.    
+    /// A list IDs of labels to remove from this message.
     #[serde(alias="removeLabelIds")]
     pub remove_label_ids: Option<Vec<String>>,
 }
@@ -591,13 +600,13 @@ impl RequestValue for ModifyMessageRequest {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct ListDraftsResponse {
-    /// Token to retrieve the next page of results in the list.    
+    /// Token to retrieve the next page of results in the list.
     #[serde(alias="nextPageToken")]
     pub next_page_token: String,
-    /// Estimated total number of results.    
+    /// Estimated total number of results.
     #[serde(alias="resultSizeEstimate")]
     pub result_size_estimate: u32,
-    /// List of drafts.    
+    /// List of drafts.
     pub drafts: Vec<Draft>,
 }
 
@@ -610,7 +619,7 @@ impl ResponseResult for ListDraftsResponse {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct HistoryMessageDeleted {
-    /// no description provided    
+    /// no description provided
     pub message: Message,
 }
 
@@ -623,20 +632,20 @@ impl Part for HistoryMessageDeleted {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct History {
-    /// Labels removed from messages in this history record.    
+    /// Labels removed from messages in this history record.
     #[serde(alias="labelsRemoved")]
     pub labels_removed: Vec<HistoryLabelRemoved>,
-    /// Messages deleted (not Trashed) from the mailbox in this history record.    
+    /// Messages deleted (not Trashed) from the mailbox in this history record.
     #[serde(alias="messagesDeleted")]
     pub messages_deleted: Vec<HistoryMessageDeleted>,
-    /// Labels added to messages in this history record.    
+    /// Labels added to messages in this history record.
     #[serde(alias="labelsAdded")]
     pub labels_added: Vec<HistoryLabelAdded>,
-    /// List of messages changed in this history record. The fields for specific change types, such as messagesAdded may duplicate messages in this field. We recommend using the specific change-type fields instead of this.    
+    /// List of messages changed in this history record. The fields for specific change types, such as messagesAdded may duplicate messages in this field. We recommend using the specific change-type fields instead of this.
     pub messages: Vec<Message>,
-    /// The mailbox sequence ID.    
+    /// The mailbox sequence ID.
     pub id: String,
-    /// Messages added to the mailbox in this history record.    
+    /// Messages added to the mailbox in this history record.
     #[serde(alias="messagesAdded")]
     pub messages_added: Vec<HistoryMessageAdded>,
 }
@@ -655,16 +664,16 @@ impl Part for History {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct Profile {
-    /// The total number of messages in the mailbox.    
+    /// The total number of messages in the mailbox.
     #[serde(alias="messagesTotal")]
     pub messages_total: i32,
-    /// The user's email address.    
+    /// The user's email address.
     #[serde(alias="emailAddress")]
     pub email_address: String,
-    /// The ID of the mailbox's current history record.    
+    /// The ID of the mailbox's current history record.
     #[serde(alias="historyId")]
     pub history_id: String,
-    /// The total number of threads in the mailbox.    
+    /// The total number of threads in the mailbox.
     #[serde(alias="threadsTotal")]
     pub threads_total: i32,
 }
@@ -678,10 +687,10 @@ impl ResponseResult for Profile {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct HistoryLabelAdded {
-    /// Label IDs added to the message.    
+    /// Label IDs added to the message.
     #[serde(alias="labelIds")]
     pub label_ids: Vec<String>,
-    /// no description provided    
+    /// no description provided
     pub message: Message,
 }
 
@@ -699,13 +708,13 @@ impl Part for HistoryLabelAdded {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct ListThreadsResponse {
-    /// Page token to retrieve the next page of results in the list.    
+    /// Page token to retrieve the next page of results in the list.
     #[serde(alias="nextPageToken")]
     pub next_page_token: String,
-    /// Estimated total number of results.    
+    /// Estimated total number of results.
     #[serde(alias="resultSizeEstimate")]
     pub result_size_estimate: u32,
-    /// List of threads.    
+    /// List of threads.
     pub threads: Vec<Thread>,
 }
 
@@ -723,10 +732,10 @@ impl ResponseResult for ListThreadsResponse {}
 /// 
 #[derive(Default, Clone, Debug, Serialize)]
 pub struct ModifyThreadRequest {
-    /// A list of IDs of labels to add to this thread.    
+    /// A list of IDs of labels to add to this thread.
     #[serde(alias="addLabelIds")]
     pub add_label_ids: Option<Vec<String>>,
-    /// A list of IDs of labels to remove from this thread.    
+    /// A list of IDs of labels to remove from this thread.
     #[serde(alias="removeLabelIds")]
     pub remove_label_ids: Option<Vec<String>>,
 }
@@ -745,13 +754,13 @@ impl RequestValue for ModifyThreadRequest {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct ListMessagesResponse {
-    /// Token to retrieve the next page of results in the list.    
+    /// Token to retrieve the next page of results in the list.
     #[serde(alias="nextPageToken")]
     pub next_page_token: String,
-    /// Estimated total number of results.    
+    /// Estimated total number of results.
     #[serde(alias="resultSizeEstimate")]
     pub result_size_estimate: u32,
-    /// List of messages.    
+    /// List of messages.
     pub messages: Vec<Message>,
 }
 
@@ -769,7 +778,7 @@ impl ResponseResult for ListMessagesResponse {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct ListLabelsResponse {
-    /// List of labels.    
+    /// List of labels.
     pub labels: Vec<Label>,
 }
 
@@ -794,16 +803,16 @@ impl ResponseResult for ListLabelsResponse {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Message {
-    /// The ID of the last history record that modified this message.    
+    /// The ID of the last history record that modified this message.
     #[serde(alias="historyId")]
     pub history_id: Option<String>,
-    /// The immutable ID of the message.    
+    /// The immutable ID of the message.
     pub id: Option<String>,
-    /// A short part of the message text.    
+    /// A short part of the message text.
     pub snippet: Option<String>,
-    /// The entire email message in an RFC 2822 formatted and base64url encoded string. Returned in messages.get and drafts.get responses when the format=RAW parameter is supplied.    
+    /// The entire email message in an RFC 2822 formatted and base64url encoded string. Returned in messages.get and drafts.get responses when the format=RAW parameter is supplied.
     pub raw: Option<String>,
-    /// Estimated size in bytes of the message.    
+    /// Estimated size in bytes of the message.
     #[serde(alias="sizeEstimate")]
     pub size_estimate: Option<i32>,
     /// The ID of the thread the message belongs to. To add a message or draft to a thread, the following criteria must be met: 
@@ -812,10 +821,10 @@ pub struct Message {
     /// - The Subject headers must match.
     #[serde(alias="threadId")]
     pub thread_id: Option<String>,
-    /// List of IDs of labels applied to this message.    
+    /// List of IDs of labels applied to this message.
     #[serde(alias="labelIds")]
     pub label_ids: Option<Vec<String>>,
-    /// The parsed email structure in the message parts.    
+    /// The parsed email structure in the message parts.
     pub payload: Option<MessagePart>,
 }
 
@@ -829,10 +838,10 @@ impl ResponseResult for Message {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct HistoryLabelRemoved {
-    /// Label IDs removed from the message.    
+    /// Label IDs removed from the message.
     #[serde(alias="labelIds")]
     pub label_ids: Vec<String>,
-    /// no description provided    
+    /// no description provided
     pub message: Message,
 }
 
@@ -878,13 +887,18 @@ pub struct UserMethods<'a, C, NC, A>
     hub: &'a Gmail<C, NC, A>,
 }
 
-impl<'a, C, NC, A> ResourceMethodsBuilder for UserMethods<'a, C, NC, A> {}
+impl<'a, C, NC, A> MethodsBuilder for UserMethods<'a, C, NC, A> {}
 
 impl<'a, C, NC, A> UserMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Imports a message into only this user's mailbox, with standard email delivery scanning and classification similar to receiving via SMTP. Does not send a message.    
+    /// Imports a message into only this user's mailbox, with standard email delivery scanning and classification similar to receiving via SMTP. Does not send a message.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `userId` - The user's email address. The special value me can be used to indicate the authenticated user.
     pub fn messages_import(&self, request: &Message, user_id: &str) -> UserMessageImportCall<'a, C, NC, A> {
         UserMessageImportCall {
             hub: self.hub,
@@ -902,7 +916,11 @@ impl<'a, C, NC, A> UserMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Lists the history of all changes to the given mailbox. History results are returned in chronological order (increasing historyId).    
+    /// Lists the history of all changes to the given mailbox. History results are returned in chronological order (increasing historyId).
+    /// 
+    /// # Arguments
+    ///
+    /// * `userId` - The user's email address. The special value me can be used to indicate the authenticated user.
     pub fn history_list(&self, user_id: &str) -> UserHistoryListCall<'a, C, NC, A> {
         UserHistoryListCall {
             hub: self.hub,
@@ -919,7 +937,12 @@ impl<'a, C, NC, A> UserMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Creates a new draft with the DRAFT label.    
+    /// Creates a new draft with the DRAFT label.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `userId` - The user's email address. The special value me can be used to indicate the authenticated user.
     pub fn drafts_create(&self, request: &Draft, user_id: &str) -> UserDraftCreateCall<'a, C, NC, A> {
         UserDraftCreateCall {
             hub: self.hub,
@@ -933,7 +956,12 @@ impl<'a, C, NC, A> UserMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Creates a new label.    
+    /// Creates a new label.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `userId` - The user's email address. The special value me can be used to indicate the authenticated user.
     pub fn labels_create(&self, request: &Label, user_id: &str) -> UserLabelCreateCall<'a, C, NC, A> {
         UserLabelCreateCall {
             hub: self.hub,
@@ -947,7 +975,12 @@ impl<'a, C, NC, A> UserMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Immediately and permanently deletes the specified label and removes it from any messages and threads that it is applied to.    
+    /// Immediately and permanently deletes the specified label and removes it from any messages and threads that it is applied to.
+    /// 
+    /// # Arguments
+    ///
+    /// * `userId` - The user's email address. The special value me can be used to indicate the authenticated user.
+    /// * `id` - The ID of the label to delete.
     pub fn labels_delete(&self, user_id: &str, id: &str) -> UserLabelDeleteCall<'a, C, NC, A> {
         UserLabelDeleteCall {
             hub: self.hub,
@@ -961,7 +994,12 @@ impl<'a, C, NC, A> UserMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Gets the specified label.    
+    /// Gets the specified label.
+    /// 
+    /// # Arguments
+    ///
+    /// * `userId` - The user's email address. The special value me can be used to indicate the authenticated user.
+    /// * `id` - The ID of the label to retrieve.
     pub fn labels_get(&self, user_id: &str, id: &str) -> UserLabelGetCall<'a, C, NC, A> {
         UserLabelGetCall {
             hub: self.hub,
@@ -975,7 +1013,12 @@ impl<'a, C, NC, A> UserMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Moves the specified message to the trash.    
+    /// Moves the specified message to the trash.
+    /// 
+    /// # Arguments
+    ///
+    /// * `userId` - The user's email address. The special value me can be used to indicate the authenticated user.
+    /// * `id` - The ID of the message to Trash.
     pub fn messages_trash(&self, user_id: &str, id: &str) -> UserMessageTrashCall<'a, C, NC, A> {
         UserMessageTrashCall {
             hub: self.hub,
@@ -989,7 +1032,12 @@ impl<'a, C, NC, A> UserMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Sends the specified, existing draft to the recipients in the To, Cc, and Bcc headers.    
+    /// Sends the specified, existing draft to the recipients in the To, Cc, and Bcc headers.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `userId` - The user's email address. The special value me can be used to indicate the authenticated user.
     pub fn drafts_send(&self, request: &Draft, user_id: &str) -> UserDraftSendCall<'a, C, NC, A> {
         UserDraftSendCall {
             hub: self.hub,
@@ -1003,7 +1051,12 @@ impl<'a, C, NC, A> UserMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Removes the specified message from the trash.    
+    /// Removes the specified message from the trash.
+    /// 
+    /// # Arguments
+    ///
+    /// * `userId` - The user's email address. The special value me can be used to indicate the authenticated user.
+    /// * `id` - The ID of the message to remove from Trash.
     pub fn messages_untrash(&self, user_id: &str, id: &str) -> UserMessageUntrashCall<'a, C, NC, A> {
         UserMessageUntrashCall {
             hub: self.hub,
@@ -1017,7 +1070,11 @@ impl<'a, C, NC, A> UserMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Lists all labels in the user's mailbox.    
+    /// Lists all labels in the user's mailbox.
+    /// 
+    /// # Arguments
+    ///
+    /// * `userId` - The user's email address. The special value me can be used to indicate the authenticated user.
     pub fn labels_list(&self, user_id: &str) -> UserLabelListCall<'a, C, NC, A> {
         UserLabelListCall {
             hub: self.hub,
@@ -1030,7 +1087,12 @@ impl<'a, C, NC, A> UserMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Immediately and permanently deletes the specified message. This operation cannot be undone. Prefer messages.trash instead.    
+    /// Immediately and permanently deletes the specified message. This operation cannot be undone. Prefer messages.trash instead.
+    /// 
+    /// # Arguments
+    ///
+    /// * `userId` - The user's email address. The special value me can be used to indicate the authenticated user.
+    /// * `id` - The ID of the message to delete.
     pub fn messages_delete(&self, user_id: &str, id: &str) -> UserMessageDeleteCall<'a, C, NC, A> {
         UserMessageDeleteCall {
             hub: self.hub,
@@ -1044,7 +1106,13 @@ impl<'a, C, NC, A> UserMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Replaces a draft's content.    
+    /// Replaces a draft's content.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `userId` - The user's email address. The special value me can be used to indicate the authenticated user.
+    /// * `id` - The ID of the draft to update.
     pub fn drafts_update(&self, request: &Draft, user_id: &str, id: &str) -> UserDraftUpdateCall<'a, C, NC, A> {
         UserDraftUpdateCall {
             hub: self.hub,
@@ -1059,7 +1127,12 @@ impl<'a, C, NC, A> UserMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Gets the specified draft.    
+    /// Gets the specified draft.
+    /// 
+    /// # Arguments
+    ///
+    /// * `userId` - The user's email address. The special value me can be used to indicate the authenticated user.
+    /// * `id` - The ID of the draft to retrieve.
     pub fn drafts_get(&self, user_id: &str, id: &str) -> UserDraftGetCall<'a, C, NC, A> {
         UserDraftGetCall {
             hub: self.hub,
@@ -1074,7 +1147,13 @@ impl<'a, C, NC, A> UserMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Updates the specified label.    
+    /// Updates the specified label.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `userId` - The user's email address. The special value me can be used to indicate the authenticated user.
+    /// * `id` - The ID of the label to update.
     pub fn labels_update(&self, request: &Label, user_id: &str, id: &str) -> UserLabelUpdateCall<'a, C, NC, A> {
         UserLabelUpdateCall {
             hub: self.hub,
@@ -1089,7 +1168,12 @@ impl<'a, C, NC, A> UserMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Removes the specified thread from the trash.    
+    /// Removes the specified thread from the trash.
+    /// 
+    /// # Arguments
+    ///
+    /// * `userId` - The user's email address. The special value me can be used to indicate the authenticated user.
+    /// * `id` - The ID of the thread to remove from Trash.
     pub fn threads_untrash(&self, user_id: &str, id: &str) -> UserThreadUntrashCall<'a, C, NC, A> {
         UserThreadUntrashCall {
             hub: self.hub,
@@ -1103,7 +1187,13 @@ impl<'a, C, NC, A> UserMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Updates the specified label. This method supports patch semantics.    
+    /// Updates the specified label. This method supports patch semantics.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `userId` - The user's email address. The special value me can be used to indicate the authenticated user.
+    /// * `id` - The ID of the label to update.
     pub fn labels_patch(&self, request: &Label, user_id: &str, id: &str) -> UserLabelPatchCall<'a, C, NC, A> {
         UserLabelPatchCall {
             hub: self.hub,
@@ -1118,7 +1208,12 @@ impl<'a, C, NC, A> UserMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Immediately and permanently deletes the specified draft. Does not simply trash it.    
+    /// Immediately and permanently deletes the specified draft. Does not simply trash it.
+    /// 
+    /// # Arguments
+    ///
+    /// * `userId` - The user's email address. The special value me can be used to indicate the authenticated user.
+    /// * `id` - The ID of the draft to delete.
     pub fn drafts_delete(&self, user_id: &str, id: &str) -> UserDraftDeleteCall<'a, C, NC, A> {
         UserDraftDeleteCall {
             hub: self.hub,
@@ -1132,7 +1227,11 @@ impl<'a, C, NC, A> UserMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Lists the threads in the user's mailbox.    
+    /// Lists the threads in the user's mailbox.
+    /// 
+    /// # Arguments
+    ///
+    /// * `userId` - The user's email address. The special value me can be used to indicate the authenticated user.
     pub fn threads_list(&self, user_id: &str) -> UserThreadListCall<'a, C, NC, A> {
         UserThreadListCall {
             hub: self.hub,
@@ -1150,7 +1249,13 @@ impl<'a, C, NC, A> UserMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Modifies the labels applied to the thread. This applies to all messages in the thread.    
+    /// Modifies the labels applied to the thread. This applies to all messages in the thread.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `userId` - The user's email address. The special value me can be used to indicate the authenticated user.
+    /// * `id` - The ID of the thread to modify.
     pub fn threads_modify(&self, request: &ModifyThreadRequest, user_id: &str, id: &str) -> UserThreadModifyCall<'a, C, NC, A> {
         UserThreadModifyCall {
             hub: self.hub,
@@ -1165,7 +1270,12 @@ impl<'a, C, NC, A> UserMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Immediately and permanently deletes the specified thread. This operation cannot be undone. Prefer threads.trash instead.    
+    /// Immediately and permanently deletes the specified thread. This operation cannot be undone. Prefer threads.trash instead.
+    /// 
+    /// # Arguments
+    ///
+    /// * `userId` - The user's email address. The special value me can be used to indicate the authenticated user.
+    /// * `id` - ID of the Thread to delete.
     pub fn threads_delete(&self, user_id: &str, id: &str) -> UserThreadDeleteCall<'a, C, NC, A> {
         UserThreadDeleteCall {
             hub: self.hub,
@@ -1179,7 +1289,13 @@ impl<'a, C, NC, A> UserMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Gets the specified message attachment.    
+    /// Gets the specified message attachment.
+    /// 
+    /// # Arguments
+    ///
+    /// * `userId` - The user's email address. The special value me can be used to indicate the authenticated user.
+    /// * `messageId` - The ID of the message containing the attachment.
+    /// * `id` - The ID of the attachment.
     pub fn messages_attachments_get(&self, user_id: &str, message_id: &str, id: &str) -> UserMessageAttachmentGetCall<'a, C, NC, A> {
         UserMessageAttachmentGetCall {
             hub: self.hub,
@@ -1194,7 +1310,13 @@ impl<'a, C, NC, A> UserMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Modifies the labels on the specified message.    
+    /// Modifies the labels on the specified message.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `userId` - The user's email address. The special value me can be used to indicate the authenticated user.
+    /// * `id` - The ID of the message to modify.
     pub fn messages_modify(&self, request: &ModifyMessageRequest, user_id: &str, id: &str) -> UserMessageModifyCall<'a, C, NC, A> {
         UserMessageModifyCall {
             hub: self.hub,
@@ -1209,7 +1331,12 @@ impl<'a, C, NC, A> UserMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Moves the specified thread to the trash.    
+    /// Moves the specified thread to the trash.
+    /// 
+    /// # Arguments
+    ///
+    /// * `userId` - The user's email address. The special value me can be used to indicate the authenticated user.
+    /// * `id` - The ID of the thread to Trash.
     pub fn threads_trash(&self, user_id: &str, id: &str) -> UserThreadTrashCall<'a, C, NC, A> {
         UserThreadTrashCall {
             hub: self.hub,
@@ -1223,7 +1350,11 @@ impl<'a, C, NC, A> UserMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Lists the drafts in the user's mailbox.    
+    /// Lists the drafts in the user's mailbox.
+    /// 
+    /// # Arguments
+    ///
+    /// * `userId` - The user's email address. The special value me can be used to indicate the authenticated user.
     pub fn drafts_list(&self, user_id: &str) -> UserDraftListCall<'a, C, NC, A> {
         UserDraftListCall {
             hub: self.hub,
@@ -1238,7 +1369,12 @@ impl<'a, C, NC, A> UserMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Sends the specified message to the recipients in the To, Cc, and Bcc headers.    
+    /// Sends the specified message to the recipients in the To, Cc, and Bcc headers.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `userId` - The user's email address. The special value me can be used to indicate the authenticated user.
     pub fn messages_send(&self, request: &Message, user_id: &str) -> UserMessageSendCall<'a, C, NC, A> {
         UserMessageSendCall {
             hub: self.hub,
@@ -1252,7 +1388,12 @@ impl<'a, C, NC, A> UserMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Gets the specified message.    
+    /// Gets the specified message.
+    /// 
+    /// # Arguments
+    ///
+    /// * `userId` - The user's email address. The special value me can be used to indicate the authenticated user.
+    /// * `id` - The ID of the message to retrieve.
     pub fn messages_get(&self, user_id: &str, id: &str) -> UserMessageGetCall<'a, C, NC, A> {
         UserMessageGetCall {
             hub: self.hub,
@@ -1268,7 +1409,11 @@ impl<'a, C, NC, A> UserMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Lists the messages in the user's mailbox.    
+    /// Lists the messages in the user's mailbox.
+    /// 
+    /// # Arguments
+    ///
+    /// * `userId` - The user's email address. The special value me can be used to indicate the authenticated user.
     pub fn messages_list(&self, user_id: &str) -> UserMessageListCall<'a, C, NC, A> {
         UserMessageListCall {
             hub: self.hub,
@@ -1286,7 +1431,11 @@ impl<'a, C, NC, A> UserMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Gets the current user's Gmail profile.    
+    /// Gets the current user's Gmail profile.
+    /// 
+    /// # Arguments
+    ///
+    /// * `userId` - The user's email address. The special value me can be used to indicate the authenticated user.
     pub fn get_profile(&self, user_id: &str) -> UserGetProfileCall<'a, C, NC, A> {
         UserGetProfileCall {
             hub: self.hub,
@@ -1299,7 +1448,12 @@ impl<'a, C, NC, A> UserMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Gets the specified thread.    
+    /// Gets the specified thread.
+    /// 
+    /// # Arguments
+    ///
+    /// * `userId` - The user's email address. The special value me can be used to indicate the authenticated user.
+    /// * `id` - The ID of the thread to retrieve.
     pub fn threads_get(&self, user_id: &str, id: &str) -> UserThreadGetCall<'a, C, NC, A> {
         UserThreadGetCall {
             hub: self.hub,
@@ -1315,7 +1469,12 @@ impl<'a, C, NC, A> UserMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Directly inserts a message into only this user's mailbox similar to IMAP APPEND, bypassing most scanning and classification. Does not send a message.    
+    /// Directly inserts a message into only this user's mailbox similar to IMAP APPEND, bypassing most scanning and classification. Does not send a message.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `userId` - The user's email address. The special value me can be used to indicate the authenticated user.
     pub fn messages_insert(&self, request: &Message, user_id: &str) -> UserMessageInsertCall<'a, C, NC, A> {
         UserMessageInsertCall {
             hub: self.hub,
@@ -1341,7 +1500,7 @@ impl<'a, C, NC, A> UserMethods<'a, C, NC, A> {
 /// Imports a message into only this user's mailbox, with standard email delivery scanning and classification similar to receiving via SMTP. Does not send a message.
 ///
 /// A builder for the *messages.import* method supported by a *user* resource.
-/// It is not used directly, but through a `UserMethods`.
+/// It is not used directly, but through a `UserMethods` instance.
 ///
 /// # Example
 ///
@@ -1428,7 +1587,7 @@ impl<'a, C, NC, A> UserMessageImportCall<'a, C, NC, A> where NC: hyper::net::Net
         for &field in ["alt", "userId", "processForCalendar", "neverMarkSpam", "internalDateSource", "deleted"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -1495,7 +1654,7 @@ impl<'a, C, NC, A> UserMessageImportCall<'a, C, NC, A> where NC: hyper::net::Net
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -1521,7 +1680,7 @@ impl<'a, C, NC, A> UserMessageImportCall<'a, C, NC, A> where NC: hyper::net::Net
                             let size = reader.seek(io::SeekFrom::End(0)).unwrap();
                         reader.seek(io::SeekFrom::Start(0)).unwrap();
                         if size > 36700160 {
-                        	return Result::UploadSizeLimitExceeded(size, 36700160)
+                        	return Err(Error::UploadSizeLimitExceeded(size, 36700160))
                         }
                             mp_reader.add_part(&mut request_value_reader, request_size, json_mime_type.clone())
                                      .add_part(&mut reader, size, reader_mime_type.clone());
@@ -1543,7 +1702,6 @@ impl<'a, C, NC, A> UserMessageImportCall<'a, C, NC, A> where NC: hyper::net::Net
     
                     dlg.pre_request();
                     req.send()
-    
                 }
             };
 
@@ -1554,7 +1712,7 @@ impl<'a, C, NC, A> UserMessageImportCall<'a, C, NC, A> where NC: hyper::net::Net
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -1565,13 +1723,13 @@ impl<'a, C, NC, A> UserMessageImportCall<'a, C, NC, A> where NC: hyper::net::Net
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     if protocol == "resumable" {
                         let size = reader.seek(io::SeekFrom::End(0)).unwrap();
                         reader.seek(io::SeekFrom::Start(0)).unwrap();
                         if size > 36700160 {
-                        	return Result::UploadSizeLimitExceeded(size, 36700160)
+                        	return Err(Error::UploadSizeLimitExceeded(size, 36700160))
                         }
                         let mut client = &mut *self.hub.client.borrow_mut();
                         let upload_result = {
@@ -1596,17 +1754,17 @@ impl<'a, C, NC, A> UserMessageImportCall<'a, C, NC, A> where NC: hyper::net::Net
                         match upload_result {
                             None => {
                                 dlg.finished(false);
-                                return Result::Cancelled
+                                return Err(Error::Cancelled)
                             }
                             Some(Err(err)) => {
                                 dlg.finished(false);
-                                return Result::HttpError(err)
+                                return Err(Error::HttpError(err))
                             }
                             Some(Ok(upload_result)) => {
                                 res = upload_result;
                                 if !res.status.is_success() {
                                     dlg.finished(false);
-                                    return Result::Failure(res)
+                                    return Err(Error::Failure(res))
                                 }
                             }
                         }
@@ -1618,13 +1776,13 @@ impl<'a, C, NC, A> UserMessageImportCall<'a, C, NC, A> where NC: hyper::net::Net
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -1640,11 +1798,14 @@ impl<'a, C, NC, A> UserMessageImportCall<'a, C, NC, A> where NC: hyper::net::Net
                 where RS: ReadSeek {
         self.doit(stream, mime_type, "simple")
     }
-    /// Upload media in a resumeable fashion.
+    /// Upload media in a resumable fashion.
     /// Even if the upload fails or is interrupted, it can be resumed for a 
     /// certain amount of time as the server maintains state temporarily.
     /// 
-    /// TODO: Write more about how delegation works in this particular case.
+    /// The delegate will be asked for an `upload_url()`, and if not provided, will be asked to store an upload URL 
+    /// that was provided by the server, using `store_upload_url(...)`. The upload will be done in chunks, the delegate
+    /// may specify the `chunk_size()` and may cancel the operation before each chunk is uploaded, using
+    /// `cancel_chunk_upload(...)`.
     ///
     /// * *max size*: 35MB
     /// * *multipart*: yes
@@ -1668,7 +1829,7 @@ impl<'a, C, NC, A> UserMessageImportCall<'a, C, NC, A> where NC: hyper::net::Net
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The user's email address. The special value me can be used to indicate the authenticated user.    
+    /// The user's email address. The special value me can be used to indicate the authenticated user.
     pub fn user_id(mut self, new_value: &str) -> UserMessageImportCall<'a, C, NC, A> {
         self._user_id = new_value.to_string();
         self
@@ -1676,7 +1837,7 @@ impl<'a, C, NC, A> UserMessageImportCall<'a, C, NC, A> where NC: hyper::net::Net
     /// Sets the *process for calendar* query property to the given value.
     ///
     /// 
-    /// Process calendar invites in the email and add any extracted meetings to the Google Calendar for this user.    
+    /// Process calendar invites in the email and add any extracted meetings to the Google Calendar for this user.
     pub fn process_for_calendar(mut self, new_value: bool) -> UserMessageImportCall<'a, C, NC, A> {
         self._process_for_calendar = Some(new_value);
         self
@@ -1684,7 +1845,7 @@ impl<'a, C, NC, A> UserMessageImportCall<'a, C, NC, A> where NC: hyper::net::Net
     /// Sets the *never mark spam* query property to the given value.
     ///
     /// 
-    /// Ignore the Gmail spam classifier decision and never mark this email as SPAM in the mailbox.    
+    /// Ignore the Gmail spam classifier decision and never mark this email as SPAM in the mailbox.
     pub fn never_mark_spam(mut self, new_value: bool) -> UserMessageImportCall<'a, C, NC, A> {
         self._never_mark_spam = Some(new_value);
         self
@@ -1692,7 +1853,7 @@ impl<'a, C, NC, A> UserMessageImportCall<'a, C, NC, A> where NC: hyper::net::Net
     /// Sets the *internal date source* query property to the given value.
     ///
     /// 
-    /// Source for Gmail's internal date of the message.    
+    /// Source for Gmail's internal date of the message.
     pub fn internal_date_source(mut self, new_value: &str) -> UserMessageImportCall<'a, C, NC, A> {
         self._internal_date_source = Some(new_value.to_string());
         self
@@ -1700,7 +1861,7 @@ impl<'a, C, NC, A> UserMessageImportCall<'a, C, NC, A> where NC: hyper::net::Net
     /// Sets the *deleted* query property to the given value.
     ///
     /// 
-    /// Mark the email as permanently deleted (not TRASH) and only visible in Google Apps Vault to a Vault administrator. Only used for Google Apps for Work accounts.    
+    /// Mark the email as permanently deleted (not TRASH) and only visible in Google Apps Vault to a Vault administrator. Only used for Google Apps for Work accounts.
     pub fn deleted(mut self, new_value: bool) -> UserMessageImportCall<'a, C, NC, A> {
         self._deleted = Some(new_value);
         self
@@ -1761,7 +1922,7 @@ impl<'a, C, NC, A> UserMessageImportCall<'a, C, NC, A> where NC: hyper::net::Net
 /// Lists the history of all changes to the given mailbox. History results are returned in chronological order (increasing historyId).
 ///
 /// A builder for the *history.list* method supported by a *user* resource.
-/// It is not used directly, but through a `UserMethods`.
+/// It is not used directly, but through a `UserMethods` instance.
 ///
 /// # Example
 ///
@@ -1839,7 +2000,7 @@ impl<'a, C, NC, A> UserHistoryListCall<'a, C, NC, A> where NC: hyper::net::Netwo
         for &field in ["alt", "userId", "startHistoryId", "pageToken", "maxResults", "labelId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -1892,7 +2053,7 @@ impl<'a, C, NC, A> UserHistoryListCall<'a, C, NC, A> where NC: hyper::net::Netwo
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -1904,7 +2065,6 @@ impl<'a, C, NC, A> UserHistoryListCall<'a, C, NC, A> where NC: hyper::net::Netwo
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -1914,7 +2074,7 @@ impl<'a, C, NC, A> UserHistoryListCall<'a, C, NC, A> where NC: hyper::net::Netwo
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -1925,7 +2085,7 @@ impl<'a, C, NC, A> UserHistoryListCall<'a, C, NC, A> where NC: hyper::net::Netwo
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -1934,13 +2094,13 @@ impl<'a, C, NC, A> UserHistoryListCall<'a, C, NC, A> where NC: hyper::net::Netwo
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -1952,7 +2112,7 @@ impl<'a, C, NC, A> UserHistoryListCall<'a, C, NC, A> where NC: hyper::net::Netwo
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The user's email address. The special value me can be used to indicate the authenticated user.    
+    /// The user's email address. The special value me can be used to indicate the authenticated user.
     pub fn user_id(mut self, new_value: &str) -> UserHistoryListCall<'a, C, NC, A> {
         self._user_id = new_value.to_string();
         self
@@ -1960,7 +2120,7 @@ impl<'a, C, NC, A> UserHistoryListCall<'a, C, NC, A> where NC: hyper::net::Netwo
     /// Sets the *start history id* query property to the given value.
     ///
     /// 
-    /// Required. Returns history records after the specified startHistoryId. The supplied startHistoryId should be obtained from the historyId of a message, thread, or previous list response. History IDs increase chronologically but are not contiguous with random gaps in between valid IDs. Supplying an invalid or out of date startHistoryId typically returns an HTTP 404 error code. A historyId is typically valid for at least a week, but in some circumstances may be valid for only a few hours. If you receive an HTTP 404 error response, your application should perform a full sync. If you receive no nextPageToken in the response, there are no updates to retrieve and you can store the returned historyId for a future request.    
+    /// Required. Returns history records after the specified startHistoryId. The supplied startHistoryId should be obtained from the historyId of a message, thread, or previous list response. History IDs increase chronologically but are not contiguous with random gaps in between valid IDs. Supplying an invalid or out of date startHistoryId typically returns an HTTP 404 error code. A historyId is typically valid for at least a week, but in some circumstances may be valid for only a few hours. If you receive an HTTP 404 error response, your application should perform a full sync. If you receive no nextPageToken in the response, there are no updates to retrieve and you can store the returned historyId for a future request.
     pub fn start_history_id(mut self, new_value: &str) -> UserHistoryListCall<'a, C, NC, A> {
         self._start_history_id = Some(new_value.to_string());
         self
@@ -1968,7 +2128,7 @@ impl<'a, C, NC, A> UserHistoryListCall<'a, C, NC, A> where NC: hyper::net::Netwo
     /// Sets the *page token* query property to the given value.
     ///
     /// 
-    /// Page token to retrieve a specific page of results in the list.    
+    /// Page token to retrieve a specific page of results in the list.
     pub fn page_token(mut self, new_value: &str) -> UserHistoryListCall<'a, C, NC, A> {
         self._page_token = Some(new_value.to_string());
         self
@@ -1976,7 +2136,7 @@ impl<'a, C, NC, A> UserHistoryListCall<'a, C, NC, A> where NC: hyper::net::Netwo
     /// Sets the *max results* query property to the given value.
     ///
     /// 
-    /// The maximum number of history records to return.    
+    /// The maximum number of history records to return.
     pub fn max_results(mut self, new_value: u32) -> UserHistoryListCall<'a, C, NC, A> {
         self._max_results = Some(new_value);
         self
@@ -1984,7 +2144,7 @@ impl<'a, C, NC, A> UserHistoryListCall<'a, C, NC, A> where NC: hyper::net::Netwo
     /// Sets the *label id* query property to the given value.
     ///
     /// 
-    /// Only return messages with a label matching the ID.    
+    /// Only return messages with a label matching the ID.
     pub fn label_id(mut self, new_value: &str) -> UserHistoryListCall<'a, C, NC, A> {
         self._label_id = Some(new_value.to_string());
         self
@@ -2045,7 +2205,7 @@ impl<'a, C, NC, A> UserHistoryListCall<'a, C, NC, A> where NC: hyper::net::Netwo
 /// Creates a new draft with the DRAFT label.
 ///
 /// A builder for the *drafts.create* method supported by a *user* resource.
-/// It is not used directly, but through a `UserMethods`.
+/// It is not used directly, but through a `UserMethods` instance.
 ///
 /// # Example
 ///
@@ -2112,7 +2272,7 @@ impl<'a, C, NC, A> UserDraftCreateCall<'a, C, NC, A> where NC: hyper::net::Netwo
         for &field in ["alt", "userId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -2179,7 +2339,7 @@ impl<'a, C, NC, A> UserDraftCreateCall<'a, C, NC, A> where NC: hyper::net::Netwo
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -2205,7 +2365,7 @@ impl<'a, C, NC, A> UserDraftCreateCall<'a, C, NC, A> where NC: hyper::net::Netwo
                             let size = reader.seek(io::SeekFrom::End(0)).unwrap();
                         reader.seek(io::SeekFrom::Start(0)).unwrap();
                         if size > 36700160 {
-                        	return Result::UploadSizeLimitExceeded(size, 36700160)
+                        	return Err(Error::UploadSizeLimitExceeded(size, 36700160))
                         }
                             mp_reader.add_part(&mut request_value_reader, request_size, json_mime_type.clone())
                                      .add_part(&mut reader, size, reader_mime_type.clone());
@@ -2227,7 +2387,6 @@ impl<'a, C, NC, A> UserDraftCreateCall<'a, C, NC, A> where NC: hyper::net::Netwo
     
                     dlg.pre_request();
                     req.send()
-    
                 }
             };
 
@@ -2238,7 +2397,7 @@ impl<'a, C, NC, A> UserDraftCreateCall<'a, C, NC, A> where NC: hyper::net::Netwo
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -2249,13 +2408,13 @@ impl<'a, C, NC, A> UserDraftCreateCall<'a, C, NC, A> where NC: hyper::net::Netwo
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     if protocol == "resumable" {
                         let size = reader.seek(io::SeekFrom::End(0)).unwrap();
                         reader.seek(io::SeekFrom::Start(0)).unwrap();
                         if size > 36700160 {
-                        	return Result::UploadSizeLimitExceeded(size, 36700160)
+                        	return Err(Error::UploadSizeLimitExceeded(size, 36700160))
                         }
                         let mut client = &mut *self.hub.client.borrow_mut();
                         let upload_result = {
@@ -2280,17 +2439,17 @@ impl<'a, C, NC, A> UserDraftCreateCall<'a, C, NC, A> where NC: hyper::net::Netwo
                         match upload_result {
                             None => {
                                 dlg.finished(false);
-                                return Result::Cancelled
+                                return Err(Error::Cancelled)
                             }
                             Some(Err(err)) => {
                                 dlg.finished(false);
-                                return Result::HttpError(err)
+                                return Err(Error::HttpError(err))
                             }
                             Some(Ok(upload_result)) => {
                                 res = upload_result;
                                 if !res.status.is_success() {
                                     dlg.finished(false);
-                                    return Result::Failure(res)
+                                    return Err(Error::Failure(res))
                                 }
                             }
                         }
@@ -2302,13 +2461,13 @@ impl<'a, C, NC, A> UserDraftCreateCall<'a, C, NC, A> where NC: hyper::net::Netwo
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -2324,11 +2483,14 @@ impl<'a, C, NC, A> UserDraftCreateCall<'a, C, NC, A> where NC: hyper::net::Netwo
                 where RS: ReadSeek {
         self.doit(stream, mime_type, "simple")
     }
-    /// Upload media in a resumeable fashion.
+    /// Upload media in a resumable fashion.
     /// Even if the upload fails or is interrupted, it can be resumed for a 
     /// certain amount of time as the server maintains state temporarily.
     /// 
-    /// TODO: Write more about how delegation works in this particular case.
+    /// The delegate will be asked for an `upload_url()`, and if not provided, will be asked to store an upload URL 
+    /// that was provided by the server, using `store_upload_url(...)`. The upload will be done in chunks, the delegate
+    /// may specify the `chunk_size()` and may cancel the operation before each chunk is uploaded, using
+    /// `cancel_chunk_upload(...)`.
     ///
     /// * *max size*: 35MB
     /// * *multipart*: yes
@@ -2352,7 +2514,7 @@ impl<'a, C, NC, A> UserDraftCreateCall<'a, C, NC, A> where NC: hyper::net::Netwo
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The user's email address. The special value me can be used to indicate the authenticated user.    
+    /// The user's email address. The special value me can be used to indicate the authenticated user.
     pub fn user_id(mut self, new_value: &str) -> UserDraftCreateCall<'a, C, NC, A> {
         self._user_id = new_value.to_string();
         self
@@ -2413,7 +2575,7 @@ impl<'a, C, NC, A> UserDraftCreateCall<'a, C, NC, A> where NC: hyper::net::Netwo
 /// Creates a new label.
 ///
 /// A builder for the *labels.create* method supported by a *user* resource.
-/// It is not used directly, but through a `UserMethods`.
+/// It is not used directly, but through a `UserMethods` instance.
 ///
 /// # Example
 ///
@@ -2478,7 +2640,7 @@ impl<'a, C, NC, A> UserLabelCreateCall<'a, C, NC, A> where NC: hyper::net::Netwo
         for &field in ["alt", "userId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -2535,7 +2697,7 @@ impl<'a, C, NC, A> UserLabelCreateCall<'a, C, NC, A> where NC: hyper::net::Netwo
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -2551,7 +2713,6 @@ impl<'a, C, NC, A> UserLabelCreateCall<'a, C, NC, A> where NC: hyper::net::Netwo
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -2561,7 +2722,7 @@ impl<'a, C, NC, A> UserLabelCreateCall<'a, C, NC, A> where NC: hyper::net::Netwo
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -2572,7 +2733,7 @@ impl<'a, C, NC, A> UserLabelCreateCall<'a, C, NC, A> where NC: hyper::net::Netwo
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -2581,13 +2742,13 @@ impl<'a, C, NC, A> UserLabelCreateCall<'a, C, NC, A> where NC: hyper::net::Netwo
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -2608,7 +2769,7 @@ impl<'a, C, NC, A> UserLabelCreateCall<'a, C, NC, A> where NC: hyper::net::Netwo
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The user's email address. The special value me can be used to indicate the authenticated user.    
+    /// The user's email address. The special value me can be used to indicate the authenticated user.
     pub fn user_id(mut self, new_value: &str) -> UserLabelCreateCall<'a, C, NC, A> {
         self._user_id = new_value.to_string();
         self
@@ -2669,7 +2830,7 @@ impl<'a, C, NC, A> UserLabelCreateCall<'a, C, NC, A> where NC: hyper::net::Netwo
 /// Immediately and permanently deletes the specified label and removes it from any messages and threads that it is applied to.
 ///
 /// A builder for the *labels.delete* method supported by a *user* resource.
-/// It is not used directly, but through a `UserMethods`.
+/// It is not used directly, but through a `UserMethods` instance.
 ///
 /// # Example
 ///
@@ -2729,7 +2890,7 @@ impl<'a, C, NC, A> UserLabelDeleteCall<'a, C, NC, A> where NC: hyper::net::Netwo
         for &field in ["userId", "id"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -2781,7 +2942,7 @@ impl<'a, C, NC, A> UserLabelDeleteCall<'a, C, NC, A> where NC: hyper::net::Netwo
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -2793,7 +2954,6 @@ impl<'a, C, NC, A> UserLabelDeleteCall<'a, C, NC, A> where NC: hyper::net::Netwo
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -2803,7 +2963,7 @@ impl<'a, C, NC, A> UserLabelDeleteCall<'a, C, NC, A> where NC: hyper::net::Netwo
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -2814,12 +2974,12 @@ impl<'a, C, NC, A> UserLabelDeleteCall<'a, C, NC, A> where NC: hyper::net::Netwo
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = res;
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -2831,7 +2991,7 @@ impl<'a, C, NC, A> UserLabelDeleteCall<'a, C, NC, A> where NC: hyper::net::Netwo
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The user's email address. The special value me can be used to indicate the authenticated user.    
+    /// The user's email address. The special value me can be used to indicate the authenticated user.
     pub fn user_id(mut self, new_value: &str) -> UserLabelDeleteCall<'a, C, NC, A> {
         self._user_id = new_value.to_string();
         self
@@ -2841,7 +3001,7 @@ impl<'a, C, NC, A> UserLabelDeleteCall<'a, C, NC, A> where NC: hyper::net::Netwo
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The ID of the label to delete.    
+    /// The ID of the label to delete.
     pub fn id(mut self, new_value: &str) -> UserLabelDeleteCall<'a, C, NC, A> {
         self._id = new_value.to_string();
         self
@@ -2902,7 +3062,7 @@ impl<'a, C, NC, A> UserLabelDeleteCall<'a, C, NC, A> where NC: hyper::net::Netwo
 /// Gets the specified label.
 ///
 /// A builder for the *labels.get* method supported by a *user* resource.
-/// It is not used directly, but through a `UserMethods`.
+/// It is not used directly, but through a `UserMethods` instance.
 ///
 /// # Example
 ///
@@ -2962,7 +3122,7 @@ impl<'a, C, NC, A> UserLabelGetCall<'a, C, NC, A> where NC: hyper::net::NetworkC
         for &field in ["alt", "userId", "id"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -3015,7 +3175,7 @@ impl<'a, C, NC, A> UserLabelGetCall<'a, C, NC, A> where NC: hyper::net::NetworkC
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -3027,7 +3187,6 @@ impl<'a, C, NC, A> UserLabelGetCall<'a, C, NC, A> where NC: hyper::net::NetworkC
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -3037,7 +3196,7 @@ impl<'a, C, NC, A> UserLabelGetCall<'a, C, NC, A> where NC: hyper::net::NetworkC
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -3048,7 +3207,7 @@ impl<'a, C, NC, A> UserLabelGetCall<'a, C, NC, A> where NC: hyper::net::NetworkC
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -3057,13 +3216,13 @@ impl<'a, C, NC, A> UserLabelGetCall<'a, C, NC, A> where NC: hyper::net::NetworkC
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -3075,7 +3234,7 @@ impl<'a, C, NC, A> UserLabelGetCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The user's email address. The special value me can be used to indicate the authenticated user.    
+    /// The user's email address. The special value me can be used to indicate the authenticated user.
     pub fn user_id(mut self, new_value: &str) -> UserLabelGetCall<'a, C, NC, A> {
         self._user_id = new_value.to_string();
         self
@@ -3085,7 +3244,7 @@ impl<'a, C, NC, A> UserLabelGetCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The ID of the label to retrieve.    
+    /// The ID of the label to retrieve.
     pub fn id(mut self, new_value: &str) -> UserLabelGetCall<'a, C, NC, A> {
         self._id = new_value.to_string();
         self
@@ -3146,7 +3305,7 @@ impl<'a, C, NC, A> UserLabelGetCall<'a, C, NC, A> where NC: hyper::net::NetworkC
 /// Moves the specified message to the trash.
 ///
 /// A builder for the *messages.trash* method supported by a *user* resource.
-/// It is not used directly, but through a `UserMethods`.
+/// It is not used directly, but through a `UserMethods` instance.
 ///
 /// # Example
 ///
@@ -3206,7 +3365,7 @@ impl<'a, C, NC, A> UserMessageTrashCall<'a, C, NC, A> where NC: hyper::net::Netw
         for &field in ["alt", "userId", "id"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -3259,7 +3418,7 @@ impl<'a, C, NC, A> UserMessageTrashCall<'a, C, NC, A> where NC: hyper::net::Netw
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -3271,7 +3430,6 @@ impl<'a, C, NC, A> UserMessageTrashCall<'a, C, NC, A> where NC: hyper::net::Netw
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -3281,7 +3439,7 @@ impl<'a, C, NC, A> UserMessageTrashCall<'a, C, NC, A> where NC: hyper::net::Netw
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -3292,7 +3450,7 @@ impl<'a, C, NC, A> UserMessageTrashCall<'a, C, NC, A> where NC: hyper::net::Netw
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -3301,13 +3459,13 @@ impl<'a, C, NC, A> UserMessageTrashCall<'a, C, NC, A> where NC: hyper::net::Netw
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -3319,7 +3477,7 @@ impl<'a, C, NC, A> UserMessageTrashCall<'a, C, NC, A> where NC: hyper::net::Netw
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The user's email address. The special value me can be used to indicate the authenticated user.    
+    /// The user's email address. The special value me can be used to indicate the authenticated user.
     pub fn user_id(mut self, new_value: &str) -> UserMessageTrashCall<'a, C, NC, A> {
         self._user_id = new_value.to_string();
         self
@@ -3329,7 +3487,7 @@ impl<'a, C, NC, A> UserMessageTrashCall<'a, C, NC, A> where NC: hyper::net::Netw
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The ID of the message to Trash.    
+    /// The ID of the message to Trash.
     pub fn id(mut self, new_value: &str) -> UserMessageTrashCall<'a, C, NC, A> {
         self._id = new_value.to_string();
         self
@@ -3390,7 +3548,7 @@ impl<'a, C, NC, A> UserMessageTrashCall<'a, C, NC, A> where NC: hyper::net::Netw
 /// Sends the specified, existing draft to the recipients in the To, Cc, and Bcc headers.
 ///
 /// A builder for the *drafts.send* method supported by a *user* resource.
-/// It is not used directly, but through a `UserMethods`.
+/// It is not used directly, but through a `UserMethods` instance.
 ///
 /// # Example
 ///
@@ -3457,7 +3615,7 @@ impl<'a, C, NC, A> UserDraftSendCall<'a, C, NC, A> where NC: hyper::net::Network
         for &field in ["alt", "userId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -3524,7 +3682,7 @@ impl<'a, C, NC, A> UserDraftSendCall<'a, C, NC, A> where NC: hyper::net::Network
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -3550,7 +3708,7 @@ impl<'a, C, NC, A> UserDraftSendCall<'a, C, NC, A> where NC: hyper::net::Network
                             let size = reader.seek(io::SeekFrom::End(0)).unwrap();
                         reader.seek(io::SeekFrom::Start(0)).unwrap();
                         if size > 36700160 {
-                        	return Result::UploadSizeLimitExceeded(size, 36700160)
+                        	return Err(Error::UploadSizeLimitExceeded(size, 36700160))
                         }
                             mp_reader.add_part(&mut request_value_reader, request_size, json_mime_type.clone())
                                      .add_part(&mut reader, size, reader_mime_type.clone());
@@ -3572,7 +3730,6 @@ impl<'a, C, NC, A> UserDraftSendCall<'a, C, NC, A> where NC: hyper::net::Network
     
                     dlg.pre_request();
                     req.send()
-    
                 }
             };
 
@@ -3583,7 +3740,7 @@ impl<'a, C, NC, A> UserDraftSendCall<'a, C, NC, A> where NC: hyper::net::Network
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -3594,13 +3751,13 @@ impl<'a, C, NC, A> UserDraftSendCall<'a, C, NC, A> where NC: hyper::net::Network
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     if protocol == "resumable" {
                         let size = reader.seek(io::SeekFrom::End(0)).unwrap();
                         reader.seek(io::SeekFrom::Start(0)).unwrap();
                         if size > 36700160 {
-                        	return Result::UploadSizeLimitExceeded(size, 36700160)
+                        	return Err(Error::UploadSizeLimitExceeded(size, 36700160))
                         }
                         let mut client = &mut *self.hub.client.borrow_mut();
                         let upload_result = {
@@ -3625,17 +3782,17 @@ impl<'a, C, NC, A> UserDraftSendCall<'a, C, NC, A> where NC: hyper::net::Network
                         match upload_result {
                             None => {
                                 dlg.finished(false);
-                                return Result::Cancelled
+                                return Err(Error::Cancelled)
                             }
                             Some(Err(err)) => {
                                 dlg.finished(false);
-                                return Result::HttpError(err)
+                                return Err(Error::HttpError(err))
                             }
                             Some(Ok(upload_result)) => {
                                 res = upload_result;
                                 if !res.status.is_success() {
                                     dlg.finished(false);
-                                    return Result::Failure(res)
+                                    return Err(Error::Failure(res))
                                 }
                             }
                         }
@@ -3647,13 +3804,13 @@ impl<'a, C, NC, A> UserDraftSendCall<'a, C, NC, A> where NC: hyper::net::Network
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -3669,11 +3826,14 @@ impl<'a, C, NC, A> UserDraftSendCall<'a, C, NC, A> where NC: hyper::net::Network
                 where RS: ReadSeek {
         self.doit(stream, mime_type, "simple")
     }
-    /// Upload media in a resumeable fashion.
+    /// Upload media in a resumable fashion.
     /// Even if the upload fails or is interrupted, it can be resumed for a 
     /// certain amount of time as the server maintains state temporarily.
     /// 
-    /// TODO: Write more about how delegation works in this particular case.
+    /// The delegate will be asked for an `upload_url()`, and if not provided, will be asked to store an upload URL 
+    /// that was provided by the server, using `store_upload_url(...)`. The upload will be done in chunks, the delegate
+    /// may specify the `chunk_size()` and may cancel the operation before each chunk is uploaded, using
+    /// `cancel_chunk_upload(...)`.
     ///
     /// * *max size*: 35MB
     /// * *multipart*: yes
@@ -3697,7 +3857,7 @@ impl<'a, C, NC, A> UserDraftSendCall<'a, C, NC, A> where NC: hyper::net::Network
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The user's email address. The special value me can be used to indicate the authenticated user.    
+    /// The user's email address. The special value me can be used to indicate the authenticated user.
     pub fn user_id(mut self, new_value: &str) -> UserDraftSendCall<'a, C, NC, A> {
         self._user_id = new_value.to_string();
         self
@@ -3758,7 +3918,7 @@ impl<'a, C, NC, A> UserDraftSendCall<'a, C, NC, A> where NC: hyper::net::Network
 /// Removes the specified message from the trash.
 ///
 /// A builder for the *messages.untrash* method supported by a *user* resource.
-/// It is not used directly, but through a `UserMethods`.
+/// It is not used directly, but through a `UserMethods` instance.
 ///
 /// # Example
 ///
@@ -3818,7 +3978,7 @@ impl<'a, C, NC, A> UserMessageUntrashCall<'a, C, NC, A> where NC: hyper::net::Ne
         for &field in ["alt", "userId", "id"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -3871,7 +4031,7 @@ impl<'a, C, NC, A> UserMessageUntrashCall<'a, C, NC, A> where NC: hyper::net::Ne
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -3883,7 +4043,6 @@ impl<'a, C, NC, A> UserMessageUntrashCall<'a, C, NC, A> where NC: hyper::net::Ne
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -3893,7 +4052,7 @@ impl<'a, C, NC, A> UserMessageUntrashCall<'a, C, NC, A> where NC: hyper::net::Ne
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -3904,7 +4063,7 @@ impl<'a, C, NC, A> UserMessageUntrashCall<'a, C, NC, A> where NC: hyper::net::Ne
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -3913,13 +4072,13 @@ impl<'a, C, NC, A> UserMessageUntrashCall<'a, C, NC, A> where NC: hyper::net::Ne
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -3931,7 +4090,7 @@ impl<'a, C, NC, A> UserMessageUntrashCall<'a, C, NC, A> where NC: hyper::net::Ne
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The user's email address. The special value me can be used to indicate the authenticated user.    
+    /// The user's email address. The special value me can be used to indicate the authenticated user.
     pub fn user_id(mut self, new_value: &str) -> UserMessageUntrashCall<'a, C, NC, A> {
         self._user_id = new_value.to_string();
         self
@@ -3941,7 +4100,7 @@ impl<'a, C, NC, A> UserMessageUntrashCall<'a, C, NC, A> where NC: hyper::net::Ne
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The ID of the message to remove from Trash.    
+    /// The ID of the message to remove from Trash.
     pub fn id(mut self, new_value: &str) -> UserMessageUntrashCall<'a, C, NC, A> {
         self._id = new_value.to_string();
         self
@@ -4002,7 +4161,7 @@ impl<'a, C, NC, A> UserMessageUntrashCall<'a, C, NC, A> where NC: hyper::net::Ne
 /// Lists all labels in the user's mailbox.
 ///
 /// A builder for the *labels.list* method supported by a *user* resource.
-/// It is not used directly, but through a `UserMethods`.
+/// It is not used directly, but through a `UserMethods` instance.
 ///
 /// # Example
 ///
@@ -4060,7 +4219,7 @@ impl<'a, C, NC, A> UserLabelListCall<'a, C, NC, A> where NC: hyper::net::Network
         for &field in ["alt", "userId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -4113,7 +4272,7 @@ impl<'a, C, NC, A> UserLabelListCall<'a, C, NC, A> where NC: hyper::net::Network
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -4125,7 +4284,6 @@ impl<'a, C, NC, A> UserLabelListCall<'a, C, NC, A> where NC: hyper::net::Network
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -4135,7 +4293,7 @@ impl<'a, C, NC, A> UserLabelListCall<'a, C, NC, A> where NC: hyper::net::Network
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -4146,7 +4304,7 @@ impl<'a, C, NC, A> UserLabelListCall<'a, C, NC, A> where NC: hyper::net::Network
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -4155,13 +4313,13 @@ impl<'a, C, NC, A> UserLabelListCall<'a, C, NC, A> where NC: hyper::net::Network
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -4173,7 +4331,7 @@ impl<'a, C, NC, A> UserLabelListCall<'a, C, NC, A> where NC: hyper::net::Network
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The user's email address. The special value me can be used to indicate the authenticated user.    
+    /// The user's email address. The special value me can be used to indicate the authenticated user.
     pub fn user_id(mut self, new_value: &str) -> UserLabelListCall<'a, C, NC, A> {
         self._user_id = new_value.to_string();
         self
@@ -4234,7 +4392,7 @@ impl<'a, C, NC, A> UserLabelListCall<'a, C, NC, A> where NC: hyper::net::Network
 /// Immediately and permanently deletes the specified message. This operation cannot be undone. Prefer messages.trash instead.
 ///
 /// A builder for the *messages.delete* method supported by a *user* resource.
-/// It is not used directly, but through a `UserMethods`.
+/// It is not used directly, but through a `UserMethods` instance.
 ///
 /// # Example
 ///
@@ -4294,7 +4452,7 @@ impl<'a, C, NC, A> UserMessageDeleteCall<'a, C, NC, A> where NC: hyper::net::Net
         for &field in ["userId", "id"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -4346,7 +4504,7 @@ impl<'a, C, NC, A> UserMessageDeleteCall<'a, C, NC, A> where NC: hyper::net::Net
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -4358,7 +4516,6 @@ impl<'a, C, NC, A> UserMessageDeleteCall<'a, C, NC, A> where NC: hyper::net::Net
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -4368,7 +4525,7 @@ impl<'a, C, NC, A> UserMessageDeleteCall<'a, C, NC, A> where NC: hyper::net::Net
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -4379,12 +4536,12 @@ impl<'a, C, NC, A> UserMessageDeleteCall<'a, C, NC, A> where NC: hyper::net::Net
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = res;
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -4396,7 +4553,7 @@ impl<'a, C, NC, A> UserMessageDeleteCall<'a, C, NC, A> where NC: hyper::net::Net
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The user's email address. The special value me can be used to indicate the authenticated user.    
+    /// The user's email address. The special value me can be used to indicate the authenticated user.
     pub fn user_id(mut self, new_value: &str) -> UserMessageDeleteCall<'a, C, NC, A> {
         self._user_id = new_value.to_string();
         self
@@ -4406,7 +4563,7 @@ impl<'a, C, NC, A> UserMessageDeleteCall<'a, C, NC, A> where NC: hyper::net::Net
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The ID of the message to delete.    
+    /// The ID of the message to delete.
     pub fn id(mut self, new_value: &str) -> UserMessageDeleteCall<'a, C, NC, A> {
         self._id = new_value.to_string();
         self
@@ -4467,7 +4624,7 @@ impl<'a, C, NC, A> UserMessageDeleteCall<'a, C, NC, A> where NC: hyper::net::Net
 /// Replaces a draft's content.
 ///
 /// A builder for the *drafts.update* method supported by a *user* resource.
-/// It is not used directly, but through a `UserMethods`.
+/// It is not used directly, but through a `UserMethods` instance.
 ///
 /// # Example
 ///
@@ -4536,7 +4693,7 @@ impl<'a, C, NC, A> UserDraftUpdateCall<'a, C, NC, A> where NC: hyper::net::Netwo
         for &field in ["alt", "userId", "id"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -4603,7 +4760,7 @@ impl<'a, C, NC, A> UserDraftUpdateCall<'a, C, NC, A> where NC: hyper::net::Netwo
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -4629,7 +4786,7 @@ impl<'a, C, NC, A> UserDraftUpdateCall<'a, C, NC, A> where NC: hyper::net::Netwo
                             let size = reader.seek(io::SeekFrom::End(0)).unwrap();
                         reader.seek(io::SeekFrom::Start(0)).unwrap();
                         if size > 36700160 {
-                        	return Result::UploadSizeLimitExceeded(size, 36700160)
+                        	return Err(Error::UploadSizeLimitExceeded(size, 36700160))
                         }
                             mp_reader.add_part(&mut request_value_reader, request_size, json_mime_type.clone())
                                      .add_part(&mut reader, size, reader_mime_type.clone());
@@ -4651,7 +4808,6 @@ impl<'a, C, NC, A> UserDraftUpdateCall<'a, C, NC, A> where NC: hyper::net::Netwo
     
                     dlg.pre_request();
                     req.send()
-    
                 }
             };
 
@@ -4662,7 +4818,7 @@ impl<'a, C, NC, A> UserDraftUpdateCall<'a, C, NC, A> where NC: hyper::net::Netwo
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -4673,13 +4829,13 @@ impl<'a, C, NC, A> UserDraftUpdateCall<'a, C, NC, A> where NC: hyper::net::Netwo
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     if protocol == "resumable" {
                         let size = reader.seek(io::SeekFrom::End(0)).unwrap();
                         reader.seek(io::SeekFrom::Start(0)).unwrap();
                         if size > 36700160 {
-                        	return Result::UploadSizeLimitExceeded(size, 36700160)
+                        	return Err(Error::UploadSizeLimitExceeded(size, 36700160))
                         }
                         let mut client = &mut *self.hub.client.borrow_mut();
                         let upload_result = {
@@ -4704,17 +4860,17 @@ impl<'a, C, NC, A> UserDraftUpdateCall<'a, C, NC, A> where NC: hyper::net::Netwo
                         match upload_result {
                             None => {
                                 dlg.finished(false);
-                                return Result::Cancelled
+                                return Err(Error::Cancelled)
                             }
                             Some(Err(err)) => {
                                 dlg.finished(false);
-                                return Result::HttpError(err)
+                                return Err(Error::HttpError(err))
                             }
                             Some(Ok(upload_result)) => {
                                 res = upload_result;
                                 if !res.status.is_success() {
                                     dlg.finished(false);
-                                    return Result::Failure(res)
+                                    return Err(Error::Failure(res))
                                 }
                             }
                         }
@@ -4726,13 +4882,13 @@ impl<'a, C, NC, A> UserDraftUpdateCall<'a, C, NC, A> where NC: hyper::net::Netwo
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -4748,11 +4904,14 @@ impl<'a, C, NC, A> UserDraftUpdateCall<'a, C, NC, A> where NC: hyper::net::Netwo
                 where RS: ReadSeek {
         self.doit(stream, mime_type, "simple")
     }
-    /// Upload media in a resumeable fashion.
+    /// Upload media in a resumable fashion.
     /// Even if the upload fails or is interrupted, it can be resumed for a 
     /// certain amount of time as the server maintains state temporarily.
     /// 
-    /// TODO: Write more about how delegation works in this particular case.
+    /// The delegate will be asked for an `upload_url()`, and if not provided, will be asked to store an upload URL 
+    /// that was provided by the server, using `store_upload_url(...)`. The upload will be done in chunks, the delegate
+    /// may specify the `chunk_size()` and may cancel the operation before each chunk is uploaded, using
+    /// `cancel_chunk_upload(...)`.
     ///
     /// * *max size*: 35MB
     /// * *multipart*: yes
@@ -4776,7 +4935,7 @@ impl<'a, C, NC, A> UserDraftUpdateCall<'a, C, NC, A> where NC: hyper::net::Netwo
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The user's email address. The special value me can be used to indicate the authenticated user.    
+    /// The user's email address. The special value me can be used to indicate the authenticated user.
     pub fn user_id(mut self, new_value: &str) -> UserDraftUpdateCall<'a, C, NC, A> {
         self._user_id = new_value.to_string();
         self
@@ -4786,7 +4945,7 @@ impl<'a, C, NC, A> UserDraftUpdateCall<'a, C, NC, A> where NC: hyper::net::Netwo
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The ID of the draft to update.    
+    /// The ID of the draft to update.
     pub fn id(mut self, new_value: &str) -> UserDraftUpdateCall<'a, C, NC, A> {
         self._id = new_value.to_string();
         self
@@ -4847,7 +5006,7 @@ impl<'a, C, NC, A> UserDraftUpdateCall<'a, C, NC, A> where NC: hyper::net::Netwo
 /// Gets the specified draft.
 ///
 /// A builder for the *drafts.get* method supported by a *user* resource.
-/// It is not used directly, but through a `UserMethods`.
+/// It is not used directly, but through a `UserMethods` instance.
 ///
 /// # Example
 ///
@@ -4912,7 +5071,7 @@ impl<'a, C, NC, A> UserDraftGetCall<'a, C, NC, A> where NC: hyper::net::NetworkC
         for &field in ["alt", "userId", "id", "format"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -4965,7 +5124,7 @@ impl<'a, C, NC, A> UserDraftGetCall<'a, C, NC, A> where NC: hyper::net::NetworkC
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -4977,7 +5136,6 @@ impl<'a, C, NC, A> UserDraftGetCall<'a, C, NC, A> where NC: hyper::net::NetworkC
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -4987,7 +5145,7 @@ impl<'a, C, NC, A> UserDraftGetCall<'a, C, NC, A> where NC: hyper::net::NetworkC
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -4998,7 +5156,7 @@ impl<'a, C, NC, A> UserDraftGetCall<'a, C, NC, A> where NC: hyper::net::NetworkC
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -5007,13 +5165,13 @@ impl<'a, C, NC, A> UserDraftGetCall<'a, C, NC, A> where NC: hyper::net::NetworkC
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -5025,7 +5183,7 @@ impl<'a, C, NC, A> UserDraftGetCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The user's email address. The special value me can be used to indicate the authenticated user.    
+    /// The user's email address. The special value me can be used to indicate the authenticated user.
     pub fn user_id(mut self, new_value: &str) -> UserDraftGetCall<'a, C, NC, A> {
         self._user_id = new_value.to_string();
         self
@@ -5035,7 +5193,7 @@ impl<'a, C, NC, A> UserDraftGetCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The ID of the draft to retrieve.    
+    /// The ID of the draft to retrieve.
     pub fn id(mut self, new_value: &str) -> UserDraftGetCall<'a, C, NC, A> {
         self._id = new_value.to_string();
         self
@@ -5043,7 +5201,7 @@ impl<'a, C, NC, A> UserDraftGetCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// Sets the *format* query property to the given value.
     ///
     /// 
-    /// The format to return the draft in.    
+    /// The format to return the draft in.
     pub fn format(mut self, new_value: &str) -> UserDraftGetCall<'a, C, NC, A> {
         self._format = Some(new_value.to_string());
         self
@@ -5104,7 +5262,7 @@ impl<'a, C, NC, A> UserDraftGetCall<'a, C, NC, A> where NC: hyper::net::NetworkC
 /// Updates the specified label.
 ///
 /// A builder for the *labels.update* method supported by a *user* resource.
-/// It is not used directly, but through a `UserMethods`.
+/// It is not used directly, but through a `UserMethods` instance.
 ///
 /// # Example
 ///
@@ -5171,7 +5329,7 @@ impl<'a, C, NC, A> UserLabelUpdateCall<'a, C, NC, A> where NC: hyper::net::Netwo
         for &field in ["alt", "userId", "id"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -5228,7 +5386,7 @@ impl<'a, C, NC, A> UserLabelUpdateCall<'a, C, NC, A> where NC: hyper::net::Netwo
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -5244,7 +5402,6 @@ impl<'a, C, NC, A> UserLabelUpdateCall<'a, C, NC, A> where NC: hyper::net::Netwo
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -5254,7 +5411,7 @@ impl<'a, C, NC, A> UserLabelUpdateCall<'a, C, NC, A> where NC: hyper::net::Netwo
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -5265,7 +5422,7 @@ impl<'a, C, NC, A> UserLabelUpdateCall<'a, C, NC, A> where NC: hyper::net::Netwo
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -5274,13 +5431,13 @@ impl<'a, C, NC, A> UserLabelUpdateCall<'a, C, NC, A> where NC: hyper::net::Netwo
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -5301,7 +5458,7 @@ impl<'a, C, NC, A> UserLabelUpdateCall<'a, C, NC, A> where NC: hyper::net::Netwo
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The user's email address. The special value me can be used to indicate the authenticated user.    
+    /// The user's email address. The special value me can be used to indicate the authenticated user.
     pub fn user_id(mut self, new_value: &str) -> UserLabelUpdateCall<'a, C, NC, A> {
         self._user_id = new_value.to_string();
         self
@@ -5311,7 +5468,7 @@ impl<'a, C, NC, A> UserLabelUpdateCall<'a, C, NC, A> where NC: hyper::net::Netwo
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The ID of the label to update.    
+    /// The ID of the label to update.
     pub fn id(mut self, new_value: &str) -> UserLabelUpdateCall<'a, C, NC, A> {
         self._id = new_value.to_string();
         self
@@ -5372,7 +5529,7 @@ impl<'a, C, NC, A> UserLabelUpdateCall<'a, C, NC, A> where NC: hyper::net::Netwo
 /// Removes the specified thread from the trash.
 ///
 /// A builder for the *threads.untrash* method supported by a *user* resource.
-/// It is not used directly, but through a `UserMethods`.
+/// It is not used directly, but through a `UserMethods` instance.
 ///
 /// # Example
 ///
@@ -5432,7 +5589,7 @@ impl<'a, C, NC, A> UserThreadUntrashCall<'a, C, NC, A> where NC: hyper::net::Net
         for &field in ["alt", "userId", "id"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -5485,7 +5642,7 @@ impl<'a, C, NC, A> UserThreadUntrashCall<'a, C, NC, A> where NC: hyper::net::Net
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -5497,7 +5654,6 @@ impl<'a, C, NC, A> UserThreadUntrashCall<'a, C, NC, A> where NC: hyper::net::Net
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -5507,7 +5663,7 @@ impl<'a, C, NC, A> UserThreadUntrashCall<'a, C, NC, A> where NC: hyper::net::Net
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -5518,7 +5674,7 @@ impl<'a, C, NC, A> UserThreadUntrashCall<'a, C, NC, A> where NC: hyper::net::Net
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -5527,13 +5683,13 @@ impl<'a, C, NC, A> UserThreadUntrashCall<'a, C, NC, A> where NC: hyper::net::Net
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -5545,7 +5701,7 @@ impl<'a, C, NC, A> UserThreadUntrashCall<'a, C, NC, A> where NC: hyper::net::Net
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The user's email address. The special value me can be used to indicate the authenticated user.    
+    /// The user's email address. The special value me can be used to indicate the authenticated user.
     pub fn user_id(mut self, new_value: &str) -> UserThreadUntrashCall<'a, C, NC, A> {
         self._user_id = new_value.to_string();
         self
@@ -5555,7 +5711,7 @@ impl<'a, C, NC, A> UserThreadUntrashCall<'a, C, NC, A> where NC: hyper::net::Net
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The ID of the thread to remove from Trash.    
+    /// The ID of the thread to remove from Trash.
     pub fn id(mut self, new_value: &str) -> UserThreadUntrashCall<'a, C, NC, A> {
         self._id = new_value.to_string();
         self
@@ -5616,7 +5772,7 @@ impl<'a, C, NC, A> UserThreadUntrashCall<'a, C, NC, A> where NC: hyper::net::Net
 /// Updates the specified label. This method supports patch semantics.
 ///
 /// A builder for the *labels.patch* method supported by a *user* resource.
-/// It is not used directly, but through a `UserMethods`.
+/// It is not used directly, but through a `UserMethods` instance.
 ///
 /// # Example
 ///
@@ -5683,7 +5839,7 @@ impl<'a, C, NC, A> UserLabelPatchCall<'a, C, NC, A> where NC: hyper::net::Networ
         for &field in ["alt", "userId", "id"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -5740,7 +5896,7 @@ impl<'a, C, NC, A> UserLabelPatchCall<'a, C, NC, A> where NC: hyper::net::Networ
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -5756,7 +5912,6 @@ impl<'a, C, NC, A> UserLabelPatchCall<'a, C, NC, A> where NC: hyper::net::Networ
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -5766,7 +5921,7 @@ impl<'a, C, NC, A> UserLabelPatchCall<'a, C, NC, A> where NC: hyper::net::Networ
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -5777,7 +5932,7 @@ impl<'a, C, NC, A> UserLabelPatchCall<'a, C, NC, A> where NC: hyper::net::Networ
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -5786,13 +5941,13 @@ impl<'a, C, NC, A> UserLabelPatchCall<'a, C, NC, A> where NC: hyper::net::Networ
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -5813,7 +5968,7 @@ impl<'a, C, NC, A> UserLabelPatchCall<'a, C, NC, A> where NC: hyper::net::Networ
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The user's email address. The special value me can be used to indicate the authenticated user.    
+    /// The user's email address. The special value me can be used to indicate the authenticated user.
     pub fn user_id(mut self, new_value: &str) -> UserLabelPatchCall<'a, C, NC, A> {
         self._user_id = new_value.to_string();
         self
@@ -5823,7 +5978,7 @@ impl<'a, C, NC, A> UserLabelPatchCall<'a, C, NC, A> where NC: hyper::net::Networ
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The ID of the label to update.    
+    /// The ID of the label to update.
     pub fn id(mut self, new_value: &str) -> UserLabelPatchCall<'a, C, NC, A> {
         self._id = new_value.to_string();
         self
@@ -5884,7 +6039,7 @@ impl<'a, C, NC, A> UserLabelPatchCall<'a, C, NC, A> where NC: hyper::net::Networ
 /// Immediately and permanently deletes the specified draft. Does not simply trash it.
 ///
 /// A builder for the *drafts.delete* method supported by a *user* resource.
-/// It is not used directly, but through a `UserMethods`.
+/// It is not used directly, but through a `UserMethods` instance.
 ///
 /// # Example
 ///
@@ -5944,7 +6099,7 @@ impl<'a, C, NC, A> UserDraftDeleteCall<'a, C, NC, A> where NC: hyper::net::Netwo
         for &field in ["userId", "id"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -5996,7 +6151,7 @@ impl<'a, C, NC, A> UserDraftDeleteCall<'a, C, NC, A> where NC: hyper::net::Netwo
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -6008,7 +6163,6 @@ impl<'a, C, NC, A> UserDraftDeleteCall<'a, C, NC, A> where NC: hyper::net::Netwo
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -6018,7 +6172,7 @@ impl<'a, C, NC, A> UserDraftDeleteCall<'a, C, NC, A> where NC: hyper::net::Netwo
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -6029,12 +6183,12 @@ impl<'a, C, NC, A> UserDraftDeleteCall<'a, C, NC, A> where NC: hyper::net::Netwo
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = res;
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -6046,7 +6200,7 @@ impl<'a, C, NC, A> UserDraftDeleteCall<'a, C, NC, A> where NC: hyper::net::Netwo
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The user's email address. The special value me can be used to indicate the authenticated user.    
+    /// The user's email address. The special value me can be used to indicate the authenticated user.
     pub fn user_id(mut self, new_value: &str) -> UserDraftDeleteCall<'a, C, NC, A> {
         self._user_id = new_value.to_string();
         self
@@ -6056,7 +6210,7 @@ impl<'a, C, NC, A> UserDraftDeleteCall<'a, C, NC, A> where NC: hyper::net::Netwo
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The ID of the draft to delete.    
+    /// The ID of the draft to delete.
     pub fn id(mut self, new_value: &str) -> UserDraftDeleteCall<'a, C, NC, A> {
         self._id = new_value.to_string();
         self
@@ -6117,7 +6271,7 @@ impl<'a, C, NC, A> UserDraftDeleteCall<'a, C, NC, A> where NC: hyper::net::Netwo
 /// Lists the threads in the user's mailbox.
 ///
 /// A builder for the *threads.list* method supported by a *user* resource.
-/// It is not used directly, but through a `UserMethods`.
+/// It is not used directly, but through a `UserMethods` instance.
 ///
 /// # Example
 ///
@@ -6204,7 +6358,7 @@ impl<'a, C, NC, A> UserThreadListCall<'a, C, NC, A> where NC: hyper::net::Networ
         for &field in ["alt", "userId", "q", "pageToken", "maxResults", "labelIds", "includeSpamTrash"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -6257,7 +6411,7 @@ impl<'a, C, NC, A> UserThreadListCall<'a, C, NC, A> where NC: hyper::net::Networ
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -6269,7 +6423,6 @@ impl<'a, C, NC, A> UserThreadListCall<'a, C, NC, A> where NC: hyper::net::Networ
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -6279,7 +6432,7 @@ impl<'a, C, NC, A> UserThreadListCall<'a, C, NC, A> where NC: hyper::net::Networ
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -6290,7 +6443,7 @@ impl<'a, C, NC, A> UserThreadListCall<'a, C, NC, A> where NC: hyper::net::Networ
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -6299,13 +6452,13 @@ impl<'a, C, NC, A> UserThreadListCall<'a, C, NC, A> where NC: hyper::net::Networ
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -6317,7 +6470,7 @@ impl<'a, C, NC, A> UserThreadListCall<'a, C, NC, A> where NC: hyper::net::Networ
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The user's email address. The special value me can be used to indicate the authenticated user.    
+    /// The user's email address. The special value me can be used to indicate the authenticated user.
     pub fn user_id(mut self, new_value: &str) -> UserThreadListCall<'a, C, NC, A> {
         self._user_id = new_value.to_string();
         self
@@ -6325,7 +6478,7 @@ impl<'a, C, NC, A> UserThreadListCall<'a, C, NC, A> where NC: hyper::net::Networ
     /// Sets the *q* query property to the given value.
     ///
     /// 
-    /// Only return threads matching the specified query. Supports the same query format as the Gmail search box. For example, "from:someuser@example.com rfc822msgid: is:unread".    
+    /// Only return threads matching the specified query. Supports the same query format as the Gmail search box. For example, "from:someuser@example.com rfc822msgid: is:unread".
     pub fn q(mut self, new_value: &str) -> UserThreadListCall<'a, C, NC, A> {
         self._q = Some(new_value.to_string());
         self
@@ -6333,7 +6486,7 @@ impl<'a, C, NC, A> UserThreadListCall<'a, C, NC, A> where NC: hyper::net::Networ
     /// Sets the *page token* query property to the given value.
     ///
     /// 
-    /// Page token to retrieve a specific page of results in the list.    
+    /// Page token to retrieve a specific page of results in the list.
     pub fn page_token(mut self, new_value: &str) -> UserThreadListCall<'a, C, NC, A> {
         self._page_token = Some(new_value.to_string());
         self
@@ -6341,7 +6494,7 @@ impl<'a, C, NC, A> UserThreadListCall<'a, C, NC, A> where NC: hyper::net::Networ
     /// Sets the *max results* query property to the given value.
     ///
     /// 
-    /// Maximum number of threads to return.    
+    /// Maximum number of threads to return.
     pub fn max_results(mut self, new_value: u32) -> UserThreadListCall<'a, C, NC, A> {
         self._max_results = Some(new_value);
         self
@@ -6350,7 +6503,7 @@ impl<'a, C, NC, A> UserThreadListCall<'a, C, NC, A> where NC: hyper::net::Networ
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
     ///
     /// 
-    /// Only return threads with labels that match all of the specified label IDs.    
+    /// Only return threads with labels that match all of the specified label IDs.
     pub fn add_label_ids(mut self, new_value: &str) -> UserThreadListCall<'a, C, NC, A> {
         self._label_ids.push(new_value.to_string());
         self
@@ -6358,7 +6511,7 @@ impl<'a, C, NC, A> UserThreadListCall<'a, C, NC, A> where NC: hyper::net::Networ
     /// Sets the *include spam trash* query property to the given value.
     ///
     /// 
-    /// Include threads from SPAM and TRASH in the results.    
+    /// Include threads from SPAM and TRASH in the results.
     pub fn include_spam_trash(mut self, new_value: bool) -> UserThreadListCall<'a, C, NC, A> {
         self._include_spam_trash = Some(new_value);
         self
@@ -6419,7 +6572,7 @@ impl<'a, C, NC, A> UserThreadListCall<'a, C, NC, A> where NC: hyper::net::Networ
 /// Modifies the labels applied to the thread. This applies to all messages in the thread.
 ///
 /// A builder for the *threads.modify* method supported by a *user* resource.
-/// It is not used directly, but through a `UserMethods`.
+/// It is not used directly, but through a `UserMethods` instance.
 ///
 /// # Example
 ///
@@ -6486,7 +6639,7 @@ impl<'a, C, NC, A> UserThreadModifyCall<'a, C, NC, A> where NC: hyper::net::Netw
         for &field in ["alt", "userId", "id"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -6543,7 +6696,7 @@ impl<'a, C, NC, A> UserThreadModifyCall<'a, C, NC, A> where NC: hyper::net::Netw
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -6559,7 +6712,6 @@ impl<'a, C, NC, A> UserThreadModifyCall<'a, C, NC, A> where NC: hyper::net::Netw
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -6569,7 +6721,7 @@ impl<'a, C, NC, A> UserThreadModifyCall<'a, C, NC, A> where NC: hyper::net::Netw
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -6580,7 +6732,7 @@ impl<'a, C, NC, A> UserThreadModifyCall<'a, C, NC, A> where NC: hyper::net::Netw
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -6589,13 +6741,13 @@ impl<'a, C, NC, A> UserThreadModifyCall<'a, C, NC, A> where NC: hyper::net::Netw
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -6616,7 +6768,7 @@ impl<'a, C, NC, A> UserThreadModifyCall<'a, C, NC, A> where NC: hyper::net::Netw
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The user's email address. The special value me can be used to indicate the authenticated user.    
+    /// The user's email address. The special value me can be used to indicate the authenticated user.
     pub fn user_id(mut self, new_value: &str) -> UserThreadModifyCall<'a, C, NC, A> {
         self._user_id = new_value.to_string();
         self
@@ -6626,7 +6778,7 @@ impl<'a, C, NC, A> UserThreadModifyCall<'a, C, NC, A> where NC: hyper::net::Netw
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The ID of the thread to modify.    
+    /// The ID of the thread to modify.
     pub fn id(mut self, new_value: &str) -> UserThreadModifyCall<'a, C, NC, A> {
         self._id = new_value.to_string();
         self
@@ -6687,7 +6839,7 @@ impl<'a, C, NC, A> UserThreadModifyCall<'a, C, NC, A> where NC: hyper::net::Netw
 /// Immediately and permanently deletes the specified thread. This operation cannot be undone. Prefer threads.trash instead.
 ///
 /// A builder for the *threads.delete* method supported by a *user* resource.
-/// It is not used directly, but through a `UserMethods`.
+/// It is not used directly, but through a `UserMethods` instance.
 ///
 /// # Example
 ///
@@ -6747,7 +6899,7 @@ impl<'a, C, NC, A> UserThreadDeleteCall<'a, C, NC, A> where NC: hyper::net::Netw
         for &field in ["userId", "id"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -6799,7 +6951,7 @@ impl<'a, C, NC, A> UserThreadDeleteCall<'a, C, NC, A> where NC: hyper::net::Netw
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -6811,7 +6963,6 @@ impl<'a, C, NC, A> UserThreadDeleteCall<'a, C, NC, A> where NC: hyper::net::Netw
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -6821,7 +6972,7 @@ impl<'a, C, NC, A> UserThreadDeleteCall<'a, C, NC, A> where NC: hyper::net::Netw
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -6832,12 +6983,12 @@ impl<'a, C, NC, A> UserThreadDeleteCall<'a, C, NC, A> where NC: hyper::net::Netw
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = res;
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -6849,7 +7000,7 @@ impl<'a, C, NC, A> UserThreadDeleteCall<'a, C, NC, A> where NC: hyper::net::Netw
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The user's email address. The special value me can be used to indicate the authenticated user.    
+    /// The user's email address. The special value me can be used to indicate the authenticated user.
     pub fn user_id(mut self, new_value: &str) -> UserThreadDeleteCall<'a, C, NC, A> {
         self._user_id = new_value.to_string();
         self
@@ -6859,7 +7010,7 @@ impl<'a, C, NC, A> UserThreadDeleteCall<'a, C, NC, A> where NC: hyper::net::Netw
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// ID of the Thread to delete.    
+    /// ID of the Thread to delete.
     pub fn id(mut self, new_value: &str) -> UserThreadDeleteCall<'a, C, NC, A> {
         self._id = new_value.to_string();
         self
@@ -6920,7 +7071,7 @@ impl<'a, C, NC, A> UserThreadDeleteCall<'a, C, NC, A> where NC: hyper::net::Netw
 /// Gets the specified message attachment.
 ///
 /// A builder for the *messages.attachments.get* method supported by a *user* resource.
-/// It is not used directly, but through a `UserMethods`.
+/// It is not used directly, but through a `UserMethods` instance.
 ///
 /// # Example
 ///
@@ -6982,7 +7133,7 @@ impl<'a, C, NC, A> UserMessageAttachmentGetCall<'a, C, NC, A> where NC: hyper::n
         for &field in ["alt", "userId", "messageId", "id"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -7035,7 +7186,7 @@ impl<'a, C, NC, A> UserMessageAttachmentGetCall<'a, C, NC, A> where NC: hyper::n
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -7047,7 +7198,6 @@ impl<'a, C, NC, A> UserMessageAttachmentGetCall<'a, C, NC, A> where NC: hyper::n
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -7057,7 +7207,7 @@ impl<'a, C, NC, A> UserMessageAttachmentGetCall<'a, C, NC, A> where NC: hyper::n
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -7068,7 +7218,7 @@ impl<'a, C, NC, A> UserMessageAttachmentGetCall<'a, C, NC, A> where NC: hyper::n
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -7077,13 +7227,13 @@ impl<'a, C, NC, A> UserMessageAttachmentGetCall<'a, C, NC, A> where NC: hyper::n
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -7095,7 +7245,7 @@ impl<'a, C, NC, A> UserMessageAttachmentGetCall<'a, C, NC, A> where NC: hyper::n
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The user's email address. The special value me can be used to indicate the authenticated user.    
+    /// The user's email address. The special value me can be used to indicate the authenticated user.
     pub fn user_id(mut self, new_value: &str) -> UserMessageAttachmentGetCall<'a, C, NC, A> {
         self._user_id = new_value.to_string();
         self
@@ -7105,7 +7255,7 @@ impl<'a, C, NC, A> UserMessageAttachmentGetCall<'a, C, NC, A> where NC: hyper::n
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The ID of the message containing the attachment.    
+    /// The ID of the message containing the attachment.
     pub fn message_id(mut self, new_value: &str) -> UserMessageAttachmentGetCall<'a, C, NC, A> {
         self._message_id = new_value.to_string();
         self
@@ -7115,7 +7265,7 @@ impl<'a, C, NC, A> UserMessageAttachmentGetCall<'a, C, NC, A> where NC: hyper::n
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The ID of the attachment.    
+    /// The ID of the attachment.
     pub fn id(mut self, new_value: &str) -> UserMessageAttachmentGetCall<'a, C, NC, A> {
         self._id = new_value.to_string();
         self
@@ -7176,7 +7326,7 @@ impl<'a, C, NC, A> UserMessageAttachmentGetCall<'a, C, NC, A> where NC: hyper::n
 /// Modifies the labels on the specified message.
 ///
 /// A builder for the *messages.modify* method supported by a *user* resource.
-/// It is not used directly, but through a `UserMethods`.
+/// It is not used directly, but through a `UserMethods` instance.
 ///
 /// # Example
 ///
@@ -7243,7 +7393,7 @@ impl<'a, C, NC, A> UserMessageModifyCall<'a, C, NC, A> where NC: hyper::net::Net
         for &field in ["alt", "userId", "id"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -7300,7 +7450,7 @@ impl<'a, C, NC, A> UserMessageModifyCall<'a, C, NC, A> where NC: hyper::net::Net
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -7316,7 +7466,6 @@ impl<'a, C, NC, A> UserMessageModifyCall<'a, C, NC, A> where NC: hyper::net::Net
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -7326,7 +7475,7 @@ impl<'a, C, NC, A> UserMessageModifyCall<'a, C, NC, A> where NC: hyper::net::Net
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -7337,7 +7486,7 @@ impl<'a, C, NC, A> UserMessageModifyCall<'a, C, NC, A> where NC: hyper::net::Net
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -7346,13 +7495,13 @@ impl<'a, C, NC, A> UserMessageModifyCall<'a, C, NC, A> where NC: hyper::net::Net
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -7373,7 +7522,7 @@ impl<'a, C, NC, A> UserMessageModifyCall<'a, C, NC, A> where NC: hyper::net::Net
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The user's email address. The special value me can be used to indicate the authenticated user.    
+    /// The user's email address. The special value me can be used to indicate the authenticated user.
     pub fn user_id(mut self, new_value: &str) -> UserMessageModifyCall<'a, C, NC, A> {
         self._user_id = new_value.to_string();
         self
@@ -7383,7 +7532,7 @@ impl<'a, C, NC, A> UserMessageModifyCall<'a, C, NC, A> where NC: hyper::net::Net
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The ID of the message to modify.    
+    /// The ID of the message to modify.
     pub fn id(mut self, new_value: &str) -> UserMessageModifyCall<'a, C, NC, A> {
         self._id = new_value.to_string();
         self
@@ -7444,7 +7593,7 @@ impl<'a, C, NC, A> UserMessageModifyCall<'a, C, NC, A> where NC: hyper::net::Net
 /// Moves the specified thread to the trash.
 ///
 /// A builder for the *threads.trash* method supported by a *user* resource.
-/// It is not used directly, but through a `UserMethods`.
+/// It is not used directly, but through a `UserMethods` instance.
 ///
 /// # Example
 ///
@@ -7504,7 +7653,7 @@ impl<'a, C, NC, A> UserThreadTrashCall<'a, C, NC, A> where NC: hyper::net::Netwo
         for &field in ["alt", "userId", "id"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -7557,7 +7706,7 @@ impl<'a, C, NC, A> UserThreadTrashCall<'a, C, NC, A> where NC: hyper::net::Netwo
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -7569,7 +7718,6 @@ impl<'a, C, NC, A> UserThreadTrashCall<'a, C, NC, A> where NC: hyper::net::Netwo
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -7579,7 +7727,7 @@ impl<'a, C, NC, A> UserThreadTrashCall<'a, C, NC, A> where NC: hyper::net::Netwo
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -7590,7 +7738,7 @@ impl<'a, C, NC, A> UserThreadTrashCall<'a, C, NC, A> where NC: hyper::net::Netwo
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -7599,13 +7747,13 @@ impl<'a, C, NC, A> UserThreadTrashCall<'a, C, NC, A> where NC: hyper::net::Netwo
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -7617,7 +7765,7 @@ impl<'a, C, NC, A> UserThreadTrashCall<'a, C, NC, A> where NC: hyper::net::Netwo
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The user's email address. The special value me can be used to indicate the authenticated user.    
+    /// The user's email address. The special value me can be used to indicate the authenticated user.
     pub fn user_id(mut self, new_value: &str) -> UserThreadTrashCall<'a, C, NC, A> {
         self._user_id = new_value.to_string();
         self
@@ -7627,7 +7775,7 @@ impl<'a, C, NC, A> UserThreadTrashCall<'a, C, NC, A> where NC: hyper::net::Netwo
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The ID of the thread to Trash.    
+    /// The ID of the thread to Trash.
     pub fn id(mut self, new_value: &str) -> UserThreadTrashCall<'a, C, NC, A> {
         self._id = new_value.to_string();
         self
@@ -7688,7 +7836,7 @@ impl<'a, C, NC, A> UserThreadTrashCall<'a, C, NC, A> where NC: hyper::net::Netwo
 /// Lists the drafts in the user's mailbox.
 ///
 /// A builder for the *drafts.list* method supported by a *user* resource.
-/// It is not used directly, but through a `UserMethods`.
+/// It is not used directly, but through a `UserMethods` instance.
 ///
 /// # Example
 ///
@@ -7756,7 +7904,7 @@ impl<'a, C, NC, A> UserDraftListCall<'a, C, NC, A> where NC: hyper::net::Network
         for &field in ["alt", "userId", "pageToken", "maxResults"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -7809,7 +7957,7 @@ impl<'a, C, NC, A> UserDraftListCall<'a, C, NC, A> where NC: hyper::net::Network
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -7821,7 +7969,6 @@ impl<'a, C, NC, A> UserDraftListCall<'a, C, NC, A> where NC: hyper::net::Network
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -7831,7 +7978,7 @@ impl<'a, C, NC, A> UserDraftListCall<'a, C, NC, A> where NC: hyper::net::Network
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -7842,7 +7989,7 @@ impl<'a, C, NC, A> UserDraftListCall<'a, C, NC, A> where NC: hyper::net::Network
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -7851,13 +7998,13 @@ impl<'a, C, NC, A> UserDraftListCall<'a, C, NC, A> where NC: hyper::net::Network
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -7869,7 +8016,7 @@ impl<'a, C, NC, A> UserDraftListCall<'a, C, NC, A> where NC: hyper::net::Network
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The user's email address. The special value me can be used to indicate the authenticated user.    
+    /// The user's email address. The special value me can be used to indicate the authenticated user.
     pub fn user_id(mut self, new_value: &str) -> UserDraftListCall<'a, C, NC, A> {
         self._user_id = new_value.to_string();
         self
@@ -7877,7 +8024,7 @@ impl<'a, C, NC, A> UserDraftListCall<'a, C, NC, A> where NC: hyper::net::Network
     /// Sets the *page token* query property to the given value.
     ///
     /// 
-    /// Page token to retrieve a specific page of results in the list.    
+    /// Page token to retrieve a specific page of results in the list.
     pub fn page_token(mut self, new_value: &str) -> UserDraftListCall<'a, C, NC, A> {
         self._page_token = Some(new_value.to_string());
         self
@@ -7885,7 +8032,7 @@ impl<'a, C, NC, A> UserDraftListCall<'a, C, NC, A> where NC: hyper::net::Network
     /// Sets the *max results* query property to the given value.
     ///
     /// 
-    /// Maximum number of drafts to return.    
+    /// Maximum number of drafts to return.
     pub fn max_results(mut self, new_value: u32) -> UserDraftListCall<'a, C, NC, A> {
         self._max_results = Some(new_value);
         self
@@ -7946,7 +8093,7 @@ impl<'a, C, NC, A> UserDraftListCall<'a, C, NC, A> where NC: hyper::net::Network
 /// Sends the specified message to the recipients in the To, Cc, and Bcc headers.
 ///
 /// A builder for the *messages.send* method supported by a *user* resource.
-/// It is not used directly, but through a `UserMethods`.
+/// It is not used directly, but through a `UserMethods` instance.
 ///
 /// # Example
 ///
@@ -8013,7 +8160,7 @@ impl<'a, C, NC, A> UserMessageSendCall<'a, C, NC, A> where NC: hyper::net::Netwo
         for &field in ["alt", "userId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -8080,7 +8227,7 @@ impl<'a, C, NC, A> UserMessageSendCall<'a, C, NC, A> where NC: hyper::net::Netwo
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -8106,7 +8253,7 @@ impl<'a, C, NC, A> UserMessageSendCall<'a, C, NC, A> where NC: hyper::net::Netwo
                             let size = reader.seek(io::SeekFrom::End(0)).unwrap();
                         reader.seek(io::SeekFrom::Start(0)).unwrap();
                         if size > 36700160 {
-                        	return Result::UploadSizeLimitExceeded(size, 36700160)
+                        	return Err(Error::UploadSizeLimitExceeded(size, 36700160))
                         }
                             mp_reader.add_part(&mut request_value_reader, request_size, json_mime_type.clone())
                                      .add_part(&mut reader, size, reader_mime_type.clone());
@@ -8128,7 +8275,6 @@ impl<'a, C, NC, A> UserMessageSendCall<'a, C, NC, A> where NC: hyper::net::Netwo
     
                     dlg.pre_request();
                     req.send()
-    
                 }
             };
 
@@ -8139,7 +8285,7 @@ impl<'a, C, NC, A> UserMessageSendCall<'a, C, NC, A> where NC: hyper::net::Netwo
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -8150,13 +8296,13 @@ impl<'a, C, NC, A> UserMessageSendCall<'a, C, NC, A> where NC: hyper::net::Netwo
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     if protocol == "resumable" {
                         let size = reader.seek(io::SeekFrom::End(0)).unwrap();
                         reader.seek(io::SeekFrom::Start(0)).unwrap();
                         if size > 36700160 {
-                        	return Result::UploadSizeLimitExceeded(size, 36700160)
+                        	return Err(Error::UploadSizeLimitExceeded(size, 36700160))
                         }
                         let mut client = &mut *self.hub.client.borrow_mut();
                         let upload_result = {
@@ -8181,17 +8327,17 @@ impl<'a, C, NC, A> UserMessageSendCall<'a, C, NC, A> where NC: hyper::net::Netwo
                         match upload_result {
                             None => {
                                 dlg.finished(false);
-                                return Result::Cancelled
+                                return Err(Error::Cancelled)
                             }
                             Some(Err(err)) => {
                                 dlg.finished(false);
-                                return Result::HttpError(err)
+                                return Err(Error::HttpError(err))
                             }
                             Some(Ok(upload_result)) => {
                                 res = upload_result;
                                 if !res.status.is_success() {
                                     dlg.finished(false);
-                                    return Result::Failure(res)
+                                    return Err(Error::Failure(res))
                                 }
                             }
                         }
@@ -8203,13 +8349,13 @@ impl<'a, C, NC, A> UserMessageSendCall<'a, C, NC, A> where NC: hyper::net::Netwo
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -8225,11 +8371,14 @@ impl<'a, C, NC, A> UserMessageSendCall<'a, C, NC, A> where NC: hyper::net::Netwo
                 where RS: ReadSeek {
         self.doit(stream, mime_type, "simple")
     }
-    /// Upload media in a resumeable fashion.
+    /// Upload media in a resumable fashion.
     /// Even if the upload fails or is interrupted, it can be resumed for a 
     /// certain amount of time as the server maintains state temporarily.
     /// 
-    /// TODO: Write more about how delegation works in this particular case.
+    /// The delegate will be asked for an `upload_url()`, and if not provided, will be asked to store an upload URL 
+    /// that was provided by the server, using `store_upload_url(...)`. The upload will be done in chunks, the delegate
+    /// may specify the `chunk_size()` and may cancel the operation before each chunk is uploaded, using
+    /// `cancel_chunk_upload(...)`.
     ///
     /// * *max size*: 35MB
     /// * *multipart*: yes
@@ -8253,7 +8402,7 @@ impl<'a, C, NC, A> UserMessageSendCall<'a, C, NC, A> where NC: hyper::net::Netwo
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The user's email address. The special value me can be used to indicate the authenticated user.    
+    /// The user's email address. The special value me can be used to indicate the authenticated user.
     pub fn user_id(mut self, new_value: &str) -> UserMessageSendCall<'a, C, NC, A> {
         self._user_id = new_value.to_string();
         self
@@ -8314,7 +8463,7 @@ impl<'a, C, NC, A> UserMessageSendCall<'a, C, NC, A> where NC: hyper::net::Netwo
 /// Gets the specified message.
 ///
 /// A builder for the *messages.get* method supported by a *user* resource.
-/// It is not used directly, but through a `UserMethods`.
+/// It is not used directly, but through a `UserMethods` instance.
 ///
 /// # Example
 ///
@@ -8388,7 +8537,7 @@ impl<'a, C, NC, A> UserMessageGetCall<'a, C, NC, A> where NC: hyper::net::Networ
         for &field in ["alt", "userId", "id", "metadataHeaders", "format"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -8441,7 +8590,7 @@ impl<'a, C, NC, A> UserMessageGetCall<'a, C, NC, A> where NC: hyper::net::Networ
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -8453,7 +8602,6 @@ impl<'a, C, NC, A> UserMessageGetCall<'a, C, NC, A> where NC: hyper::net::Networ
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -8463,7 +8611,7 @@ impl<'a, C, NC, A> UserMessageGetCall<'a, C, NC, A> where NC: hyper::net::Networ
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -8474,7 +8622,7 @@ impl<'a, C, NC, A> UserMessageGetCall<'a, C, NC, A> where NC: hyper::net::Networ
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -8483,13 +8631,13 @@ impl<'a, C, NC, A> UserMessageGetCall<'a, C, NC, A> where NC: hyper::net::Networ
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -8501,7 +8649,7 @@ impl<'a, C, NC, A> UserMessageGetCall<'a, C, NC, A> where NC: hyper::net::Networ
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The user's email address. The special value me can be used to indicate the authenticated user.    
+    /// The user's email address. The special value me can be used to indicate the authenticated user.
     pub fn user_id(mut self, new_value: &str) -> UserMessageGetCall<'a, C, NC, A> {
         self._user_id = new_value.to_string();
         self
@@ -8511,7 +8659,7 @@ impl<'a, C, NC, A> UserMessageGetCall<'a, C, NC, A> where NC: hyper::net::Networ
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The ID of the message to retrieve.    
+    /// The ID of the message to retrieve.
     pub fn id(mut self, new_value: &str) -> UserMessageGetCall<'a, C, NC, A> {
         self._id = new_value.to_string();
         self
@@ -8520,7 +8668,7 @@ impl<'a, C, NC, A> UserMessageGetCall<'a, C, NC, A> where NC: hyper::net::Networ
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
     ///
     /// 
-    /// When given and format is METADATA, only include headers specified.    
+    /// When given and format is METADATA, only include headers specified.
     pub fn add_metadata_headers(mut self, new_value: &str) -> UserMessageGetCall<'a, C, NC, A> {
         self._metadata_headers.push(new_value.to_string());
         self
@@ -8528,7 +8676,7 @@ impl<'a, C, NC, A> UserMessageGetCall<'a, C, NC, A> where NC: hyper::net::Networ
     /// Sets the *format* query property to the given value.
     ///
     /// 
-    /// The format to return the message in.    
+    /// The format to return the message in.
     pub fn format(mut self, new_value: &str) -> UserMessageGetCall<'a, C, NC, A> {
         self._format = Some(new_value.to_string());
         self
@@ -8589,7 +8737,7 @@ impl<'a, C, NC, A> UserMessageGetCall<'a, C, NC, A> where NC: hyper::net::Networ
 /// Lists the messages in the user's mailbox.
 ///
 /// A builder for the *messages.list* method supported by a *user* resource.
-/// It is not used directly, but through a `UserMethods`.
+/// It is not used directly, but through a `UserMethods` instance.
 ///
 /// # Example
 ///
@@ -8676,7 +8824,7 @@ impl<'a, C, NC, A> UserMessageListCall<'a, C, NC, A> where NC: hyper::net::Netwo
         for &field in ["alt", "userId", "q", "pageToken", "maxResults", "labelIds", "includeSpamTrash"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -8729,7 +8877,7 @@ impl<'a, C, NC, A> UserMessageListCall<'a, C, NC, A> where NC: hyper::net::Netwo
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -8741,7 +8889,6 @@ impl<'a, C, NC, A> UserMessageListCall<'a, C, NC, A> where NC: hyper::net::Netwo
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -8751,7 +8898,7 @@ impl<'a, C, NC, A> UserMessageListCall<'a, C, NC, A> where NC: hyper::net::Netwo
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -8762,7 +8909,7 @@ impl<'a, C, NC, A> UserMessageListCall<'a, C, NC, A> where NC: hyper::net::Netwo
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -8771,13 +8918,13 @@ impl<'a, C, NC, A> UserMessageListCall<'a, C, NC, A> where NC: hyper::net::Netwo
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -8789,7 +8936,7 @@ impl<'a, C, NC, A> UserMessageListCall<'a, C, NC, A> where NC: hyper::net::Netwo
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The user's email address. The special value me can be used to indicate the authenticated user.    
+    /// The user's email address. The special value me can be used to indicate the authenticated user.
     pub fn user_id(mut self, new_value: &str) -> UserMessageListCall<'a, C, NC, A> {
         self._user_id = new_value.to_string();
         self
@@ -8797,7 +8944,7 @@ impl<'a, C, NC, A> UserMessageListCall<'a, C, NC, A> where NC: hyper::net::Netwo
     /// Sets the *q* query property to the given value.
     ///
     /// 
-    /// Only return messages matching the specified query. Supports the same query format as the Gmail search box. For example, "from:someuser@example.com rfc822msgid: is:unread".    
+    /// Only return messages matching the specified query. Supports the same query format as the Gmail search box. For example, "from:someuser@example.com rfc822msgid: is:unread".
     pub fn q(mut self, new_value: &str) -> UserMessageListCall<'a, C, NC, A> {
         self._q = Some(new_value.to_string());
         self
@@ -8805,7 +8952,7 @@ impl<'a, C, NC, A> UserMessageListCall<'a, C, NC, A> where NC: hyper::net::Netwo
     /// Sets the *page token* query property to the given value.
     ///
     /// 
-    /// Page token to retrieve a specific page of results in the list.    
+    /// Page token to retrieve a specific page of results in the list.
     pub fn page_token(mut self, new_value: &str) -> UserMessageListCall<'a, C, NC, A> {
         self._page_token = Some(new_value.to_string());
         self
@@ -8813,7 +8960,7 @@ impl<'a, C, NC, A> UserMessageListCall<'a, C, NC, A> where NC: hyper::net::Netwo
     /// Sets the *max results* query property to the given value.
     ///
     /// 
-    /// Maximum number of messages to return.    
+    /// Maximum number of messages to return.
     pub fn max_results(mut self, new_value: u32) -> UserMessageListCall<'a, C, NC, A> {
         self._max_results = Some(new_value);
         self
@@ -8822,7 +8969,7 @@ impl<'a, C, NC, A> UserMessageListCall<'a, C, NC, A> where NC: hyper::net::Netwo
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
     ///
     /// 
-    /// Only return messages with labels that match all of the specified label IDs.    
+    /// Only return messages with labels that match all of the specified label IDs.
     pub fn add_label_ids(mut self, new_value: &str) -> UserMessageListCall<'a, C, NC, A> {
         self._label_ids.push(new_value.to_string());
         self
@@ -8830,7 +8977,7 @@ impl<'a, C, NC, A> UserMessageListCall<'a, C, NC, A> where NC: hyper::net::Netwo
     /// Sets the *include spam trash* query property to the given value.
     ///
     /// 
-    /// Include messages from SPAM and TRASH in the results.    
+    /// Include messages from SPAM and TRASH in the results.
     pub fn include_spam_trash(mut self, new_value: bool) -> UserMessageListCall<'a, C, NC, A> {
         self._include_spam_trash = Some(new_value);
         self
@@ -8891,7 +9038,7 @@ impl<'a, C, NC, A> UserMessageListCall<'a, C, NC, A> where NC: hyper::net::Netwo
 /// Gets the current user's Gmail profile.
 ///
 /// A builder for the *getProfile* method supported by a *user* resource.
-/// It is not used directly, but through a `UserMethods`.
+/// It is not used directly, but through a `UserMethods` instance.
 ///
 /// # Example
 ///
@@ -8949,7 +9096,7 @@ impl<'a, C, NC, A> UserGetProfileCall<'a, C, NC, A> where NC: hyper::net::Networ
         for &field in ["alt", "userId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -9002,7 +9149,7 @@ impl<'a, C, NC, A> UserGetProfileCall<'a, C, NC, A> where NC: hyper::net::Networ
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -9014,7 +9161,6 @@ impl<'a, C, NC, A> UserGetProfileCall<'a, C, NC, A> where NC: hyper::net::Networ
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -9024,7 +9170,7 @@ impl<'a, C, NC, A> UserGetProfileCall<'a, C, NC, A> where NC: hyper::net::Networ
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -9035,7 +9181,7 @@ impl<'a, C, NC, A> UserGetProfileCall<'a, C, NC, A> where NC: hyper::net::Networ
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -9044,13 +9190,13 @@ impl<'a, C, NC, A> UserGetProfileCall<'a, C, NC, A> where NC: hyper::net::Networ
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -9062,7 +9208,7 @@ impl<'a, C, NC, A> UserGetProfileCall<'a, C, NC, A> where NC: hyper::net::Networ
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The user's email address. The special value me can be used to indicate the authenticated user.    
+    /// The user's email address. The special value me can be used to indicate the authenticated user.
     pub fn user_id(mut self, new_value: &str) -> UserGetProfileCall<'a, C, NC, A> {
         self._user_id = new_value.to_string();
         self
@@ -9123,7 +9269,7 @@ impl<'a, C, NC, A> UserGetProfileCall<'a, C, NC, A> where NC: hyper::net::Networ
 /// Gets the specified thread.
 ///
 /// A builder for the *threads.get* method supported by a *user* resource.
-/// It is not used directly, but through a `UserMethods`.
+/// It is not used directly, but through a `UserMethods` instance.
 ///
 /// # Example
 ///
@@ -9197,7 +9343,7 @@ impl<'a, C, NC, A> UserThreadGetCall<'a, C, NC, A> where NC: hyper::net::Network
         for &field in ["alt", "userId", "id", "metadataHeaders", "format"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -9250,7 +9396,7 @@ impl<'a, C, NC, A> UserThreadGetCall<'a, C, NC, A> where NC: hyper::net::Network
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -9262,7 +9408,6 @@ impl<'a, C, NC, A> UserThreadGetCall<'a, C, NC, A> where NC: hyper::net::Network
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -9272,7 +9417,7 @@ impl<'a, C, NC, A> UserThreadGetCall<'a, C, NC, A> where NC: hyper::net::Network
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -9283,7 +9428,7 @@ impl<'a, C, NC, A> UserThreadGetCall<'a, C, NC, A> where NC: hyper::net::Network
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -9292,13 +9437,13 @@ impl<'a, C, NC, A> UserThreadGetCall<'a, C, NC, A> where NC: hyper::net::Network
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -9310,7 +9455,7 @@ impl<'a, C, NC, A> UserThreadGetCall<'a, C, NC, A> where NC: hyper::net::Network
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The user's email address. The special value me can be used to indicate the authenticated user.    
+    /// The user's email address. The special value me can be used to indicate the authenticated user.
     pub fn user_id(mut self, new_value: &str) -> UserThreadGetCall<'a, C, NC, A> {
         self._user_id = new_value.to_string();
         self
@@ -9320,7 +9465,7 @@ impl<'a, C, NC, A> UserThreadGetCall<'a, C, NC, A> where NC: hyper::net::Network
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The ID of the thread to retrieve.    
+    /// The ID of the thread to retrieve.
     pub fn id(mut self, new_value: &str) -> UserThreadGetCall<'a, C, NC, A> {
         self._id = new_value.to_string();
         self
@@ -9329,7 +9474,7 @@ impl<'a, C, NC, A> UserThreadGetCall<'a, C, NC, A> where NC: hyper::net::Network
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
     ///
     /// 
-    /// When given and format is METADATA, only include headers specified.    
+    /// When given and format is METADATA, only include headers specified.
     pub fn add_metadata_headers(mut self, new_value: &str) -> UserThreadGetCall<'a, C, NC, A> {
         self._metadata_headers.push(new_value.to_string());
         self
@@ -9337,7 +9482,7 @@ impl<'a, C, NC, A> UserThreadGetCall<'a, C, NC, A> where NC: hyper::net::Network
     /// Sets the *format* query property to the given value.
     ///
     /// 
-    /// The format to return the messages in.    
+    /// The format to return the messages in.
     pub fn format(mut self, new_value: &str) -> UserThreadGetCall<'a, C, NC, A> {
         self._format = Some(new_value.to_string());
         self
@@ -9398,7 +9543,7 @@ impl<'a, C, NC, A> UserThreadGetCall<'a, C, NC, A> where NC: hyper::net::Network
 /// Directly inserts a message into only this user's mailbox similar to IMAP APPEND, bypassing most scanning and classification. Does not send a message.
 ///
 /// A builder for the *messages.insert* method supported by a *user* resource.
-/// It is not used directly, but through a `UserMethods`.
+/// It is not used directly, but through a `UserMethods` instance.
 ///
 /// # Example
 ///
@@ -9475,7 +9620,7 @@ impl<'a, C, NC, A> UserMessageInsertCall<'a, C, NC, A> where NC: hyper::net::Net
         for &field in ["alt", "userId", "internalDateSource", "deleted"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -9542,7 +9687,7 @@ impl<'a, C, NC, A> UserMessageInsertCall<'a, C, NC, A> where NC: hyper::net::Net
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -9568,7 +9713,7 @@ impl<'a, C, NC, A> UserMessageInsertCall<'a, C, NC, A> where NC: hyper::net::Net
                             let size = reader.seek(io::SeekFrom::End(0)).unwrap();
                         reader.seek(io::SeekFrom::Start(0)).unwrap();
                         if size > 36700160 {
-                        	return Result::UploadSizeLimitExceeded(size, 36700160)
+                        	return Err(Error::UploadSizeLimitExceeded(size, 36700160))
                         }
                             mp_reader.add_part(&mut request_value_reader, request_size, json_mime_type.clone())
                                      .add_part(&mut reader, size, reader_mime_type.clone());
@@ -9590,7 +9735,6 @@ impl<'a, C, NC, A> UserMessageInsertCall<'a, C, NC, A> where NC: hyper::net::Net
     
                     dlg.pre_request();
                     req.send()
-    
                 }
             };
 
@@ -9601,7 +9745,7 @@ impl<'a, C, NC, A> UserMessageInsertCall<'a, C, NC, A> where NC: hyper::net::Net
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -9612,13 +9756,13 @@ impl<'a, C, NC, A> UserMessageInsertCall<'a, C, NC, A> where NC: hyper::net::Net
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     if protocol == "resumable" {
                         let size = reader.seek(io::SeekFrom::End(0)).unwrap();
                         reader.seek(io::SeekFrom::Start(0)).unwrap();
                         if size > 36700160 {
-                        	return Result::UploadSizeLimitExceeded(size, 36700160)
+                        	return Err(Error::UploadSizeLimitExceeded(size, 36700160))
                         }
                         let mut client = &mut *self.hub.client.borrow_mut();
                         let upload_result = {
@@ -9643,17 +9787,17 @@ impl<'a, C, NC, A> UserMessageInsertCall<'a, C, NC, A> where NC: hyper::net::Net
                         match upload_result {
                             None => {
                                 dlg.finished(false);
-                                return Result::Cancelled
+                                return Err(Error::Cancelled)
                             }
                             Some(Err(err)) => {
                                 dlg.finished(false);
-                                return Result::HttpError(err)
+                                return Err(Error::HttpError(err))
                             }
                             Some(Ok(upload_result)) => {
                                 res = upload_result;
                                 if !res.status.is_success() {
                                     dlg.finished(false);
-                                    return Result::Failure(res)
+                                    return Err(Error::Failure(res))
                                 }
                             }
                         }
@@ -9665,13 +9809,13 @@ impl<'a, C, NC, A> UserMessageInsertCall<'a, C, NC, A> where NC: hyper::net::Net
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -9687,11 +9831,14 @@ impl<'a, C, NC, A> UserMessageInsertCall<'a, C, NC, A> where NC: hyper::net::Net
                 where RS: ReadSeek {
         self.doit(stream, mime_type, "simple")
     }
-    /// Upload media in a resumeable fashion.
+    /// Upload media in a resumable fashion.
     /// Even if the upload fails or is interrupted, it can be resumed for a 
     /// certain amount of time as the server maintains state temporarily.
     /// 
-    /// TODO: Write more about how delegation works in this particular case.
+    /// The delegate will be asked for an `upload_url()`, and if not provided, will be asked to store an upload URL 
+    /// that was provided by the server, using `store_upload_url(...)`. The upload will be done in chunks, the delegate
+    /// may specify the `chunk_size()` and may cancel the operation before each chunk is uploaded, using
+    /// `cancel_chunk_upload(...)`.
     ///
     /// * *max size*: 35MB
     /// * *multipart*: yes
@@ -9715,7 +9862,7 @@ impl<'a, C, NC, A> UserMessageInsertCall<'a, C, NC, A> where NC: hyper::net::Net
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The user's email address. The special value me can be used to indicate the authenticated user.    
+    /// The user's email address. The special value me can be used to indicate the authenticated user.
     pub fn user_id(mut self, new_value: &str) -> UserMessageInsertCall<'a, C, NC, A> {
         self._user_id = new_value.to_string();
         self
@@ -9723,7 +9870,7 @@ impl<'a, C, NC, A> UserMessageInsertCall<'a, C, NC, A> where NC: hyper::net::Net
     /// Sets the *internal date source* query property to the given value.
     ///
     /// 
-    /// Source for Gmail's internal date of the message.    
+    /// Source for Gmail's internal date of the message.
     pub fn internal_date_source(mut self, new_value: &str) -> UserMessageInsertCall<'a, C, NC, A> {
         self._internal_date_source = Some(new_value.to_string());
         self
@@ -9731,7 +9878,7 @@ impl<'a, C, NC, A> UserMessageInsertCall<'a, C, NC, A> where NC: hyper::net::Net
     /// Sets the *deleted* query property to the given value.
     ///
     /// 
-    /// Mark the email as permanently deleted (not TRASH) and only visible in Google Apps Vault to a Vault administrator. Only used for Google Apps for Work accounts.    
+    /// Mark the email as permanently deleted (not TRASH) and only visible in Google Apps Vault to a Vault administrator. Only used for Google Apps for Work accounts.
     pub fn deleted(mut self, new_value: bool) -> UserMessageInsertCall<'a, C, NC, A> {
         self._deleted = Some(new_value);
         self

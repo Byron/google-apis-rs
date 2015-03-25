@@ -1,8 +1,8 @@
 // DO NOT EDIT !
-// This file was generated automatically from 'src/mako/lib.rs.mako'
+// This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *cloudlatencytest* crate version *0.1.1+20150206*, where *20150206* is the exact revision of the *cloudlatencytest:v2* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.1*.
+//! This documentation was generated from *cloudlatencytest* crate version *0.1.2+20150206*, where *20150206* is the exact revision of the *cloudlatencytest:v2* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.2*.
 //! The original source code is [on github](https://github.com/Byron/google-apis-rs/tree/master/gen/cloudlatencytest2).
 //! # Features
 //! 
@@ -22,6 +22,8 @@
 //! 
 //! * **[Hub](struct.Cloudlatencytest.html)**
 //!     * a central object to maintain state and allow accessing all *Activities*
+//!     * creates [*Method Builders*](trait.MethodsBuilder.html) which in turn
+//!       allow access to individual [*Call Builders*](trait.CallBuilder.html)
 //! * **[Resources](trait.Resource.html)**
 //!     * primary types that you can apply *Activities* to
 //!     * a collection of properties and *Parts*
@@ -30,6 +32,8 @@
 //!         * never directly used in *Activities*
 //! * **[Activities](trait.CallBuilder.html)**
 //!     * operations to apply to *Resources*
+//! 
+//! All *structures* are marked with applicable traits to further categorize them and ease browsing.
 //! 
 //! Generally speaking, you can invoke *Activities* like this:
 //! 
@@ -66,7 +70,7 @@
 //! extern crate "yup-oauth2" as oauth2;
 //! extern crate "google-cloudlatencytest2" as cloudlatencytest2;
 //! use cloudlatencytest2::Stats;
-//! use cloudlatencytest2::Result;
+//! use cloudlatencytest2::{Result, Error};
 //! # #[test] fn egal() {
 //! use std::default::Default;
 //! use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -96,15 +100,17 @@
 //!              .doit();
 //! 
 //! match result {
-//!     Result::HttpError(err) => println!("HTTPERROR: {:?}", err),
-//!     Result::MissingAPIKey => println!("Auth: Missing API Key - used if there are no scopes"),
-//!     Result::MissingToken => println!("OAuth2: Missing Token"),
-//!     Result::Cancelled => println!("Operation cancelled by user"),
-//!     Result::UploadSizeLimitExceeded(size, max_size) => println!("Upload size too big: {} of {}", size, max_size),
-//!     Result::Failure(_) => println!("General Failure (hyper::client::Response doesn't print)"),
-//!     Result::FieldClash(clashed_field) => println!("You added custom parameter which is part of builder: {:?}", clashed_field),
-//!     Result::JsonDecodeError(err) => println!("Couldn't understand server reply - maybe API needs update: {:?}", err),
-//!     Result::Success(_) => println!("Success (value doesn't print)"),
+//!     Err(e) => match e {
+//!         Error::HttpError(err) => println!("HTTPERROR: {:?}", err),
+//!         Error::MissingAPIKey => println!("Auth: Missing API Key - used if there are no scopes"),
+//!         Error::MissingToken => println!("OAuth2: Missing Token"),
+//!         Error::Cancelled => println!("Operation canceled by user"),
+//!         Error::UploadSizeLimitExceeded(size, max_size) => println!("Upload size too big: {} of {}", size, max_size),
+//!         Error::Failure(_) => println!("General Failure (hyper::client::Response doesn't print)"),
+//!         Error::FieldClash(clashed_field) => println!("You added custom parameter which is part of builder: {:?}", clashed_field),
+//!         Error::JsonDecodeError(err) => println!("Couldn't understand server reply - maybe API needs update: {:?}", err),
+//!     },
+//!     Ok(_) => println!("Success (value doesn't print)"),
 //! }
 //! # }
 //! ```
@@ -117,7 +123,7 @@
 //! When delegates handle errors or intermediate values, they may have a chance to instruct the system to retry. This 
 //! makes the system potentially resilient to all kinds of errors.
 //! 
-//! ## Uploads and Downlods
+//! ## Uploads and Downloads
 //! If a method supports downloads, the response body, which is part of the [Result](enum.Result.html), should be
 //! read by you to obtain the media.
 //! If such a method also supports a [Response Result](trait.ResponseResult.html), it will return that by default.
@@ -140,8 +146,9 @@
 //! ## Optional Parts in Server-Requests
 //! 
 //! All structures provided by this library are made to be [enocodable](trait.RequestValue.html) and 
-//! [decodable](trait.ResponseResult.html) via json. Optionals are used to indicate that partial requests are responses are valid.
-//! Most optionals are are considered [Parts](trait.Part.html) which are identifyable by name, which will be sent to 
+//! [decodable](trait.ResponseResult.html) via *json*. Optionals are used to indicate that partial requests are responses 
+//! are valid.
+//! Most optionals are are considered [Parts](trait.Part.html) which are identifiable by name, which will be sent to 
 //! the server to indicate either the set parts of the request or the desired parts in the response.
 //! 
 //! ## Builder Arguments
@@ -190,7 +197,7 @@ use std::io;
 use std::fs;
 use std::thread::sleep;
 
-pub use cmn::{MultiPartReader, ToParts, MethodInfo, Result, CallBuilder, Hub, ReadSeek, Part, ResponseResult, RequestValue, NestedType, Delegate, DefaultDelegate, ResourceMethodsBuilder, Resource, JsonServerError};
+pub use cmn::{MultiPartReader, ToParts, MethodInfo, Result, Error, CallBuilder, Hub, ReadSeek, Part, ResponseResult, RequestValue, NestedType, Delegate, DefaultDelegate, MethodsBuilder, Resource, JsonServerError};
 
 
 // ##############
@@ -237,7 +244,7 @@ impl Default for Scope {
 /// extern crate "yup-oauth2" as oauth2;
 /// extern crate "google-cloudlatencytest2" as cloudlatencytest2;
 /// use cloudlatencytest2::Stats;
-/// use cloudlatencytest2::Result;
+/// use cloudlatencytest2::{Result, Error};
 /// # #[test] fn egal() {
 /// use std::default::Default;
 /// use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -267,15 +274,17 @@ impl Default for Scope {
 ///              .doit();
 /// 
 /// match result {
-///     Result::HttpError(err) => println!("HTTPERROR: {:?}", err),
-///     Result::MissingAPIKey => println!("Auth: Missing API Key - used if there are no scopes"),
-///     Result::MissingToken => println!("OAuth2: Missing Token"),
-///     Result::Cancelled => println!("Operation cancelled by user"),
-///     Result::UploadSizeLimitExceeded(size, max_size) => println!("Upload size too big: {} of {}", size, max_size),
-///     Result::Failure(_) => println!("General Failure (hyper::client::Response doesn't print)"),
-///     Result::FieldClash(clashed_field) => println!("You added custom parameter which is part of builder: {:?}", clashed_field),
-///     Result::JsonDecodeError(err) => println!("Couldn't understand server reply - maybe API needs update: {:?}", err),
-///     Result::Success(_) => println!("Success (value doesn't print)"),
+///     Err(e) => match e {
+///         Error::HttpError(err) => println!("HTTPERROR: {:?}", err),
+///         Error::MissingAPIKey => println!("Auth: Missing API Key - used if there are no scopes"),
+///         Error::MissingToken => println!("OAuth2: Missing Token"),
+///         Error::Cancelled => println!("Operation canceled by user"),
+///         Error::UploadSizeLimitExceeded(size, max_size) => println!("Upload size too big: {} of {}", size, max_size),
+///         Error::Failure(_) => println!("General Failure (hyper::client::Response doesn't print)"),
+///         Error::FieldClash(clashed_field) => println!("You added custom parameter which is part of builder: {:?}", clashed_field),
+///         Error::JsonDecodeError(err) => println!("Couldn't understand server reply - maybe API needs update: {:?}", err),
+///     },
+///     Ok(_) => println!("Success (value doesn't print)"),
 /// }
 /// # }
 /// ```
@@ -296,7 +305,7 @@ impl<'a, C, NC, A> Cloudlatencytest<C, NC, A>
         Cloudlatencytest {
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/0.1.1".to_string(),
+            _user_agent: "google-api-rust-client/0.1.2".to_string(),
             _m: PhantomData
         }
     }
@@ -306,7 +315,7 @@ impl<'a, C, NC, A> Cloudlatencytest<C, NC, A>
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/0.1.1`.
+    /// It defaults to `google-api-rust-client/0.1.2`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -326,9 +335,9 @@ impl<'a, C, NC, A> Cloudlatencytest<C, NC, A>
 /// 
 #[derive(Default, Clone, Debug, Serialize)]
 pub struct IntValue {
-    /// no description provided    
+    /// no description provided
     pub value: String,
-    /// no description provided    
+    /// no description provided
     pub label: String,
 }
 
@@ -346,16 +355,16 @@ impl Part for IntValue {}
 /// 
 #[derive(Default, Clone, Debug, Serialize)]
 pub struct Stats {
-    /// no description provided    
+    /// no description provided
     #[serde(alias="stringValues")]
     pub string_values: Option<Vec<StringValue>>,
-    /// no description provided    
+    /// no description provided
     #[serde(alias="intValues")]
     pub int_values: Option<Vec<IntValue>>,
-    /// no description provided    
+    /// no description provided
     #[serde(alias="doubleValues")]
     pub double_values: Option<Vec<DoubleValue>>,
-    /// no description provided    
+    /// no description provided
     pub time: Option<f64>,
 }
 
@@ -368,9 +377,9 @@ impl RequestValue for Stats {}
 /// 
 #[derive(Default, Clone, Debug, Serialize)]
 pub struct StringValue {
-    /// no description provided    
+    /// no description provided
     pub value: String,
-    /// no description provided    
+    /// no description provided
     pub label: String,
 }
 
@@ -388,7 +397,7 @@ impl Part for StringValue {}
 /// 
 #[derive(Default, Clone, Debug, Serialize)]
 pub struct AggregatedStats {
-    /// no description provided    
+    /// no description provided
     pub stats: Option<Vec<Stats>>,
 }
 
@@ -406,7 +415,7 @@ impl RequestValue for AggregatedStats {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct AggregatedStatsReply {
-    /// no description provided    
+    /// no description provided
     #[serde(alias="testValue")]
     pub test_value: String,
 }
@@ -420,9 +429,9 @@ impl ResponseResult for AggregatedStatsReply {}
 /// 
 #[derive(Default, Clone, Debug, Serialize)]
 pub struct DoubleValue {
-    /// no description provided    
+    /// no description provided
     pub value: f32,
-    /// no description provided    
+    /// no description provided
     pub label: String,
 }
 
@@ -440,7 +449,7 @@ impl Part for DoubleValue {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct StatsReply {
-    /// no description provided    
+    /// no description provided
     #[serde(alias="testValue")]
     pub test_value: String,
 }
@@ -487,13 +496,17 @@ pub struct StatscollectionMethods<'a, C, NC, A>
     hub: &'a Cloudlatencytest<C, NC, A>,
 }
 
-impl<'a, C, NC, A> ResourceMethodsBuilder for StatscollectionMethods<'a, C, NC, A> {}
+impl<'a, C, NC, A> MethodsBuilder for StatscollectionMethods<'a, C, NC, A> {}
 
 impl<'a, C, NC, A> StatscollectionMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// RPC to update the new TCP stats.    
+    /// RPC to update the new TCP stats.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
     pub fn updateaggregatedstats(&self, request: &AggregatedStats) -> StatscollectionUpdateaggregatedstatCall<'a, C, NC, A> {
         StatscollectionUpdateaggregatedstatCall {
             hub: self.hub,
@@ -506,7 +519,11 @@ impl<'a, C, NC, A> StatscollectionMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// RPC to update the new TCP stats.    
+    /// RPC to update the new TCP stats.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
     pub fn updatestats(&self, request: &Stats) -> StatscollectionUpdatestatCall<'a, C, NC, A> {
         StatscollectionUpdatestatCall {
             hub: self.hub,
@@ -529,7 +546,7 @@ impl<'a, C, NC, A> StatscollectionMethods<'a, C, NC, A> {
 /// RPC to update the new TCP stats.
 ///
 /// A builder for the *updateaggregatedstats* method supported by a *statscollection* resource.
-/// It is not used directly, but through a `StatscollectionMethods`.
+/// It is not used directly, but through a `StatscollectionMethods` instance.
 ///
 /// # Example
 ///
@@ -592,7 +609,7 @@ impl<'a, C, NC, A> StatscollectionUpdateaggregatedstatCall<'a, C, NC, A> where N
         for &field in ["alt"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -625,7 +642,7 @@ impl<'a, C, NC, A> StatscollectionUpdateaggregatedstatCall<'a, C, NC, A> where N
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -641,7 +658,6 @@ impl<'a, C, NC, A> StatscollectionUpdateaggregatedstatCall<'a, C, NC, A> where N
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -651,7 +667,7 @@ impl<'a, C, NC, A> StatscollectionUpdateaggregatedstatCall<'a, C, NC, A> where N
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -662,7 +678,7 @@ impl<'a, C, NC, A> StatscollectionUpdateaggregatedstatCall<'a, C, NC, A> where N
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -671,13 +687,13 @@ impl<'a, C, NC, A> StatscollectionUpdateaggregatedstatCall<'a, C, NC, A> where N
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -749,7 +765,7 @@ impl<'a, C, NC, A> StatscollectionUpdateaggregatedstatCall<'a, C, NC, A> where N
 /// RPC to update the new TCP stats.
 ///
 /// A builder for the *updatestats* method supported by a *statscollection* resource.
-/// It is not used directly, but through a `StatscollectionMethods`.
+/// It is not used directly, but through a `StatscollectionMethods` instance.
 ///
 /// # Example
 ///
@@ -812,7 +828,7 @@ impl<'a, C, NC, A> StatscollectionUpdatestatCall<'a, C, NC, A> where NC: hyper::
         for &field in ["alt"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -845,7 +861,7 @@ impl<'a, C, NC, A> StatscollectionUpdatestatCall<'a, C, NC, A> where NC: hyper::
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -861,7 +877,6 @@ impl<'a, C, NC, A> StatscollectionUpdatestatCall<'a, C, NC, A> where NC: hyper::
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -871,7 +886,7 @@ impl<'a, C, NC, A> StatscollectionUpdatestatCall<'a, C, NC, A> where NC: hyper::
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -882,7 +897,7 @@ impl<'a, C, NC, A> StatscollectionUpdatestatCall<'a, C, NC, A> where NC: hyper::
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -891,13 +906,13 @@ impl<'a, C, NC, A> StatscollectionUpdatestatCall<'a, C, NC, A> where NC: hyper::
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }

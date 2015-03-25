@@ -1,8 +1,8 @@
 // DO NOT EDIT !
-// This file was generated automatically from 'src/mako/lib.rs.mako'
+// This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *Ad Exchange Seller* crate version *0.1.1+20150313*, where *20150313* is the exact revision of the *adexchangeseller:v2.0* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.1*.
+//! This documentation was generated from *Ad Exchange Seller* crate version *0.1.2+20150309*, where *20150309* is the exact revision of the *adexchangeseller:v2.0* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.2*.
 //! 
 //! Everything else about the *Ad Exchange Seller* *v2* API can be found at the
 //! [official documentation site](https://developers.google.com/ad-exchange/seller-rest/).
@@ -29,6 +29,8 @@
 //! 
 //! * **[Hub](struct.AdExchangeSeller.html)**
 //!     * a central object to maintain state and allow accessing all *Activities*
+//!     * creates [*Method Builders*](trait.MethodsBuilder.html) which in turn
+//!       allow access to individual [*Call Builders*](trait.CallBuilder.html)
 //! * **[Resources](trait.Resource.html)**
 //!     * primary types that you can apply *Activities* to
 //!     * a collection of properties and *Parts*
@@ -37,6 +39,8 @@
 //!         * never directly used in *Activities*
 //! * **[Activities](trait.CallBuilder.html)**
 //!     * operations to apply to *Resources*
+//! 
+//! All *structures* are marked with applicable traits to further categorize them and ease browsing.
 //! 
 //! Generally speaking, you can invoke *Activities* like this:
 //! 
@@ -85,7 +89,7 @@
 //! extern crate hyper;
 //! extern crate "yup-oauth2" as oauth2;
 //! extern crate "google-adexchangeseller2" as adexchangeseller2;
-//! use adexchangeseller2::Result;
+//! use adexchangeseller2::{Result, Error};
 //! # #[test] fn egal() {
 //! use std::default::Default;
 //! use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -117,15 +121,17 @@
 //!              .doit();
 //! 
 //! match result {
-//!     Result::HttpError(err) => println!("HTTPERROR: {:?}", err),
-//!     Result::MissingAPIKey => println!("Auth: Missing API Key - used if there are no scopes"),
-//!     Result::MissingToken => println!("OAuth2: Missing Token"),
-//!     Result::Cancelled => println!("Operation cancelled by user"),
-//!     Result::UploadSizeLimitExceeded(size, max_size) => println!("Upload size too big: {} of {}", size, max_size),
-//!     Result::Failure(_) => println!("General Failure (hyper::client::Response doesn't print)"),
-//!     Result::FieldClash(clashed_field) => println!("You added custom parameter which is part of builder: {:?}", clashed_field),
-//!     Result::JsonDecodeError(err) => println!("Couldn't understand server reply - maybe API needs update: {:?}", err),
-//!     Result::Success(_) => println!("Success (value doesn't print)"),
+//!     Err(e) => match e {
+//!         Error::HttpError(err) => println!("HTTPERROR: {:?}", err),
+//!         Error::MissingAPIKey => println!("Auth: Missing API Key - used if there are no scopes"),
+//!         Error::MissingToken => println!("OAuth2: Missing Token"),
+//!         Error::Cancelled => println!("Operation canceled by user"),
+//!         Error::UploadSizeLimitExceeded(size, max_size) => println!("Upload size too big: {} of {}", size, max_size),
+//!         Error::Failure(_) => println!("General Failure (hyper::client::Response doesn't print)"),
+//!         Error::FieldClash(clashed_field) => println!("You added custom parameter which is part of builder: {:?}", clashed_field),
+//!         Error::JsonDecodeError(err) => println!("Couldn't understand server reply - maybe API needs update: {:?}", err),
+//!     },
+//!     Ok(_) => println!("Success (value doesn't print)"),
 //! }
 //! # }
 //! ```
@@ -138,7 +144,7 @@
 //! When delegates handle errors or intermediate values, they may have a chance to instruct the system to retry. This 
 //! makes the system potentially resilient to all kinds of errors.
 //! 
-//! ## Uploads and Downlods
+//! ## Uploads and Downloads
 //! If a method supports downloads, the response body, which is part of the [Result](enum.Result.html), should be
 //! read by you to obtain the media.
 //! If such a method also supports a [Response Result](trait.ResponseResult.html), it will return that by default.
@@ -161,8 +167,9 @@
 //! ## Optional Parts in Server-Requests
 //! 
 //! All structures provided by this library are made to be [enocodable](trait.RequestValue.html) and 
-//! [decodable](trait.ResponseResult.html) via json. Optionals are used to indicate that partial requests are responses are valid.
-//! Most optionals are are considered [Parts](trait.Part.html) which are identifyable by name, which will be sent to 
+//! [decodable](trait.ResponseResult.html) via *json*. Optionals are used to indicate that partial requests are responses 
+//! are valid.
+//! Most optionals are are considered [Parts](trait.Part.html) which are identifiable by name, which will be sent to 
 //! the server to indicate either the set parts of the request or the desired parts in the response.
 //! 
 //! ## Builder Arguments
@@ -211,7 +218,7 @@ use std::io;
 use std::fs;
 use std::thread::sleep;
 
-pub use cmn::{MultiPartReader, ToParts, MethodInfo, Result, CallBuilder, Hub, ReadSeek, Part, ResponseResult, RequestValue, NestedType, Delegate, DefaultDelegate, ResourceMethodsBuilder, Resource, JsonServerError};
+pub use cmn::{MultiPartReader, ToParts, MethodInfo, Result, Error, CallBuilder, Hub, ReadSeek, Part, ResponseResult, RequestValue, NestedType, Delegate, DefaultDelegate, MethodsBuilder, Resource, JsonServerError};
 
 
 // ##############
@@ -261,7 +268,7 @@ impl Default for Scope {
 /// extern crate hyper;
 /// extern crate "yup-oauth2" as oauth2;
 /// extern crate "google-adexchangeseller2" as adexchangeseller2;
-/// use adexchangeseller2::Result;
+/// use adexchangeseller2::{Result, Error};
 /// # #[test] fn egal() {
 /// use std::default::Default;
 /// use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -293,15 +300,17 @@ impl Default for Scope {
 ///              .doit();
 /// 
 /// match result {
-///     Result::HttpError(err) => println!("HTTPERROR: {:?}", err),
-///     Result::MissingAPIKey => println!("Auth: Missing API Key - used if there are no scopes"),
-///     Result::MissingToken => println!("OAuth2: Missing Token"),
-///     Result::Cancelled => println!("Operation cancelled by user"),
-///     Result::UploadSizeLimitExceeded(size, max_size) => println!("Upload size too big: {} of {}", size, max_size),
-///     Result::Failure(_) => println!("General Failure (hyper::client::Response doesn't print)"),
-///     Result::FieldClash(clashed_field) => println!("You added custom parameter which is part of builder: {:?}", clashed_field),
-///     Result::JsonDecodeError(err) => println!("Couldn't understand server reply - maybe API needs update: {:?}", err),
-///     Result::Success(_) => println!("Success (value doesn't print)"),
+///     Err(e) => match e {
+///         Error::HttpError(err) => println!("HTTPERROR: {:?}", err),
+///         Error::MissingAPIKey => println!("Auth: Missing API Key - used if there are no scopes"),
+///         Error::MissingToken => println!("OAuth2: Missing Token"),
+///         Error::Cancelled => println!("Operation canceled by user"),
+///         Error::UploadSizeLimitExceeded(size, max_size) => println!("Upload size too big: {} of {}", size, max_size),
+///         Error::Failure(_) => println!("General Failure (hyper::client::Response doesn't print)"),
+///         Error::FieldClash(clashed_field) => println!("You added custom parameter which is part of builder: {:?}", clashed_field),
+///         Error::JsonDecodeError(err) => println!("Couldn't understand server reply - maybe API needs update: {:?}", err),
+///     },
+///     Ok(_) => println!("Success (value doesn't print)"),
 /// }
 /// # }
 /// ```
@@ -322,7 +331,7 @@ impl<'a, C, NC, A> AdExchangeSeller<C, NC, A>
         AdExchangeSeller {
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/0.1.1".to_string(),
+            _user_agent: "google-api-rust-client/0.1.2".to_string(),
             _m: PhantomData
         }
     }
@@ -332,7 +341,7 @@ impl<'a, C, NC, A> AdExchangeSeller<C, NC, A>
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/0.1.1`.
+    /// It defaults to `google-api-rust-client/0.1.2`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -357,14 +366,14 @@ impl<'a, C, NC, A> AdExchangeSeller<C, NC, A>
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct UrlChannels {
-    /// Continuation token used to page through URL channels. To retrieve the next page of results, set the next request's "pageToken" value to this.    
+    /// Continuation token used to page through URL channels. To retrieve the next page of results, set the next request's "pageToken" value to this.
     #[serde(alias="nextPageToken")]
     pub next_page_token: String,
-    /// The URL channels returned in this list response.    
+    /// The URL channels returned in this list response.
     pub items: Vec<UrlChannel>,
-    /// Kind of list this is, in this case adexchangeseller#urlChannels.    
+    /// Kind of list this is, in this case adexchangeseller#urlChannels.
     pub kind: String,
-    /// ETag of this response for caching purposes.    
+    /// ETag of this response for caching purposes.
     pub etag: String,
 }
 
@@ -395,11 +404,11 @@ impl ResponseResult for UrlChannels {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct Account {
-    /// Kind of resource this is, in this case adexchangeseller#account.    
+    /// Kind of resource this is, in this case adexchangeseller#account.
     pub kind: String,
-    /// Unique identifier of this account.    
+    /// Unique identifier of this account.
     pub id: String,
-    /// Name of this account.    
+    /// Name of this account.
     pub name: String,
 }
 
@@ -418,14 +427,14 @@ impl ResponseResult for Account {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct CustomChannels {
-    /// Continuation token used to page through custom channels. To retrieve the next page of results, set the next request's "pageToken" value to this.    
+    /// Continuation token used to page through custom channels. To retrieve the next page of results, set the next request's "pageToken" value to this.
     #[serde(alias="nextPageToken")]
     pub next_page_token: String,
-    /// The custom channels returned in this list response.    
+    /// The custom channels returned in this list response.
     pub items: Vec<CustomChannel>,
-    /// Kind of list this is, in this case adexchangeseller#customChannels.    
+    /// Kind of list this is, in this case adexchangeseller#customChannels.
     pub kind: String,
-    /// ETag of this response for caching purposes.    
+    /// ETag of this response for caching purposes.
     pub etag: String,
 }
 
@@ -443,9 +452,9 @@ impl ResponseResult for CustomChannels {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct Alerts {
-    /// The alerts returned in this list response.    
+    /// The alerts returned in this list response.
     pub items: Vec<Alert>,
-    /// Kind of list this is, in this case adexchangeseller#alerts.    
+    /// Kind of list this is, in this case adexchangeseller#alerts.
     pub kind: String,
 }
 
@@ -458,11 +467,11 @@ impl ResponseResult for Alerts {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct SavedReport {
-    /// Kind of resource this is, in this case adexchangeseller#savedReport.    
+    /// Kind of resource this is, in this case adexchangeseller#savedReport.
     pub kind: String,
-    /// Unique identifier of this saved report.    
+    /// Unique identifier of this saved report.
     pub id: String,
-    /// This saved report's name.    
+    /// This saved report's name.
     pub name: String,
 }
 
@@ -475,17 +484,17 @@ impl Part for SavedReport {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct AdClient {
-    /// This ad client's product code, which corresponds to the PRODUCT_CODE report dimension.    
+    /// This ad client's product code, which corresponds to the PRODUCT_CODE report dimension.
     #[serde(alias="productCode")]
     pub product_code: String,
-    /// Kind of resource this is, in this case adexchangeseller#adClient.    
+    /// Kind of resource this is, in this case adexchangeseller#adClient.
     pub kind: String,
-    /// Unique identifier of this ad client.    
+    /// Unique identifier of this ad client.
     pub id: String,
-    /// Whether this ad client is opted in to ARC.    
+    /// Whether this ad client is opted in to ARC.
     #[serde(alias="arcOptIn")]
     pub arc_opt_in: bool,
-    /// Whether this ad client supports being reported on.    
+    /// Whether this ad client supports being reported on.
     #[serde(alias="supportsReporting")]
     pub supports_reporting: bool,
 }
@@ -504,9 +513,9 @@ impl Part for AdClient {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct PreferredDeals {
-    /// The preferred deals returned in this list response.    
+    /// The preferred deals returned in this list response.
     pub items: Vec<PreferredDeal>,
-    /// Kind of list this is, in this case adexchangeseller#preferredDeals.    
+    /// Kind of list this is, in this case adexchangeseller#preferredDeals.
     pub kind: String,
 }
 
@@ -519,23 +528,23 @@ impl ResponseResult for PreferredDeals {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct ReportingMetadataEntry {
-    /// The names of the metrics which the dimension or metric this reporting metadata entry describes requires to also be present in order for the report to be valid. Omitting these will not cause an error or warning, but may result in data which cannot be correctly interpreted.    
+    /// The names of the metrics which the dimension or metric this reporting metadata entry describes requires to also be present in order for the report to be valid. Omitting these will not cause an error or warning, but may result in data which cannot be correctly interpreted.
     #[serde(alias="requiredMetrics")]
     pub required_metrics: Vec<String>,
-    /// Kind of resource this is, in this case adexchangeseller#reportingMetadataEntry.    
+    /// Kind of resource this is, in this case adexchangeseller#reportingMetadataEntry.
     pub kind: String,
-    /// The names of the metrics the dimension or metric this reporting metadata entry describes is compatible with.    
+    /// The names of the metrics the dimension or metric this reporting metadata entry describes is compatible with.
     #[serde(alias="compatibleMetrics")]
     pub compatible_metrics: Vec<String>,
-    /// For metrics this is a list of dimension IDs which the metric is compatible with, for dimensions it is a list of compatibility groups the dimension belongs to.    
+    /// For metrics this is a list of dimension IDs which the metric is compatible with, for dimensions it is a list of compatibility groups the dimension belongs to.
     #[serde(alias="compatibleDimensions")]
     pub compatible_dimensions: Vec<String>,
-    /// Unique identifier of this reporting metadata entry, corresponding to the name of the appropriate dimension or metric.    
+    /// Unique identifier of this reporting metadata entry, corresponding to the name of the appropriate dimension or metric.
     pub id: String,
-    /// The names of the dimensions which the dimension or metric this reporting metadata entry describes requires to also be present in order for the report to be valid. Omitting these will not cause an error or warning, but may result in data which cannot be correctly interpreted.    
+    /// The names of the dimensions which the dimension or metric this reporting metadata entry describes requires to also be present in order for the report to be valid. Omitting these will not cause an error or warning, but may result in data which cannot be correctly interpreted.
     #[serde(alias="requiredDimensions")]
     pub required_dimensions: Vec<String>,
-    /// The codes of the projects supported by the dimension or metric this reporting metadata entry describes.    
+    /// The codes of the projects supported by the dimension or metric this reporting metadata entry describes.
     #[serde(alias="supportedProducts")]
     pub supported_products: Vec<String>,
 }
@@ -549,14 +558,14 @@ impl Part for ReportingMetadataEntry {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct CustomChannelTargetingInfo {
-    /// The external description of the channel.    
+    /// The external description of the channel.
     pub description: String,
-    /// The language of the sites ads will be displayed on.    
+    /// The language of the sites ads will be displayed on.
     #[serde(alias="siteLanguage")]
     pub site_language: String,
-    /// The locations in which ads appear. (Only valid for content and mobile content ads). Acceptable values for content ads are: TOP_LEFT, TOP_CENTER, TOP_RIGHT, MIDDLE_LEFT, MIDDLE_CENTER, MIDDLE_RIGHT, BOTTOM_LEFT, BOTTOM_CENTER, BOTTOM_RIGHT, MULTIPLE_LOCATIONS. Acceptable values for mobile content ads are: TOP, MIDDLE, BOTTOM, MULTIPLE_LOCATIONS.    
+    /// The locations in which ads appear. (Only valid for content and mobile content ads). Acceptable values for content ads are: TOP_LEFT, TOP_CENTER, TOP_RIGHT, MIDDLE_LEFT, MIDDLE_CENTER, MIDDLE_RIGHT, BOTTOM_LEFT, BOTTOM_CENTER, BOTTOM_RIGHT, MULTIPLE_LOCATIONS. Acceptable values for mobile content ads are: TOP, MIDDLE, BOTTOM, MULTIPLE_LOCATIONS.
     pub location: String,
-    /// The name used to describe this channel externally.    
+    /// The name used to describe this channel externally.
     #[serde(alias="adsAppearOn")]
     pub ads_appear_on: String,
 }
@@ -577,9 +586,9 @@ impl Part for CustomChannelTargetingInfo {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct Metadata {
-    /// no description provided    
+    /// no description provided
     pub items: Vec<ReportingMetadataEntry>,
-    /// Kind of list this is, in this case adexchangeseller#metadata.    
+    /// Kind of list this is, in this case adexchangeseller#metadata.
     pub kind: String,
 }
 
@@ -592,11 +601,11 @@ impl ResponseResult for Metadata {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct UrlChannel {
-    /// Kind of resource this is, in this case adexchangeseller#urlChannel.    
+    /// Kind of resource this is, in this case adexchangeseller#urlChannel.
     pub kind: String,
-    /// Unique identifier of this URL channel. This should be considered an opaque identifier; it is not safe to rely on it being in any particular format.    
+    /// Unique identifier of this URL channel. This should be considered an opaque identifier; it is not safe to rely on it being in any particular format.
     pub id: String,
-    /// URL Pattern of this URL channel. Does not include "http://" or "https://". Example: www.example.com/home    
+    /// URL Pattern of this URL channel. Does not include "http://" or "https://". Example: www.example.com/home
     #[serde(alias="urlPattern")]
     pub url_pattern: String,
 }
@@ -615,14 +624,14 @@ impl Part for UrlChannel {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct AdClients {
-    /// Continuation token used to page through ad clients. To retrieve the next page of results, set the next request's "pageToken" value to this.    
+    /// Continuation token used to page through ad clients. To retrieve the next page of results, set the next request's "pageToken" value to this.
     #[serde(alias="nextPageToken")]
     pub next_page_token: String,
-    /// The ad clients returned in this list response.    
+    /// The ad clients returned in this list response.
     pub items: Vec<AdClient>,
-    /// Kind of list this is, in this case adexchangeseller#adClients.    
+    /// Kind of list this is, in this case adexchangeseller#adClients.
     pub kind: String,
-    /// ETag of this response for caching purposes.    
+    /// ETag of this response for caching purposes.
     pub etag: String,
 }
 
@@ -640,27 +649,27 @@ impl ResponseResult for AdClients {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct PreferredDeal {
-    /// Kind of resource this is, in this case adexchangeseller#preferredDeal.    
+    /// Kind of resource this is, in this case adexchangeseller#preferredDeal.
     pub kind: String,
-    /// The name of the buyer network this deal is for.    
+    /// The name of the buyer network this deal is for.
     #[serde(alias="buyerNetworkName")]
     pub buyer_network_name: String,
-    /// The currency code that applies to the fixed_cpm value. If not set then assumed to be USD.    
+    /// The currency code that applies to the fixed_cpm value. If not set then assumed to be USD.
     #[serde(alias="currencyCode")]
     pub currency_code: String,
-    /// The name of the advertiser this deal is for.    
+    /// The name of the advertiser this deal is for.
     #[serde(alias="advertiserName")]
     pub advertiser_name: String,
-    /// The fixed price for this preferred deal. In cpm micros of currency according to currencyCode. If set, then this preferred deal is eligible for the fixed price tier of buying (highest priority, pay exactly the configured fixed price).    
+    /// The fixed price for this preferred deal. In cpm micros of currency according to currencyCode. If set, then this preferred deal is eligible for the fixed price tier of buying (highest priority, pay exactly the configured fixed price).
     #[serde(alias="fixedCpm")]
     pub fixed_cpm: String,
-    /// Time when this deal becomes active in seconds since the epoch (GMT). If not set then this deal is active immediately upon creation.    
+    /// Time when this deal becomes active in seconds since the epoch (GMT). If not set then this deal is active immediately upon creation.
     #[serde(alias="startTime")]
     pub start_time: String,
-    /// Time when this deal stops being active in seconds since the epoch (GMT). If not set then this deal is valid until manually disabled by the publisher.    
+    /// Time when this deal stops being active in seconds since the epoch (GMT). If not set then this deal is valid until manually disabled by the publisher.
     #[serde(alias="endTime")]
     pub end_time: String,
-    /// Unique identifier of this preferred deal.    
+    /// Unique identifier of this preferred deal.
     pub id: String,
 }
 
@@ -678,14 +687,14 @@ impl ResponseResult for PreferredDeal {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct SavedReports {
-    /// Continuation token used to page through saved reports. To retrieve the next page of results, set the next request's "pageToken" value to this.    
+    /// Continuation token used to page through saved reports. To retrieve the next page of results, set the next request's "pageToken" value to this.
     #[serde(alias="nextPageToken")]
     pub next_page_token: String,
-    /// The saved reports returned in this list response.    
+    /// The saved reports returned in this list response.
     pub items: Vec<SavedReport>,
-    /// Kind of list this is, in this case adexchangeseller#savedReports.    
+    /// Kind of list this is, in this case adexchangeseller#savedReports.
     pub kind: String,
-    /// ETag of this response for caching purposes.    
+    /// ETag of this response for caching purposes.
     pub etag: String,
 }
 
@@ -698,12 +707,12 @@ impl ResponseResult for SavedReports {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct ReportHeaders {
-    /// The currency of this column. Only present if the header type is METRIC_CURRENCY.    
+    /// The currency of this column. Only present if the header type is METRIC_CURRENCY.
     pub currency: String,
-    /// The type of the header; one of DIMENSION, METRIC_TALLY, METRIC_RATIO, or METRIC_CURRENCY.    
+    /// The type of the header; one of DIMENSION, METRIC_TALLY, METRIC_RATIO, or METRIC_CURRENCY.
     #[serde(alias="type")]
     pub type_: String,
-    /// The name of the header.    
+    /// The name of the header.
     pub name: String,
 }
 
@@ -717,16 +726,16 @@ impl Part for ReportHeaders {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct Alert {
-    /// Unique identifier of this alert. This should be considered an opaque identifier; it is not safe to rely on it being in any particular format.    
+    /// Unique identifier of this alert. This should be considered an opaque identifier; it is not safe to rely on it being in any particular format.
     pub id: String,
-    /// Kind of resource this is, in this case adexchangeseller#alert.    
+    /// Kind of resource this is, in this case adexchangeseller#alert.
     pub kind: String,
-    /// Type of this alert. Possible values: SELF_HOLD, MIGRATED_TO_BILLING3, ADDRESS_PIN_VERIFICATION, PHONE_PIN_VERIFICATION, CORPORATE_ENTITY, GRAYLISTED_PUBLISHER, API_HOLD.    
+    /// Type of this alert. Possible values: SELF_HOLD, MIGRATED_TO_BILLING3, ADDRESS_PIN_VERIFICATION, PHONE_PIN_VERIFICATION, CORPORATE_ENTITY, GRAYLISTED_PUBLISHER, API_HOLD.
     #[serde(alias="type")]
     pub type_: String,
-    /// The localized alert message.    
+    /// The localized alert message.
     pub message: String,
-    /// Severity of this alert. Possible values: INFO, WARNING, SEVERE.    
+    /// Severity of this alert. Possible values: INFO, WARNING, SEVERE.
     pub severity: String,
 }
 
@@ -744,14 +753,14 @@ impl Part for Alert {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct Accounts {
-    /// Continuation token used to page through accounts. To retrieve the next page of results, set the next request's "pageToken" value to this.    
+    /// Continuation token used to page through accounts. To retrieve the next page of results, set the next request's "pageToken" value to this.
     #[serde(alias="nextPageToken")]
     pub next_page_token: String,
-    /// The accounts returned in this list response.    
+    /// The accounts returned in this list response.
     pub items: Vec<Account>,
-    /// Kind of list this is, in this case adexchangeseller#accounts.    
+    /// Kind of list this is, in this case adexchangeseller#accounts.
     pub kind: String,
-    /// ETag of this response for caching purposes.    
+    /// ETag of this response for caching purposes.
     pub etag: String,
 }
 
@@ -770,20 +779,20 @@ impl ResponseResult for Accounts {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct Report {
-    /// The header information of the columns requested in the report. This is a list of headers; one for each dimension in the request, followed by one for each metric in the request.    
+    /// The header information of the columns requested in the report. This is a list of headers; one for each dimension in the request, followed by one for each metric in the request.
     pub headers: Vec<ReportHeaders>,
-    /// Kind this is, in this case adexchangeseller#report.    
+    /// Kind this is, in this case adexchangeseller#report.
     pub kind: String,
-    /// The output rows of the report. Each row is a list of cells; one for each dimension in the request, followed by one for each metric in the request. The dimension cells contain strings, and the metric cells contain numbers.    
+    /// The output rows of the report. Each row is a list of cells; one for each dimension in the request, followed by one for each metric in the request. The dimension cells contain strings, and the metric cells contain numbers.
     pub rows: Vec<Vec<String>>,
-    /// The total number of rows matched by the report request. Fewer rows may be returned in the response due to being limited by the row count requested or the report row limit.    
+    /// The total number of rows matched by the report request. Fewer rows may be returned in the response due to being limited by the row count requested or the report row limit.
     #[serde(alias="totalMatchedRows")]
     pub total_matched_rows: String,
-    /// Any warnings associated with generation of the report.    
+    /// Any warnings associated with generation of the report.
     pub warnings: Vec<String>,
-    /// The averages of the report. This is the same length as any other row in the report; cells corresponding to dimension columns are empty.    
+    /// The averages of the report. This is the same length as any other row in the report; cells corresponding to dimension columns are empty.
     pub averages: Vec<String>,
-    /// The totals of the report. This is the same length as any other row in the report; cells corresponding to dimension columns are empty.    
+    /// The totals of the report. This is the same length as any other row in the report; cells corresponding to dimension columns are empty.
     pub totals: Vec<String>,
 }
 
@@ -801,16 +810,16 @@ impl ResponseResult for Report {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct CustomChannel {
-    /// Kind of resource this is, in this case adexchangeseller#customChannel.    
+    /// Kind of resource this is, in this case adexchangeseller#customChannel.
     pub kind: String,
-    /// Code of this custom channel, not necessarily unique across ad clients.    
+    /// Code of this custom channel, not necessarily unique across ad clients.
     pub code: String,
-    /// The targeting information of this custom channel, if activated.    
+    /// The targeting information of this custom channel, if activated.
     #[serde(alias="targetingInfo")]
     pub targeting_info: CustomChannelTargetingInfo,
-    /// Unique identifier of this custom channel. This should be considered an opaque identifier; it is not safe to rely on it being in any particular format.    
+    /// Unique identifier of this custom channel. This should be considered an opaque identifier; it is not safe to rely on it being in any particular format.
     pub id: String,
-    /// Name of this custom channel.    
+    /// Name of this custom channel.
     pub name: String,
 }
 
@@ -856,13 +865,18 @@ pub struct AccountMethods<'a, C, NC, A>
     hub: &'a AdExchangeSeller<C, NC, A>,
 }
 
-impl<'a, C, NC, A> ResourceMethodsBuilder for AccountMethods<'a, C, NC, A> {}
+impl<'a, C, NC, A> MethodsBuilder for AccountMethods<'a, C, NC, A> {}
 
 impl<'a, C, NC, A> AccountMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Generate an Ad Exchange report based on the saved report ID sent in the query parameters.    
+    /// Generate an Ad Exchange report based on the saved report ID sent in the query parameters.
+    /// 
+    /// # Arguments
+    ///
+    /// * `accountId` - Account owning the saved report.
+    /// * `savedReportId` - The saved report to retrieve.
     pub fn reports_saved_generate(&self, account_id: &str, saved_report_id: &str) -> AccountReportSavedGenerateCall<'a, C, NC, A> {
         AccountReportSavedGenerateCall {
             hub: self.hub,
@@ -879,7 +893,11 @@ impl<'a, C, NC, A> AccountMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// List the metadata for the metrics available to this AdExchange account.    
+    /// List the metadata for the metrics available to this AdExchange account.
+    /// 
+    /// # Arguments
+    ///
+    /// * `accountId` - Account with visibility to the metrics.
     pub fn metadata_metrics_list(&self, account_id: &str) -> AccountMetadataMetricListCall<'a, C, NC, A> {
         AccountMetadataMetricListCall {
             hub: self.hub,
@@ -892,7 +910,13 @@ impl<'a, C, NC, A> AccountMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Generate an Ad Exchange report based on the report request sent in the query parameters. Returns the result as JSON; to retrieve output in CSV format specify "alt=csv" as a query parameter.    
+    /// Generate an Ad Exchange report based on the report request sent in the query parameters. Returns the result as JSON; to retrieve output in CSV format specify "alt=csv" as a query parameter.
+    /// 
+    /// # Arguments
+    ///
+    /// * `accountId` - Account which owns the generated report.
+    /// * `startDate` - Start of the date range to report on in "YYYY-MM-DD" format, inclusive.
+    /// * `endDate` - End of the date range to report on in "YYYY-MM-DD" format, inclusive.
     pub fn reports_generate(&self, account_id: &str, start_date: &str, end_date: &str) -> AccountReportGenerateCall<'a, C, NC, A> {
         AccountReportGenerateCall {
             hub: self.hub,
@@ -914,7 +938,12 @@ impl<'a, C, NC, A> AccountMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// List all URL channels in the specified ad client for this Ad Exchange account.    
+    /// List all URL channels in the specified ad client for this Ad Exchange account.
+    /// 
+    /// # Arguments
+    ///
+    /// * `accountId` - Account to which the ad client belongs.
+    /// * `adClientId` - Ad client for which to list URL channels.
     pub fn urlchannels_list(&self, account_id: &str, ad_client_id: &str) -> AccountUrlchannelListCall<'a, C, NC, A> {
         AccountUrlchannelListCall {
             hub: self.hub,
@@ -930,7 +959,11 @@ impl<'a, C, NC, A> AccountMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// List all saved reports in this Ad Exchange account.    
+    /// List all saved reports in this Ad Exchange account.
+    /// 
+    /// # Arguments
+    ///
+    /// * `accountId` - Account owning the saved reports.
     pub fn reports_saved_list(&self, account_id: &str) -> AccountReportSavedListCall<'a, C, NC, A> {
         AccountReportSavedListCall {
             hub: self.hub,
@@ -945,7 +978,12 @@ impl<'a, C, NC, A> AccountMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Get information about the selected Ad Exchange Preferred Deal.    
+    /// Get information about the selected Ad Exchange Preferred Deal.
+    /// 
+    /// # Arguments
+    ///
+    /// * `accountId` - Account owning the deal.
+    /// * `dealId` - Preferred deal to get information about.
     pub fn preferreddeals_get(&self, account_id: &str, deal_id: &str) -> AccountPreferreddealGetCall<'a, C, NC, A> {
         AccountPreferreddealGetCall {
             hub: self.hub,
@@ -959,7 +997,11 @@ impl<'a, C, NC, A> AccountMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// List all ad clients in this Ad Exchange account.    
+    /// List all ad clients in this Ad Exchange account.
+    /// 
+    /// # Arguments
+    ///
+    /// * `accountId` - Account to which the ad client belongs.
     pub fn adclients_list(&self, account_id: &str) -> AccountAdclientListCall<'a, C, NC, A> {
         AccountAdclientListCall {
             hub: self.hub,
@@ -974,7 +1016,11 @@ impl<'a, C, NC, A> AccountMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// List the metadata for the dimensions available to this AdExchange account.    
+    /// List the metadata for the dimensions available to this AdExchange account.
+    /// 
+    /// # Arguments
+    ///
+    /// * `accountId` - Account with visibility to the dimensions.
     pub fn metadata_dimensions_list(&self, account_id: &str) -> AccountMetadataDimensionListCall<'a, C, NC, A> {
         AccountMetadataDimensionListCall {
             hub: self.hub,
@@ -987,7 +1033,13 @@ impl<'a, C, NC, A> AccountMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Get the specified custom channel from the specified ad client.    
+    /// Get the specified custom channel from the specified ad client.
+    /// 
+    /// # Arguments
+    ///
+    /// * `accountId` - Account to which the ad client belongs.
+    /// * `adClientId` - Ad client which contains the custom channel.
+    /// * `customChannelId` - Custom channel to retrieve.
     pub fn customchannels_get(&self, account_id: &str, ad_client_id: &str, custom_channel_id: &str) -> AccountCustomchannelGetCall<'a, C, NC, A> {
         AccountCustomchannelGetCall {
             hub: self.hub,
@@ -1002,7 +1054,12 @@ impl<'a, C, NC, A> AccountMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// List all custom channels in the specified ad client for this Ad Exchange account.    
+    /// List all custom channels in the specified ad client for this Ad Exchange account.
+    /// 
+    /// # Arguments
+    ///
+    /// * `accountId` - Account to which the ad client belongs.
+    /// * `adClientId` - Ad client for which to list custom channels.
     pub fn customchannels_list(&self, account_id: &str, ad_client_id: &str) -> AccountCustomchannelListCall<'a, C, NC, A> {
         AccountCustomchannelListCall {
             hub: self.hub,
@@ -1018,7 +1075,7 @@ impl<'a, C, NC, A> AccountMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// List all accounts available to this Ad Exchange account.    
+    /// List all accounts available to this Ad Exchange account.
     pub fn list(&self) -> AccountListCall<'a, C, NC, A> {
         AccountListCall {
             hub: self.hub,
@@ -1032,7 +1089,11 @@ impl<'a, C, NC, A> AccountMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// List the alerts for this Ad Exchange account.    
+    /// List the alerts for this Ad Exchange account.
+    /// 
+    /// # Arguments
+    ///
+    /// * `accountId` - Account owning the alerts.
     pub fn alerts_list(&self, account_id: &str) -> AccountAlertListCall<'a, C, NC, A> {
         AccountAlertListCall {
             hub: self.hub,
@@ -1046,7 +1107,11 @@ impl<'a, C, NC, A> AccountMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// List the preferred deals for this Ad Exchange account.    
+    /// List the preferred deals for this Ad Exchange account.
+    /// 
+    /// # Arguments
+    ///
+    /// * `accountId` - Account owning the deals.
     pub fn preferreddeals_list(&self, account_id: &str) -> AccountPreferreddealListCall<'a, C, NC, A> {
         AccountPreferreddealListCall {
             hub: self.hub,
@@ -1059,7 +1124,11 @@ impl<'a, C, NC, A> AccountMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Get information about the selected Ad Exchange account.    
+    /// Get information about the selected Ad Exchange account.
+    /// 
+    /// # Arguments
+    ///
+    /// * `accountId` - Account to get information about. Tip: 'myaccount' is a valid ID.
     pub fn get(&self, account_id: &str) -> AccountGetCall<'a, C, NC, A> {
         AccountGetCall {
             hub: self.hub,
@@ -1082,7 +1151,7 @@ impl<'a, C, NC, A> AccountMethods<'a, C, NC, A> {
 /// Generate an Ad Exchange report based on the saved report ID sent in the query parameters.
 ///
 /// A builder for the *reports.saved.generate* method supported by a *account* resource.
-/// It is not used directly, but through a `AccountMethods`.
+/// It is not used directly, but through a `AccountMethods` instance.
 ///
 /// # Example
 ///
@@ -1157,7 +1226,7 @@ impl<'a, C, NC, A> AccountReportSavedGenerateCall<'a, C, NC, A> where NC: hyper:
         for &field in ["alt", "accountId", "savedReportId", "startIndex", "maxResults", "locale"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -1210,7 +1279,7 @@ impl<'a, C, NC, A> AccountReportSavedGenerateCall<'a, C, NC, A> where NC: hyper:
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -1222,7 +1291,6 @@ impl<'a, C, NC, A> AccountReportSavedGenerateCall<'a, C, NC, A> where NC: hyper:
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -1232,7 +1300,7 @@ impl<'a, C, NC, A> AccountReportSavedGenerateCall<'a, C, NC, A> where NC: hyper:
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -1243,7 +1311,7 @@ impl<'a, C, NC, A> AccountReportSavedGenerateCall<'a, C, NC, A> where NC: hyper:
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -1252,13 +1320,13 @@ impl<'a, C, NC, A> AccountReportSavedGenerateCall<'a, C, NC, A> where NC: hyper:
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -1270,7 +1338,7 @@ impl<'a, C, NC, A> AccountReportSavedGenerateCall<'a, C, NC, A> where NC: hyper:
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Account owning the saved report.    
+    /// Account owning the saved report.
     pub fn account_id(mut self, new_value: &str) -> AccountReportSavedGenerateCall<'a, C, NC, A> {
         self._account_id = new_value.to_string();
         self
@@ -1280,7 +1348,7 @@ impl<'a, C, NC, A> AccountReportSavedGenerateCall<'a, C, NC, A> where NC: hyper:
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The saved report to retrieve.    
+    /// The saved report to retrieve.
     pub fn saved_report_id(mut self, new_value: &str) -> AccountReportSavedGenerateCall<'a, C, NC, A> {
         self._saved_report_id = new_value.to_string();
         self
@@ -1288,7 +1356,7 @@ impl<'a, C, NC, A> AccountReportSavedGenerateCall<'a, C, NC, A> where NC: hyper:
     /// Sets the *start index* query property to the given value.
     ///
     /// 
-    /// Index of the first row of report data to return.    
+    /// Index of the first row of report data to return.
     pub fn start_index(mut self, new_value: i32) -> AccountReportSavedGenerateCall<'a, C, NC, A> {
         self._start_index = Some(new_value);
         self
@@ -1296,7 +1364,7 @@ impl<'a, C, NC, A> AccountReportSavedGenerateCall<'a, C, NC, A> where NC: hyper:
     /// Sets the *max results* query property to the given value.
     ///
     /// 
-    /// The maximum number of rows of report data to return.    
+    /// The maximum number of rows of report data to return.
     pub fn max_results(mut self, new_value: i32) -> AccountReportSavedGenerateCall<'a, C, NC, A> {
         self._max_results = Some(new_value);
         self
@@ -1304,7 +1372,7 @@ impl<'a, C, NC, A> AccountReportSavedGenerateCall<'a, C, NC, A> where NC: hyper:
     /// Sets the *locale* query property to the given value.
     ///
     /// 
-    /// Optional locale to use for translating report output to a local language. Defaults to "en_US" if not specified.    
+    /// Optional locale to use for translating report output to a local language. Defaults to "en_US" if not specified.
     pub fn locale(mut self, new_value: &str) -> AccountReportSavedGenerateCall<'a, C, NC, A> {
         self._locale = Some(new_value.to_string());
         self
@@ -1365,7 +1433,7 @@ impl<'a, C, NC, A> AccountReportSavedGenerateCall<'a, C, NC, A> where NC: hyper:
 /// List the metadata for the metrics available to this AdExchange account.
 ///
 /// A builder for the *metadata.metrics.list* method supported by a *account* resource.
-/// It is not used directly, but through a `AccountMethods`.
+/// It is not used directly, but through a `AccountMethods` instance.
 ///
 /// # Example
 ///
@@ -1423,7 +1491,7 @@ impl<'a, C, NC, A> AccountMetadataMetricListCall<'a, C, NC, A> where NC: hyper::
         for &field in ["alt", "accountId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -1476,7 +1544,7 @@ impl<'a, C, NC, A> AccountMetadataMetricListCall<'a, C, NC, A> where NC: hyper::
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -1488,7 +1556,6 @@ impl<'a, C, NC, A> AccountMetadataMetricListCall<'a, C, NC, A> where NC: hyper::
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -1498,7 +1565,7 @@ impl<'a, C, NC, A> AccountMetadataMetricListCall<'a, C, NC, A> where NC: hyper::
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -1509,7 +1576,7 @@ impl<'a, C, NC, A> AccountMetadataMetricListCall<'a, C, NC, A> where NC: hyper::
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -1518,13 +1585,13 @@ impl<'a, C, NC, A> AccountMetadataMetricListCall<'a, C, NC, A> where NC: hyper::
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -1536,7 +1603,7 @@ impl<'a, C, NC, A> AccountMetadataMetricListCall<'a, C, NC, A> where NC: hyper::
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Account with visibility to the metrics.    
+    /// Account with visibility to the metrics.
     pub fn account_id(mut self, new_value: &str) -> AccountMetadataMetricListCall<'a, C, NC, A> {
         self._account_id = new_value.to_string();
         self
@@ -1602,7 +1669,7 @@ impl<'a, C, NC, A> AccountMetadataMetricListCall<'a, C, NC, A> where NC: hyper::
 /// but not the `Report` structure that you would usually get. The latter will be a default value.
 ///
 /// A builder for the *reports.generate* method supported by a *account* resource.
-/// It is not used directly, but through a `AccountMethods`.
+/// It is not used directly, but through a `AccountMethods` instance.
 ///
 /// # Example
 ///
@@ -1715,7 +1782,7 @@ impl<'a, C, NC, A> AccountReportGenerateCall<'a, C, NC, A> where NC: hyper::net:
         for &field in ["accountId", "startDate", "endDate", "startIndex", "sort", "metric", "maxResults", "locale", "filter", "dimension"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -1784,7 +1851,7 @@ impl<'a, C, NC, A> AccountReportGenerateCall<'a, C, NC, A> where NC: hyper::net:
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -1796,7 +1863,6 @@ impl<'a, C, NC, A> AccountReportGenerateCall<'a, C, NC, A> where NC: hyper::net:
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -1806,7 +1872,7 @@ impl<'a, C, NC, A> AccountReportGenerateCall<'a, C, NC, A> where NC: hyper::net:
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -1817,7 +1883,7 @@ impl<'a, C, NC, A> AccountReportGenerateCall<'a, C, NC, A> where NC: hyper::net:
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = if enable_resource_parsing {
                         let mut json_response = String::new();
@@ -1826,13 +1892,13 @@ impl<'a, C, NC, A> AccountReportGenerateCall<'a, C, NC, A> where NC: hyper::net:
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     } else { (res, Default::default()) };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -1844,7 +1910,7 @@ impl<'a, C, NC, A> AccountReportGenerateCall<'a, C, NC, A> where NC: hyper::net:
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Account which owns the generated report.    
+    /// Account which owns the generated report.
     pub fn account_id(mut self, new_value: &str) -> AccountReportGenerateCall<'a, C, NC, A> {
         self._account_id = new_value.to_string();
         self
@@ -1854,7 +1920,7 @@ impl<'a, C, NC, A> AccountReportGenerateCall<'a, C, NC, A> where NC: hyper::net:
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Start of the date range to report on in "YYYY-MM-DD" format, inclusive.    
+    /// Start of the date range to report on in "YYYY-MM-DD" format, inclusive.
     pub fn start_date(mut self, new_value: &str) -> AccountReportGenerateCall<'a, C, NC, A> {
         self._start_date = new_value.to_string();
         self
@@ -1864,7 +1930,7 @@ impl<'a, C, NC, A> AccountReportGenerateCall<'a, C, NC, A> where NC: hyper::net:
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// End of the date range to report on in "YYYY-MM-DD" format, inclusive.    
+    /// End of the date range to report on in "YYYY-MM-DD" format, inclusive.
     pub fn end_date(mut self, new_value: &str) -> AccountReportGenerateCall<'a, C, NC, A> {
         self._end_date = new_value.to_string();
         self
@@ -1872,7 +1938,7 @@ impl<'a, C, NC, A> AccountReportGenerateCall<'a, C, NC, A> where NC: hyper::net:
     /// Sets the *start index* query property to the given value.
     ///
     /// 
-    /// Index of the first row of report data to return.    
+    /// Index of the first row of report data to return.
     pub fn start_index(mut self, new_value: u32) -> AccountReportGenerateCall<'a, C, NC, A> {
         self._start_index = Some(new_value);
         self
@@ -1881,7 +1947,7 @@ impl<'a, C, NC, A> AccountReportGenerateCall<'a, C, NC, A> where NC: hyper::net:
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
     ///
     /// 
-    /// The name of a dimension or metric to sort the resulting report on, optionally prefixed with "+" to sort ascending or "-" to sort descending. If no prefix is specified, the column is sorted ascending.    
+    /// The name of a dimension or metric to sort the resulting report on, optionally prefixed with "+" to sort ascending or "-" to sort descending. If no prefix is specified, the column is sorted ascending.
     pub fn add_sort(mut self, new_value: &str) -> AccountReportGenerateCall<'a, C, NC, A> {
         self._sort.push(new_value.to_string());
         self
@@ -1890,7 +1956,7 @@ impl<'a, C, NC, A> AccountReportGenerateCall<'a, C, NC, A> where NC: hyper::net:
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
     ///
     /// 
-    /// Numeric columns to include in the report.    
+    /// Numeric columns to include in the report.
     pub fn add_metric(mut self, new_value: &str) -> AccountReportGenerateCall<'a, C, NC, A> {
         self._metric.push(new_value.to_string());
         self
@@ -1898,7 +1964,7 @@ impl<'a, C, NC, A> AccountReportGenerateCall<'a, C, NC, A> where NC: hyper::net:
     /// Sets the *max results* query property to the given value.
     ///
     /// 
-    /// The maximum number of rows of report data to return.    
+    /// The maximum number of rows of report data to return.
     pub fn max_results(mut self, new_value: u32) -> AccountReportGenerateCall<'a, C, NC, A> {
         self._max_results = Some(new_value);
         self
@@ -1906,7 +1972,7 @@ impl<'a, C, NC, A> AccountReportGenerateCall<'a, C, NC, A> where NC: hyper::net:
     /// Sets the *locale* query property to the given value.
     ///
     /// 
-    /// Optional locale to use for translating report output to a local language. Defaults to "en_US" if not specified.    
+    /// Optional locale to use for translating report output to a local language. Defaults to "en_US" if not specified.
     pub fn locale(mut self, new_value: &str) -> AccountReportGenerateCall<'a, C, NC, A> {
         self._locale = Some(new_value.to_string());
         self
@@ -1915,7 +1981,7 @@ impl<'a, C, NC, A> AccountReportGenerateCall<'a, C, NC, A> where NC: hyper::net:
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
     ///
     /// 
-    /// Filters to be run on the report.    
+    /// Filters to be run on the report.
     pub fn add_filter(mut self, new_value: &str) -> AccountReportGenerateCall<'a, C, NC, A> {
         self._filter.push(new_value.to_string());
         self
@@ -1924,7 +1990,7 @@ impl<'a, C, NC, A> AccountReportGenerateCall<'a, C, NC, A> where NC: hyper::net:
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
     ///
     /// 
-    /// Dimensions to base the report on.    
+    /// Dimensions to base the report on.
     pub fn add_dimension(mut self, new_value: &str) -> AccountReportGenerateCall<'a, C, NC, A> {
         self._dimension.push(new_value.to_string());
         self
@@ -1985,7 +2051,7 @@ impl<'a, C, NC, A> AccountReportGenerateCall<'a, C, NC, A> where NC: hyper::net:
 /// List all URL channels in the specified ad client for this Ad Exchange account.
 ///
 /// A builder for the *urlchannels.list* method supported by a *account* resource.
-/// It is not used directly, but through a `AccountMethods`.
+/// It is not used directly, but through a `AccountMethods` instance.
 ///
 /// # Example
 ///
@@ -2055,7 +2121,7 @@ impl<'a, C, NC, A> AccountUrlchannelListCall<'a, C, NC, A> where NC: hyper::net:
         for &field in ["alt", "accountId", "adClientId", "pageToken", "maxResults"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -2108,7 +2174,7 @@ impl<'a, C, NC, A> AccountUrlchannelListCall<'a, C, NC, A> where NC: hyper::net:
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -2120,7 +2186,6 @@ impl<'a, C, NC, A> AccountUrlchannelListCall<'a, C, NC, A> where NC: hyper::net:
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -2130,7 +2195,7 @@ impl<'a, C, NC, A> AccountUrlchannelListCall<'a, C, NC, A> where NC: hyper::net:
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -2141,7 +2206,7 @@ impl<'a, C, NC, A> AccountUrlchannelListCall<'a, C, NC, A> where NC: hyper::net:
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -2150,13 +2215,13 @@ impl<'a, C, NC, A> AccountUrlchannelListCall<'a, C, NC, A> where NC: hyper::net:
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -2168,7 +2233,7 @@ impl<'a, C, NC, A> AccountUrlchannelListCall<'a, C, NC, A> where NC: hyper::net:
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Account to which the ad client belongs.    
+    /// Account to which the ad client belongs.
     pub fn account_id(mut self, new_value: &str) -> AccountUrlchannelListCall<'a, C, NC, A> {
         self._account_id = new_value.to_string();
         self
@@ -2178,7 +2243,7 @@ impl<'a, C, NC, A> AccountUrlchannelListCall<'a, C, NC, A> where NC: hyper::net:
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Ad client for which to list URL channels.    
+    /// Ad client for which to list URL channels.
     pub fn ad_client_id(mut self, new_value: &str) -> AccountUrlchannelListCall<'a, C, NC, A> {
         self._ad_client_id = new_value.to_string();
         self
@@ -2186,7 +2251,7 @@ impl<'a, C, NC, A> AccountUrlchannelListCall<'a, C, NC, A> where NC: hyper::net:
     /// Sets the *page token* query property to the given value.
     ///
     /// 
-    /// A continuation token, used to page through URL channels. To retrieve the next page, set this parameter to the value of "nextPageToken" from the previous response.    
+    /// A continuation token, used to page through URL channels. To retrieve the next page, set this parameter to the value of "nextPageToken" from the previous response.
     pub fn page_token(mut self, new_value: &str) -> AccountUrlchannelListCall<'a, C, NC, A> {
         self._page_token = Some(new_value.to_string());
         self
@@ -2194,7 +2259,7 @@ impl<'a, C, NC, A> AccountUrlchannelListCall<'a, C, NC, A> where NC: hyper::net:
     /// Sets the *max results* query property to the given value.
     ///
     /// 
-    /// The maximum number of URL channels to include in the response, used for paging.    
+    /// The maximum number of URL channels to include in the response, used for paging.
     pub fn max_results(mut self, new_value: u32) -> AccountUrlchannelListCall<'a, C, NC, A> {
         self._max_results = Some(new_value);
         self
@@ -2255,7 +2320,7 @@ impl<'a, C, NC, A> AccountUrlchannelListCall<'a, C, NC, A> where NC: hyper::net:
 /// List all saved reports in this Ad Exchange account.
 ///
 /// A builder for the *reports.saved.list* method supported by a *account* resource.
-/// It is not used directly, but through a `AccountMethods`.
+/// It is not used directly, but through a `AccountMethods` instance.
 ///
 /// # Example
 ///
@@ -2323,7 +2388,7 @@ impl<'a, C, NC, A> AccountReportSavedListCall<'a, C, NC, A> where NC: hyper::net
         for &field in ["alt", "accountId", "pageToken", "maxResults"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -2376,7 +2441,7 @@ impl<'a, C, NC, A> AccountReportSavedListCall<'a, C, NC, A> where NC: hyper::net
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -2388,7 +2453,6 @@ impl<'a, C, NC, A> AccountReportSavedListCall<'a, C, NC, A> where NC: hyper::net
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -2398,7 +2462,7 @@ impl<'a, C, NC, A> AccountReportSavedListCall<'a, C, NC, A> where NC: hyper::net
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -2409,7 +2473,7 @@ impl<'a, C, NC, A> AccountReportSavedListCall<'a, C, NC, A> where NC: hyper::net
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -2418,13 +2482,13 @@ impl<'a, C, NC, A> AccountReportSavedListCall<'a, C, NC, A> where NC: hyper::net
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -2436,7 +2500,7 @@ impl<'a, C, NC, A> AccountReportSavedListCall<'a, C, NC, A> where NC: hyper::net
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Account owning the saved reports.    
+    /// Account owning the saved reports.
     pub fn account_id(mut self, new_value: &str) -> AccountReportSavedListCall<'a, C, NC, A> {
         self._account_id = new_value.to_string();
         self
@@ -2444,7 +2508,7 @@ impl<'a, C, NC, A> AccountReportSavedListCall<'a, C, NC, A> where NC: hyper::net
     /// Sets the *page token* query property to the given value.
     ///
     /// 
-    /// A continuation token, used to page through saved reports. To retrieve the next page, set this parameter to the value of "nextPageToken" from the previous response.    
+    /// A continuation token, used to page through saved reports. To retrieve the next page, set this parameter to the value of "nextPageToken" from the previous response.
     pub fn page_token(mut self, new_value: &str) -> AccountReportSavedListCall<'a, C, NC, A> {
         self._page_token = Some(new_value.to_string());
         self
@@ -2452,7 +2516,7 @@ impl<'a, C, NC, A> AccountReportSavedListCall<'a, C, NC, A> where NC: hyper::net
     /// Sets the *max results* query property to the given value.
     ///
     /// 
-    /// The maximum number of saved reports to include in the response, used for paging.    
+    /// The maximum number of saved reports to include in the response, used for paging.
     pub fn max_results(mut self, new_value: i32) -> AccountReportSavedListCall<'a, C, NC, A> {
         self._max_results = Some(new_value);
         self
@@ -2513,7 +2577,7 @@ impl<'a, C, NC, A> AccountReportSavedListCall<'a, C, NC, A> where NC: hyper::net
 /// Get information about the selected Ad Exchange Preferred Deal.
 ///
 /// A builder for the *preferreddeals.get* method supported by a *account* resource.
-/// It is not used directly, but through a `AccountMethods`.
+/// It is not used directly, but through a `AccountMethods` instance.
 ///
 /// # Example
 ///
@@ -2573,7 +2637,7 @@ impl<'a, C, NC, A> AccountPreferreddealGetCall<'a, C, NC, A> where NC: hyper::ne
         for &field in ["alt", "accountId", "dealId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -2626,7 +2690,7 @@ impl<'a, C, NC, A> AccountPreferreddealGetCall<'a, C, NC, A> where NC: hyper::ne
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -2638,7 +2702,6 @@ impl<'a, C, NC, A> AccountPreferreddealGetCall<'a, C, NC, A> where NC: hyper::ne
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -2648,7 +2711,7 @@ impl<'a, C, NC, A> AccountPreferreddealGetCall<'a, C, NC, A> where NC: hyper::ne
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -2659,7 +2722,7 @@ impl<'a, C, NC, A> AccountPreferreddealGetCall<'a, C, NC, A> where NC: hyper::ne
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -2668,13 +2731,13 @@ impl<'a, C, NC, A> AccountPreferreddealGetCall<'a, C, NC, A> where NC: hyper::ne
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -2686,7 +2749,7 @@ impl<'a, C, NC, A> AccountPreferreddealGetCall<'a, C, NC, A> where NC: hyper::ne
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Account owning the deal.    
+    /// Account owning the deal.
     pub fn account_id(mut self, new_value: &str) -> AccountPreferreddealGetCall<'a, C, NC, A> {
         self._account_id = new_value.to_string();
         self
@@ -2696,7 +2759,7 @@ impl<'a, C, NC, A> AccountPreferreddealGetCall<'a, C, NC, A> where NC: hyper::ne
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Preferred deal to get information about.    
+    /// Preferred deal to get information about.
     pub fn deal_id(mut self, new_value: &str) -> AccountPreferreddealGetCall<'a, C, NC, A> {
         self._deal_id = new_value.to_string();
         self
@@ -2757,7 +2820,7 @@ impl<'a, C, NC, A> AccountPreferreddealGetCall<'a, C, NC, A> where NC: hyper::ne
 /// List all ad clients in this Ad Exchange account.
 ///
 /// A builder for the *adclients.list* method supported by a *account* resource.
-/// It is not used directly, but through a `AccountMethods`.
+/// It is not used directly, but through a `AccountMethods` instance.
 ///
 /// # Example
 ///
@@ -2825,7 +2888,7 @@ impl<'a, C, NC, A> AccountAdclientListCall<'a, C, NC, A> where NC: hyper::net::N
         for &field in ["alt", "accountId", "pageToken", "maxResults"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -2878,7 +2941,7 @@ impl<'a, C, NC, A> AccountAdclientListCall<'a, C, NC, A> where NC: hyper::net::N
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -2890,7 +2953,6 @@ impl<'a, C, NC, A> AccountAdclientListCall<'a, C, NC, A> where NC: hyper::net::N
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -2900,7 +2962,7 @@ impl<'a, C, NC, A> AccountAdclientListCall<'a, C, NC, A> where NC: hyper::net::N
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -2911,7 +2973,7 @@ impl<'a, C, NC, A> AccountAdclientListCall<'a, C, NC, A> where NC: hyper::net::N
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -2920,13 +2982,13 @@ impl<'a, C, NC, A> AccountAdclientListCall<'a, C, NC, A> where NC: hyper::net::N
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -2938,7 +3000,7 @@ impl<'a, C, NC, A> AccountAdclientListCall<'a, C, NC, A> where NC: hyper::net::N
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Account to which the ad client belongs.    
+    /// Account to which the ad client belongs.
     pub fn account_id(mut self, new_value: &str) -> AccountAdclientListCall<'a, C, NC, A> {
         self._account_id = new_value.to_string();
         self
@@ -2946,7 +3008,7 @@ impl<'a, C, NC, A> AccountAdclientListCall<'a, C, NC, A> where NC: hyper::net::N
     /// Sets the *page token* query property to the given value.
     ///
     /// 
-    /// A continuation token, used to page through ad clients. To retrieve the next page, set this parameter to the value of "nextPageToken" from the previous response.    
+    /// A continuation token, used to page through ad clients. To retrieve the next page, set this parameter to the value of "nextPageToken" from the previous response.
     pub fn page_token(mut self, new_value: &str) -> AccountAdclientListCall<'a, C, NC, A> {
         self._page_token = Some(new_value.to_string());
         self
@@ -2954,7 +3016,7 @@ impl<'a, C, NC, A> AccountAdclientListCall<'a, C, NC, A> where NC: hyper::net::N
     /// Sets the *max results* query property to the given value.
     ///
     /// 
-    /// The maximum number of ad clients to include in the response, used for paging.    
+    /// The maximum number of ad clients to include in the response, used for paging.
     pub fn max_results(mut self, new_value: u32) -> AccountAdclientListCall<'a, C, NC, A> {
         self._max_results = Some(new_value);
         self
@@ -3015,7 +3077,7 @@ impl<'a, C, NC, A> AccountAdclientListCall<'a, C, NC, A> where NC: hyper::net::N
 /// List the metadata for the dimensions available to this AdExchange account.
 ///
 /// A builder for the *metadata.dimensions.list* method supported by a *account* resource.
-/// It is not used directly, but through a `AccountMethods`.
+/// It is not used directly, but through a `AccountMethods` instance.
 ///
 /// # Example
 ///
@@ -3073,7 +3135,7 @@ impl<'a, C, NC, A> AccountMetadataDimensionListCall<'a, C, NC, A> where NC: hype
         for &field in ["alt", "accountId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -3126,7 +3188,7 @@ impl<'a, C, NC, A> AccountMetadataDimensionListCall<'a, C, NC, A> where NC: hype
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -3138,7 +3200,6 @@ impl<'a, C, NC, A> AccountMetadataDimensionListCall<'a, C, NC, A> where NC: hype
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -3148,7 +3209,7 @@ impl<'a, C, NC, A> AccountMetadataDimensionListCall<'a, C, NC, A> where NC: hype
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -3159,7 +3220,7 @@ impl<'a, C, NC, A> AccountMetadataDimensionListCall<'a, C, NC, A> where NC: hype
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -3168,13 +3229,13 @@ impl<'a, C, NC, A> AccountMetadataDimensionListCall<'a, C, NC, A> where NC: hype
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -3186,7 +3247,7 @@ impl<'a, C, NC, A> AccountMetadataDimensionListCall<'a, C, NC, A> where NC: hype
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Account with visibility to the dimensions.    
+    /// Account with visibility to the dimensions.
     pub fn account_id(mut self, new_value: &str) -> AccountMetadataDimensionListCall<'a, C, NC, A> {
         self._account_id = new_value.to_string();
         self
@@ -3247,7 +3308,7 @@ impl<'a, C, NC, A> AccountMetadataDimensionListCall<'a, C, NC, A> where NC: hype
 /// Get the specified custom channel from the specified ad client.
 ///
 /// A builder for the *customchannels.get* method supported by a *account* resource.
-/// It is not used directly, but through a `AccountMethods`.
+/// It is not used directly, but through a `AccountMethods` instance.
 ///
 /// # Example
 ///
@@ -3309,7 +3370,7 @@ impl<'a, C, NC, A> AccountCustomchannelGetCall<'a, C, NC, A> where NC: hyper::ne
         for &field in ["alt", "accountId", "adClientId", "customChannelId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -3362,7 +3423,7 @@ impl<'a, C, NC, A> AccountCustomchannelGetCall<'a, C, NC, A> where NC: hyper::ne
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -3374,7 +3435,6 @@ impl<'a, C, NC, A> AccountCustomchannelGetCall<'a, C, NC, A> where NC: hyper::ne
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -3384,7 +3444,7 @@ impl<'a, C, NC, A> AccountCustomchannelGetCall<'a, C, NC, A> where NC: hyper::ne
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -3395,7 +3455,7 @@ impl<'a, C, NC, A> AccountCustomchannelGetCall<'a, C, NC, A> where NC: hyper::ne
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -3404,13 +3464,13 @@ impl<'a, C, NC, A> AccountCustomchannelGetCall<'a, C, NC, A> where NC: hyper::ne
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -3422,7 +3482,7 @@ impl<'a, C, NC, A> AccountCustomchannelGetCall<'a, C, NC, A> where NC: hyper::ne
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Account to which the ad client belongs.    
+    /// Account to which the ad client belongs.
     pub fn account_id(mut self, new_value: &str) -> AccountCustomchannelGetCall<'a, C, NC, A> {
         self._account_id = new_value.to_string();
         self
@@ -3432,7 +3492,7 @@ impl<'a, C, NC, A> AccountCustomchannelGetCall<'a, C, NC, A> where NC: hyper::ne
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Ad client which contains the custom channel.    
+    /// Ad client which contains the custom channel.
     pub fn ad_client_id(mut self, new_value: &str) -> AccountCustomchannelGetCall<'a, C, NC, A> {
         self._ad_client_id = new_value.to_string();
         self
@@ -3442,7 +3502,7 @@ impl<'a, C, NC, A> AccountCustomchannelGetCall<'a, C, NC, A> where NC: hyper::ne
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Custom channel to retrieve.    
+    /// Custom channel to retrieve.
     pub fn custom_channel_id(mut self, new_value: &str) -> AccountCustomchannelGetCall<'a, C, NC, A> {
         self._custom_channel_id = new_value.to_string();
         self
@@ -3503,7 +3563,7 @@ impl<'a, C, NC, A> AccountCustomchannelGetCall<'a, C, NC, A> where NC: hyper::ne
 /// List all custom channels in the specified ad client for this Ad Exchange account.
 ///
 /// A builder for the *customchannels.list* method supported by a *account* resource.
-/// It is not used directly, but through a `AccountMethods`.
+/// It is not used directly, but through a `AccountMethods` instance.
 ///
 /// # Example
 ///
@@ -3573,7 +3633,7 @@ impl<'a, C, NC, A> AccountCustomchannelListCall<'a, C, NC, A> where NC: hyper::n
         for &field in ["alt", "accountId", "adClientId", "pageToken", "maxResults"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -3626,7 +3686,7 @@ impl<'a, C, NC, A> AccountCustomchannelListCall<'a, C, NC, A> where NC: hyper::n
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -3638,7 +3698,6 @@ impl<'a, C, NC, A> AccountCustomchannelListCall<'a, C, NC, A> where NC: hyper::n
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -3648,7 +3707,7 @@ impl<'a, C, NC, A> AccountCustomchannelListCall<'a, C, NC, A> where NC: hyper::n
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -3659,7 +3718,7 @@ impl<'a, C, NC, A> AccountCustomchannelListCall<'a, C, NC, A> where NC: hyper::n
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -3668,13 +3727,13 @@ impl<'a, C, NC, A> AccountCustomchannelListCall<'a, C, NC, A> where NC: hyper::n
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -3686,7 +3745,7 @@ impl<'a, C, NC, A> AccountCustomchannelListCall<'a, C, NC, A> where NC: hyper::n
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Account to which the ad client belongs.    
+    /// Account to which the ad client belongs.
     pub fn account_id(mut self, new_value: &str) -> AccountCustomchannelListCall<'a, C, NC, A> {
         self._account_id = new_value.to_string();
         self
@@ -3696,7 +3755,7 @@ impl<'a, C, NC, A> AccountCustomchannelListCall<'a, C, NC, A> where NC: hyper::n
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Ad client for which to list custom channels.    
+    /// Ad client for which to list custom channels.
     pub fn ad_client_id(mut self, new_value: &str) -> AccountCustomchannelListCall<'a, C, NC, A> {
         self._ad_client_id = new_value.to_string();
         self
@@ -3704,7 +3763,7 @@ impl<'a, C, NC, A> AccountCustomchannelListCall<'a, C, NC, A> where NC: hyper::n
     /// Sets the *page token* query property to the given value.
     ///
     /// 
-    /// A continuation token, used to page through custom channels. To retrieve the next page, set this parameter to the value of "nextPageToken" from the previous response.    
+    /// A continuation token, used to page through custom channels. To retrieve the next page, set this parameter to the value of "nextPageToken" from the previous response.
     pub fn page_token(mut self, new_value: &str) -> AccountCustomchannelListCall<'a, C, NC, A> {
         self._page_token = Some(new_value.to_string());
         self
@@ -3712,7 +3771,7 @@ impl<'a, C, NC, A> AccountCustomchannelListCall<'a, C, NC, A> where NC: hyper::n
     /// Sets the *max results* query property to the given value.
     ///
     /// 
-    /// The maximum number of custom channels to include in the response, used for paging.    
+    /// The maximum number of custom channels to include in the response, used for paging.
     pub fn max_results(mut self, new_value: u32) -> AccountCustomchannelListCall<'a, C, NC, A> {
         self._max_results = Some(new_value);
         self
@@ -3773,7 +3832,7 @@ impl<'a, C, NC, A> AccountCustomchannelListCall<'a, C, NC, A> where NC: hyper::n
 /// List all accounts available to this Ad Exchange account.
 ///
 /// A builder for the *list* method supported by a *account* resource.
-/// It is not used directly, but through a `AccountMethods`.
+/// It is not used directly, but through a `AccountMethods` instance.
 ///
 /// # Example
 ///
@@ -3839,7 +3898,7 @@ impl<'a, C, NC, A> AccountListCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
         for &field in ["alt", "pageToken", "maxResults"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -3868,7 +3927,7 @@ impl<'a, C, NC, A> AccountListCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -3880,7 +3939,6 @@ impl<'a, C, NC, A> AccountListCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -3890,7 +3948,7 @@ impl<'a, C, NC, A> AccountListCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -3901,7 +3959,7 @@ impl<'a, C, NC, A> AccountListCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -3910,13 +3968,13 @@ impl<'a, C, NC, A> AccountListCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -3926,7 +3984,7 @@ impl<'a, C, NC, A> AccountListCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// Sets the *page token* query property to the given value.
     ///
     /// 
-    /// A continuation token, used to page through accounts. To retrieve the next page, set this parameter to the value of "nextPageToken" from the previous response.    
+    /// A continuation token, used to page through accounts. To retrieve the next page, set this parameter to the value of "nextPageToken" from the previous response.
     pub fn page_token(mut self, new_value: &str) -> AccountListCall<'a, C, NC, A> {
         self._page_token = Some(new_value.to_string());
         self
@@ -3934,7 +3992,7 @@ impl<'a, C, NC, A> AccountListCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// Sets the *max results* query property to the given value.
     ///
     /// 
-    /// The maximum number of accounts to include in the response, used for paging.    
+    /// The maximum number of accounts to include in the response, used for paging.
     pub fn max_results(mut self, new_value: i32) -> AccountListCall<'a, C, NC, A> {
         self._max_results = Some(new_value);
         self
@@ -3995,7 +4053,7 @@ impl<'a, C, NC, A> AccountListCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
 /// List the alerts for this Ad Exchange account.
 ///
 /// A builder for the *alerts.list* method supported by a *account* resource.
-/// It is not used directly, but through a `AccountMethods`.
+/// It is not used directly, but through a `AccountMethods` instance.
 ///
 /// # Example
 ///
@@ -4058,7 +4116,7 @@ impl<'a, C, NC, A> AccountAlertListCall<'a, C, NC, A> where NC: hyper::net::Netw
         for &field in ["alt", "accountId", "locale"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -4111,7 +4169,7 @@ impl<'a, C, NC, A> AccountAlertListCall<'a, C, NC, A> where NC: hyper::net::Netw
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -4123,7 +4181,6 @@ impl<'a, C, NC, A> AccountAlertListCall<'a, C, NC, A> where NC: hyper::net::Netw
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -4133,7 +4190,7 @@ impl<'a, C, NC, A> AccountAlertListCall<'a, C, NC, A> where NC: hyper::net::Netw
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -4144,7 +4201,7 @@ impl<'a, C, NC, A> AccountAlertListCall<'a, C, NC, A> where NC: hyper::net::Netw
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -4153,13 +4210,13 @@ impl<'a, C, NC, A> AccountAlertListCall<'a, C, NC, A> where NC: hyper::net::Netw
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -4171,7 +4228,7 @@ impl<'a, C, NC, A> AccountAlertListCall<'a, C, NC, A> where NC: hyper::net::Netw
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Account owning the alerts.    
+    /// Account owning the alerts.
     pub fn account_id(mut self, new_value: &str) -> AccountAlertListCall<'a, C, NC, A> {
         self._account_id = new_value.to_string();
         self
@@ -4179,7 +4236,7 @@ impl<'a, C, NC, A> AccountAlertListCall<'a, C, NC, A> where NC: hyper::net::Netw
     /// Sets the *locale* query property to the given value.
     ///
     /// 
-    /// The locale to use for translating alert messages. The account locale will be used if this is not supplied. The AdSense default (English) will be used if the supplied locale is invalid or unsupported.    
+    /// The locale to use for translating alert messages. The account locale will be used if this is not supplied. The AdSense default (English) will be used if the supplied locale is invalid or unsupported.
     pub fn locale(mut self, new_value: &str) -> AccountAlertListCall<'a, C, NC, A> {
         self._locale = Some(new_value.to_string());
         self
@@ -4240,7 +4297,7 @@ impl<'a, C, NC, A> AccountAlertListCall<'a, C, NC, A> where NC: hyper::net::Netw
 /// List the preferred deals for this Ad Exchange account.
 ///
 /// A builder for the *preferreddeals.list* method supported by a *account* resource.
-/// It is not used directly, but through a `AccountMethods`.
+/// It is not used directly, but through a `AccountMethods` instance.
 ///
 /// # Example
 ///
@@ -4298,7 +4355,7 @@ impl<'a, C, NC, A> AccountPreferreddealListCall<'a, C, NC, A> where NC: hyper::n
         for &field in ["alt", "accountId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -4351,7 +4408,7 @@ impl<'a, C, NC, A> AccountPreferreddealListCall<'a, C, NC, A> where NC: hyper::n
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -4363,7 +4420,6 @@ impl<'a, C, NC, A> AccountPreferreddealListCall<'a, C, NC, A> where NC: hyper::n
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -4373,7 +4429,7 @@ impl<'a, C, NC, A> AccountPreferreddealListCall<'a, C, NC, A> where NC: hyper::n
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -4384,7 +4440,7 @@ impl<'a, C, NC, A> AccountPreferreddealListCall<'a, C, NC, A> where NC: hyper::n
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -4393,13 +4449,13 @@ impl<'a, C, NC, A> AccountPreferreddealListCall<'a, C, NC, A> where NC: hyper::n
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -4411,7 +4467,7 @@ impl<'a, C, NC, A> AccountPreferreddealListCall<'a, C, NC, A> where NC: hyper::n
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Account owning the deals.    
+    /// Account owning the deals.
     pub fn account_id(mut self, new_value: &str) -> AccountPreferreddealListCall<'a, C, NC, A> {
         self._account_id = new_value.to_string();
         self
@@ -4472,7 +4528,7 @@ impl<'a, C, NC, A> AccountPreferreddealListCall<'a, C, NC, A> where NC: hyper::n
 /// Get information about the selected Ad Exchange account.
 ///
 /// A builder for the *get* method supported by a *account* resource.
-/// It is not used directly, but through a `AccountMethods`.
+/// It is not used directly, but through a `AccountMethods` instance.
 ///
 /// # Example
 ///
@@ -4530,7 +4586,7 @@ impl<'a, C, NC, A> AccountGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
         for &field in ["alt", "accountId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -4583,7 +4639,7 @@ impl<'a, C, NC, A> AccountGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -4595,7 +4651,6 @@ impl<'a, C, NC, A> AccountGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -4605,7 +4660,7 @@ impl<'a, C, NC, A> AccountGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -4616,7 +4671,7 @@ impl<'a, C, NC, A> AccountGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -4625,13 +4680,13 @@ impl<'a, C, NC, A> AccountGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -4643,7 +4698,7 @@ impl<'a, C, NC, A> AccountGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Account to get information about. Tip: 'myaccount' is a valid ID.    
+    /// Account to get information about. Tip: 'myaccount' is a valid ID.
     pub fn account_id(mut self, new_value: &str) -> AccountGetCall<'a, C, NC, A> {
         self._account_id = new_value.to_string();
         self

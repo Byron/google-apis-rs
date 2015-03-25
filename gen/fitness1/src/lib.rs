@@ -1,8 +1,8 @@
 // DO NOT EDIT !
-// This file was generated automatically from 'src/mako/lib.rs.mako'
+// This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *fitness* crate version *0.1.1+20150222*, where *20150222* is the exact revision of the *fitness:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.1*.
+//! This documentation was generated from *fitness* crate version *0.1.2+20150222*, where *20150222* is the exact revision of the *fitness:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.2*.
 //! 
 //! Everything else about the *fitness* *v1* API can be found at the
 //! [official documentation site](https://developers.google.com/fit/rest/).
@@ -25,6 +25,8 @@
 //! 
 //! * **[Hub](struct.Fitness.html)**
 //!     * a central object to maintain state and allow accessing all *Activities*
+//!     * creates [*Method Builders*](trait.MethodsBuilder.html) which in turn
+//!       allow access to individual [*Call Builders*](trait.CallBuilder.html)
 //! * **[Resources](trait.Resource.html)**
 //!     * primary types that you can apply *Activities* to
 //!     * a collection of properties and *Parts*
@@ -33,6 +35,8 @@
 //!         * never directly used in *Activities*
 //! * **[Activities](trait.CallBuilder.html)**
 //!     * operations to apply to *Resources*
+//! 
+//! All *structures* are marked with applicable traits to further categorize them and ease browsing.
 //! 
 //! Generally speaking, you can invoke *Activities* like this:
 //! 
@@ -72,7 +76,7 @@
 //! extern crate "yup-oauth2" as oauth2;
 //! extern crate "google-fitness1" as fitness1;
 //! use fitness1::DataSource;
-//! use fitness1::Result;
+//! use fitness1::{Result, Error};
 //! # #[test] fn egal() {
 //! use std::default::Default;
 //! use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -102,15 +106,17 @@
 //!              .doit();
 //! 
 //! match result {
-//!     Result::HttpError(err) => println!("HTTPERROR: {:?}", err),
-//!     Result::MissingAPIKey => println!("Auth: Missing API Key - used if there are no scopes"),
-//!     Result::MissingToken => println!("OAuth2: Missing Token"),
-//!     Result::Cancelled => println!("Operation cancelled by user"),
-//!     Result::UploadSizeLimitExceeded(size, max_size) => println!("Upload size too big: {} of {}", size, max_size),
-//!     Result::Failure(_) => println!("General Failure (hyper::client::Response doesn't print)"),
-//!     Result::FieldClash(clashed_field) => println!("You added custom parameter which is part of builder: {:?}", clashed_field),
-//!     Result::JsonDecodeError(err) => println!("Couldn't understand server reply - maybe API needs update: {:?}", err),
-//!     Result::Success(_) => println!("Success (value doesn't print)"),
+//!     Err(e) => match e {
+//!         Error::HttpError(err) => println!("HTTPERROR: {:?}", err),
+//!         Error::MissingAPIKey => println!("Auth: Missing API Key - used if there are no scopes"),
+//!         Error::MissingToken => println!("OAuth2: Missing Token"),
+//!         Error::Cancelled => println!("Operation canceled by user"),
+//!         Error::UploadSizeLimitExceeded(size, max_size) => println!("Upload size too big: {} of {}", size, max_size),
+//!         Error::Failure(_) => println!("General Failure (hyper::client::Response doesn't print)"),
+//!         Error::FieldClash(clashed_field) => println!("You added custom parameter which is part of builder: {:?}", clashed_field),
+//!         Error::JsonDecodeError(err) => println!("Couldn't understand server reply - maybe API needs update: {:?}", err),
+//!     },
+//!     Ok(_) => println!("Success (value doesn't print)"),
 //! }
 //! # }
 //! ```
@@ -123,7 +129,7 @@
 //! When delegates handle errors or intermediate values, they may have a chance to instruct the system to retry. This 
 //! makes the system potentially resilient to all kinds of errors.
 //! 
-//! ## Uploads and Downlods
+//! ## Uploads and Downloads
 //! If a method supports downloads, the response body, which is part of the [Result](enum.Result.html), should be
 //! read by you to obtain the media.
 //! If such a method also supports a [Response Result](trait.ResponseResult.html), it will return that by default.
@@ -146,8 +152,9 @@
 //! ## Optional Parts in Server-Requests
 //! 
 //! All structures provided by this library are made to be [enocodable](trait.RequestValue.html) and 
-//! [decodable](trait.ResponseResult.html) via json. Optionals are used to indicate that partial requests are responses are valid.
-//! Most optionals are are considered [Parts](trait.Part.html) which are identifyable by name, which will be sent to 
+//! [decodable](trait.ResponseResult.html) via *json*. Optionals are used to indicate that partial requests are responses 
+//! are valid.
+//! Most optionals are are considered [Parts](trait.Part.html) which are identifiable by name, which will be sent to 
 //! the server to indicate either the set parts of the request or the desired parts in the response.
 //! 
 //! ## Builder Arguments
@@ -196,7 +203,7 @@ use std::io;
 use std::fs;
 use std::thread::sleep;
 
-pub use cmn::{MultiPartReader, ToParts, MethodInfo, Result, CallBuilder, Hub, ReadSeek, Part, ResponseResult, RequestValue, NestedType, Delegate, DefaultDelegate, ResourceMethodsBuilder, Resource, JsonServerError};
+pub use cmn::{MultiPartReader, ToParts, MethodInfo, Result, Error, CallBuilder, Hub, ReadSeek, Part, ResponseResult, RequestValue, NestedType, Delegate, DefaultDelegate, MethodsBuilder, Resource, JsonServerError};
 
 
 // ##############
@@ -263,7 +270,7 @@ impl Default for Scope {
 /// extern crate "yup-oauth2" as oauth2;
 /// extern crate "google-fitness1" as fitness1;
 /// use fitness1::DataSource;
-/// use fitness1::Result;
+/// use fitness1::{Result, Error};
 /// # #[test] fn egal() {
 /// use std::default::Default;
 /// use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -293,15 +300,17 @@ impl Default for Scope {
 ///              .doit();
 /// 
 /// match result {
-///     Result::HttpError(err) => println!("HTTPERROR: {:?}", err),
-///     Result::MissingAPIKey => println!("Auth: Missing API Key - used if there are no scopes"),
-///     Result::MissingToken => println!("OAuth2: Missing Token"),
-///     Result::Cancelled => println!("Operation cancelled by user"),
-///     Result::UploadSizeLimitExceeded(size, max_size) => println!("Upload size too big: {} of {}", size, max_size),
-///     Result::Failure(_) => println!("General Failure (hyper::client::Response doesn't print)"),
-///     Result::FieldClash(clashed_field) => println!("You added custom parameter which is part of builder: {:?}", clashed_field),
-///     Result::JsonDecodeError(err) => println!("Couldn't understand server reply - maybe API needs update: {:?}", err),
-///     Result::Success(_) => println!("Success (value doesn't print)"),
+///     Err(e) => match e {
+///         Error::HttpError(err) => println!("HTTPERROR: {:?}", err),
+///         Error::MissingAPIKey => println!("Auth: Missing API Key - used if there are no scopes"),
+///         Error::MissingToken => println!("OAuth2: Missing Token"),
+///         Error::Cancelled => println!("Operation canceled by user"),
+///         Error::UploadSizeLimitExceeded(size, max_size) => println!("Upload size too big: {} of {}", size, max_size),
+///         Error::Failure(_) => println!("General Failure (hyper::client::Response doesn't print)"),
+///         Error::FieldClash(clashed_field) => println!("You added custom parameter which is part of builder: {:?}", clashed_field),
+///         Error::JsonDecodeError(err) => println!("Couldn't understand server reply - maybe API needs update: {:?}", err),
+///     },
+///     Ok(_) => println!("Success (value doesn't print)"),
 /// }
 /// # }
 /// ```
@@ -322,7 +331,7 @@ impl<'a, C, NC, A> Fitness<C, NC, A>
         Fitness {
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/0.1.1".to_string(),
+            _user_agent: "google-api-rust-client/0.1.2".to_string(),
             _m: PhantomData
         }
     }
@@ -332,7 +341,7 @@ impl<'a, C, NC, A> Fitness<C, NC, A>
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/0.1.1`.
+    /// It defaults to `google-api-rust-client/0.1.2`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -352,9 +361,9 @@ impl<'a, C, NC, A> Fitness<C, NC, A>
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct DataType {
-    /// A field represents one dimension of a data type.    
+    /// A field represents one dimension of a data type.
     pub field: Vec<DataTypeField>,
-    /// Each data type has a unique, namespaced, name. All data types in the com.google namespace are shared as part of the platform.    
+    /// Each data type has a unique, namespaced, name. All data types in the com.google namespace are shared as part of the platform.
     pub name: String,
 }
 
@@ -369,10 +378,10 @@ impl Part for DataType {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Value {
-    /// Floating point value. When this is set, intVal must not be set.    
+    /// Floating point value. When this is set, intVal must not be set.
     #[serde(alias="fpVal")]
     pub fp_val: f64,
-    /// Integer value. When this is set, fpVal must not be set.    
+    /// Integer value. When this is set, fpVal must not be set.
     #[serde(alias="intVal")]
     pub int_val: i32,
 }
@@ -392,19 +401,19 @@ impl Part for Value {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Dataset {
-    /// The smallest start time of all data points in this possibly partial representation of the dataset. Time is in nanoseconds from epoch. This should also match the first part of the dataset identifier.    
+    /// The smallest start time of all data points in this possibly partial representation of the dataset. Time is in nanoseconds from epoch. This should also match the first part of the dataset identifier.
     #[serde(alias="minStartTimeNs")]
     pub min_start_time_ns: Option<String>,
-    /// This token will be set when a dataset is received in response to a GET request and the dataset is too large to be included in a single response. Provide this value in a subsequent GET request to return the next page of data points within this dataset.    
+    /// This token will be set when a dataset is received in response to a GET request and the dataset is too large to be included in a single response. Provide this value in a subsequent GET request to return the next page of data points within this dataset.
     #[serde(alias="nextPageToken")]
     pub next_page_token: Option<String>,
-    /// The largest end time of all data points in this possibly partial representation of the dataset. Time is in nanoseconds from epoch. This should also match the first part of the dataset identifier.    
+    /// The largest end time of all data points in this possibly partial representation of the dataset. Time is in nanoseconds from epoch. This should also match the first part of the dataset identifier.
     #[serde(alias="maxEndTimeNs")]
     pub max_end_time_ns: Option<String>,
-    /// The data stream ID of the data source that created the points in this dataset.    
+    /// The data stream ID of the data source that created the points in this dataset.
     #[serde(alias="dataSourceId")]
     pub data_source_id: Option<String>,
-    /// A partial list of data points contained in the dataset, ordered by largest endTimeNanos first. This list is considered complete when retrieving a small dataset and partial when patching a dataset or retrieving a dataset that is too large to include in a single response.    
+    /// A partial list of data points contained in the dataset, ordered by largest endTimeNanos first. This list is considered complete when retrieving a small dataset and partial when patching a dataset or retrieving a dataset that is too large to include in a single response.
     pub point: Option<Vec<DataPoint>>,
 }
 
@@ -423,7 +432,7 @@ impl ResponseResult for Dataset {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct ListDataSourcesResponse {
-    /// A previously created data source.    
+    /// A previously created data source.
     #[serde(alias="dataSource")]
     pub data_source: Vec<DataSource>,
 }
@@ -437,14 +446,14 @@ impl ResponseResult for ListDataSourcesResponse {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Application {
-    /// Package name for this application. This is used as a unique identifier when created by Android applications, but cannot be specified by REST clients. REST clients will have their developer project number reflected into the Data Source data stream IDs, instead of the packageName.    
+    /// Package name for this application. This is used as a unique identifier when created by Android applications, but cannot be specified by REST clients. REST clients will have their developer project number reflected into the Data Source data stream IDs, instead of the packageName.
     #[serde(alias="packageName")]
     pub package_name: String,
-    /// Version of the application. You should update this field whenever the application changes in a way that affects the computation of the data.    
+    /// Version of the application. You should update this field whenever the application changes in a way that affects the computation of the data.
     pub version: String,
-    /// The name of this application. This is required for REST clients, but we do not enforce uniqueness of this name. It is provided as a matter of convenience for other developers who would like to identify which REST created an Application or Data Source.    
+    /// The name of this application. This is required for REST clients, but we do not enforce uniqueness of this name. It is provided as a matter of convenience for other developers who would like to identify which REST created an Application or Data Source.
     pub name: String,
-    /// An optional URI that can be used to link back to the application.    
+    /// An optional URI that can be used to link back to the application.
     #[serde(alias="detailsUrl")]
     pub details_url: String,
 }
@@ -463,25 +472,25 @@ impl Part for Application {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Session {
-    /// A timestamp that indicates when the session was last modified.    
+    /// A timestamp that indicates when the session was last modified.
     #[serde(alias="modifiedTimeMillis")]
     pub modified_time_millis: Option<String>,
-    /// An end time, in milliseconds since epoch, inclusive.    
+    /// An end time, in milliseconds since epoch, inclusive.
     #[serde(alias="endTimeMillis")]
     pub end_time_millis: Option<String>,
-    /// A description for this session.    
+    /// A description for this session.
     pub description: Option<String>,
-    /// The type of activity this session represents.    
+    /// The type of activity this session represents.
     #[serde(alias="activityType")]
     pub activity_type: Option<i32>,
-    /// The application that created the session.    
+    /// The application that created the session.
     pub application: Option<Application>,
-    /// A start time, in milliseconds since epoch, inclusive.    
+    /// A start time, in milliseconds since epoch, inclusive.
     #[serde(alias="startTimeMillis")]
     pub start_time_millis: Option<String>,
-    /// A client-generated identifier that is unique across all sessions owned by this particular user.    
+    /// A client-generated identifier that is unique across all sessions owned by this particular user.
     pub id: Option<String>,
-    /// A human readable name of the session.    
+    /// A human readable name of the session.
     pub name: Option<String>,
 }
 
@@ -500,13 +509,13 @@ impl ResponseResult for Session {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct ListSessionsResponse {
-    /// The continuation token, which is used to page through large result sets. Provide this value in a subsequent request to return the next page of results.    
+    /// The continuation token, which is used to page through large result sets. Provide this value in a subsequent request to return the next page of results.
     #[serde(alias="nextPageToken")]
     pub next_page_token: String,
-    /// If includeDeleted is set to true in the request, this list will contain sessions deleted with original end times that are within the startTime and endTime frame.    
+    /// If includeDeleted is set to true in the request, this list will contain sessions deleted with original end times that are within the startTime and endTime frame.
     #[serde(alias="deletedSession")]
     pub deleted_session: Vec<Session>,
-    /// Sessions with an end time that is between startTime and endTime of the request.    
+    /// Sessions with an end time that is between startTime and endTime of the request.
     pub session: Vec<Session>,
 }
 
@@ -525,16 +534,16 @@ impl ResponseResult for ListSessionsResponse {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Device {
-    /// End-user visible model name for the device.    
+    /// End-user visible model name for the device.
     pub model: String,
-    /// Version string for the device hardware/software.    
+    /// Version string for the device hardware/software.
     pub version: String,
-    /// A constant representing the type of the device.    
+    /// A constant representing the type of the device.
     #[serde(alias="type")]
     pub type_: String,
-    /// The serial number or other unique ID for the hardware. This field is obfuscated when read by any REST or Android client that did not create the data source. Only the data source creator will see the uid field in clear and normal form.    
+    /// The serial number or other unique ID for the hardware. This field is obfuscated when read by any REST or Android client that did not create the data source. Only the data source creator will see the uid field in clear and normal form.
     pub uid: String,
-    /// Manufacturer of the product/hardware.    
+    /// Manufacturer of the product/hardware.
     pub manufacturer: String,
 }
 
@@ -549,11 +558,11 @@ impl Part for Device {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct DataTypeField {
-    /// no description provided    
+    /// no description provided
     pub optional: bool,
-    /// Defines the name and format of data. Unlike data type names, field names are not namespaced, and only need to be unique within the data type.    
+    /// Defines the name and format of data. Unlike data type names, field names are not namespaced, and only need to be unique within the data type.
     pub name: String,
-    /// The different supported formats for each field in a data type.    
+    /// The different supported formats for each field in a data type.
     pub format: String,
 }
 
@@ -570,29 +579,29 @@ impl Part for DataTypeField {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct DataPoint {
-    /// Used for version checking during transformation; that is, a datapoint can only replace another datapoint that has an older computation time stamp.    
+    /// Used for version checking during transformation; that is, a datapoint can only replace another datapoint that has an older computation time stamp.
     #[serde(alias="computationTimeMillis")]
     pub computation_time_millis: String,
-    /// Indicates the last time this data point was modified. Useful only in contexts where we are listing the data changes, rather than representing the current state of the data.    
+    /// Indicates the last time this data point was modified. Useful only in contexts where we are listing the data changes, rather than representing the current state of the data.
     #[serde(alias="modifiedTimeMillis")]
     pub modified_time_millis: String,
-    /// The start time of the interval represented by this data point, in nanoseconds since epoch.    
+    /// The start time of the interval represented by this data point, in nanoseconds since epoch.
     #[serde(alias="startTimeNanos")]
     pub start_time_nanos: String,
-    /// The data type defining the format of the values in this data point.    
+    /// The data type defining the format of the values in this data point.
     #[serde(alias="dataTypeName")]
     pub data_type_name: String,
     /// Values of each data type field for the data point. It is expected that each value corresponding to a data type field will occur in the same order that the field is listed with in the data type specified in a data source.
     /// 
     /// Only one of integer and floating point fields will be populated, depending on the format enum value within data source's type field.
     pub value: Vec<Value>,
-    /// The end time of the interval represented by this data point, in nanoseconds since epoch.    
+    /// The end time of the interval represented by this data point, in nanoseconds since epoch.
     #[serde(alias="endTimeNanos")]
     pub end_time_nanos: String,
-    /// If the data point is contained in a dataset for a derived data source, this field will be populated with the data source stream ID that created the data point originally.    
+    /// If the data point is contained in a dataset for a derived data source, this field will be populated with the data source stream ID that created the data point originally.
     #[serde(alias="originDataSourceId")]
     pub origin_data_source_id: String,
-    /// The raw timestamp from the original SensorEvent.    
+    /// The raw timestamp from the original SensorEvent.
     #[serde(alias="rawTimestampNanos")]
     pub raw_timestamp_nanos: String,
 }
@@ -618,16 +627,16 @@ impl Part for DataPoint {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct DataSource {
-    /// Information about an application which feeds sensor data into the platform.    
+    /// Information about an application which feeds sensor data into the platform.
     pub application: Option<Application>,
-    /// Representation of an integrated device (such as a phone or a wearable) that can hold sensors.    
+    /// Representation of an integrated device (such as a phone or a wearable) that can hold sensors.
     pub device: Option<Device>,
-    /// An end-user visible name for this data source.    
+    /// An end-user visible name for this data source.
     pub name: Option<String>,
-    /// The stream name uniquely identifies this particular data source among other data sources of the same type from the same underlying producer. Setting the stream name is optional, but should be done whenever an application exposes two streams for the same data type, or when a device has two equivalent sensors.    
+    /// The stream name uniquely identifies this particular data source among other data sources of the same type from the same underlying producer. Setting the stream name is optional, but should be done whenever an application exposes two streams for the same data type, or when a device has two equivalent sensors.
     #[serde(alias="dataStreamName")]
     pub data_stream_name: Option<String>,
-    /// The data type defines the schema for a stream of data being collected by, inserted into, or queried from the Fitness API.    
+    /// The data type defines the schema for a stream of data being collected by, inserted into, or queried from the Fitness API.
     #[serde(alias="dataType")]
     pub data_type: Option<DataType>,
     /// A unique identifier for the data stream produced by this data source. The identifier includes:
@@ -647,7 +656,7 @@ pub struct DataSource {
     /// Finally, the developer project number is obfuscated when read by any REST or Android client that did not create the data source. Only the data source creator will see the developer project number in clear and normal form.
     #[serde(alias="dataStreamId")]
     pub data_stream_id: Option<String>,
-    /// A constant describing the type of this data source. Indicates whether this data source produces raw or derived data.    
+    /// A constant describing the type of this data source. Indicates whether this data source produces raw or derived data.
     #[serde(alias="type")]
     pub type_: Option<String>,
 }
@@ -695,13 +704,19 @@ pub struct UserMethods<'a, C, NC, A>
     hub: &'a Fitness<C, NC, A>,
 }
 
-impl<'a, C, NC, A> ResourceMethodsBuilder for UserMethods<'a, C, NC, A> {}
+impl<'a, C, NC, A> MethodsBuilder for UserMethods<'a, C, NC, A> {}
 
 impl<'a, C, NC, A> UserMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Returns a dataset containing all data points whose start and end times overlap with the specified range of the dataset minimum start time and maximum end time. Specifically, any data point whose start time is less than or equal to the dataset end time and whose end time is greater than or equal to the dataset start time.    
+    /// Returns a dataset containing all data points whose start and end times overlap with the specified range of the dataset minimum start time and maximum end time. Specifically, any data point whose start time is less than or equal to the dataset end time and whose end time is greater than or equal to the dataset start time.
+    /// 
+    /// # Arguments
+    ///
+    /// * `userId` - Retrieve a dataset for the person identified. Use me to indicate the authenticated user. Only me is supported at this time.
+    /// * `dataSourceId` - The data stream ID of the data source that created the dataset.
+    /// * `datasetId` - Dataset identifier that is a composite of the minimum data point start time and maximum data point end time represented as nanoseconds from the epoch. The ID is formatted like: "startTime-endTime" where startTime and endTime are 64 bit integers.
     pub fn data_sources_datasets_get(&self, user_id: &str, data_source_id: &str, dataset_id: &str) -> UserDataSourceDatasetGetCall<'a, C, NC, A> {
         UserDataSourceDatasetGetCall {
             hub: self.hub,
@@ -718,7 +733,12 @@ impl<'a, C, NC, A> UserMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Creates a new data source that is unique across all data sources belonging to this user. The data stream ID field can be omitted and will be generated by the server with the correct format. The data stream ID is an ordered combination of some fields from the data source. In addition to the data source fields reflected into the data source ID, the developer project number that is authenticated when creating the data source is included. This developer project number is obfuscated when read by any other developer reading public data types.    
+    /// Creates a new data source that is unique across all data sources belonging to this user. The data stream ID field can be omitted and will be generated by the server with the correct format. The data stream ID is an ordered combination of some fields from the data source. In addition to the data source fields reflected into the data source ID, the developer project number that is authenticated when creating the data source is included. This developer project number is obfuscated when read by any other developer reading public data types.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `userId` - Create the data source for the person identified. Use me to indicate the authenticated user. Only me is supported at this time.
     pub fn data_sources_create(&self, request: &DataSource, user_id: &str) -> UserDataSourceCreateCall<'a, C, NC, A> {
         UserDataSourceCreateCall {
             hub: self.hub,
@@ -732,7 +752,13 @@ impl<'a, C, NC, A> UserMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Performs an inclusive delete of all data points whose start and end times have any overlap with the time range specified by the dataset ID. For most data types, the entire data point will be deleted. For data types where the time span represents a consistent value (such as com.google.activity.segment), and a data point straddles either end point of the dataset, only the overlapping portion of the data point will be deleted.    
+    /// Performs an inclusive delete of all data points whose start and end times have any overlap with the time range specified by the dataset ID. For most data types, the entire data point will be deleted. For data types where the time span represents a consistent value (such as com.google.activity.segment), and a data point straddles either end point of the dataset, only the overlapping portion of the data point will be deleted.
+    /// 
+    /// # Arguments
+    ///
+    /// * `userId` - Delete a dataset for the person identified. Use me to indicate the authenticated user. Only me is supported at this time.
+    /// * `dataSourceId` - The data stream ID of the data source that created the dataset.
+    /// * `datasetId` - Dataset identifier that is a composite of the minimum data point start time and maximum data point end time represented as nanoseconds from the epoch. The ID is formatted like: "startTime-endTime" where startTime and endTime are 64 bit integers.
     pub fn data_sources_datasets_delete(&self, user_id: &str, data_source_id: &str, dataset_id: &str) -> UserDataSourceDatasetDeleteCall<'a, C, NC, A> {
         UserDataSourceDatasetDeleteCall {
             hub: self.hub,
@@ -749,7 +775,14 @@ impl<'a, C, NC, A> UserMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Adds data points to a dataset. The dataset need not be previously created. All points within the given dataset will be returned with subsquent calls to retrieve this dataset. Data points can belong to more than one dataset. This method does not use patch semantics.    
+    /// Adds data points to a dataset. The dataset need not be previously created. All points within the given dataset will be returned with subsquent calls to retrieve this dataset. Data points can belong to more than one dataset. This method does not use patch semantics.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `userId` - Patch a dataset for the person identified. Use me to indicate the authenticated user. Only me is supported at this time.
+    /// * `dataSourceId` - The data stream ID of the data source that created the dataset.
+    /// * `datasetId` - Dataset identifier that is a composite of the minimum data point start time and maximum data point end time represented as nanoseconds from the epoch. The ID is formatted like: "startTime-endTime" where startTime and endTime are 64 bit integers.
     pub fn data_sources_datasets_patch(&self, request: &Dataset, user_id: &str, data_source_id: &str, dataset_id: &str) -> UserDataSourceDatasetPatchCall<'a, C, NC, A> {
         UserDataSourceDatasetPatchCall {
             hub: self.hub,
@@ -766,7 +799,12 @@ impl<'a, C, NC, A> UserMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Deletes a session specified by the given session ID.    
+    /// Deletes a session specified by the given session ID.
+    /// 
+    /// # Arguments
+    ///
+    /// * `userId` - Delete a session for the person identified. Use me to indicate the authenticated user. Only me is supported at this time.
+    /// * `sessionId` - The ID of the session to be deleted.
     pub fn sessions_delete(&self, user_id: &str, session_id: &str) -> UserSessionDeleteCall<'a, C, NC, A> {
         UserSessionDeleteCall {
             hub: self.hub,
@@ -781,7 +819,12 @@ impl<'a, C, NC, A> UserMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Returns a data source identified by a data stream ID.    
+    /// Returns a data source identified by a data stream ID.
+    /// 
+    /// # Arguments
+    ///
+    /// * `userId` - Retrieve a data source for the person identified. Use me to indicate the authenticated user. Only me is supported at this time.
+    /// * `dataSourceId` - The data stream ID of the data source to retrieve.
     pub fn data_sources_get(&self, user_id: &str, data_source_id: &str) -> UserDataSourceGetCall<'a, C, NC, A> {
         UserDataSourceGetCall {
             hub: self.hub,
@@ -798,6 +841,12 @@ impl<'a, C, NC, A> UserMethods<'a, C, NC, A> {
     /// Updates a given data source. It is an error to modify the data source's data stream ID, data type, type, stream name or device information apart from the device version. Changing these fields would require a new unique data stream ID and separate data source.
     /// 
     /// Data sources are identified by their data stream ID.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `userId` - Update the data source for the person identified. Use me to indicate the authenticated user. Only me is supported at this time.
+    /// * `dataSourceId` - The data stream ID of the data source to update.
     pub fn data_sources_update(&self, request: &DataSource, user_id: &str, data_source_id: &str) -> UserDataSourceUpdateCall<'a, C, NC, A> {
         UserDataSourceUpdateCall {
             hub: self.hub,
@@ -812,7 +861,11 @@ impl<'a, C, NC, A> UserMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Lists sessions previously created.    
+    /// Lists sessions previously created.
+    /// 
+    /// # Arguments
+    ///
+    /// * `userId` - List sessions for the person identified. Use me to indicate the authenticated user. Only me is supported at this time.
     pub fn sessions_list(&self, user_id: &str) -> UserSessionListCall<'a, C, NC, A> {
         UserSessionListCall {
             hub: self.hub,
@@ -829,7 +882,13 @@ impl<'a, C, NC, A> UserMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Updates or insert a given session.    
+    /// Updates or insert a given session.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `userId` - Create sessions for the person identified. Use me to indicate the authenticated user. Only me is supported at this time.
+    /// * `sessionId` - The ID of the session to be created.
     pub fn sessions_update(&self, request: &Session, user_id: &str, session_id: &str) -> UserSessionUpdateCall<'a, C, NC, A> {
         UserSessionUpdateCall {
             hub: self.hub,
@@ -848,6 +907,12 @@ impl<'a, C, NC, A> UserMethods<'a, C, NC, A> {
     /// Updates a given data source. It is an error to modify the data source's data stream ID, data type, type, stream name or device information apart from the device version. Changing these fields would require a new unique data stream ID and separate data source.
     /// 
     /// Data sources are identified by their data stream ID. This method supports patch semantics.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `userId` - Update the data source for the person identified. Use me to indicate the authenticated user. Only me is supported at this time.
+    /// * `dataSourceId` - The data stream ID of the data source to update.
     pub fn data_sources_patch(&self, request: &DataSource, user_id: &str, data_source_id: &str) -> UserDataSourcePatchCall<'a, C, NC, A> {
         UserDataSourcePatchCall {
             hub: self.hub,
@@ -862,7 +927,11 @@ impl<'a, C, NC, A> UserMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Lists all data sources that are visible to the developer, using the OAuth scopes provided. The list is not exhaustive: the user may have private data sources that are only visible to other developers or calls using other scopes.    
+    /// Lists all data sources that are visible to the developer, using the OAuth scopes provided. The list is not exhaustive: the user may have private data sources that are only visible to other developers or calls using other scopes.
+    /// 
+    /// # Arguments
+    ///
+    /// * `userId` - List data sources for the person identified. Use me to indicate the authenticated user. Only me is supported at this time.
     pub fn data_sources_list(&self, user_id: &str) -> UserDataSourceListCall<'a, C, NC, A> {
         UserDataSourceListCall {
             hub: self.hub,
@@ -886,7 +955,7 @@ impl<'a, C, NC, A> UserMethods<'a, C, NC, A> {
 /// Returns a dataset containing all data points whose start and end times overlap with the specified range of the dataset minimum start time and maximum end time. Specifically, any data point whose start time is less than or equal to the dataset end time and whose end time is greater than or equal to the dataset start time.
 ///
 /// A builder for the *dataSources.datasets.get* method supported by a *user* resource.
-/// It is not used directly, but through a `UserMethods`.
+/// It is not used directly, but through a `UserMethods` instance.
 ///
 /// # Example
 ///
@@ -958,7 +1027,7 @@ impl<'a, C, NC, A> UserDataSourceDatasetGetCall<'a, C, NC, A> where NC: hyper::n
         for &field in ["alt", "userId", "dataSourceId", "datasetId", "pageToken", "limit"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -1011,7 +1080,7 @@ impl<'a, C, NC, A> UserDataSourceDatasetGetCall<'a, C, NC, A> where NC: hyper::n
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -1023,7 +1092,6 @@ impl<'a, C, NC, A> UserDataSourceDatasetGetCall<'a, C, NC, A> where NC: hyper::n
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -1033,7 +1101,7 @@ impl<'a, C, NC, A> UserDataSourceDatasetGetCall<'a, C, NC, A> where NC: hyper::n
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -1044,7 +1112,7 @@ impl<'a, C, NC, A> UserDataSourceDatasetGetCall<'a, C, NC, A> where NC: hyper::n
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -1053,13 +1121,13 @@ impl<'a, C, NC, A> UserDataSourceDatasetGetCall<'a, C, NC, A> where NC: hyper::n
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -1071,7 +1139,7 @@ impl<'a, C, NC, A> UserDataSourceDatasetGetCall<'a, C, NC, A> where NC: hyper::n
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Retrieve a dataset for the person identified. Use me to indicate the authenticated user. Only me is supported at this time.    
+    /// Retrieve a dataset for the person identified. Use me to indicate the authenticated user. Only me is supported at this time.
     pub fn user_id(mut self, new_value: &str) -> UserDataSourceDatasetGetCall<'a, C, NC, A> {
         self._user_id = new_value.to_string();
         self
@@ -1081,7 +1149,7 @@ impl<'a, C, NC, A> UserDataSourceDatasetGetCall<'a, C, NC, A> where NC: hyper::n
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The data stream ID of the data source that created the dataset.    
+    /// The data stream ID of the data source that created the dataset.
     pub fn data_source_id(mut self, new_value: &str) -> UserDataSourceDatasetGetCall<'a, C, NC, A> {
         self._data_source_id = new_value.to_string();
         self
@@ -1091,7 +1159,7 @@ impl<'a, C, NC, A> UserDataSourceDatasetGetCall<'a, C, NC, A> where NC: hyper::n
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Dataset identifier that is a composite of the minimum data point start time and maximum data point end time represented as nanoseconds from the epoch. The ID is formatted like: "startTime-endTime" where startTime and endTime are 64 bit integers.    
+    /// Dataset identifier that is a composite of the minimum data point start time and maximum data point end time represented as nanoseconds from the epoch. The ID is formatted like: "startTime-endTime" where startTime and endTime are 64 bit integers.
     pub fn dataset_id(mut self, new_value: &str) -> UserDataSourceDatasetGetCall<'a, C, NC, A> {
         self._dataset_id = new_value.to_string();
         self
@@ -1099,7 +1167,7 @@ impl<'a, C, NC, A> UserDataSourceDatasetGetCall<'a, C, NC, A> where NC: hyper::n
     /// Sets the *page token* query property to the given value.
     ///
     /// 
-    /// The continuation token, which is used to page through large datasets. To get the next page of a dataset, set this parameter to the value of nextPageToken from the previous response. Each subsequent call will yield a partial dataset with data point end timestamps that are strictly smaller than those in the previous partial response.    
+    /// The continuation token, which is used to page through large datasets. To get the next page of a dataset, set this parameter to the value of nextPageToken from the previous response. Each subsequent call will yield a partial dataset with data point end timestamps that are strictly smaller than those in the previous partial response.
     pub fn page_token(mut self, new_value: &str) -> UserDataSourceDatasetGetCall<'a, C, NC, A> {
         self._page_token = Some(new_value.to_string());
         self
@@ -1107,7 +1175,7 @@ impl<'a, C, NC, A> UserDataSourceDatasetGetCall<'a, C, NC, A> where NC: hyper::n
     /// Sets the *limit* query property to the given value.
     ///
     /// 
-    /// If specified, no more than this many data points will be included in the dataset. If the there are more data points in the dataset, nextPageToken will be set in the dataset response.    
+    /// If specified, no more than this many data points will be included in the dataset. If the there are more data points in the dataset, nextPageToken will be set in the dataset response.
     pub fn limit(mut self, new_value: i32) -> UserDataSourceDatasetGetCall<'a, C, NC, A> {
         self._limit = Some(new_value);
         self
@@ -1168,7 +1236,7 @@ impl<'a, C, NC, A> UserDataSourceDatasetGetCall<'a, C, NC, A> where NC: hyper::n
 /// Creates a new data source that is unique across all data sources belonging to this user. The data stream ID field can be omitted and will be generated by the server with the correct format. The data stream ID is an ordered combination of some fields from the data source. In addition to the data source fields reflected into the data source ID, the developer project number that is authenticated when creating the data source is included. This developer project number is obfuscated when read by any other developer reading public data types.
 ///
 /// A builder for the *dataSources.create* method supported by a *user* resource.
-/// It is not used directly, but through a `UserMethods`.
+/// It is not used directly, but through a `UserMethods` instance.
 ///
 /// # Example
 ///
@@ -1233,7 +1301,7 @@ impl<'a, C, NC, A> UserDataSourceCreateCall<'a, C, NC, A> where NC: hyper::net::
         for &field in ["alt", "userId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -1290,7 +1358,7 @@ impl<'a, C, NC, A> UserDataSourceCreateCall<'a, C, NC, A> where NC: hyper::net::
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -1306,7 +1374,6 @@ impl<'a, C, NC, A> UserDataSourceCreateCall<'a, C, NC, A> where NC: hyper::net::
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -1316,7 +1383,7 @@ impl<'a, C, NC, A> UserDataSourceCreateCall<'a, C, NC, A> where NC: hyper::net::
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -1327,7 +1394,7 @@ impl<'a, C, NC, A> UserDataSourceCreateCall<'a, C, NC, A> where NC: hyper::net::
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -1336,13 +1403,13 @@ impl<'a, C, NC, A> UserDataSourceCreateCall<'a, C, NC, A> where NC: hyper::net::
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -1363,7 +1430,7 @@ impl<'a, C, NC, A> UserDataSourceCreateCall<'a, C, NC, A> where NC: hyper::net::
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Create the data source for the person identified. Use me to indicate the authenticated user. Only me is supported at this time.    
+    /// Create the data source for the person identified. Use me to indicate the authenticated user. Only me is supported at this time.
     pub fn user_id(mut self, new_value: &str) -> UserDataSourceCreateCall<'a, C, NC, A> {
         self._user_id = new_value.to_string();
         self
@@ -1424,7 +1491,7 @@ impl<'a, C, NC, A> UserDataSourceCreateCall<'a, C, NC, A> where NC: hyper::net::
 /// Performs an inclusive delete of all data points whose start and end times have any overlap with the time range specified by the dataset ID. For most data types, the entire data point will be deleted. For data types where the time span represents a consistent value (such as com.google.activity.segment), and a data point straddles either end point of the dataset, only the overlapping portion of the data point will be deleted.
 ///
 /// A builder for the *dataSources.datasets.delete* method supported by a *user* resource.
-/// It is not used directly, but through a `UserMethods`.
+/// It is not used directly, but through a `UserMethods` instance.
 ///
 /// # Example
 ///
@@ -1496,7 +1563,7 @@ impl<'a, C, NC, A> UserDataSourceDatasetDeleteCall<'a, C, NC, A> where NC: hyper
         for &field in ["userId", "dataSourceId", "datasetId", "modifiedTimeMillis", "currentTimeMillis"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -1548,7 +1615,7 @@ impl<'a, C, NC, A> UserDataSourceDatasetDeleteCall<'a, C, NC, A> where NC: hyper
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -1560,7 +1627,6 @@ impl<'a, C, NC, A> UserDataSourceDatasetDeleteCall<'a, C, NC, A> where NC: hyper
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -1570,7 +1636,7 @@ impl<'a, C, NC, A> UserDataSourceDatasetDeleteCall<'a, C, NC, A> where NC: hyper
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -1581,12 +1647,12 @@ impl<'a, C, NC, A> UserDataSourceDatasetDeleteCall<'a, C, NC, A> where NC: hyper
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = res;
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -1598,7 +1664,7 @@ impl<'a, C, NC, A> UserDataSourceDatasetDeleteCall<'a, C, NC, A> where NC: hyper
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Delete a dataset for the person identified. Use me to indicate the authenticated user. Only me is supported at this time.    
+    /// Delete a dataset for the person identified. Use me to indicate the authenticated user. Only me is supported at this time.
     pub fn user_id(mut self, new_value: &str) -> UserDataSourceDatasetDeleteCall<'a, C, NC, A> {
         self._user_id = new_value.to_string();
         self
@@ -1608,7 +1674,7 @@ impl<'a, C, NC, A> UserDataSourceDatasetDeleteCall<'a, C, NC, A> where NC: hyper
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The data stream ID of the data source that created the dataset.    
+    /// The data stream ID of the data source that created the dataset.
     pub fn data_source_id(mut self, new_value: &str) -> UserDataSourceDatasetDeleteCall<'a, C, NC, A> {
         self._data_source_id = new_value.to_string();
         self
@@ -1618,7 +1684,7 @@ impl<'a, C, NC, A> UserDataSourceDatasetDeleteCall<'a, C, NC, A> where NC: hyper
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Dataset identifier that is a composite of the minimum data point start time and maximum data point end time represented as nanoseconds from the epoch. The ID is formatted like: "startTime-endTime" where startTime and endTime are 64 bit integers.    
+    /// Dataset identifier that is a composite of the minimum data point start time and maximum data point end time represented as nanoseconds from the epoch. The ID is formatted like: "startTime-endTime" where startTime and endTime are 64 bit integers.
     pub fn dataset_id(mut self, new_value: &str) -> UserDataSourceDatasetDeleteCall<'a, C, NC, A> {
         self._dataset_id = new_value.to_string();
         self
@@ -1626,7 +1692,7 @@ impl<'a, C, NC, A> UserDataSourceDatasetDeleteCall<'a, C, NC, A> where NC: hyper
     /// Sets the *modified time millis* query property to the given value.
     ///
     /// 
-    /// When the operation was performed on the client.    
+    /// When the operation was performed on the client.
     pub fn modified_time_millis(mut self, new_value: &str) -> UserDataSourceDatasetDeleteCall<'a, C, NC, A> {
         self._modified_time_millis = Some(new_value.to_string());
         self
@@ -1634,7 +1700,7 @@ impl<'a, C, NC, A> UserDataSourceDatasetDeleteCall<'a, C, NC, A> where NC: hyper
     /// Sets the *current time millis* query property to the given value.
     ///
     /// 
-    /// The client's current time in milliseconds since epoch.    
+    /// The client's current time in milliseconds since epoch.
     pub fn current_time_millis(mut self, new_value: &str) -> UserDataSourceDatasetDeleteCall<'a, C, NC, A> {
         self._current_time_millis = Some(new_value.to_string());
         self
@@ -1695,7 +1761,7 @@ impl<'a, C, NC, A> UserDataSourceDatasetDeleteCall<'a, C, NC, A> where NC: hyper
 /// Adds data points to a dataset. The dataset need not be previously created. All points within the given dataset will be returned with subsquent calls to retrieve this dataset. Data points can belong to more than one dataset. This method does not use patch semantics.
 ///
 /// A builder for the *dataSources.datasets.patch* method supported by a *user* resource.
-/// It is not used directly, but through a `UserMethods`.
+/// It is not used directly, but through a `UserMethods` instance.
 ///
 /// # Example
 ///
@@ -1769,7 +1835,7 @@ impl<'a, C, NC, A> UserDataSourceDatasetPatchCall<'a, C, NC, A> where NC: hyper:
         for &field in ["alt", "userId", "dataSourceId", "datasetId", "currentTimeMillis"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -1826,7 +1892,7 @@ impl<'a, C, NC, A> UserDataSourceDatasetPatchCall<'a, C, NC, A> where NC: hyper:
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -1842,7 +1908,6 @@ impl<'a, C, NC, A> UserDataSourceDatasetPatchCall<'a, C, NC, A> where NC: hyper:
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -1852,7 +1917,7 @@ impl<'a, C, NC, A> UserDataSourceDatasetPatchCall<'a, C, NC, A> where NC: hyper:
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -1863,7 +1928,7 @@ impl<'a, C, NC, A> UserDataSourceDatasetPatchCall<'a, C, NC, A> where NC: hyper:
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -1872,13 +1937,13 @@ impl<'a, C, NC, A> UserDataSourceDatasetPatchCall<'a, C, NC, A> where NC: hyper:
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -1899,7 +1964,7 @@ impl<'a, C, NC, A> UserDataSourceDatasetPatchCall<'a, C, NC, A> where NC: hyper:
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Patch a dataset for the person identified. Use me to indicate the authenticated user. Only me is supported at this time.    
+    /// Patch a dataset for the person identified. Use me to indicate the authenticated user. Only me is supported at this time.
     pub fn user_id(mut self, new_value: &str) -> UserDataSourceDatasetPatchCall<'a, C, NC, A> {
         self._user_id = new_value.to_string();
         self
@@ -1909,7 +1974,7 @@ impl<'a, C, NC, A> UserDataSourceDatasetPatchCall<'a, C, NC, A> where NC: hyper:
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The data stream ID of the data source that created the dataset.    
+    /// The data stream ID of the data source that created the dataset.
     pub fn data_source_id(mut self, new_value: &str) -> UserDataSourceDatasetPatchCall<'a, C, NC, A> {
         self._data_source_id = new_value.to_string();
         self
@@ -1919,7 +1984,7 @@ impl<'a, C, NC, A> UserDataSourceDatasetPatchCall<'a, C, NC, A> where NC: hyper:
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Dataset identifier that is a composite of the minimum data point start time and maximum data point end time represented as nanoseconds from the epoch. The ID is formatted like: "startTime-endTime" where startTime and endTime are 64 bit integers.    
+    /// Dataset identifier that is a composite of the minimum data point start time and maximum data point end time represented as nanoseconds from the epoch. The ID is formatted like: "startTime-endTime" where startTime and endTime are 64 bit integers.
     pub fn dataset_id(mut self, new_value: &str) -> UserDataSourceDatasetPatchCall<'a, C, NC, A> {
         self._dataset_id = new_value.to_string();
         self
@@ -1927,7 +1992,7 @@ impl<'a, C, NC, A> UserDataSourceDatasetPatchCall<'a, C, NC, A> where NC: hyper:
     /// Sets the *current time millis* query property to the given value.
     ///
     /// 
-    /// The client's current time in milliseconds since epoch. Note that the minStartTimeNs and maxEndTimeNs properties in the request body are in nanoseconds instead of milliseconds.    
+    /// The client's current time in milliseconds since epoch. Note that the minStartTimeNs and maxEndTimeNs properties in the request body are in nanoseconds instead of milliseconds.
     pub fn current_time_millis(mut self, new_value: &str) -> UserDataSourceDatasetPatchCall<'a, C, NC, A> {
         self._current_time_millis = Some(new_value.to_string());
         self
@@ -1988,7 +2053,7 @@ impl<'a, C, NC, A> UserDataSourceDatasetPatchCall<'a, C, NC, A> where NC: hyper:
 /// Deletes a session specified by the given session ID.
 ///
 /// A builder for the *sessions.delete* method supported by a *user* resource.
-/// It is not used directly, but through a `UserMethods`.
+/// It is not used directly, but through a `UserMethods` instance.
 ///
 /// # Example
 ///
@@ -2053,7 +2118,7 @@ impl<'a, C, NC, A> UserSessionDeleteCall<'a, C, NC, A> where NC: hyper::net::Net
         for &field in ["userId", "sessionId", "currentTimeMillis"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -2105,7 +2170,7 @@ impl<'a, C, NC, A> UserSessionDeleteCall<'a, C, NC, A> where NC: hyper::net::Net
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -2117,7 +2182,6 @@ impl<'a, C, NC, A> UserSessionDeleteCall<'a, C, NC, A> where NC: hyper::net::Net
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -2127,7 +2191,7 @@ impl<'a, C, NC, A> UserSessionDeleteCall<'a, C, NC, A> where NC: hyper::net::Net
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -2138,12 +2202,12 @@ impl<'a, C, NC, A> UserSessionDeleteCall<'a, C, NC, A> where NC: hyper::net::Net
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = res;
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -2155,7 +2219,7 @@ impl<'a, C, NC, A> UserSessionDeleteCall<'a, C, NC, A> where NC: hyper::net::Net
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Delete a session for the person identified. Use me to indicate the authenticated user. Only me is supported at this time.    
+    /// Delete a session for the person identified. Use me to indicate the authenticated user. Only me is supported at this time.
     pub fn user_id(mut self, new_value: &str) -> UserSessionDeleteCall<'a, C, NC, A> {
         self._user_id = new_value.to_string();
         self
@@ -2165,7 +2229,7 @@ impl<'a, C, NC, A> UserSessionDeleteCall<'a, C, NC, A> where NC: hyper::net::Net
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The ID of the session to be deleted.    
+    /// The ID of the session to be deleted.
     pub fn session_id(mut self, new_value: &str) -> UserSessionDeleteCall<'a, C, NC, A> {
         self._session_id = new_value.to_string();
         self
@@ -2173,7 +2237,7 @@ impl<'a, C, NC, A> UserSessionDeleteCall<'a, C, NC, A> where NC: hyper::net::Net
     /// Sets the *current time millis* query property to the given value.
     ///
     /// 
-    /// The client's current time in milliseconds since epoch.    
+    /// The client's current time in milliseconds since epoch.
     pub fn current_time_millis(mut self, new_value: &str) -> UserSessionDeleteCall<'a, C, NC, A> {
         self._current_time_millis = Some(new_value.to_string());
         self
@@ -2234,7 +2298,7 @@ impl<'a, C, NC, A> UserSessionDeleteCall<'a, C, NC, A> where NC: hyper::net::Net
 /// Returns a data source identified by a data stream ID.
 ///
 /// A builder for the *dataSources.get* method supported by a *user* resource.
-/// It is not used directly, but through a `UserMethods`.
+/// It is not used directly, but through a `UserMethods` instance.
 ///
 /// # Example
 ///
@@ -2294,7 +2358,7 @@ impl<'a, C, NC, A> UserDataSourceGetCall<'a, C, NC, A> where NC: hyper::net::Net
         for &field in ["alt", "userId", "dataSourceId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -2347,7 +2411,7 @@ impl<'a, C, NC, A> UserDataSourceGetCall<'a, C, NC, A> where NC: hyper::net::Net
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -2359,7 +2423,6 @@ impl<'a, C, NC, A> UserDataSourceGetCall<'a, C, NC, A> where NC: hyper::net::Net
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -2369,7 +2432,7 @@ impl<'a, C, NC, A> UserDataSourceGetCall<'a, C, NC, A> where NC: hyper::net::Net
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -2380,7 +2443,7 @@ impl<'a, C, NC, A> UserDataSourceGetCall<'a, C, NC, A> where NC: hyper::net::Net
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -2389,13 +2452,13 @@ impl<'a, C, NC, A> UserDataSourceGetCall<'a, C, NC, A> where NC: hyper::net::Net
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -2407,7 +2470,7 @@ impl<'a, C, NC, A> UserDataSourceGetCall<'a, C, NC, A> where NC: hyper::net::Net
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Retrieve a data source for the person identified. Use me to indicate the authenticated user. Only me is supported at this time.    
+    /// Retrieve a data source for the person identified. Use me to indicate the authenticated user. Only me is supported at this time.
     pub fn user_id(mut self, new_value: &str) -> UserDataSourceGetCall<'a, C, NC, A> {
         self._user_id = new_value.to_string();
         self
@@ -2417,7 +2480,7 @@ impl<'a, C, NC, A> UserDataSourceGetCall<'a, C, NC, A> where NC: hyper::net::Net
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The data stream ID of the data source to retrieve.    
+    /// The data stream ID of the data source to retrieve.
     pub fn data_source_id(mut self, new_value: &str) -> UserDataSourceGetCall<'a, C, NC, A> {
         self._data_source_id = new_value.to_string();
         self
@@ -2480,7 +2543,7 @@ impl<'a, C, NC, A> UserDataSourceGetCall<'a, C, NC, A> where NC: hyper::net::Net
 /// Data sources are identified by their data stream ID.
 ///
 /// A builder for the *dataSources.update* method supported by a *user* resource.
-/// It is not used directly, but through a `UserMethods`.
+/// It is not used directly, but through a `UserMethods` instance.
 ///
 /// # Example
 ///
@@ -2547,7 +2610,7 @@ impl<'a, C, NC, A> UserDataSourceUpdateCall<'a, C, NC, A> where NC: hyper::net::
         for &field in ["alt", "userId", "dataSourceId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -2604,7 +2667,7 @@ impl<'a, C, NC, A> UserDataSourceUpdateCall<'a, C, NC, A> where NC: hyper::net::
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -2620,7 +2683,6 @@ impl<'a, C, NC, A> UserDataSourceUpdateCall<'a, C, NC, A> where NC: hyper::net::
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -2630,7 +2692,7 @@ impl<'a, C, NC, A> UserDataSourceUpdateCall<'a, C, NC, A> where NC: hyper::net::
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -2641,7 +2703,7 @@ impl<'a, C, NC, A> UserDataSourceUpdateCall<'a, C, NC, A> where NC: hyper::net::
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -2650,13 +2712,13 @@ impl<'a, C, NC, A> UserDataSourceUpdateCall<'a, C, NC, A> where NC: hyper::net::
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -2677,7 +2739,7 @@ impl<'a, C, NC, A> UserDataSourceUpdateCall<'a, C, NC, A> where NC: hyper::net::
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Update the data source for the person identified. Use me to indicate the authenticated user. Only me is supported at this time.    
+    /// Update the data source for the person identified. Use me to indicate the authenticated user. Only me is supported at this time.
     pub fn user_id(mut self, new_value: &str) -> UserDataSourceUpdateCall<'a, C, NC, A> {
         self._user_id = new_value.to_string();
         self
@@ -2687,7 +2749,7 @@ impl<'a, C, NC, A> UserDataSourceUpdateCall<'a, C, NC, A> where NC: hyper::net::
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The data stream ID of the data source to update.    
+    /// The data stream ID of the data source to update.
     pub fn data_source_id(mut self, new_value: &str) -> UserDataSourceUpdateCall<'a, C, NC, A> {
         self._data_source_id = new_value.to_string();
         self
@@ -2748,7 +2810,7 @@ impl<'a, C, NC, A> UserDataSourceUpdateCall<'a, C, NC, A> where NC: hyper::net::
 /// Lists sessions previously created.
 ///
 /// A builder for the *sessions.list* method supported by a *user* resource.
-/// It is not used directly, but through a `UserMethods`.
+/// It is not used directly, but through a `UserMethods` instance.
 ///
 /// # Example
 ///
@@ -2826,7 +2888,7 @@ impl<'a, C, NC, A> UserSessionListCall<'a, C, NC, A> where NC: hyper::net::Netwo
         for &field in ["alt", "userId", "startTime", "pageToken", "includeDeleted", "endTime"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -2879,7 +2941,7 @@ impl<'a, C, NC, A> UserSessionListCall<'a, C, NC, A> where NC: hyper::net::Netwo
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -2891,7 +2953,6 @@ impl<'a, C, NC, A> UserSessionListCall<'a, C, NC, A> where NC: hyper::net::Netwo
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -2901,7 +2962,7 @@ impl<'a, C, NC, A> UserSessionListCall<'a, C, NC, A> where NC: hyper::net::Netwo
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -2912,7 +2973,7 @@ impl<'a, C, NC, A> UserSessionListCall<'a, C, NC, A> where NC: hyper::net::Netwo
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -2921,13 +2982,13 @@ impl<'a, C, NC, A> UserSessionListCall<'a, C, NC, A> where NC: hyper::net::Netwo
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -2939,7 +3000,7 @@ impl<'a, C, NC, A> UserSessionListCall<'a, C, NC, A> where NC: hyper::net::Netwo
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// List sessions for the person identified. Use me to indicate the authenticated user. Only me is supported at this time.    
+    /// List sessions for the person identified. Use me to indicate the authenticated user. Only me is supported at this time.
     pub fn user_id(mut self, new_value: &str) -> UserSessionListCall<'a, C, NC, A> {
         self._user_id = new_value.to_string();
         self
@@ -2947,7 +3008,7 @@ impl<'a, C, NC, A> UserSessionListCall<'a, C, NC, A> where NC: hyper::net::Netwo
     /// Sets the *start time* query property to the given value.
     ///
     /// 
-    /// An RFC3339 timestamp. Only sessions ending between the start and end times will be included in the response.    
+    /// An RFC3339 timestamp. Only sessions ending between the start and end times will be included in the response.
     pub fn start_time(mut self, new_value: &str) -> UserSessionListCall<'a, C, NC, A> {
         self._start_time = Some(new_value.to_string());
         self
@@ -2955,7 +3016,7 @@ impl<'a, C, NC, A> UserSessionListCall<'a, C, NC, A> where NC: hyper::net::Netwo
     /// Sets the *page token* query property to the given value.
     ///
     /// 
-    /// The continuation token, which is used to page through large result sets. To get the next page of results, set this parameter to the value of nextPageToken from the previous response.    
+    /// The continuation token, which is used to page through large result sets. To get the next page of results, set this parameter to the value of nextPageToken from the previous response.
     pub fn page_token(mut self, new_value: &str) -> UserSessionListCall<'a, C, NC, A> {
         self._page_token = Some(new_value.to_string());
         self
@@ -2963,7 +3024,7 @@ impl<'a, C, NC, A> UserSessionListCall<'a, C, NC, A> where NC: hyper::net::Netwo
     /// Sets the *include deleted* query property to the given value.
     ///
     /// 
-    /// If true, deleted sessions will be returned. When set to true, sessions returned in this response will only have an ID and will not have any other fields.    
+    /// If true, deleted sessions will be returned. When set to true, sessions returned in this response will only have an ID and will not have any other fields.
     pub fn include_deleted(mut self, new_value: bool) -> UserSessionListCall<'a, C, NC, A> {
         self._include_deleted = Some(new_value);
         self
@@ -2971,7 +3032,7 @@ impl<'a, C, NC, A> UserSessionListCall<'a, C, NC, A> where NC: hyper::net::Netwo
     /// Sets the *end time* query property to the given value.
     ///
     /// 
-    /// An RFC3339 timestamp. Only sessions ending between the start and end times will be included in the response.    
+    /// An RFC3339 timestamp. Only sessions ending between the start and end times will be included in the response.
     pub fn end_time(mut self, new_value: &str) -> UserSessionListCall<'a, C, NC, A> {
         self._end_time = Some(new_value.to_string());
         self
@@ -3032,7 +3093,7 @@ impl<'a, C, NC, A> UserSessionListCall<'a, C, NC, A> where NC: hyper::net::Netwo
 /// Updates or insert a given session.
 ///
 /// A builder for the *sessions.update* method supported by a *user* resource.
-/// It is not used directly, but through a `UserMethods`.
+/// It is not used directly, but through a `UserMethods` instance.
 ///
 /// # Example
 ///
@@ -3104,7 +3165,7 @@ impl<'a, C, NC, A> UserSessionUpdateCall<'a, C, NC, A> where NC: hyper::net::Net
         for &field in ["alt", "userId", "sessionId", "currentTimeMillis"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -3161,7 +3222,7 @@ impl<'a, C, NC, A> UserSessionUpdateCall<'a, C, NC, A> where NC: hyper::net::Net
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -3177,7 +3238,6 @@ impl<'a, C, NC, A> UserSessionUpdateCall<'a, C, NC, A> where NC: hyper::net::Net
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -3187,7 +3247,7 @@ impl<'a, C, NC, A> UserSessionUpdateCall<'a, C, NC, A> where NC: hyper::net::Net
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -3198,7 +3258,7 @@ impl<'a, C, NC, A> UserSessionUpdateCall<'a, C, NC, A> where NC: hyper::net::Net
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -3207,13 +3267,13 @@ impl<'a, C, NC, A> UserSessionUpdateCall<'a, C, NC, A> where NC: hyper::net::Net
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -3234,7 +3294,7 @@ impl<'a, C, NC, A> UserSessionUpdateCall<'a, C, NC, A> where NC: hyper::net::Net
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Create sessions for the person identified. Use me to indicate the authenticated user. Only me is supported at this time.    
+    /// Create sessions for the person identified. Use me to indicate the authenticated user. Only me is supported at this time.
     pub fn user_id(mut self, new_value: &str) -> UserSessionUpdateCall<'a, C, NC, A> {
         self._user_id = new_value.to_string();
         self
@@ -3244,7 +3304,7 @@ impl<'a, C, NC, A> UserSessionUpdateCall<'a, C, NC, A> where NC: hyper::net::Net
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The ID of the session to be created.    
+    /// The ID of the session to be created.
     pub fn session_id(mut self, new_value: &str) -> UserSessionUpdateCall<'a, C, NC, A> {
         self._session_id = new_value.to_string();
         self
@@ -3252,7 +3312,7 @@ impl<'a, C, NC, A> UserSessionUpdateCall<'a, C, NC, A> where NC: hyper::net::Net
     /// Sets the *current time millis* query property to the given value.
     ///
     /// 
-    /// The client's current time in milliseconds since epoch.    
+    /// The client's current time in milliseconds since epoch.
     pub fn current_time_millis(mut self, new_value: &str) -> UserSessionUpdateCall<'a, C, NC, A> {
         self._current_time_millis = Some(new_value.to_string());
         self
@@ -3315,7 +3375,7 @@ impl<'a, C, NC, A> UserSessionUpdateCall<'a, C, NC, A> where NC: hyper::net::Net
 /// Data sources are identified by their data stream ID. This method supports patch semantics.
 ///
 /// A builder for the *dataSources.patch* method supported by a *user* resource.
-/// It is not used directly, but through a `UserMethods`.
+/// It is not used directly, but through a `UserMethods` instance.
 ///
 /// # Example
 ///
@@ -3382,7 +3442,7 @@ impl<'a, C, NC, A> UserDataSourcePatchCall<'a, C, NC, A> where NC: hyper::net::N
         for &field in ["alt", "userId", "dataSourceId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -3439,7 +3499,7 @@ impl<'a, C, NC, A> UserDataSourcePatchCall<'a, C, NC, A> where NC: hyper::net::N
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -3455,7 +3515,6 @@ impl<'a, C, NC, A> UserDataSourcePatchCall<'a, C, NC, A> where NC: hyper::net::N
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -3465,7 +3524,7 @@ impl<'a, C, NC, A> UserDataSourcePatchCall<'a, C, NC, A> where NC: hyper::net::N
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -3476,7 +3535,7 @@ impl<'a, C, NC, A> UserDataSourcePatchCall<'a, C, NC, A> where NC: hyper::net::N
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -3485,13 +3544,13 @@ impl<'a, C, NC, A> UserDataSourcePatchCall<'a, C, NC, A> where NC: hyper::net::N
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -3512,7 +3571,7 @@ impl<'a, C, NC, A> UserDataSourcePatchCall<'a, C, NC, A> where NC: hyper::net::N
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Update the data source for the person identified. Use me to indicate the authenticated user. Only me is supported at this time.    
+    /// Update the data source for the person identified. Use me to indicate the authenticated user. Only me is supported at this time.
     pub fn user_id(mut self, new_value: &str) -> UserDataSourcePatchCall<'a, C, NC, A> {
         self._user_id = new_value.to_string();
         self
@@ -3522,7 +3581,7 @@ impl<'a, C, NC, A> UserDataSourcePatchCall<'a, C, NC, A> where NC: hyper::net::N
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The data stream ID of the data source to update.    
+    /// The data stream ID of the data source to update.
     pub fn data_source_id(mut self, new_value: &str) -> UserDataSourcePatchCall<'a, C, NC, A> {
         self._data_source_id = new_value.to_string();
         self
@@ -3583,7 +3642,7 @@ impl<'a, C, NC, A> UserDataSourcePatchCall<'a, C, NC, A> where NC: hyper::net::N
 /// Lists all data sources that are visible to the developer, using the OAuth scopes provided. The list is not exhaustive: the user may have private data sources that are only visible to other developers or calls using other scopes.
 ///
 /// A builder for the *dataSources.list* method supported by a *user* resource.
-/// It is not used directly, but through a `UserMethods`.
+/// It is not used directly, but through a `UserMethods` instance.
 ///
 /// # Example
 ///
@@ -3650,7 +3709,7 @@ impl<'a, C, NC, A> UserDataSourceListCall<'a, C, NC, A> where NC: hyper::net::Ne
         for &field in ["alt", "userId", "dataTypeName"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -3703,7 +3762,7 @@ impl<'a, C, NC, A> UserDataSourceListCall<'a, C, NC, A> where NC: hyper::net::Ne
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -3715,7 +3774,6 @@ impl<'a, C, NC, A> UserDataSourceListCall<'a, C, NC, A> where NC: hyper::net::Ne
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -3725,7 +3783,7 @@ impl<'a, C, NC, A> UserDataSourceListCall<'a, C, NC, A> where NC: hyper::net::Ne
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -3736,7 +3794,7 @@ impl<'a, C, NC, A> UserDataSourceListCall<'a, C, NC, A> where NC: hyper::net::Ne
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -3745,13 +3803,13 @@ impl<'a, C, NC, A> UserDataSourceListCall<'a, C, NC, A> where NC: hyper::net::Ne
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -3763,7 +3821,7 @@ impl<'a, C, NC, A> UserDataSourceListCall<'a, C, NC, A> where NC: hyper::net::Ne
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// List data sources for the person identified. Use me to indicate the authenticated user. Only me is supported at this time.    
+    /// List data sources for the person identified. Use me to indicate the authenticated user. Only me is supported at this time.
     pub fn user_id(mut self, new_value: &str) -> UserDataSourceListCall<'a, C, NC, A> {
         self._user_id = new_value.to_string();
         self
@@ -3772,7 +3830,7 @@ impl<'a, C, NC, A> UserDataSourceListCall<'a, C, NC, A> where NC: hyper::net::Ne
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
     ///
     /// 
-    /// The names of data types to include in the list. If not specified, all data sources will be returned.    
+    /// The names of data types to include in the list. If not specified, all data sources will be returned.
     pub fn add_data_type_name(mut self, new_value: &str) -> UserDataSourceListCall<'a, C, NC, A> {
         self._data_type_name.push(new_value.to_string());
         self

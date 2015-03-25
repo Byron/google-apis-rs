@@ -1,8 +1,8 @@
 // DO NOT EDIT !
-// This file was generated automatically from 'src/mako/lib.rs.mako'
+// This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *Cloud Monitoring* crate version *0.1.1+20150305*, where *20150305* is the exact revision of the *cloudmonitoring:v2beta2* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.1*.
+//! This documentation was generated from *Cloud Monitoring* crate version *0.1.2+20150305*, where *20150305* is the exact revision of the *cloudmonitoring:v2beta2* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.2*.
 //! 
 //! Everything else about the *Cloud Monitoring* *v2_beta2* API can be found at the
 //! [official documentation site](https://cloud.google.com/monitoring/v2beta2/).
@@ -29,6 +29,8 @@
 //! 
 //! * **[Hub](struct.CloudMonitoring.html)**
 //!     * a central object to maintain state and allow accessing all *Activities*
+//!     * creates [*Method Builders*](trait.MethodsBuilder.html) which in turn
+//!       allow access to individual [*Call Builders*](trait.CallBuilder.html)
 //! * **[Resources](trait.Resource.html)**
 //!     * primary types that you can apply *Activities* to
 //!     * a collection of properties and *Parts*
@@ -37,6 +39,8 @@
 //!         * never directly used in *Activities*
 //! * **[Activities](trait.CallBuilder.html)**
 //!     * operations to apply to *Resources*
+//! 
+//! All *structures* are marked with applicable traits to further categorize them and ease browsing.
 //! 
 //! Generally speaking, you can invoke *Activities* like this:
 //! 
@@ -75,7 +79,7 @@
 //! extern crate "yup-oauth2" as oauth2;
 //! extern crate "google-cloudmonitoring2_beta2" as cloudmonitoring2_beta2;
 //! use cloudmonitoring2_beta2::ListMetricDescriptorsRequest;
-//! use cloudmonitoring2_beta2::Result;
+//! use cloudmonitoring2_beta2::{Result, Error};
 //! # #[test] fn egal() {
 //! use std::default::Default;
 //! use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -108,15 +112,17 @@
 //!              .doit();
 //! 
 //! match result {
-//!     Result::HttpError(err) => println!("HTTPERROR: {:?}", err),
-//!     Result::MissingAPIKey => println!("Auth: Missing API Key - used if there are no scopes"),
-//!     Result::MissingToken => println!("OAuth2: Missing Token"),
-//!     Result::Cancelled => println!("Operation cancelled by user"),
-//!     Result::UploadSizeLimitExceeded(size, max_size) => println!("Upload size too big: {} of {}", size, max_size),
-//!     Result::Failure(_) => println!("General Failure (hyper::client::Response doesn't print)"),
-//!     Result::FieldClash(clashed_field) => println!("You added custom parameter which is part of builder: {:?}", clashed_field),
-//!     Result::JsonDecodeError(err) => println!("Couldn't understand server reply - maybe API needs update: {:?}", err),
-//!     Result::Success(_) => println!("Success (value doesn't print)"),
+//!     Err(e) => match e {
+//!         Error::HttpError(err) => println!("HTTPERROR: {:?}", err),
+//!         Error::MissingAPIKey => println!("Auth: Missing API Key - used if there are no scopes"),
+//!         Error::MissingToken => println!("OAuth2: Missing Token"),
+//!         Error::Cancelled => println!("Operation canceled by user"),
+//!         Error::UploadSizeLimitExceeded(size, max_size) => println!("Upload size too big: {} of {}", size, max_size),
+//!         Error::Failure(_) => println!("General Failure (hyper::client::Response doesn't print)"),
+//!         Error::FieldClash(clashed_field) => println!("You added custom parameter which is part of builder: {:?}", clashed_field),
+//!         Error::JsonDecodeError(err) => println!("Couldn't understand server reply - maybe API needs update: {:?}", err),
+//!     },
+//!     Ok(_) => println!("Success (value doesn't print)"),
 //! }
 //! # }
 //! ```
@@ -129,7 +135,7 @@
 //! When delegates handle errors or intermediate values, they may have a chance to instruct the system to retry. This 
 //! makes the system potentially resilient to all kinds of errors.
 //! 
-//! ## Uploads and Downlods
+//! ## Uploads and Downloads
 //! If a method supports downloads, the response body, which is part of the [Result](enum.Result.html), should be
 //! read by you to obtain the media.
 //! If such a method also supports a [Response Result](trait.ResponseResult.html), it will return that by default.
@@ -152,8 +158,9 @@
 //! ## Optional Parts in Server-Requests
 //! 
 //! All structures provided by this library are made to be [enocodable](trait.RequestValue.html) and 
-//! [decodable](trait.ResponseResult.html) via json. Optionals are used to indicate that partial requests are responses are valid.
-//! Most optionals are are considered [Parts](trait.Part.html) which are identifyable by name, which will be sent to 
+//! [decodable](trait.ResponseResult.html) via *json*. Optionals are used to indicate that partial requests are responses 
+//! are valid.
+//! Most optionals are are considered [Parts](trait.Part.html) which are identifiable by name, which will be sent to 
 //! the server to indicate either the set parts of the request or the desired parts in the response.
 //! 
 //! ## Builder Arguments
@@ -202,7 +209,7 @@ use std::io;
 use std::fs;
 use std::thread::sleep;
 
-pub use cmn::{MultiPartReader, ToParts, MethodInfo, Result, CallBuilder, Hub, ReadSeek, Part, ResponseResult, RequestValue, NestedType, Delegate, DefaultDelegate, ResourceMethodsBuilder, Resource, JsonServerError};
+pub use cmn::{MultiPartReader, ToParts, MethodInfo, Result, Error, CallBuilder, Hub, ReadSeek, Part, ResponseResult, RequestValue, NestedType, Delegate, DefaultDelegate, MethodsBuilder, Resource, JsonServerError};
 
 
 // ##############
@@ -249,7 +256,7 @@ impl Default for Scope {
 /// extern crate "yup-oauth2" as oauth2;
 /// extern crate "google-cloudmonitoring2_beta2" as cloudmonitoring2_beta2;
 /// use cloudmonitoring2_beta2::ListMetricDescriptorsRequest;
-/// use cloudmonitoring2_beta2::Result;
+/// use cloudmonitoring2_beta2::{Result, Error};
 /// # #[test] fn egal() {
 /// use std::default::Default;
 /// use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -282,15 +289,17 @@ impl Default for Scope {
 ///              .doit();
 /// 
 /// match result {
-///     Result::HttpError(err) => println!("HTTPERROR: {:?}", err),
-///     Result::MissingAPIKey => println!("Auth: Missing API Key - used if there are no scopes"),
-///     Result::MissingToken => println!("OAuth2: Missing Token"),
-///     Result::Cancelled => println!("Operation cancelled by user"),
-///     Result::UploadSizeLimitExceeded(size, max_size) => println!("Upload size too big: {} of {}", size, max_size),
-///     Result::Failure(_) => println!("General Failure (hyper::client::Response doesn't print)"),
-///     Result::FieldClash(clashed_field) => println!("You added custom parameter which is part of builder: {:?}", clashed_field),
-///     Result::JsonDecodeError(err) => println!("Couldn't understand server reply - maybe API needs update: {:?}", err),
-///     Result::Success(_) => println!("Success (value doesn't print)"),
+///     Err(e) => match e {
+///         Error::HttpError(err) => println!("HTTPERROR: {:?}", err),
+///         Error::MissingAPIKey => println!("Auth: Missing API Key - used if there are no scopes"),
+///         Error::MissingToken => println!("OAuth2: Missing Token"),
+///         Error::Cancelled => println!("Operation canceled by user"),
+///         Error::UploadSizeLimitExceeded(size, max_size) => println!("Upload size too big: {} of {}", size, max_size),
+///         Error::Failure(_) => println!("General Failure (hyper::client::Response doesn't print)"),
+///         Error::FieldClash(clashed_field) => println!("You added custom parameter which is part of builder: {:?}", clashed_field),
+///         Error::JsonDecodeError(err) => println!("Couldn't understand server reply - maybe API needs update: {:?}", err),
+///     },
+///     Ok(_) => println!("Success (value doesn't print)"),
 /// }
 /// # }
 /// ```
@@ -311,7 +320,7 @@ impl<'a, C, NC, A> CloudMonitoring<C, NC, A>
         CloudMonitoring {
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/0.1.1".to_string(),
+            _user_agent: "google-api-rust-client/0.1.2".to_string(),
             _m: PhantomData
         }
     }
@@ -327,7 +336,7 @@ impl<'a, C, NC, A> CloudMonitoring<C, NC, A>
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/0.1.1`.
+    /// It defaults to `google-api-rust-client/0.1.2`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -347,9 +356,9 @@ impl<'a, C, NC, A> CloudMonitoring<C, NC, A>
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct PointDistributionUnderflowBucket {
-    /// The number of events whose values are in the interval defined by this bucket.    
+    /// The number of events whose values are in the interval defined by this bucket.
     pub count: String,
-    /// The upper bound of the value interval of this bucket (exclusive).    
+    /// The upper bound of the value interval of this bucket (exclusive).
     #[serde(alias="upperBound")]
     pub upper_bound: f64,
 }
@@ -368,12 +377,12 @@ impl Part for PointDistributionUnderflowBucket {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct ListMetricDescriptorsResponse {
-    /// The returned metric descriptors.    
+    /// The returned metric descriptors.
     pub metrics: Vec<MetricDescriptor>,
-    /// Pagination token. If present, indicates that additional results are available for retrieval. To access the results past the pagination limit, pass this value to the pageToken query parameter.    
+    /// Pagination token. If present, indicates that additional results are available for retrieval. To access the results past the pagination limit, pass this value to the pageToken query parameter.
     #[serde(alias="nextPageToken")]
     pub next_page_token: String,
-    /// Identifies what kind of resource this is. Value: the fixed string "cloudmonitoring#listMetricDescriptorsResponse".    
+    /// Identifies what kind of resource this is. Value: the fixed string "cloudmonitoring#listMetricDescriptorsResponse".
     pub kind: String,
 }
 
@@ -391,7 +400,7 @@ impl ResponseResult for ListMetricDescriptorsResponse {}
 /// 
 #[derive(Default, Clone, Debug, Serialize)]
 pub struct ListMetricDescriptorsRequest {
-    /// Identifies what kind of resource this is. Value: the fixed string "cloudmonitoring#listMetricDescriptorsRequest".    
+    /// Identifies what kind of resource this is. Value: the fixed string "cloudmonitoring#listMetricDescriptorsRequest".
     pub kind: Option<String>,
 }
 
@@ -409,7 +418,7 @@ impl RequestValue for ListMetricDescriptorsRequest {}
 /// 
 #[derive(Default, Clone, Debug, Serialize)]
 pub struct ListTimeseriesDescriptorsRequest {
-    /// Identifies what kind of resource this is. Value: the fixed string "cloudmonitoring#listTimeseriesDescriptorsRequest".    
+    /// Identifies what kind of resource this is. Value: the fixed string "cloudmonitoring#listTimeseriesDescriptorsRequest".
     pub kind: Option<String>,
 }
 
@@ -422,10 +431,10 @@ impl RequestValue for ListTimeseriesDescriptorsRequest {}
 /// 
 #[derive(Default, Clone, Debug, Serialize)]
 pub struct TimeseriesPoint {
-    /// The descriptor of this time series.    
+    /// The descriptor of this time series.
     #[serde(alias="timeseriesDesc")]
     pub timeseries_desc: TimeseriesDescriptor,
-    /// The data point in this time series snapshot.    
+    /// The data point in this time series snapshot.
     pub point: Point,
 }
 
@@ -438,12 +447,12 @@ impl Part for TimeseriesPoint {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct PointDistribution {
-    /// The finite buckets.    
+    /// The finite buckets.
     pub buckets: Vec<PointDistributionBucket>,
-    /// The underflow bucket.    
+    /// The underflow bucket.
     #[serde(alias="underflowBucket")]
     pub underflow_bucket: PointDistributionUnderflowBucket,
-    /// The overflow bucket.    
+    /// The overflow bucket.
     #[serde(alias="overflowBucket")]
     pub overflow_bucket: PointDistributionOverflowBucket,
 }
@@ -457,10 +466,10 @@ impl Part for PointDistribution {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct MetricDescriptorTypeDescriptor {
-    /// The type of data that is written to a timeseries point for this metric.    
+    /// The type of data that is written to a timeseries point for this metric.
     #[serde(alias="valueType")]
     pub value_type: String,
-    /// The method of collecting data for the metric.    
+    /// The method of collecting data for the metric.
     #[serde(alias="metricType")]
     pub metric_type: String,
 }
@@ -474,9 +483,9 @@ impl Part for MetricDescriptorTypeDescriptor {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct MetricDescriptorLabelDescriptor {
-    /// Label description.    
+    /// Label description.
     pub description: String,
-    /// Label key.    
+    /// Label key.
     pub key: String,
 }
 
@@ -489,12 +498,12 @@ impl Part for MetricDescriptorLabelDescriptor {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct PointDistributionBucket {
-    /// The number of events whose values are in the interval defined by this bucket.    
+    /// The number of events whose values are in the interval defined by this bucket.
     pub count: String,
-    /// The lower bound of the value interval of this bucket (inclusive).    
+    /// The lower bound of the value interval of this bucket (inclusive).
     #[serde(alias="lowerBound")]
     pub lower_bound: f64,
-    /// The upper bound of the value interval of this bucket (exclusive).    
+    /// The upper bound of the value interval of this bucket (exclusive).
     #[serde(alias="upperBound")]
     pub upper_bound: f64,
 }
@@ -513,7 +522,7 @@ impl Part for PointDistributionBucket {}
 /// 
 #[derive(Default, Clone, Debug, Serialize)]
 pub struct ListTimeseriesRequest {
-    /// Identifies what kind of resource this is. Value: the fixed string "cloudmonitoring#listTimeseriesRequest".    
+    /// Identifies what kind of resource this is. Value: the fixed string "cloudmonitoring#listTimeseriesRequest".
     pub kind: Option<String>,
 }
 
@@ -533,15 +542,15 @@ impl RequestValue for ListTimeseriesRequest {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct MetricDescriptor {
-    /// The project ID to which the metric belongs.    
+    /// The project ID to which the metric belongs.
     pub project: Option<String>,
-    /// Labels defined for this metric.    
+    /// Labels defined for this metric.
     pub labels: Option<Vec<MetricDescriptorLabelDescriptor>>,
-    /// Description of this metric.    
+    /// Description of this metric.
     pub description: Option<String>,
-    /// The name of this metric.    
+    /// The name of this metric.
     pub name: Option<String>,
-    /// Type description for this metric.    
+    /// Type description for this metric.
     #[serde(alias="typeDescriptor")]
     pub type_descriptor: Option<MetricDescriptorTypeDescriptor>,
 }
@@ -562,7 +571,7 @@ impl ResponseResult for MetricDescriptor {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct WriteTimeseriesResponse {
-    /// Identifies what kind of resource this is. Value: the fixed string "cloudmonitoring#writeTimeseriesResponse".    
+    /// Identifies what kind of resource this is. Value: the fixed string "cloudmonitoring#writeTimeseriesResponse".
     pub kind: String,
 }
 
@@ -580,7 +589,7 @@ impl ResponseResult for WriteTimeseriesResponse {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct DeleteMetricDescriptorResponse {
-    /// Identifies what kind of resource this is. Value: the fixed string "cloudmonitoring#deleteMetricDescriptorResponse".    
+    /// Identifies what kind of resource this is. Value: the fixed string "cloudmonitoring#deleteMetricDescriptorResponse".
     pub kind: String,
 }
 
@@ -598,10 +607,10 @@ impl ResponseResult for DeleteMetricDescriptorResponse {}
 /// 
 #[derive(Default, Clone, Debug, Serialize)]
 pub struct WriteTimeseriesRequest {
-    /// The label's name.    
+    /// The label's name.
     #[serde(alias="commonLabels")]
     pub common_labels: Option<HashMap<String, String>>,
-    /// Provide time series specific labels and the data points for each time series. The labels in timeseries and the common_labels should form a complete list of labels that required by the metric.    
+    /// Provide time series specific labels and the data points for each time series. The labels in timeseries and the common_labels should form a complete list of labels that required by the metric.
     pub timeseries: Option<Vec<TimeseriesPoint>>,
 }
 
@@ -614,23 +623,23 @@ impl RequestValue for WriteTimeseriesRequest {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Point {
-    /// The interval [start, end] is the time period to which the point's value applies. For gauge metrics, whose values are instantaneous measurements, this interval should be empty (start should equal end). For cumulative metrics (of which deltas and rates are special cases), the interval should be non-empty. Both start and end are RFC 3339 strings.    
+    /// The interval [start, end] is the time period to which the point's value applies. For gauge metrics, whose values are instantaneous measurements, this interval should be empty (start should equal end). For cumulative metrics (of which deltas and rates are special cases), the interval should be non-empty. Both start and end are RFC 3339 strings.
     pub start: String,
-    /// The value of this data point. Either "true" or "false".    
+    /// The value of this data point. Either "true" or "false".
     #[serde(alias="boolValue")]
     pub bool_value: bool,
-    /// The interval [start, end] is the time period to which the point's value applies. For gauge metrics, whose values are instantaneous measurements, this interval should be empty (start should equal end). For cumulative metrics (of which deltas and rates are special cases), the interval should be non-empty. Both start and end are RFC 3339 strings.    
+    /// The interval [start, end] is the time period to which the point's value applies. For gauge metrics, whose values are instantaneous measurements, this interval should be empty (start should equal end). For cumulative metrics (of which deltas and rates are special cases), the interval should be non-empty. Both start and end are RFC 3339 strings.
     pub end: String,
-    /// The value of this data point as a distribution. A distribution value can contain a list of buckets and/or an underflowBucket and an overflowBucket. The values of these points can be used to create a histogram.    
+    /// The value of this data point as a distribution. A distribution value can contain a list of buckets and/or an underflowBucket and an overflowBucket. The values of these points can be used to create a histogram.
     #[serde(alias="distributionValue")]
     pub distribution_value: PointDistribution,
-    /// The value of this data point in string format.    
+    /// The value of this data point in string format.
     #[serde(alias="stringValue")]
     pub string_value: String,
-    /// The value of this data point as a 64-bit integer.    
+    /// The value of this data point as a 64-bit integer.
     #[serde(alias="int64Value")]
     pub int64_value: String,
-    /// The value of this data point as a double-precision floating-point number.    
+    /// The value of this data point as a double-precision floating-point number.
     #[serde(alias="doubleValue")]
     pub double_value: f64,
 }
@@ -649,11 +658,11 @@ impl Part for Point {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct TimeseriesDescriptor {
-    /// The Developers Console project number to which this time series belongs.    
+    /// The Developers Console project number to which this time series belongs.
     pub project: Option<String>,
-    /// The name of the metric.    
+    /// The name of the metric.
     pub metric: Option<String>,
-    /// The label's name.    
+    /// The label's name.
     pub labels: Option<HashMap<String, String>>,
 }
 
@@ -666,10 +675,10 @@ impl Resource for TimeseriesDescriptor {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct Timeseries {
-    /// The descriptor of this time series.    
+    /// The descriptor of this time series.
     #[serde(alias="timeseriesDesc")]
     pub timeseries_desc: TimeseriesDescriptor,
-    /// The data points of this time series. The points are listed in order of their end timestamp, from younger to older.    
+    /// The data points of this time series. The points are listed in order of their end timestamp, from younger to older.
     pub points: Vec<Point>,
 }
 
@@ -682,9 +691,9 @@ impl Part for Timeseries {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct PointDistributionOverflowBucket {
-    /// The number of events whose values are in the interval defined by this bucket.    
+    /// The number of events whose values are in the interval defined by this bucket.
     pub count: String,
-    /// The lower bound of the value interval of this bucket (inclusive).    
+    /// The lower bound of the value interval of this bucket (inclusive).
     #[serde(alias="lowerBound")]
     pub lower_bound: f64,
 }
@@ -703,16 +712,16 @@ impl Part for PointDistributionOverflowBucket {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct ListTimeseriesDescriptorsResponse {
-    /// Pagination token. If present, indicates that additional results are available for retrieval. To access the results past the pagination limit, set this value to the pageToken query parameter.    
+    /// Pagination token. If present, indicates that additional results are available for retrieval. To access the results past the pagination limit, set this value to the pageToken query parameter.
     #[serde(alias="nextPageToken")]
     pub next_page_token: String,
-    /// The youngest timestamp of the interval of this query, as an RFC 3339 string.    
+    /// The youngest timestamp of the interval of this query, as an RFC 3339 string.
     pub youngest: String,
-    /// Identifies what kind of resource this is. Value: the fixed string "cloudmonitoring#listTimeseriesDescriptorsResponse".    
+    /// Identifies what kind of resource this is. Value: the fixed string "cloudmonitoring#listTimeseriesDescriptorsResponse".
     pub kind: String,
-    /// The oldest timestamp of the interval of this query, as an RFC 3339 string.    
+    /// The oldest timestamp of the interval of this query, as an RFC 3339 string.
     pub oldest: String,
-    /// The returned time series descriptors.    
+    /// The returned time series descriptors.
     pub timeseries: Vec<TimeseriesDescriptor>,
 }
 
@@ -730,16 +739,16 @@ impl ResponseResult for ListTimeseriesDescriptorsResponse {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct ListTimeseriesResponse {
-    /// Pagination token. If present, indicates that additional results are available for retrieval. To access the results past the pagination limit, set the pageToken query parameter to this value. All of the points of a time series will be returned before returning any point of the subsequent time series.    
+    /// Pagination token. If present, indicates that additional results are available for retrieval. To access the results past the pagination limit, set the pageToken query parameter to this value. All of the points of a time series will be returned before returning any point of the subsequent time series.
     #[serde(alias="nextPageToken")]
     pub next_page_token: String,
-    /// The youngest timestamp of the interval of this query as an RFC 3339 string.    
+    /// The youngest timestamp of the interval of this query as an RFC 3339 string.
     pub youngest: String,
-    /// Identifies what kind of resource this is. Value: the fixed string "cloudmonitoring#listTimeseriesResponse".    
+    /// Identifies what kind of resource this is. Value: the fixed string "cloudmonitoring#listTimeseriesResponse".
     pub kind: String,
-    /// The oldest timestamp of the interval of this query as an RFC 3339 string.    
+    /// The oldest timestamp of the interval of this query as an RFC 3339 string.
     pub oldest: String,
-    /// The returned time series.    
+    /// The returned time series.
     pub timeseries: Vec<Timeseries>,
 }
 
@@ -785,13 +794,20 @@ pub struct TimeseriesDescriptorMethods<'a, C, NC, A>
     hub: &'a CloudMonitoring<C, NC, A>,
 }
 
-impl<'a, C, NC, A> ResourceMethodsBuilder for TimeseriesDescriptorMethods<'a, C, NC, A> {}
+impl<'a, C, NC, A> MethodsBuilder for TimeseriesDescriptorMethods<'a, C, NC, A> {}
 
 impl<'a, C, NC, A> TimeseriesDescriptorMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// List the descriptors of the time series that match the metric and labels values and that have data points in the interval. Large responses are paginated; use the nextPageToken returned in the response to request subsequent pages of results by setting the pageToken query parameter to the value of the nextPageToken.    
+    /// List the descriptors of the time series that match the metric and labels values and that have data points in the interval. Large responses are paginated; use the nextPageToken returned in the response to request subsequent pages of results by setting the pageToken query parameter to the value of the nextPageToken.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `project` - The project ID to which this time series belongs. The value can be the numeric project ID or string-based project name.
+    /// * `metric` - Metric names are protocol-free URLs as listed in the Supported Metrics page. For example, compute.googleapis.com/instance/disk/read_ops_count.
+    /// * `youngest` - End of the time interval (inclusive), which is expressed as an RFC 3339 timestamp.
     pub fn list(&self, request: &ListTimeseriesDescriptorsRequest, project: &str, metric: &str, youngest: &str) -> TimeseriesDescriptorListCall<'a, C, NC, A> {
         TimeseriesDescriptorListCall {
             hub: self.hub,
@@ -849,13 +865,18 @@ pub struct TimeseryMethods<'a, C, NC, A>
     hub: &'a CloudMonitoring<C, NC, A>,
 }
 
-impl<'a, C, NC, A> ResourceMethodsBuilder for TimeseryMethods<'a, C, NC, A> {}
+impl<'a, C, NC, A> MethodsBuilder for TimeseryMethods<'a, C, NC, A> {}
 
 impl<'a, C, NC, A> TimeseryMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Put data points to one or more time series for one or more metrics. If a time series does not exist, a new time series will be created. It is not allowed to write a time series point that is older than the existing youngest point of that time series. Points that are older than the existing youngest point of that time series will be discarded silently. Therefore, users should make sure that points of a time series are written sequentially in the order of their end time.    
+    /// Put data points to one or more time series for one or more metrics. If a time series does not exist, a new time series will be created. It is not allowed to write a time series point that is older than the existing youngest point of that time series. Points that are older than the existing youngest point of that time series will be discarded silently. Therefore, users should make sure that points of a time series are written sequentially in the order of their end time.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `project` - The project ID. The value can be the numeric project ID or string-based project name.
     pub fn write(&self, request: &WriteTimeseriesRequest, project: &str) -> TimeseryWriteCall<'a, C, NC, A> {
         TimeseryWriteCall {
             hub: self.hub,
@@ -869,7 +890,14 @@ impl<'a, C, NC, A> TimeseryMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// List the data points of the time series that match the metric and labels values and that have data points in the interval. Large responses are paginated; use the nextPageToken returned in the response to request subsequent pages of results by setting the pageToken query parameter to the value of the nextPageToken.    
+    /// List the data points of the time series that match the metric and labels values and that have data points in the interval. Large responses are paginated; use the nextPageToken returned in the response to request subsequent pages of results by setting the pageToken query parameter to the value of the nextPageToken.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `project` - The project ID to which this time series belongs. The value can be the numeric project ID or string-based project name.
+    /// * `metric` - Metric names are protocol-free URLs as listed in the Supported Metrics page. For example, compute.googleapis.com/instance/disk/read_ops_count.
+    /// * `youngest` - End of the time interval (inclusive), which is expressed as an RFC 3339 timestamp.
     pub fn list(&self, request: &ListTimeseriesRequest, project: &str, metric: &str, youngest: &str) -> TimeseryListCall<'a, C, NC, A> {
         TimeseryListCall {
             hub: self.hub,
@@ -927,13 +955,18 @@ pub struct MetricDescriptorMethods<'a, C, NC, A>
     hub: &'a CloudMonitoring<C, NC, A>,
 }
 
-impl<'a, C, NC, A> ResourceMethodsBuilder for MetricDescriptorMethods<'a, C, NC, A> {}
+impl<'a, C, NC, A> MethodsBuilder for MetricDescriptorMethods<'a, C, NC, A> {}
 
 impl<'a, C, NC, A> MetricDescriptorMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// List metric descriptors that match the query. If the query is not set, then all of the metric descriptors will be returned. Large responses will be paginated, use the nextPageToken returned in the response to request subsequent pages of results by setting the pageToken query parameter to the value of the nextPageToken.    
+    /// List metric descriptors that match the query. If the query is not set, then all of the metric descriptors will be returned. Large responses will be paginated, use the nextPageToken returned in the response to request subsequent pages of results by setting the pageToken query parameter to the value of the nextPageToken.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `project` - The project id. The value can be the numeric project ID or string-based project name.
     pub fn list(&self, request: &ListMetricDescriptorsRequest, project: &str) -> MetricDescriptorListCall<'a, C, NC, A> {
         MetricDescriptorListCall {
             hub: self.hub,
@@ -950,7 +983,12 @@ impl<'a, C, NC, A> MetricDescriptorMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Delete an existing metric.    
+    /// Delete an existing metric.
+    /// 
+    /// # Arguments
+    ///
+    /// * `project` - The project ID to which the metric belongs.
+    /// * `metric` - Name of the metric.
     pub fn delete(&self, project: &str, metric: &str) -> MetricDescriptorDeleteCall<'a, C, NC, A> {
         MetricDescriptorDeleteCall {
             hub: self.hub,
@@ -964,7 +1002,12 @@ impl<'a, C, NC, A> MetricDescriptorMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Create a new metric.    
+    /// Create a new metric.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `project` - The project id. The value can be the numeric project ID or string-based project name.
     pub fn create(&self, request: &MetricDescriptor, project: &str) -> MetricDescriptorCreateCall<'a, C, NC, A> {
         MetricDescriptorCreateCall {
             hub: self.hub,
@@ -988,7 +1031,7 @@ impl<'a, C, NC, A> MetricDescriptorMethods<'a, C, NC, A> {
 /// List the descriptors of the time series that match the metric and labels values and that have data points in the interval. Large responses are paginated; use the nextPageToken returned in the response to request subsequent pages of results by setting the pageToken query parameter to the value of the nextPageToken.
 ///
 /// A builder for the *list* method supported by a *timeseriesDescriptor* resource.
-/// It is not used directly, but through a `TimeseriesDescriptorMethods`.
+/// It is not used directly, but through a `TimeseriesDescriptorMethods` instance.
 ///
 /// # Example
 ///
@@ -1096,7 +1139,7 @@ impl<'a, C, NC, A> TimeseriesDescriptorListCall<'a, C, NC, A> where NC: hyper::n
         for &field in ["alt", "project", "metric", "youngest", "window", "timespan", "pageToken", "oldest", "labels", "count", "aggregator"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -1153,7 +1196,7 @@ impl<'a, C, NC, A> TimeseriesDescriptorListCall<'a, C, NC, A> where NC: hyper::n
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -1169,7 +1212,6 @@ impl<'a, C, NC, A> TimeseriesDescriptorListCall<'a, C, NC, A> where NC: hyper::n
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -1179,7 +1221,7 @@ impl<'a, C, NC, A> TimeseriesDescriptorListCall<'a, C, NC, A> where NC: hyper::n
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -1190,7 +1232,7 @@ impl<'a, C, NC, A> TimeseriesDescriptorListCall<'a, C, NC, A> where NC: hyper::n
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -1199,13 +1241,13 @@ impl<'a, C, NC, A> TimeseriesDescriptorListCall<'a, C, NC, A> where NC: hyper::n
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -1226,7 +1268,7 @@ impl<'a, C, NC, A> TimeseriesDescriptorListCall<'a, C, NC, A> where NC: hyper::n
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The project ID to which this time series belongs. The value can be the numeric project ID or string-based project name.    
+    /// The project ID to which this time series belongs. The value can be the numeric project ID or string-based project name.
     pub fn project(mut self, new_value: &str) -> TimeseriesDescriptorListCall<'a, C, NC, A> {
         self._project = new_value.to_string();
         self
@@ -1236,7 +1278,7 @@ impl<'a, C, NC, A> TimeseriesDescriptorListCall<'a, C, NC, A> where NC: hyper::n
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Metric names are protocol-free URLs as listed in the Supported Metrics page. For example, compute.googleapis.com/instance/disk/read_ops_count.    
+    /// Metric names are protocol-free URLs as listed in the Supported Metrics page. For example, compute.googleapis.com/instance/disk/read_ops_count.
     pub fn metric(mut self, new_value: &str) -> TimeseriesDescriptorListCall<'a, C, NC, A> {
         self._metric = new_value.to_string();
         self
@@ -1246,7 +1288,7 @@ impl<'a, C, NC, A> TimeseriesDescriptorListCall<'a, C, NC, A> where NC: hyper::n
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// End of the time interval (inclusive), which is expressed as an RFC 3339 timestamp.    
+    /// End of the time interval (inclusive), which is expressed as an RFC 3339 timestamp.
     pub fn youngest(mut self, new_value: &str) -> TimeseriesDescriptorListCall<'a, C, NC, A> {
         self._youngest = new_value.to_string();
         self
@@ -1281,7 +1323,7 @@ impl<'a, C, NC, A> TimeseriesDescriptorListCall<'a, C, NC, A> where NC: hyper::n
     /// Sets the *page token* query property to the given value.
     ///
     /// 
-    /// The pagination token, which is used to page through large result sets. Set this value to the value of the nextPageToken to retrieve the next page of results.    
+    /// The pagination token, which is used to page through large result sets. Set this value to the value of the nextPageToken to retrieve the next page of results.
     pub fn page_token(mut self, new_value: &str) -> TimeseriesDescriptorListCall<'a, C, NC, A> {
         self._page_token = Some(new_value.to_string());
         self
@@ -1289,7 +1331,7 @@ impl<'a, C, NC, A> TimeseriesDescriptorListCall<'a, C, NC, A> where NC: hyper::n
     /// Sets the *oldest* query property to the given value.
     ///
     /// 
-    /// Start of the time interval (exclusive), which is expressed as an RFC 3339 timestamp. If neither oldest nor timespan is specified, the default time interval will be (youngest - 4 hours, youngest]    
+    /// Start of the time interval (exclusive), which is expressed as an RFC 3339 timestamp. If neither oldest nor timespan is specified, the default time interval will be (youngest - 4 hours, youngest]
     pub fn oldest(mut self, new_value: &str) -> TimeseriesDescriptorListCall<'a, C, NC, A> {
         self._oldest = Some(new_value.to_string());
         self
@@ -1311,7 +1353,7 @@ impl<'a, C, NC, A> TimeseriesDescriptorListCall<'a, C, NC, A> where NC: hyper::n
     /// Sets the *count* query property to the given value.
     ///
     /// 
-    /// Maximum number of time series descriptors per page. Used for pagination. If not specified, count = 100.    
+    /// Maximum number of time series descriptors per page. Used for pagination. If not specified, count = 100.
     pub fn count(mut self, new_value: i32) -> TimeseriesDescriptorListCall<'a, C, NC, A> {
         self._count = Some(new_value);
         self
@@ -1319,7 +1361,7 @@ impl<'a, C, NC, A> TimeseriesDescriptorListCall<'a, C, NC, A> where NC: hyper::n
     /// Sets the *aggregator* query property to the given value.
     ///
     /// 
-    /// The aggregation function that will reduce the data points in each window to a single point. This parameter is only valid for non-cumulative metric types.    
+    /// The aggregation function that will reduce the data points in each window to a single point. This parameter is only valid for non-cumulative metric types.
     pub fn aggregator(mut self, new_value: &str) -> TimeseriesDescriptorListCall<'a, C, NC, A> {
         self._aggregator = Some(new_value.to_string());
         self
@@ -1380,7 +1422,7 @@ impl<'a, C, NC, A> TimeseriesDescriptorListCall<'a, C, NC, A> where NC: hyper::n
 /// Put data points to one or more time series for one or more metrics. If a time series does not exist, a new time series will be created. It is not allowed to write a time series point that is older than the existing youngest point of that time series. Points that are older than the existing youngest point of that time series will be discarded silently. Therefore, users should make sure that points of a time series are written sequentially in the order of their end time.
 ///
 /// A builder for the *write* method supported by a *timesery* resource.
-/// It is not used directly, but through a `TimeseryMethods`.
+/// It is not used directly, but through a `TimeseryMethods` instance.
 ///
 /// # Example
 ///
@@ -1445,7 +1487,7 @@ impl<'a, C, NC, A> TimeseryWriteCall<'a, C, NC, A> where NC: hyper::net::Network
         for &field in ["alt", "project"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -1502,7 +1544,7 @@ impl<'a, C, NC, A> TimeseryWriteCall<'a, C, NC, A> where NC: hyper::net::Network
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -1518,7 +1560,6 @@ impl<'a, C, NC, A> TimeseryWriteCall<'a, C, NC, A> where NC: hyper::net::Network
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -1528,7 +1569,7 @@ impl<'a, C, NC, A> TimeseryWriteCall<'a, C, NC, A> where NC: hyper::net::Network
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -1539,7 +1580,7 @@ impl<'a, C, NC, A> TimeseryWriteCall<'a, C, NC, A> where NC: hyper::net::Network
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -1548,13 +1589,13 @@ impl<'a, C, NC, A> TimeseryWriteCall<'a, C, NC, A> where NC: hyper::net::Network
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -1575,7 +1616,7 @@ impl<'a, C, NC, A> TimeseryWriteCall<'a, C, NC, A> where NC: hyper::net::Network
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The project ID. The value can be the numeric project ID or string-based project name.    
+    /// The project ID. The value can be the numeric project ID or string-based project name.
     pub fn project(mut self, new_value: &str) -> TimeseryWriteCall<'a, C, NC, A> {
         self._project = new_value.to_string();
         self
@@ -1636,7 +1677,7 @@ impl<'a, C, NC, A> TimeseryWriteCall<'a, C, NC, A> where NC: hyper::net::Network
 /// List the data points of the time series that match the metric and labels values and that have data points in the interval. Large responses are paginated; use the nextPageToken returned in the response to request subsequent pages of results by setting the pageToken query parameter to the value of the nextPageToken.
 ///
 /// A builder for the *list* method supported by a *timesery* resource.
-/// It is not used directly, but through a `TimeseryMethods`.
+/// It is not used directly, but through a `TimeseryMethods` instance.
 ///
 /// # Example
 ///
@@ -1744,7 +1785,7 @@ impl<'a, C, NC, A> TimeseryListCall<'a, C, NC, A> where NC: hyper::net::NetworkC
         for &field in ["alt", "project", "metric", "youngest", "window", "timespan", "pageToken", "oldest", "labels", "count", "aggregator"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -1801,7 +1842,7 @@ impl<'a, C, NC, A> TimeseryListCall<'a, C, NC, A> where NC: hyper::net::NetworkC
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -1817,7 +1858,6 @@ impl<'a, C, NC, A> TimeseryListCall<'a, C, NC, A> where NC: hyper::net::NetworkC
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -1827,7 +1867,7 @@ impl<'a, C, NC, A> TimeseryListCall<'a, C, NC, A> where NC: hyper::net::NetworkC
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -1838,7 +1878,7 @@ impl<'a, C, NC, A> TimeseryListCall<'a, C, NC, A> where NC: hyper::net::NetworkC
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -1847,13 +1887,13 @@ impl<'a, C, NC, A> TimeseryListCall<'a, C, NC, A> where NC: hyper::net::NetworkC
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -1874,7 +1914,7 @@ impl<'a, C, NC, A> TimeseryListCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The project ID to which this time series belongs. The value can be the numeric project ID or string-based project name.    
+    /// The project ID to which this time series belongs. The value can be the numeric project ID or string-based project name.
     pub fn project(mut self, new_value: &str) -> TimeseryListCall<'a, C, NC, A> {
         self._project = new_value.to_string();
         self
@@ -1884,7 +1924,7 @@ impl<'a, C, NC, A> TimeseryListCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Metric names are protocol-free URLs as listed in the Supported Metrics page. For example, compute.googleapis.com/instance/disk/read_ops_count.    
+    /// Metric names are protocol-free URLs as listed in the Supported Metrics page. For example, compute.googleapis.com/instance/disk/read_ops_count.
     pub fn metric(mut self, new_value: &str) -> TimeseryListCall<'a, C, NC, A> {
         self._metric = new_value.to_string();
         self
@@ -1894,7 +1934,7 @@ impl<'a, C, NC, A> TimeseryListCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// End of the time interval (inclusive), which is expressed as an RFC 3339 timestamp.    
+    /// End of the time interval (inclusive), which is expressed as an RFC 3339 timestamp.
     pub fn youngest(mut self, new_value: &str) -> TimeseryListCall<'a, C, NC, A> {
         self._youngest = new_value.to_string();
         self
@@ -1929,7 +1969,7 @@ impl<'a, C, NC, A> TimeseryListCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// Sets the *page token* query property to the given value.
     ///
     /// 
-    /// The pagination token, which is used to page through large result sets. Set this value to the value of the nextPageToken to retrieve the next page of results.    
+    /// The pagination token, which is used to page through large result sets. Set this value to the value of the nextPageToken to retrieve the next page of results.
     pub fn page_token(mut self, new_value: &str) -> TimeseryListCall<'a, C, NC, A> {
         self._page_token = Some(new_value.to_string());
         self
@@ -1937,7 +1977,7 @@ impl<'a, C, NC, A> TimeseryListCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// Sets the *oldest* query property to the given value.
     ///
     /// 
-    /// Start of the time interval (exclusive), which is expressed as an RFC 3339 timestamp. If neither oldest nor timespan is specified, the default time interval will be (youngest - 4 hours, youngest]    
+    /// Start of the time interval (exclusive), which is expressed as an RFC 3339 timestamp. If neither oldest nor timespan is specified, the default time interval will be (youngest - 4 hours, youngest]
     pub fn oldest(mut self, new_value: &str) -> TimeseryListCall<'a, C, NC, A> {
         self._oldest = Some(new_value.to_string());
         self
@@ -1959,7 +1999,7 @@ impl<'a, C, NC, A> TimeseryListCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// Sets the *count* query property to the given value.
     ///
     /// 
-    /// Maximum number of data points per page, which is used for pagination of results.    
+    /// Maximum number of data points per page, which is used for pagination of results.
     pub fn count(mut self, new_value: i32) -> TimeseryListCall<'a, C, NC, A> {
         self._count = Some(new_value);
         self
@@ -1967,7 +2007,7 @@ impl<'a, C, NC, A> TimeseryListCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// Sets the *aggregator* query property to the given value.
     ///
     /// 
-    /// The aggregation function that will reduce the data points in each window to a single point. This parameter is only valid for non-cumulative metric types.    
+    /// The aggregation function that will reduce the data points in each window to a single point. This parameter is only valid for non-cumulative metric types.
     pub fn aggregator(mut self, new_value: &str) -> TimeseryListCall<'a, C, NC, A> {
         self._aggregator = Some(new_value.to_string());
         self
@@ -2028,7 +2068,7 @@ impl<'a, C, NC, A> TimeseryListCall<'a, C, NC, A> where NC: hyper::net::NetworkC
 /// List metric descriptors that match the query. If the query is not set, then all of the metric descriptors will be returned. Large responses will be paginated, use the nextPageToken returned in the response to request subsequent pages of results by setting the pageToken query parameter to the value of the nextPageToken.
 ///
 /// A builder for the *list* method supported by a *metricDescriptor* resource.
-/// It is not used directly, but through a `MetricDescriptorMethods`.
+/// It is not used directly, but through a `MetricDescriptorMethods` instance.
 ///
 /// # Example
 ///
@@ -2108,7 +2148,7 @@ impl<'a, C, NC, A> MetricDescriptorListCall<'a, C, NC, A> where NC: hyper::net::
         for &field in ["alt", "project", "query", "pageToken", "count"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -2165,7 +2205,7 @@ impl<'a, C, NC, A> MetricDescriptorListCall<'a, C, NC, A> where NC: hyper::net::
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -2181,7 +2221,6 @@ impl<'a, C, NC, A> MetricDescriptorListCall<'a, C, NC, A> where NC: hyper::net::
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -2191,7 +2230,7 @@ impl<'a, C, NC, A> MetricDescriptorListCall<'a, C, NC, A> where NC: hyper::net::
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -2202,7 +2241,7 @@ impl<'a, C, NC, A> MetricDescriptorListCall<'a, C, NC, A> where NC: hyper::net::
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -2211,13 +2250,13 @@ impl<'a, C, NC, A> MetricDescriptorListCall<'a, C, NC, A> where NC: hyper::net::
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -2238,7 +2277,7 @@ impl<'a, C, NC, A> MetricDescriptorListCall<'a, C, NC, A> where NC: hyper::net::
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The project id. The value can be the numeric project ID or string-based project name.    
+    /// The project id. The value can be the numeric project ID or string-based project name.
     pub fn project(mut self, new_value: &str) -> MetricDescriptorListCall<'a, C, NC, A> {
         self._project = new_value.to_string();
         self
@@ -2246,7 +2285,7 @@ impl<'a, C, NC, A> MetricDescriptorListCall<'a, C, NC, A> where NC: hyper::net::
     /// Sets the *query* query property to the given value.
     ///
     /// 
-    /// The query used to search against existing metrics. Separate keywords with a space; the service joins all keywords with AND, meaning that all keywords must match for a metric to be returned. If this field is omitted, all metrics are returned. If an empty string is passed with this field, no metrics are returned.    
+    /// The query used to search against existing metrics. Separate keywords with a space; the service joins all keywords with AND, meaning that all keywords must match for a metric to be returned. If this field is omitted, all metrics are returned. If an empty string is passed with this field, no metrics are returned.
     pub fn query(mut self, new_value: &str) -> MetricDescriptorListCall<'a, C, NC, A> {
         self._query = Some(new_value.to_string());
         self
@@ -2254,7 +2293,7 @@ impl<'a, C, NC, A> MetricDescriptorListCall<'a, C, NC, A> where NC: hyper::net::
     /// Sets the *page token* query property to the given value.
     ///
     /// 
-    /// The pagination token, which is used to page through large result sets. Set this value to the value of the nextPageToken to retrieve the next page of results.    
+    /// The pagination token, which is used to page through large result sets. Set this value to the value of the nextPageToken to retrieve the next page of results.
     pub fn page_token(mut self, new_value: &str) -> MetricDescriptorListCall<'a, C, NC, A> {
         self._page_token = Some(new_value.to_string());
         self
@@ -2262,7 +2301,7 @@ impl<'a, C, NC, A> MetricDescriptorListCall<'a, C, NC, A> where NC: hyper::net::
     /// Sets the *count* query property to the given value.
     ///
     /// 
-    /// Maximum number of metric descriptors per page. Used for pagination. If not specified, count = 100.    
+    /// Maximum number of metric descriptors per page. Used for pagination. If not specified, count = 100.
     pub fn count(mut self, new_value: i32) -> MetricDescriptorListCall<'a, C, NC, A> {
         self._count = Some(new_value);
         self
@@ -2323,7 +2362,7 @@ impl<'a, C, NC, A> MetricDescriptorListCall<'a, C, NC, A> where NC: hyper::net::
 /// Delete an existing metric.
 ///
 /// A builder for the *delete* method supported by a *metricDescriptor* resource.
-/// It is not used directly, but through a `MetricDescriptorMethods`.
+/// It is not used directly, but through a `MetricDescriptorMethods` instance.
 ///
 /// # Example
 ///
@@ -2383,7 +2422,7 @@ impl<'a, C, NC, A> MetricDescriptorDeleteCall<'a, C, NC, A> where NC: hyper::net
         for &field in ["alt", "project", "metric"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -2436,7 +2475,7 @@ impl<'a, C, NC, A> MetricDescriptorDeleteCall<'a, C, NC, A> where NC: hyper::net
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -2448,7 +2487,6 @@ impl<'a, C, NC, A> MetricDescriptorDeleteCall<'a, C, NC, A> where NC: hyper::net
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -2458,7 +2496,7 @@ impl<'a, C, NC, A> MetricDescriptorDeleteCall<'a, C, NC, A> where NC: hyper::net
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -2469,7 +2507,7 @@ impl<'a, C, NC, A> MetricDescriptorDeleteCall<'a, C, NC, A> where NC: hyper::net
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -2478,13 +2516,13 @@ impl<'a, C, NC, A> MetricDescriptorDeleteCall<'a, C, NC, A> where NC: hyper::net
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -2496,7 +2534,7 @@ impl<'a, C, NC, A> MetricDescriptorDeleteCall<'a, C, NC, A> where NC: hyper::net
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The project ID to which the metric belongs.    
+    /// The project ID to which the metric belongs.
     pub fn project(mut self, new_value: &str) -> MetricDescriptorDeleteCall<'a, C, NC, A> {
         self._project = new_value.to_string();
         self
@@ -2506,7 +2544,7 @@ impl<'a, C, NC, A> MetricDescriptorDeleteCall<'a, C, NC, A> where NC: hyper::net
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Name of the metric.    
+    /// Name of the metric.
     pub fn metric(mut self, new_value: &str) -> MetricDescriptorDeleteCall<'a, C, NC, A> {
         self._metric = new_value.to_string();
         self
@@ -2567,7 +2605,7 @@ impl<'a, C, NC, A> MetricDescriptorDeleteCall<'a, C, NC, A> where NC: hyper::net
 /// Create a new metric.
 ///
 /// A builder for the *create* method supported by a *metricDescriptor* resource.
-/// It is not used directly, but through a `MetricDescriptorMethods`.
+/// It is not used directly, but through a `MetricDescriptorMethods` instance.
 ///
 /// # Example
 ///
@@ -2632,7 +2670,7 @@ impl<'a, C, NC, A> MetricDescriptorCreateCall<'a, C, NC, A> where NC: hyper::net
         for &field in ["alt", "project"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -2689,7 +2727,7 @@ impl<'a, C, NC, A> MetricDescriptorCreateCall<'a, C, NC, A> where NC: hyper::net
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -2705,7 +2743,6 @@ impl<'a, C, NC, A> MetricDescriptorCreateCall<'a, C, NC, A> where NC: hyper::net
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -2715,7 +2752,7 @@ impl<'a, C, NC, A> MetricDescriptorCreateCall<'a, C, NC, A> where NC: hyper::net
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -2726,7 +2763,7 @@ impl<'a, C, NC, A> MetricDescriptorCreateCall<'a, C, NC, A> where NC: hyper::net
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -2735,13 +2772,13 @@ impl<'a, C, NC, A> MetricDescriptorCreateCall<'a, C, NC, A> where NC: hyper::net
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -2762,7 +2799,7 @@ impl<'a, C, NC, A> MetricDescriptorCreateCall<'a, C, NC, A> where NC: hyper::net
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The project id. The value can be the numeric project ID or string-based project name.    
+    /// The project id. The value can be the numeric project ID or string-based project name.
     pub fn project(mut self, new_value: &str) -> MetricDescriptorCreateCall<'a, C, NC, A> {
         self._project = new_value.to_string();
         self

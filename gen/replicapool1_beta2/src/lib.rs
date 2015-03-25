@@ -1,8 +1,8 @@
 // DO NOT EDIT !
-// This file was generated automatically from 'src/mako/lib.rs.mako'
+// This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *replicapool* crate version *0.1.1+20141002*, where *20141002* is the exact revision of the *replicapool:v1beta2* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.1*.
+//! This documentation was generated from *replicapool* crate version *0.1.2+20141002*, where *20141002* is the exact revision of the *replicapool:v1beta2* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.2*.
 //! 
 //! Everything else about the *replicapool* *v1_beta2* API can be found at the
 //! [official documentation site](https://developers.google.com/compute/docs/instance-groups/manager/v1beta2).
@@ -27,6 +27,8 @@
 //! 
 //! * **[Hub](struct.Replicapool.html)**
 //!     * a central object to maintain state and allow accessing all *Activities*
+//!     * creates [*Method Builders*](trait.MethodsBuilder.html) which in turn
+//!       allow access to individual [*Call Builders*](trait.CallBuilder.html)
 //! * **[Resources](trait.Resource.html)**
 //!     * primary types that you can apply *Activities* to
 //!     * a collection of properties and *Parts*
@@ -35,6 +37,8 @@
 //!         * never directly used in *Activities*
 //! * **[Activities](trait.CallBuilder.html)**
 //!     * operations to apply to *Resources*
+//! 
+//! All *structures* are marked with applicable traits to further categorize them and ease browsing.
 //! 
 //! Generally speaking, you can invoke *Activities* like this:
 //! 
@@ -79,7 +83,7 @@
 //! extern crate hyper;
 //! extern crate "yup-oauth2" as oauth2;
 //! extern crate "google-replicapool1_beta2" as replicapool1_beta2;
-//! use replicapool1_beta2::Result;
+//! use replicapool1_beta2::{Result, Error};
 //! # #[test] fn egal() {
 //! use std::default::Default;
 //! use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -107,15 +111,17 @@
 //!              .doit();
 //! 
 //! match result {
-//!     Result::HttpError(err) => println!("HTTPERROR: {:?}", err),
-//!     Result::MissingAPIKey => println!("Auth: Missing API Key - used if there are no scopes"),
-//!     Result::MissingToken => println!("OAuth2: Missing Token"),
-//!     Result::Cancelled => println!("Operation cancelled by user"),
-//!     Result::UploadSizeLimitExceeded(size, max_size) => println!("Upload size too big: {} of {}", size, max_size),
-//!     Result::Failure(_) => println!("General Failure (hyper::client::Response doesn't print)"),
-//!     Result::FieldClash(clashed_field) => println!("You added custom parameter which is part of builder: {:?}", clashed_field),
-//!     Result::JsonDecodeError(err) => println!("Couldn't understand server reply - maybe API needs update: {:?}", err),
-//!     Result::Success(_) => println!("Success (value doesn't print)"),
+//!     Err(e) => match e {
+//!         Error::HttpError(err) => println!("HTTPERROR: {:?}", err),
+//!         Error::MissingAPIKey => println!("Auth: Missing API Key - used if there are no scopes"),
+//!         Error::MissingToken => println!("OAuth2: Missing Token"),
+//!         Error::Cancelled => println!("Operation canceled by user"),
+//!         Error::UploadSizeLimitExceeded(size, max_size) => println!("Upload size too big: {} of {}", size, max_size),
+//!         Error::Failure(_) => println!("General Failure (hyper::client::Response doesn't print)"),
+//!         Error::FieldClash(clashed_field) => println!("You added custom parameter which is part of builder: {:?}", clashed_field),
+//!         Error::JsonDecodeError(err) => println!("Couldn't understand server reply - maybe API needs update: {:?}", err),
+//!     },
+//!     Ok(_) => println!("Success (value doesn't print)"),
 //! }
 //! # }
 //! ```
@@ -128,7 +134,7 @@
 //! When delegates handle errors or intermediate values, they may have a chance to instruct the system to retry. This 
 //! makes the system potentially resilient to all kinds of errors.
 //! 
-//! ## Uploads and Downlods
+//! ## Uploads and Downloads
 //! If a method supports downloads, the response body, which is part of the [Result](enum.Result.html), should be
 //! read by you to obtain the media.
 //! If such a method also supports a [Response Result](trait.ResponseResult.html), it will return that by default.
@@ -151,8 +157,9 @@
 //! ## Optional Parts in Server-Requests
 //! 
 //! All structures provided by this library are made to be [enocodable](trait.RequestValue.html) and 
-//! [decodable](trait.ResponseResult.html) via json. Optionals are used to indicate that partial requests are responses are valid.
-//! Most optionals are are considered [Parts](trait.Part.html) which are identifyable by name, which will be sent to 
+//! [decodable](trait.ResponseResult.html) via *json*. Optionals are used to indicate that partial requests are responses 
+//! are valid.
+//! Most optionals are are considered [Parts](trait.Part.html) which are identifiable by name, which will be sent to 
 //! the server to indicate either the set parts of the request or the desired parts in the response.
 //! 
 //! ## Builder Arguments
@@ -201,7 +208,7 @@ use std::io;
 use std::fs;
 use std::thread::sleep;
 
-pub use cmn::{MultiPartReader, ToParts, MethodInfo, Result, CallBuilder, Hub, ReadSeek, Part, ResponseResult, RequestValue, NestedType, Delegate, DefaultDelegate, ResourceMethodsBuilder, Resource, JsonServerError};
+pub use cmn::{MultiPartReader, ToParts, MethodInfo, Result, Error, CallBuilder, Hub, ReadSeek, Part, ResponseResult, RequestValue, NestedType, Delegate, DefaultDelegate, MethodsBuilder, Resource, JsonServerError};
 
 
 // ##############
@@ -255,7 +262,7 @@ impl Default for Scope {
 /// extern crate hyper;
 /// extern crate "yup-oauth2" as oauth2;
 /// extern crate "google-replicapool1_beta2" as replicapool1_beta2;
-/// use replicapool1_beta2::Result;
+/// use replicapool1_beta2::{Result, Error};
 /// # #[test] fn egal() {
 /// use std::default::Default;
 /// use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -283,15 +290,17 @@ impl Default for Scope {
 ///              .doit();
 /// 
 /// match result {
-///     Result::HttpError(err) => println!("HTTPERROR: {:?}", err),
-///     Result::MissingAPIKey => println!("Auth: Missing API Key - used if there are no scopes"),
-///     Result::MissingToken => println!("OAuth2: Missing Token"),
-///     Result::Cancelled => println!("Operation cancelled by user"),
-///     Result::UploadSizeLimitExceeded(size, max_size) => println!("Upload size too big: {} of {}", size, max_size),
-///     Result::Failure(_) => println!("General Failure (hyper::client::Response doesn't print)"),
-///     Result::FieldClash(clashed_field) => println!("You added custom parameter which is part of builder: {:?}", clashed_field),
-///     Result::JsonDecodeError(err) => println!("Couldn't understand server reply - maybe API needs update: {:?}", err),
-///     Result::Success(_) => println!("Success (value doesn't print)"),
+///     Err(e) => match e {
+///         Error::HttpError(err) => println!("HTTPERROR: {:?}", err),
+///         Error::MissingAPIKey => println!("Auth: Missing API Key - used if there are no scopes"),
+///         Error::MissingToken => println!("OAuth2: Missing Token"),
+///         Error::Cancelled => println!("Operation canceled by user"),
+///         Error::UploadSizeLimitExceeded(size, max_size) => println!("Upload size too big: {} of {}", size, max_size),
+///         Error::Failure(_) => println!("General Failure (hyper::client::Response doesn't print)"),
+///         Error::FieldClash(clashed_field) => println!("You added custom parameter which is part of builder: {:?}", clashed_field),
+///         Error::JsonDecodeError(err) => println!("Couldn't understand server reply - maybe API needs update: {:?}", err),
+///     },
+///     Ok(_) => println!("Success (value doesn't print)"),
 /// }
 /// # }
 /// ```
@@ -312,7 +321,7 @@ impl<'a, C, NC, A> Replicapool<C, NC, A>
         Replicapool {
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/0.1.1".to_string(),
+            _user_agent: "google-api-rust-client/0.1.2".to_string(),
             _m: PhantomData
         }
     }
@@ -325,7 +334,7 @@ impl<'a, C, NC, A> Replicapool<C, NC, A>
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/0.1.1`.
+    /// It defaults to `google-api-rust-client/0.1.2`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -345,9 +354,9 @@ impl<'a, C, NC, A> Replicapool<C, NC, A>
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct OperationWarningsData {
-    /// [Output Only] Metadata key for this warning.    
+    /// [Output Only] Metadata key for this warning.
     pub key: String,
-    /// [Output Only] Metadata value for this warning.    
+    /// [Output Only] Metadata value for this warning.
     pub value: String,
 }
 
@@ -380,11 +389,11 @@ impl RequestValue for InstanceGroupManagersRecreateInstancesRequest {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct OperationWarnings {
-    /// [Output only] Optional human-readable details for this warning.    
+    /// [Output only] Optional human-readable details for this warning.
     pub message: String,
-    /// [Output only] The warning type identifier for this warning.    
+    /// [Output only] The warning type identifier for this warning.
     pub code: String,
-    /// [Output only] Metadata for this warning in key:value format.    
+    /// [Output only] Metadata for this warning in key:value format.
     pub data: Vec<OperationWarningsData>,
 }
 
@@ -403,16 +412,16 @@ impl Part for OperationWarnings {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct OperationList {
-    /// A token used to continue a truncated list request (output only).    
+    /// A token used to continue a truncated list request (output only).
     #[serde(alias="nextPageToken")]
     pub next_page_token: String,
-    /// The operation resources.    
+    /// The operation resources.
     pub items: Vec<Operation>,
-    /// Type of resource.    
+    /// Type of resource.
     pub kind: String,
-    /// Unique identifier for the resource; defined by the server (output only).    
+    /// Unique identifier for the resource; defined by the server (output only).
     pub id: String,
-    /// Server defined URL for this resource (output only).    
+    /// Server defined URL for this resource (output only).
     #[serde(alias="selfLink")]
     pub self_link: String,
 }
@@ -431,7 +440,7 @@ impl ResponseResult for OperationList {}
 /// 
 #[derive(Default, Clone, Debug, Serialize)]
 pub struct InstanceGroupManagersSetInstanceTemplateRequest {
-    /// The full URL to an Instance Template from which all new instances will be created.    
+    /// The full URL to an Instance Template from which all new instances will be created.
     #[serde(alias="instanceTemplate")]
     pub instance_template: Option<String>,
 }
@@ -445,11 +454,11 @@ impl RequestValue for InstanceGroupManagersSetInstanceTemplateRequest {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct OperationErrorErrors {
-    /// [Output Only] An optional, human-readable error message.    
+    /// [Output Only] An optional, human-readable error message.
     pub message: String,
-    /// [Output Only] The error type identifier for this error.    
+    /// [Output Only] The error type identifier for this error.
     pub code: String,
-    /// [Output Only] Indicates the field in the request which caused the error. This property is optional.    
+    /// [Output Only] Indicates the field in the request which caused the error. This property is optional.
     pub location: String,
 }
 
@@ -468,16 +477,16 @@ impl Part for OperationErrorErrors {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct InstanceGroupManagerList {
-    /// A token used to continue a truncated list request (output only).    
+    /// A token used to continue a truncated list request (output only).
     #[serde(alias="nextPageToken")]
     pub next_page_token: String,
-    /// A list of instance resources.    
+    /// A list of instance resources.
     pub items: Vec<InstanceGroupManager>,
-    /// Type of resource.    
+    /// Type of resource.
     pub kind: String,
-    /// Unique identifier for the resource; defined by the server (output only).    
+    /// Unique identifier for the resource; defined by the server (output only).
     pub id: String,
-    /// Server defined URL for this resource (output only).    
+    /// Server defined URL for this resource (output only).
     #[serde(alias="selfLink")]
     pub self_link: String,
 }
@@ -491,7 +500,7 @@ impl ResponseResult for InstanceGroupManagerList {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct OperationError {
-    /// [Output Only] The array of errors encountered while processing this operation.    
+    /// [Output Only] The array of errors encountered while processing this operation.
     pub errors: Vec<OperationErrorErrors>,
 }
 
@@ -519,38 +528,38 @@ impl Part for OperationError {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct InstanceGroupManager {
-    /// [Output only] The number of instances that the manager is attempting to maintain. Deleting or abandoning instances affects this number, as does resizing the group.    
+    /// [Output only] The number of instances that the manager is attempting to maintain. Deleting or abandoning instances affects this number, as does resizing the group.
     #[serde(alias="targetSize")]
     pub target_size: Option<i32>,
-    /// [Output only] The full URL of the instance group created by the manager. This group contains all of the instances being managed, and cannot contain non-managed instances.    
+    /// [Output only] The full URL of the instance group created by the manager. This group contains all of the instances being managed, and cannot contain non-managed instances.
     pub group: Option<String>,
-    /// An optional textual description of the instance group manager.    
+    /// An optional textual description of the instance group manager.
     pub description: Option<String>,
-    /// [Output only] Fingerprint of the instance group manager. This field is used for optimistic locking. An up-to-date fingerprint must be provided in order to modify the Instance Group Manager resource.    
+    /// [Output only] Fingerprint of the instance group manager. This field is used for optimistic locking. An up-to-date fingerprint must be provided in order to modify the Instance Group Manager resource.
     pub fingerprint: Option<String>,
-    /// [Output only] The resource type. Always replicapool#instanceGroupManager.    
+    /// [Output only] The resource type. Always replicapool#instanceGroupManager.
     pub kind: Option<String>,
-    /// The base instance name to use for instances in this group. The value must be a valid RFC1035 name. Supported characters are lowercase letters, numbers, and hyphens (-). Instances are named by appending a hyphen and a random four-character string to the base instance name.    
+    /// The base instance name to use for instances in this group. The value must be a valid RFC1035 name. Supported characters are lowercase letters, numbers, and hyphens (-). Instances are named by appending a hyphen and a random four-character string to the base instance name.
     #[serde(alias="baseInstanceName")]
     pub base_instance_name: Option<String>,
-    /// The full URL of all target pools to which new instances in the group are added. Updating the target pool values does not affect existing instances.    
+    /// The full URL of all target pools to which new instances in the group are added. Updating the target pool values does not affect existing instances.
     #[serde(alias="targetPools")]
     pub target_pools: Option<Vec<String>>,
-    /// The full URL to an instance template from which all new instances will be created.    
+    /// The full URL to an instance template from which all new instances will be created.
     #[serde(alias="instanceTemplate")]
     pub instance_template: Option<String>,
-    /// [Output only] The number of instances that currently exist and are a part of this group. This includes instances that are starting but are not yet RUNNING, and instances that are in the process of being deleted or abandoned.    
+    /// [Output only] The number of instances that currently exist and are a part of this group. This includes instances that are starting but are not yet RUNNING, and instances that are in the process of being deleted or abandoned.
     #[serde(alias="currentSize")]
     pub current_size: Option<i32>,
-    /// [Output only] The time the instance group manager was created, in RFC3339 text format.    
+    /// [Output only] The time the instance group manager was created, in RFC3339 text format.
     #[serde(alias="creationTimestamp")]
     pub creation_timestamp: Option<String>,
-    /// [Output only] A server-assigned unique identifier for the resource.    
+    /// [Output only] A server-assigned unique identifier for the resource.
     pub id: Option<String>,
-    /// [Output only] The fully qualified URL for this resource.    
+    /// [Output only] The fully qualified URL for this resource.
     #[serde(alias="selfLink")]
     pub self_link: Option<String>,
-    /// The name of the instance group manager. Must be 1-63 characters long and comply with RFC1035. Supported characters include lowercase letters, numbers, and hyphens.    
+    /// The name of the instance group manager. Must be 1-63 characters long and comply with RFC1035. Supported characters include lowercase letters, numbers, and hyphens.
     pub name: Option<String>,
 }
 
@@ -570,9 +579,9 @@ impl ResponseResult for InstanceGroupManager {}
 /// 
 #[derive(Default, Clone, Debug, Serialize)]
 pub struct InstanceGroupManagersSetTargetPoolsRequest {
-    /// The current fingerprint of the Instance Group Manager resource. If this does not match the server-side fingerprint of the resource, then the request will be rejected.    
+    /// The current fingerprint of the Instance Group Manager resource. If this does not match the server-side fingerprint of the resource, then the request will be rejected.
     pub fingerprint: Option<String>,
-    /// A list of fully-qualified URLs to existing Target Pool resources. New instances in the Instance Group Manager will be added to the specified target pools; existing instances are not affected.    
+    /// A list of fully-qualified URLs to existing Target Pool resources. New instances in the Instance Group Manager will be added to the specified target pools; existing instances are not affected.
     #[serde(alias="targetPools")]
     pub target_pools: Option<Vec<String>>,
 }
@@ -638,61 +647,61 @@ impl RequestValue for InstanceGroupManagersDeleteInstancesRequest {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct Operation {
-    /// [Output Only] Status of the operation.    
+    /// [Output Only] Status of the operation.
     pub status: String,
-    /// [Output Only] The time that this operation was requested, in RFC3339 text format.    
+    /// [Output Only] The time that this operation was requested, in RFC3339 text format.
     #[serde(alias="insertTime")]
     pub insert_time: String,
-    /// [Output Only] If there are issues with this operation, a warning is returned.    
+    /// [Output Only] If there are issues with this operation, a warning is returned.
     pub warnings: Vec<OperationWarnings>,
-    /// [Output Only] If errors occurred during processing of this operation, this field will be populated.    
+    /// [Output Only] If errors occurred during processing of this operation, this field will be populated.
     pub error: OperationError,
-    /// [Output Only] Unique target ID which identifies a particular incarnation of the target.    
+    /// [Output Only] Unique target ID which identifies a particular incarnation of the target.
     #[serde(alias="targetId")]
     pub target_id: String,
-    /// [Output only] URL of the resource the operation is mutating.    
+    /// [Output only] URL of the resource the operation is mutating.
     #[serde(alias="targetLink")]
     pub target_link: String,
-    /// [Output Only] The time that this operation was started by the server, in RFC3339 text format.    
+    /// [Output Only] The time that this operation was started by the server, in RFC3339 text format.
     #[serde(alias="startTime")]
     pub start_time: String,
-    /// [Output only] An optional identifier specified by the client when the mutation was initiated. Must be unique for all operation resources in the project.    
+    /// [Output only] An optional identifier specified by the client when the mutation was initiated. Must be unique for all operation resources in the project.
     #[serde(alias="clientOperationId")]
     pub client_operation_id: String,
-    /// [Output Only] The time that this operation was requested, in RFC3339 text format.    
+    /// [Output Only] The time that this operation was requested, in RFC3339 text format.
     #[serde(alias="creationTimestamp")]
     pub creation_timestamp: String,
-    /// [Output Only] Unique identifier for the resource, generated by the server.    
+    /// [Output Only] Unique identifier for the resource, generated by the server.
     pub id: String,
-    /// [Output only] Type of the resource.    
+    /// [Output only] Type of the resource.
     pub kind: String,
-    /// [Output Only] Name of the resource.    
+    /// [Output Only] Name of the resource.
     pub name: String,
-    /// [Output Only] URL of the zone where the operation resides. Only available when performing per-zone operations.    
+    /// [Output Only] URL of the zone where the operation resides. Only available when performing per-zone operations.
     pub zone: String,
-    /// [Output Only] URL of the region where the operation resides. Only available when performing regional operations.    
+    /// [Output Only] URL of the region where the operation resides. Only available when performing regional operations.
     pub region: String,
-    /// [Output Only] Server-defined fully-qualified URL for this resource.    
+    /// [Output Only] Server-defined fully-qualified URL for this resource.
     #[serde(alias="selfLink")]
     pub self_link: String,
-    /// [Output only] Type of the operation. Operations include insert, update, and delete.    
+    /// [Output only] Type of the operation. Operations include insert, update, and delete.
     #[serde(alias="operationType")]
     pub operation_type: String,
-    /// [Output only] If operation fails, the HTTP error message returned.    
+    /// [Output only] If operation fails, the HTTP error message returned.
     #[serde(alias="httpErrorMessage")]
     pub http_error_message: String,
-    /// [Output only] An optional progress indicator that ranges from 0 to 100. There is no requirement that this be linear or support any granularity of operations. This should not be used to guess at when the operation will be complete. This number should be monotonically increasing as the operation progresses.    
+    /// [Output only] An optional progress indicator that ranges from 0 to 100. There is no requirement that this be linear or support any granularity of operations. This should not be used to guess at when the operation will be complete. This number should be monotonically increasing as the operation progresses.
     pub progress: i32,
-    /// [Output Only] The time that this operation was completed, in RFC3339 text format.    
+    /// [Output Only] The time that this operation was completed, in RFC3339 text format.
     #[serde(alias="endTime")]
     pub end_time: String,
-    /// [Output only] If operation fails, the HTTP error status code returned.    
+    /// [Output only] If operation fails, the HTTP error status code returned.
     #[serde(alias="httpErrorStatusCode")]
     pub http_error_status_code: i32,
-    /// [Output Only] An optional textual description of the current status of the operation.    
+    /// [Output Only] An optional textual description of the current status of the operation.
     #[serde(alias="statusMessage")]
     pub status_message: String,
-    /// [Output Only] User who requested the operation, for example: user@example.com.    
+    /// [Output Only] User who requested the operation, for example: user@example.com.
     pub user: String,
 }
 
@@ -738,13 +747,18 @@ pub struct ZoneOperationMethods<'a, C, NC, A>
     hub: &'a Replicapool<C, NC, A>,
 }
 
-impl<'a, C, NC, A> ResourceMethodsBuilder for ZoneOperationMethods<'a, C, NC, A> {}
+impl<'a, C, NC, A> MethodsBuilder for ZoneOperationMethods<'a, C, NC, A> {}
 
 impl<'a, C, NC, A> ZoneOperationMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Retrieves the list of operation resources contained within the specified zone.    
+    /// Retrieves the list of operation resources contained within the specified zone.
+    /// 
+    /// # Arguments
+    ///
+    /// * `project` - Name of the project scoping this request.
+    /// * `zone` - Name of the zone scoping this request.
     pub fn list(&self, project: &str, zone: &str) -> ZoneOperationListCall<'a, C, NC, A> {
         ZoneOperationListCall {
             hub: self.hub,
@@ -761,7 +775,13 @@ impl<'a, C, NC, A> ZoneOperationMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Retrieves the specified zone-specific operation resource.    
+    /// Retrieves the specified zone-specific operation resource.
+    /// 
+    /// # Arguments
+    ///
+    /// * `project` - Name of the project scoping this request.
+    /// * `zone` - Name of the zone scoping this request.
+    /// * `operation` - Name of the operation resource to return.
     pub fn get(&self, project: &str, zone: &str, operation: &str) -> ZoneOperationGetCall<'a, C, NC, A> {
         ZoneOperationGetCall {
             hub: self.hub,
@@ -811,13 +831,20 @@ pub struct InstanceGroupManagerMethods<'a, C, NC, A>
     hub: &'a Replicapool<C, NC, A>,
 }
 
-impl<'a, C, NC, A> ResourceMethodsBuilder for InstanceGroupManagerMethods<'a, C, NC, A> {}
+impl<'a, C, NC, A> MethodsBuilder for InstanceGroupManagerMethods<'a, C, NC, A> {}
 
 impl<'a, C, NC, A> InstanceGroupManagerMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Modifies the target pools to which all new instances in this group are assigned. Existing instances in the group are not affected.    
+    /// Modifies the target pools to which all new instances in this group are assigned. Existing instances in the group are not affected.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `project` - The Google Developers Console project name.
+    /// * `zone` - The name of the zone in which the instance group manager resides.
+    /// * `instanceGroupManager` - The name of the instance group manager.
     pub fn set_target_pools(&self, request: &InstanceGroupManagersSetTargetPoolsRequest, project: &str, zone: &str, instance_group_manager: &str) -> InstanceGroupManagerSetTargetPoolCall<'a, C, NC, A> {
         InstanceGroupManagerSetTargetPoolCall {
             hub: self.hub,
@@ -833,7 +860,12 @@ impl<'a, C, NC, A> InstanceGroupManagerMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Retrieves the list of Instance Group Manager resources contained within the specified zone.    
+    /// Retrieves the list of Instance Group Manager resources contained within the specified zone.
+    /// 
+    /// # Arguments
+    ///
+    /// * `project` - The Google Developers Console project name.
+    /// * `zone` - The name of the zone in which the instance group manager resides.
     pub fn list(&self, project: &str, zone: &str) -> InstanceGroupManagerListCall<'a, C, NC, A> {
         InstanceGroupManagerListCall {
             hub: self.hub,
@@ -850,7 +882,14 @@ impl<'a, C, NC, A> InstanceGroupManagerMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Creates an instance group manager, as well as the instance group and the specified number of instances.    
+    /// Creates an instance group manager, as well as the instance group and the specified number of instances.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `project` - The Google Developers Console project name.
+    /// * `zone` - The name of the zone in which the instance group manager resides.
+    /// * `size` - Number of instances that should exist.
     pub fn insert(&self, request: &InstanceGroupManager, project: &str, zone: &str, size: i32) -> InstanceGroupManagerInsertCall<'a, C, NC, A> {
         InstanceGroupManagerInsertCall {
             hub: self.hub,
@@ -866,7 +905,13 @@ impl<'a, C, NC, A> InstanceGroupManagerMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Returns the specified Instance Group Manager resource.    
+    /// Returns the specified Instance Group Manager resource.
+    /// 
+    /// # Arguments
+    ///
+    /// * `project` - The Google Developers Console project name.
+    /// * `zone` - The name of the zone in which the instance group manager resides.
+    /// * `instanceGroupManager` - Name of the instance resource to return.
     pub fn get(&self, project: &str, zone: &str, instance_group_manager: &str) -> InstanceGroupManagerGetCall<'a, C, NC, A> {
         InstanceGroupManagerGetCall {
             hub: self.hub,
@@ -881,7 +926,14 @@ impl<'a, C, NC, A> InstanceGroupManagerMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Removes the specified instances from the managed instance group, and from any target pools of which they were members, without deleting the instances.    
+    /// Removes the specified instances from the managed instance group, and from any target pools of which they were members, without deleting the instances.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `project` - The Google Developers Console project name.
+    /// * `zone` - The name of the zone in which the instance group manager resides.
+    /// * `instanceGroupManager` - The name of the instance group manager.
     pub fn abandon_instances(&self, request: &InstanceGroupManagersAbandonInstancesRequest, project: &str, zone: &str, instance_group_manager: &str) -> InstanceGroupManagerAbandonInstanceCall<'a, C, NC, A> {
         InstanceGroupManagerAbandonInstanceCall {
             hub: self.hub,
@@ -897,7 +949,14 @@ impl<'a, C, NC, A> InstanceGroupManagerMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Recreates the specified instances. The instances are deleted, then recreated using the instance group manager's current instance template.    
+    /// Recreates the specified instances. The instances are deleted, then recreated using the instance group manager's current instance template.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `project` - The Google Developers Console project name.
+    /// * `zone` - The name of the zone in which the instance group manager resides.
+    /// * `instanceGroupManager` - The name of the instance group manager.
     pub fn recreate_instances(&self, request: &InstanceGroupManagersRecreateInstancesRequest, project: &str, zone: &str, instance_group_manager: &str) -> InstanceGroupManagerRecreateInstanceCall<'a, C, NC, A> {
         InstanceGroupManagerRecreateInstanceCall {
             hub: self.hub,
@@ -913,7 +972,13 @@ impl<'a, C, NC, A> InstanceGroupManagerMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Deletes the instance group manager and all instances contained within. If you'd like to delete the manager without deleting the instances, you must first abandon the instances to remove them from the group.    
+    /// Deletes the instance group manager and all instances contained within. If you'd like to delete the manager without deleting the instances, you must first abandon the instances to remove them from the group.
+    /// 
+    /// # Arguments
+    ///
+    /// * `project` - The Google Developers Console project name.
+    /// * `zone` - The name of the zone in which the instance group manager resides.
+    /// * `instanceGroupManager` - Name of the Instance Group Manager resource to delete.
     pub fn delete(&self, project: &str, zone: &str, instance_group_manager: &str) -> InstanceGroupManagerDeleteCall<'a, C, NC, A> {
         InstanceGroupManagerDeleteCall {
             hub: self.hub,
@@ -928,7 +993,14 @@ impl<'a, C, NC, A> InstanceGroupManagerMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Sets the instance template to use when creating new instances in this group. Existing instances are not affected.    
+    /// Sets the instance template to use when creating new instances in this group. Existing instances are not affected.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `project` - The Google Developers Console project name.
+    /// * `zone` - The name of the zone in which the instance group manager resides.
+    /// * `instanceGroupManager` - The name of the instance group manager.
     pub fn set_instance_template(&self, request: &InstanceGroupManagersSetInstanceTemplateRequest, project: &str, zone: &str, instance_group_manager: &str) -> InstanceGroupManagerSetInstanceTemplateCall<'a, C, NC, A> {
         InstanceGroupManagerSetInstanceTemplateCall {
             hub: self.hub,
@@ -944,7 +1016,14 @@ impl<'a, C, NC, A> InstanceGroupManagerMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Resizes the managed instance group up or down. If resized up, new instances are created using the current instance template. If resized down, instances are removed in the order outlined in Resizing a managed instance group.    
+    /// Resizes the managed instance group up or down. If resized up, new instances are created using the current instance template. If resized down, instances are removed in the order outlined in Resizing a managed instance group.
+    /// 
+    /// # Arguments
+    ///
+    /// * `project` - The Google Developers Console project name.
+    /// * `zone` - The name of the zone in which the instance group manager resides.
+    /// * `instanceGroupManager` - The name of the instance group manager.
+    /// * `size` - Number of instances that should exist in this Instance Group Manager.
     pub fn resize(&self, project: &str, zone: &str, instance_group_manager: &str, size: i32) -> InstanceGroupManagerResizeCall<'a, C, NC, A> {
         InstanceGroupManagerResizeCall {
             hub: self.hub,
@@ -960,7 +1039,14 @@ impl<'a, C, NC, A> InstanceGroupManagerMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Deletes the specified instances. The instances are removed from the instance group and any target pools of which they are a member, then deleted. The targetSize of the instance group manager is reduced by the number of instances deleted.    
+    /// Deletes the specified instances. The instances are removed from the instance group and any target pools of which they are a member, then deleted. The targetSize of the instance group manager is reduced by the number of instances deleted.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `project` - The Google Developers Console project name.
+    /// * `zone` - The name of the zone in which the instance group manager resides.
+    /// * `instanceGroupManager` - The name of the instance group manager.
     pub fn delete_instances(&self, request: &InstanceGroupManagersDeleteInstancesRequest, project: &str, zone: &str, instance_group_manager: &str) -> InstanceGroupManagerDeleteInstanceCall<'a, C, NC, A> {
         InstanceGroupManagerDeleteInstanceCall {
             hub: self.hub,
@@ -986,7 +1072,7 @@ impl<'a, C, NC, A> InstanceGroupManagerMethods<'a, C, NC, A> {
 /// Retrieves the list of operation resources contained within the specified zone.
 ///
 /// A builder for the *list* method supported by a *zoneOperation* resource.
-/// It is not used directly, but through a `ZoneOperationMethods`.
+/// It is not used directly, but through a `ZoneOperationMethods` instance.
 ///
 /// # Example
 ///
@@ -1061,7 +1147,7 @@ impl<'a, C, NC, A> ZoneOperationListCall<'a, C, NC, A> where NC: hyper::net::Net
         for &field in ["alt", "project", "zone", "pageToken", "maxResults", "filter"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -1114,7 +1200,7 @@ impl<'a, C, NC, A> ZoneOperationListCall<'a, C, NC, A> where NC: hyper::net::Net
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -1126,7 +1212,6 @@ impl<'a, C, NC, A> ZoneOperationListCall<'a, C, NC, A> where NC: hyper::net::Net
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -1136,7 +1221,7 @@ impl<'a, C, NC, A> ZoneOperationListCall<'a, C, NC, A> where NC: hyper::net::Net
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -1147,7 +1232,7 @@ impl<'a, C, NC, A> ZoneOperationListCall<'a, C, NC, A> where NC: hyper::net::Net
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -1156,13 +1241,13 @@ impl<'a, C, NC, A> ZoneOperationListCall<'a, C, NC, A> where NC: hyper::net::Net
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -1174,7 +1259,7 @@ impl<'a, C, NC, A> ZoneOperationListCall<'a, C, NC, A> where NC: hyper::net::Net
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Name of the project scoping this request.    
+    /// Name of the project scoping this request.
     pub fn project(mut self, new_value: &str) -> ZoneOperationListCall<'a, C, NC, A> {
         self._project = new_value.to_string();
         self
@@ -1184,7 +1269,7 @@ impl<'a, C, NC, A> ZoneOperationListCall<'a, C, NC, A> where NC: hyper::net::Net
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Name of the zone scoping this request.    
+    /// Name of the zone scoping this request.
     pub fn zone(mut self, new_value: &str) -> ZoneOperationListCall<'a, C, NC, A> {
         self._zone = new_value.to_string();
         self
@@ -1192,7 +1277,7 @@ impl<'a, C, NC, A> ZoneOperationListCall<'a, C, NC, A> where NC: hyper::net::Net
     /// Sets the *page token* query property to the given value.
     ///
     /// 
-    /// Optional. Tag returned by a previous list request truncated by maxResults. Used to continue a previous list request.    
+    /// Optional. Tag returned by a previous list request truncated by maxResults. Used to continue a previous list request.
     pub fn page_token(mut self, new_value: &str) -> ZoneOperationListCall<'a, C, NC, A> {
         self._page_token = Some(new_value.to_string());
         self
@@ -1200,7 +1285,7 @@ impl<'a, C, NC, A> ZoneOperationListCall<'a, C, NC, A> where NC: hyper::net::Net
     /// Sets the *max results* query property to the given value.
     ///
     /// 
-    /// Optional. Maximum count of results to be returned. Maximum value is 500 and default value is 500.    
+    /// Optional. Maximum count of results to be returned. Maximum value is 500 and default value is 500.
     pub fn max_results(mut self, new_value: u32) -> ZoneOperationListCall<'a, C, NC, A> {
         self._max_results = Some(new_value);
         self
@@ -1208,7 +1293,7 @@ impl<'a, C, NC, A> ZoneOperationListCall<'a, C, NC, A> where NC: hyper::net::Net
     /// Sets the *filter* query property to the given value.
     ///
     /// 
-    /// Optional. Filter expression for filtering listed resources.    
+    /// Optional. Filter expression for filtering listed resources.
     pub fn filter(mut self, new_value: &str) -> ZoneOperationListCall<'a, C, NC, A> {
         self._filter = Some(new_value.to_string());
         self
@@ -1269,7 +1354,7 @@ impl<'a, C, NC, A> ZoneOperationListCall<'a, C, NC, A> where NC: hyper::net::Net
 /// Retrieves the specified zone-specific operation resource.
 ///
 /// A builder for the *get* method supported by a *zoneOperation* resource.
-/// It is not used directly, but through a `ZoneOperationMethods`.
+/// It is not used directly, but through a `ZoneOperationMethods` instance.
 ///
 /// # Example
 ///
@@ -1331,7 +1416,7 @@ impl<'a, C, NC, A> ZoneOperationGetCall<'a, C, NC, A> where NC: hyper::net::Netw
         for &field in ["alt", "project", "zone", "operation"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -1384,7 +1469,7 @@ impl<'a, C, NC, A> ZoneOperationGetCall<'a, C, NC, A> where NC: hyper::net::Netw
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -1396,7 +1481,6 @@ impl<'a, C, NC, A> ZoneOperationGetCall<'a, C, NC, A> where NC: hyper::net::Netw
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -1406,7 +1490,7 @@ impl<'a, C, NC, A> ZoneOperationGetCall<'a, C, NC, A> where NC: hyper::net::Netw
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -1417,7 +1501,7 @@ impl<'a, C, NC, A> ZoneOperationGetCall<'a, C, NC, A> where NC: hyper::net::Netw
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -1426,13 +1510,13 @@ impl<'a, C, NC, A> ZoneOperationGetCall<'a, C, NC, A> where NC: hyper::net::Netw
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -1444,7 +1528,7 @@ impl<'a, C, NC, A> ZoneOperationGetCall<'a, C, NC, A> where NC: hyper::net::Netw
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Name of the project scoping this request.    
+    /// Name of the project scoping this request.
     pub fn project(mut self, new_value: &str) -> ZoneOperationGetCall<'a, C, NC, A> {
         self._project = new_value.to_string();
         self
@@ -1454,7 +1538,7 @@ impl<'a, C, NC, A> ZoneOperationGetCall<'a, C, NC, A> where NC: hyper::net::Netw
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Name of the zone scoping this request.    
+    /// Name of the zone scoping this request.
     pub fn zone(mut self, new_value: &str) -> ZoneOperationGetCall<'a, C, NC, A> {
         self._zone = new_value.to_string();
         self
@@ -1464,7 +1548,7 @@ impl<'a, C, NC, A> ZoneOperationGetCall<'a, C, NC, A> where NC: hyper::net::Netw
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Name of the operation resource to return.    
+    /// Name of the operation resource to return.
     pub fn operation(mut self, new_value: &str) -> ZoneOperationGetCall<'a, C, NC, A> {
         self._operation = new_value.to_string();
         self
@@ -1525,7 +1609,7 @@ impl<'a, C, NC, A> ZoneOperationGetCall<'a, C, NC, A> where NC: hyper::net::Netw
 /// Modifies the target pools to which all new instances in this group are assigned. Existing instances in the group are not affected.
 ///
 /// A builder for the *setTargetPools* method supported by a *instanceGroupManager* resource.
-/// It is not used directly, but through a `InstanceGroupManagerMethods`.
+/// It is not used directly, but through a `InstanceGroupManagerMethods` instance.
 ///
 /// # Example
 ///
@@ -1594,7 +1678,7 @@ impl<'a, C, NC, A> InstanceGroupManagerSetTargetPoolCall<'a, C, NC, A> where NC:
         for &field in ["alt", "project", "zone", "instanceGroupManager"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -1651,7 +1735,7 @@ impl<'a, C, NC, A> InstanceGroupManagerSetTargetPoolCall<'a, C, NC, A> where NC:
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -1667,7 +1751,6 @@ impl<'a, C, NC, A> InstanceGroupManagerSetTargetPoolCall<'a, C, NC, A> where NC:
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -1677,7 +1760,7 @@ impl<'a, C, NC, A> InstanceGroupManagerSetTargetPoolCall<'a, C, NC, A> where NC:
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -1688,7 +1771,7 @@ impl<'a, C, NC, A> InstanceGroupManagerSetTargetPoolCall<'a, C, NC, A> where NC:
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -1697,13 +1780,13 @@ impl<'a, C, NC, A> InstanceGroupManagerSetTargetPoolCall<'a, C, NC, A> where NC:
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -1724,7 +1807,7 @@ impl<'a, C, NC, A> InstanceGroupManagerSetTargetPoolCall<'a, C, NC, A> where NC:
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The Google Developers Console project name.    
+    /// The Google Developers Console project name.
     pub fn project(mut self, new_value: &str) -> InstanceGroupManagerSetTargetPoolCall<'a, C, NC, A> {
         self._project = new_value.to_string();
         self
@@ -1734,7 +1817,7 @@ impl<'a, C, NC, A> InstanceGroupManagerSetTargetPoolCall<'a, C, NC, A> where NC:
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The name of the zone in which the instance group manager resides.    
+    /// The name of the zone in which the instance group manager resides.
     pub fn zone(mut self, new_value: &str) -> InstanceGroupManagerSetTargetPoolCall<'a, C, NC, A> {
         self._zone = new_value.to_string();
         self
@@ -1744,7 +1827,7 @@ impl<'a, C, NC, A> InstanceGroupManagerSetTargetPoolCall<'a, C, NC, A> where NC:
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The name of the instance group manager.    
+    /// The name of the instance group manager.
     pub fn instance_group_manager(mut self, new_value: &str) -> InstanceGroupManagerSetTargetPoolCall<'a, C, NC, A> {
         self._instance_group_manager = new_value.to_string();
         self
@@ -1805,7 +1888,7 @@ impl<'a, C, NC, A> InstanceGroupManagerSetTargetPoolCall<'a, C, NC, A> where NC:
 /// Retrieves the list of Instance Group Manager resources contained within the specified zone.
 ///
 /// A builder for the *list* method supported by a *instanceGroupManager* resource.
-/// It is not used directly, but through a `InstanceGroupManagerMethods`.
+/// It is not used directly, but through a `InstanceGroupManagerMethods` instance.
 ///
 /// # Example
 ///
@@ -1880,7 +1963,7 @@ impl<'a, C, NC, A> InstanceGroupManagerListCall<'a, C, NC, A> where NC: hyper::n
         for &field in ["alt", "project", "zone", "pageToken", "maxResults", "filter"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -1933,7 +2016,7 @@ impl<'a, C, NC, A> InstanceGroupManagerListCall<'a, C, NC, A> where NC: hyper::n
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -1945,7 +2028,6 @@ impl<'a, C, NC, A> InstanceGroupManagerListCall<'a, C, NC, A> where NC: hyper::n
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -1955,7 +2037,7 @@ impl<'a, C, NC, A> InstanceGroupManagerListCall<'a, C, NC, A> where NC: hyper::n
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -1966,7 +2048,7 @@ impl<'a, C, NC, A> InstanceGroupManagerListCall<'a, C, NC, A> where NC: hyper::n
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -1975,13 +2057,13 @@ impl<'a, C, NC, A> InstanceGroupManagerListCall<'a, C, NC, A> where NC: hyper::n
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -1993,7 +2075,7 @@ impl<'a, C, NC, A> InstanceGroupManagerListCall<'a, C, NC, A> where NC: hyper::n
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The Google Developers Console project name.    
+    /// The Google Developers Console project name.
     pub fn project(mut self, new_value: &str) -> InstanceGroupManagerListCall<'a, C, NC, A> {
         self._project = new_value.to_string();
         self
@@ -2003,7 +2085,7 @@ impl<'a, C, NC, A> InstanceGroupManagerListCall<'a, C, NC, A> where NC: hyper::n
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The name of the zone in which the instance group manager resides.    
+    /// The name of the zone in which the instance group manager resides.
     pub fn zone(mut self, new_value: &str) -> InstanceGroupManagerListCall<'a, C, NC, A> {
         self._zone = new_value.to_string();
         self
@@ -2011,7 +2093,7 @@ impl<'a, C, NC, A> InstanceGroupManagerListCall<'a, C, NC, A> where NC: hyper::n
     /// Sets the *page token* query property to the given value.
     ///
     /// 
-    /// Optional. Tag returned by a previous list request truncated by maxResults. Used to continue a previous list request.    
+    /// Optional. Tag returned by a previous list request truncated by maxResults. Used to continue a previous list request.
     pub fn page_token(mut self, new_value: &str) -> InstanceGroupManagerListCall<'a, C, NC, A> {
         self._page_token = Some(new_value.to_string());
         self
@@ -2019,7 +2101,7 @@ impl<'a, C, NC, A> InstanceGroupManagerListCall<'a, C, NC, A> where NC: hyper::n
     /// Sets the *max results* query property to the given value.
     ///
     /// 
-    /// Optional. Maximum count of results to be returned. Maximum value is 500 and default value is 500.    
+    /// Optional. Maximum count of results to be returned. Maximum value is 500 and default value is 500.
     pub fn max_results(mut self, new_value: u32) -> InstanceGroupManagerListCall<'a, C, NC, A> {
         self._max_results = Some(new_value);
         self
@@ -2027,7 +2109,7 @@ impl<'a, C, NC, A> InstanceGroupManagerListCall<'a, C, NC, A> where NC: hyper::n
     /// Sets the *filter* query property to the given value.
     ///
     /// 
-    /// Optional. Filter expression for filtering listed resources.    
+    /// Optional. Filter expression for filtering listed resources.
     pub fn filter(mut self, new_value: &str) -> InstanceGroupManagerListCall<'a, C, NC, A> {
         self._filter = Some(new_value.to_string());
         self
@@ -2088,7 +2170,7 @@ impl<'a, C, NC, A> InstanceGroupManagerListCall<'a, C, NC, A> where NC: hyper::n
 /// Creates an instance group manager, as well as the instance group and the specified number of instances.
 ///
 /// A builder for the *insert* method supported by a *instanceGroupManager* resource.
-/// It is not used directly, but through a `InstanceGroupManagerMethods`.
+/// It is not used directly, but through a `InstanceGroupManagerMethods` instance.
 ///
 /// # Example
 ///
@@ -2157,7 +2239,7 @@ impl<'a, C, NC, A> InstanceGroupManagerInsertCall<'a, C, NC, A> where NC: hyper:
         for &field in ["alt", "project", "zone", "size"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -2214,7 +2296,7 @@ impl<'a, C, NC, A> InstanceGroupManagerInsertCall<'a, C, NC, A> where NC: hyper:
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -2230,7 +2312,6 @@ impl<'a, C, NC, A> InstanceGroupManagerInsertCall<'a, C, NC, A> where NC: hyper:
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -2240,7 +2321,7 @@ impl<'a, C, NC, A> InstanceGroupManagerInsertCall<'a, C, NC, A> where NC: hyper:
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -2251,7 +2332,7 @@ impl<'a, C, NC, A> InstanceGroupManagerInsertCall<'a, C, NC, A> where NC: hyper:
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -2260,13 +2341,13 @@ impl<'a, C, NC, A> InstanceGroupManagerInsertCall<'a, C, NC, A> where NC: hyper:
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -2287,7 +2368,7 @@ impl<'a, C, NC, A> InstanceGroupManagerInsertCall<'a, C, NC, A> where NC: hyper:
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The Google Developers Console project name.    
+    /// The Google Developers Console project name.
     pub fn project(mut self, new_value: &str) -> InstanceGroupManagerInsertCall<'a, C, NC, A> {
         self._project = new_value.to_string();
         self
@@ -2297,7 +2378,7 @@ impl<'a, C, NC, A> InstanceGroupManagerInsertCall<'a, C, NC, A> where NC: hyper:
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The name of the zone in which the instance group manager resides.    
+    /// The name of the zone in which the instance group manager resides.
     pub fn zone(mut self, new_value: &str) -> InstanceGroupManagerInsertCall<'a, C, NC, A> {
         self._zone = new_value.to_string();
         self
@@ -2307,7 +2388,7 @@ impl<'a, C, NC, A> InstanceGroupManagerInsertCall<'a, C, NC, A> where NC: hyper:
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Number of instances that should exist.    
+    /// Number of instances that should exist.
     pub fn size(mut self, new_value: i32) -> InstanceGroupManagerInsertCall<'a, C, NC, A> {
         self._size = new_value;
         self
@@ -2368,7 +2449,7 @@ impl<'a, C, NC, A> InstanceGroupManagerInsertCall<'a, C, NC, A> where NC: hyper:
 /// Returns the specified Instance Group Manager resource.
 ///
 /// A builder for the *get* method supported by a *instanceGroupManager* resource.
-/// It is not used directly, but through a `InstanceGroupManagerMethods`.
+/// It is not used directly, but through a `InstanceGroupManagerMethods` instance.
 ///
 /// # Example
 ///
@@ -2430,7 +2511,7 @@ impl<'a, C, NC, A> InstanceGroupManagerGetCall<'a, C, NC, A> where NC: hyper::ne
         for &field in ["alt", "project", "zone", "instanceGroupManager"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -2483,7 +2564,7 @@ impl<'a, C, NC, A> InstanceGroupManagerGetCall<'a, C, NC, A> where NC: hyper::ne
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -2495,7 +2576,6 @@ impl<'a, C, NC, A> InstanceGroupManagerGetCall<'a, C, NC, A> where NC: hyper::ne
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -2505,7 +2585,7 @@ impl<'a, C, NC, A> InstanceGroupManagerGetCall<'a, C, NC, A> where NC: hyper::ne
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -2516,7 +2596,7 @@ impl<'a, C, NC, A> InstanceGroupManagerGetCall<'a, C, NC, A> where NC: hyper::ne
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -2525,13 +2605,13 @@ impl<'a, C, NC, A> InstanceGroupManagerGetCall<'a, C, NC, A> where NC: hyper::ne
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -2543,7 +2623,7 @@ impl<'a, C, NC, A> InstanceGroupManagerGetCall<'a, C, NC, A> where NC: hyper::ne
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The Google Developers Console project name.    
+    /// The Google Developers Console project name.
     pub fn project(mut self, new_value: &str) -> InstanceGroupManagerGetCall<'a, C, NC, A> {
         self._project = new_value.to_string();
         self
@@ -2553,7 +2633,7 @@ impl<'a, C, NC, A> InstanceGroupManagerGetCall<'a, C, NC, A> where NC: hyper::ne
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The name of the zone in which the instance group manager resides.    
+    /// The name of the zone in which the instance group manager resides.
     pub fn zone(mut self, new_value: &str) -> InstanceGroupManagerGetCall<'a, C, NC, A> {
         self._zone = new_value.to_string();
         self
@@ -2563,7 +2643,7 @@ impl<'a, C, NC, A> InstanceGroupManagerGetCall<'a, C, NC, A> where NC: hyper::ne
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Name of the instance resource to return.    
+    /// Name of the instance resource to return.
     pub fn instance_group_manager(mut self, new_value: &str) -> InstanceGroupManagerGetCall<'a, C, NC, A> {
         self._instance_group_manager = new_value.to_string();
         self
@@ -2624,7 +2704,7 @@ impl<'a, C, NC, A> InstanceGroupManagerGetCall<'a, C, NC, A> where NC: hyper::ne
 /// Removes the specified instances from the managed instance group, and from any target pools of which they were members, without deleting the instances.
 ///
 /// A builder for the *abandonInstances* method supported by a *instanceGroupManager* resource.
-/// It is not used directly, but through a `InstanceGroupManagerMethods`.
+/// It is not used directly, but through a `InstanceGroupManagerMethods` instance.
 ///
 /// # Example
 ///
@@ -2693,7 +2773,7 @@ impl<'a, C, NC, A> InstanceGroupManagerAbandonInstanceCall<'a, C, NC, A> where N
         for &field in ["alt", "project", "zone", "instanceGroupManager"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -2750,7 +2830,7 @@ impl<'a, C, NC, A> InstanceGroupManagerAbandonInstanceCall<'a, C, NC, A> where N
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -2766,7 +2846,6 @@ impl<'a, C, NC, A> InstanceGroupManagerAbandonInstanceCall<'a, C, NC, A> where N
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -2776,7 +2855,7 @@ impl<'a, C, NC, A> InstanceGroupManagerAbandonInstanceCall<'a, C, NC, A> where N
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -2787,7 +2866,7 @@ impl<'a, C, NC, A> InstanceGroupManagerAbandonInstanceCall<'a, C, NC, A> where N
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -2796,13 +2875,13 @@ impl<'a, C, NC, A> InstanceGroupManagerAbandonInstanceCall<'a, C, NC, A> where N
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -2823,7 +2902,7 @@ impl<'a, C, NC, A> InstanceGroupManagerAbandonInstanceCall<'a, C, NC, A> where N
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The Google Developers Console project name.    
+    /// The Google Developers Console project name.
     pub fn project(mut self, new_value: &str) -> InstanceGroupManagerAbandonInstanceCall<'a, C, NC, A> {
         self._project = new_value.to_string();
         self
@@ -2833,7 +2912,7 @@ impl<'a, C, NC, A> InstanceGroupManagerAbandonInstanceCall<'a, C, NC, A> where N
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The name of the zone in which the instance group manager resides.    
+    /// The name of the zone in which the instance group manager resides.
     pub fn zone(mut self, new_value: &str) -> InstanceGroupManagerAbandonInstanceCall<'a, C, NC, A> {
         self._zone = new_value.to_string();
         self
@@ -2843,7 +2922,7 @@ impl<'a, C, NC, A> InstanceGroupManagerAbandonInstanceCall<'a, C, NC, A> where N
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The name of the instance group manager.    
+    /// The name of the instance group manager.
     pub fn instance_group_manager(mut self, new_value: &str) -> InstanceGroupManagerAbandonInstanceCall<'a, C, NC, A> {
         self._instance_group_manager = new_value.to_string();
         self
@@ -2904,7 +2983,7 @@ impl<'a, C, NC, A> InstanceGroupManagerAbandonInstanceCall<'a, C, NC, A> where N
 /// Recreates the specified instances. The instances are deleted, then recreated using the instance group manager's current instance template.
 ///
 /// A builder for the *recreateInstances* method supported by a *instanceGroupManager* resource.
-/// It is not used directly, but through a `InstanceGroupManagerMethods`.
+/// It is not used directly, but through a `InstanceGroupManagerMethods` instance.
 ///
 /// # Example
 ///
@@ -2973,7 +3052,7 @@ impl<'a, C, NC, A> InstanceGroupManagerRecreateInstanceCall<'a, C, NC, A> where 
         for &field in ["alt", "project", "zone", "instanceGroupManager"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -3030,7 +3109,7 @@ impl<'a, C, NC, A> InstanceGroupManagerRecreateInstanceCall<'a, C, NC, A> where 
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -3046,7 +3125,6 @@ impl<'a, C, NC, A> InstanceGroupManagerRecreateInstanceCall<'a, C, NC, A> where 
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -3056,7 +3134,7 @@ impl<'a, C, NC, A> InstanceGroupManagerRecreateInstanceCall<'a, C, NC, A> where 
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -3067,7 +3145,7 @@ impl<'a, C, NC, A> InstanceGroupManagerRecreateInstanceCall<'a, C, NC, A> where 
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -3076,13 +3154,13 @@ impl<'a, C, NC, A> InstanceGroupManagerRecreateInstanceCall<'a, C, NC, A> where 
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -3103,7 +3181,7 @@ impl<'a, C, NC, A> InstanceGroupManagerRecreateInstanceCall<'a, C, NC, A> where 
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The Google Developers Console project name.    
+    /// The Google Developers Console project name.
     pub fn project(mut self, new_value: &str) -> InstanceGroupManagerRecreateInstanceCall<'a, C, NC, A> {
         self._project = new_value.to_string();
         self
@@ -3113,7 +3191,7 @@ impl<'a, C, NC, A> InstanceGroupManagerRecreateInstanceCall<'a, C, NC, A> where 
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The name of the zone in which the instance group manager resides.    
+    /// The name of the zone in which the instance group manager resides.
     pub fn zone(mut self, new_value: &str) -> InstanceGroupManagerRecreateInstanceCall<'a, C, NC, A> {
         self._zone = new_value.to_string();
         self
@@ -3123,7 +3201,7 @@ impl<'a, C, NC, A> InstanceGroupManagerRecreateInstanceCall<'a, C, NC, A> where 
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The name of the instance group manager.    
+    /// The name of the instance group manager.
     pub fn instance_group_manager(mut self, new_value: &str) -> InstanceGroupManagerRecreateInstanceCall<'a, C, NC, A> {
         self._instance_group_manager = new_value.to_string();
         self
@@ -3184,7 +3262,7 @@ impl<'a, C, NC, A> InstanceGroupManagerRecreateInstanceCall<'a, C, NC, A> where 
 /// Deletes the instance group manager and all instances contained within. If you'd like to delete the manager without deleting the instances, you must first abandon the instances to remove them from the group.
 ///
 /// A builder for the *delete* method supported by a *instanceGroupManager* resource.
-/// It is not used directly, but through a `InstanceGroupManagerMethods`.
+/// It is not used directly, but through a `InstanceGroupManagerMethods` instance.
 ///
 /// # Example
 ///
@@ -3246,7 +3324,7 @@ impl<'a, C, NC, A> InstanceGroupManagerDeleteCall<'a, C, NC, A> where NC: hyper:
         for &field in ["alt", "project", "zone", "instanceGroupManager"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -3299,7 +3377,7 @@ impl<'a, C, NC, A> InstanceGroupManagerDeleteCall<'a, C, NC, A> where NC: hyper:
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -3311,7 +3389,6 @@ impl<'a, C, NC, A> InstanceGroupManagerDeleteCall<'a, C, NC, A> where NC: hyper:
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -3321,7 +3398,7 @@ impl<'a, C, NC, A> InstanceGroupManagerDeleteCall<'a, C, NC, A> where NC: hyper:
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -3332,7 +3409,7 @@ impl<'a, C, NC, A> InstanceGroupManagerDeleteCall<'a, C, NC, A> where NC: hyper:
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -3341,13 +3418,13 @@ impl<'a, C, NC, A> InstanceGroupManagerDeleteCall<'a, C, NC, A> where NC: hyper:
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -3359,7 +3436,7 @@ impl<'a, C, NC, A> InstanceGroupManagerDeleteCall<'a, C, NC, A> where NC: hyper:
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The Google Developers Console project name.    
+    /// The Google Developers Console project name.
     pub fn project(mut self, new_value: &str) -> InstanceGroupManagerDeleteCall<'a, C, NC, A> {
         self._project = new_value.to_string();
         self
@@ -3369,7 +3446,7 @@ impl<'a, C, NC, A> InstanceGroupManagerDeleteCall<'a, C, NC, A> where NC: hyper:
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The name of the zone in which the instance group manager resides.    
+    /// The name of the zone in which the instance group manager resides.
     pub fn zone(mut self, new_value: &str) -> InstanceGroupManagerDeleteCall<'a, C, NC, A> {
         self._zone = new_value.to_string();
         self
@@ -3379,7 +3456,7 @@ impl<'a, C, NC, A> InstanceGroupManagerDeleteCall<'a, C, NC, A> where NC: hyper:
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Name of the Instance Group Manager resource to delete.    
+    /// Name of the Instance Group Manager resource to delete.
     pub fn instance_group_manager(mut self, new_value: &str) -> InstanceGroupManagerDeleteCall<'a, C, NC, A> {
         self._instance_group_manager = new_value.to_string();
         self
@@ -3440,7 +3517,7 @@ impl<'a, C, NC, A> InstanceGroupManagerDeleteCall<'a, C, NC, A> where NC: hyper:
 /// Sets the instance template to use when creating new instances in this group. Existing instances are not affected.
 ///
 /// A builder for the *setInstanceTemplate* method supported by a *instanceGroupManager* resource.
-/// It is not used directly, but through a `InstanceGroupManagerMethods`.
+/// It is not used directly, but through a `InstanceGroupManagerMethods` instance.
 ///
 /// # Example
 ///
@@ -3509,7 +3586,7 @@ impl<'a, C, NC, A> InstanceGroupManagerSetInstanceTemplateCall<'a, C, NC, A> whe
         for &field in ["alt", "project", "zone", "instanceGroupManager"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -3566,7 +3643,7 @@ impl<'a, C, NC, A> InstanceGroupManagerSetInstanceTemplateCall<'a, C, NC, A> whe
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -3582,7 +3659,6 @@ impl<'a, C, NC, A> InstanceGroupManagerSetInstanceTemplateCall<'a, C, NC, A> whe
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -3592,7 +3668,7 @@ impl<'a, C, NC, A> InstanceGroupManagerSetInstanceTemplateCall<'a, C, NC, A> whe
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -3603,7 +3679,7 @@ impl<'a, C, NC, A> InstanceGroupManagerSetInstanceTemplateCall<'a, C, NC, A> whe
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -3612,13 +3688,13 @@ impl<'a, C, NC, A> InstanceGroupManagerSetInstanceTemplateCall<'a, C, NC, A> whe
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -3639,7 +3715,7 @@ impl<'a, C, NC, A> InstanceGroupManagerSetInstanceTemplateCall<'a, C, NC, A> whe
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The Google Developers Console project name.    
+    /// The Google Developers Console project name.
     pub fn project(mut self, new_value: &str) -> InstanceGroupManagerSetInstanceTemplateCall<'a, C, NC, A> {
         self._project = new_value.to_string();
         self
@@ -3649,7 +3725,7 @@ impl<'a, C, NC, A> InstanceGroupManagerSetInstanceTemplateCall<'a, C, NC, A> whe
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The name of the zone in which the instance group manager resides.    
+    /// The name of the zone in which the instance group manager resides.
     pub fn zone(mut self, new_value: &str) -> InstanceGroupManagerSetInstanceTemplateCall<'a, C, NC, A> {
         self._zone = new_value.to_string();
         self
@@ -3659,7 +3735,7 @@ impl<'a, C, NC, A> InstanceGroupManagerSetInstanceTemplateCall<'a, C, NC, A> whe
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The name of the instance group manager.    
+    /// The name of the instance group manager.
     pub fn instance_group_manager(mut self, new_value: &str) -> InstanceGroupManagerSetInstanceTemplateCall<'a, C, NC, A> {
         self._instance_group_manager = new_value.to_string();
         self
@@ -3720,7 +3796,7 @@ impl<'a, C, NC, A> InstanceGroupManagerSetInstanceTemplateCall<'a, C, NC, A> whe
 /// Resizes the managed instance group up or down. If resized up, new instances are created using the current instance template. If resized down, instances are removed in the order outlined in Resizing a managed instance group.
 ///
 /// A builder for the *resize* method supported by a *instanceGroupManager* resource.
-/// It is not used directly, but through a `InstanceGroupManagerMethods`.
+/// It is not used directly, but through a `InstanceGroupManagerMethods` instance.
 ///
 /// # Example
 ///
@@ -3784,7 +3860,7 @@ impl<'a, C, NC, A> InstanceGroupManagerResizeCall<'a, C, NC, A> where NC: hyper:
         for &field in ["alt", "project", "zone", "instanceGroupManager", "size"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -3837,7 +3913,7 @@ impl<'a, C, NC, A> InstanceGroupManagerResizeCall<'a, C, NC, A> where NC: hyper:
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -3849,7 +3925,6 @@ impl<'a, C, NC, A> InstanceGroupManagerResizeCall<'a, C, NC, A> where NC: hyper:
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -3859,7 +3934,7 @@ impl<'a, C, NC, A> InstanceGroupManagerResizeCall<'a, C, NC, A> where NC: hyper:
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -3870,7 +3945,7 @@ impl<'a, C, NC, A> InstanceGroupManagerResizeCall<'a, C, NC, A> where NC: hyper:
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -3879,13 +3954,13 @@ impl<'a, C, NC, A> InstanceGroupManagerResizeCall<'a, C, NC, A> where NC: hyper:
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -3897,7 +3972,7 @@ impl<'a, C, NC, A> InstanceGroupManagerResizeCall<'a, C, NC, A> where NC: hyper:
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The Google Developers Console project name.    
+    /// The Google Developers Console project name.
     pub fn project(mut self, new_value: &str) -> InstanceGroupManagerResizeCall<'a, C, NC, A> {
         self._project = new_value.to_string();
         self
@@ -3907,7 +3982,7 @@ impl<'a, C, NC, A> InstanceGroupManagerResizeCall<'a, C, NC, A> where NC: hyper:
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The name of the zone in which the instance group manager resides.    
+    /// The name of the zone in which the instance group manager resides.
     pub fn zone(mut self, new_value: &str) -> InstanceGroupManagerResizeCall<'a, C, NC, A> {
         self._zone = new_value.to_string();
         self
@@ -3917,7 +3992,7 @@ impl<'a, C, NC, A> InstanceGroupManagerResizeCall<'a, C, NC, A> where NC: hyper:
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The name of the instance group manager.    
+    /// The name of the instance group manager.
     pub fn instance_group_manager(mut self, new_value: &str) -> InstanceGroupManagerResizeCall<'a, C, NC, A> {
         self._instance_group_manager = new_value.to_string();
         self
@@ -3927,7 +4002,7 @@ impl<'a, C, NC, A> InstanceGroupManagerResizeCall<'a, C, NC, A> where NC: hyper:
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Number of instances that should exist in this Instance Group Manager.    
+    /// Number of instances that should exist in this Instance Group Manager.
     pub fn size(mut self, new_value: i32) -> InstanceGroupManagerResizeCall<'a, C, NC, A> {
         self._size = new_value;
         self
@@ -3988,7 +4063,7 @@ impl<'a, C, NC, A> InstanceGroupManagerResizeCall<'a, C, NC, A> where NC: hyper:
 /// Deletes the specified instances. The instances are removed from the instance group and any target pools of which they are a member, then deleted. The targetSize of the instance group manager is reduced by the number of instances deleted.
 ///
 /// A builder for the *deleteInstances* method supported by a *instanceGroupManager* resource.
-/// It is not used directly, but through a `InstanceGroupManagerMethods`.
+/// It is not used directly, but through a `InstanceGroupManagerMethods` instance.
 ///
 /// # Example
 ///
@@ -4057,7 +4132,7 @@ impl<'a, C, NC, A> InstanceGroupManagerDeleteInstanceCall<'a, C, NC, A> where NC
         for &field in ["alt", "project", "zone", "instanceGroupManager"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -4114,7 +4189,7 @@ impl<'a, C, NC, A> InstanceGroupManagerDeleteInstanceCall<'a, C, NC, A> where NC
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -4130,7 +4205,6 @@ impl<'a, C, NC, A> InstanceGroupManagerDeleteInstanceCall<'a, C, NC, A> where NC
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -4140,7 +4214,7 @@ impl<'a, C, NC, A> InstanceGroupManagerDeleteInstanceCall<'a, C, NC, A> where NC
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -4151,7 +4225,7 @@ impl<'a, C, NC, A> InstanceGroupManagerDeleteInstanceCall<'a, C, NC, A> where NC
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -4160,13 +4234,13 @@ impl<'a, C, NC, A> InstanceGroupManagerDeleteInstanceCall<'a, C, NC, A> where NC
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -4187,7 +4261,7 @@ impl<'a, C, NC, A> InstanceGroupManagerDeleteInstanceCall<'a, C, NC, A> where NC
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The Google Developers Console project name.    
+    /// The Google Developers Console project name.
     pub fn project(mut self, new_value: &str) -> InstanceGroupManagerDeleteInstanceCall<'a, C, NC, A> {
         self._project = new_value.to_string();
         self
@@ -4197,7 +4271,7 @@ impl<'a, C, NC, A> InstanceGroupManagerDeleteInstanceCall<'a, C, NC, A> where NC
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The name of the zone in which the instance group manager resides.    
+    /// The name of the zone in which the instance group manager resides.
     pub fn zone(mut self, new_value: &str) -> InstanceGroupManagerDeleteInstanceCall<'a, C, NC, A> {
         self._zone = new_value.to_string();
         self
@@ -4207,7 +4281,7 @@ impl<'a, C, NC, A> InstanceGroupManagerDeleteInstanceCall<'a, C, NC, A> where NC
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The name of the instance group manager.    
+    /// The name of the instance group manager.
     pub fn instance_group_manager(mut self, new_value: &str) -> InstanceGroupManagerDeleteInstanceCall<'a, C, NC, A> {
         self._instance_group_manager = new_value.to_string();
         self

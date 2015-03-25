@@ -1,8 +1,8 @@
 // DO NOT EDIT !
-// This file was generated automatically from 'src/mako/lib.rs.mako'
+// This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *tasks* crate version *0.1.1+20141121*, where *20141121* is the exact revision of the *tasks:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.1*.
+//! This documentation was generated from *tasks* crate version *0.1.2+20141121*, where *20141121* is the exact revision of the *tasks:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.2*.
 //! 
 //! Everything else about the *tasks* *v1* API can be found at the
 //! [official documentation site](https://developers.google.com/google-apps/tasks/firstapp).
@@ -27,6 +27,8 @@
 //! 
 //! * **[Hub](struct.TasksHub.html)**
 //!     * a central object to maintain state and allow accessing all *Activities*
+//!     * creates [*Method Builders*](trait.MethodsBuilder.html) which in turn
+//!       allow access to individual [*Call Builders*](trait.CallBuilder.html)
 //! * **[Resources](trait.Resource.html)**
 //!     * primary types that you can apply *Activities* to
 //!     * a collection of properties and *Parts*
@@ -35,6 +37,8 @@
 //!         * never directly used in *Activities*
 //! * **[Activities](trait.CallBuilder.html)**
 //!     * operations to apply to *Resources*
+//! 
+//! All *structures* are marked with applicable traits to further categorize them and ease browsing.
 //! 
 //! Generally speaking, you can invoke *Activities* like this:
 //! 
@@ -77,7 +81,7 @@
 //! extern crate hyper;
 //! extern crate "yup-oauth2" as oauth2;
 //! extern crate "google-tasks1" as tasks1;
-//! use tasks1::Result;
+//! use tasks1::{Result, Error};
 //! # #[test] fn egal() {
 //! use std::default::Default;
 //! use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -112,15 +116,17 @@
 //!              .doit();
 //! 
 //! match result {
-//!     Result::HttpError(err) => println!("HTTPERROR: {:?}", err),
-//!     Result::MissingAPIKey => println!("Auth: Missing API Key - used if there are no scopes"),
-//!     Result::MissingToken => println!("OAuth2: Missing Token"),
-//!     Result::Cancelled => println!("Operation cancelled by user"),
-//!     Result::UploadSizeLimitExceeded(size, max_size) => println!("Upload size too big: {} of {}", size, max_size),
-//!     Result::Failure(_) => println!("General Failure (hyper::client::Response doesn't print)"),
-//!     Result::FieldClash(clashed_field) => println!("You added custom parameter which is part of builder: {:?}", clashed_field),
-//!     Result::JsonDecodeError(err) => println!("Couldn't understand server reply - maybe API needs update: {:?}", err),
-//!     Result::Success(_) => println!("Success (value doesn't print)"),
+//!     Err(e) => match e {
+//!         Error::HttpError(err) => println!("HTTPERROR: {:?}", err),
+//!         Error::MissingAPIKey => println!("Auth: Missing API Key - used if there are no scopes"),
+//!         Error::MissingToken => println!("OAuth2: Missing Token"),
+//!         Error::Cancelled => println!("Operation canceled by user"),
+//!         Error::UploadSizeLimitExceeded(size, max_size) => println!("Upload size too big: {} of {}", size, max_size),
+//!         Error::Failure(_) => println!("General Failure (hyper::client::Response doesn't print)"),
+//!         Error::FieldClash(clashed_field) => println!("You added custom parameter which is part of builder: {:?}", clashed_field),
+//!         Error::JsonDecodeError(err) => println!("Couldn't understand server reply - maybe API needs update: {:?}", err),
+//!     },
+//!     Ok(_) => println!("Success (value doesn't print)"),
 //! }
 //! # }
 //! ```
@@ -133,7 +139,7 @@
 //! When delegates handle errors or intermediate values, they may have a chance to instruct the system to retry. This 
 //! makes the system potentially resilient to all kinds of errors.
 //! 
-//! ## Uploads and Downlods
+//! ## Uploads and Downloads
 //! If a method supports downloads, the response body, which is part of the [Result](enum.Result.html), should be
 //! read by you to obtain the media.
 //! If such a method also supports a [Response Result](trait.ResponseResult.html), it will return that by default.
@@ -156,8 +162,9 @@
 //! ## Optional Parts in Server-Requests
 //! 
 //! All structures provided by this library are made to be [enocodable](trait.RequestValue.html) and 
-//! [decodable](trait.ResponseResult.html) via json. Optionals are used to indicate that partial requests are responses are valid.
-//! Most optionals are are considered [Parts](trait.Part.html) which are identifyable by name, which will be sent to 
+//! [decodable](trait.ResponseResult.html) via *json*. Optionals are used to indicate that partial requests are responses 
+//! are valid.
+//! Most optionals are are considered [Parts](trait.Part.html) which are identifiable by name, which will be sent to 
 //! the server to indicate either the set parts of the request or the desired parts in the response.
 //! 
 //! ## Builder Arguments
@@ -206,7 +213,7 @@ use std::io;
 use std::fs;
 use std::thread::sleep;
 
-pub use cmn::{MultiPartReader, ToParts, MethodInfo, Result, CallBuilder, Hub, ReadSeek, Part, ResponseResult, RequestValue, NestedType, Delegate, DefaultDelegate, ResourceMethodsBuilder, Resource, JsonServerError};
+pub use cmn::{MultiPartReader, ToParts, MethodInfo, Result, Error, CallBuilder, Hub, ReadSeek, Part, ResponseResult, RequestValue, NestedType, Delegate, DefaultDelegate, MethodsBuilder, Resource, JsonServerError};
 
 
 // ##############
@@ -256,7 +263,7 @@ impl Default for Scope {
 /// extern crate hyper;
 /// extern crate "yup-oauth2" as oauth2;
 /// extern crate "google-tasks1" as tasks1;
-/// use tasks1::Result;
+/// use tasks1::{Result, Error};
 /// # #[test] fn egal() {
 /// use std::default::Default;
 /// use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -291,15 +298,17 @@ impl Default for Scope {
 ///              .doit();
 /// 
 /// match result {
-///     Result::HttpError(err) => println!("HTTPERROR: {:?}", err),
-///     Result::MissingAPIKey => println!("Auth: Missing API Key - used if there are no scopes"),
-///     Result::MissingToken => println!("OAuth2: Missing Token"),
-///     Result::Cancelled => println!("Operation cancelled by user"),
-///     Result::UploadSizeLimitExceeded(size, max_size) => println!("Upload size too big: {} of {}", size, max_size),
-///     Result::Failure(_) => println!("General Failure (hyper::client::Response doesn't print)"),
-///     Result::FieldClash(clashed_field) => println!("You added custom parameter which is part of builder: {:?}", clashed_field),
-///     Result::JsonDecodeError(err) => println!("Couldn't understand server reply - maybe API needs update: {:?}", err),
-///     Result::Success(_) => println!("Success (value doesn't print)"),
+///     Err(e) => match e {
+///         Error::HttpError(err) => println!("HTTPERROR: {:?}", err),
+///         Error::MissingAPIKey => println!("Auth: Missing API Key - used if there are no scopes"),
+///         Error::MissingToken => println!("OAuth2: Missing Token"),
+///         Error::Cancelled => println!("Operation canceled by user"),
+///         Error::UploadSizeLimitExceeded(size, max_size) => println!("Upload size too big: {} of {}", size, max_size),
+///         Error::Failure(_) => println!("General Failure (hyper::client::Response doesn't print)"),
+///         Error::FieldClash(clashed_field) => println!("You added custom parameter which is part of builder: {:?}", clashed_field),
+///         Error::JsonDecodeError(err) => println!("Couldn't understand server reply - maybe API needs update: {:?}", err),
+///     },
+///     Ok(_) => println!("Success (value doesn't print)"),
 /// }
 /// # }
 /// ```
@@ -320,7 +329,7 @@ impl<'a, C, NC, A> TasksHub<C, NC, A>
         TasksHub {
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/0.1.1".to_string(),
+            _user_agent: "google-api-rust-client/0.1.2".to_string(),
             _m: PhantomData
         }
     }
@@ -333,7 +342,7 @@ impl<'a, C, NC, A> TasksHub<C, NC, A>
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/0.1.1`.
+    /// It defaults to `google-api-rust-client/0.1.2`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -365,35 +374,35 @@ impl<'a, C, NC, A> TasksHub<C, NC, A>
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Task {
-    /// Status of the task. This is either "needsAction" or "completed".    
+    /// Status of the task. This is either "needsAction" or "completed".
     pub status: Option<String>,
-    /// Type of the resource. This is always "tasks#task".    
+    /// Type of the resource. This is always "tasks#task".
     pub kind: Option<String>,
-    /// Parent task identifier. This field is omitted if it is a top-level task. This field is read-only. Use the "move" method to move the task under a different parent or to the top level.    
+    /// Parent task identifier. This field is omitted if it is a top-level task. This field is read-only. Use the "move" method to move the task under a different parent or to the top level.
     pub parent: Option<String>,
-    /// Collection of links. This collection is read-only.    
+    /// Collection of links. This collection is read-only.
     pub links: Option<Vec<TaskLinks>>,
-    /// Title of the task.    
+    /// Title of the task.
     pub title: Option<String>,
-    /// Flag indicating whether the task has been deleted. The default if False.    
+    /// Flag indicating whether the task has been deleted. The default if False.
     pub deleted: Option<bool>,
-    /// Completion date of the task (as a RFC 3339 timestamp). This field is omitted if the task has not been completed.    
+    /// Completion date of the task (as a RFC 3339 timestamp). This field is omitted if the task has not been completed.
     pub completed: Option<String>,
-    /// Last modification time of the task (as a RFC 3339 timestamp).    
+    /// Last modification time of the task (as a RFC 3339 timestamp).
     pub updated: Option<String>,
-    /// Due date of the task (as a RFC 3339 timestamp). Optional.    
+    /// Due date of the task (as a RFC 3339 timestamp). Optional.
     pub due: Option<String>,
-    /// ETag of the resource.    
+    /// ETag of the resource.
     pub etag: Option<String>,
-    /// Task identifier.    
+    /// Task identifier.
     pub id: Option<String>,
-    /// String indicating the position of the task among its sibling tasks under the same parent task or at the top level. If this string is greater than another task's corresponding position string according to lexicographical ordering, the task is positioned after the other task under the same parent task (or at the top level). This field is read-only. Use the "move" method to move the task to another position.    
+    /// String indicating the position of the task among its sibling tasks under the same parent task or at the top level. If this string is greater than another task's corresponding position string according to lexicographical ordering, the task is positioned after the other task under the same parent task (or at the top level). This field is read-only. Use the "move" method to move the task to another position.
     pub position: Option<String>,
-    /// Flag indicating whether the task is hidden. This is the case if the task had been marked completed when the task list was last cleared. The default is False. This field is read-only.    
+    /// Flag indicating whether the task is hidden. This is the case if the task had been marked completed when the task list was last cleared. The default is False. This field is read-only.
     pub hidden: Option<bool>,
-    /// Notes describing the task. Optional.    
+    /// Notes describing the task. Optional.
     pub notes: Option<String>,
-    /// URL pointing to this task. Used to retrieve, update, or delete this task.    
+    /// URL pointing to this task. Used to retrieve, update, or delete this task.
     #[serde(alias="selfLink")]
     pub self_link: Option<String>,
 }
@@ -417,18 +426,18 @@ impl ResponseResult for Task {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct TaskList {
-    /// Type of the resource. This is always "tasks#taskList".    
+    /// Type of the resource. This is always "tasks#taskList".
     pub kind: Option<String>,
-    /// ETag of the resource.    
+    /// ETag of the resource.
     pub etag: Option<String>,
-    /// Title of the task list.    
+    /// Title of the task list.
     pub title: Option<String>,
-    /// Last modification time of the task list (as a RFC 3339 timestamp).    
+    /// Last modification time of the task list (as a RFC 3339 timestamp).
     pub updated: Option<String>,
-    /// URL pointing to this task list. Used to retrieve, update, or delete this task list.    
+    /// URL pointing to this task list. Used to retrieve, update, or delete this task list.
     #[serde(alias="selfLink")]
     pub self_link: Option<String>,
-    /// Task list identifier.    
+    /// Task list identifier.
     pub id: Option<String>,
 }
 
@@ -448,14 +457,14 @@ impl ResponseResult for TaskList {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct TaskLists {
-    /// Token that can be used to request the next page of this result.    
+    /// Token that can be used to request the next page of this result.
     #[serde(alias="nextPageToken")]
     pub next_page_token: String,
-    /// Collection of task lists.    
+    /// Collection of task lists.
     pub items: Vec<TaskList>,
-    /// Type of the resource. This is always "tasks#taskLists".    
+    /// Type of the resource. This is always "tasks#taskLists".
     pub kind: String,
-    /// ETag of the resource.    
+    /// ETag of the resource.
     pub etag: String,
 }
 
@@ -468,12 +477,12 @@ impl ResponseResult for TaskLists {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct TaskLinks {
-    /// The URL.    
+    /// The URL.
     pub link: String,
-    /// Type of the link, e.g. "email".    
+    /// Type of the link, e.g. "email".
     #[serde(alias="type")]
     pub type_: String,
-    /// The description. In HTML speak: Everything between <a> and </a>.    
+    /// The description. In HTML speak: Everything between <a> and </a>.
     pub description: String,
 }
 
@@ -492,14 +501,14 @@ impl Part for TaskLinks {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct Tasks {
-    /// Token used to access the next page of this result.    
+    /// Token used to access the next page of this result.
     #[serde(alias="nextPageToken")]
     pub next_page_token: String,
-    /// Collection of tasks.    
+    /// Collection of tasks.
     pub items: Vec<Task>,
-    /// Type of the resource. This is always "tasks#tasks".    
+    /// Type of the resource. This is always "tasks#tasks".
     pub kind: String,
-    /// ETag of the resource.    
+    /// ETag of the resource.
     pub etag: String,
 }
 
@@ -545,13 +554,17 @@ pub struct TaskMethods<'a, C, NC, A>
     hub: &'a TasksHub<C, NC, A>,
 }
 
-impl<'a, C, NC, A> ResourceMethodsBuilder for TaskMethods<'a, C, NC, A> {}
+impl<'a, C, NC, A> MethodsBuilder for TaskMethods<'a, C, NC, A> {}
 
 impl<'a, C, NC, A> TaskMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Returns all tasks in the specified task list.    
+    /// Returns all tasks in the specified task list.
+    /// 
+    /// # Arguments
+    ///
+    /// * `tasklist` - Task list identifier.
     pub fn list(&self, tasklist: &str) -> TaskListCall<'a, C, NC, A> {
         TaskListCall {
             hub: self.hub,
@@ -574,7 +587,13 @@ impl<'a, C, NC, A> TaskMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Updates the specified task.    
+    /// Updates the specified task.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `tasklist` - Task list identifier.
+    /// * `task` - Task identifier.
     pub fn update(&self, request: &Task, tasklist: &str, task: &str) -> TaskUpdateCall<'a, C, NC, A> {
         TaskUpdateCall {
             hub: self.hub,
@@ -589,7 +608,13 @@ impl<'a, C, NC, A> TaskMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Updates the specified task. This method supports patch semantics.    
+    /// Updates the specified task. This method supports patch semantics.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `tasklist` - Task list identifier.
+    /// * `task` - Task identifier.
     pub fn patch(&self, request: &Task, tasklist: &str, task: &str) -> TaskPatchCall<'a, C, NC, A> {
         TaskPatchCall {
             hub: self.hub,
@@ -604,7 +629,11 @@ impl<'a, C, NC, A> TaskMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Clears all completed tasks from the specified task list. The affected tasks will be marked as 'hidden' and no longer be returned by default when retrieving all tasks for a task list.    
+    /// Clears all completed tasks from the specified task list. The affected tasks will be marked as 'hidden' and no longer be returned by default when retrieving all tasks for a task list.
+    /// 
+    /// # Arguments
+    ///
+    /// * `tasklist` - Task list identifier.
     pub fn clear(&self, tasklist: &str) -> TaskClearCall<'a, C, NC, A> {
         TaskClearCall {
             hub: self.hub,
@@ -617,7 +646,12 @@ impl<'a, C, NC, A> TaskMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Moves the specified task to another position in the task list. This can include putting it as a child task under a new parent and/or move it to a different position among its sibling tasks.    
+    /// Moves the specified task to another position in the task list. This can include putting it as a child task under a new parent and/or move it to a different position among its sibling tasks.
+    /// 
+    /// # Arguments
+    ///
+    /// * `tasklist` - Task list identifier.
+    /// * `task` - Task identifier.
     pub fn move_(&self, tasklist: &str, task: &str) -> TaskMoveCall<'a, C, NC, A> {
         TaskMoveCall {
             hub: self.hub,
@@ -633,7 +667,12 @@ impl<'a, C, NC, A> TaskMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Deletes the specified task from the task list.    
+    /// Deletes the specified task from the task list.
+    /// 
+    /// # Arguments
+    ///
+    /// * `tasklist` - Task list identifier.
+    /// * `task` - Task identifier.
     pub fn delete(&self, tasklist: &str, task: &str) -> TaskDeleteCall<'a, C, NC, A> {
         TaskDeleteCall {
             hub: self.hub,
@@ -647,7 +686,12 @@ impl<'a, C, NC, A> TaskMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Returns the specified task.    
+    /// Returns the specified task.
+    /// 
+    /// # Arguments
+    ///
+    /// * `tasklist` - Task list identifier.
+    /// * `task` - Task identifier.
     pub fn get(&self, tasklist: &str, task: &str) -> TaskGetCall<'a, C, NC, A> {
         TaskGetCall {
             hub: self.hub,
@@ -661,7 +705,12 @@ impl<'a, C, NC, A> TaskMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Creates a new task on the specified task list.    
+    /// Creates a new task on the specified task list.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `tasklist` - Task list identifier.
     pub fn insert(&self, request: &Task, tasklist: &str) -> TaskInsertCall<'a, C, NC, A> {
         TaskInsertCall {
             hub: self.hub,
@@ -712,13 +761,13 @@ pub struct TasklistMethods<'a, C, NC, A>
     hub: &'a TasksHub<C, NC, A>,
 }
 
-impl<'a, C, NC, A> ResourceMethodsBuilder for TasklistMethods<'a, C, NC, A> {}
+impl<'a, C, NC, A> MethodsBuilder for TasklistMethods<'a, C, NC, A> {}
 
 impl<'a, C, NC, A> TasklistMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Returns all the authenticated user's task lists.    
+    /// Returns all the authenticated user's task lists.
     pub fn list(&self) -> TasklistListCall<'a, C, NC, A> {
         TasklistListCall {
             hub: self.hub,
@@ -732,7 +781,12 @@ impl<'a, C, NC, A> TasklistMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Updates the authenticated user's specified task list.    
+    /// Updates the authenticated user's specified task list.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `tasklist` - Task list identifier.
     pub fn update(&self, request: &TaskList, tasklist: &str) -> TasklistUpdateCall<'a, C, NC, A> {
         TasklistUpdateCall {
             hub: self.hub,
@@ -746,7 +800,11 @@ impl<'a, C, NC, A> TasklistMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Deletes the authenticated user's specified task list.    
+    /// Deletes the authenticated user's specified task list.
+    /// 
+    /// # Arguments
+    ///
+    /// * `tasklist` - Task list identifier.
     pub fn delete(&self, tasklist: &str) -> TasklistDeleteCall<'a, C, NC, A> {
         TasklistDeleteCall {
             hub: self.hub,
@@ -759,7 +817,12 @@ impl<'a, C, NC, A> TasklistMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Updates the authenticated user's specified task list. This method supports patch semantics.    
+    /// Updates the authenticated user's specified task list. This method supports patch semantics.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `tasklist` - Task list identifier.
     pub fn patch(&self, request: &TaskList, tasklist: &str) -> TasklistPatchCall<'a, C, NC, A> {
         TasklistPatchCall {
             hub: self.hub,
@@ -773,7 +836,11 @@ impl<'a, C, NC, A> TasklistMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Creates a new task list and adds it to the authenticated user's task lists.    
+    /// Creates a new task list and adds it to the authenticated user's task lists.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
     pub fn insert(&self, request: &TaskList) -> TasklistInsertCall<'a, C, NC, A> {
         TasklistInsertCall {
             hub: self.hub,
@@ -786,7 +853,11 @@ impl<'a, C, NC, A> TasklistMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Returns the authenticated user's specified task list.    
+    /// Returns the authenticated user's specified task list.
+    /// 
+    /// # Arguments
+    ///
+    /// * `tasklist` - Task list identifier.
     pub fn get(&self, tasklist: &str) -> TasklistGetCall<'a, C, NC, A> {
         TasklistGetCall {
             hub: self.hub,
@@ -809,7 +880,7 @@ impl<'a, C, NC, A> TasklistMethods<'a, C, NC, A> {
 /// Returns all tasks in the specified task list.
 ///
 /// A builder for the *list* method supported by a *task* resource.
-/// It is not used directly, but through a `TaskMethods`.
+/// It is not used directly, but through a `TaskMethods` instance.
 ///
 /// # Example
 ///
@@ -917,7 +988,7 @@ impl<'a, C, NC, A> TaskListCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
         for &field in ["alt", "tasklist", "updatedMin", "showHidden", "showDeleted", "showCompleted", "pageToken", "maxResults", "dueMin", "dueMax", "completedMin", "completedMax"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -970,7 +1041,7 @@ impl<'a, C, NC, A> TaskListCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -982,7 +1053,6 @@ impl<'a, C, NC, A> TaskListCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -992,7 +1062,7 @@ impl<'a, C, NC, A> TaskListCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -1003,7 +1073,7 @@ impl<'a, C, NC, A> TaskListCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -1012,13 +1082,13 @@ impl<'a, C, NC, A> TaskListCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -1030,7 +1100,7 @@ impl<'a, C, NC, A> TaskListCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Task list identifier.    
+    /// Task list identifier.
     pub fn tasklist(mut self, new_value: &str) -> TaskListCall<'a, C, NC, A> {
         self._tasklist = new_value.to_string();
         self
@@ -1038,7 +1108,7 @@ impl<'a, C, NC, A> TaskListCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
     /// Sets the *updated min* query property to the given value.
     ///
     /// 
-    /// Lower bound for a task's last modification time (as a RFC 3339 timestamp) to filter by. Optional. The default is not to filter by last modification time.    
+    /// Lower bound for a task's last modification time (as a RFC 3339 timestamp) to filter by. Optional. The default is not to filter by last modification time.
     pub fn updated_min(mut self, new_value: &str) -> TaskListCall<'a, C, NC, A> {
         self._updated_min = Some(new_value.to_string());
         self
@@ -1046,7 +1116,7 @@ impl<'a, C, NC, A> TaskListCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
     /// Sets the *show hidden* query property to the given value.
     ///
     /// 
-    /// Flag indicating whether hidden tasks are returned in the result. Optional. The default is False.    
+    /// Flag indicating whether hidden tasks are returned in the result. Optional. The default is False.
     pub fn show_hidden(mut self, new_value: bool) -> TaskListCall<'a, C, NC, A> {
         self._show_hidden = Some(new_value);
         self
@@ -1054,7 +1124,7 @@ impl<'a, C, NC, A> TaskListCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
     /// Sets the *show deleted* query property to the given value.
     ///
     /// 
-    /// Flag indicating whether deleted tasks are returned in the result. Optional. The default is False.    
+    /// Flag indicating whether deleted tasks are returned in the result. Optional. The default is False.
     pub fn show_deleted(mut self, new_value: bool) -> TaskListCall<'a, C, NC, A> {
         self._show_deleted = Some(new_value);
         self
@@ -1062,7 +1132,7 @@ impl<'a, C, NC, A> TaskListCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
     /// Sets the *show completed* query property to the given value.
     ///
     /// 
-    /// Flag indicating whether completed tasks are returned in the result. Optional. The default is True.    
+    /// Flag indicating whether completed tasks are returned in the result. Optional. The default is True.
     pub fn show_completed(mut self, new_value: bool) -> TaskListCall<'a, C, NC, A> {
         self._show_completed = Some(new_value);
         self
@@ -1070,7 +1140,7 @@ impl<'a, C, NC, A> TaskListCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
     /// Sets the *page token* query property to the given value.
     ///
     /// 
-    /// Token specifying the result page to return. Optional.    
+    /// Token specifying the result page to return. Optional.
     pub fn page_token(mut self, new_value: &str) -> TaskListCall<'a, C, NC, A> {
         self._page_token = Some(new_value.to_string());
         self
@@ -1078,7 +1148,7 @@ impl<'a, C, NC, A> TaskListCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
     /// Sets the *max results* query property to the given value.
     ///
     /// 
-    /// Maximum number of task lists returned on one page. Optional. The default is 100.    
+    /// Maximum number of task lists returned on one page. Optional. The default is 100.
     pub fn max_results(mut self, new_value: &str) -> TaskListCall<'a, C, NC, A> {
         self._max_results = Some(new_value.to_string());
         self
@@ -1086,7 +1156,7 @@ impl<'a, C, NC, A> TaskListCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
     /// Sets the *due min* query property to the given value.
     ///
     /// 
-    /// Lower bound for a task's due date (as a RFC 3339 timestamp) to filter by. Optional. The default is not to filter by due date.    
+    /// Lower bound for a task's due date (as a RFC 3339 timestamp) to filter by. Optional. The default is not to filter by due date.
     pub fn due_min(mut self, new_value: &str) -> TaskListCall<'a, C, NC, A> {
         self._due_min = Some(new_value.to_string());
         self
@@ -1094,7 +1164,7 @@ impl<'a, C, NC, A> TaskListCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
     /// Sets the *due max* query property to the given value.
     ///
     /// 
-    /// Upper bound for a task's due date (as a RFC 3339 timestamp) to filter by. Optional. The default is not to filter by due date.    
+    /// Upper bound for a task's due date (as a RFC 3339 timestamp) to filter by. Optional. The default is not to filter by due date.
     pub fn due_max(mut self, new_value: &str) -> TaskListCall<'a, C, NC, A> {
         self._due_max = Some(new_value.to_string());
         self
@@ -1102,7 +1172,7 @@ impl<'a, C, NC, A> TaskListCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
     /// Sets the *completed min* query property to the given value.
     ///
     /// 
-    /// Lower bound for a task's completion date (as a RFC 3339 timestamp) to filter by. Optional. The default is not to filter by completion date.    
+    /// Lower bound for a task's completion date (as a RFC 3339 timestamp) to filter by. Optional. The default is not to filter by completion date.
     pub fn completed_min(mut self, new_value: &str) -> TaskListCall<'a, C, NC, A> {
         self._completed_min = Some(new_value.to_string());
         self
@@ -1110,7 +1180,7 @@ impl<'a, C, NC, A> TaskListCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
     /// Sets the *completed max* query property to the given value.
     ///
     /// 
-    /// Upper bound for a task's completion date (as a RFC 3339 timestamp) to filter by. Optional. The default is not to filter by completion date.    
+    /// Upper bound for a task's completion date (as a RFC 3339 timestamp) to filter by. Optional. The default is not to filter by completion date.
     pub fn completed_max(mut self, new_value: &str) -> TaskListCall<'a, C, NC, A> {
         self._completed_max = Some(new_value.to_string());
         self
@@ -1171,7 +1241,7 @@ impl<'a, C, NC, A> TaskListCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
 /// Updates the specified task.
 ///
 /// A builder for the *update* method supported by a *task* resource.
-/// It is not used directly, but through a `TaskMethods`.
+/// It is not used directly, but through a `TaskMethods` instance.
 ///
 /// # Example
 ///
@@ -1238,7 +1308,7 @@ impl<'a, C, NC, A> TaskUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
         for &field in ["alt", "tasklist", "task"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -1295,7 +1365,7 @@ impl<'a, C, NC, A> TaskUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -1311,7 +1381,6 @@ impl<'a, C, NC, A> TaskUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -1321,7 +1390,7 @@ impl<'a, C, NC, A> TaskUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -1332,7 +1401,7 @@ impl<'a, C, NC, A> TaskUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -1341,13 +1410,13 @@ impl<'a, C, NC, A> TaskUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -1368,7 +1437,7 @@ impl<'a, C, NC, A> TaskUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Task list identifier.    
+    /// Task list identifier.
     pub fn tasklist(mut self, new_value: &str) -> TaskUpdateCall<'a, C, NC, A> {
         self._tasklist = new_value.to_string();
         self
@@ -1378,7 +1447,7 @@ impl<'a, C, NC, A> TaskUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Task identifier.    
+    /// Task identifier.
     pub fn task(mut self, new_value: &str) -> TaskUpdateCall<'a, C, NC, A> {
         self._task = new_value.to_string();
         self
@@ -1439,7 +1508,7 @@ impl<'a, C, NC, A> TaskUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
 /// Updates the specified task. This method supports patch semantics.
 ///
 /// A builder for the *patch* method supported by a *task* resource.
-/// It is not used directly, but through a `TaskMethods`.
+/// It is not used directly, but through a `TaskMethods` instance.
 ///
 /// # Example
 ///
@@ -1506,7 +1575,7 @@ impl<'a, C, NC, A> TaskPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
         for &field in ["alt", "tasklist", "task"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -1563,7 +1632,7 @@ impl<'a, C, NC, A> TaskPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -1579,7 +1648,6 @@ impl<'a, C, NC, A> TaskPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -1589,7 +1657,7 @@ impl<'a, C, NC, A> TaskPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -1600,7 +1668,7 @@ impl<'a, C, NC, A> TaskPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -1609,13 +1677,13 @@ impl<'a, C, NC, A> TaskPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -1636,7 +1704,7 @@ impl<'a, C, NC, A> TaskPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Task list identifier.    
+    /// Task list identifier.
     pub fn tasklist(mut self, new_value: &str) -> TaskPatchCall<'a, C, NC, A> {
         self._tasklist = new_value.to_string();
         self
@@ -1646,7 +1714,7 @@ impl<'a, C, NC, A> TaskPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Task identifier.    
+    /// Task identifier.
     pub fn task(mut self, new_value: &str) -> TaskPatchCall<'a, C, NC, A> {
         self._task = new_value.to_string();
         self
@@ -1707,7 +1775,7 @@ impl<'a, C, NC, A> TaskPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
 /// Clears all completed tasks from the specified task list. The affected tasks will be marked as 'hidden' and no longer be returned by default when retrieving all tasks for a task list.
 ///
 /// A builder for the *clear* method supported by a *task* resource.
-/// It is not used directly, but through a `TaskMethods`.
+/// It is not used directly, but through a `TaskMethods` instance.
 ///
 /// # Example
 ///
@@ -1765,7 +1833,7 @@ impl<'a, C, NC, A> TaskClearCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
         for &field in ["tasklist"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -1817,7 +1885,7 @@ impl<'a, C, NC, A> TaskClearCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -1829,7 +1897,6 @@ impl<'a, C, NC, A> TaskClearCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -1839,7 +1906,7 @@ impl<'a, C, NC, A> TaskClearCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -1850,12 +1917,12 @@ impl<'a, C, NC, A> TaskClearCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = res;
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -1867,7 +1934,7 @@ impl<'a, C, NC, A> TaskClearCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Task list identifier.    
+    /// Task list identifier.
     pub fn tasklist(mut self, new_value: &str) -> TaskClearCall<'a, C, NC, A> {
         self._tasklist = new_value.to_string();
         self
@@ -1928,7 +1995,7 @@ impl<'a, C, NC, A> TaskClearCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
 /// Moves the specified task to another position in the task list. This can include putting it as a child task under a new parent and/or move it to a different position among its sibling tasks.
 ///
 /// A builder for the *move* method supported by a *task* resource.
-/// It is not used directly, but through a `TaskMethods`.
+/// It is not used directly, but through a `TaskMethods` instance.
 ///
 /// # Example
 ///
@@ -1998,7 +2065,7 @@ impl<'a, C, NC, A> TaskMoveCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
         for &field in ["alt", "tasklist", "task", "previous", "parent"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -2051,7 +2118,7 @@ impl<'a, C, NC, A> TaskMoveCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -2063,7 +2130,6 @@ impl<'a, C, NC, A> TaskMoveCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -2073,7 +2139,7 @@ impl<'a, C, NC, A> TaskMoveCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -2084,7 +2150,7 @@ impl<'a, C, NC, A> TaskMoveCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -2093,13 +2159,13 @@ impl<'a, C, NC, A> TaskMoveCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -2111,7 +2177,7 @@ impl<'a, C, NC, A> TaskMoveCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Task list identifier.    
+    /// Task list identifier.
     pub fn tasklist(mut self, new_value: &str) -> TaskMoveCall<'a, C, NC, A> {
         self._tasklist = new_value.to_string();
         self
@@ -2121,7 +2187,7 @@ impl<'a, C, NC, A> TaskMoveCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Task identifier.    
+    /// Task identifier.
     pub fn task(mut self, new_value: &str) -> TaskMoveCall<'a, C, NC, A> {
         self._task = new_value.to_string();
         self
@@ -2129,7 +2195,7 @@ impl<'a, C, NC, A> TaskMoveCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
     /// Sets the *previous* query property to the given value.
     ///
     /// 
-    /// New previous sibling task identifier. If the task is moved to the first position among its siblings, this parameter is omitted. Optional.    
+    /// New previous sibling task identifier. If the task is moved to the first position among its siblings, this parameter is omitted. Optional.
     pub fn previous(mut self, new_value: &str) -> TaskMoveCall<'a, C, NC, A> {
         self._previous = Some(new_value.to_string());
         self
@@ -2137,7 +2203,7 @@ impl<'a, C, NC, A> TaskMoveCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
     /// Sets the *parent* query property to the given value.
     ///
     /// 
-    /// New parent task identifier. If the task is moved to the top level, this parameter is omitted. Optional.    
+    /// New parent task identifier. If the task is moved to the top level, this parameter is omitted. Optional.
     pub fn parent(mut self, new_value: &str) -> TaskMoveCall<'a, C, NC, A> {
         self._parent = Some(new_value.to_string());
         self
@@ -2198,7 +2264,7 @@ impl<'a, C, NC, A> TaskMoveCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
 /// Deletes the specified task from the task list.
 ///
 /// A builder for the *delete* method supported by a *task* resource.
-/// It is not used directly, but through a `TaskMethods`.
+/// It is not used directly, but through a `TaskMethods` instance.
 ///
 /// # Example
 ///
@@ -2258,7 +2324,7 @@ impl<'a, C, NC, A> TaskDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
         for &field in ["tasklist", "task"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -2310,7 +2376,7 @@ impl<'a, C, NC, A> TaskDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -2322,7 +2388,6 @@ impl<'a, C, NC, A> TaskDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -2332,7 +2397,7 @@ impl<'a, C, NC, A> TaskDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -2343,12 +2408,12 @@ impl<'a, C, NC, A> TaskDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = res;
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -2360,7 +2425,7 @@ impl<'a, C, NC, A> TaskDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Task list identifier.    
+    /// Task list identifier.
     pub fn tasklist(mut self, new_value: &str) -> TaskDeleteCall<'a, C, NC, A> {
         self._tasklist = new_value.to_string();
         self
@@ -2370,7 +2435,7 @@ impl<'a, C, NC, A> TaskDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Task identifier.    
+    /// Task identifier.
     pub fn task(mut self, new_value: &str) -> TaskDeleteCall<'a, C, NC, A> {
         self._task = new_value.to_string();
         self
@@ -2431,7 +2496,7 @@ impl<'a, C, NC, A> TaskDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
 /// Returns the specified task.
 ///
 /// A builder for the *get* method supported by a *task* resource.
-/// It is not used directly, but through a `TaskMethods`.
+/// It is not used directly, but through a `TaskMethods` instance.
 ///
 /// # Example
 ///
@@ -2491,7 +2556,7 @@ impl<'a, C, NC, A> TaskGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnec
         for &field in ["alt", "tasklist", "task"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -2544,7 +2609,7 @@ impl<'a, C, NC, A> TaskGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnec
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -2556,7 +2621,6 @@ impl<'a, C, NC, A> TaskGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnec
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -2566,7 +2630,7 @@ impl<'a, C, NC, A> TaskGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnec
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -2577,7 +2641,7 @@ impl<'a, C, NC, A> TaskGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnec
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -2586,13 +2650,13 @@ impl<'a, C, NC, A> TaskGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnec
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -2604,7 +2668,7 @@ impl<'a, C, NC, A> TaskGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnec
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Task list identifier.    
+    /// Task list identifier.
     pub fn tasklist(mut self, new_value: &str) -> TaskGetCall<'a, C, NC, A> {
         self._tasklist = new_value.to_string();
         self
@@ -2614,7 +2678,7 @@ impl<'a, C, NC, A> TaskGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnec
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Task identifier.    
+    /// Task identifier.
     pub fn task(mut self, new_value: &str) -> TaskGetCall<'a, C, NC, A> {
         self._task = new_value.to_string();
         self
@@ -2675,7 +2739,7 @@ impl<'a, C, NC, A> TaskGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnec
 /// Creates a new task on the specified task list.
 ///
 /// A builder for the *insert* method supported by a *task* resource.
-/// It is not used directly, but through a `TaskMethods`.
+/// It is not used directly, but through a `TaskMethods` instance.
 ///
 /// # Example
 ///
@@ -2750,7 +2814,7 @@ impl<'a, C, NC, A> TaskInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
         for &field in ["alt", "tasklist", "previous", "parent"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -2807,7 +2871,7 @@ impl<'a, C, NC, A> TaskInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -2823,7 +2887,6 @@ impl<'a, C, NC, A> TaskInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -2833,7 +2896,7 @@ impl<'a, C, NC, A> TaskInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -2844,7 +2907,7 @@ impl<'a, C, NC, A> TaskInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -2853,13 +2916,13 @@ impl<'a, C, NC, A> TaskInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -2880,7 +2943,7 @@ impl<'a, C, NC, A> TaskInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Task list identifier.    
+    /// Task list identifier.
     pub fn tasklist(mut self, new_value: &str) -> TaskInsertCall<'a, C, NC, A> {
         self._tasklist = new_value.to_string();
         self
@@ -2888,7 +2951,7 @@ impl<'a, C, NC, A> TaskInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// Sets the *previous* query property to the given value.
     ///
     /// 
-    /// Previous sibling task identifier. If the task is created at the first position among its siblings, this parameter is omitted. Optional.    
+    /// Previous sibling task identifier. If the task is created at the first position among its siblings, this parameter is omitted. Optional.
     pub fn previous(mut self, new_value: &str) -> TaskInsertCall<'a, C, NC, A> {
         self._previous = Some(new_value.to_string());
         self
@@ -2896,7 +2959,7 @@ impl<'a, C, NC, A> TaskInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// Sets the *parent* query property to the given value.
     ///
     /// 
-    /// Parent task identifier. If the task is created at the top level, this parameter is omitted. Optional.    
+    /// Parent task identifier. If the task is created at the top level, this parameter is omitted. Optional.
     pub fn parent(mut self, new_value: &str) -> TaskInsertCall<'a, C, NC, A> {
         self._parent = Some(new_value.to_string());
         self
@@ -2957,7 +3020,7 @@ impl<'a, C, NC, A> TaskInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
 /// Returns all the authenticated user's task lists.
 ///
 /// A builder for the *list* method supported by a *tasklist* resource.
-/// It is not used directly, but through a `TasklistMethods`.
+/// It is not used directly, but through a `TasklistMethods` instance.
 ///
 /// # Example
 ///
@@ -3023,7 +3086,7 @@ impl<'a, C, NC, A> TasklistListCall<'a, C, NC, A> where NC: hyper::net::NetworkC
         for &field in ["alt", "pageToken", "maxResults"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -3052,7 +3115,7 @@ impl<'a, C, NC, A> TasklistListCall<'a, C, NC, A> where NC: hyper::net::NetworkC
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -3064,7 +3127,6 @@ impl<'a, C, NC, A> TasklistListCall<'a, C, NC, A> where NC: hyper::net::NetworkC
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -3074,7 +3136,7 @@ impl<'a, C, NC, A> TasklistListCall<'a, C, NC, A> where NC: hyper::net::NetworkC
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -3085,7 +3147,7 @@ impl<'a, C, NC, A> TasklistListCall<'a, C, NC, A> where NC: hyper::net::NetworkC
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -3094,13 +3156,13 @@ impl<'a, C, NC, A> TasklistListCall<'a, C, NC, A> where NC: hyper::net::NetworkC
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -3110,7 +3172,7 @@ impl<'a, C, NC, A> TasklistListCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// Sets the *page token* query property to the given value.
     ///
     /// 
-    /// Token specifying the result page to return. Optional.    
+    /// Token specifying the result page to return. Optional.
     pub fn page_token(mut self, new_value: &str) -> TasklistListCall<'a, C, NC, A> {
         self._page_token = Some(new_value.to_string());
         self
@@ -3118,7 +3180,7 @@ impl<'a, C, NC, A> TasklistListCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// Sets the *max results* query property to the given value.
     ///
     /// 
-    /// Maximum number of task lists returned on one page. Optional. The default is 100.    
+    /// Maximum number of task lists returned on one page. Optional. The default is 100.
     pub fn max_results(mut self, new_value: &str) -> TasklistListCall<'a, C, NC, A> {
         self._max_results = Some(new_value.to_string());
         self
@@ -3179,7 +3241,7 @@ impl<'a, C, NC, A> TasklistListCall<'a, C, NC, A> where NC: hyper::net::NetworkC
 /// Updates the authenticated user's specified task list.
 ///
 /// A builder for the *update* method supported by a *tasklist* resource.
-/// It is not used directly, but through a `TasklistMethods`.
+/// It is not used directly, but through a `TasklistMethods` instance.
 ///
 /// # Example
 ///
@@ -3244,7 +3306,7 @@ impl<'a, C, NC, A> TasklistUpdateCall<'a, C, NC, A> where NC: hyper::net::Networ
         for &field in ["alt", "tasklist"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -3301,7 +3363,7 @@ impl<'a, C, NC, A> TasklistUpdateCall<'a, C, NC, A> where NC: hyper::net::Networ
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -3317,7 +3379,6 @@ impl<'a, C, NC, A> TasklistUpdateCall<'a, C, NC, A> where NC: hyper::net::Networ
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -3327,7 +3388,7 @@ impl<'a, C, NC, A> TasklistUpdateCall<'a, C, NC, A> where NC: hyper::net::Networ
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -3338,7 +3399,7 @@ impl<'a, C, NC, A> TasklistUpdateCall<'a, C, NC, A> where NC: hyper::net::Networ
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -3347,13 +3408,13 @@ impl<'a, C, NC, A> TasklistUpdateCall<'a, C, NC, A> where NC: hyper::net::Networ
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -3374,7 +3435,7 @@ impl<'a, C, NC, A> TasklistUpdateCall<'a, C, NC, A> where NC: hyper::net::Networ
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Task list identifier.    
+    /// Task list identifier.
     pub fn tasklist(mut self, new_value: &str) -> TasklistUpdateCall<'a, C, NC, A> {
         self._tasklist = new_value.to_string();
         self
@@ -3435,7 +3496,7 @@ impl<'a, C, NC, A> TasklistUpdateCall<'a, C, NC, A> where NC: hyper::net::Networ
 /// Deletes the authenticated user's specified task list.
 ///
 /// A builder for the *delete* method supported by a *tasklist* resource.
-/// It is not used directly, but through a `TasklistMethods`.
+/// It is not used directly, but through a `TasklistMethods` instance.
 ///
 /// # Example
 ///
@@ -3493,7 +3554,7 @@ impl<'a, C, NC, A> TasklistDeleteCall<'a, C, NC, A> where NC: hyper::net::Networ
         for &field in ["tasklist"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -3545,7 +3606,7 @@ impl<'a, C, NC, A> TasklistDeleteCall<'a, C, NC, A> where NC: hyper::net::Networ
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -3557,7 +3618,6 @@ impl<'a, C, NC, A> TasklistDeleteCall<'a, C, NC, A> where NC: hyper::net::Networ
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -3567,7 +3627,7 @@ impl<'a, C, NC, A> TasklistDeleteCall<'a, C, NC, A> where NC: hyper::net::Networ
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -3578,12 +3638,12 @@ impl<'a, C, NC, A> TasklistDeleteCall<'a, C, NC, A> where NC: hyper::net::Networ
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = res;
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -3595,7 +3655,7 @@ impl<'a, C, NC, A> TasklistDeleteCall<'a, C, NC, A> where NC: hyper::net::Networ
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Task list identifier.    
+    /// Task list identifier.
     pub fn tasklist(mut self, new_value: &str) -> TasklistDeleteCall<'a, C, NC, A> {
         self._tasklist = new_value.to_string();
         self
@@ -3656,7 +3716,7 @@ impl<'a, C, NC, A> TasklistDeleteCall<'a, C, NC, A> where NC: hyper::net::Networ
 /// Updates the authenticated user's specified task list. This method supports patch semantics.
 ///
 /// A builder for the *patch* method supported by a *tasklist* resource.
-/// It is not used directly, but through a `TasklistMethods`.
+/// It is not used directly, but through a `TasklistMethods` instance.
 ///
 /// # Example
 ///
@@ -3721,7 +3781,7 @@ impl<'a, C, NC, A> TasklistPatchCall<'a, C, NC, A> where NC: hyper::net::Network
         for &field in ["alt", "tasklist"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -3778,7 +3838,7 @@ impl<'a, C, NC, A> TasklistPatchCall<'a, C, NC, A> where NC: hyper::net::Network
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -3794,7 +3854,6 @@ impl<'a, C, NC, A> TasklistPatchCall<'a, C, NC, A> where NC: hyper::net::Network
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -3804,7 +3863,7 @@ impl<'a, C, NC, A> TasklistPatchCall<'a, C, NC, A> where NC: hyper::net::Network
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -3815,7 +3874,7 @@ impl<'a, C, NC, A> TasklistPatchCall<'a, C, NC, A> where NC: hyper::net::Network
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -3824,13 +3883,13 @@ impl<'a, C, NC, A> TasklistPatchCall<'a, C, NC, A> where NC: hyper::net::Network
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -3851,7 +3910,7 @@ impl<'a, C, NC, A> TasklistPatchCall<'a, C, NC, A> where NC: hyper::net::Network
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Task list identifier.    
+    /// Task list identifier.
     pub fn tasklist(mut self, new_value: &str) -> TasklistPatchCall<'a, C, NC, A> {
         self._tasklist = new_value.to_string();
         self
@@ -3912,7 +3971,7 @@ impl<'a, C, NC, A> TasklistPatchCall<'a, C, NC, A> where NC: hyper::net::Network
 /// Creates a new task list and adds it to the authenticated user's task lists.
 ///
 /// A builder for the *insert* method supported by a *tasklist* resource.
-/// It is not used directly, but through a `TasklistMethods`.
+/// It is not used directly, but through a `TasklistMethods` instance.
 ///
 /// # Example
 ///
@@ -3975,7 +4034,7 @@ impl<'a, C, NC, A> TasklistInsertCall<'a, C, NC, A> where NC: hyper::net::Networ
         for &field in ["alt"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -4008,7 +4067,7 @@ impl<'a, C, NC, A> TasklistInsertCall<'a, C, NC, A> where NC: hyper::net::Networ
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -4024,7 +4083,6 @@ impl<'a, C, NC, A> TasklistInsertCall<'a, C, NC, A> where NC: hyper::net::Networ
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -4034,7 +4092,7 @@ impl<'a, C, NC, A> TasklistInsertCall<'a, C, NC, A> where NC: hyper::net::Networ
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -4045,7 +4103,7 @@ impl<'a, C, NC, A> TasklistInsertCall<'a, C, NC, A> where NC: hyper::net::Networ
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -4054,13 +4112,13 @@ impl<'a, C, NC, A> TasklistInsertCall<'a, C, NC, A> where NC: hyper::net::Networ
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -4132,7 +4190,7 @@ impl<'a, C, NC, A> TasklistInsertCall<'a, C, NC, A> where NC: hyper::net::Networ
 /// Returns the authenticated user's specified task list.
 ///
 /// A builder for the *get* method supported by a *tasklist* resource.
-/// It is not used directly, but through a `TasklistMethods`.
+/// It is not used directly, but through a `TasklistMethods` instance.
 ///
 /// # Example
 ///
@@ -4190,7 +4248,7 @@ impl<'a, C, NC, A> TasklistGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
         for &field in ["alt", "tasklist"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -4243,7 +4301,7 @@ impl<'a, C, NC, A> TasklistGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -4255,7 +4313,6 @@ impl<'a, C, NC, A> TasklistGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -4265,7 +4322,7 @@ impl<'a, C, NC, A> TasklistGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -4276,7 +4333,7 @@ impl<'a, C, NC, A> TasklistGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -4285,13 +4342,13 @@ impl<'a, C, NC, A> TasklistGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -4303,7 +4360,7 @@ impl<'a, C, NC, A> TasklistGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Task list identifier.    
+    /// Task list identifier.
     pub fn tasklist(mut self, new_value: &str) -> TasklistGetCall<'a, C, NC, A> {
         self._tasklist = new_value.to_string();
         self

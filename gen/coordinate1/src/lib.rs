@@ -1,8 +1,8 @@
 // DO NOT EDIT !
-// This file was generated automatically from 'src/mako/lib.rs.mako'
+// This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *coordinate* crate version *0.1.1+20141215*, where *20141215* is the exact revision of the *coordinate:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.1*.
+//! This documentation was generated from *coordinate* crate version *0.1.2+20141215*, where *20141215* is the exact revision of the *coordinate:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.2*.
 //! 
 //! Everything else about the *coordinate* *v1* API can be found at the
 //! [official documentation site](https://developers.google.com/coordinate/).
@@ -35,6 +35,8 @@
 //! 
 //! * **[Hub](struct.Coordinate.html)**
 //!     * a central object to maintain state and allow accessing all *Activities*
+//!     * creates [*Method Builders*](trait.MethodsBuilder.html) which in turn
+//!       allow access to individual [*Call Builders*](trait.CallBuilder.html)
 //! * **[Resources](trait.Resource.html)**
 //!     * primary types that you can apply *Activities* to
 //!     * a collection of properties and *Parts*
@@ -43,6 +45,8 @@
 //!         * never directly used in *Activities*
 //! * **[Activities](trait.CallBuilder.html)**
 //!     * operations to apply to *Resources*
+//! 
+//! All *structures* are marked with applicable traits to further categorize them and ease browsing.
 //! 
 //! Generally speaking, you can invoke *Activities* like this:
 //! 
@@ -83,7 +87,7 @@
 //! extern crate "yup-oauth2" as oauth2;
 //! extern crate "google-coordinate1" as coordinate1;
 //! use coordinate1::Job;
-//! use coordinate1::Result;
+//! use coordinate1::{Result, Error};
 //! # #[test] fn egal() {
 //! use std::default::Default;
 //! use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -123,15 +127,17 @@
 //!              .doit();
 //! 
 //! match result {
-//!     Result::HttpError(err) => println!("HTTPERROR: {:?}", err),
-//!     Result::MissingAPIKey => println!("Auth: Missing API Key - used if there are no scopes"),
-//!     Result::MissingToken => println!("OAuth2: Missing Token"),
-//!     Result::Cancelled => println!("Operation cancelled by user"),
-//!     Result::UploadSizeLimitExceeded(size, max_size) => println!("Upload size too big: {} of {}", size, max_size),
-//!     Result::Failure(_) => println!("General Failure (hyper::client::Response doesn't print)"),
-//!     Result::FieldClash(clashed_field) => println!("You added custom parameter which is part of builder: {:?}", clashed_field),
-//!     Result::JsonDecodeError(err) => println!("Couldn't understand server reply - maybe API needs update: {:?}", err),
-//!     Result::Success(_) => println!("Success (value doesn't print)"),
+//!     Err(e) => match e {
+//!         Error::HttpError(err) => println!("HTTPERROR: {:?}", err),
+//!         Error::MissingAPIKey => println!("Auth: Missing API Key - used if there are no scopes"),
+//!         Error::MissingToken => println!("OAuth2: Missing Token"),
+//!         Error::Cancelled => println!("Operation canceled by user"),
+//!         Error::UploadSizeLimitExceeded(size, max_size) => println!("Upload size too big: {} of {}", size, max_size),
+//!         Error::Failure(_) => println!("General Failure (hyper::client::Response doesn't print)"),
+//!         Error::FieldClash(clashed_field) => println!("You added custom parameter which is part of builder: {:?}", clashed_field),
+//!         Error::JsonDecodeError(err) => println!("Couldn't understand server reply - maybe API needs update: {:?}", err),
+//!     },
+//!     Ok(_) => println!("Success (value doesn't print)"),
 //! }
 //! # }
 //! ```
@@ -144,7 +150,7 @@
 //! When delegates handle errors or intermediate values, they may have a chance to instruct the system to retry. This 
 //! makes the system potentially resilient to all kinds of errors.
 //! 
-//! ## Uploads and Downlods
+//! ## Uploads and Downloads
 //! If a method supports downloads, the response body, which is part of the [Result](enum.Result.html), should be
 //! read by you to obtain the media.
 //! If such a method also supports a [Response Result](trait.ResponseResult.html), it will return that by default.
@@ -167,8 +173,9 @@
 //! ## Optional Parts in Server-Requests
 //! 
 //! All structures provided by this library are made to be [enocodable](trait.RequestValue.html) and 
-//! [decodable](trait.ResponseResult.html) via json. Optionals are used to indicate that partial requests are responses are valid.
-//! Most optionals are are considered [Parts](trait.Part.html) which are identifyable by name, which will be sent to 
+//! [decodable](trait.ResponseResult.html) via *json*. Optionals are used to indicate that partial requests are responses 
+//! are valid.
+//! Most optionals are are considered [Parts](trait.Part.html) which are identifiable by name, which will be sent to 
 //! the server to indicate either the set parts of the request or the desired parts in the response.
 //! 
 //! ## Builder Arguments
@@ -217,7 +224,7 @@ use std::io;
 use std::fs;
 use std::thread::sleep;
 
-pub use cmn::{MultiPartReader, ToParts, MethodInfo, Result, CallBuilder, Hub, ReadSeek, Part, ResponseResult, RequestValue, NestedType, Delegate, DefaultDelegate, ResourceMethodsBuilder, Resource, JsonServerError};
+pub use cmn::{MultiPartReader, ToParts, MethodInfo, Result, Error, CallBuilder, Hub, ReadSeek, Part, ResponseResult, RequestValue, NestedType, Delegate, DefaultDelegate, MethodsBuilder, Resource, JsonServerError};
 
 
 // ##############
@@ -268,7 +275,7 @@ impl Default for Scope {
 /// extern crate "yup-oauth2" as oauth2;
 /// extern crate "google-coordinate1" as coordinate1;
 /// use coordinate1::Job;
-/// use coordinate1::Result;
+/// use coordinate1::{Result, Error};
 /// # #[test] fn egal() {
 /// use std::default::Default;
 /// use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -308,15 +315,17 @@ impl Default for Scope {
 ///              .doit();
 /// 
 /// match result {
-///     Result::HttpError(err) => println!("HTTPERROR: {:?}", err),
-///     Result::MissingAPIKey => println!("Auth: Missing API Key - used if there are no scopes"),
-///     Result::MissingToken => println!("OAuth2: Missing Token"),
-///     Result::Cancelled => println!("Operation cancelled by user"),
-///     Result::UploadSizeLimitExceeded(size, max_size) => println!("Upload size too big: {} of {}", size, max_size),
-///     Result::Failure(_) => println!("General Failure (hyper::client::Response doesn't print)"),
-///     Result::FieldClash(clashed_field) => println!("You added custom parameter which is part of builder: {:?}", clashed_field),
-///     Result::JsonDecodeError(err) => println!("Couldn't understand server reply - maybe API needs update: {:?}", err),
-///     Result::Success(_) => println!("Success (value doesn't print)"),
+///     Err(e) => match e {
+///         Error::HttpError(err) => println!("HTTPERROR: {:?}", err),
+///         Error::MissingAPIKey => println!("Auth: Missing API Key - used if there are no scopes"),
+///         Error::MissingToken => println!("OAuth2: Missing Token"),
+///         Error::Cancelled => println!("Operation canceled by user"),
+///         Error::UploadSizeLimitExceeded(size, max_size) => println!("Upload size too big: {} of {}", size, max_size),
+///         Error::Failure(_) => println!("General Failure (hyper::client::Response doesn't print)"),
+///         Error::FieldClash(clashed_field) => println!("You added custom parameter which is part of builder: {:?}", clashed_field),
+///         Error::JsonDecodeError(err) => println!("Couldn't understand server reply - maybe API needs update: {:?}", err),
+///     },
+///     Ok(_) => println!("Success (value doesn't print)"),
 /// }
 /// # }
 /// ```
@@ -337,7 +346,7 @@ impl<'a, C, NC, A> Coordinate<C, NC, A>
         Coordinate {
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/0.1.1".to_string(),
+            _user_agent: "google-api-rust-client/0.1.2".to_string(),
             _m: PhantomData
         }
     }
@@ -362,7 +371,7 @@ impl<'a, C, NC, A> Coordinate<C, NC, A>
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/0.1.1`.
+    /// It defaults to `google-api-rust-client/0.1.2`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -387,14 +396,14 @@ impl<'a, C, NC, A> Coordinate<C, NC, A>
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct LocationListResponse {
-    /// A token to provide to get the next page of results.    
+    /// A token to provide to get the next page of results.
     #[serde(alias="nextPageToken")]
     pub next_page_token: String,
-    /// Locations in the collection.    
+    /// Locations in the collection.
     pub items: Vec<LocationRecord>,
-    /// Identifies this object as a list of locations.    
+    /// Identifies this object as a list of locations.
     pub kind: String,
-    /// Pagination information for token pagination.    
+    /// Pagination information for token pagination.
     #[serde(alias="tokenPagination")]
     pub token_pagination: TokenPagination,
 }
@@ -408,11 +417,11 @@ impl ResponseResult for LocationListResponse {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct JobChange {
-    /// Time at which this change was applied.    
+    /// Time at which this change was applied.
     pub timestamp: String,
-    /// Identifies this object as a job change.    
+    /// Identifies this object as a job change.
     pub kind: String,
-    /// Change applied to the job. Only the fields that were changed are set.    
+    /// Change applied to the job. Only the fields that were changed are set.
     pub state: JobState,
 }
 
@@ -425,11 +434,11 @@ impl Part for JobChange {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct EnumItemDef {
-    /// Whether the enum item is active. Jobs may contain inactive enum values; however, setting an enum to an inactive value when creating or updating a job will result in a 500 error.    
+    /// Whether the enum item is active. Jobs may contain inactive enum values; however, setting an enum to an inactive value when creating or updating a job will result in a 500 error.
     pub active: bool,
-    /// Identifies this object as an enum item definition.    
+    /// Identifies this object as an enum item definition.
     pub kind: String,
-    /// Custom field value.    
+    /// Custom field value.
     pub value: String,
 }
 
@@ -447,9 +456,9 @@ impl Part for EnumItemDef {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct CustomFieldDefListResponse {
-    /// Collection of custom field definitions in a team.    
+    /// Collection of custom field definitions in a team.
     pub items: Vec<CustomFieldDef>,
-    /// Identifies this object as a collection of custom field definitions in a team.    
+    /// Identifies this object as a collection of custom field definitions in a team.
     pub kind: String,
 }
 
@@ -462,13 +471,13 @@ impl ResponseResult for CustomFieldDefListResponse {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct TokenPagination {
-    /// A token to provide to get the next page of results.    
+    /// A token to provide to get the next page of results.
     #[serde(alias="nextPageToken")]
     pub next_page_token: String,
-    /// A token to provide to get the previous page of results.    
+    /// A token to provide to get the previous page of results.
     #[serde(alias="previousPageToken")]
     pub previous_page_token: String,
-    /// Identifies this object as pagination information.    
+    /// Identifies this object as pagination information.
     pub kind: String,
 }
 
@@ -481,14 +490,14 @@ impl Part for TokenPagination {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Location {
-    /// Latitude.    
+    /// Latitude.
     pub lat: f64,
-    /// Identifies this object as a location.    
+    /// Identifies this object as a location.
     pub kind: String,
-    /// Address.    
+    /// Address.
     #[serde(alias="addressLine")]
     pub address_line: Vec<String>,
-    /// Longitude.    
+    /// Longitude.
     pub lng: f64,
 }
 
@@ -501,11 +510,11 @@ impl Part for Location {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct Team {
-    /// Identifies this object as a team.    
+    /// Identifies this object as a team.
     pub kind: String,
-    /// Team id, as found in a coordinate team url e.g. https://coordinate.google.com/f/xyz where "xyz" is the team id.    
+    /// Team id, as found in a coordinate team url e.g. https://coordinate.google.com/f/xyz where "xyz" is the team id.
     pub id: String,
-    /// Team name    
+    /// Team name
     pub name: String,
 }
 
@@ -518,25 +527,25 @@ impl Part for Team {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct JobState {
-    /// Identifies this object as a job state.    
+    /// Identifies this object as a job state.
     pub kind: String,
-    /// Customer name.    
+    /// Customer name.
     #[serde(alias="customerName")]
     pub customer_name: String,
-    /// Job title.    
+    /// Job title.
     pub title: String,
-    /// Note added to the job.    
+    /// Note added to the job.
     pub note: Vec<String>,
-    /// Email address of the assignee, or the string "DELETED_USER" if the account is no longer available.    
+    /// Email address of the assignee, or the string "DELETED_USER" if the account is no longer available.
     pub assignee: String,
-    /// Customer phone number.    
+    /// Customer phone number.
     #[serde(alias="customerPhoneNumber")]
     pub customer_phone_number: String,
-    /// Job location.    
+    /// Job location.
     pub location: Location,
-    /// Job progress.    
+    /// Job progress.
     pub progress: String,
-    /// Custom fields.    
+    /// Custom fields.
     #[serde(alias="customFields")]
     pub custom_fields: CustomFields,
 }
@@ -550,9 +559,9 @@ impl Part for JobState {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct CustomFields {
-    /// Identifies this object as a collection of custom fields.    
+    /// Identifies this object as a collection of custom fields.
     pub kind: String,
-    /// Collection of custom fields.    
+    /// Collection of custom fields.
     #[serde(alias="customField")]
     pub custom_field: Vec<CustomField>,
 }
@@ -571,9 +580,9 @@ impl Part for CustomFields {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct WorkerListResponse {
-    /// Workers in the collection.    
+    /// Workers in the collection.
     pub items: Vec<Worker>,
-    /// Identifies this object as a list of workers.    
+    /// Identifies this object as a list of workers.
     pub kind: String,
 }
 
@@ -586,17 +595,17 @@ impl ResponseResult for WorkerListResponse {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct LocationRecord {
-    /// Latitude.    
+    /// Latitude.
     pub latitude: f64,
-    /// The collection time in milliseconds since the epoch.    
+    /// The collection time in milliseconds since the epoch.
     #[serde(alias="collectionTime")]
     pub collection_time: String,
-    /// The location accuracy in meters. This is the radius of a 95% confidence interval around the location measurement.    
+    /// The location accuracy in meters. This is the radius of a 95% confidence interval around the location measurement.
     #[serde(alias="confidenceRadius")]
     pub confidence_radius: f64,
-    /// Identifies this object as a location.    
+    /// Identifies this object as a location.
     pub kind: String,
-    /// Longitude.    
+    /// Longitude.
     pub longitude: f64,
 }
 
@@ -616,17 +625,17 @@ impl Part for LocationRecord {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Schedule {
-    /// Job duration in milliseconds.    
+    /// Job duration in milliseconds.
     pub duration: Option<String>,
-    /// Identifies this object as a job schedule.    
+    /// Identifies this object as a job schedule.
     pub kind: Option<String>,
-    /// Whether the job is scheduled for the whole day. Time of day in start/end times is ignored if this is true.    
+    /// Whether the job is scheduled for the whole day. Time of day in start/end times is ignored if this is true.
     #[serde(alias="allDay")]
     pub all_day: Option<bool>,
-    /// Scheduled start time in milliseconds since epoch.    
+    /// Scheduled start time in milliseconds since epoch.
     #[serde(alias="startTime")]
     pub start_time: Option<String>,
-    /// Scheduled end time in milliseconds since epoch.    
+    /// Scheduled end time in milliseconds since epoch.
     #[serde(alias="endTime")]
     pub end_time: Option<String>,
 }
@@ -646,9 +655,9 @@ impl ResponseResult for Schedule {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct TeamListResponse {
-    /// Teams in the collection.    
+    /// Teams in the collection.
     pub items: Vec<Team>,
-    /// Identifies this object as a list of teams.    
+    /// Identifies this object as a list of teams.
     pub kind: String,
 }
 
@@ -666,12 +675,12 @@ impl ResponseResult for TeamListResponse {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct JobListResponse {
-    /// A token to provide to get the next page of results.    
+    /// A token to provide to get the next page of results.
     #[serde(alias="nextPageToken")]
     pub next_page_token: String,
-    /// Jobs in the collection.    
+    /// Jobs in the collection.
     pub items: Vec<Job>,
-    /// Identifies this object as a list of jobs.    
+    /// Identifies this object as a list of jobs.
     pub kind: String,
 }
 
@@ -684,9 +693,9 @@ impl ResponseResult for JobListResponse {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct Worker {
-    /// Identifies this object as a worker.    
+    /// Identifies this object as a worker.
     pub kind: String,
-    /// Worker email address. If a worker has been deleted from your team, the email address will appear as DELETED_USER.    
+    /// Worker email address. If a worker has been deleted from your team, the email address will appear as DELETED_USER.
     pub id: String,
 }
 
@@ -708,14 +717,14 @@ impl Part for Worker {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Job {
-    /// Identifies this object as a job.    
+    /// Identifies this object as a job.
     pub kind: Option<String>,
-    /// List of job changes since it was created. The first change corresponds to the state of the job when it was created.    
+    /// List of job changes since it was created. The first change corresponds to the state of the job when it was created.
     #[serde(alias="jobChange")]
     pub job_change: Option<Vec<JobChange>>,
-    /// Job id.    
+    /// Job id.
     pub id: Option<String>,
-    /// Current job state.    
+    /// Current job state.
     pub state: Option<JobState>,
 }
 
@@ -730,21 +739,21 @@ impl ResponseResult for Job {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct CustomFieldDef {
-    /// Identifies this object as a custom field definition.    
+    /// Identifies this object as a custom field definition.
     pub kind: String,
-    /// List of enum items for this custom field. Populated only if the field type is enum. Enum fields appear as 'lists' in the Coordinate web and mobile UI.    
+    /// List of enum items for this custom field. Populated only if the field type is enum. Enum fields appear as 'lists' in the Coordinate web and mobile UI.
     pub enumitems: Vec<EnumItemDef>,
-    /// Custom field name.    
+    /// Custom field name.
     pub name: String,
-    /// Custom field type.    
+    /// Custom field type.
     #[serde(alias="type")]
     pub type_: String,
-    /// Whether the field is required for checkout.    
+    /// Whether the field is required for checkout.
     #[serde(alias="requiredForCheckout")]
     pub required_for_checkout: bool,
-    /// Whether the field is enabled.    
+    /// Whether the field is enabled.
     pub enabled: bool,
-    /// Custom field id.    
+    /// Custom field id.
     pub id: String,
 }
 
@@ -757,12 +766,12 @@ impl Part for CustomFieldDef {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct CustomField {
-    /// Identifies this object as a custom field.    
+    /// Identifies this object as a custom field.
     pub kind: String,
-    /// Custom field id.    
+    /// Custom field id.
     #[serde(alias="customFieldId")]
     pub custom_field_id: String,
-    /// Custom field value.    
+    /// Custom field value.
     pub value: String,
 }
 
@@ -808,13 +817,18 @@ pub struct JobMethods<'a, C, NC, A>
     hub: &'a Coordinate<C, NC, A>,
 }
 
-impl<'a, C, NC, A> ResourceMethodsBuilder for JobMethods<'a, C, NC, A> {}
+impl<'a, C, NC, A> MethodsBuilder for JobMethods<'a, C, NC, A> {}
 
 impl<'a, C, NC, A> JobMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Retrieves a job, including all the changes made to the job.    
+    /// Retrieves a job, including all the changes made to the job.
+    /// 
+    /// # Arguments
+    ///
+    /// * `teamId` - Team ID
+    /// * `jobId` - Job number
     pub fn get(&self, team_id: &str, job_id: &str) -> JobGetCall<'a, C, NC, A> {
         JobGetCall {
             hub: self.hub,
@@ -828,7 +842,13 @@ impl<'a, C, NC, A> JobMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Updates a job. Fields that are set in the job state will be updated.    
+    /// Updates a job. Fields that are set in the job state will be updated.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `teamId` - Team ID
+    /// * `jobId` - Job number
     pub fn update(&self, request: &Job, team_id: &str, job_id: &str) -> JobUpdateCall<'a, C, NC, A> {
         JobUpdateCall {
             hub: self.hub,
@@ -853,7 +873,13 @@ impl<'a, C, NC, A> JobMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Updates a job. Fields that are set in the job state will be updated. This method supports patch semantics.    
+    /// Updates a job. Fields that are set in the job state will be updated. This method supports patch semantics.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `teamId` - Team ID
+    /// * `jobId` - Job number
     pub fn patch(&self, request: &Job, team_id: &str, job_id: &str) -> JobPatchCall<'a, C, NC, A> {
         JobPatchCall {
             hub: self.hub,
@@ -878,7 +904,11 @@ impl<'a, C, NC, A> JobMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Retrieves jobs created or modified since the given timestamp.    
+    /// Retrieves jobs created or modified since the given timestamp.
+    /// 
+    /// # Arguments
+    ///
+    /// * `teamId` - Team ID
     pub fn list(&self, team_id: &str) -> JobListCall<'a, C, NC, A> {
         JobListCall {
             hub: self.hub,
@@ -894,7 +924,16 @@ impl<'a, C, NC, A> JobMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Inserts a new job. Only the state field of the job should be set.    
+    /// Inserts a new job. Only the state field of the job should be set.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `teamId` - Team ID
+    /// * `address` - Job address as newline (Unix) separated string
+    /// * `lat` - The latitude coordinate of this job's location.
+    /// * `lng` - The longitude coordinate of this job's location.
+    /// * `title` - Job title
     pub fn insert(&self, request: &Job, team_id: &str, address: &str, lat: f64, lng: f64, title: &str) -> JobInsertCall<'a, C, NC, A> {
         JobInsertCall {
             hub: self.hub,
@@ -952,13 +991,19 @@ pub struct ScheduleMethods<'a, C, NC, A>
     hub: &'a Coordinate<C, NC, A>,
 }
 
-impl<'a, C, NC, A> ResourceMethodsBuilder for ScheduleMethods<'a, C, NC, A> {}
+impl<'a, C, NC, A> MethodsBuilder for ScheduleMethods<'a, C, NC, A> {}
 
 impl<'a, C, NC, A> ScheduleMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Replaces the schedule of a job with the provided schedule.    
+    /// Replaces the schedule of a job with the provided schedule.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `teamId` - Team ID
+    /// * `jobId` - Job number
     pub fn update(&self, request: &Schedule, team_id: &str, job_id: &str) -> ScheduleUpdateCall<'a, C, NC, A> {
         ScheduleUpdateCall {
             hub: self.hub,
@@ -977,7 +1022,13 @@ impl<'a, C, NC, A> ScheduleMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Replaces the schedule of a job with the provided schedule. This method supports patch semantics.    
+    /// Replaces the schedule of a job with the provided schedule. This method supports patch semantics.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `teamId` - Team ID
+    /// * `jobId` - Job number
     pub fn patch(&self, request: &Schedule, team_id: &str, job_id: &str) -> SchedulePatchCall<'a, C, NC, A> {
         SchedulePatchCall {
             hub: self.hub,
@@ -996,7 +1047,12 @@ impl<'a, C, NC, A> ScheduleMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Retrieves the schedule for a job.    
+    /// Retrieves the schedule for a job.
+    /// 
+    /// # Arguments
+    ///
+    /// * `teamId` - Team ID
+    /// * `jobId` - Job number
     pub fn get(&self, team_id: &str, job_id: &str) -> ScheduleGetCall<'a, C, NC, A> {
         ScheduleGetCall {
             hub: self.hub,
@@ -1045,13 +1101,17 @@ pub struct WorkerMethods<'a, C, NC, A>
     hub: &'a Coordinate<C, NC, A>,
 }
 
-impl<'a, C, NC, A> ResourceMethodsBuilder for WorkerMethods<'a, C, NC, A> {}
+impl<'a, C, NC, A> MethodsBuilder for WorkerMethods<'a, C, NC, A> {}
 
 impl<'a, C, NC, A> WorkerMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Retrieves a list of workers in a team.    
+    /// Retrieves a list of workers in a team.
+    /// 
+    /// # Arguments
+    ///
+    /// * `teamId` - Team ID
     pub fn list(&self, team_id: &str) -> WorkerListCall<'a, C, NC, A> {
         WorkerListCall {
             hub: self.hub,
@@ -1099,13 +1159,19 @@ pub struct LocationMethods<'a, C, NC, A>
     hub: &'a Coordinate<C, NC, A>,
 }
 
-impl<'a, C, NC, A> ResourceMethodsBuilder for LocationMethods<'a, C, NC, A> {}
+impl<'a, C, NC, A> MethodsBuilder for LocationMethods<'a, C, NC, A> {}
 
 impl<'a, C, NC, A> LocationMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Retrieves a list of locations for a worker.    
+    /// Retrieves a list of locations for a worker.
+    /// 
+    /// # Arguments
+    ///
+    /// * `teamId` - Team ID
+    /// * `workerEmail` - Worker email address.
+    /// * `startTimestampMs` - Start timestamp in milliseconds since the epoch.
     pub fn list(&self, team_id: &str, worker_email: &str, start_timestamp_ms: &str) -> LocationListCall<'a, C, NC, A> {
         LocationListCall {
             hub: self.hub,
@@ -1157,13 +1223,13 @@ pub struct TeamMethods<'a, C, NC, A>
     hub: &'a Coordinate<C, NC, A>,
 }
 
-impl<'a, C, NC, A> ResourceMethodsBuilder for TeamMethods<'a, C, NC, A> {}
+impl<'a, C, NC, A> MethodsBuilder for TeamMethods<'a, C, NC, A> {}
 
 impl<'a, C, NC, A> TeamMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Retrieves a list of teams for a user.    
+    /// Retrieves a list of teams for a user.
     pub fn list(&self) -> TeamListCall<'a, C, NC, A> {
         TeamListCall {
             hub: self.hub,
@@ -1213,13 +1279,17 @@ pub struct CustomFieldDefMethods<'a, C, NC, A>
     hub: &'a Coordinate<C, NC, A>,
 }
 
-impl<'a, C, NC, A> ResourceMethodsBuilder for CustomFieldDefMethods<'a, C, NC, A> {}
+impl<'a, C, NC, A> MethodsBuilder for CustomFieldDefMethods<'a, C, NC, A> {}
 
 impl<'a, C, NC, A> CustomFieldDefMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Retrieves a list of custom field definitions for a team.    
+    /// Retrieves a list of custom field definitions for a team.
+    /// 
+    /// # Arguments
+    ///
+    /// * `teamId` - Team ID
     pub fn list(&self, team_id: &str) -> CustomFieldDefListCall<'a, C, NC, A> {
         CustomFieldDefListCall {
             hub: self.hub,
@@ -1242,7 +1312,7 @@ impl<'a, C, NC, A> CustomFieldDefMethods<'a, C, NC, A> {
 /// Retrieves a job, including all the changes made to the job.
 ///
 /// A builder for the *get* method supported by a *job* resource.
-/// It is not used directly, but through a `JobMethods`.
+/// It is not used directly, but through a `JobMethods` instance.
 ///
 /// # Example
 ///
@@ -1302,7 +1372,7 @@ impl<'a, C, NC, A> JobGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnect
         for &field in ["alt", "teamId", "jobId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -1355,7 +1425,7 @@ impl<'a, C, NC, A> JobGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnect
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -1367,7 +1437,6 @@ impl<'a, C, NC, A> JobGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnect
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -1377,7 +1446,7 @@ impl<'a, C, NC, A> JobGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnect
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -1388,7 +1457,7 @@ impl<'a, C, NC, A> JobGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnect
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -1397,13 +1466,13 @@ impl<'a, C, NC, A> JobGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnect
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -1415,7 +1484,7 @@ impl<'a, C, NC, A> JobGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnect
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Team ID    
+    /// Team ID
     pub fn team_id(mut self, new_value: &str) -> JobGetCall<'a, C, NC, A> {
         self._team_id = new_value.to_string();
         self
@@ -1425,7 +1494,7 @@ impl<'a, C, NC, A> JobGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnect
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Job number    
+    /// Job number
     pub fn job_id(mut self, new_value: &str) -> JobGetCall<'a, C, NC, A> {
         self._job_id = new_value.to_string();
         self
@@ -1486,7 +1555,7 @@ impl<'a, C, NC, A> JobGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnect
 /// Updates a job. Fields that are set in the job state will be updated.
 ///
 /// A builder for the *update* method supported by a *job* resource.
-/// It is not used directly, but through a `JobMethods`.
+/// It is not used directly, but through a `JobMethods` instance.
 ///
 /// # Example
 ///
@@ -1607,7 +1676,7 @@ impl<'a, C, NC, A> JobUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
         for &field in ["alt", "teamId", "jobId", "title", "progress", "note", "lng", "lat", "customerPhoneNumber", "customerName", "customField", "assignee", "address"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -1664,7 +1733,7 @@ impl<'a, C, NC, A> JobUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -1680,7 +1749,6 @@ impl<'a, C, NC, A> JobUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -1690,7 +1758,7 @@ impl<'a, C, NC, A> JobUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -1701,7 +1769,7 @@ impl<'a, C, NC, A> JobUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -1710,13 +1778,13 @@ impl<'a, C, NC, A> JobUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -1737,7 +1805,7 @@ impl<'a, C, NC, A> JobUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Team ID    
+    /// Team ID
     pub fn team_id(mut self, new_value: &str) -> JobUpdateCall<'a, C, NC, A> {
         self._team_id = new_value.to_string();
         self
@@ -1747,7 +1815,7 @@ impl<'a, C, NC, A> JobUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Job number    
+    /// Job number
     pub fn job_id(mut self, new_value: &str) -> JobUpdateCall<'a, C, NC, A> {
         self._job_id = new_value.to_string();
         self
@@ -1755,7 +1823,7 @@ impl<'a, C, NC, A> JobUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     /// Sets the *title* query property to the given value.
     ///
     /// 
-    /// Job title    
+    /// Job title
     pub fn title(mut self, new_value: &str) -> JobUpdateCall<'a, C, NC, A> {
         self._title = Some(new_value.to_string());
         self
@@ -1763,7 +1831,7 @@ impl<'a, C, NC, A> JobUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     /// Sets the *progress* query property to the given value.
     ///
     /// 
-    /// Job progress    
+    /// Job progress
     pub fn progress(mut self, new_value: &str) -> JobUpdateCall<'a, C, NC, A> {
         self._progress = Some(new_value.to_string());
         self
@@ -1771,7 +1839,7 @@ impl<'a, C, NC, A> JobUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     /// Sets the *note* query property to the given value.
     ///
     /// 
-    /// Job note as newline (Unix) separated string    
+    /// Job note as newline (Unix) separated string
     pub fn note(mut self, new_value: &str) -> JobUpdateCall<'a, C, NC, A> {
         self._note = Some(new_value.to_string());
         self
@@ -1779,7 +1847,7 @@ impl<'a, C, NC, A> JobUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     /// Sets the *lng* query property to the given value.
     ///
     /// 
-    /// The longitude coordinate of this job's location.    
+    /// The longitude coordinate of this job's location.
     pub fn lng(mut self, new_value: f64) -> JobUpdateCall<'a, C, NC, A> {
         self._lng = Some(new_value);
         self
@@ -1787,7 +1855,7 @@ impl<'a, C, NC, A> JobUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     /// Sets the *lat* query property to the given value.
     ///
     /// 
-    /// The latitude coordinate of this job's location.    
+    /// The latitude coordinate of this job's location.
     pub fn lat(mut self, new_value: f64) -> JobUpdateCall<'a, C, NC, A> {
         self._lat = Some(new_value);
         self
@@ -1795,7 +1863,7 @@ impl<'a, C, NC, A> JobUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     /// Sets the *customer phone number* query property to the given value.
     ///
     /// 
-    /// Customer phone number    
+    /// Customer phone number
     pub fn customer_phone_number(mut self, new_value: &str) -> JobUpdateCall<'a, C, NC, A> {
         self._customer_phone_number = Some(new_value.to_string());
         self
@@ -1803,7 +1871,7 @@ impl<'a, C, NC, A> JobUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     /// Sets the *customer name* query property to the given value.
     ///
     /// 
-    /// Customer name    
+    /// Customer name
     pub fn customer_name(mut self, new_value: &str) -> JobUpdateCall<'a, C, NC, A> {
         self._customer_name = Some(new_value.to_string());
         self
@@ -1812,7 +1880,7 @@ impl<'a, C, NC, A> JobUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
     ///
     /// 
-    /// Sets the value of custom fields. To set a custom field, pass the field id (from /team/teamId/custom_fields), a URL escaped '=' character, and the desired value as a parameter. For example, customField=12%3DAlice. Repeat the parameter for each custom field. Note that '=' cannot appear in the parameter value. Specifying an invalid, or inactive enum field will result in an error 500.    
+    /// Sets the value of custom fields. To set a custom field, pass the field id (from /team/teamId/custom_fields), a URL escaped '=' character, and the desired value as a parameter. For example, customField=12%3DAlice. Repeat the parameter for each custom field. Note that '=' cannot appear in the parameter value. Specifying an invalid, or inactive enum field will result in an error 500.
     pub fn add_custom_field(mut self, new_value: &str) -> JobUpdateCall<'a, C, NC, A> {
         self._custom_field.push(new_value.to_string());
         self
@@ -1820,7 +1888,7 @@ impl<'a, C, NC, A> JobUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     /// Sets the *assignee* query property to the given value.
     ///
     /// 
-    /// Assignee email address, or empty string to unassign.    
+    /// Assignee email address, or empty string to unassign.
     pub fn assignee(mut self, new_value: &str) -> JobUpdateCall<'a, C, NC, A> {
         self._assignee = Some(new_value.to_string());
         self
@@ -1828,7 +1896,7 @@ impl<'a, C, NC, A> JobUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     /// Sets the *address* query property to the given value.
     ///
     /// 
-    /// Job address as newline (Unix) separated string    
+    /// Job address as newline (Unix) separated string
     pub fn address(mut self, new_value: &str) -> JobUpdateCall<'a, C, NC, A> {
         self._address = Some(new_value.to_string());
         self
@@ -1889,7 +1957,7 @@ impl<'a, C, NC, A> JobUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
 /// Updates a job. Fields that are set in the job state will be updated. This method supports patch semantics.
 ///
 /// A builder for the *patch* method supported by a *job* resource.
-/// It is not used directly, but through a `JobMethods`.
+/// It is not used directly, but through a `JobMethods` instance.
 ///
 /// # Example
 ///
@@ -2010,7 +2078,7 @@ impl<'a, C, NC, A> JobPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
         for &field in ["alt", "teamId", "jobId", "title", "progress", "note", "lng", "lat", "customerPhoneNumber", "customerName", "customField", "assignee", "address"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -2067,7 +2135,7 @@ impl<'a, C, NC, A> JobPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -2083,7 +2151,6 @@ impl<'a, C, NC, A> JobPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -2093,7 +2160,7 @@ impl<'a, C, NC, A> JobPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -2104,7 +2171,7 @@ impl<'a, C, NC, A> JobPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -2113,13 +2180,13 @@ impl<'a, C, NC, A> JobPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -2140,7 +2207,7 @@ impl<'a, C, NC, A> JobPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Team ID    
+    /// Team ID
     pub fn team_id(mut self, new_value: &str) -> JobPatchCall<'a, C, NC, A> {
         self._team_id = new_value.to_string();
         self
@@ -2150,7 +2217,7 @@ impl<'a, C, NC, A> JobPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Job number    
+    /// Job number
     pub fn job_id(mut self, new_value: &str) -> JobPatchCall<'a, C, NC, A> {
         self._job_id = new_value.to_string();
         self
@@ -2158,7 +2225,7 @@ impl<'a, C, NC, A> JobPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
     /// Sets the *title* query property to the given value.
     ///
     /// 
-    /// Job title    
+    /// Job title
     pub fn title(mut self, new_value: &str) -> JobPatchCall<'a, C, NC, A> {
         self._title = Some(new_value.to_string());
         self
@@ -2166,7 +2233,7 @@ impl<'a, C, NC, A> JobPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
     /// Sets the *progress* query property to the given value.
     ///
     /// 
-    /// Job progress    
+    /// Job progress
     pub fn progress(mut self, new_value: &str) -> JobPatchCall<'a, C, NC, A> {
         self._progress = Some(new_value.to_string());
         self
@@ -2174,7 +2241,7 @@ impl<'a, C, NC, A> JobPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
     /// Sets the *note* query property to the given value.
     ///
     /// 
-    /// Job note as newline (Unix) separated string    
+    /// Job note as newline (Unix) separated string
     pub fn note(mut self, new_value: &str) -> JobPatchCall<'a, C, NC, A> {
         self._note = Some(new_value.to_string());
         self
@@ -2182,7 +2249,7 @@ impl<'a, C, NC, A> JobPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
     /// Sets the *lng* query property to the given value.
     ///
     /// 
-    /// The longitude coordinate of this job's location.    
+    /// The longitude coordinate of this job's location.
     pub fn lng(mut self, new_value: f64) -> JobPatchCall<'a, C, NC, A> {
         self._lng = Some(new_value);
         self
@@ -2190,7 +2257,7 @@ impl<'a, C, NC, A> JobPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
     /// Sets the *lat* query property to the given value.
     ///
     /// 
-    /// The latitude coordinate of this job's location.    
+    /// The latitude coordinate of this job's location.
     pub fn lat(mut self, new_value: f64) -> JobPatchCall<'a, C, NC, A> {
         self._lat = Some(new_value);
         self
@@ -2198,7 +2265,7 @@ impl<'a, C, NC, A> JobPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
     /// Sets the *customer phone number* query property to the given value.
     ///
     /// 
-    /// Customer phone number    
+    /// Customer phone number
     pub fn customer_phone_number(mut self, new_value: &str) -> JobPatchCall<'a, C, NC, A> {
         self._customer_phone_number = Some(new_value.to_string());
         self
@@ -2206,7 +2273,7 @@ impl<'a, C, NC, A> JobPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
     /// Sets the *customer name* query property to the given value.
     ///
     /// 
-    /// Customer name    
+    /// Customer name
     pub fn customer_name(mut self, new_value: &str) -> JobPatchCall<'a, C, NC, A> {
         self._customer_name = Some(new_value.to_string());
         self
@@ -2215,7 +2282,7 @@ impl<'a, C, NC, A> JobPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
     ///
     /// 
-    /// Sets the value of custom fields. To set a custom field, pass the field id (from /team/teamId/custom_fields), a URL escaped '=' character, and the desired value as a parameter. For example, customField=12%3DAlice. Repeat the parameter for each custom field. Note that '=' cannot appear in the parameter value. Specifying an invalid, or inactive enum field will result in an error 500.    
+    /// Sets the value of custom fields. To set a custom field, pass the field id (from /team/teamId/custom_fields), a URL escaped '=' character, and the desired value as a parameter. For example, customField=12%3DAlice. Repeat the parameter for each custom field. Note that '=' cannot appear in the parameter value. Specifying an invalid, or inactive enum field will result in an error 500.
     pub fn add_custom_field(mut self, new_value: &str) -> JobPatchCall<'a, C, NC, A> {
         self._custom_field.push(new_value.to_string());
         self
@@ -2223,7 +2290,7 @@ impl<'a, C, NC, A> JobPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
     /// Sets the *assignee* query property to the given value.
     ///
     /// 
-    /// Assignee email address, or empty string to unassign.    
+    /// Assignee email address, or empty string to unassign.
     pub fn assignee(mut self, new_value: &str) -> JobPatchCall<'a, C, NC, A> {
         self._assignee = Some(new_value.to_string());
         self
@@ -2231,7 +2298,7 @@ impl<'a, C, NC, A> JobPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
     /// Sets the *address* query property to the given value.
     ///
     /// 
-    /// Job address as newline (Unix) separated string    
+    /// Job address as newline (Unix) separated string
     pub fn address(mut self, new_value: &str) -> JobPatchCall<'a, C, NC, A> {
         self._address = Some(new_value.to_string());
         self
@@ -2292,7 +2359,7 @@ impl<'a, C, NC, A> JobPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
 /// Retrieves jobs created or modified since the given timestamp.
 ///
 /// A builder for the *list* method supported by a *job* resource.
-/// It is not used directly, but through a `JobMethods`.
+/// It is not used directly, but through a `JobMethods` instance.
 ///
 /// # Example
 ///
@@ -2365,7 +2432,7 @@ impl<'a, C, NC, A> JobListCall<'a, C, NC, A> where NC: hyper::net::NetworkConnec
         for &field in ["alt", "teamId", "pageToken", "minModifiedTimestampMs", "maxResults"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -2418,7 +2485,7 @@ impl<'a, C, NC, A> JobListCall<'a, C, NC, A> where NC: hyper::net::NetworkConnec
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -2430,7 +2497,6 @@ impl<'a, C, NC, A> JobListCall<'a, C, NC, A> where NC: hyper::net::NetworkConnec
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -2440,7 +2506,7 @@ impl<'a, C, NC, A> JobListCall<'a, C, NC, A> where NC: hyper::net::NetworkConnec
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -2451,7 +2517,7 @@ impl<'a, C, NC, A> JobListCall<'a, C, NC, A> where NC: hyper::net::NetworkConnec
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -2460,13 +2526,13 @@ impl<'a, C, NC, A> JobListCall<'a, C, NC, A> where NC: hyper::net::NetworkConnec
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -2478,7 +2544,7 @@ impl<'a, C, NC, A> JobListCall<'a, C, NC, A> where NC: hyper::net::NetworkConnec
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Team ID    
+    /// Team ID
     pub fn team_id(mut self, new_value: &str) -> JobListCall<'a, C, NC, A> {
         self._team_id = new_value.to_string();
         self
@@ -2486,7 +2552,7 @@ impl<'a, C, NC, A> JobListCall<'a, C, NC, A> where NC: hyper::net::NetworkConnec
     /// Sets the *page token* query property to the given value.
     ///
     /// 
-    /// Continuation token    
+    /// Continuation token
     pub fn page_token(mut self, new_value: &str) -> JobListCall<'a, C, NC, A> {
         self._page_token = Some(new_value.to_string());
         self
@@ -2494,7 +2560,7 @@ impl<'a, C, NC, A> JobListCall<'a, C, NC, A> where NC: hyper::net::NetworkConnec
     /// Sets the *min modified timestamp ms* query property to the given value.
     ///
     /// 
-    /// Minimum time a job was modified in milliseconds since epoch.    
+    /// Minimum time a job was modified in milliseconds since epoch.
     pub fn min_modified_timestamp_ms(mut self, new_value: &str) -> JobListCall<'a, C, NC, A> {
         self._min_modified_timestamp_ms = Some(new_value.to_string());
         self
@@ -2502,7 +2568,7 @@ impl<'a, C, NC, A> JobListCall<'a, C, NC, A> where NC: hyper::net::NetworkConnec
     /// Sets the *max results* query property to the given value.
     ///
     /// 
-    /// Maximum number of results to return in one page.    
+    /// Maximum number of results to return in one page.
     pub fn max_results(mut self, new_value: u32) -> JobListCall<'a, C, NC, A> {
         self._max_results = Some(new_value);
         self
@@ -2563,7 +2629,7 @@ impl<'a, C, NC, A> JobListCall<'a, C, NC, A> where NC: hyper::net::NetworkConnec
 /// Inserts a new job. Only the state field of the job should be set.
 ///
 /// A builder for the *insert* method supported by a *job* resource.
-/// It is not used directly, but through a `JobMethods`.
+/// It is not used directly, but through a `JobMethods` instance.
 ///
 /// # Example
 ///
@@ -2665,7 +2731,7 @@ impl<'a, C, NC, A> JobInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
         for &field in ["alt", "teamId", "address", "lat", "lng", "title", "note", "customerPhoneNumber", "customerName", "customField", "assignee"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -2722,7 +2788,7 @@ impl<'a, C, NC, A> JobInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -2738,7 +2804,6 @@ impl<'a, C, NC, A> JobInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -2748,7 +2813,7 @@ impl<'a, C, NC, A> JobInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -2759,7 +2824,7 @@ impl<'a, C, NC, A> JobInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -2768,13 +2833,13 @@ impl<'a, C, NC, A> JobInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -2795,7 +2860,7 @@ impl<'a, C, NC, A> JobInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Team ID    
+    /// Team ID
     pub fn team_id(mut self, new_value: &str) -> JobInsertCall<'a, C, NC, A> {
         self._team_id = new_value.to_string();
         self
@@ -2805,7 +2870,7 @@ impl<'a, C, NC, A> JobInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Job address as newline (Unix) separated string    
+    /// Job address as newline (Unix) separated string
     pub fn address(mut self, new_value: &str) -> JobInsertCall<'a, C, NC, A> {
         self._address = new_value.to_string();
         self
@@ -2815,7 +2880,7 @@ impl<'a, C, NC, A> JobInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The latitude coordinate of this job's location.    
+    /// The latitude coordinate of this job's location.
     pub fn lat(mut self, new_value: f64) -> JobInsertCall<'a, C, NC, A> {
         self._lat = new_value;
         self
@@ -2825,7 +2890,7 @@ impl<'a, C, NC, A> JobInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The longitude coordinate of this job's location.    
+    /// The longitude coordinate of this job's location.
     pub fn lng(mut self, new_value: f64) -> JobInsertCall<'a, C, NC, A> {
         self._lng = new_value;
         self
@@ -2835,7 +2900,7 @@ impl<'a, C, NC, A> JobInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Job title    
+    /// Job title
     pub fn title(mut self, new_value: &str) -> JobInsertCall<'a, C, NC, A> {
         self._title = new_value.to_string();
         self
@@ -2843,7 +2908,7 @@ impl<'a, C, NC, A> JobInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     /// Sets the *note* query property to the given value.
     ///
     /// 
-    /// Job note as newline (Unix) separated string    
+    /// Job note as newline (Unix) separated string
     pub fn note(mut self, new_value: &str) -> JobInsertCall<'a, C, NC, A> {
         self._note = Some(new_value.to_string());
         self
@@ -2851,7 +2916,7 @@ impl<'a, C, NC, A> JobInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     /// Sets the *customer phone number* query property to the given value.
     ///
     /// 
-    /// Customer phone number    
+    /// Customer phone number
     pub fn customer_phone_number(mut self, new_value: &str) -> JobInsertCall<'a, C, NC, A> {
         self._customer_phone_number = Some(new_value.to_string());
         self
@@ -2859,7 +2924,7 @@ impl<'a, C, NC, A> JobInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     /// Sets the *customer name* query property to the given value.
     ///
     /// 
-    /// Customer name    
+    /// Customer name
     pub fn customer_name(mut self, new_value: &str) -> JobInsertCall<'a, C, NC, A> {
         self._customer_name = Some(new_value.to_string());
         self
@@ -2868,7 +2933,7 @@ impl<'a, C, NC, A> JobInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
     ///
     /// 
-    /// Sets the value of custom fields. To set a custom field, pass the field id (from /team/teamId/custom_fields), a URL escaped '=' character, and the desired value as a parameter. For example, customField=12%3DAlice. Repeat the parameter for each custom field. Note that '=' cannot appear in the parameter value. Specifying an invalid, or inactive enum field will result in an error 500.    
+    /// Sets the value of custom fields. To set a custom field, pass the field id (from /team/teamId/custom_fields), a URL escaped '=' character, and the desired value as a parameter. For example, customField=12%3DAlice. Repeat the parameter for each custom field. Note that '=' cannot appear in the parameter value. Specifying an invalid, or inactive enum field will result in an error 500.
     pub fn add_custom_field(mut self, new_value: &str) -> JobInsertCall<'a, C, NC, A> {
         self._custom_field.push(new_value.to_string());
         self
@@ -2876,7 +2941,7 @@ impl<'a, C, NC, A> JobInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     /// Sets the *assignee* query property to the given value.
     ///
     /// 
-    /// Assignee email address, or empty string to unassign.    
+    /// Assignee email address, or empty string to unassign.
     pub fn assignee(mut self, new_value: &str) -> JobInsertCall<'a, C, NC, A> {
         self._assignee = Some(new_value.to_string());
         self
@@ -2937,7 +3002,7 @@ impl<'a, C, NC, A> JobInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
 /// Replaces the schedule of a job with the provided schedule.
 ///
 /// A builder for the *update* method supported by a *schedule* resource.
-/// It is not used directly, but through a `ScheduleMethods`.
+/// It is not used directly, but through a `ScheduleMethods` instance.
 ///
 /// # Example
 ///
@@ -3024,7 +3089,7 @@ impl<'a, C, NC, A> ScheduleUpdateCall<'a, C, NC, A> where NC: hyper::net::Networ
         for &field in ["alt", "teamId", "jobId", "startTime", "endTime", "duration", "allDay"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -3081,7 +3146,7 @@ impl<'a, C, NC, A> ScheduleUpdateCall<'a, C, NC, A> where NC: hyper::net::Networ
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -3097,7 +3162,6 @@ impl<'a, C, NC, A> ScheduleUpdateCall<'a, C, NC, A> where NC: hyper::net::Networ
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -3107,7 +3171,7 @@ impl<'a, C, NC, A> ScheduleUpdateCall<'a, C, NC, A> where NC: hyper::net::Networ
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -3118,7 +3182,7 @@ impl<'a, C, NC, A> ScheduleUpdateCall<'a, C, NC, A> where NC: hyper::net::Networ
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -3127,13 +3191,13 @@ impl<'a, C, NC, A> ScheduleUpdateCall<'a, C, NC, A> where NC: hyper::net::Networ
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -3154,7 +3218,7 @@ impl<'a, C, NC, A> ScheduleUpdateCall<'a, C, NC, A> where NC: hyper::net::Networ
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Team ID    
+    /// Team ID
     pub fn team_id(mut self, new_value: &str) -> ScheduleUpdateCall<'a, C, NC, A> {
         self._team_id = new_value.to_string();
         self
@@ -3164,7 +3228,7 @@ impl<'a, C, NC, A> ScheduleUpdateCall<'a, C, NC, A> where NC: hyper::net::Networ
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Job number    
+    /// Job number
     pub fn job_id(mut self, new_value: &str) -> ScheduleUpdateCall<'a, C, NC, A> {
         self._job_id = new_value.to_string();
         self
@@ -3172,7 +3236,7 @@ impl<'a, C, NC, A> ScheduleUpdateCall<'a, C, NC, A> where NC: hyper::net::Networ
     /// Sets the *start time* query property to the given value.
     ///
     /// 
-    /// Scheduled start time in milliseconds since epoch.    
+    /// Scheduled start time in milliseconds since epoch.
     pub fn start_time(mut self, new_value: &str) -> ScheduleUpdateCall<'a, C, NC, A> {
         self._start_time = Some(new_value.to_string());
         self
@@ -3180,7 +3244,7 @@ impl<'a, C, NC, A> ScheduleUpdateCall<'a, C, NC, A> where NC: hyper::net::Networ
     /// Sets the *end time* query property to the given value.
     ///
     /// 
-    /// Scheduled end time in milliseconds since epoch.    
+    /// Scheduled end time in milliseconds since epoch.
     pub fn end_time(mut self, new_value: &str) -> ScheduleUpdateCall<'a, C, NC, A> {
         self._end_time = Some(new_value.to_string());
         self
@@ -3188,7 +3252,7 @@ impl<'a, C, NC, A> ScheduleUpdateCall<'a, C, NC, A> where NC: hyper::net::Networ
     /// Sets the *duration* query property to the given value.
     ///
     /// 
-    /// Job duration in milliseconds.    
+    /// Job duration in milliseconds.
     pub fn duration(mut self, new_value: &str) -> ScheduleUpdateCall<'a, C, NC, A> {
         self._duration = Some(new_value.to_string());
         self
@@ -3196,7 +3260,7 @@ impl<'a, C, NC, A> ScheduleUpdateCall<'a, C, NC, A> where NC: hyper::net::Networ
     /// Sets the *all day* query property to the given value.
     ///
     /// 
-    /// Whether the job is scheduled for the whole day. Time of day in start/end times is ignored if this is true.    
+    /// Whether the job is scheduled for the whole day. Time of day in start/end times is ignored if this is true.
     pub fn all_day(mut self, new_value: bool) -> ScheduleUpdateCall<'a, C, NC, A> {
         self._all_day = Some(new_value);
         self
@@ -3257,7 +3321,7 @@ impl<'a, C, NC, A> ScheduleUpdateCall<'a, C, NC, A> where NC: hyper::net::Networ
 /// Replaces the schedule of a job with the provided schedule. This method supports patch semantics.
 ///
 /// A builder for the *patch* method supported by a *schedule* resource.
-/// It is not used directly, but through a `ScheduleMethods`.
+/// It is not used directly, but through a `ScheduleMethods` instance.
 ///
 /// # Example
 ///
@@ -3344,7 +3408,7 @@ impl<'a, C, NC, A> SchedulePatchCall<'a, C, NC, A> where NC: hyper::net::Network
         for &field in ["alt", "teamId", "jobId", "startTime", "endTime", "duration", "allDay"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -3401,7 +3465,7 @@ impl<'a, C, NC, A> SchedulePatchCall<'a, C, NC, A> where NC: hyper::net::Network
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -3417,7 +3481,6 @@ impl<'a, C, NC, A> SchedulePatchCall<'a, C, NC, A> where NC: hyper::net::Network
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -3427,7 +3490,7 @@ impl<'a, C, NC, A> SchedulePatchCall<'a, C, NC, A> where NC: hyper::net::Network
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -3438,7 +3501,7 @@ impl<'a, C, NC, A> SchedulePatchCall<'a, C, NC, A> where NC: hyper::net::Network
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -3447,13 +3510,13 @@ impl<'a, C, NC, A> SchedulePatchCall<'a, C, NC, A> where NC: hyper::net::Network
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -3474,7 +3537,7 @@ impl<'a, C, NC, A> SchedulePatchCall<'a, C, NC, A> where NC: hyper::net::Network
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Team ID    
+    /// Team ID
     pub fn team_id(mut self, new_value: &str) -> SchedulePatchCall<'a, C, NC, A> {
         self._team_id = new_value.to_string();
         self
@@ -3484,7 +3547,7 @@ impl<'a, C, NC, A> SchedulePatchCall<'a, C, NC, A> where NC: hyper::net::Network
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Job number    
+    /// Job number
     pub fn job_id(mut self, new_value: &str) -> SchedulePatchCall<'a, C, NC, A> {
         self._job_id = new_value.to_string();
         self
@@ -3492,7 +3555,7 @@ impl<'a, C, NC, A> SchedulePatchCall<'a, C, NC, A> where NC: hyper::net::Network
     /// Sets the *start time* query property to the given value.
     ///
     /// 
-    /// Scheduled start time in milliseconds since epoch.    
+    /// Scheduled start time in milliseconds since epoch.
     pub fn start_time(mut self, new_value: &str) -> SchedulePatchCall<'a, C, NC, A> {
         self._start_time = Some(new_value.to_string());
         self
@@ -3500,7 +3563,7 @@ impl<'a, C, NC, A> SchedulePatchCall<'a, C, NC, A> where NC: hyper::net::Network
     /// Sets the *end time* query property to the given value.
     ///
     /// 
-    /// Scheduled end time in milliseconds since epoch.    
+    /// Scheduled end time in milliseconds since epoch.
     pub fn end_time(mut self, new_value: &str) -> SchedulePatchCall<'a, C, NC, A> {
         self._end_time = Some(new_value.to_string());
         self
@@ -3508,7 +3571,7 @@ impl<'a, C, NC, A> SchedulePatchCall<'a, C, NC, A> where NC: hyper::net::Network
     /// Sets the *duration* query property to the given value.
     ///
     /// 
-    /// Job duration in milliseconds.    
+    /// Job duration in milliseconds.
     pub fn duration(mut self, new_value: &str) -> SchedulePatchCall<'a, C, NC, A> {
         self._duration = Some(new_value.to_string());
         self
@@ -3516,7 +3579,7 @@ impl<'a, C, NC, A> SchedulePatchCall<'a, C, NC, A> where NC: hyper::net::Network
     /// Sets the *all day* query property to the given value.
     ///
     /// 
-    /// Whether the job is scheduled for the whole day. Time of day in start/end times is ignored if this is true.    
+    /// Whether the job is scheduled for the whole day. Time of day in start/end times is ignored if this is true.
     pub fn all_day(mut self, new_value: bool) -> SchedulePatchCall<'a, C, NC, A> {
         self._all_day = Some(new_value);
         self
@@ -3577,7 +3640,7 @@ impl<'a, C, NC, A> SchedulePatchCall<'a, C, NC, A> where NC: hyper::net::Network
 /// Retrieves the schedule for a job.
 ///
 /// A builder for the *get* method supported by a *schedule* resource.
-/// It is not used directly, but through a `ScheduleMethods`.
+/// It is not used directly, but through a `ScheduleMethods` instance.
 ///
 /// # Example
 ///
@@ -3637,7 +3700,7 @@ impl<'a, C, NC, A> ScheduleGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
         for &field in ["alt", "teamId", "jobId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -3690,7 +3753,7 @@ impl<'a, C, NC, A> ScheduleGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -3702,7 +3765,6 @@ impl<'a, C, NC, A> ScheduleGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -3712,7 +3774,7 @@ impl<'a, C, NC, A> ScheduleGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -3723,7 +3785,7 @@ impl<'a, C, NC, A> ScheduleGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -3732,13 +3794,13 @@ impl<'a, C, NC, A> ScheduleGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -3750,7 +3812,7 @@ impl<'a, C, NC, A> ScheduleGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Team ID    
+    /// Team ID
     pub fn team_id(mut self, new_value: &str) -> ScheduleGetCall<'a, C, NC, A> {
         self._team_id = new_value.to_string();
         self
@@ -3760,7 +3822,7 @@ impl<'a, C, NC, A> ScheduleGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Job number    
+    /// Job number
     pub fn job_id(mut self, new_value: &str) -> ScheduleGetCall<'a, C, NC, A> {
         self._job_id = new_value.to_string();
         self
@@ -3821,7 +3883,7 @@ impl<'a, C, NC, A> ScheduleGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
 /// Retrieves a list of workers in a team.
 ///
 /// A builder for the *list* method supported by a *worker* resource.
-/// It is not used directly, but through a `WorkerMethods`.
+/// It is not used directly, but through a `WorkerMethods` instance.
 ///
 /// # Example
 ///
@@ -3879,7 +3941,7 @@ impl<'a, C, NC, A> WorkerListCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
         for &field in ["alt", "teamId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -3932,7 +3994,7 @@ impl<'a, C, NC, A> WorkerListCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -3944,7 +4006,6 @@ impl<'a, C, NC, A> WorkerListCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -3954,7 +4015,7 @@ impl<'a, C, NC, A> WorkerListCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -3965,7 +4026,7 @@ impl<'a, C, NC, A> WorkerListCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -3974,13 +4035,13 @@ impl<'a, C, NC, A> WorkerListCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -3992,7 +4053,7 @@ impl<'a, C, NC, A> WorkerListCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Team ID    
+    /// Team ID
     pub fn team_id(mut self, new_value: &str) -> WorkerListCall<'a, C, NC, A> {
         self._team_id = new_value.to_string();
         self
@@ -4053,7 +4114,7 @@ impl<'a, C, NC, A> WorkerListCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
 /// Retrieves a list of locations for a worker.
 ///
 /// A builder for the *list* method supported by a *location* resource.
-/// It is not used directly, but through a `LocationMethods`.
+/// It is not used directly, but through a `LocationMethods` instance.
 ///
 /// # Example
 ///
@@ -4125,7 +4186,7 @@ impl<'a, C, NC, A> LocationListCall<'a, C, NC, A> where NC: hyper::net::NetworkC
         for &field in ["alt", "teamId", "workerEmail", "startTimestampMs", "pageToken", "maxResults"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -4178,7 +4239,7 @@ impl<'a, C, NC, A> LocationListCall<'a, C, NC, A> where NC: hyper::net::NetworkC
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -4190,7 +4251,6 @@ impl<'a, C, NC, A> LocationListCall<'a, C, NC, A> where NC: hyper::net::NetworkC
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -4200,7 +4260,7 @@ impl<'a, C, NC, A> LocationListCall<'a, C, NC, A> where NC: hyper::net::NetworkC
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -4211,7 +4271,7 @@ impl<'a, C, NC, A> LocationListCall<'a, C, NC, A> where NC: hyper::net::NetworkC
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -4220,13 +4280,13 @@ impl<'a, C, NC, A> LocationListCall<'a, C, NC, A> where NC: hyper::net::NetworkC
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -4238,7 +4298,7 @@ impl<'a, C, NC, A> LocationListCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Team ID    
+    /// Team ID
     pub fn team_id(mut self, new_value: &str) -> LocationListCall<'a, C, NC, A> {
         self._team_id = new_value.to_string();
         self
@@ -4248,7 +4308,7 @@ impl<'a, C, NC, A> LocationListCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Worker email address.    
+    /// Worker email address.
     pub fn worker_email(mut self, new_value: &str) -> LocationListCall<'a, C, NC, A> {
         self._worker_email = new_value.to_string();
         self
@@ -4258,7 +4318,7 @@ impl<'a, C, NC, A> LocationListCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Start timestamp in milliseconds since the epoch.    
+    /// Start timestamp in milliseconds since the epoch.
     pub fn start_timestamp_ms(mut self, new_value: &str) -> LocationListCall<'a, C, NC, A> {
         self._start_timestamp_ms = new_value.to_string();
         self
@@ -4266,7 +4326,7 @@ impl<'a, C, NC, A> LocationListCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// Sets the *page token* query property to the given value.
     ///
     /// 
-    /// Continuation token    
+    /// Continuation token
     pub fn page_token(mut self, new_value: &str) -> LocationListCall<'a, C, NC, A> {
         self._page_token = Some(new_value.to_string());
         self
@@ -4274,7 +4334,7 @@ impl<'a, C, NC, A> LocationListCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// Sets the *max results* query property to the given value.
     ///
     /// 
-    /// Maximum number of results to return in one page.    
+    /// Maximum number of results to return in one page.
     pub fn max_results(mut self, new_value: u32) -> LocationListCall<'a, C, NC, A> {
         self._max_results = Some(new_value);
         self
@@ -4335,7 +4395,7 @@ impl<'a, C, NC, A> LocationListCall<'a, C, NC, A> where NC: hyper::net::NetworkC
 /// Retrieves a list of teams for a user.
 ///
 /// A builder for the *list* method supported by a *team* resource.
-/// It is not used directly, but through a `TeamMethods`.
+/// It is not used directly, but through a `TeamMethods` instance.
 ///
 /// # Example
 ///
@@ -4406,7 +4466,7 @@ impl<'a, C, NC, A> TeamListCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
         for &field in ["alt", "worker", "dispatcher", "admin"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -4435,7 +4495,7 @@ impl<'a, C, NC, A> TeamListCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -4447,7 +4507,6 @@ impl<'a, C, NC, A> TeamListCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -4457,7 +4516,7 @@ impl<'a, C, NC, A> TeamListCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -4468,7 +4527,7 @@ impl<'a, C, NC, A> TeamListCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -4477,13 +4536,13 @@ impl<'a, C, NC, A> TeamListCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -4493,7 +4552,7 @@ impl<'a, C, NC, A> TeamListCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
     /// Sets the *worker* query property to the given value.
     ///
     /// 
-    /// Whether to include teams for which the user has the Worker role.    
+    /// Whether to include teams for which the user has the Worker role.
     pub fn worker(mut self, new_value: bool) -> TeamListCall<'a, C, NC, A> {
         self._worker = Some(new_value);
         self
@@ -4501,7 +4560,7 @@ impl<'a, C, NC, A> TeamListCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
     /// Sets the *dispatcher* query property to the given value.
     ///
     /// 
-    /// Whether to include teams for which the user has the Dispatcher role.    
+    /// Whether to include teams for which the user has the Dispatcher role.
     pub fn dispatcher(mut self, new_value: bool) -> TeamListCall<'a, C, NC, A> {
         self._dispatcher = Some(new_value);
         self
@@ -4509,7 +4568,7 @@ impl<'a, C, NC, A> TeamListCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
     /// Sets the *admin* query property to the given value.
     ///
     /// 
-    /// Whether to include teams for which the user has the Admin role.    
+    /// Whether to include teams for which the user has the Admin role.
     pub fn admin(mut self, new_value: bool) -> TeamListCall<'a, C, NC, A> {
         self._admin = Some(new_value);
         self
@@ -4570,7 +4629,7 @@ impl<'a, C, NC, A> TeamListCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
 /// Retrieves a list of custom field definitions for a team.
 ///
 /// A builder for the *list* method supported by a *customFieldDef* resource.
-/// It is not used directly, but through a `CustomFieldDefMethods`.
+/// It is not used directly, but through a `CustomFieldDefMethods` instance.
 ///
 /// # Example
 ///
@@ -4628,7 +4687,7 @@ impl<'a, C, NC, A> CustomFieldDefListCall<'a, C, NC, A> where NC: hyper::net::Ne
         for &field in ["alt", "teamId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -4681,7 +4740,7 @@ impl<'a, C, NC, A> CustomFieldDefListCall<'a, C, NC, A> where NC: hyper::net::Ne
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -4693,7 +4752,6 @@ impl<'a, C, NC, A> CustomFieldDefListCall<'a, C, NC, A> where NC: hyper::net::Ne
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -4703,7 +4761,7 @@ impl<'a, C, NC, A> CustomFieldDefListCall<'a, C, NC, A> where NC: hyper::net::Ne
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -4714,7 +4772,7 @@ impl<'a, C, NC, A> CustomFieldDefListCall<'a, C, NC, A> where NC: hyper::net::Ne
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -4723,13 +4781,13 @@ impl<'a, C, NC, A> CustomFieldDefListCall<'a, C, NC, A> where NC: hyper::net::Ne
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -4741,7 +4799,7 @@ impl<'a, C, NC, A> CustomFieldDefListCall<'a, C, NC, A> where NC: hyper::net::Ne
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Team ID    
+    /// Team ID
     pub fn team_id(mut self, new_value: &str) -> CustomFieldDefListCall<'a, C, NC, A> {
         self._team_id = new_value.to_string();
         self

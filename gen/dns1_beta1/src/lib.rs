@@ -1,8 +1,8 @@
 // DO NOT EDIT !
-// This file was generated automatically from 'src/mako/lib.rs.mako'
+// This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *dns* crate version *0.1.1+20150114*, where *20150114* is the exact revision of the *dns:v1beta1* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.1*.
+//! This documentation was generated from *dns* crate version *0.1.2+20150114*, where *20150114* is the exact revision of the *dns:v1beta1* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.2*.
 //! 
 //! Everything else about the *dns* *v1_beta1* API can be found at the
 //! [official documentation site](https://developers.google.com/cloud-dns).
@@ -31,6 +31,8 @@
 //! 
 //! * **[Hub](struct.Dns.html)**
 //!     * a central object to maintain state and allow accessing all *Activities*
+//!     * creates [*Method Builders*](trait.MethodsBuilder.html) which in turn
+//!       allow access to individual [*Call Builders*](trait.CallBuilder.html)
 //! * **[Resources](trait.Resource.html)**
 //!     * primary types that you can apply *Activities* to
 //!     * a collection of properties and *Parts*
@@ -39,6 +41,8 @@
 //!         * never directly used in *Activities*
 //! * **[Activities](trait.CallBuilder.html)**
 //!     * operations to apply to *Resources*
+//! 
+//! All *structures* are marked with applicable traits to further categorize them and ease browsing.
 //! 
 //! Generally speaking, you can invoke *Activities* like this:
 //! 
@@ -77,7 +81,7 @@
 //! extern crate hyper;
 //! extern crate "yup-oauth2" as oauth2;
 //! extern crate "google-dns1_beta1" as dns1_beta1;
-//! use dns1_beta1::Result;
+//! use dns1_beta1::{Result, Error};
 //! # #[test] fn egal() {
 //! use std::default::Default;
 //! use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -104,15 +108,17 @@
 //!              .doit();
 //! 
 //! match result {
-//!     Result::HttpError(err) => println!("HTTPERROR: {:?}", err),
-//!     Result::MissingAPIKey => println!("Auth: Missing API Key - used if there are no scopes"),
-//!     Result::MissingToken => println!("OAuth2: Missing Token"),
-//!     Result::Cancelled => println!("Operation cancelled by user"),
-//!     Result::UploadSizeLimitExceeded(size, max_size) => println!("Upload size too big: {} of {}", size, max_size),
-//!     Result::Failure(_) => println!("General Failure (hyper::client::Response doesn't print)"),
-//!     Result::FieldClash(clashed_field) => println!("You added custom parameter which is part of builder: {:?}", clashed_field),
-//!     Result::JsonDecodeError(err) => println!("Couldn't understand server reply - maybe API needs update: {:?}", err),
-//!     Result::Success(_) => println!("Success (value doesn't print)"),
+//!     Err(e) => match e {
+//!         Error::HttpError(err) => println!("HTTPERROR: {:?}", err),
+//!         Error::MissingAPIKey => println!("Auth: Missing API Key - used if there are no scopes"),
+//!         Error::MissingToken => println!("OAuth2: Missing Token"),
+//!         Error::Cancelled => println!("Operation canceled by user"),
+//!         Error::UploadSizeLimitExceeded(size, max_size) => println!("Upload size too big: {} of {}", size, max_size),
+//!         Error::Failure(_) => println!("General Failure (hyper::client::Response doesn't print)"),
+//!         Error::FieldClash(clashed_field) => println!("You added custom parameter which is part of builder: {:?}", clashed_field),
+//!         Error::JsonDecodeError(err) => println!("Couldn't understand server reply - maybe API needs update: {:?}", err),
+//!     },
+//!     Ok(_) => println!("Success (value doesn't print)"),
 //! }
 //! # }
 //! ```
@@ -125,7 +131,7 @@
 //! When delegates handle errors or intermediate values, they may have a chance to instruct the system to retry. This 
 //! makes the system potentially resilient to all kinds of errors.
 //! 
-//! ## Uploads and Downlods
+//! ## Uploads and Downloads
 //! If a method supports downloads, the response body, which is part of the [Result](enum.Result.html), should be
 //! read by you to obtain the media.
 //! If such a method also supports a [Response Result](trait.ResponseResult.html), it will return that by default.
@@ -148,8 +154,9 @@
 //! ## Optional Parts in Server-Requests
 //! 
 //! All structures provided by this library are made to be [enocodable](trait.RequestValue.html) and 
-//! [decodable](trait.ResponseResult.html) via json. Optionals are used to indicate that partial requests are responses are valid.
-//! Most optionals are are considered [Parts](trait.Part.html) which are identifyable by name, which will be sent to 
+//! [decodable](trait.ResponseResult.html) via *json*. Optionals are used to indicate that partial requests are responses 
+//! are valid.
+//! Most optionals are are considered [Parts](trait.Part.html) which are identifiable by name, which will be sent to 
 //! the server to indicate either the set parts of the request or the desired parts in the response.
 //! 
 //! ## Builder Arguments
@@ -198,7 +205,7 @@ use std::io;
 use std::fs;
 use std::thread::sleep;
 
-pub use cmn::{MultiPartReader, ToParts, MethodInfo, Result, CallBuilder, Hub, ReadSeek, Part, ResponseResult, RequestValue, NestedType, Delegate, DefaultDelegate, ResourceMethodsBuilder, Resource, JsonServerError};
+pub use cmn::{MultiPartReader, ToParts, MethodInfo, Result, Error, CallBuilder, Hub, ReadSeek, Part, ResponseResult, RequestValue, NestedType, Delegate, DefaultDelegate, MethodsBuilder, Resource, JsonServerError};
 
 
 // ##############
@@ -252,7 +259,7 @@ impl Default for Scope {
 /// extern crate hyper;
 /// extern crate "yup-oauth2" as oauth2;
 /// extern crate "google-dns1_beta1" as dns1_beta1;
-/// use dns1_beta1::Result;
+/// use dns1_beta1::{Result, Error};
 /// # #[test] fn egal() {
 /// use std::default::Default;
 /// use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -279,15 +286,17 @@ impl Default for Scope {
 ///              .doit();
 /// 
 /// match result {
-///     Result::HttpError(err) => println!("HTTPERROR: {:?}", err),
-///     Result::MissingAPIKey => println!("Auth: Missing API Key - used if there are no scopes"),
-///     Result::MissingToken => println!("OAuth2: Missing Token"),
-///     Result::Cancelled => println!("Operation cancelled by user"),
-///     Result::UploadSizeLimitExceeded(size, max_size) => println!("Upload size too big: {} of {}", size, max_size),
-///     Result::Failure(_) => println!("General Failure (hyper::client::Response doesn't print)"),
-///     Result::FieldClash(clashed_field) => println!("You added custom parameter which is part of builder: {:?}", clashed_field),
-///     Result::JsonDecodeError(err) => println!("Couldn't understand server reply - maybe API needs update: {:?}", err),
-///     Result::Success(_) => println!("Success (value doesn't print)"),
+///     Err(e) => match e {
+///         Error::HttpError(err) => println!("HTTPERROR: {:?}", err),
+///         Error::MissingAPIKey => println!("Auth: Missing API Key - used if there are no scopes"),
+///         Error::MissingToken => println!("OAuth2: Missing Token"),
+///         Error::Cancelled => println!("Operation canceled by user"),
+///         Error::UploadSizeLimitExceeded(size, max_size) => println!("Upload size too big: {} of {}", size, max_size),
+///         Error::Failure(_) => println!("General Failure (hyper::client::Response doesn't print)"),
+///         Error::FieldClash(clashed_field) => println!("You added custom parameter which is part of builder: {:?}", clashed_field),
+///         Error::JsonDecodeError(err) => println!("Couldn't understand server reply - maybe API needs update: {:?}", err),
+///     },
+///     Ok(_) => println!("Success (value doesn't print)"),
 /// }
 /// # }
 /// ```
@@ -308,7 +317,7 @@ impl<'a, C, NC, A> Dns<C, NC, A>
         Dns {
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/0.1.1".to_string(),
+            _user_agent: "google-api-rust-client/0.1.2".to_string(),
             _m: PhantomData
         }
     }
@@ -327,7 +336,7 @@ impl<'a, C, NC, A> Dns<C, NC, A>
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/0.1.1`.
+    /// It defaults to `google-api-rust-client/0.1.2`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -355,25 +364,25 @@ impl<'a, C, NC, A> Dns<C, NC, A>
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ManagedZone {
-    /// Identifies what kind of resource this is. Value: the fixed string "dns#managedZone".    
+    /// Identifies what kind of resource this is. Value: the fixed string "dns#managedZone".
     pub kind: Option<String>,
-    /// A mutable string of at most 1024 characters associated with this resource for the user's convenience. Has no effect on the managed zone's function.    
+    /// A mutable string of at most 1024 characters associated with this resource for the user's convenience. Has no effect on the managed zone's function.
     pub description: Option<String>,
-    /// Delegate your managed_zone to these virtual name servers; defined by the server (output only)    
+    /// Delegate your managed_zone to these virtual name servers; defined by the server (output only)
     #[serde(alias="nameServers")]
     pub name_servers: Option<Vec<String>>,
-    /// The time that this resource was created on the server. This is in RFC3339 text format. Output only.    
+    /// The time that this resource was created on the server. This is in RFC3339 text format. Output only.
     #[serde(alias="creationTime")]
     pub creation_time: Option<String>,
-    /// Unique identifier for the resource; defined by the server (output only)    
+    /// Unique identifier for the resource; defined by the server (output only)
     pub id: Option<String>,
-    /// The DNS name of this managed zone, for instance "example.com.".    
+    /// The DNS name of this managed zone, for instance "example.com.".
     #[serde(alias="dnsName")]
     pub dns_name: Option<String>,
-    /// Optionally specifies the NameServerSet for this ManagedZone. A NameServerSet is a set of DNS name servers that all host the same ManagedZones. Most users will leave this field unset.    
+    /// Optionally specifies the NameServerSet for this ManagedZone. A NameServerSet is a set of DNS name servers that all host the same ManagedZones. Most users will leave this field unset.
     #[serde(alias="nameServerSet")]
     pub name_server_set: Option<String>,
-    /// User assigned name for this resource. Must be unique within the project. The name must be 1-32 characters long, must begin with a letter, end with a letter or digit, and only contain lowercase letters, digits or dashes.    
+    /// User assigned name for this resource. Must be unique within the project. The name must be 1-32 characters long, must begin with a letter, end with a letter or digit, and only contain lowercase letters, digits or dashes.
     pub name: Option<String>,
 }
 
@@ -393,16 +402,16 @@ impl ResponseResult for ManagedZone {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ResourceRecordSet {
-    /// As defined in RFC 1035 (section 5) and RFC 1034 (section 3.6.1)    
+    /// As defined in RFC 1035 (section 5) and RFC 1034 (section 3.6.1)
     pub rrdatas: Option<Vec<String>>,
-    /// Identifies what kind of resource this is. Value: the fixed string "dns#resourceRecordSet".    
+    /// Identifies what kind of resource this is. Value: the fixed string "dns#resourceRecordSet".
     pub kind: Option<String>,
-    /// One of A, AAAA, SOA, MX, NS, TXT    
+    /// One of A, AAAA, SOA, MX, NS, TXT
     #[serde(alias="type")]
     pub type_: Option<String>,
-    /// For example, www.example.com.    
+    /// For example, www.example.com.
     pub name: Option<String>,
-    /// Number of seconds that this ResourceRecordSet can be cached by resolvers.    
+    /// Number of seconds that this ResourceRecordSet can be cached by resolvers.
     pub ttl: Option<i32>,
 }
 
@@ -415,24 +424,24 @@ impl Resource for ResourceRecordSet {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct Quota {
-    /// Maximum allowed number of ResourceRecordSets per zone in the project.    
+    /// Maximum allowed number of ResourceRecordSets per zone in the project.
     #[serde(alias="rrsetsPerManagedZone")]
     pub rrsets_per_managed_zone: i32,
-    /// Identifies what kind of resource this is. Value: the fixed string "dns#quota".    
+    /// Identifies what kind of resource this is. Value: the fixed string "dns#quota".
     pub kind: String,
-    /// Maximum allowed number of ResourceRecordSets to add per ChangesCreateRequest.    
+    /// Maximum allowed number of ResourceRecordSets to add per ChangesCreateRequest.
     #[serde(alias="rrsetAdditionsPerChange")]
     pub rrset_additions_per_change: i32,
-    /// Maximum allowed size for total rrdata in one ChangesCreateRequest in bytes.    
+    /// Maximum allowed size for total rrdata in one ChangesCreateRequest in bytes.
     #[serde(alias="totalRrdataSizePerChange")]
     pub total_rrdata_size_per_change: i32,
-    /// Maximum allowed number of ResourceRecords per ResourceRecordSet.    
+    /// Maximum allowed number of ResourceRecords per ResourceRecordSet.
     #[serde(alias="resourceRecordsPerRrset")]
     pub resource_records_per_rrset: i32,
-    /// Maximum allowed number of ResourceRecordSets to delete per ChangesCreateRequest.    
+    /// Maximum allowed number of ResourceRecordSets to delete per ChangesCreateRequest.
     #[serde(alias="rrsetDeletionsPerChange")]
     pub rrset_deletions_per_change: i32,
-    /// Maximum allowed number of managed zones in the project.    
+    /// Maximum allowed number of managed zones in the project.
     #[serde(alias="managedZones")]
     pub managed_zones: i32,
 }
@@ -451,13 +460,13 @@ impl Part for Quota {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct Project {
-    /// Quotas assigned to this project (output only).    
+    /// Quotas assigned to this project (output only).
     pub quota: Quota,
-    /// Identifies what kind of resource this is. Value: the fixed string "dns#project".    
+    /// Identifies what kind of resource this is. Value: the fixed string "dns#project".
     pub kind: String,
-    /// User assigned unique identifier for the resource (output only).    
+    /// User assigned unique identifier for the resource (output only).
     pub id: String,
-    /// Unique numeric identifier for the resource; defined by the server (output only).    
+    /// Unique numeric identifier for the resource; defined by the server (output only).
     pub number: String,
 }
 
@@ -481,9 +490,9 @@ pub struct ChangesListResponse {
     /// In this way you can retrieve the complete contents of even very large collections one page at a time. However, if the contents of the collection change between the first and last paginated list request, the set of all elements returned will be an inconsistent view of the collection. There is no way to retrieve a "snapshot" of collections larger than the maximum page size.
     #[serde(alias="nextPageToken")]
     pub next_page_token: String,
-    /// Type of resource.    
+    /// Type of resource.
     pub kind: String,
-    /// The requested changes.    
+    /// The requested changes.
     pub changes: Vec<Change>,
 }
 
@@ -506,9 +515,9 @@ pub struct ManagedZonesListResponse {
     /// In this way you can retrieve the complete contents of even very large collections one page at a time. However, if the contents of the collection change between the first and last paginated list request, the set of all elements returned will be an inconsistent view of the collection. There is no way to retrieve a consistent snapshot of a collection larger than the maximum page size.
     #[serde(alias="nextPageToken")]
     pub next_page_token: String,
-    /// Type of resource.    
+    /// Type of resource.
     pub kind: String,
-    /// The managed zone resources.    
+    /// The managed zone resources.
     #[serde(alias="managedZones")]
     pub managed_zones: Vec<ManagedZone>,
 }
@@ -529,18 +538,18 @@ impl ResponseResult for ManagedZonesListResponse {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Change {
-    /// Which ResourceRecordSets to remove? Must match existing data exactly.    
+    /// Which ResourceRecordSets to remove? Must match existing data exactly.
     pub deletions: Option<Vec<ResourceRecordSet>>,
-    /// Status of the operation. Can be one of the following: "PENDING" or "DONE" (output only).    
+    /// Status of the operation. Can be one of the following: "PENDING" or "DONE" (output only).
     pub status: Option<String>,
-    /// Identifies what kind of resource this is. Value: the fixed string "dns#change".    
+    /// Identifies what kind of resource this is. Value: the fixed string "dns#change".
     pub kind: Option<String>,
-    /// The time that this operation was started by the server. This is in RFC3339 text format.    
+    /// The time that this operation was started by the server. This is in RFC3339 text format.
     #[serde(alias="startTime")]
     pub start_time: Option<String>,
-    /// Which ResourceRecordSets to add?    
+    /// Which ResourceRecordSets to add?
     pub additions: Option<Vec<ResourceRecordSet>>,
-    /// Unique identifier for the resource; defined by the server (output only).    
+    /// Unique identifier for the resource; defined by the server (output only).
     pub id: Option<String>,
 }
 
@@ -565,9 +574,9 @@ pub struct ResourceRecordSetsListResponse {
     /// In this way you can retrieve the complete contents of even very large collections one page at a time. However, if the contents of the collection change between the first and last paginated list request, the set of all elements returned will be an inconsistent view of the collection. There is no way to retrieve a consistent snapshot of a collection larger than the maximum page size.
     #[serde(alias="nextPageToken")]
     pub next_page_token: String,
-    /// The resource record set resources.    
+    /// The resource record set resources.
     pub rrsets: Vec<ResourceRecordSet>,
-    /// Type of resource.    
+    /// Type of resource.
     pub kind: String,
 }
 
@@ -613,13 +622,19 @@ pub struct ChangeMethods<'a, C, NC, A>
     hub: &'a Dns<C, NC, A>,
 }
 
-impl<'a, C, NC, A> ResourceMethodsBuilder for ChangeMethods<'a, C, NC, A> {}
+impl<'a, C, NC, A> MethodsBuilder for ChangeMethods<'a, C, NC, A> {}
 
 impl<'a, C, NC, A> ChangeMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Atomically update the ResourceRecordSet collection.    
+    /// Atomically update the ResourceRecordSet collection.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `project` - Identifies the project addressed by this request.
+    /// * `managedZone` - Identifies the managed zone addressed by this request. Can be the managed zone name or id.
     pub fn create(&self, request: &Change, project: &str, managed_zone: &str) -> ChangeCreateCall<'a, C, NC, A> {
         ChangeCreateCall {
             hub: self.hub,
@@ -634,7 +649,12 @@ impl<'a, C, NC, A> ChangeMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Enumerate Changes to a ResourceRecordSet collection.    
+    /// Enumerate Changes to a ResourceRecordSet collection.
+    /// 
+    /// # Arguments
+    ///
+    /// * `project` - Identifies the project addressed by this request.
+    /// * `managedZone` - Identifies the managed zone addressed by this request. Can be the managed zone name or id.
     pub fn list(&self, project: &str, managed_zone: &str) -> ChangeListCall<'a, C, NC, A> {
         ChangeListCall {
             hub: self.hub,
@@ -652,7 +672,13 @@ impl<'a, C, NC, A> ChangeMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Fetch the representation of an existing Change.    
+    /// Fetch the representation of an existing Change.
+    /// 
+    /// # Arguments
+    ///
+    /// * `project` - Identifies the project addressed by this request.
+    /// * `managedZone` - Identifies the managed zone addressed by this request. Can be the managed zone name or id.
+    /// * `changeId` - The identifier of the requested change, from a previous ResourceRecordSetsChangeResponse.
     pub fn get(&self, project: &str, managed_zone: &str, change_id: &str) -> ChangeGetCall<'a, C, NC, A> {
         ChangeGetCall {
             hub: self.hub,
@@ -702,13 +728,18 @@ pub struct ManagedZoneMethods<'a, C, NC, A>
     hub: &'a Dns<C, NC, A>,
 }
 
-impl<'a, C, NC, A> ResourceMethodsBuilder for ManagedZoneMethods<'a, C, NC, A> {}
+impl<'a, C, NC, A> MethodsBuilder for ManagedZoneMethods<'a, C, NC, A> {}
 
 impl<'a, C, NC, A> ManagedZoneMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Create a new ManagedZone.    
+    /// Create a new ManagedZone.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `project` - Identifies the project addressed by this request.
     pub fn create(&self, request: &ManagedZone, project: &str) -> ManagedZoneCreateCall<'a, C, NC, A> {
         ManagedZoneCreateCall {
             hub: self.hub,
@@ -722,7 +753,12 @@ impl<'a, C, NC, A> ManagedZoneMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Delete a previously created ManagedZone.    
+    /// Delete a previously created ManagedZone.
+    /// 
+    /// # Arguments
+    ///
+    /// * `project` - Identifies the project addressed by this request.
+    /// * `managedZone` - Identifies the managed zone addressed by this request. Can be the managed zone name or id.
     pub fn delete(&self, project: &str, managed_zone: &str) -> ManagedZoneDeleteCall<'a, C, NC, A> {
         ManagedZoneDeleteCall {
             hub: self.hub,
@@ -736,7 +772,12 @@ impl<'a, C, NC, A> ManagedZoneMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Fetch the representation of an existing ManagedZone.    
+    /// Fetch the representation of an existing ManagedZone.
+    /// 
+    /// # Arguments
+    ///
+    /// * `project` - Identifies the project addressed by this request.
+    /// * `managedZone` - Identifies the managed zone addressed by this request. Can be the managed zone name or id.
     pub fn get(&self, project: &str, managed_zone: &str) -> ManagedZoneGetCall<'a, C, NC, A> {
         ManagedZoneGetCall {
             hub: self.hub,
@@ -750,7 +791,11 @@ impl<'a, C, NC, A> ManagedZoneMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Enumerate ManagedZones that have been created but not yet deleted.    
+    /// Enumerate ManagedZones that have been created but not yet deleted.
+    /// 
+    /// # Arguments
+    ///
+    /// * `project` - Identifies the project addressed by this request.
     pub fn list(&self, project: &str) -> ManagedZoneListCall<'a, C, NC, A> {
         ManagedZoneListCall {
             hub: self.hub,
@@ -800,13 +845,18 @@ pub struct ResourceRecordSetMethods<'a, C, NC, A>
     hub: &'a Dns<C, NC, A>,
 }
 
-impl<'a, C, NC, A> ResourceMethodsBuilder for ResourceRecordSetMethods<'a, C, NC, A> {}
+impl<'a, C, NC, A> MethodsBuilder for ResourceRecordSetMethods<'a, C, NC, A> {}
 
 impl<'a, C, NC, A> ResourceRecordSetMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Enumerate ResourceRecordSets that have been created but not yet deleted.    
+    /// Enumerate ResourceRecordSets that have been created but not yet deleted.
+    /// 
+    /// # Arguments
+    ///
+    /// * `project` - Identifies the project addressed by this request.
+    /// * `managedZone` - Identifies the managed zone addressed by this request. Can be the managed zone name or id.
     pub fn list(&self, project: &str, managed_zone: &str) -> ResourceRecordSetListCall<'a, C, NC, A> {
         ResourceRecordSetListCall {
             hub: self.hub,
@@ -859,13 +909,17 @@ pub struct ProjectMethods<'a, C, NC, A>
     hub: &'a Dns<C, NC, A>,
 }
 
-impl<'a, C, NC, A> ResourceMethodsBuilder for ProjectMethods<'a, C, NC, A> {}
+impl<'a, C, NC, A> MethodsBuilder for ProjectMethods<'a, C, NC, A> {}
 
 impl<'a, C, NC, A> ProjectMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Fetch the representation of an existing Project.    
+    /// Fetch the representation of an existing Project.
+    /// 
+    /// # Arguments
+    ///
+    /// * `project` - Identifies the project addressed by this request.
     pub fn get(&self, project: &str) -> ProjectGetCall<'a, C, NC, A> {
         ProjectGetCall {
             hub: self.hub,
@@ -888,7 +942,7 @@ impl<'a, C, NC, A> ProjectMethods<'a, C, NC, A> {
 /// Atomically update the ResourceRecordSet collection.
 ///
 /// A builder for the *create* method supported by a *change* resource.
-/// It is not used directly, but through a `ChangeMethods`.
+/// It is not used directly, but through a `ChangeMethods` instance.
 ///
 /// # Example
 ///
@@ -955,7 +1009,7 @@ impl<'a, C, NC, A> ChangeCreateCall<'a, C, NC, A> where NC: hyper::net::NetworkC
         for &field in ["alt", "project", "managedZone"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -1012,7 +1066,7 @@ impl<'a, C, NC, A> ChangeCreateCall<'a, C, NC, A> where NC: hyper::net::NetworkC
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -1028,7 +1082,6 @@ impl<'a, C, NC, A> ChangeCreateCall<'a, C, NC, A> where NC: hyper::net::NetworkC
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -1038,7 +1091,7 @@ impl<'a, C, NC, A> ChangeCreateCall<'a, C, NC, A> where NC: hyper::net::NetworkC
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -1049,7 +1102,7 @@ impl<'a, C, NC, A> ChangeCreateCall<'a, C, NC, A> where NC: hyper::net::NetworkC
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -1058,13 +1111,13 @@ impl<'a, C, NC, A> ChangeCreateCall<'a, C, NC, A> where NC: hyper::net::NetworkC
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -1085,7 +1138,7 @@ impl<'a, C, NC, A> ChangeCreateCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Identifies the project addressed by this request.    
+    /// Identifies the project addressed by this request.
     pub fn project(mut self, new_value: &str) -> ChangeCreateCall<'a, C, NC, A> {
         self._project = new_value.to_string();
         self
@@ -1095,7 +1148,7 @@ impl<'a, C, NC, A> ChangeCreateCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Identifies the managed zone addressed by this request. Can be the managed zone name or id.    
+    /// Identifies the managed zone addressed by this request. Can be the managed zone name or id.
     pub fn managed_zone(mut self, new_value: &str) -> ChangeCreateCall<'a, C, NC, A> {
         self._managed_zone = new_value.to_string();
         self
@@ -1156,7 +1209,7 @@ impl<'a, C, NC, A> ChangeCreateCall<'a, C, NC, A> where NC: hyper::net::NetworkC
 /// Enumerate Changes to a ResourceRecordSet collection.
 ///
 /// A builder for the *list* method supported by a *change* resource.
-/// It is not used directly, but through a `ChangeMethods`.
+/// It is not used directly, but through a `ChangeMethods` instance.
 ///
 /// # Example
 ///
@@ -1236,7 +1289,7 @@ impl<'a, C, NC, A> ChangeListCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
         for &field in ["alt", "project", "managedZone", "sortOrder", "sortBy", "pageToken", "maxResults"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -1289,7 +1342,7 @@ impl<'a, C, NC, A> ChangeListCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -1301,7 +1354,6 @@ impl<'a, C, NC, A> ChangeListCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -1311,7 +1363,7 @@ impl<'a, C, NC, A> ChangeListCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -1322,7 +1374,7 @@ impl<'a, C, NC, A> ChangeListCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -1331,13 +1383,13 @@ impl<'a, C, NC, A> ChangeListCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -1349,7 +1401,7 @@ impl<'a, C, NC, A> ChangeListCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Identifies the project addressed by this request.    
+    /// Identifies the project addressed by this request.
     pub fn project(mut self, new_value: &str) -> ChangeListCall<'a, C, NC, A> {
         self._project = new_value.to_string();
         self
@@ -1359,7 +1411,7 @@ impl<'a, C, NC, A> ChangeListCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Identifies the managed zone addressed by this request. Can be the managed zone name or id.    
+    /// Identifies the managed zone addressed by this request. Can be the managed zone name or id.
     pub fn managed_zone(mut self, new_value: &str) -> ChangeListCall<'a, C, NC, A> {
         self._managed_zone = new_value.to_string();
         self
@@ -1367,7 +1419,7 @@ impl<'a, C, NC, A> ChangeListCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// Sets the *sort order* query property to the given value.
     ///
     /// 
-    /// Sorting order direction: 'ascending' or 'descending'.    
+    /// Sorting order direction: 'ascending' or 'descending'.
     pub fn sort_order(mut self, new_value: &str) -> ChangeListCall<'a, C, NC, A> {
         self._sort_order = Some(new_value.to_string());
         self
@@ -1375,7 +1427,7 @@ impl<'a, C, NC, A> ChangeListCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// Sets the *sort by* query property to the given value.
     ///
     /// 
-    /// Sorting criterion. The only supported value is change sequence.    
+    /// Sorting criterion. The only supported value is change sequence.
     pub fn sort_by(mut self, new_value: &str) -> ChangeListCall<'a, C, NC, A> {
         self._sort_by = Some(new_value.to_string());
         self
@@ -1383,7 +1435,7 @@ impl<'a, C, NC, A> ChangeListCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// Sets the *page token* query property to the given value.
     ///
     /// 
-    /// Optional. A tag returned by a previous list request that was truncated. Use this parameter to continue a previous list request.    
+    /// Optional. A tag returned by a previous list request that was truncated. Use this parameter to continue a previous list request.
     pub fn page_token(mut self, new_value: &str) -> ChangeListCall<'a, C, NC, A> {
         self._page_token = Some(new_value.to_string());
         self
@@ -1391,7 +1443,7 @@ impl<'a, C, NC, A> ChangeListCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// Sets the *max results* query property to the given value.
     ///
     /// 
-    /// Optional. Maximum number of results to be returned. If unspecified, the server will decide how many results to return.    
+    /// Optional. Maximum number of results to be returned. If unspecified, the server will decide how many results to return.
     pub fn max_results(mut self, new_value: i32) -> ChangeListCall<'a, C, NC, A> {
         self._max_results = Some(new_value);
         self
@@ -1452,7 +1504,7 @@ impl<'a, C, NC, A> ChangeListCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
 /// Fetch the representation of an existing Change.
 ///
 /// A builder for the *get* method supported by a *change* resource.
-/// It is not used directly, but through a `ChangeMethods`.
+/// It is not used directly, but through a `ChangeMethods` instance.
 ///
 /// # Example
 ///
@@ -1514,7 +1566,7 @@ impl<'a, C, NC, A> ChangeGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
         for &field in ["alt", "project", "managedZone", "changeId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -1567,7 +1619,7 @@ impl<'a, C, NC, A> ChangeGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -1579,7 +1631,6 @@ impl<'a, C, NC, A> ChangeGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -1589,7 +1640,7 @@ impl<'a, C, NC, A> ChangeGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -1600,7 +1651,7 @@ impl<'a, C, NC, A> ChangeGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -1609,13 +1660,13 @@ impl<'a, C, NC, A> ChangeGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -1627,7 +1678,7 @@ impl<'a, C, NC, A> ChangeGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Identifies the project addressed by this request.    
+    /// Identifies the project addressed by this request.
     pub fn project(mut self, new_value: &str) -> ChangeGetCall<'a, C, NC, A> {
         self._project = new_value.to_string();
         self
@@ -1637,7 +1688,7 @@ impl<'a, C, NC, A> ChangeGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Identifies the managed zone addressed by this request. Can be the managed zone name or id.    
+    /// Identifies the managed zone addressed by this request. Can be the managed zone name or id.
     pub fn managed_zone(mut self, new_value: &str) -> ChangeGetCall<'a, C, NC, A> {
         self._managed_zone = new_value.to_string();
         self
@@ -1647,7 +1698,7 @@ impl<'a, C, NC, A> ChangeGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The identifier of the requested change, from a previous ResourceRecordSetsChangeResponse.    
+    /// The identifier of the requested change, from a previous ResourceRecordSetsChangeResponse.
     pub fn change_id(mut self, new_value: &str) -> ChangeGetCall<'a, C, NC, A> {
         self._change_id = new_value.to_string();
         self
@@ -1708,7 +1759,7 @@ impl<'a, C, NC, A> ChangeGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
 /// Create a new ManagedZone.
 ///
 /// A builder for the *create* method supported by a *managedZone* resource.
-/// It is not used directly, but through a `ManagedZoneMethods`.
+/// It is not used directly, but through a `ManagedZoneMethods` instance.
 ///
 /// # Example
 ///
@@ -1773,7 +1824,7 @@ impl<'a, C, NC, A> ManagedZoneCreateCall<'a, C, NC, A> where NC: hyper::net::Net
         for &field in ["alt", "project"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -1830,7 +1881,7 @@ impl<'a, C, NC, A> ManagedZoneCreateCall<'a, C, NC, A> where NC: hyper::net::Net
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -1846,7 +1897,6 @@ impl<'a, C, NC, A> ManagedZoneCreateCall<'a, C, NC, A> where NC: hyper::net::Net
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -1856,7 +1906,7 @@ impl<'a, C, NC, A> ManagedZoneCreateCall<'a, C, NC, A> where NC: hyper::net::Net
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -1867,7 +1917,7 @@ impl<'a, C, NC, A> ManagedZoneCreateCall<'a, C, NC, A> where NC: hyper::net::Net
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -1876,13 +1926,13 @@ impl<'a, C, NC, A> ManagedZoneCreateCall<'a, C, NC, A> where NC: hyper::net::Net
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -1903,7 +1953,7 @@ impl<'a, C, NC, A> ManagedZoneCreateCall<'a, C, NC, A> where NC: hyper::net::Net
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Identifies the project addressed by this request.    
+    /// Identifies the project addressed by this request.
     pub fn project(mut self, new_value: &str) -> ManagedZoneCreateCall<'a, C, NC, A> {
         self._project = new_value.to_string();
         self
@@ -1964,7 +2014,7 @@ impl<'a, C, NC, A> ManagedZoneCreateCall<'a, C, NC, A> where NC: hyper::net::Net
 /// Delete a previously created ManagedZone.
 ///
 /// A builder for the *delete* method supported by a *managedZone* resource.
-/// It is not used directly, but through a `ManagedZoneMethods`.
+/// It is not used directly, but through a `ManagedZoneMethods` instance.
 ///
 /// # Example
 ///
@@ -2024,7 +2074,7 @@ impl<'a, C, NC, A> ManagedZoneDeleteCall<'a, C, NC, A> where NC: hyper::net::Net
         for &field in ["project", "managedZone"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -2076,7 +2126,7 @@ impl<'a, C, NC, A> ManagedZoneDeleteCall<'a, C, NC, A> where NC: hyper::net::Net
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -2088,7 +2138,6 @@ impl<'a, C, NC, A> ManagedZoneDeleteCall<'a, C, NC, A> where NC: hyper::net::Net
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -2098,7 +2147,7 @@ impl<'a, C, NC, A> ManagedZoneDeleteCall<'a, C, NC, A> where NC: hyper::net::Net
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -2109,12 +2158,12 @@ impl<'a, C, NC, A> ManagedZoneDeleteCall<'a, C, NC, A> where NC: hyper::net::Net
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = res;
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -2126,7 +2175,7 @@ impl<'a, C, NC, A> ManagedZoneDeleteCall<'a, C, NC, A> where NC: hyper::net::Net
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Identifies the project addressed by this request.    
+    /// Identifies the project addressed by this request.
     pub fn project(mut self, new_value: &str) -> ManagedZoneDeleteCall<'a, C, NC, A> {
         self._project = new_value.to_string();
         self
@@ -2136,7 +2185,7 @@ impl<'a, C, NC, A> ManagedZoneDeleteCall<'a, C, NC, A> where NC: hyper::net::Net
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Identifies the managed zone addressed by this request. Can be the managed zone name or id.    
+    /// Identifies the managed zone addressed by this request. Can be the managed zone name or id.
     pub fn managed_zone(mut self, new_value: &str) -> ManagedZoneDeleteCall<'a, C, NC, A> {
         self._managed_zone = new_value.to_string();
         self
@@ -2197,7 +2246,7 @@ impl<'a, C, NC, A> ManagedZoneDeleteCall<'a, C, NC, A> where NC: hyper::net::Net
 /// Fetch the representation of an existing ManagedZone.
 ///
 /// A builder for the *get* method supported by a *managedZone* resource.
-/// It is not used directly, but through a `ManagedZoneMethods`.
+/// It is not used directly, but through a `ManagedZoneMethods` instance.
 ///
 /// # Example
 ///
@@ -2257,7 +2306,7 @@ impl<'a, C, NC, A> ManagedZoneGetCall<'a, C, NC, A> where NC: hyper::net::Networ
         for &field in ["alt", "project", "managedZone"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -2310,7 +2359,7 @@ impl<'a, C, NC, A> ManagedZoneGetCall<'a, C, NC, A> where NC: hyper::net::Networ
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -2322,7 +2371,6 @@ impl<'a, C, NC, A> ManagedZoneGetCall<'a, C, NC, A> where NC: hyper::net::Networ
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -2332,7 +2380,7 @@ impl<'a, C, NC, A> ManagedZoneGetCall<'a, C, NC, A> where NC: hyper::net::Networ
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -2343,7 +2391,7 @@ impl<'a, C, NC, A> ManagedZoneGetCall<'a, C, NC, A> where NC: hyper::net::Networ
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -2352,13 +2400,13 @@ impl<'a, C, NC, A> ManagedZoneGetCall<'a, C, NC, A> where NC: hyper::net::Networ
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -2370,7 +2418,7 @@ impl<'a, C, NC, A> ManagedZoneGetCall<'a, C, NC, A> where NC: hyper::net::Networ
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Identifies the project addressed by this request.    
+    /// Identifies the project addressed by this request.
     pub fn project(mut self, new_value: &str) -> ManagedZoneGetCall<'a, C, NC, A> {
         self._project = new_value.to_string();
         self
@@ -2380,7 +2428,7 @@ impl<'a, C, NC, A> ManagedZoneGetCall<'a, C, NC, A> where NC: hyper::net::Networ
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Identifies the managed zone addressed by this request. Can be the managed zone name or id.    
+    /// Identifies the managed zone addressed by this request. Can be the managed zone name or id.
     pub fn managed_zone(mut self, new_value: &str) -> ManagedZoneGetCall<'a, C, NC, A> {
         self._managed_zone = new_value.to_string();
         self
@@ -2441,7 +2489,7 @@ impl<'a, C, NC, A> ManagedZoneGetCall<'a, C, NC, A> where NC: hyper::net::Networ
 /// Enumerate ManagedZones that have been created but not yet deleted.
 ///
 /// A builder for the *list* method supported by a *managedZone* resource.
-/// It is not used directly, but through a `ManagedZoneMethods`.
+/// It is not used directly, but through a `ManagedZoneMethods` instance.
 ///
 /// # Example
 ///
@@ -2509,7 +2557,7 @@ impl<'a, C, NC, A> ManagedZoneListCall<'a, C, NC, A> where NC: hyper::net::Netwo
         for &field in ["alt", "project", "pageToken", "maxResults"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -2562,7 +2610,7 @@ impl<'a, C, NC, A> ManagedZoneListCall<'a, C, NC, A> where NC: hyper::net::Netwo
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -2574,7 +2622,6 @@ impl<'a, C, NC, A> ManagedZoneListCall<'a, C, NC, A> where NC: hyper::net::Netwo
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -2584,7 +2631,7 @@ impl<'a, C, NC, A> ManagedZoneListCall<'a, C, NC, A> where NC: hyper::net::Netwo
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -2595,7 +2642,7 @@ impl<'a, C, NC, A> ManagedZoneListCall<'a, C, NC, A> where NC: hyper::net::Netwo
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -2604,13 +2651,13 @@ impl<'a, C, NC, A> ManagedZoneListCall<'a, C, NC, A> where NC: hyper::net::Netwo
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -2622,7 +2669,7 @@ impl<'a, C, NC, A> ManagedZoneListCall<'a, C, NC, A> where NC: hyper::net::Netwo
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Identifies the project addressed by this request.    
+    /// Identifies the project addressed by this request.
     pub fn project(mut self, new_value: &str) -> ManagedZoneListCall<'a, C, NC, A> {
         self._project = new_value.to_string();
         self
@@ -2630,7 +2677,7 @@ impl<'a, C, NC, A> ManagedZoneListCall<'a, C, NC, A> where NC: hyper::net::Netwo
     /// Sets the *page token* query property to the given value.
     ///
     /// 
-    /// Optional. A tag returned by a previous list request that was truncated. Use this parameter to continue a previous list request.    
+    /// Optional. A tag returned by a previous list request that was truncated. Use this parameter to continue a previous list request.
     pub fn page_token(mut self, new_value: &str) -> ManagedZoneListCall<'a, C, NC, A> {
         self._page_token = Some(new_value.to_string());
         self
@@ -2638,7 +2685,7 @@ impl<'a, C, NC, A> ManagedZoneListCall<'a, C, NC, A> where NC: hyper::net::Netwo
     /// Sets the *max results* query property to the given value.
     ///
     /// 
-    /// Optional. Maximum number of results to be returned. If unspecified, the server will decide how many results to return.    
+    /// Optional. Maximum number of results to be returned. If unspecified, the server will decide how many results to return.
     pub fn max_results(mut self, new_value: i32) -> ManagedZoneListCall<'a, C, NC, A> {
         self._max_results = Some(new_value);
         self
@@ -2699,7 +2746,7 @@ impl<'a, C, NC, A> ManagedZoneListCall<'a, C, NC, A> where NC: hyper::net::Netwo
 /// Enumerate ResourceRecordSets that have been created but not yet deleted.
 ///
 /// A builder for the *list* method supported by a *resourceRecordSet* resource.
-/// It is not used directly, but through a `ResourceRecordSetMethods`.
+/// It is not used directly, but through a `ResourceRecordSetMethods` instance.
 ///
 /// # Example
 ///
@@ -2779,7 +2826,7 @@ impl<'a, C, NC, A> ResourceRecordSetListCall<'a, C, NC, A> where NC: hyper::net:
         for &field in ["alt", "project", "managedZone", "type", "pageToken", "name", "maxResults"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -2832,7 +2879,7 @@ impl<'a, C, NC, A> ResourceRecordSetListCall<'a, C, NC, A> where NC: hyper::net:
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -2844,7 +2891,6 @@ impl<'a, C, NC, A> ResourceRecordSetListCall<'a, C, NC, A> where NC: hyper::net:
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -2854,7 +2900,7 @@ impl<'a, C, NC, A> ResourceRecordSetListCall<'a, C, NC, A> where NC: hyper::net:
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -2865,7 +2911,7 @@ impl<'a, C, NC, A> ResourceRecordSetListCall<'a, C, NC, A> where NC: hyper::net:
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -2874,13 +2920,13 @@ impl<'a, C, NC, A> ResourceRecordSetListCall<'a, C, NC, A> where NC: hyper::net:
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -2892,7 +2938,7 @@ impl<'a, C, NC, A> ResourceRecordSetListCall<'a, C, NC, A> where NC: hyper::net:
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Identifies the project addressed by this request.    
+    /// Identifies the project addressed by this request.
     pub fn project(mut self, new_value: &str) -> ResourceRecordSetListCall<'a, C, NC, A> {
         self._project = new_value.to_string();
         self
@@ -2902,7 +2948,7 @@ impl<'a, C, NC, A> ResourceRecordSetListCall<'a, C, NC, A> where NC: hyper::net:
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Identifies the managed zone addressed by this request. Can be the managed zone name or id.    
+    /// Identifies the managed zone addressed by this request. Can be the managed zone name or id.
     pub fn managed_zone(mut self, new_value: &str) -> ResourceRecordSetListCall<'a, C, NC, A> {
         self._managed_zone = new_value.to_string();
         self
@@ -2910,7 +2956,7 @@ impl<'a, C, NC, A> ResourceRecordSetListCall<'a, C, NC, A> where NC: hyper::net:
     /// Sets the *type* query property to the given value.
     ///
     /// 
-    /// Restricts the list to return only records of this type. If present, the "name" parameter must also be present.    
+    /// Restricts the list to return only records of this type. If present, the "name" parameter must also be present.
     pub fn type_(mut self, new_value: &str) -> ResourceRecordSetListCall<'a, C, NC, A> {
         self._type_ = Some(new_value.to_string());
         self
@@ -2918,7 +2964,7 @@ impl<'a, C, NC, A> ResourceRecordSetListCall<'a, C, NC, A> where NC: hyper::net:
     /// Sets the *page token* query property to the given value.
     ///
     /// 
-    /// Optional. A tag returned by a previous list request that was truncated. Use this parameter to continue a previous list request.    
+    /// Optional. A tag returned by a previous list request that was truncated. Use this parameter to continue a previous list request.
     pub fn page_token(mut self, new_value: &str) -> ResourceRecordSetListCall<'a, C, NC, A> {
         self._page_token = Some(new_value.to_string());
         self
@@ -2926,7 +2972,7 @@ impl<'a, C, NC, A> ResourceRecordSetListCall<'a, C, NC, A> where NC: hyper::net:
     /// Sets the *name* query property to the given value.
     ///
     /// 
-    /// Restricts the list to return only records with this fully qualified domain name.    
+    /// Restricts the list to return only records with this fully qualified domain name.
     pub fn name(mut self, new_value: &str) -> ResourceRecordSetListCall<'a, C, NC, A> {
         self._name = Some(new_value.to_string());
         self
@@ -2934,7 +2980,7 @@ impl<'a, C, NC, A> ResourceRecordSetListCall<'a, C, NC, A> where NC: hyper::net:
     /// Sets the *max results* query property to the given value.
     ///
     /// 
-    /// Optional. Maximum number of results to be returned. If unspecified, the server will decide how many results to return.    
+    /// Optional. Maximum number of results to be returned. If unspecified, the server will decide how many results to return.
     pub fn max_results(mut self, new_value: i32) -> ResourceRecordSetListCall<'a, C, NC, A> {
         self._max_results = Some(new_value);
         self
@@ -2995,7 +3041,7 @@ impl<'a, C, NC, A> ResourceRecordSetListCall<'a, C, NC, A> where NC: hyper::net:
 /// Fetch the representation of an existing Project.
 ///
 /// A builder for the *get* method supported by a *project* resource.
-/// It is not used directly, but through a `ProjectMethods`.
+/// It is not used directly, but through a `ProjectMethods` instance.
 ///
 /// # Example
 ///
@@ -3053,7 +3099,7 @@ impl<'a, C, NC, A> ProjectGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
         for &field in ["alt", "project"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -3106,7 +3152,7 @@ impl<'a, C, NC, A> ProjectGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -3118,7 +3164,6 @@ impl<'a, C, NC, A> ProjectGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -3128,7 +3173,7 @@ impl<'a, C, NC, A> ProjectGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -3139,7 +3184,7 @@ impl<'a, C, NC, A> ProjectGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -3148,13 +3193,13 @@ impl<'a, C, NC, A> ProjectGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -3166,7 +3211,7 @@ impl<'a, C, NC, A> ProjectGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Identifies the project addressed by this request.    
+    /// Identifies the project addressed by this request.
     pub fn project(mut self, new_value: &str) -> ProjectGetCall<'a, C, NC, A> {
         self._project = new_value.to_string();
         self

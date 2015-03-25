@@ -1,8 +1,8 @@
 // DO NOT EDIT !
-// This file was generated automatically from 'src/mako/lib.rs.mako'
+// This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *reseller* crate version *0.1.1+20141112*, where *20141112* is the exact revision of the *reseller:v1sandbox* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.1*.
+//! This documentation was generated from *reseller* crate version *0.1.2+20141112*, where *20141112* is the exact revision of the *reseller:v1sandbox* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.2*.
 //! 
 //! Everything else about the *reseller* *v1_sandbox* API can be found at the
 //! [official documentation site](https://developers.google.com/google-apps/reseller/).
@@ -27,6 +27,8 @@
 //! 
 //! * **[Hub](struct.Reseller.html)**
 //!     * a central object to maintain state and allow accessing all *Activities*
+//!     * creates [*Method Builders*](trait.MethodsBuilder.html) which in turn
+//!       allow access to individual [*Call Builders*](trait.CallBuilder.html)
 //! * **[Resources](trait.Resource.html)**
 //!     * primary types that you can apply *Activities* to
 //!     * a collection of properties and *Parts*
@@ -35,6 +37,8 @@
 //!         * never directly used in *Activities*
 //! * **[Activities](trait.CallBuilder.html)**
 //!     * operations to apply to *Resources*
+//! 
+//! All *structures* are marked with applicable traits to further categorize them and ease browsing.
 //! 
 //! Generally speaking, you can invoke *Activities* like this:
 //! 
@@ -79,7 +83,7 @@
 //! extern crate hyper;
 //! extern crate "yup-oauth2" as oauth2;
 //! extern crate "google-reseller1_sandbox" as reseller1_sandbox;
-//! use reseller1_sandbox::Result;
+//! use reseller1_sandbox::{Result, Error};
 //! # #[test] fn egal() {
 //! use std::default::Default;
 //! use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -109,15 +113,17 @@
 //!              .doit();
 //! 
 //! match result {
-//!     Result::HttpError(err) => println!("HTTPERROR: {:?}", err),
-//!     Result::MissingAPIKey => println!("Auth: Missing API Key - used if there are no scopes"),
-//!     Result::MissingToken => println!("OAuth2: Missing Token"),
-//!     Result::Cancelled => println!("Operation cancelled by user"),
-//!     Result::UploadSizeLimitExceeded(size, max_size) => println!("Upload size too big: {} of {}", size, max_size),
-//!     Result::Failure(_) => println!("General Failure (hyper::client::Response doesn't print)"),
-//!     Result::FieldClash(clashed_field) => println!("You added custom parameter which is part of builder: {:?}", clashed_field),
-//!     Result::JsonDecodeError(err) => println!("Couldn't understand server reply - maybe API needs update: {:?}", err),
-//!     Result::Success(_) => println!("Success (value doesn't print)"),
+//!     Err(e) => match e {
+//!         Error::HttpError(err) => println!("HTTPERROR: {:?}", err),
+//!         Error::MissingAPIKey => println!("Auth: Missing API Key - used if there are no scopes"),
+//!         Error::MissingToken => println!("OAuth2: Missing Token"),
+//!         Error::Cancelled => println!("Operation canceled by user"),
+//!         Error::UploadSizeLimitExceeded(size, max_size) => println!("Upload size too big: {} of {}", size, max_size),
+//!         Error::Failure(_) => println!("General Failure (hyper::client::Response doesn't print)"),
+//!         Error::FieldClash(clashed_field) => println!("You added custom parameter which is part of builder: {:?}", clashed_field),
+//!         Error::JsonDecodeError(err) => println!("Couldn't understand server reply - maybe API needs update: {:?}", err),
+//!     },
+//!     Ok(_) => println!("Success (value doesn't print)"),
 //! }
 //! # }
 //! ```
@@ -130,7 +136,7 @@
 //! When delegates handle errors or intermediate values, they may have a chance to instruct the system to retry. This 
 //! makes the system potentially resilient to all kinds of errors.
 //! 
-//! ## Uploads and Downlods
+//! ## Uploads and Downloads
 //! If a method supports downloads, the response body, which is part of the [Result](enum.Result.html), should be
 //! read by you to obtain the media.
 //! If such a method also supports a [Response Result](trait.ResponseResult.html), it will return that by default.
@@ -153,8 +159,9 @@
 //! ## Optional Parts in Server-Requests
 //! 
 //! All structures provided by this library are made to be [enocodable](trait.RequestValue.html) and 
-//! [decodable](trait.ResponseResult.html) via json. Optionals are used to indicate that partial requests are responses are valid.
-//! Most optionals are are considered [Parts](trait.Part.html) which are identifyable by name, which will be sent to 
+//! [decodable](trait.ResponseResult.html) via *json*. Optionals are used to indicate that partial requests are responses 
+//! are valid.
+//! Most optionals are are considered [Parts](trait.Part.html) which are identifiable by name, which will be sent to 
 //! the server to indicate either the set parts of the request or the desired parts in the response.
 //! 
 //! ## Builder Arguments
@@ -203,7 +210,7 @@ use std::io;
 use std::fs;
 use std::thread::sleep;
 
-pub use cmn::{MultiPartReader, ToParts, MethodInfo, Result, CallBuilder, Hub, ReadSeek, Part, ResponseResult, RequestValue, NestedType, Delegate, DefaultDelegate, ResourceMethodsBuilder, Resource, JsonServerError};
+pub use cmn::{MultiPartReader, ToParts, MethodInfo, Result, Error, CallBuilder, Hub, ReadSeek, Part, ResponseResult, RequestValue, NestedType, Delegate, DefaultDelegate, MethodsBuilder, Resource, JsonServerError};
 
 
 // ##############
@@ -253,7 +260,7 @@ impl Default for Scope {
 /// extern crate hyper;
 /// extern crate "yup-oauth2" as oauth2;
 /// extern crate "google-reseller1_sandbox" as reseller1_sandbox;
-/// use reseller1_sandbox::Result;
+/// use reseller1_sandbox::{Result, Error};
 /// # #[test] fn egal() {
 /// use std::default::Default;
 /// use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -283,15 +290,17 @@ impl Default for Scope {
 ///              .doit();
 /// 
 /// match result {
-///     Result::HttpError(err) => println!("HTTPERROR: {:?}", err),
-///     Result::MissingAPIKey => println!("Auth: Missing API Key - used if there are no scopes"),
-///     Result::MissingToken => println!("OAuth2: Missing Token"),
-///     Result::Cancelled => println!("Operation cancelled by user"),
-///     Result::UploadSizeLimitExceeded(size, max_size) => println!("Upload size too big: {} of {}", size, max_size),
-///     Result::Failure(_) => println!("General Failure (hyper::client::Response doesn't print)"),
-///     Result::FieldClash(clashed_field) => println!("You added custom parameter which is part of builder: {:?}", clashed_field),
-///     Result::JsonDecodeError(err) => println!("Couldn't understand server reply - maybe API needs update: {:?}", err),
-///     Result::Success(_) => println!("Success (value doesn't print)"),
+///     Err(e) => match e {
+///         Error::HttpError(err) => println!("HTTPERROR: {:?}", err),
+///         Error::MissingAPIKey => println!("Auth: Missing API Key - used if there are no scopes"),
+///         Error::MissingToken => println!("OAuth2: Missing Token"),
+///         Error::Cancelled => println!("Operation canceled by user"),
+///         Error::UploadSizeLimitExceeded(size, max_size) => println!("Upload size too big: {} of {}", size, max_size),
+///         Error::Failure(_) => println!("General Failure (hyper::client::Response doesn't print)"),
+///         Error::FieldClash(clashed_field) => println!("You added custom parameter which is part of builder: {:?}", clashed_field),
+///         Error::JsonDecodeError(err) => println!("Couldn't understand server reply - maybe API needs update: {:?}", err),
+///     },
+///     Ok(_) => println!("Success (value doesn't print)"),
 /// }
 /// # }
 /// ```
@@ -312,7 +321,7 @@ impl<'a, C, NC, A> Reseller<C, NC, A>
         Reseller {
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/0.1.1".to_string(),
+            _user_agent: "google-api-rust-client/0.1.2".to_string(),
             _m: PhantomData
         }
     }
@@ -325,7 +334,7 @@ impl<'a, C, NC, A> Reseller<C, NC, A>
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/0.1.1`.
+    /// It defaults to `google-api-rust-client/0.1.2`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -353,24 +362,24 @@ impl<'a, C, NC, A> Reseller<C, NC, A>
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Customer {
-    /// The alternate email of the customer.    
+    /// The alternate email of the customer.
     #[serde(alias="alternateEmail")]
     pub alternate_email: Option<String>,
-    /// The domain name of the customer.    
+    /// The domain name of the customer.
     #[serde(alias="customerDomain")]
     pub customer_domain: Option<String>,
-    /// The phone number of the customer.    
+    /// The phone number of the customer.
     #[serde(alias="phoneNumber")]
     pub phone_number: Option<String>,
-    /// Ui url for customer resource.    
+    /// Ui url for customer resource.
     #[serde(alias="resourceUiUrl")]
     pub resource_ui_url: Option<String>,
-    /// The postal address of the customer.    
+    /// The postal address of the customer.
     #[serde(alias="postalAddress")]
     pub postal_address: Option<Address>,
-    /// Identifies the resource as a customer.    
+    /// Identifies the resource as a customer.
     pub kind: Option<String>,
-    /// The id of the customer.    
+    /// The id of the customer.
     #[serde(alias="customerId")]
     pub customer_id: Option<String>,
 }
@@ -391,9 +400,9 @@ impl ResponseResult for Customer {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct RenewalSettings {
-    /// Identifies the resource as a subscription renewal setting.    
+    /// Identifies the resource as a subscription renewal setting.
     pub kind: Option<String>,
-    /// Subscription renewal type.    
+    /// Subscription renewal type.
     #[serde(alias="renewalType")]
     pub renewal_type: Option<String>,
 }
@@ -412,15 +421,15 @@ impl RequestValue for RenewalSettings {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Seats {
-    /// Identifies the resource as a subscription change plan request.    
+    /// Identifies the resource as a subscription change plan request.
     pub kind: Option<String>,
-    /// Number of seats to purchase. This is applicable only for a commitment plan.    
+    /// Number of seats to purchase. This is applicable only for a commitment plan.
     #[serde(alias="numberOfSeats")]
     pub number_of_seats: Option<i32>,
-    /// Maximum number of seats that can be purchased. This needs to be provided only for a non-commitment plan. For a commitment plan it is decided by the contract.    
+    /// Maximum number of seats that can be purchased. This needs to be provided only for a non-commitment plan. For a commitment plan it is decided by the contract.
     #[serde(alias="maximumNumberOfSeats")]
     pub maximum_number_of_seats: Option<i32>,
-    /// Read-only field containing the current number of licensed seats for FLEXIBLE Google-Apps subscriptions and secondary subscriptions such as Google-Vault and Drive-storage.    
+    /// Read-only field containing the current number of licensed seats for FLEXIBLE Google-Apps subscriptions and secondary subscriptions such as Google-Vault and Drive-storage.
     #[serde(alias="licensedNumberOfSeats")]
     pub licensed_number_of_seats: Option<i32>,
 }
@@ -434,10 +443,10 @@ impl RequestValue for Seats {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct SubscriptionTransferInfo {
-    /// Time when transfer token or intent to transfer will expire.    
+    /// Time when transfer token or intent to transfer will expire.
     #[serde(alias="transferabilityExpirationTime")]
     pub transferability_expiration_time: String,
-    /// no description provided    
+    /// no description provided
     #[serde(alias="minimumTransferableSeats")]
     pub minimum_transferable_seats: i32,
 }
@@ -452,10 +461,10 @@ impl Part for SubscriptionTransferInfo {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct SubscriptionPlanCommitmentInterval {
-    /// End time of the commitment interval in milliseconds since Unix epoch.    
+    /// End time of the commitment interval in milliseconds since Unix epoch.
     #[serde(alias="endTime")]
     pub end_time: String,
-    /// Start time of the commitment interval in milliseconds since Unix epoch.    
+    /// Start time of the commitment interval in milliseconds since Unix epoch.
     #[serde(alias="startTime")]
     pub start_time: String,
 }
@@ -475,12 +484,12 @@ impl Part for SubscriptionPlanCommitmentInterval {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct Subscriptions {
-    /// The continuation token, used to page through large result sets. Provide this value in a subsequent request to return the next page of results.    
+    /// The continuation token, used to page through large result sets. Provide this value in a subsequent request to return the next page of results.
     #[serde(alias="nextPageToken")]
     pub next_page_token: String,
-    /// Identifies the resource as a collection of subscriptions.    
+    /// Identifies the resource as a collection of subscriptions.
     pub kind: String,
-    /// The subscriptions in this page of results.    
+    /// The subscriptions in this page of results.
     pub subscriptions: Vec<Subscription>,
 }
 
@@ -498,15 +507,15 @@ impl ResponseResult for Subscriptions {}
 /// 
 #[derive(Default, Clone, Debug, Serialize)]
 pub struct ChangePlanRequest {
-    /// Name of the plan to change to.    
+    /// Name of the plan to change to.
     #[serde(alias="planName")]
     pub plan_name: Option<String>,
-    /// Identifies the resource as a subscription change plan request.    
+    /// Identifies the resource as a subscription change plan request.
     pub kind: Option<String>,
-    /// Purchase order id for your order tracking purposes.    
+    /// Purchase order id for your order tracking purposes.
     #[serde(alias="purchaseOrderId")]
     pub purchase_order_id: Option<String>,
-    /// Number/Limit of seats in the new plan.    
+    /// Number/Limit of seats in the new plan.
     pub seats: Option<Seats>,
 }
 
@@ -519,10 +528,10 @@ impl RequestValue for ChangePlanRequest {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct SubscriptionTrialSettings {
-    /// End time of the trial in milliseconds since Unix epoch.    
+    /// End time of the trial in milliseconds since Unix epoch.
     #[serde(alias="trialEndTime")]
     pub trial_end_time: String,
-    /// Whether the subscription is in trial.    
+    /// Whether the subscription is in trial.
     #[serde(alias="isInTrial")]
     pub is_in_trial: bool,
 }
@@ -537,13 +546,13 @@ impl Part for SubscriptionTrialSettings {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct SubscriptionPlan {
-    /// The plan name of this subscription's plan.    
+    /// The plan name of this subscription's plan.
     #[serde(alias="planName")]
     pub plan_name: String,
-    /// Interval of the commitment if it is a commitment plan.    
+    /// Interval of the commitment if it is a commitment plan.
     #[serde(alias="commitmentInterval")]
     pub commitment_interval: SubscriptionPlanCommitmentInterval,
-    /// Whether the plan is a commitment plan or not.    
+    /// Whether the plan is a commitment plan or not.
     #[serde(alias="isCommitmentPlan")]
     pub is_commitment_plan: bool,
 }
@@ -558,31 +567,31 @@ impl Part for SubscriptionPlan {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Address {
-    /// Identifies the resource as a customer address.    
+    /// Identifies the resource as a customer address.
     pub kind: String,
-    /// Name of the organization.    
+    /// Name of the organization.
     #[serde(alias="organizationName")]
     pub organization_name: String,
-    /// ISO 3166 country code.    
+    /// ISO 3166 country code.
     #[serde(alias="countryCode")]
     pub country_code: String,
-    /// Name of the locality. This is in accordance with - http://portablecontacts.net/draft-spec.html#address_element.    
+    /// Name of the locality. This is in accordance with - http://portablecontacts.net/draft-spec.html#address_element.
     pub locality: String,
-    /// Name of the region. This is in accordance with - http://portablecontacts.net/draft-spec.html#address_element.    
+    /// Name of the region. This is in accordance with - http://portablecontacts.net/draft-spec.html#address_element.
     pub region: String,
-    /// Address line 2 of the address.    
+    /// Address line 2 of the address.
     #[serde(alias="addressLine2")]
     pub address_line2: String,
-    /// Address line 3 of the address.    
+    /// Address line 3 of the address.
     #[serde(alias="addressLine3")]
     pub address_line3: String,
-    /// Name of the contact person.    
+    /// Name of the contact person.
     #[serde(alias="contactName")]
     pub contact_name: String,
-    /// Address line 1 of the address.    
+    /// Address line 1 of the address.
     #[serde(alias="addressLine1")]
     pub address_line1: String,
-    /// The postal code. This is in accordance with - http://portablecontacts.net/draft-spec.html#address_element.    
+    /// The postal code. This is in accordance with - http://portablecontacts.net/draft-spec.html#address_element.
     #[serde(alias="postalCode")]
     pub postal_code: String,
 }
@@ -610,42 +619,42 @@ impl Part for Address {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Subscription {
-    /// Renewal settings of the subscription.    
+    /// Renewal settings of the subscription.
     #[serde(alias="renewalSettings")]
     pub renewal_settings: Option<RenewalSettings>,
-    /// Name of the sku for which this subscription is purchased.    
+    /// Name of the sku for which this subscription is purchased.
     #[serde(alias="skuId")]
     pub sku_id: Option<String>,
-    /// Identifies the resource as a Subscription.    
+    /// Identifies the resource as a Subscription.
     pub kind: Option<String>,
-    /// Trial Settings of the subscription.    
+    /// Trial Settings of the subscription.
     #[serde(alias="trialSettings")]
     pub trial_settings: Option<SubscriptionTrialSettings>,
-    /// Transfer related information for the subscription.    
+    /// Transfer related information for the subscription.
     #[serde(alias="transferInfo")]
     pub transfer_info: Option<SubscriptionTransferInfo>,
-    /// Ui url for subscription resource.    
+    /// Ui url for subscription resource.
     #[serde(alias="resourceUiUrl")]
     pub resource_ui_url: Option<String>,
-    /// Purchase order id for your order tracking purposes.    
+    /// Purchase order id for your order tracking purposes.
     #[serde(alias="purchaseOrderId")]
     pub purchase_order_id: Option<String>,
-    /// Creation time of this subscription in milliseconds since Unix epoch.    
+    /// Creation time of this subscription in milliseconds since Unix epoch.
     #[serde(alias="creationTime")]
     pub creation_time: Option<String>,
-    /// Status of the subscription.    
+    /// Status of the subscription.
     pub status: Option<String>,
-    /// Plan details of the subscription    
+    /// Plan details of the subscription
     pub plan: Option<SubscriptionPlan>,
-    /// Number/Limit of seats in the new plan.    
+    /// Number/Limit of seats in the new plan.
     pub seats: Option<Seats>,
-    /// The id of the subscription.    
+    /// The id of the subscription.
     #[serde(alias="subscriptionId")]
     pub subscription_id: Option<String>,
-    /// Billing method of this subscription.    
+    /// Billing method of this subscription.
     #[serde(alias="billingMethod")]
     pub billing_method: Option<String>,
-    /// The id of the customer to whom the subscription belongs.    
+    /// The id of the customer to whom the subscription belongs.
     #[serde(alias="customerId")]
     pub customer_id: Option<String>,
 }
@@ -694,13 +703,18 @@ pub struct CustomerMethods<'a, C, NC, A>
     hub: &'a Reseller<C, NC, A>,
 }
 
-impl<'a, C, NC, A> ResourceMethodsBuilder for CustomerMethods<'a, C, NC, A> {}
+impl<'a, C, NC, A> MethodsBuilder for CustomerMethods<'a, C, NC, A> {}
 
 impl<'a, C, NC, A> CustomerMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Update a customer resource if one it exists and is owned by the reseller.    
+    /// Update a customer resource if one it exists and is owned by the reseller.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `customerId` - Id of the Customer
     pub fn update(&self, request: &Customer, customer_id: &str) -> CustomerUpdateCall<'a, C, NC, A> {
         CustomerUpdateCall {
             hub: self.hub,
@@ -714,7 +728,11 @@ impl<'a, C, NC, A> CustomerMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Creates a customer resource if one does not already exist.    
+    /// Creates a customer resource if one does not already exist.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
     pub fn insert(&self, request: &Customer) -> CustomerInsertCall<'a, C, NC, A> {
         CustomerInsertCall {
             hub: self.hub,
@@ -728,7 +746,12 @@ impl<'a, C, NC, A> CustomerMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Update a customer resource if one it exists and is owned by the reseller. This method supports patch semantics.    
+    /// Update a customer resource if one it exists and is owned by the reseller. This method supports patch semantics.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `customerId` - Id of the Customer
     pub fn patch(&self, request: &Customer, customer_id: &str) -> CustomerPatchCall<'a, C, NC, A> {
         CustomerPatchCall {
             hub: self.hub,
@@ -742,7 +765,11 @@ impl<'a, C, NC, A> CustomerMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Gets a customer resource if one exists and is owned by the reseller.    
+    /// Gets a customer resource if one exists and is owned by the reseller.
+    /// 
+    /// # Arguments
+    ///
+    /// * `customerId` - Id of the Customer
     pub fn get(&self, customer_id: &str) -> CustomerGetCall<'a, C, NC, A> {
         CustomerGetCall {
             hub: self.hub,
@@ -790,13 +817,18 @@ pub struct SubscriptionMethods<'a, C, NC, A>
     hub: &'a Reseller<C, NC, A>,
 }
 
-impl<'a, C, NC, A> ResourceMethodsBuilder for SubscriptionMethods<'a, C, NC, A> {}
+impl<'a, C, NC, A> MethodsBuilder for SubscriptionMethods<'a, C, NC, A> {}
 
 impl<'a, C, NC, A> SubscriptionMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Creates/Transfers a subscription for the customer.    
+    /// Creates/Transfers a subscription for the customer.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `customerId` - Id of the Customer
     pub fn insert(&self, request: &Subscription, customer_id: &str) -> SubscriptionInsertCall<'a, C, NC, A> {
         SubscriptionInsertCall {
             hub: self.hub,
@@ -811,7 +843,13 @@ impl<'a, C, NC, A> SubscriptionMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Cancels/Downgrades a subscription.    
+    /// Cancels/Downgrades a subscription.
+    /// 
+    /// # Arguments
+    ///
+    /// * `customerId` - Id of the Customer
+    /// * `subscriptionId` - Id of the subscription, which is unique for a customer
+    /// * `deletionType` - Whether the subscription is to be fully cancelled or downgraded
     pub fn delete(&self, customer_id: &str, subscription_id: &str, deletion_type: &str) -> SubscriptionDeleteCall<'a, C, NC, A> {
         SubscriptionDeleteCall {
             hub: self.hub,
@@ -826,7 +864,12 @@ impl<'a, C, NC, A> SubscriptionMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Gets a subscription of the customer.    
+    /// Gets a subscription of the customer.
+    /// 
+    /// # Arguments
+    ///
+    /// * `customerId` - Id of the Customer
+    /// * `subscriptionId` - Id of the subscription, which is unique for a customer
     pub fn get(&self, customer_id: &str, subscription_id: &str) -> SubscriptionGetCall<'a, C, NC, A> {
         SubscriptionGetCall {
             hub: self.hub,
@@ -840,7 +883,7 @@ impl<'a, C, NC, A> SubscriptionMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Lists subscriptions of a reseller, optionally filtered by a customer name prefix.    
+    /// Lists subscriptions of a reseller, optionally filtered by a customer name prefix.
     pub fn list(&self) -> SubscriptionListCall<'a, C, NC, A> {
         SubscriptionListCall {
             hub: self.hub,
@@ -857,7 +900,13 @@ impl<'a, C, NC, A> SubscriptionMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Changes the renewal settings of a subscription    
+    /// Changes the renewal settings of a subscription
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `customerId` - Id of the Customer
+    /// * `subscriptionId` - Id of the subscription, which is unique for a customer
     pub fn change_renewal_settings(&self, request: &RenewalSettings, customer_id: &str, subscription_id: &str) -> SubscriptionChangeRenewalSettingCall<'a, C, NC, A> {
         SubscriptionChangeRenewalSettingCall {
             hub: self.hub,
@@ -872,7 +921,12 @@ impl<'a, C, NC, A> SubscriptionMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Starts paid service of a trial subscription    
+    /// Starts paid service of a trial subscription
+    /// 
+    /// # Arguments
+    ///
+    /// * `customerId` - Id of the Customer
+    /// * `subscriptionId` - Id of the subscription, which is unique for a customer
     pub fn start_paid_service(&self, customer_id: &str, subscription_id: &str) -> SubscriptionStartPaidServiceCall<'a, C, NC, A> {
         SubscriptionStartPaidServiceCall {
             hub: self.hub,
@@ -886,7 +940,13 @@ impl<'a, C, NC, A> SubscriptionMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Changes the seats configuration of a subscription    
+    /// Changes the seats configuration of a subscription
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `customerId` - Id of the Customer
+    /// * `subscriptionId` - Id of the subscription, which is unique for a customer
     pub fn change_seats(&self, request: &Seats, customer_id: &str, subscription_id: &str) -> SubscriptionChangeSeatCall<'a, C, NC, A> {
         SubscriptionChangeSeatCall {
             hub: self.hub,
@@ -901,7 +961,12 @@ impl<'a, C, NC, A> SubscriptionMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Suspends an active subscription    
+    /// Suspends an active subscription
+    /// 
+    /// # Arguments
+    ///
+    /// * `customerId` - Id of the Customer
+    /// * `subscriptionId` - Id of the subscription, which is unique for a customer
     pub fn suspend(&self, customer_id: &str, subscription_id: &str) -> SubscriptionSuspendCall<'a, C, NC, A> {
         SubscriptionSuspendCall {
             hub: self.hub,
@@ -915,7 +980,12 @@ impl<'a, C, NC, A> SubscriptionMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Activates a subscription previously suspended by the reseller    
+    /// Activates a subscription previously suspended by the reseller
+    /// 
+    /// # Arguments
+    ///
+    /// * `customerId` - Id of the Customer
+    /// * `subscriptionId` - Id of the subscription, which is unique for a customer
     pub fn activate(&self, customer_id: &str, subscription_id: &str) -> SubscriptionActivateCall<'a, C, NC, A> {
         SubscriptionActivateCall {
             hub: self.hub,
@@ -929,7 +999,13 @@ impl<'a, C, NC, A> SubscriptionMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Changes the plan of a subscription    
+    /// Changes the plan of a subscription
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `customerId` - Id of the Customer
+    /// * `subscriptionId` - Id of the subscription, which is unique for a customer
     pub fn change_plan(&self, request: &ChangePlanRequest, customer_id: &str, subscription_id: &str) -> SubscriptionChangePlanCall<'a, C, NC, A> {
         SubscriptionChangePlanCall {
             hub: self.hub,
@@ -954,7 +1030,7 @@ impl<'a, C, NC, A> SubscriptionMethods<'a, C, NC, A> {
 /// Update a customer resource if one it exists and is owned by the reseller.
 ///
 /// A builder for the *update* method supported by a *customer* resource.
-/// It is not used directly, but through a `CustomerMethods`.
+/// It is not used directly, but through a `CustomerMethods` instance.
 ///
 /// # Example
 ///
@@ -1019,7 +1095,7 @@ impl<'a, C, NC, A> CustomerUpdateCall<'a, C, NC, A> where NC: hyper::net::Networ
         for &field in ["alt", "customerId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -1076,7 +1152,7 @@ impl<'a, C, NC, A> CustomerUpdateCall<'a, C, NC, A> where NC: hyper::net::Networ
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -1092,7 +1168,6 @@ impl<'a, C, NC, A> CustomerUpdateCall<'a, C, NC, A> where NC: hyper::net::Networ
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -1102,7 +1177,7 @@ impl<'a, C, NC, A> CustomerUpdateCall<'a, C, NC, A> where NC: hyper::net::Networ
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -1113,7 +1188,7 @@ impl<'a, C, NC, A> CustomerUpdateCall<'a, C, NC, A> where NC: hyper::net::Networ
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -1122,13 +1197,13 @@ impl<'a, C, NC, A> CustomerUpdateCall<'a, C, NC, A> where NC: hyper::net::Networ
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -1149,7 +1224,7 @@ impl<'a, C, NC, A> CustomerUpdateCall<'a, C, NC, A> where NC: hyper::net::Networ
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Id of the Customer    
+    /// Id of the Customer
     pub fn customer_id(mut self, new_value: &str) -> CustomerUpdateCall<'a, C, NC, A> {
         self._customer_id = new_value.to_string();
         self
@@ -1210,7 +1285,7 @@ impl<'a, C, NC, A> CustomerUpdateCall<'a, C, NC, A> where NC: hyper::net::Networ
 /// Creates a customer resource if one does not already exist.
 ///
 /// A builder for the *insert* method supported by a *customer* resource.
-/// It is not used directly, but through a `CustomerMethods`.
+/// It is not used directly, but through a `CustomerMethods` instance.
 ///
 /// # Example
 ///
@@ -1278,7 +1353,7 @@ impl<'a, C, NC, A> CustomerInsertCall<'a, C, NC, A> where NC: hyper::net::Networ
         for &field in ["alt", "customerAuthToken"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -1311,7 +1386,7 @@ impl<'a, C, NC, A> CustomerInsertCall<'a, C, NC, A> where NC: hyper::net::Networ
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -1327,7 +1402,6 @@ impl<'a, C, NC, A> CustomerInsertCall<'a, C, NC, A> where NC: hyper::net::Networ
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -1337,7 +1411,7 @@ impl<'a, C, NC, A> CustomerInsertCall<'a, C, NC, A> where NC: hyper::net::Networ
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -1348,7 +1422,7 @@ impl<'a, C, NC, A> CustomerInsertCall<'a, C, NC, A> where NC: hyper::net::Networ
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -1357,13 +1431,13 @@ impl<'a, C, NC, A> CustomerInsertCall<'a, C, NC, A> where NC: hyper::net::Networ
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -1382,7 +1456,7 @@ impl<'a, C, NC, A> CustomerInsertCall<'a, C, NC, A> where NC: hyper::net::Networ
     /// Sets the *customer auth token* query property to the given value.
     ///
     /// 
-    /// An auth token needed for inserting a customer for which domain already exists. Can be generated at https://www.google.com/a/cpanel//TransferToken. Optional.    
+    /// An auth token needed for inserting a customer for which domain already exists. Can be generated at https://www.google.com/a/cpanel//TransferToken. Optional.
     pub fn customer_auth_token(mut self, new_value: &str) -> CustomerInsertCall<'a, C, NC, A> {
         self._customer_auth_token = Some(new_value.to_string());
         self
@@ -1443,7 +1517,7 @@ impl<'a, C, NC, A> CustomerInsertCall<'a, C, NC, A> where NC: hyper::net::Networ
 /// Update a customer resource if one it exists and is owned by the reseller. This method supports patch semantics.
 ///
 /// A builder for the *patch* method supported by a *customer* resource.
-/// It is not used directly, but through a `CustomerMethods`.
+/// It is not used directly, but through a `CustomerMethods` instance.
 ///
 /// # Example
 ///
@@ -1508,7 +1582,7 @@ impl<'a, C, NC, A> CustomerPatchCall<'a, C, NC, A> where NC: hyper::net::Network
         for &field in ["alt", "customerId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -1565,7 +1639,7 @@ impl<'a, C, NC, A> CustomerPatchCall<'a, C, NC, A> where NC: hyper::net::Network
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -1581,7 +1655,6 @@ impl<'a, C, NC, A> CustomerPatchCall<'a, C, NC, A> where NC: hyper::net::Network
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -1591,7 +1664,7 @@ impl<'a, C, NC, A> CustomerPatchCall<'a, C, NC, A> where NC: hyper::net::Network
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -1602,7 +1675,7 @@ impl<'a, C, NC, A> CustomerPatchCall<'a, C, NC, A> where NC: hyper::net::Network
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -1611,13 +1684,13 @@ impl<'a, C, NC, A> CustomerPatchCall<'a, C, NC, A> where NC: hyper::net::Network
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -1638,7 +1711,7 @@ impl<'a, C, NC, A> CustomerPatchCall<'a, C, NC, A> where NC: hyper::net::Network
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Id of the Customer    
+    /// Id of the Customer
     pub fn customer_id(mut self, new_value: &str) -> CustomerPatchCall<'a, C, NC, A> {
         self._customer_id = new_value.to_string();
         self
@@ -1699,7 +1772,7 @@ impl<'a, C, NC, A> CustomerPatchCall<'a, C, NC, A> where NC: hyper::net::Network
 /// Gets a customer resource if one exists and is owned by the reseller.
 ///
 /// A builder for the *get* method supported by a *customer* resource.
-/// It is not used directly, but through a `CustomerMethods`.
+/// It is not used directly, but through a `CustomerMethods` instance.
 ///
 /// # Example
 ///
@@ -1757,7 +1830,7 @@ impl<'a, C, NC, A> CustomerGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
         for &field in ["alt", "customerId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -1810,7 +1883,7 @@ impl<'a, C, NC, A> CustomerGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -1822,7 +1895,6 @@ impl<'a, C, NC, A> CustomerGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -1832,7 +1904,7 @@ impl<'a, C, NC, A> CustomerGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -1843,7 +1915,7 @@ impl<'a, C, NC, A> CustomerGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -1852,13 +1924,13 @@ impl<'a, C, NC, A> CustomerGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -1870,7 +1942,7 @@ impl<'a, C, NC, A> CustomerGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Id of the Customer    
+    /// Id of the Customer
     pub fn customer_id(mut self, new_value: &str) -> CustomerGetCall<'a, C, NC, A> {
         self._customer_id = new_value.to_string();
         self
@@ -1931,7 +2003,7 @@ impl<'a, C, NC, A> CustomerGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
 /// Creates/Transfers a subscription for the customer.
 ///
 /// A builder for the *insert* method supported by a *subscription* resource.
-/// It is not used directly, but through a `SubscriptionMethods`.
+/// It is not used directly, but through a `SubscriptionMethods` instance.
 ///
 /// # Example
 ///
@@ -2001,7 +2073,7 @@ impl<'a, C, NC, A> SubscriptionInsertCall<'a, C, NC, A> where NC: hyper::net::Ne
         for &field in ["alt", "customerId", "customerAuthToken"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -2058,7 +2130,7 @@ impl<'a, C, NC, A> SubscriptionInsertCall<'a, C, NC, A> where NC: hyper::net::Ne
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -2074,7 +2146,6 @@ impl<'a, C, NC, A> SubscriptionInsertCall<'a, C, NC, A> where NC: hyper::net::Ne
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -2084,7 +2155,7 @@ impl<'a, C, NC, A> SubscriptionInsertCall<'a, C, NC, A> where NC: hyper::net::Ne
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -2095,7 +2166,7 @@ impl<'a, C, NC, A> SubscriptionInsertCall<'a, C, NC, A> where NC: hyper::net::Ne
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -2104,13 +2175,13 @@ impl<'a, C, NC, A> SubscriptionInsertCall<'a, C, NC, A> where NC: hyper::net::Ne
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -2131,7 +2202,7 @@ impl<'a, C, NC, A> SubscriptionInsertCall<'a, C, NC, A> where NC: hyper::net::Ne
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Id of the Customer    
+    /// Id of the Customer
     pub fn customer_id(mut self, new_value: &str) -> SubscriptionInsertCall<'a, C, NC, A> {
         self._customer_id = new_value.to_string();
         self
@@ -2139,7 +2210,7 @@ impl<'a, C, NC, A> SubscriptionInsertCall<'a, C, NC, A> where NC: hyper::net::Ne
     /// Sets the *customer auth token* query property to the given value.
     ///
     /// 
-    /// An auth token needed for transferring a subscription. Can be generated at https://www.google.com/a/cpanel/customer-domain/TransferToken. Optional.    
+    /// An auth token needed for transferring a subscription. Can be generated at https://www.google.com/a/cpanel/customer-domain/TransferToken. Optional.
     pub fn customer_auth_token(mut self, new_value: &str) -> SubscriptionInsertCall<'a, C, NC, A> {
         self._customer_auth_token = Some(new_value.to_string());
         self
@@ -2200,7 +2271,7 @@ impl<'a, C, NC, A> SubscriptionInsertCall<'a, C, NC, A> where NC: hyper::net::Ne
 /// Cancels/Downgrades a subscription.
 ///
 /// A builder for the *delete* method supported by a *subscription* resource.
-/// It is not used directly, but through a `SubscriptionMethods`.
+/// It is not used directly, but through a `SubscriptionMethods` instance.
 ///
 /// # Example
 ///
@@ -2262,7 +2333,7 @@ impl<'a, C, NC, A> SubscriptionDeleteCall<'a, C, NC, A> where NC: hyper::net::Ne
         for &field in ["customerId", "subscriptionId", "deletionType"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -2314,7 +2385,7 @@ impl<'a, C, NC, A> SubscriptionDeleteCall<'a, C, NC, A> where NC: hyper::net::Ne
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -2326,7 +2397,6 @@ impl<'a, C, NC, A> SubscriptionDeleteCall<'a, C, NC, A> where NC: hyper::net::Ne
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -2336,7 +2406,7 @@ impl<'a, C, NC, A> SubscriptionDeleteCall<'a, C, NC, A> where NC: hyper::net::Ne
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -2347,12 +2417,12 @@ impl<'a, C, NC, A> SubscriptionDeleteCall<'a, C, NC, A> where NC: hyper::net::Ne
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = res;
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -2364,7 +2434,7 @@ impl<'a, C, NC, A> SubscriptionDeleteCall<'a, C, NC, A> where NC: hyper::net::Ne
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Id of the Customer    
+    /// Id of the Customer
     pub fn customer_id(mut self, new_value: &str) -> SubscriptionDeleteCall<'a, C, NC, A> {
         self._customer_id = new_value.to_string();
         self
@@ -2374,7 +2444,7 @@ impl<'a, C, NC, A> SubscriptionDeleteCall<'a, C, NC, A> where NC: hyper::net::Ne
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Id of the subscription, which is unique for a customer    
+    /// Id of the subscription, which is unique for a customer
     pub fn subscription_id(mut self, new_value: &str) -> SubscriptionDeleteCall<'a, C, NC, A> {
         self._subscription_id = new_value.to_string();
         self
@@ -2384,7 +2454,7 @@ impl<'a, C, NC, A> SubscriptionDeleteCall<'a, C, NC, A> where NC: hyper::net::Ne
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Whether the subscription is to be fully cancelled or downgraded    
+    /// Whether the subscription is to be fully cancelled or downgraded
     pub fn deletion_type(mut self, new_value: &str) -> SubscriptionDeleteCall<'a, C, NC, A> {
         self._deletion_type = new_value.to_string();
         self
@@ -2445,7 +2515,7 @@ impl<'a, C, NC, A> SubscriptionDeleteCall<'a, C, NC, A> where NC: hyper::net::Ne
 /// Gets a subscription of the customer.
 ///
 /// A builder for the *get* method supported by a *subscription* resource.
-/// It is not used directly, but through a `SubscriptionMethods`.
+/// It is not used directly, but through a `SubscriptionMethods` instance.
 ///
 /// # Example
 ///
@@ -2505,7 +2575,7 @@ impl<'a, C, NC, A> SubscriptionGetCall<'a, C, NC, A> where NC: hyper::net::Netwo
         for &field in ["alt", "customerId", "subscriptionId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -2558,7 +2628,7 @@ impl<'a, C, NC, A> SubscriptionGetCall<'a, C, NC, A> where NC: hyper::net::Netwo
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -2570,7 +2640,6 @@ impl<'a, C, NC, A> SubscriptionGetCall<'a, C, NC, A> where NC: hyper::net::Netwo
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -2580,7 +2649,7 @@ impl<'a, C, NC, A> SubscriptionGetCall<'a, C, NC, A> where NC: hyper::net::Netwo
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -2591,7 +2660,7 @@ impl<'a, C, NC, A> SubscriptionGetCall<'a, C, NC, A> where NC: hyper::net::Netwo
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -2600,13 +2669,13 @@ impl<'a, C, NC, A> SubscriptionGetCall<'a, C, NC, A> where NC: hyper::net::Netwo
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -2618,7 +2687,7 @@ impl<'a, C, NC, A> SubscriptionGetCall<'a, C, NC, A> where NC: hyper::net::Netwo
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Id of the Customer    
+    /// Id of the Customer
     pub fn customer_id(mut self, new_value: &str) -> SubscriptionGetCall<'a, C, NC, A> {
         self._customer_id = new_value.to_string();
         self
@@ -2628,7 +2697,7 @@ impl<'a, C, NC, A> SubscriptionGetCall<'a, C, NC, A> where NC: hyper::net::Netwo
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Id of the subscription, which is unique for a customer    
+    /// Id of the subscription, which is unique for a customer
     pub fn subscription_id(mut self, new_value: &str) -> SubscriptionGetCall<'a, C, NC, A> {
         self._subscription_id = new_value.to_string();
         self
@@ -2689,7 +2758,7 @@ impl<'a, C, NC, A> SubscriptionGetCall<'a, C, NC, A> where NC: hyper::net::Netwo
 /// Lists subscriptions of a reseller, optionally filtered by a customer name prefix.
 ///
 /// A builder for the *list* method supported by a *subscription* resource.
-/// It is not used directly, but through a `SubscriptionMethods`.
+/// It is not used directly, but through a `SubscriptionMethods` instance.
 ///
 /// # Example
 ///
@@ -2770,7 +2839,7 @@ impl<'a, C, NC, A> SubscriptionListCall<'a, C, NC, A> where NC: hyper::net::Netw
         for &field in ["alt", "pageToken", "maxResults", "customerNamePrefix", "customerId", "customerAuthToken"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -2799,7 +2868,7 @@ impl<'a, C, NC, A> SubscriptionListCall<'a, C, NC, A> where NC: hyper::net::Netw
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -2811,7 +2880,6 @@ impl<'a, C, NC, A> SubscriptionListCall<'a, C, NC, A> where NC: hyper::net::Netw
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -2821,7 +2889,7 @@ impl<'a, C, NC, A> SubscriptionListCall<'a, C, NC, A> where NC: hyper::net::Netw
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -2832,7 +2900,7 @@ impl<'a, C, NC, A> SubscriptionListCall<'a, C, NC, A> where NC: hyper::net::Netw
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -2841,13 +2909,13 @@ impl<'a, C, NC, A> SubscriptionListCall<'a, C, NC, A> where NC: hyper::net::Netw
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -2857,7 +2925,7 @@ impl<'a, C, NC, A> SubscriptionListCall<'a, C, NC, A> where NC: hyper::net::Netw
     /// Sets the *page token* query property to the given value.
     ///
     /// 
-    /// Token to specify next page in the list    
+    /// Token to specify next page in the list
     pub fn page_token(mut self, new_value: &str) -> SubscriptionListCall<'a, C, NC, A> {
         self._page_token = Some(new_value.to_string());
         self
@@ -2865,7 +2933,7 @@ impl<'a, C, NC, A> SubscriptionListCall<'a, C, NC, A> where NC: hyper::net::Netw
     /// Sets the *max results* query property to the given value.
     ///
     /// 
-    /// Maximum number of results to return    
+    /// Maximum number of results to return
     pub fn max_results(mut self, new_value: u32) -> SubscriptionListCall<'a, C, NC, A> {
         self._max_results = Some(new_value);
         self
@@ -2873,7 +2941,7 @@ impl<'a, C, NC, A> SubscriptionListCall<'a, C, NC, A> where NC: hyper::net::Netw
     /// Sets the *customer name prefix* query property to the given value.
     ///
     /// 
-    /// Prefix of the customer's domain name by which the subscriptions should be filtered. Optional    
+    /// Prefix of the customer's domain name by which the subscriptions should be filtered. Optional
     pub fn customer_name_prefix(mut self, new_value: &str) -> SubscriptionListCall<'a, C, NC, A> {
         self._customer_name_prefix = Some(new_value.to_string());
         self
@@ -2881,7 +2949,7 @@ impl<'a, C, NC, A> SubscriptionListCall<'a, C, NC, A> where NC: hyper::net::Netw
     /// Sets the *customer id* query property to the given value.
     ///
     /// 
-    /// Id of the Customer    
+    /// Id of the Customer
     pub fn customer_id(mut self, new_value: &str) -> SubscriptionListCall<'a, C, NC, A> {
         self._customer_id = Some(new_value.to_string());
         self
@@ -2889,7 +2957,7 @@ impl<'a, C, NC, A> SubscriptionListCall<'a, C, NC, A> where NC: hyper::net::Netw
     /// Sets the *customer auth token* query property to the given value.
     ///
     /// 
-    /// An auth token needed if the customer is not a resold customer of this reseller. Can be generated at https://www.google.com/a/cpanel/customer-domain/TransferToken.Optional.    
+    /// An auth token needed if the customer is not a resold customer of this reseller. Can be generated at https://www.google.com/a/cpanel/customer-domain/TransferToken.Optional.
     pub fn customer_auth_token(mut self, new_value: &str) -> SubscriptionListCall<'a, C, NC, A> {
         self._customer_auth_token = Some(new_value.to_string());
         self
@@ -2950,7 +3018,7 @@ impl<'a, C, NC, A> SubscriptionListCall<'a, C, NC, A> where NC: hyper::net::Netw
 /// Changes the renewal settings of a subscription
 ///
 /// A builder for the *changeRenewalSettings* method supported by a *subscription* resource.
-/// It is not used directly, but through a `SubscriptionMethods`.
+/// It is not used directly, but through a `SubscriptionMethods` instance.
 ///
 /// # Example
 ///
@@ -3017,7 +3085,7 @@ impl<'a, C, NC, A> SubscriptionChangeRenewalSettingCall<'a, C, NC, A> where NC: 
         for &field in ["alt", "customerId", "subscriptionId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -3074,7 +3142,7 @@ impl<'a, C, NC, A> SubscriptionChangeRenewalSettingCall<'a, C, NC, A> where NC: 
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -3090,7 +3158,6 @@ impl<'a, C, NC, A> SubscriptionChangeRenewalSettingCall<'a, C, NC, A> where NC: 
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -3100,7 +3167,7 @@ impl<'a, C, NC, A> SubscriptionChangeRenewalSettingCall<'a, C, NC, A> where NC: 
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -3111,7 +3178,7 @@ impl<'a, C, NC, A> SubscriptionChangeRenewalSettingCall<'a, C, NC, A> where NC: 
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -3120,13 +3187,13 @@ impl<'a, C, NC, A> SubscriptionChangeRenewalSettingCall<'a, C, NC, A> where NC: 
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -3147,7 +3214,7 @@ impl<'a, C, NC, A> SubscriptionChangeRenewalSettingCall<'a, C, NC, A> where NC: 
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Id of the Customer    
+    /// Id of the Customer
     pub fn customer_id(mut self, new_value: &str) -> SubscriptionChangeRenewalSettingCall<'a, C, NC, A> {
         self._customer_id = new_value.to_string();
         self
@@ -3157,7 +3224,7 @@ impl<'a, C, NC, A> SubscriptionChangeRenewalSettingCall<'a, C, NC, A> where NC: 
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Id of the subscription, which is unique for a customer    
+    /// Id of the subscription, which is unique for a customer
     pub fn subscription_id(mut self, new_value: &str) -> SubscriptionChangeRenewalSettingCall<'a, C, NC, A> {
         self._subscription_id = new_value.to_string();
         self
@@ -3218,7 +3285,7 @@ impl<'a, C, NC, A> SubscriptionChangeRenewalSettingCall<'a, C, NC, A> where NC: 
 /// Starts paid service of a trial subscription
 ///
 /// A builder for the *startPaidService* method supported by a *subscription* resource.
-/// It is not used directly, but through a `SubscriptionMethods`.
+/// It is not used directly, but through a `SubscriptionMethods` instance.
 ///
 /// # Example
 ///
@@ -3278,7 +3345,7 @@ impl<'a, C, NC, A> SubscriptionStartPaidServiceCall<'a, C, NC, A> where NC: hype
         for &field in ["alt", "customerId", "subscriptionId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -3331,7 +3398,7 @@ impl<'a, C, NC, A> SubscriptionStartPaidServiceCall<'a, C, NC, A> where NC: hype
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -3343,7 +3410,6 @@ impl<'a, C, NC, A> SubscriptionStartPaidServiceCall<'a, C, NC, A> where NC: hype
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -3353,7 +3419,7 @@ impl<'a, C, NC, A> SubscriptionStartPaidServiceCall<'a, C, NC, A> where NC: hype
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -3364,7 +3430,7 @@ impl<'a, C, NC, A> SubscriptionStartPaidServiceCall<'a, C, NC, A> where NC: hype
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -3373,13 +3439,13 @@ impl<'a, C, NC, A> SubscriptionStartPaidServiceCall<'a, C, NC, A> where NC: hype
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -3391,7 +3457,7 @@ impl<'a, C, NC, A> SubscriptionStartPaidServiceCall<'a, C, NC, A> where NC: hype
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Id of the Customer    
+    /// Id of the Customer
     pub fn customer_id(mut self, new_value: &str) -> SubscriptionStartPaidServiceCall<'a, C, NC, A> {
         self._customer_id = new_value.to_string();
         self
@@ -3401,7 +3467,7 @@ impl<'a, C, NC, A> SubscriptionStartPaidServiceCall<'a, C, NC, A> where NC: hype
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Id of the subscription, which is unique for a customer    
+    /// Id of the subscription, which is unique for a customer
     pub fn subscription_id(mut self, new_value: &str) -> SubscriptionStartPaidServiceCall<'a, C, NC, A> {
         self._subscription_id = new_value.to_string();
         self
@@ -3462,7 +3528,7 @@ impl<'a, C, NC, A> SubscriptionStartPaidServiceCall<'a, C, NC, A> where NC: hype
 /// Changes the seats configuration of a subscription
 ///
 /// A builder for the *changeSeats* method supported by a *subscription* resource.
-/// It is not used directly, but through a `SubscriptionMethods`.
+/// It is not used directly, but through a `SubscriptionMethods` instance.
 ///
 /// # Example
 ///
@@ -3529,7 +3595,7 @@ impl<'a, C, NC, A> SubscriptionChangeSeatCall<'a, C, NC, A> where NC: hyper::net
         for &field in ["alt", "customerId", "subscriptionId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -3586,7 +3652,7 @@ impl<'a, C, NC, A> SubscriptionChangeSeatCall<'a, C, NC, A> where NC: hyper::net
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -3602,7 +3668,6 @@ impl<'a, C, NC, A> SubscriptionChangeSeatCall<'a, C, NC, A> where NC: hyper::net
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -3612,7 +3677,7 @@ impl<'a, C, NC, A> SubscriptionChangeSeatCall<'a, C, NC, A> where NC: hyper::net
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -3623,7 +3688,7 @@ impl<'a, C, NC, A> SubscriptionChangeSeatCall<'a, C, NC, A> where NC: hyper::net
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -3632,13 +3697,13 @@ impl<'a, C, NC, A> SubscriptionChangeSeatCall<'a, C, NC, A> where NC: hyper::net
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -3659,7 +3724,7 @@ impl<'a, C, NC, A> SubscriptionChangeSeatCall<'a, C, NC, A> where NC: hyper::net
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Id of the Customer    
+    /// Id of the Customer
     pub fn customer_id(mut self, new_value: &str) -> SubscriptionChangeSeatCall<'a, C, NC, A> {
         self._customer_id = new_value.to_string();
         self
@@ -3669,7 +3734,7 @@ impl<'a, C, NC, A> SubscriptionChangeSeatCall<'a, C, NC, A> where NC: hyper::net
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Id of the subscription, which is unique for a customer    
+    /// Id of the subscription, which is unique for a customer
     pub fn subscription_id(mut self, new_value: &str) -> SubscriptionChangeSeatCall<'a, C, NC, A> {
         self._subscription_id = new_value.to_string();
         self
@@ -3730,7 +3795,7 @@ impl<'a, C, NC, A> SubscriptionChangeSeatCall<'a, C, NC, A> where NC: hyper::net
 /// Suspends an active subscription
 ///
 /// A builder for the *suspend* method supported by a *subscription* resource.
-/// It is not used directly, but through a `SubscriptionMethods`.
+/// It is not used directly, but through a `SubscriptionMethods` instance.
 ///
 /// # Example
 ///
@@ -3790,7 +3855,7 @@ impl<'a, C, NC, A> SubscriptionSuspendCall<'a, C, NC, A> where NC: hyper::net::N
         for &field in ["alt", "customerId", "subscriptionId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -3843,7 +3908,7 @@ impl<'a, C, NC, A> SubscriptionSuspendCall<'a, C, NC, A> where NC: hyper::net::N
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -3855,7 +3920,6 @@ impl<'a, C, NC, A> SubscriptionSuspendCall<'a, C, NC, A> where NC: hyper::net::N
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -3865,7 +3929,7 @@ impl<'a, C, NC, A> SubscriptionSuspendCall<'a, C, NC, A> where NC: hyper::net::N
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -3876,7 +3940,7 @@ impl<'a, C, NC, A> SubscriptionSuspendCall<'a, C, NC, A> where NC: hyper::net::N
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -3885,13 +3949,13 @@ impl<'a, C, NC, A> SubscriptionSuspendCall<'a, C, NC, A> where NC: hyper::net::N
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -3903,7 +3967,7 @@ impl<'a, C, NC, A> SubscriptionSuspendCall<'a, C, NC, A> where NC: hyper::net::N
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Id of the Customer    
+    /// Id of the Customer
     pub fn customer_id(mut self, new_value: &str) -> SubscriptionSuspendCall<'a, C, NC, A> {
         self._customer_id = new_value.to_string();
         self
@@ -3913,7 +3977,7 @@ impl<'a, C, NC, A> SubscriptionSuspendCall<'a, C, NC, A> where NC: hyper::net::N
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Id of the subscription, which is unique for a customer    
+    /// Id of the subscription, which is unique for a customer
     pub fn subscription_id(mut self, new_value: &str) -> SubscriptionSuspendCall<'a, C, NC, A> {
         self._subscription_id = new_value.to_string();
         self
@@ -3974,7 +4038,7 @@ impl<'a, C, NC, A> SubscriptionSuspendCall<'a, C, NC, A> where NC: hyper::net::N
 /// Activates a subscription previously suspended by the reseller
 ///
 /// A builder for the *activate* method supported by a *subscription* resource.
-/// It is not used directly, but through a `SubscriptionMethods`.
+/// It is not used directly, but through a `SubscriptionMethods` instance.
 ///
 /// # Example
 ///
@@ -4034,7 +4098,7 @@ impl<'a, C, NC, A> SubscriptionActivateCall<'a, C, NC, A> where NC: hyper::net::
         for &field in ["alt", "customerId", "subscriptionId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -4087,7 +4151,7 @@ impl<'a, C, NC, A> SubscriptionActivateCall<'a, C, NC, A> where NC: hyper::net::
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -4099,7 +4163,6 @@ impl<'a, C, NC, A> SubscriptionActivateCall<'a, C, NC, A> where NC: hyper::net::
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -4109,7 +4172,7 @@ impl<'a, C, NC, A> SubscriptionActivateCall<'a, C, NC, A> where NC: hyper::net::
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -4120,7 +4183,7 @@ impl<'a, C, NC, A> SubscriptionActivateCall<'a, C, NC, A> where NC: hyper::net::
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -4129,13 +4192,13 @@ impl<'a, C, NC, A> SubscriptionActivateCall<'a, C, NC, A> where NC: hyper::net::
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -4147,7 +4210,7 @@ impl<'a, C, NC, A> SubscriptionActivateCall<'a, C, NC, A> where NC: hyper::net::
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Id of the Customer    
+    /// Id of the Customer
     pub fn customer_id(mut self, new_value: &str) -> SubscriptionActivateCall<'a, C, NC, A> {
         self._customer_id = new_value.to_string();
         self
@@ -4157,7 +4220,7 @@ impl<'a, C, NC, A> SubscriptionActivateCall<'a, C, NC, A> where NC: hyper::net::
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Id of the subscription, which is unique for a customer    
+    /// Id of the subscription, which is unique for a customer
     pub fn subscription_id(mut self, new_value: &str) -> SubscriptionActivateCall<'a, C, NC, A> {
         self._subscription_id = new_value.to_string();
         self
@@ -4218,7 +4281,7 @@ impl<'a, C, NC, A> SubscriptionActivateCall<'a, C, NC, A> where NC: hyper::net::
 /// Changes the plan of a subscription
 ///
 /// A builder for the *changePlan* method supported by a *subscription* resource.
-/// It is not used directly, but through a `SubscriptionMethods`.
+/// It is not used directly, but through a `SubscriptionMethods` instance.
 ///
 /// # Example
 ///
@@ -4285,7 +4348,7 @@ impl<'a, C, NC, A> SubscriptionChangePlanCall<'a, C, NC, A> where NC: hyper::net
         for &field in ["alt", "customerId", "subscriptionId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -4342,7 +4405,7 @@ impl<'a, C, NC, A> SubscriptionChangePlanCall<'a, C, NC, A> where NC: hyper::net
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -4358,7 +4421,6 @@ impl<'a, C, NC, A> SubscriptionChangePlanCall<'a, C, NC, A> where NC: hyper::net
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -4368,7 +4430,7 @@ impl<'a, C, NC, A> SubscriptionChangePlanCall<'a, C, NC, A> where NC: hyper::net
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -4379,7 +4441,7 @@ impl<'a, C, NC, A> SubscriptionChangePlanCall<'a, C, NC, A> where NC: hyper::net
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -4388,13 +4450,13 @@ impl<'a, C, NC, A> SubscriptionChangePlanCall<'a, C, NC, A> where NC: hyper::net
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -4415,7 +4477,7 @@ impl<'a, C, NC, A> SubscriptionChangePlanCall<'a, C, NC, A> where NC: hyper::net
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Id of the Customer    
+    /// Id of the Customer
     pub fn customer_id(mut self, new_value: &str) -> SubscriptionChangePlanCall<'a, C, NC, A> {
         self._customer_id = new_value.to_string();
         self
@@ -4425,7 +4487,7 @@ impl<'a, C, NC, A> SubscriptionChangePlanCall<'a, C, NC, A> where NC: hyper::net
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Id of the subscription, which is unique for a customer    
+    /// Id of the subscription, which is unique for a customer
     pub fn subscription_id(mut self, new_value: &str) -> SubscriptionChangePlanCall<'a, C, NC, A> {
         self._subscription_id = new_value.to_string();
         self

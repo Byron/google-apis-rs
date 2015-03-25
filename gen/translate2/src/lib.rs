@@ -1,8 +1,8 @@
 // DO NOT EDIT !
-// This file was generated automatically from 'src/mako/lib.rs.mako'
+// This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *translate* crate version *0.1.1+20141123*, where *20141123* is the exact revision of the *translate:v2* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.1*.
+//! This documentation was generated from *translate* crate version *0.1.2+20141123*, where *20141123* is the exact revision of the *translate:v2* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.2*.
 //! 
 //! Everything else about the *translate* *v2* API can be found at the
 //! [official documentation site](https://developers.google.com/translate/v2/using_rest).
@@ -29,6 +29,8 @@
 //! 
 //! * **[Hub](struct.Translate.html)**
 //!     * a central object to maintain state and allow accessing all *Activities*
+//!     * creates [*Method Builders*](trait.MethodsBuilder.html) which in turn
+//!       allow access to individual [*Call Builders*](trait.CallBuilder.html)
 //! * **[Resources](trait.Resource.html)**
 //!     * primary types that you can apply *Activities* to
 //!     * a collection of properties and *Parts*
@@ -37,6 +39,8 @@
 //!         * never directly used in *Activities*
 //! * **[Activities](trait.CallBuilder.html)**
 //!     * operations to apply to *Resources*
+//! 
+//! All *structures* are marked with applicable traits to further categorize them and ease browsing.
 //! 
 //! Generally speaking, you can invoke *Activities* like this:
 //! 
@@ -72,7 +76,7 @@
 //! extern crate hyper;
 //! extern crate "yup-oauth2" as oauth2;
 //! extern crate "google-translate2" as translate2;
-//! use translate2::Result;
+//! use translate2::{Result, Error};
 //! # #[test] fn egal() {
 //! use std::default::Default;
 //! use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -97,15 +101,17 @@
 //!              .doit();
 //! 
 //! match result {
-//!     Result::HttpError(err) => println!("HTTPERROR: {:?}", err),
-//!     Result::MissingAPIKey => println!("Auth: Missing API Key - used if there are no scopes"),
-//!     Result::MissingToken => println!("OAuth2: Missing Token"),
-//!     Result::Cancelled => println!("Operation cancelled by user"),
-//!     Result::UploadSizeLimitExceeded(size, max_size) => println!("Upload size too big: {} of {}", size, max_size),
-//!     Result::Failure(_) => println!("General Failure (hyper::client::Response doesn't print)"),
-//!     Result::FieldClash(clashed_field) => println!("You added custom parameter which is part of builder: {:?}", clashed_field),
-//!     Result::JsonDecodeError(err) => println!("Couldn't understand server reply - maybe API needs update: {:?}", err),
-//!     Result::Success(_) => println!("Success (value doesn't print)"),
+//!     Err(e) => match e {
+//!         Error::HttpError(err) => println!("HTTPERROR: {:?}", err),
+//!         Error::MissingAPIKey => println!("Auth: Missing API Key - used if there are no scopes"),
+//!         Error::MissingToken => println!("OAuth2: Missing Token"),
+//!         Error::Cancelled => println!("Operation canceled by user"),
+//!         Error::UploadSizeLimitExceeded(size, max_size) => println!("Upload size too big: {} of {}", size, max_size),
+//!         Error::Failure(_) => println!("General Failure (hyper::client::Response doesn't print)"),
+//!         Error::FieldClash(clashed_field) => println!("You added custom parameter which is part of builder: {:?}", clashed_field),
+//!         Error::JsonDecodeError(err) => println!("Couldn't understand server reply - maybe API needs update: {:?}", err),
+//!     },
+//!     Ok(_) => println!("Success (value doesn't print)"),
 //! }
 //! # }
 //! ```
@@ -118,7 +124,7 @@
 //! When delegates handle errors or intermediate values, they may have a chance to instruct the system to retry. This 
 //! makes the system potentially resilient to all kinds of errors.
 //! 
-//! ## Uploads and Downlods
+//! ## Uploads and Downloads
 //! If a method supports downloads, the response body, which is part of the [Result](enum.Result.html), should be
 //! read by you to obtain the media.
 //! If such a method also supports a [Response Result](trait.ResponseResult.html), it will return that by default.
@@ -141,8 +147,9 @@
 //! ## Optional Parts in Server-Requests
 //! 
 //! All structures provided by this library are made to be [enocodable](trait.RequestValue.html) and 
-//! [decodable](trait.ResponseResult.html) via json. Optionals are used to indicate that partial requests are responses are valid.
-//! Most optionals are are considered [Parts](trait.Part.html) which are identifyable by name, which will be sent to 
+//! [decodable](trait.ResponseResult.html) via *json*. Optionals are used to indicate that partial requests are responses 
+//! are valid.
+//! Most optionals are are considered [Parts](trait.Part.html) which are identifiable by name, which will be sent to 
 //! the server to indicate either the set parts of the request or the desired parts in the response.
 //! 
 //! ## Builder Arguments
@@ -191,7 +198,7 @@ use std::io;
 use std::fs;
 use std::thread::sleep;
 
-pub use cmn::{MultiPartReader, ToParts, MethodInfo, Result, CallBuilder, Hub, ReadSeek, Part, ResponseResult, RequestValue, NestedType, Delegate, DefaultDelegate, ResourceMethodsBuilder, Resource, JsonServerError};
+pub use cmn::{MultiPartReader, ToParts, MethodInfo, Result, Error, CallBuilder, Hub, ReadSeek, Part, ResponseResult, RequestValue, NestedType, Delegate, DefaultDelegate, MethodsBuilder, Resource, JsonServerError};
 
 
 // ##############
@@ -215,7 +222,7 @@ pub use cmn::{MultiPartReader, ToParts, MethodInfo, Result, CallBuilder, Hub, Re
 /// extern crate hyper;
 /// extern crate "yup-oauth2" as oauth2;
 /// extern crate "google-translate2" as translate2;
-/// use translate2::Result;
+/// use translate2::{Result, Error};
 /// # #[test] fn egal() {
 /// use std::default::Default;
 /// use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -240,15 +247,17 @@ pub use cmn::{MultiPartReader, ToParts, MethodInfo, Result, CallBuilder, Hub, Re
 ///              .doit();
 /// 
 /// match result {
-///     Result::HttpError(err) => println!("HTTPERROR: {:?}", err),
-///     Result::MissingAPIKey => println!("Auth: Missing API Key - used if there are no scopes"),
-///     Result::MissingToken => println!("OAuth2: Missing Token"),
-///     Result::Cancelled => println!("Operation cancelled by user"),
-///     Result::UploadSizeLimitExceeded(size, max_size) => println!("Upload size too big: {} of {}", size, max_size),
-///     Result::Failure(_) => println!("General Failure (hyper::client::Response doesn't print)"),
-///     Result::FieldClash(clashed_field) => println!("You added custom parameter which is part of builder: {:?}", clashed_field),
-///     Result::JsonDecodeError(err) => println!("Couldn't understand server reply - maybe API needs update: {:?}", err),
-///     Result::Success(_) => println!("Success (value doesn't print)"),
+///     Err(e) => match e {
+///         Error::HttpError(err) => println!("HTTPERROR: {:?}", err),
+///         Error::MissingAPIKey => println!("Auth: Missing API Key - used if there are no scopes"),
+///         Error::MissingToken => println!("OAuth2: Missing Token"),
+///         Error::Cancelled => println!("Operation canceled by user"),
+///         Error::UploadSizeLimitExceeded(size, max_size) => println!("Upload size too big: {} of {}", size, max_size),
+///         Error::Failure(_) => println!("General Failure (hyper::client::Response doesn't print)"),
+///         Error::FieldClash(clashed_field) => println!("You added custom parameter which is part of builder: {:?}", clashed_field),
+///         Error::JsonDecodeError(err) => println!("Couldn't understand server reply - maybe API needs update: {:?}", err),
+///     },
+///     Ok(_) => println!("Success (value doesn't print)"),
 /// }
 /// # }
 /// ```
@@ -269,7 +278,7 @@ impl<'a, C, NC, A> Translate<C, NC, A>
         Translate {
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/0.1.1".to_string(),
+            _user_agent: "google-api-rust-client/0.1.2".to_string(),
             _m: PhantomData
         }
     }
@@ -285,7 +294,7 @@ impl<'a, C, NC, A> Translate<C, NC, A>
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/0.1.1`.
+    /// It defaults to `google-api-rust-client/0.1.2`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -310,7 +319,7 @@ impl<'a, C, NC, A> Translate<C, NC, A>
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct DetectionsListResponse {
-    /// A detections contains detection results of several text    
+    /// A detections contains detection results of several text
     pub detections: Vec<DetectionsResource>,
 }
 
@@ -328,7 +337,7 @@ impl ResponseResult for DetectionsListResponse {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct LanguagesListResponse {
-    /// List of source/target languages supported by the translation API. If target parameter is unspecified, the list is sorted by the ASCII code point order of the language code. If target parameter is specified, the list is sorted by the collation order of the language name in the target language.    
+    /// List of source/target languages supported by the translation API. If target parameter is unspecified, the list is sorted by the ASCII code point order of the language code. If target parameter is specified, the list is sorted by the collation order of the language name in the target language.
     pub languages: Vec<LanguagesResource>,
 }
 
@@ -343,12 +352,12 @@ impl ResponseResult for LanguagesListResponse {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct DetectionsResource {
-    /// A boolean to indicate is the language detection result reliable.    
+    /// A boolean to indicate is the language detection result reliable.
     #[serde(alias="isReliable")]
     pub is_reliable: bool,
-    /// The confidence of the detection resul of this language.    
+    /// The confidence of the detection resul of this language.
     pub confidence: f32,
-    /// The language we detect    
+    /// The language we detect
     pub language: String,
 }
 
@@ -361,10 +370,10 @@ impl Part for DetectionsResource {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct TranslationsResource {
-    /// Detected source language if source parameter is unspecified.    
+    /// Detected source language if source parameter is unspecified.
     #[serde(alias="detectedSourceLanguage")]
     pub detected_source_language: String,
-    /// The translation.    
+    /// The translation.
     #[serde(alias="translatedText")]
     pub translated_text: String,
 }
@@ -378,9 +387,9 @@ impl Part for TranslationsResource {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct LanguagesResource {
-    /// The localized name of the language if target parameter is given.    
+    /// The localized name of the language if target parameter is given.
     pub name: String,
-    /// The language code.    
+    /// The language code.
     pub language: String,
 }
 
@@ -393,12 +402,12 @@ impl Part for LanguagesResource {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct DetectionsResourceNested {
-    /// A boolean to indicate is the language detection result reliable.    
+    /// A boolean to indicate is the language detection result reliable.
     #[serde(alias="isReliable")]
     pub is_reliable: bool,
-    /// The confidence of the detection resul of this language.    
+    /// The confidence of the detection resul of this language.
     pub confidence: f32,
-    /// The language we detect    
+    /// The language we detect
     pub language: String,
 }
 
@@ -417,7 +426,7 @@ impl Part for DetectionsResourceNested {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct TranslationsListResponse {
-    /// Translations contains list of translation results of given text    
+    /// Translations contains list of translation results of given text
     pub translations: Vec<TranslationsResource>,
 }
 
@@ -463,13 +472,13 @@ pub struct LanguageMethods<'a, C, NC, A>
     hub: &'a Translate<C, NC, A>,
 }
 
-impl<'a, C, NC, A> ResourceMethodsBuilder for LanguageMethods<'a, C, NC, A> {}
+impl<'a, C, NC, A> MethodsBuilder for LanguageMethods<'a, C, NC, A> {}
 
 impl<'a, C, NC, A> LanguageMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// List the source/target languages supported by the API    
+    /// List the source/target languages supported by the API
     pub fn list(&self) -> LanguageListCall<'a, C, NC, A> {
         LanguageListCall {
             hub: self.hub,
@@ -516,13 +525,17 @@ pub struct DetectionMethods<'a, C, NC, A>
     hub: &'a Translate<C, NC, A>,
 }
 
-impl<'a, C, NC, A> ResourceMethodsBuilder for DetectionMethods<'a, C, NC, A> {}
+impl<'a, C, NC, A> MethodsBuilder for DetectionMethods<'a, C, NC, A> {}
 
 impl<'a, C, NC, A> DetectionMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Detect the language of text.    
+    /// Detect the language of text.
+    /// 
+    /// # Arguments
+    ///
+    /// * `q` - The text to detect
     pub fn list(&self, q: &Vec<String>) -> DetectionListCall<'a, C, NC, A> {
         DetectionListCall {
             hub: self.hub,
@@ -569,13 +582,18 @@ pub struct TranslationMethods<'a, C, NC, A>
     hub: &'a Translate<C, NC, A>,
 }
 
-impl<'a, C, NC, A> ResourceMethodsBuilder for TranslationMethods<'a, C, NC, A> {}
+impl<'a, C, NC, A> MethodsBuilder for TranslationMethods<'a, C, NC, A> {}
 
 impl<'a, C, NC, A> TranslationMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Returns text translations from one language to another.    
+    /// Returns text translations from one language to another.
+    /// 
+    /// # Arguments
+    ///
+    /// * `q` - The text to translate
+    /// * `target` - The target language into which the text should be translated
     pub fn list(&self, q: &Vec<String>, target: &str) -> TranslationListCall<'a, C, NC, A> {
         TranslationListCall {
             hub: self.hub,
@@ -601,7 +619,7 @@ impl<'a, C, NC, A> TranslationMethods<'a, C, NC, A> {
 /// List the source/target languages supported by the API
 ///
 /// A builder for the *list* method supported by a *language* resource.
-/// It is not used directly, but through a `LanguageMethods`.
+/// It is not used directly, but through a `LanguageMethods` instance.
 ///
 /// # Example
 ///
@@ -661,7 +679,7 @@ impl<'a, C, NC, A> LanguageListCall<'a, C, NC, A> where NC: hyper::net::NetworkC
         for &field in ["alt", "target"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -680,7 +698,7 @@ impl<'a, C, NC, A> LanguageListCall<'a, C, NC, A> where NC: hyper::net::NetworkC
             Some(value) => params.push(("key", value)),
             None => {
                 dlg.finished(false);
-                return Result::MissingAPIKey
+                return Err(Error::MissingAPIKey)
             }
         }
 
@@ -700,7 +718,6 @@ impl<'a, C, NC, A> LanguageListCall<'a, C, NC, A> where NC: hyper::net::NetworkC
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -710,7 +727,7 @@ impl<'a, C, NC, A> LanguageListCall<'a, C, NC, A> where NC: hyper::net::NetworkC
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -721,7 +738,7 @@ impl<'a, C, NC, A> LanguageListCall<'a, C, NC, A> where NC: hyper::net::NetworkC
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -730,13 +747,13 @@ impl<'a, C, NC, A> LanguageListCall<'a, C, NC, A> where NC: hyper::net::NetworkC
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -746,7 +763,7 @@ impl<'a, C, NC, A> LanguageListCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// Sets the *target* query property to the given value.
     ///
     /// 
-    /// the language and collation in which the localized results should be returned    
+    /// the language and collation in which the localized results should be returned
     pub fn target(mut self, new_value: &str) -> LanguageListCall<'a, C, NC, A> {
         self._target = Some(new_value.to_string());
         self
@@ -791,7 +808,7 @@ impl<'a, C, NC, A> LanguageListCall<'a, C, NC, A> where NC: hyper::net::NetworkC
 /// Detect the language of text.
 ///
 /// A builder for the *list* method supported by a *detection* resource.
-/// It is not used directly, but through a `DetectionMethods`.
+/// It is not used directly, but through a `DetectionMethods` instance.
 ///
 /// # Example
 ///
@@ -854,7 +871,7 @@ impl<'a, C, NC, A> DetectionListCall<'a, C, NC, A> where NC: hyper::net::Network
         for &field in ["alt", "q"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -873,7 +890,7 @@ impl<'a, C, NC, A> DetectionListCall<'a, C, NC, A> where NC: hyper::net::Network
             Some(value) => params.push(("key", value)),
             None => {
                 dlg.finished(false);
-                return Result::MissingAPIKey
+                return Err(Error::MissingAPIKey)
             }
         }
 
@@ -893,7 +910,6 @@ impl<'a, C, NC, A> DetectionListCall<'a, C, NC, A> where NC: hyper::net::Network
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -903,7 +919,7 @@ impl<'a, C, NC, A> DetectionListCall<'a, C, NC, A> where NC: hyper::net::Network
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -914,7 +930,7 @@ impl<'a, C, NC, A> DetectionListCall<'a, C, NC, A> where NC: hyper::net::Network
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -923,13 +939,13 @@ impl<'a, C, NC, A> DetectionListCall<'a, C, NC, A> where NC: hyper::net::Network
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -942,7 +958,7 @@ impl<'a, C, NC, A> DetectionListCall<'a, C, NC, A> where NC: hyper::net::Network
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The text to detect    
+    /// The text to detect
     pub fn add_q(mut self, new_value: &str) -> DetectionListCall<'a, C, NC, A> {
         self._q.push(new_value.to_string());
         self
@@ -987,7 +1003,7 @@ impl<'a, C, NC, A> DetectionListCall<'a, C, NC, A> where NC: hyper::net::Network
 /// Returns text translations from one language to another.
 ///
 /// A builder for the *list* method supported by a *translation* resource.
-/// It is not used directly, but through a `TranslationMethods`.
+/// It is not used directly, but through a `TranslationMethods` instance.
 ///
 /// # Example
 ///
@@ -1071,7 +1087,7 @@ impl<'a, C, NC, A> TranslationListCall<'a, C, NC, A> where NC: hyper::net::Netwo
         for &field in ["alt", "q", "target", "source", "format", "cid"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -1090,7 +1106,7 @@ impl<'a, C, NC, A> TranslationListCall<'a, C, NC, A> where NC: hyper::net::Netwo
             Some(value) => params.push(("key", value)),
             None => {
                 dlg.finished(false);
-                return Result::MissingAPIKey
+                return Err(Error::MissingAPIKey)
             }
         }
 
@@ -1110,7 +1126,6 @@ impl<'a, C, NC, A> TranslationListCall<'a, C, NC, A> where NC: hyper::net::Netwo
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -1120,7 +1135,7 @@ impl<'a, C, NC, A> TranslationListCall<'a, C, NC, A> where NC: hyper::net::Netwo
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -1131,7 +1146,7 @@ impl<'a, C, NC, A> TranslationListCall<'a, C, NC, A> where NC: hyper::net::Netwo
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -1140,13 +1155,13 @@ impl<'a, C, NC, A> TranslationListCall<'a, C, NC, A> where NC: hyper::net::Netwo
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -1159,7 +1174,7 @@ impl<'a, C, NC, A> TranslationListCall<'a, C, NC, A> where NC: hyper::net::Netwo
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The text to translate    
+    /// The text to translate
     pub fn add_q(mut self, new_value: &str) -> TranslationListCall<'a, C, NC, A> {
         self._q.push(new_value.to_string());
         self
@@ -1169,7 +1184,7 @@ impl<'a, C, NC, A> TranslationListCall<'a, C, NC, A> where NC: hyper::net::Netwo
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The target language into which the text should be translated    
+    /// The target language into which the text should be translated
     pub fn target(mut self, new_value: &str) -> TranslationListCall<'a, C, NC, A> {
         self._target = new_value.to_string();
         self
@@ -1177,7 +1192,7 @@ impl<'a, C, NC, A> TranslationListCall<'a, C, NC, A> where NC: hyper::net::Netwo
     /// Sets the *source* query property to the given value.
     ///
     /// 
-    /// The source language of the text    
+    /// The source language of the text
     pub fn source(mut self, new_value: &str) -> TranslationListCall<'a, C, NC, A> {
         self._source = Some(new_value.to_string());
         self
@@ -1185,7 +1200,7 @@ impl<'a, C, NC, A> TranslationListCall<'a, C, NC, A> where NC: hyper::net::Netwo
     /// Sets the *format* query property to the given value.
     ///
     /// 
-    /// The format of the text    
+    /// The format of the text
     pub fn format(mut self, new_value: &str) -> TranslationListCall<'a, C, NC, A> {
         self._format = Some(new_value.to_string());
         self
@@ -1194,7 +1209,7 @@ impl<'a, C, NC, A> TranslationListCall<'a, C, NC, A> where NC: hyper::net::Netwo
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
     ///
     /// 
-    /// The customization id for translate    
+    /// The customization id for translate
     pub fn add_cid(mut self, new_value: &str) -> TranslationListCall<'a, C, NC, A> {
         self._cid.push(new_value.to_string());
         self

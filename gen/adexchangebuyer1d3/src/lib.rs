@@ -1,8 +1,8 @@
 // DO NOT EDIT !
-// This file was generated automatically from 'src/mako/lib.rs.mako'
+// This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *Ad Exchange Buyer* crate version *0.1.1+20150218*, where *20150218* is the exact revision of the *adexchangebuyer:v1.3* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.1*.
+//! This documentation was generated from *Ad Exchange Buyer* crate version *0.1.2+20150218*, where *20150218* is the exact revision of the *adexchangebuyer:v1.3* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.2*.
 //! 
 //! Everything else about the *Ad Exchange Buyer* *v1d3* API can be found at the
 //! [official documentation site](https://developers.google.com/ad-exchange/buyer-rest).
@@ -37,6 +37,8 @@
 //! 
 //! * **[Hub](struct.AdExchangeBuyer.html)**
 //!     * a central object to maintain state and allow accessing all *Activities*
+//!     * creates [*Method Builders*](trait.MethodsBuilder.html) which in turn
+//!       allow access to individual [*Call Builders*](trait.CallBuilder.html)
 //! * **[Resources](trait.Resource.html)**
 //!     * primary types that you can apply *Activities* to
 //!     * a collection of properties and *Parts*
@@ -45,6 +47,8 @@
 //!         * never directly used in *Activities*
 //! * **[Activities](trait.CallBuilder.html)**
 //!     * operations to apply to *Resources*
+//! 
+//! All *structures* are marked with applicable traits to further categorize them and ease browsing.
 //! 
 //! Generally speaking, you can invoke *Activities* like this:
 //! 
@@ -84,7 +88,7 @@
 //! extern crate "yup-oauth2" as oauth2;
 //! extern crate "google-adexchangebuyer1d3" as adexchangebuyer1d3;
 //! use adexchangebuyer1d3::PretargetingConfig;
-//! use adexchangebuyer1d3::Result;
+//! use adexchangebuyer1d3::{Result, Error};
 //! # #[test] fn egal() {
 //! use std::default::Default;
 //! use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -114,15 +118,17 @@
 //!              .doit();
 //! 
 //! match result {
-//!     Result::HttpError(err) => println!("HTTPERROR: {:?}", err),
-//!     Result::MissingAPIKey => println!("Auth: Missing API Key - used if there are no scopes"),
-//!     Result::MissingToken => println!("OAuth2: Missing Token"),
-//!     Result::Cancelled => println!("Operation cancelled by user"),
-//!     Result::UploadSizeLimitExceeded(size, max_size) => println!("Upload size too big: {} of {}", size, max_size),
-//!     Result::Failure(_) => println!("General Failure (hyper::client::Response doesn't print)"),
-//!     Result::FieldClash(clashed_field) => println!("You added custom parameter which is part of builder: {:?}", clashed_field),
-//!     Result::JsonDecodeError(err) => println!("Couldn't understand server reply - maybe API needs update: {:?}", err),
-//!     Result::Success(_) => println!("Success (value doesn't print)"),
+//!     Err(e) => match e {
+//!         Error::HttpError(err) => println!("HTTPERROR: {:?}", err),
+//!         Error::MissingAPIKey => println!("Auth: Missing API Key - used if there are no scopes"),
+//!         Error::MissingToken => println!("OAuth2: Missing Token"),
+//!         Error::Cancelled => println!("Operation canceled by user"),
+//!         Error::UploadSizeLimitExceeded(size, max_size) => println!("Upload size too big: {} of {}", size, max_size),
+//!         Error::Failure(_) => println!("General Failure (hyper::client::Response doesn't print)"),
+//!         Error::FieldClash(clashed_field) => println!("You added custom parameter which is part of builder: {:?}", clashed_field),
+//!         Error::JsonDecodeError(err) => println!("Couldn't understand server reply - maybe API needs update: {:?}", err),
+//!     },
+//!     Ok(_) => println!("Success (value doesn't print)"),
 //! }
 //! # }
 //! ```
@@ -135,7 +141,7 @@
 //! When delegates handle errors or intermediate values, they may have a chance to instruct the system to retry. This 
 //! makes the system potentially resilient to all kinds of errors.
 //! 
-//! ## Uploads and Downlods
+//! ## Uploads and Downloads
 //! If a method supports downloads, the response body, which is part of the [Result](enum.Result.html), should be
 //! read by you to obtain the media.
 //! If such a method also supports a [Response Result](trait.ResponseResult.html), it will return that by default.
@@ -158,8 +164,9 @@
 //! ## Optional Parts in Server-Requests
 //! 
 //! All structures provided by this library are made to be [enocodable](trait.RequestValue.html) and 
-//! [decodable](trait.ResponseResult.html) via json. Optionals are used to indicate that partial requests are responses are valid.
-//! Most optionals are are considered [Parts](trait.Part.html) which are identifyable by name, which will be sent to 
+//! [decodable](trait.ResponseResult.html) via *json*. Optionals are used to indicate that partial requests are responses 
+//! are valid.
+//! Most optionals are are considered [Parts](trait.Part.html) which are identifiable by name, which will be sent to 
 //! the server to indicate either the set parts of the request or the desired parts in the response.
 //! 
 //! ## Builder Arguments
@@ -208,7 +215,7 @@ use std::io;
 use std::fs;
 use std::thread::sleep;
 
-pub use cmn::{MultiPartReader, ToParts, MethodInfo, Result, CallBuilder, Hub, ReadSeek, Part, ResponseResult, RequestValue, NestedType, Delegate, DefaultDelegate, ResourceMethodsBuilder, Resource, JsonServerError};
+pub use cmn::{MultiPartReader, ToParts, MethodInfo, Result, Error, CallBuilder, Hub, ReadSeek, Part, ResponseResult, RequestValue, NestedType, Delegate, DefaultDelegate, MethodsBuilder, Resource, JsonServerError};
 
 
 // ##############
@@ -255,7 +262,7 @@ impl Default for Scope {
 /// extern crate "yup-oauth2" as oauth2;
 /// extern crate "google-adexchangebuyer1d3" as adexchangebuyer1d3;
 /// use adexchangebuyer1d3::PretargetingConfig;
-/// use adexchangebuyer1d3::Result;
+/// use adexchangebuyer1d3::{Result, Error};
 /// # #[test] fn egal() {
 /// use std::default::Default;
 /// use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -285,15 +292,17 @@ impl Default for Scope {
 ///              .doit();
 /// 
 /// match result {
-///     Result::HttpError(err) => println!("HTTPERROR: {:?}", err),
-///     Result::MissingAPIKey => println!("Auth: Missing API Key - used if there are no scopes"),
-///     Result::MissingToken => println!("OAuth2: Missing Token"),
-///     Result::Cancelled => println!("Operation cancelled by user"),
-///     Result::UploadSizeLimitExceeded(size, max_size) => println!("Upload size too big: {} of {}", size, max_size),
-///     Result::Failure(_) => println!("General Failure (hyper::client::Response doesn't print)"),
-///     Result::FieldClash(clashed_field) => println!("You added custom parameter which is part of builder: {:?}", clashed_field),
-///     Result::JsonDecodeError(err) => println!("Couldn't understand server reply - maybe API needs update: {:?}", err),
-///     Result::Success(_) => println!("Success (value doesn't print)"),
+///     Err(e) => match e {
+///         Error::HttpError(err) => println!("HTTPERROR: {:?}", err),
+///         Error::MissingAPIKey => println!("Auth: Missing API Key - used if there are no scopes"),
+///         Error::MissingToken => println!("OAuth2: Missing Token"),
+///         Error::Cancelled => println!("Operation canceled by user"),
+///         Error::UploadSizeLimitExceeded(size, max_size) => println!("Upload size too big: {} of {}", size, max_size),
+///         Error::Failure(_) => println!("General Failure (hyper::client::Response doesn't print)"),
+///         Error::FieldClash(clashed_field) => println!("You added custom parameter which is part of builder: {:?}", clashed_field),
+///         Error::JsonDecodeError(err) => println!("Couldn't understand server reply - maybe API needs update: {:?}", err),
+///     },
+///     Ok(_) => println!("Success (value doesn't print)"),
 /// }
 /// # }
 /// ```
@@ -314,7 +323,7 @@ impl<'a, C, NC, A> AdExchangeBuyer<C, NC, A>
         AdExchangeBuyer {
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/0.1.1".to_string(),
+            _user_agent: "google-api-rust-client/0.1.2".to_string(),
             _m: PhantomData
         }
     }
@@ -342,7 +351,7 @@ impl<'a, C, NC, A> AdExchangeBuyer<C, NC, A>
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/0.1.1`.
+    /// It defaults to `google-api-rust-client/0.1.2`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -362,9 +371,9 @@ impl<'a, C, NC, A> AdExchangeBuyer<C, NC, A>
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct PretargetingConfigExcludedPlacements {
-    /// The value of the placement. Interpretation depends on the placement type, e.g. URL for a site placement, channel name for a channel placement, app id for a mobile app placement.    
+    /// The value of the placement. Interpretation depends on the placement type, e.g. URL for a site placement, channel name for a channel placement, app id for a mobile app placement.
     pub token: String,
-    /// The type of the placement.    
+    /// The type of the placement.
     #[serde(alias="type")]
     pub type_: String,
 }
@@ -379,9 +388,9 @@ impl Part for PretargetingConfigExcludedPlacements {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct CreativeDisapprovalReasons {
-    /// The categorized reason for disapproval.    
+    /// The categorized reason for disapproval.
     pub reason: String,
-    /// Additional details about the reason for disapproval.    
+    /// Additional details about the reason for disapproval.
     pub details: Vec<String>,
 }
 
@@ -403,26 +412,26 @@ impl Part for CreativeDisapprovalReasons {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Account {
-    /// Resource type.    
+    /// Resource type.
     pub kind: Option<String>,
-    /// The sum of all bidderLocation.maximumQps values cannot exceed this. Please contact your technical account manager if you need to change this.    
+    /// The sum of all bidderLocation.maximumQps values cannot exceed this. Please contact your technical account manager if you need to change this.
     #[serde(alias="maximumTotalQps")]
     pub maximum_total_qps: Option<i32>,
-    /// The maximum number of active creatives that an account can have, where a creative is active if it was inserted or bid with in the last 30 days. Please contact your technical account manager if you need to change this.    
+    /// The maximum number of active creatives that an account can have, where a creative is active if it was inserted or bid with in the last 30 days. Please contact your technical account manager if you need to change this.
     #[serde(alias="maximumActiveCreatives")]
     pub maximum_active_creatives: Option<i32>,
-    /// Your bidder locations that have distinct URLs.    
+    /// Your bidder locations that have distinct URLs.
     #[serde(alias="bidderLocation")]
     pub bidder_location: Option<Vec<AccountBidderLocation>>,
-    /// The nid parameter value used in cookie match requests. Please contact your technical account manager if you need to change this.    
+    /// The nid parameter value used in cookie match requests. Please contact your technical account manager if you need to change this.
     #[serde(alias="cookieMatchingNid")]
     pub cookie_matching_nid: Option<String>,
-    /// The number of creatives that this account inserted or bid with in the last 30 days.    
+    /// The number of creatives that this account inserted or bid with in the last 30 days.
     #[serde(alias="numberActiveCreatives")]
     pub number_active_creatives: Option<i32>,
-    /// Account id.    
+    /// Account id.
     pub id: Option<i32>,
-    /// The base URL used in cookie match requests.    
+    /// The base URL used in cookie match requests.
     #[serde(alias="cookieMatchingUrl")]
     pub cookie_matching_url: Option<String>,
 }
@@ -443,9 +452,9 @@ impl ResponseResult for Account {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct PretargetingConfigList {
-    /// A list of pretargeting configs    
+    /// A list of pretargeting configs
     pub items: Vec<PretargetingConfig>,
-    /// Resource type.    
+    /// Resource type.
     pub kind: String,
 }
 
@@ -458,9 +467,9 @@ impl ResponseResult for PretargetingConfigList {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct CreativeFilteringReasons {
-    /// The date in ISO 8601 format for the data. The data is collected from 00:00:00 to 23:59:59 in PST.    
+    /// The date in ISO 8601 format for the data. The data is collected from 00:00:00 to 23:59:59 in PST.
     pub date: String,
-    /// The filtering reasons.    
+    /// The filtering reasons.
     pub reasons: Vec<CreativeFilteringReasonsReasons>,
 }
 
@@ -479,15 +488,15 @@ impl Part for CreativeFilteringReasons {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct BillingInfo {
-    /// Resource type.    
+    /// Resource type.
     pub kind: String,
-    /// A list of adgroup IDs associated with this particular account. These IDs may show up as part of a realtime bidding BidRequest, which indicates a bid request for this account.    
+    /// A list of adgroup IDs associated with this particular account. These IDs may show up as part of a realtime bidding BidRequest, which indicates a bid request for this account.
     #[serde(alias="billingId")]
     pub billing_id: Vec<String>,
-    /// Account id.    
+    /// Account id.
     #[serde(alias="accountId")]
     pub account_id: i32,
-    /// Account name.    
+    /// Account name.
     #[serde(alias="accountName")]
     pub account_name: String,
 }
@@ -506,9 +515,9 @@ impl ResponseResult for BillingInfo {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct DirectDealsList {
-    /// Resource type.    
+    /// Resource type.
     pub kind: String,
-    /// A list of direct deals relevant for your account.    
+    /// A list of direct deals relevant for your account.
     #[serde(alias="directDeals")]
     pub direct_deals: Vec<DirectDeal>,
 }
@@ -527,9 +536,9 @@ impl ResponseResult for DirectDealsList {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct AccountsList {
-    /// A list of accounts.    
+    /// A list of accounts.
     pub items: Vec<Account>,
-    /// Resource type.    
+    /// Resource type.
     pub kind: String,
 }
 
@@ -547,12 +556,12 @@ impl ResponseResult for AccountsList {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct CreativesList {
-    /// Continuation token used to page through creatives. To retrieve the next page of results, set the next request's "pageToken" value to this.    
+    /// Continuation token used to page through creatives. To retrieve the next page of results, set the next request's "pageToken" value to this.
     #[serde(alias="nextPageToken")]
     pub next_page_token: String,
-    /// A list of creatives.    
+    /// A list of creatives.
     pub items: Vec<Creative>,
-    /// Resource type.    
+    /// Resource type.
     pub kind: String,
 }
 
@@ -572,20 +581,20 @@ impl ResponseResult for CreativesList {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Budget {
-    /// The billing id to determine which adgroup to provide budget information for. This is required for get and update requests.    
+    /// The billing id to determine which adgroup to provide budget information for. This is required for get and update requests.
     #[serde(alias="billingId")]
     pub billing_id: Option<String>,
-    /// The kind of the resource, i.e. "adexchangebuyer#budget".    
+    /// The kind of the resource, i.e. "adexchangebuyer#budget".
     pub kind: Option<String>,
-    /// The budget amount to apply for the billingId provided. This is required for update requests.    
+    /// The budget amount to apply for the billingId provided. This is required for update requests.
     #[serde(alias="budgetAmount")]
     pub budget_amount: Option<String>,
-    /// The currency code for the buyer. This cannot be altered here.    
+    /// The currency code for the buyer. This cannot be altered here.
     #[serde(alias="currencyCode")]
     pub currency_code: Option<String>,
-    /// The unique id that describes this item.    
+    /// The unique id that describes this item.
     pub id: Option<String>,
-    /// The id of the account. This is required for get and update requests.    
+    /// The id of the account. This is required for get and update requests.
     #[serde(alias="accountId")]
     pub account_id: Option<String>,
 }
@@ -607,58 +616,58 @@ impl ResponseResult for Budget {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Creative {
-    /// Detected product categories, if any. Read-only. This field should not be set in requests.    
+    /// Detected product categories, if any. Read-only. This field should not be set in requests.
     #[serde(alias="productCategories")]
     pub product_categories: Option<Vec<i32>>,
-    /// Creative serving status. Read-only. This field should not be set in requests.    
+    /// Creative serving status. Read-only. This field should not be set in requests.
     pub status: Option<String>,
-    /// The agency id for this creative.    
+    /// The agency id for this creative.
     #[serde(alias="agencyId")]
     pub agency_id: Option<String>,
-    /// All attributes for the ads that may be shown from this snippet.    
+    /// All attributes for the ads that may be shown from this snippet.
     pub attribute: Option<Vec<i32>>,
-    /// Ad height.    
+    /// Ad height.
     pub height: Option<i32>,
-    /// The name of the company being advertised in the creative.    
+    /// The name of the company being advertised in the creative.
     #[serde(alias="advertiserName")]
     pub advertiser_name: Option<String>,
-    /// The HTML snippet that displays the ad when inserted in the web page. If set, videoURL should not be set.    
+    /// The HTML snippet that displays the ad when inserted in the web page. If set, videoURL should not be set.
     #[serde(alias="HTMLSnippet")]
     pub html_snippet: Option<String>,
-    /// A buyer-specific id identifying the creative in this ad.    
+    /// A buyer-specific id identifying the creative in this ad.
     #[serde(alias="buyerCreativeId")]
     pub buyer_creative_id: Option<String>,
-    /// Account id.    
+    /// Account id.
     #[serde(alias="accountId")]
     pub account_id: Option<i32>,
-    /// Detected advertiser id, if any. Read-only. This field should not be set in requests.    
+    /// Detected advertiser id, if any. Read-only. This field should not be set in requests.
     #[serde(alias="advertiserId")]
     pub advertiser_id: Option<Vec<String>>,
-    /// Resource type.    
+    /// Resource type.
     pub kind: Option<String>,
-    /// The url to fetch a video ad. If set, HTMLSnippet should not be set.    
+    /// The url to fetch a video ad. If set, HTMLSnippet should not be set.
     #[serde(alias="videoURL")]
     pub video_url: Option<String>,
-    /// The set of destination urls for the snippet.    
+    /// The set of destination urls for the snippet.
     #[serde(alias="clickThroughUrl")]
     pub click_through_url: Option<Vec<String>>,
-    /// Shows any corrections that were applied to this creative. Read-only. This field should not be set in requests.    
+    /// Shows any corrections that were applied to this creative. Read-only. This field should not be set in requests.
     pub corrections: Option<Vec<CreativeCorrections>>,
-    /// Ad width.    
+    /// Ad width.
     pub width: Option<i32>,
-    /// All restricted categories for the ads that may be shown from this snippet.    
+    /// All restricted categories for the ads that may be shown from this snippet.
     #[serde(alias="restrictedCategories")]
     pub restricted_categories: Option<Vec<i32>>,
-    /// All vendor types for the ads that may be shown from this snippet.    
+    /// All vendor types for the ads that may be shown from this snippet.
     #[serde(alias="vendorType")]
     pub vendor_type: Option<Vec<i32>>,
-    /// The filtering reasons for the creative. If this feature is not enabled, please ask your technical account manager. Read-only. This field should not be set in requests.    
+    /// The filtering reasons for the creative. If this feature is not enabled, please ask your technical account manager. Read-only. This field should not be set in requests.
     #[serde(alias="filteringReasons")]
     pub filtering_reasons: Option<CreativeFilteringReasons>,
-    /// The reasons for disapproval, if any. Note that not all disapproval reasons may be categorized, so it is possible for the creative to have a status of DISAPPROVED with an empty list for disapproval_reasons. In this case, please reach out to your TAM to help debug the issue. Read-only. This field should not be set in requests.    
+    /// The reasons for disapproval, if any. Note that not all disapproval reasons may be categorized, so it is possible for the creative to have a status of DISAPPROVED with an empty list for disapproval_reasons. In this case, please reach out to your TAM to help debug the issue. Read-only. This field should not be set in requests.
     #[serde(alias="disapprovalReasons")]
     pub disapproval_reasons: Option<Vec<CreativeDisapprovalReasons>>,
-    /// Detected sensitive categories, if any. Read-only. This field should not be set in requests.    
+    /// Detected sensitive categories, if any. Read-only. This field should not be set in requests.
     #[serde(alias="sensitiveCategories")]
     pub sensitive_categories: Option<Vec<i32>>,
 }
@@ -679,9 +688,9 @@ impl ResponseResult for Creative {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct PerformanceReportList {
-    /// Resource type.    
+    /// Resource type.
     pub kind: String,
-    /// A list of performance reports relevant for the account.    
+    /// A list of performance reports relevant for the account.
     #[serde(alias="performanceReport")]
     pub performance_report: Vec<PerformanceReport>,
 }
@@ -695,10 +704,10 @@ impl ResponseResult for PerformanceReportList {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct CreativeFilteringReasonsReasons {
-    /// The number of times the creative was filtered for the status. The count is aggregated across all publishers on the exchange.    
+    /// The number of times the creative was filtered for the status. The count is aggregated across all publishers on the exchange.
     #[serde(alias="filteringCount")]
     pub filtering_count: i64,
-    /// The filtering status code. Please refer to the creative-status-codes.txt file for different statuses.    
+    /// The filtering status code. Please refer to the creative-status-codes.txt file for different statuses.
     #[serde(alias="filteringStatus")]
     pub filtering_status: i32,
 }
@@ -713,9 +722,9 @@ impl Part for CreativeFilteringReasonsReasons {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct PretargetingConfigPlacements {
-    /// The value of the placement. Interpretation depends on the placement type, e.g. URL for a site placement, channel name for a channel placement, app id for a mobile app placement.    
+    /// The value of the placement. Interpretation depends on the placement type, e.g. URL for a site placement, channel name for a channel placement, app id for a mobile app placement.
     pub token: String,
-    /// The type of the placement.    
+    /// The type of the placement.
     #[serde(alias="type")]
     pub type_: String,
 }
@@ -730,9 +739,9 @@ impl Part for PretargetingConfigPlacements {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct PretargetingConfigDimensions {
-    /// Width in pixels.    
+    /// Width in pixels.
     pub width: String,
-    /// Height in pixels.    
+    /// Height in pixels.
     pub height: String,
 }
 
@@ -746,49 +755,49 @@ impl Part for PretargetingConfigDimensions {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct PerformanceReport {
-    /// Average QPS for cookie matcher operations.    
+    /// Average QPS for cookie matcher operations.
     #[serde(alias="cookieMatcherStatusRate")]
     pub cookie_matcher_status_rate: Vec<String>,
-    /// Rate of various prefiltering statuses per match. Please refer to the callout-status-codes.txt file for different statuses.    
+    /// Rate of various prefiltering statuses per match. Please refer to the callout-status-codes.txt file for different statuses.
     #[serde(alias="calloutStatusRate")]
     pub callout_status_rate: Vec<String>,
-    /// Average QPS for hosted match operations.    
+    /// Average QPS for hosted match operations.
     #[serde(alias="hostedMatchStatusRate")]
     pub hosted_match_status_rate: Vec<String>,
-    /// The unix timestamp of the starting time of this performance data.    
+    /// The unix timestamp of the starting time of this performance data.
     pub timestamp: String,
-    /// The 50th percentile round trip latency(ms) as perceived from Google servers for the duration period covered by the report.    
+    /// The 50th percentile round trip latency(ms) as perceived from Google servers for the duration period covered by the report.
     #[serde(alias="latency50thPercentile")]
     pub latency50th_percentile: f64,
-    /// The 85th percentile round trip latency(ms) as perceived from Google servers for the duration period covered by the report.    
+    /// The 85th percentile round trip latency(ms) as perceived from Google servers for the duration period covered by the report.
     #[serde(alias="latency85thPercentile")]
     pub latency85th_percentile: f64,
-    /// Average QPS for pixel match responses from clients.    
+    /// Average QPS for pixel match responses from clients.
     #[serde(alias="pixelMatchResponses")]
     pub pixel_match_responses: f64,
-    /// Rate of ads with a given status. Please refer to the creative-status-codes.txt file for different statuses.    
+    /// Rate of ads with a given status. Please refer to the creative-status-codes.txt file for different statuses.
     #[serde(alias="creativeStatusRate")]
     pub creative_status_rate: Vec<String>,
-    /// The 95th percentile round trip latency(ms) as perceived from Google servers for the duration period covered by the report.    
+    /// The 95th percentile round trip latency(ms) as perceived from Google servers for the duration period covered by the report.
     #[serde(alias="latency95thPercentile")]
     pub latency95th_percentile: f64,
-    /// Rate of various quota account statuses per quota check.    
+    /// Rate of various quota account statuses per quota check.
     #[serde(alias="noQuotaInRegion")]
     pub no_quota_in_region: f64,
-    /// Resource type.    
+    /// Resource type.
     pub kind: String,
-    /// The trading location of this data.    
+    /// The trading location of this data.
     pub region: String,
-    /// The configured quota limits for this account.    
+    /// The configured quota limits for this account.
     #[serde(alias="quotaConfiguredLimit")]
     pub quota_configured_limit: f64,
-    /// Rate of various quota account statuses per quota check.    
+    /// Rate of various quota account statuses per quota check.
     #[serde(alias="outOfQuota")]
     pub out_of_quota: f64,
-    /// The throttled quota limits for this account.    
+    /// The throttled quota limits for this account.
     #[serde(alias="quotaThrottledLimit")]
     pub quota_throttled_limit: f64,
-    /// Average QPS for pixel match requests from clients.    
+    /// Average QPS for pixel match requests from clients.
     #[serde(alias="pixelMatchRequests")]
     pub pixel_match_requests: f64,
 }
@@ -802,9 +811,9 @@ impl Part for PerformanceReport {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct CreativeCorrections {
-    /// The type of correction that was applied to the creative.    
+    /// The type of correction that was applied to the creative.
     pub reason: String,
-    /// Additional details about the correction.    
+    /// Additional details about the correction.
     pub details: Vec<String>,
 }
 
@@ -823,9 +832,9 @@ impl Part for CreativeCorrections {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct BillingInfoList {
-    /// A list of billing info relevant for your account.    
+    /// A list of billing info relevant for your account.
     pub items: Vec<BillingInfo>,
-    /// Resource type.    
+    /// Resource type.
     pub kind: String,
 }
 
@@ -844,36 +853,36 @@ impl ResponseResult for BillingInfoList {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct DirectDeal {
-    /// The name of the advertiser this deal is for.    
+    /// The name of the advertiser this deal is for.
     pub advertiser: String,
-    /// Resource type.    
+    /// Resource type.
     pub kind: String,
-    /// Deal name.    
+    /// Deal name.
     pub name: String,
-    /// The currency code that applies to the fixed_cpm value. If not set then assumed to be USD.    
+    /// The currency code that applies to the fixed_cpm value. If not set then assumed to be USD.
     #[serde(alias="currencyCode")]
     pub currency_code: String,
-    /// The account id of the buyer this deal is for.    
+    /// The account id of the buyer this deal is for.
     #[serde(alias="accountId")]
     pub account_id: i32,
-    /// The fixed price for this direct deal. In cpm micros of currency according to currency_code. If set, then this deal is eligible for the fixed price tier of buying (highest priority, pay exactly the configured fixed price).    
+    /// The fixed price for this direct deal. In cpm micros of currency according to currency_code. If set, then this deal is eligible for the fixed price tier of buying (highest priority, pay exactly the configured fixed price).
     #[serde(alias="fixedCpm")]
     pub fixed_cpm: String,
-    /// Start time for when this deal becomes active. If not set then this deal is active immediately upon creation. In seconds since the epoch.    
+    /// Start time for when this deal becomes active. If not set then this deal is active immediately upon creation. In seconds since the epoch.
     #[serde(alias="startTime")]
     pub start_time: String,
-    /// If true, the publisher has opted to have their blocks ignored when a creative is bid with for this deal.    
+    /// If true, the publisher has opted to have their blocks ignored when a creative is bid with for this deal.
     #[serde(alias="publisherBlocksOverriden")]
     pub publisher_blocks_overriden: bool,
-    /// End time for when this deal stops being active. If not set then this deal is valid until manually disabled by the publisher. In seconds since the epoch.    
+    /// End time for when this deal stops being active. If not set then this deal is valid until manually disabled by the publisher. In seconds since the epoch.
     #[serde(alias="endTime")]
     pub end_time: String,
-    /// The name of the publisher offering this direct deal.    
+    /// The name of the publisher offering this direct deal.
     #[serde(alias="sellerNetwork")]
     pub seller_network: String,
-    /// Deal id.    
+    /// Deal id.
     pub id: String,
-    /// The minimum price for this direct deal. In cpm micros of currency according to currency_code. If set, then this deal is eligible for the private exchange tier of buying (below fixed price priority, run as a second price auction).    
+    /// The minimum price for this direct deal. In cpm micros of currency according to currency_code. If set, then this deal is eligible for the private exchange tier of buying (below fixed price priority, run as a second price auction).
     #[serde(alias="privateExchangeMinCpm")]
     pub private_exchange_min_cpm: String,
 }
@@ -896,68 +905,68 @@ impl ResponseResult for DirectDeal {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct PretargetingConfig {
-    /// The kind of the resource, i.e. "adexchangebuyer#pretargetingConfig".    
+    /// The kind of the resource, i.e. "adexchangebuyer#pretargetingConfig".
     pub kind: Option<String>,
-    /// Requests containing any of these vertical ids will match.    
+    /// Requests containing any of these vertical ids will match.
     pub verticals: Option<Vec<String>>,
-    /// Requests matching any of these platforms will match. Possible values are PRETARGETING_PLATFORM_MOBILE, PRETARGETING_PLATFORM_DESKTOP, and PRETARGETING_PLATFORM_TABLET.    
+    /// Requests matching any of these platforms will match. Possible values are PRETARGETING_PLATFORM_MOBILE, PRETARGETING_PLATFORM_DESKTOP, and PRETARGETING_PLATFORM_TABLET.
     pub platforms: Option<Vec<String>>,
-    /// List must contain exactly one of PRETARGETING_CREATIVE_TYPE_HTML or PRETARGETING_CREATIVE_TYPE_VIDEO.    
+    /// List must contain exactly one of PRETARGETING_CREATIVE_TYPE_HTML or PRETARGETING_CREATIVE_TYPE_VIDEO.
     #[serde(alias="creativeType")]
     pub creative_type: Option<Vec<String>>,
-    /// Requests containing any of these geo criteria ids will match.    
+    /// Requests containing any of these geo criteria ids will match.
     #[serde(alias="geoCriteriaIds")]
     pub geo_criteria_ids: Option<Vec<String>>,
-    /// Requests containing any of these mobile operating system version ids will match. Values are from mobile-os.csv in the downloadable files section.    
+    /// Requests containing any of these mobile operating system version ids will match. Values are from mobile-os.csv in the downloadable files section.
     #[serde(alias="mobileOperatingSystemVersions")]
     pub mobile_operating_system_versions: Option<Vec<String>>,
-    /// The config id; generated automatically. Leave this field blank for insert requests.    
+    /// The config id; generated automatically. Leave this field blank for insert requests.
     #[serde(alias="configId")]
     pub config_id: Option<String>,
-    /// Requests containing any of these users list ids will not match.    
+    /// Requests containing any of these users list ids will not match.
     #[serde(alias="excludedUserLists")]
     pub excluded_user_lists: Option<Vec<String>>,
-    /// Whether this config is active. Required for all requests.    
+    /// Whether this config is active. Required for all requests.
     #[serde(alias="isActive")]
     pub is_active: Option<bool>,
-    /// The name of the config. Must be unique. Required for all requests.    
+    /// The name of the config. Must be unique. Required for all requests.
     #[serde(alias="configName")]
     pub config_name: Option<String>,
-    /// Requests containing any of these vertical ids will not match. Values are from the publisher-verticals.txt file in the downloadable files section.    
+    /// Requests containing any of these vertical ids will not match. Values are from the publisher-verticals.txt file in the downloadable files section.
     #[serde(alias="excludedVerticals")]
     pub excluded_verticals: Option<Vec<String>>,
-    /// Requests which allow one of these (width, height) pairs will match. All pairs must be supported ad dimensions.    
+    /// Requests which allow one of these (width, height) pairs will match. All pairs must be supported ad dimensions.
     pub dimensions: Option<Vec<PretargetingConfigDimensions>>,
-    /// Requests containing any of these geo criteria ids will not match.    
+    /// Requests containing any of these geo criteria ids will not match.
     #[serde(alias="excludedGeoCriteriaIds")]
     pub excluded_geo_criteria_ids: Option<Vec<String>>,
-    /// Creative attributes should be declared here if all creatives corresponding to this pretargeting configuration have that creative attribute. Values are from pretargetable-creative-attributes.txt in the downloadable files section.    
+    /// Creative attributes should be declared here if all creatives corresponding to this pretargeting configuration have that creative attribute. Values are from pretargetable-creative-attributes.txt in the downloadable files section.
     #[serde(alias="supportedCreativeAttributes")]
     pub supported_creative_attributes: Option<Vec<String>>,
-    /// Requests with any of these content labels will not match. Values are from content-labels.txt in the downloadable files section.    
+    /// Requests with any of these content labels will not match. Values are from content-labels.txt in the downloadable files section.
     #[serde(alias="excludedContentLabels")]
     pub excluded_content_labels: Option<Vec<String>>,
-    /// Requests that allow any of these vendor ids will match. Values are from vendors.txt in the downloadable files section.    
+    /// Requests that allow any of these vendor ids will match. Values are from vendors.txt in the downloadable files section.
     #[serde(alias="vendorTypes")]
     pub vendor_types: Option<Vec<String>>,
-    /// Request containing any of these language codes will match.    
+    /// Request containing any of these language codes will match.
     pub languages: Option<Vec<String>>,
-    /// Requests containing any of these user list ids will match.    
+    /// Requests containing any of these user list ids will match.
     #[serde(alias="userLists")]
     pub user_lists: Option<Vec<String>>,
-    /// Requests containing any of these mobile device ids will match. Values are from mobile-devices.csv in the downloadable files section.    
+    /// Requests containing any of these mobile device ids will match. Values are from mobile-devices.csv in the downloadable files section.
     #[serde(alias="mobileDevices")]
     pub mobile_devices: Option<Vec<String>>,
-    /// The id for billing purposes, provided for reference. Leave this field blank for insert requests; the id will be generated automatically.    
+    /// The id for billing purposes, provided for reference. Leave this field blank for insert requests; the id will be generated automatically.
     #[serde(alias="billingId")]
     pub billing_id: Option<String>,
-    /// Requests containing any of these mobile carrier ids will match. Values are from mobile-carriers.csv in the downloadable files section.    
+    /// Requests containing any of these mobile carrier ids will match. Values are from mobile-carriers.csv in the downloadable files section.
     #[serde(alias="mobileCarriers")]
     pub mobile_carriers: Option<Vec<String>>,
-    /// Requests containing any of these placements will not match.    
+    /// Requests containing any of these placements will not match.
     #[serde(alias="excludedPlacements")]
     pub excluded_placements: Option<Vec<PretargetingConfigExcludedPlacements>>,
-    /// Requests containing any of these placements will match.    
+    /// Requests containing any of these placements will match.
     pub placements: Option<Vec<PretargetingConfigPlacements>>,
 }
 
@@ -971,7 +980,7 @@ impl ResponseResult for PretargetingConfig {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct AccountBidderLocation {
-    /// The URL to which the Ad Exchange will send bid requests.    
+    /// The URL to which the Ad Exchange will send bid requests.
     pub url: String,
     /// The geographical region the Ad Exchange should send requests from. Only used by some quota systems, but always setting the value is recommended. Allowed values:  
     /// - ASIA 
@@ -979,7 +988,7 @@ pub struct AccountBidderLocation {
     /// - US_EAST 
     /// - US_WEST
     pub region: String,
-    /// The maximum queries per second the Ad Exchange will send.    
+    /// The maximum queries per second the Ad Exchange will send.
     #[serde(alias="maximumQps")]
     pub maximum_qps: i32,
 }
@@ -1027,13 +1036,17 @@ pub struct BillingInfoMethods<'a, C, NC, A>
     hub: &'a AdExchangeBuyer<C, NC, A>,
 }
 
-impl<'a, C, NC, A> ResourceMethodsBuilder for BillingInfoMethods<'a, C, NC, A> {}
+impl<'a, C, NC, A> MethodsBuilder for BillingInfoMethods<'a, C, NC, A> {}
 
 impl<'a, C, NC, A> BillingInfoMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Returns the billing information for one account specified by account ID.    
+    /// Returns the billing information for one account specified by account ID.
+    /// 
+    /// # Arguments
+    ///
+    /// * `accountId` - The account id.
     pub fn get(&self, account_id: i32) -> BillingInfoGetCall<'a, C, NC, A> {
         BillingInfoGetCall {
             hub: self.hub,
@@ -1046,7 +1059,7 @@ impl<'a, C, NC, A> BillingInfoMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Retrieves a list of billing information for all accounts of the authenticated user.    
+    /// Retrieves a list of billing information for all accounts of the authenticated user.
     pub fn list(&self) -> BillingInfoListCall<'a, C, NC, A> {
         BillingInfoListCall {
             hub: self.hub,
@@ -1093,13 +1106,13 @@ pub struct DirectDealMethods<'a, C, NC, A>
     hub: &'a AdExchangeBuyer<C, NC, A>,
 }
 
-impl<'a, C, NC, A> ResourceMethodsBuilder for DirectDealMethods<'a, C, NC, A> {}
+impl<'a, C, NC, A> MethodsBuilder for DirectDealMethods<'a, C, NC, A> {}
 
 impl<'a, C, NC, A> DirectDealMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Retrieves the authenticated user's list of direct deals.    
+    /// Retrieves the authenticated user's list of direct deals.
     pub fn list(&self) -> DirectDealListCall<'a, C, NC, A> {
         DirectDealListCall {
             hub: self.hub,
@@ -1111,7 +1124,11 @@ impl<'a, C, NC, A> DirectDealMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Gets one direct deal by ID.    
+    /// Gets one direct deal by ID.
+    /// 
+    /// # Arguments
+    ///
+    /// * `id` - The direct deal id
     pub fn get(&self, id: &str) -> DirectDealGetCall<'a, C, NC, A> {
         DirectDealGetCall {
             hub: self.hub,
@@ -1159,13 +1176,19 @@ pub struct BudgetMethods<'a, C, NC, A>
     hub: &'a AdExchangeBuyer<C, NC, A>,
 }
 
-impl<'a, C, NC, A> ResourceMethodsBuilder for BudgetMethods<'a, C, NC, A> {}
+impl<'a, C, NC, A> MethodsBuilder for BudgetMethods<'a, C, NC, A> {}
 
 impl<'a, C, NC, A> BudgetMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Updates the budget amount for the budget of the adgroup specified by the accountId and billingId, with the budget amount in the request. This method supports patch semantics.    
+    /// Updates the budget amount for the budget of the adgroup specified by the accountId and billingId, with the budget amount in the request. This method supports patch semantics.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `accountId` - The account id associated with the budget being updated.
+    /// * `billingId` - The billing id associated with the budget being updated.
     pub fn patch(&self, request: &Budget, account_id: &str, billing_id: &str) -> BudgetPatchCall<'a, C, NC, A> {
         BudgetPatchCall {
             hub: self.hub,
@@ -1180,7 +1203,13 @@ impl<'a, C, NC, A> BudgetMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Updates the budget amount for the budget of the adgroup specified by the accountId and billingId, with the budget amount in the request.    
+    /// Updates the budget amount for the budget of the adgroup specified by the accountId and billingId, with the budget amount in the request.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `accountId` - The account id associated with the budget being updated.
+    /// * `billingId` - The billing id associated with the budget being updated.
     pub fn update(&self, request: &Budget, account_id: &str, billing_id: &str) -> BudgetUpdateCall<'a, C, NC, A> {
         BudgetUpdateCall {
             hub: self.hub,
@@ -1195,7 +1224,12 @@ impl<'a, C, NC, A> BudgetMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Returns the budget information for the adgroup specified by the accountId and billingId.    
+    /// Returns the budget information for the adgroup specified by the accountId and billingId.
+    /// 
+    /// # Arguments
+    ///
+    /// * `accountId` - The account id to get the budget information for.
+    /// * `billingId` - The billing id to get the budget information for.
     pub fn get(&self, account_id: &str, billing_id: &str) -> BudgetGetCall<'a, C, NC, A> {
         BudgetGetCall {
             hub: self.hub,
@@ -1244,13 +1278,17 @@ pub struct CreativeMethods<'a, C, NC, A>
     hub: &'a AdExchangeBuyer<C, NC, A>,
 }
 
-impl<'a, C, NC, A> ResourceMethodsBuilder for CreativeMethods<'a, C, NC, A> {}
+impl<'a, C, NC, A> MethodsBuilder for CreativeMethods<'a, C, NC, A> {}
 
 impl<'a, C, NC, A> CreativeMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Submit a new creative.    
+    /// Submit a new creative.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
     pub fn insert(&self, request: &Creative) -> CreativeInsertCall<'a, C, NC, A> {
         CreativeInsertCall {
             hub: self.hub,
@@ -1263,7 +1301,7 @@ impl<'a, C, NC, A> CreativeMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Retrieves a list of the authenticated user's active creatives. A creative will be available 30-40 minutes after submission.    
+    /// Retrieves a list of the authenticated user's active creatives. A creative will be available 30-40 minutes after submission.
     pub fn list(&self) -> CreativeListCall<'a, C, NC, A> {
         CreativeListCall {
             hub: self.hub,
@@ -1280,7 +1318,12 @@ impl<'a, C, NC, A> CreativeMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Gets the status for a single creative. A creative will be available 30-40 minutes after submission.    
+    /// Gets the status for a single creative. A creative will be available 30-40 minutes after submission.
+    /// 
+    /// # Arguments
+    ///
+    /// * `accountId` - The id for the account that will serve this creative.
+    /// * `buyerCreativeId` - The buyer-specific id for this creative.
     pub fn get(&self, account_id: i32, buyer_creative_id: &str) -> CreativeGetCall<'a, C, NC, A> {
         CreativeGetCall {
             hub: self.hub,
@@ -1329,13 +1372,18 @@ pub struct AccountMethods<'a, C, NC, A>
     hub: &'a AdExchangeBuyer<C, NC, A>,
 }
 
-impl<'a, C, NC, A> ResourceMethodsBuilder for AccountMethods<'a, C, NC, A> {}
+impl<'a, C, NC, A> MethodsBuilder for AccountMethods<'a, C, NC, A> {}
 
 impl<'a, C, NC, A> AccountMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Updates an existing account.    
+    /// Updates an existing account.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `id` - The account id
     pub fn update(&self, request: &Account, id: i32) -> AccountUpdateCall<'a, C, NC, A> {
         AccountUpdateCall {
             hub: self.hub,
@@ -1349,7 +1397,12 @@ impl<'a, C, NC, A> AccountMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Updates an existing account. This method supports patch semantics.    
+    /// Updates an existing account. This method supports patch semantics.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `id` - The account id
     pub fn patch(&self, request: &Account, id: i32) -> AccountPatchCall<'a, C, NC, A> {
         AccountPatchCall {
             hub: self.hub,
@@ -1363,7 +1416,7 @@ impl<'a, C, NC, A> AccountMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Retrieves the authenticated user's list of accounts.    
+    /// Retrieves the authenticated user's list of accounts.
     pub fn list(&self) -> AccountListCall<'a, C, NC, A> {
         AccountListCall {
             hub: self.hub,
@@ -1375,7 +1428,11 @@ impl<'a, C, NC, A> AccountMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Gets one account by ID.    
+    /// Gets one account by ID.
+    /// 
+    /// # Arguments
+    ///
+    /// * `id` - The account id
     pub fn get(&self, id: i32) -> AccountGetCall<'a, C, NC, A> {
         AccountGetCall {
             hub: self.hub,
@@ -1423,13 +1480,19 @@ pub struct PerformanceReportMethods<'a, C, NC, A>
     hub: &'a AdExchangeBuyer<C, NC, A>,
 }
 
-impl<'a, C, NC, A> ResourceMethodsBuilder for PerformanceReportMethods<'a, C, NC, A> {}
+impl<'a, C, NC, A> MethodsBuilder for PerformanceReportMethods<'a, C, NC, A> {}
 
 impl<'a, C, NC, A> PerformanceReportMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Retrieves the authenticated user's list of performance metrics.    
+    /// Retrieves the authenticated user's list of performance metrics.
+    /// 
+    /// # Arguments
+    ///
+    /// * `accountId` - The account id to get the reports.
+    /// * `endDateTime` - The end time of the report in ISO 8601 timestamp format using UTC.
+    /// * `startDateTime` - The start time of the report in ISO 8601 timestamp format using UTC.
     pub fn list(&self, account_id: &str, end_date_time: &str, start_date_time: &str) -> PerformanceReportListCall<'a, C, NC, A> {
         PerformanceReportListCall {
             hub: self.hub,
@@ -1481,13 +1544,18 @@ pub struct PretargetingConfigMethods<'a, C, NC, A>
     hub: &'a AdExchangeBuyer<C, NC, A>,
 }
 
-impl<'a, C, NC, A> ResourceMethodsBuilder for PretargetingConfigMethods<'a, C, NC, A> {}
+impl<'a, C, NC, A> MethodsBuilder for PretargetingConfigMethods<'a, C, NC, A> {}
 
 impl<'a, C, NC, A> PretargetingConfigMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Deletes an existing pretargeting config.    
+    /// Deletes an existing pretargeting config.
+    /// 
+    /// # Arguments
+    ///
+    /// * `accountId` - The account id to delete the pretargeting config for.
+    /// * `configId` - The specific id of the configuration to delete.
     pub fn delete(&self, account_id: &str, config_id: &str) -> PretargetingConfigDeleteCall<'a, C, NC, A> {
         PretargetingConfigDeleteCall {
             hub: self.hub,
@@ -1501,7 +1569,13 @@ impl<'a, C, NC, A> PretargetingConfigMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Updates an existing pretargeting config. This method supports patch semantics.    
+    /// Updates an existing pretargeting config. This method supports patch semantics.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `accountId` - The account id to update the pretargeting config for.
+    /// * `configId` - The specific id of the configuration to update.
     pub fn patch(&self, request: &PretargetingConfig, account_id: &str, config_id: &str) -> PretargetingConfigPatchCall<'a, C, NC, A> {
         PretargetingConfigPatchCall {
             hub: self.hub,
@@ -1516,7 +1590,12 @@ impl<'a, C, NC, A> PretargetingConfigMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Gets a specific pretargeting configuration    
+    /// Gets a specific pretargeting configuration
+    /// 
+    /// # Arguments
+    ///
+    /// * `accountId` - The account id to get the pretargeting config for.
+    /// * `configId` - The specific id of the configuration to retrieve.
     pub fn get(&self, account_id: &str, config_id: &str) -> PretargetingConfigGetCall<'a, C, NC, A> {
         PretargetingConfigGetCall {
             hub: self.hub,
@@ -1530,7 +1609,12 @@ impl<'a, C, NC, A> PretargetingConfigMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Inserts a new pretargeting configuration.    
+    /// Inserts a new pretargeting configuration.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `accountId` - The account id to insert the pretargeting config for.
     pub fn insert(&self, request: &PretargetingConfig, account_id: &str) -> PretargetingConfigInsertCall<'a, C, NC, A> {
         PretargetingConfigInsertCall {
             hub: self.hub,
@@ -1544,7 +1628,11 @@ impl<'a, C, NC, A> PretargetingConfigMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Retrieves a list of the authenticated user's pretargeting configurations.    
+    /// Retrieves a list of the authenticated user's pretargeting configurations.
+    /// 
+    /// # Arguments
+    ///
+    /// * `accountId` - The account id to get the pretargeting configs for.
     pub fn list(&self, account_id: &str) -> PretargetingConfigListCall<'a, C, NC, A> {
         PretargetingConfigListCall {
             hub: self.hub,
@@ -1557,7 +1645,13 @@ impl<'a, C, NC, A> PretargetingConfigMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Updates an existing pretargeting config.    
+    /// Updates an existing pretargeting config.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `accountId` - The account id to update the pretargeting config for.
+    /// * `configId` - The specific id of the configuration to update.
     pub fn update(&self, request: &PretargetingConfig, account_id: &str, config_id: &str) -> PretargetingConfigUpdateCall<'a, C, NC, A> {
         PretargetingConfigUpdateCall {
             hub: self.hub,
@@ -1582,7 +1676,7 @@ impl<'a, C, NC, A> PretargetingConfigMethods<'a, C, NC, A> {
 /// Returns the billing information for one account specified by account ID.
 ///
 /// A builder for the *get* method supported by a *billingInfo* resource.
-/// It is not used directly, but through a `BillingInfoMethods`.
+/// It is not used directly, but through a `BillingInfoMethods` instance.
 ///
 /// # Example
 ///
@@ -1640,7 +1734,7 @@ impl<'a, C, NC, A> BillingInfoGetCall<'a, C, NC, A> where NC: hyper::net::Networ
         for &field in ["alt", "accountId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -1693,7 +1787,7 @@ impl<'a, C, NC, A> BillingInfoGetCall<'a, C, NC, A> where NC: hyper::net::Networ
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -1705,7 +1799,6 @@ impl<'a, C, NC, A> BillingInfoGetCall<'a, C, NC, A> where NC: hyper::net::Networ
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -1715,7 +1808,7 @@ impl<'a, C, NC, A> BillingInfoGetCall<'a, C, NC, A> where NC: hyper::net::Networ
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -1726,7 +1819,7 @@ impl<'a, C, NC, A> BillingInfoGetCall<'a, C, NC, A> where NC: hyper::net::Networ
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -1735,13 +1828,13 @@ impl<'a, C, NC, A> BillingInfoGetCall<'a, C, NC, A> where NC: hyper::net::Networ
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -1753,7 +1846,7 @@ impl<'a, C, NC, A> BillingInfoGetCall<'a, C, NC, A> where NC: hyper::net::Networ
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The account id.    
+    /// The account id.
     pub fn account_id(mut self, new_value: i32) -> BillingInfoGetCall<'a, C, NC, A> {
         self._account_id = new_value;
         self
@@ -1814,7 +1907,7 @@ impl<'a, C, NC, A> BillingInfoGetCall<'a, C, NC, A> where NC: hyper::net::Networ
 /// Retrieves a list of billing information for all accounts of the authenticated user.
 ///
 /// A builder for the *list* method supported by a *billingInfo* resource.
-/// It is not used directly, but through a `BillingInfoMethods`.
+/// It is not used directly, but through a `BillingInfoMethods` instance.
 ///
 /// # Example
 ///
@@ -1870,7 +1963,7 @@ impl<'a, C, NC, A> BillingInfoListCall<'a, C, NC, A> where NC: hyper::net::Netwo
         for &field in ["alt"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -1899,7 +1992,7 @@ impl<'a, C, NC, A> BillingInfoListCall<'a, C, NC, A> where NC: hyper::net::Netwo
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -1911,7 +2004,6 @@ impl<'a, C, NC, A> BillingInfoListCall<'a, C, NC, A> where NC: hyper::net::Netwo
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -1921,7 +2013,7 @@ impl<'a, C, NC, A> BillingInfoListCall<'a, C, NC, A> where NC: hyper::net::Netwo
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -1932,7 +2024,7 @@ impl<'a, C, NC, A> BillingInfoListCall<'a, C, NC, A> where NC: hyper::net::Netwo
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -1941,13 +2033,13 @@ impl<'a, C, NC, A> BillingInfoListCall<'a, C, NC, A> where NC: hyper::net::Netwo
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -2010,7 +2102,7 @@ impl<'a, C, NC, A> BillingInfoListCall<'a, C, NC, A> where NC: hyper::net::Netwo
 /// Retrieves the authenticated user's list of direct deals.
 ///
 /// A builder for the *list* method supported by a *directDeal* resource.
-/// It is not used directly, but through a `DirectDealMethods`.
+/// It is not used directly, but through a `DirectDealMethods` instance.
 ///
 /// # Example
 ///
@@ -2066,7 +2158,7 @@ impl<'a, C, NC, A> DirectDealListCall<'a, C, NC, A> where NC: hyper::net::Networ
         for &field in ["alt"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -2095,7 +2187,7 @@ impl<'a, C, NC, A> DirectDealListCall<'a, C, NC, A> where NC: hyper::net::Networ
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -2107,7 +2199,6 @@ impl<'a, C, NC, A> DirectDealListCall<'a, C, NC, A> where NC: hyper::net::Networ
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -2117,7 +2208,7 @@ impl<'a, C, NC, A> DirectDealListCall<'a, C, NC, A> where NC: hyper::net::Networ
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -2128,7 +2219,7 @@ impl<'a, C, NC, A> DirectDealListCall<'a, C, NC, A> where NC: hyper::net::Networ
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -2137,13 +2228,13 @@ impl<'a, C, NC, A> DirectDealListCall<'a, C, NC, A> where NC: hyper::net::Networ
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -2206,7 +2297,7 @@ impl<'a, C, NC, A> DirectDealListCall<'a, C, NC, A> where NC: hyper::net::Networ
 /// Gets one direct deal by ID.
 ///
 /// A builder for the *get* method supported by a *directDeal* resource.
-/// It is not used directly, but through a `DirectDealMethods`.
+/// It is not used directly, but through a `DirectDealMethods` instance.
 ///
 /// # Example
 ///
@@ -2264,7 +2355,7 @@ impl<'a, C, NC, A> DirectDealGetCall<'a, C, NC, A> where NC: hyper::net::Network
         for &field in ["alt", "id"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -2317,7 +2408,7 @@ impl<'a, C, NC, A> DirectDealGetCall<'a, C, NC, A> where NC: hyper::net::Network
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -2329,7 +2420,6 @@ impl<'a, C, NC, A> DirectDealGetCall<'a, C, NC, A> where NC: hyper::net::Network
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -2339,7 +2429,7 @@ impl<'a, C, NC, A> DirectDealGetCall<'a, C, NC, A> where NC: hyper::net::Network
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -2350,7 +2440,7 @@ impl<'a, C, NC, A> DirectDealGetCall<'a, C, NC, A> where NC: hyper::net::Network
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -2359,13 +2449,13 @@ impl<'a, C, NC, A> DirectDealGetCall<'a, C, NC, A> where NC: hyper::net::Network
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -2377,7 +2467,7 @@ impl<'a, C, NC, A> DirectDealGetCall<'a, C, NC, A> where NC: hyper::net::Network
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The direct deal id    
+    /// The direct deal id
     pub fn id(mut self, new_value: &str) -> DirectDealGetCall<'a, C, NC, A> {
         self._id = new_value.to_string();
         self
@@ -2438,7 +2528,7 @@ impl<'a, C, NC, A> DirectDealGetCall<'a, C, NC, A> where NC: hyper::net::Network
 /// Updates the budget amount for the budget of the adgroup specified by the accountId and billingId, with the budget amount in the request. This method supports patch semantics.
 ///
 /// A builder for the *patch* method supported by a *budget* resource.
-/// It is not used directly, but through a `BudgetMethods`.
+/// It is not used directly, but through a `BudgetMethods` instance.
 ///
 /// # Example
 ///
@@ -2505,7 +2595,7 @@ impl<'a, C, NC, A> BudgetPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
         for &field in ["alt", "accountId", "billingId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -2562,7 +2652,7 @@ impl<'a, C, NC, A> BudgetPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -2578,7 +2668,6 @@ impl<'a, C, NC, A> BudgetPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -2588,7 +2677,7 @@ impl<'a, C, NC, A> BudgetPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -2599,7 +2688,7 @@ impl<'a, C, NC, A> BudgetPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -2608,13 +2697,13 @@ impl<'a, C, NC, A> BudgetPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -2635,7 +2724,7 @@ impl<'a, C, NC, A> BudgetPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The account id associated with the budget being updated.    
+    /// The account id associated with the budget being updated.
     pub fn account_id(mut self, new_value: &str) -> BudgetPatchCall<'a, C, NC, A> {
         self._account_id = new_value.to_string();
         self
@@ -2645,7 +2734,7 @@ impl<'a, C, NC, A> BudgetPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The billing id associated with the budget being updated.    
+    /// The billing id associated with the budget being updated.
     pub fn billing_id(mut self, new_value: &str) -> BudgetPatchCall<'a, C, NC, A> {
         self._billing_id = new_value.to_string();
         self
@@ -2706,7 +2795,7 @@ impl<'a, C, NC, A> BudgetPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
 /// Updates the budget amount for the budget of the adgroup specified by the accountId and billingId, with the budget amount in the request.
 ///
 /// A builder for the *update* method supported by a *budget* resource.
-/// It is not used directly, but through a `BudgetMethods`.
+/// It is not used directly, but through a `BudgetMethods` instance.
 ///
 /// # Example
 ///
@@ -2773,7 +2862,7 @@ impl<'a, C, NC, A> BudgetUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkC
         for &field in ["alt", "accountId", "billingId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -2830,7 +2919,7 @@ impl<'a, C, NC, A> BudgetUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkC
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -2846,7 +2935,6 @@ impl<'a, C, NC, A> BudgetUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkC
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -2856,7 +2944,7 @@ impl<'a, C, NC, A> BudgetUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkC
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -2867,7 +2955,7 @@ impl<'a, C, NC, A> BudgetUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkC
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -2876,13 +2964,13 @@ impl<'a, C, NC, A> BudgetUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkC
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -2903,7 +2991,7 @@ impl<'a, C, NC, A> BudgetUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The account id associated with the budget being updated.    
+    /// The account id associated with the budget being updated.
     pub fn account_id(mut self, new_value: &str) -> BudgetUpdateCall<'a, C, NC, A> {
         self._account_id = new_value.to_string();
         self
@@ -2913,7 +3001,7 @@ impl<'a, C, NC, A> BudgetUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The billing id associated with the budget being updated.    
+    /// The billing id associated with the budget being updated.
     pub fn billing_id(mut self, new_value: &str) -> BudgetUpdateCall<'a, C, NC, A> {
         self._billing_id = new_value.to_string();
         self
@@ -2974,7 +3062,7 @@ impl<'a, C, NC, A> BudgetUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkC
 /// Returns the budget information for the adgroup specified by the accountId and billingId.
 ///
 /// A builder for the *get* method supported by a *budget* resource.
-/// It is not used directly, but through a `BudgetMethods`.
+/// It is not used directly, but through a `BudgetMethods` instance.
 ///
 /// # Example
 ///
@@ -3034,7 +3122,7 @@ impl<'a, C, NC, A> BudgetGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
         for &field in ["alt", "accountId", "billingId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -3087,7 +3175,7 @@ impl<'a, C, NC, A> BudgetGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -3099,7 +3187,6 @@ impl<'a, C, NC, A> BudgetGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -3109,7 +3196,7 @@ impl<'a, C, NC, A> BudgetGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -3120,7 +3207,7 @@ impl<'a, C, NC, A> BudgetGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -3129,13 +3216,13 @@ impl<'a, C, NC, A> BudgetGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -3147,7 +3234,7 @@ impl<'a, C, NC, A> BudgetGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The account id to get the budget information for.    
+    /// The account id to get the budget information for.
     pub fn account_id(mut self, new_value: &str) -> BudgetGetCall<'a, C, NC, A> {
         self._account_id = new_value.to_string();
         self
@@ -3157,7 +3244,7 @@ impl<'a, C, NC, A> BudgetGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The billing id to get the budget information for.    
+    /// The billing id to get the budget information for.
     pub fn billing_id(mut self, new_value: &str) -> BudgetGetCall<'a, C, NC, A> {
         self._billing_id = new_value.to_string();
         self
@@ -3218,7 +3305,7 @@ impl<'a, C, NC, A> BudgetGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
 /// Submit a new creative.
 ///
 /// A builder for the *insert* method supported by a *creative* resource.
-/// It is not used directly, but through a `CreativeMethods`.
+/// It is not used directly, but through a `CreativeMethods` instance.
 ///
 /// # Example
 ///
@@ -3281,7 +3368,7 @@ impl<'a, C, NC, A> CreativeInsertCall<'a, C, NC, A> where NC: hyper::net::Networ
         for &field in ["alt"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -3314,7 +3401,7 @@ impl<'a, C, NC, A> CreativeInsertCall<'a, C, NC, A> where NC: hyper::net::Networ
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -3330,7 +3417,6 @@ impl<'a, C, NC, A> CreativeInsertCall<'a, C, NC, A> where NC: hyper::net::Networ
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -3340,7 +3426,7 @@ impl<'a, C, NC, A> CreativeInsertCall<'a, C, NC, A> where NC: hyper::net::Networ
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -3351,7 +3437,7 @@ impl<'a, C, NC, A> CreativeInsertCall<'a, C, NC, A> where NC: hyper::net::Networ
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -3360,13 +3446,13 @@ impl<'a, C, NC, A> CreativeInsertCall<'a, C, NC, A> where NC: hyper::net::Networ
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -3438,7 +3524,7 @@ impl<'a, C, NC, A> CreativeInsertCall<'a, C, NC, A> where NC: hyper::net::Networ
 /// Retrieves a list of the authenticated user's active creatives. A creative will be available 30-40 minutes after submission.
 ///
 /// A builder for the *list* method supported by a *creative* resource.
-/// It is not used directly, but through a `CreativeMethods`.
+/// It is not used directly, but through a `CreativeMethods` instance.
 ///
 /// # Example
 ///
@@ -3527,7 +3613,7 @@ impl<'a, C, NC, A> CreativeListCall<'a, C, NC, A> where NC: hyper::net::NetworkC
         for &field in ["alt", "statusFilter", "pageToken", "maxResults", "buyerCreativeId", "accountId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -3556,7 +3642,7 @@ impl<'a, C, NC, A> CreativeListCall<'a, C, NC, A> where NC: hyper::net::NetworkC
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -3568,7 +3654,6 @@ impl<'a, C, NC, A> CreativeListCall<'a, C, NC, A> where NC: hyper::net::NetworkC
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -3578,7 +3663,7 @@ impl<'a, C, NC, A> CreativeListCall<'a, C, NC, A> where NC: hyper::net::NetworkC
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -3589,7 +3674,7 @@ impl<'a, C, NC, A> CreativeListCall<'a, C, NC, A> where NC: hyper::net::NetworkC
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -3598,13 +3683,13 @@ impl<'a, C, NC, A> CreativeListCall<'a, C, NC, A> where NC: hyper::net::NetworkC
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -3614,7 +3699,7 @@ impl<'a, C, NC, A> CreativeListCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// Sets the *status filter* query property to the given value.
     ///
     /// 
-    /// When specified, only creatives having the given status are returned.    
+    /// When specified, only creatives having the given status are returned.
     pub fn status_filter(mut self, new_value: &str) -> CreativeListCall<'a, C, NC, A> {
         self._status_filter = Some(new_value.to_string());
         self
@@ -3622,7 +3707,7 @@ impl<'a, C, NC, A> CreativeListCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// Sets the *page token* query property to the given value.
     ///
     /// 
-    /// A continuation token, used to page through ad clients. To retrieve the next page, set this parameter to the value of "nextPageToken" from the previous response. Optional.    
+    /// A continuation token, used to page through ad clients. To retrieve the next page, set this parameter to the value of "nextPageToken" from the previous response. Optional.
     pub fn page_token(mut self, new_value: &str) -> CreativeListCall<'a, C, NC, A> {
         self._page_token = Some(new_value.to_string());
         self
@@ -3630,7 +3715,7 @@ impl<'a, C, NC, A> CreativeListCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// Sets the *max results* query property to the given value.
     ///
     /// 
-    /// Maximum number of entries returned on one result page. If not set, the default is 100. Optional.    
+    /// Maximum number of entries returned on one result page. If not set, the default is 100. Optional.
     pub fn max_results(mut self, new_value: u32) -> CreativeListCall<'a, C, NC, A> {
         self._max_results = Some(new_value);
         self
@@ -3639,7 +3724,7 @@ impl<'a, C, NC, A> CreativeListCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
     ///
     /// 
-    /// When specified, only creatives for the given buyer creative ids are returned.    
+    /// When specified, only creatives for the given buyer creative ids are returned.
     pub fn add_buyer_creative_id(mut self, new_value: &str) -> CreativeListCall<'a, C, NC, A> {
         self._buyer_creative_id.push(new_value.to_string());
         self
@@ -3648,7 +3733,7 @@ impl<'a, C, NC, A> CreativeListCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
     ///
     /// 
-    /// When specified, only creatives for the given account ids are returned.    
+    /// When specified, only creatives for the given account ids are returned.
     pub fn add_account_id(mut self, new_value: i32) -> CreativeListCall<'a, C, NC, A> {
         self._account_id.push(new_value);
         self
@@ -3709,7 +3794,7 @@ impl<'a, C, NC, A> CreativeListCall<'a, C, NC, A> where NC: hyper::net::NetworkC
 /// Gets the status for a single creative. A creative will be available 30-40 minutes after submission.
 ///
 /// A builder for the *get* method supported by a *creative* resource.
-/// It is not used directly, but through a `CreativeMethods`.
+/// It is not used directly, but through a `CreativeMethods` instance.
 ///
 /// # Example
 ///
@@ -3769,7 +3854,7 @@ impl<'a, C, NC, A> CreativeGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
         for &field in ["alt", "accountId", "buyerCreativeId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -3822,7 +3907,7 @@ impl<'a, C, NC, A> CreativeGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -3834,7 +3919,6 @@ impl<'a, C, NC, A> CreativeGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -3844,7 +3928,7 @@ impl<'a, C, NC, A> CreativeGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -3855,7 +3939,7 @@ impl<'a, C, NC, A> CreativeGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -3864,13 +3948,13 @@ impl<'a, C, NC, A> CreativeGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -3882,7 +3966,7 @@ impl<'a, C, NC, A> CreativeGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The id for the account that will serve this creative.    
+    /// The id for the account that will serve this creative.
     pub fn account_id(mut self, new_value: i32) -> CreativeGetCall<'a, C, NC, A> {
         self._account_id = new_value;
         self
@@ -3892,7 +3976,7 @@ impl<'a, C, NC, A> CreativeGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The buyer-specific id for this creative.    
+    /// The buyer-specific id for this creative.
     pub fn buyer_creative_id(mut self, new_value: &str) -> CreativeGetCall<'a, C, NC, A> {
         self._buyer_creative_id = new_value.to_string();
         self
@@ -3953,7 +4037,7 @@ impl<'a, C, NC, A> CreativeGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
 /// Updates an existing account.
 ///
 /// A builder for the *update* method supported by a *account* resource.
-/// It is not used directly, but through a `AccountMethods`.
+/// It is not used directly, but through a `AccountMethods` instance.
 ///
 /// # Example
 ///
@@ -4018,7 +4102,7 @@ impl<'a, C, NC, A> AccountUpdateCall<'a, C, NC, A> where NC: hyper::net::Network
         for &field in ["alt", "id"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -4075,7 +4159,7 @@ impl<'a, C, NC, A> AccountUpdateCall<'a, C, NC, A> where NC: hyper::net::Network
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -4091,7 +4175,6 @@ impl<'a, C, NC, A> AccountUpdateCall<'a, C, NC, A> where NC: hyper::net::Network
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -4101,7 +4184,7 @@ impl<'a, C, NC, A> AccountUpdateCall<'a, C, NC, A> where NC: hyper::net::Network
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -4112,7 +4195,7 @@ impl<'a, C, NC, A> AccountUpdateCall<'a, C, NC, A> where NC: hyper::net::Network
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -4121,13 +4204,13 @@ impl<'a, C, NC, A> AccountUpdateCall<'a, C, NC, A> where NC: hyper::net::Network
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -4148,7 +4231,7 @@ impl<'a, C, NC, A> AccountUpdateCall<'a, C, NC, A> where NC: hyper::net::Network
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The account id    
+    /// The account id
     pub fn id(mut self, new_value: i32) -> AccountUpdateCall<'a, C, NC, A> {
         self._id = new_value;
         self
@@ -4209,7 +4292,7 @@ impl<'a, C, NC, A> AccountUpdateCall<'a, C, NC, A> where NC: hyper::net::Network
 /// Updates an existing account. This method supports patch semantics.
 ///
 /// A builder for the *patch* method supported by a *account* resource.
-/// It is not used directly, but through a `AccountMethods`.
+/// It is not used directly, but through a `AccountMethods` instance.
 ///
 /// # Example
 ///
@@ -4274,7 +4357,7 @@ impl<'a, C, NC, A> AccountPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkC
         for &field in ["alt", "id"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -4331,7 +4414,7 @@ impl<'a, C, NC, A> AccountPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkC
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -4347,7 +4430,6 @@ impl<'a, C, NC, A> AccountPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkC
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -4357,7 +4439,7 @@ impl<'a, C, NC, A> AccountPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkC
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -4368,7 +4450,7 @@ impl<'a, C, NC, A> AccountPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkC
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -4377,13 +4459,13 @@ impl<'a, C, NC, A> AccountPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkC
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -4404,7 +4486,7 @@ impl<'a, C, NC, A> AccountPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The account id    
+    /// The account id
     pub fn id(mut self, new_value: i32) -> AccountPatchCall<'a, C, NC, A> {
         self._id = new_value;
         self
@@ -4465,7 +4547,7 @@ impl<'a, C, NC, A> AccountPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkC
 /// Retrieves the authenticated user's list of accounts.
 ///
 /// A builder for the *list* method supported by a *account* resource.
-/// It is not used directly, but through a `AccountMethods`.
+/// It is not used directly, but through a `AccountMethods` instance.
 ///
 /// # Example
 ///
@@ -4521,7 +4603,7 @@ impl<'a, C, NC, A> AccountListCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
         for &field in ["alt"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -4550,7 +4632,7 @@ impl<'a, C, NC, A> AccountListCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -4562,7 +4644,6 @@ impl<'a, C, NC, A> AccountListCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -4572,7 +4653,7 @@ impl<'a, C, NC, A> AccountListCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -4583,7 +4664,7 @@ impl<'a, C, NC, A> AccountListCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -4592,13 +4673,13 @@ impl<'a, C, NC, A> AccountListCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -4661,7 +4742,7 @@ impl<'a, C, NC, A> AccountListCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
 /// Gets one account by ID.
 ///
 /// A builder for the *get* method supported by a *account* resource.
-/// It is not used directly, but through a `AccountMethods`.
+/// It is not used directly, but through a `AccountMethods` instance.
 ///
 /// # Example
 ///
@@ -4719,7 +4800,7 @@ impl<'a, C, NC, A> AccountGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
         for &field in ["alt", "id"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -4772,7 +4853,7 @@ impl<'a, C, NC, A> AccountGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -4784,7 +4865,6 @@ impl<'a, C, NC, A> AccountGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -4794,7 +4874,7 @@ impl<'a, C, NC, A> AccountGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -4805,7 +4885,7 @@ impl<'a, C, NC, A> AccountGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -4814,13 +4894,13 @@ impl<'a, C, NC, A> AccountGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -4832,7 +4912,7 @@ impl<'a, C, NC, A> AccountGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The account id    
+    /// The account id
     pub fn id(mut self, new_value: i32) -> AccountGetCall<'a, C, NC, A> {
         self._id = new_value;
         self
@@ -4893,7 +4973,7 @@ impl<'a, C, NC, A> AccountGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
 /// Retrieves the authenticated user's list of performance metrics.
 ///
 /// A builder for the *list* method supported by a *performanceReport* resource.
-/// It is not used directly, but through a `PerformanceReportMethods`.
+/// It is not used directly, but through a `PerformanceReportMethods` instance.
 ///
 /// # Example
 ///
@@ -4965,7 +5045,7 @@ impl<'a, C, NC, A> PerformanceReportListCall<'a, C, NC, A> where NC: hyper::net:
         for &field in ["alt", "accountId", "endDateTime", "startDateTime", "pageToken", "maxResults"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -4994,7 +5074,7 @@ impl<'a, C, NC, A> PerformanceReportListCall<'a, C, NC, A> where NC: hyper::net:
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -5006,7 +5086,6 @@ impl<'a, C, NC, A> PerformanceReportListCall<'a, C, NC, A> where NC: hyper::net:
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -5016,7 +5095,7 @@ impl<'a, C, NC, A> PerformanceReportListCall<'a, C, NC, A> where NC: hyper::net:
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -5027,7 +5106,7 @@ impl<'a, C, NC, A> PerformanceReportListCall<'a, C, NC, A> where NC: hyper::net:
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -5036,13 +5115,13 @@ impl<'a, C, NC, A> PerformanceReportListCall<'a, C, NC, A> where NC: hyper::net:
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -5054,7 +5133,7 @@ impl<'a, C, NC, A> PerformanceReportListCall<'a, C, NC, A> where NC: hyper::net:
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The account id to get the reports.    
+    /// The account id to get the reports.
     pub fn account_id(mut self, new_value: &str) -> PerformanceReportListCall<'a, C, NC, A> {
         self._account_id = new_value.to_string();
         self
@@ -5064,7 +5143,7 @@ impl<'a, C, NC, A> PerformanceReportListCall<'a, C, NC, A> where NC: hyper::net:
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The end time of the report in ISO 8601 timestamp format using UTC.    
+    /// The end time of the report in ISO 8601 timestamp format using UTC.
     pub fn end_date_time(mut self, new_value: &str) -> PerformanceReportListCall<'a, C, NC, A> {
         self._end_date_time = new_value.to_string();
         self
@@ -5074,7 +5153,7 @@ impl<'a, C, NC, A> PerformanceReportListCall<'a, C, NC, A> where NC: hyper::net:
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The start time of the report in ISO 8601 timestamp format using UTC.    
+    /// The start time of the report in ISO 8601 timestamp format using UTC.
     pub fn start_date_time(mut self, new_value: &str) -> PerformanceReportListCall<'a, C, NC, A> {
         self._start_date_time = new_value.to_string();
         self
@@ -5082,7 +5161,7 @@ impl<'a, C, NC, A> PerformanceReportListCall<'a, C, NC, A> where NC: hyper::net:
     /// Sets the *page token* query property to the given value.
     ///
     /// 
-    /// A continuation token, used to page through performance reports. To retrieve the next page, set this parameter to the value of "nextPageToken" from the previous response. Optional.    
+    /// A continuation token, used to page through performance reports. To retrieve the next page, set this parameter to the value of "nextPageToken" from the previous response. Optional.
     pub fn page_token(mut self, new_value: &str) -> PerformanceReportListCall<'a, C, NC, A> {
         self._page_token = Some(new_value.to_string());
         self
@@ -5090,7 +5169,7 @@ impl<'a, C, NC, A> PerformanceReportListCall<'a, C, NC, A> where NC: hyper::net:
     /// Sets the *max results* query property to the given value.
     ///
     /// 
-    /// Maximum number of entries returned on one result page. If not set, the default is 100. Optional.    
+    /// Maximum number of entries returned on one result page. If not set, the default is 100. Optional.
     pub fn max_results(mut self, new_value: u32) -> PerformanceReportListCall<'a, C, NC, A> {
         self._max_results = Some(new_value);
         self
@@ -5151,7 +5230,7 @@ impl<'a, C, NC, A> PerformanceReportListCall<'a, C, NC, A> where NC: hyper::net:
 /// Deletes an existing pretargeting config.
 ///
 /// A builder for the *delete* method supported by a *pretargetingConfig* resource.
-/// It is not used directly, but through a `PretargetingConfigMethods`.
+/// It is not used directly, but through a `PretargetingConfigMethods` instance.
 ///
 /// # Example
 ///
@@ -5211,7 +5290,7 @@ impl<'a, C, NC, A> PretargetingConfigDeleteCall<'a, C, NC, A> where NC: hyper::n
         for &field in ["accountId", "configId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -5263,7 +5342,7 @@ impl<'a, C, NC, A> PretargetingConfigDeleteCall<'a, C, NC, A> where NC: hyper::n
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -5275,7 +5354,6 @@ impl<'a, C, NC, A> PretargetingConfigDeleteCall<'a, C, NC, A> where NC: hyper::n
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -5285,7 +5363,7 @@ impl<'a, C, NC, A> PretargetingConfigDeleteCall<'a, C, NC, A> where NC: hyper::n
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -5296,12 +5374,12 @@ impl<'a, C, NC, A> PretargetingConfigDeleteCall<'a, C, NC, A> where NC: hyper::n
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = res;
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -5313,7 +5391,7 @@ impl<'a, C, NC, A> PretargetingConfigDeleteCall<'a, C, NC, A> where NC: hyper::n
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The account id to delete the pretargeting config for.    
+    /// The account id to delete the pretargeting config for.
     pub fn account_id(mut self, new_value: &str) -> PretargetingConfigDeleteCall<'a, C, NC, A> {
         self._account_id = new_value.to_string();
         self
@@ -5323,7 +5401,7 @@ impl<'a, C, NC, A> PretargetingConfigDeleteCall<'a, C, NC, A> where NC: hyper::n
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The specific id of the configuration to delete.    
+    /// The specific id of the configuration to delete.
     pub fn config_id(mut self, new_value: &str) -> PretargetingConfigDeleteCall<'a, C, NC, A> {
         self._config_id = new_value.to_string();
         self
@@ -5384,7 +5462,7 @@ impl<'a, C, NC, A> PretargetingConfigDeleteCall<'a, C, NC, A> where NC: hyper::n
 /// Updates an existing pretargeting config. This method supports patch semantics.
 ///
 /// A builder for the *patch* method supported by a *pretargetingConfig* resource.
-/// It is not used directly, but through a `PretargetingConfigMethods`.
+/// It is not used directly, but through a `PretargetingConfigMethods` instance.
 ///
 /// # Example
 ///
@@ -5451,7 +5529,7 @@ impl<'a, C, NC, A> PretargetingConfigPatchCall<'a, C, NC, A> where NC: hyper::ne
         for &field in ["alt", "accountId", "configId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -5508,7 +5586,7 @@ impl<'a, C, NC, A> PretargetingConfigPatchCall<'a, C, NC, A> where NC: hyper::ne
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -5524,7 +5602,6 @@ impl<'a, C, NC, A> PretargetingConfigPatchCall<'a, C, NC, A> where NC: hyper::ne
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -5534,7 +5611,7 @@ impl<'a, C, NC, A> PretargetingConfigPatchCall<'a, C, NC, A> where NC: hyper::ne
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -5545,7 +5622,7 @@ impl<'a, C, NC, A> PretargetingConfigPatchCall<'a, C, NC, A> where NC: hyper::ne
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -5554,13 +5631,13 @@ impl<'a, C, NC, A> PretargetingConfigPatchCall<'a, C, NC, A> where NC: hyper::ne
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -5581,7 +5658,7 @@ impl<'a, C, NC, A> PretargetingConfigPatchCall<'a, C, NC, A> where NC: hyper::ne
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The account id to update the pretargeting config for.    
+    /// The account id to update the pretargeting config for.
     pub fn account_id(mut self, new_value: &str) -> PretargetingConfigPatchCall<'a, C, NC, A> {
         self._account_id = new_value.to_string();
         self
@@ -5591,7 +5668,7 @@ impl<'a, C, NC, A> PretargetingConfigPatchCall<'a, C, NC, A> where NC: hyper::ne
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The specific id of the configuration to update.    
+    /// The specific id of the configuration to update.
     pub fn config_id(mut self, new_value: &str) -> PretargetingConfigPatchCall<'a, C, NC, A> {
         self._config_id = new_value.to_string();
         self
@@ -5652,7 +5729,7 @@ impl<'a, C, NC, A> PretargetingConfigPatchCall<'a, C, NC, A> where NC: hyper::ne
 /// Gets a specific pretargeting configuration
 ///
 /// A builder for the *get* method supported by a *pretargetingConfig* resource.
-/// It is not used directly, but through a `PretargetingConfigMethods`.
+/// It is not used directly, but through a `PretargetingConfigMethods` instance.
 ///
 /// # Example
 ///
@@ -5712,7 +5789,7 @@ impl<'a, C, NC, A> PretargetingConfigGetCall<'a, C, NC, A> where NC: hyper::net:
         for &field in ["alt", "accountId", "configId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -5765,7 +5842,7 @@ impl<'a, C, NC, A> PretargetingConfigGetCall<'a, C, NC, A> where NC: hyper::net:
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -5777,7 +5854,6 @@ impl<'a, C, NC, A> PretargetingConfigGetCall<'a, C, NC, A> where NC: hyper::net:
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -5787,7 +5863,7 @@ impl<'a, C, NC, A> PretargetingConfigGetCall<'a, C, NC, A> where NC: hyper::net:
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -5798,7 +5874,7 @@ impl<'a, C, NC, A> PretargetingConfigGetCall<'a, C, NC, A> where NC: hyper::net:
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -5807,13 +5883,13 @@ impl<'a, C, NC, A> PretargetingConfigGetCall<'a, C, NC, A> where NC: hyper::net:
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -5825,7 +5901,7 @@ impl<'a, C, NC, A> PretargetingConfigGetCall<'a, C, NC, A> where NC: hyper::net:
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The account id to get the pretargeting config for.    
+    /// The account id to get the pretargeting config for.
     pub fn account_id(mut self, new_value: &str) -> PretargetingConfigGetCall<'a, C, NC, A> {
         self._account_id = new_value.to_string();
         self
@@ -5835,7 +5911,7 @@ impl<'a, C, NC, A> PretargetingConfigGetCall<'a, C, NC, A> where NC: hyper::net:
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The specific id of the configuration to retrieve.    
+    /// The specific id of the configuration to retrieve.
     pub fn config_id(mut self, new_value: &str) -> PretargetingConfigGetCall<'a, C, NC, A> {
         self._config_id = new_value.to_string();
         self
@@ -5896,7 +5972,7 @@ impl<'a, C, NC, A> PretargetingConfigGetCall<'a, C, NC, A> where NC: hyper::net:
 /// Inserts a new pretargeting configuration.
 ///
 /// A builder for the *insert* method supported by a *pretargetingConfig* resource.
-/// It is not used directly, but through a `PretargetingConfigMethods`.
+/// It is not used directly, but through a `PretargetingConfigMethods` instance.
 ///
 /// # Example
 ///
@@ -5961,7 +6037,7 @@ impl<'a, C, NC, A> PretargetingConfigInsertCall<'a, C, NC, A> where NC: hyper::n
         for &field in ["alt", "accountId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -6018,7 +6094,7 @@ impl<'a, C, NC, A> PretargetingConfigInsertCall<'a, C, NC, A> where NC: hyper::n
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -6034,7 +6110,6 @@ impl<'a, C, NC, A> PretargetingConfigInsertCall<'a, C, NC, A> where NC: hyper::n
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -6044,7 +6119,7 @@ impl<'a, C, NC, A> PretargetingConfigInsertCall<'a, C, NC, A> where NC: hyper::n
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -6055,7 +6130,7 @@ impl<'a, C, NC, A> PretargetingConfigInsertCall<'a, C, NC, A> where NC: hyper::n
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -6064,13 +6139,13 @@ impl<'a, C, NC, A> PretargetingConfigInsertCall<'a, C, NC, A> where NC: hyper::n
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -6091,7 +6166,7 @@ impl<'a, C, NC, A> PretargetingConfigInsertCall<'a, C, NC, A> where NC: hyper::n
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The account id to insert the pretargeting config for.    
+    /// The account id to insert the pretargeting config for.
     pub fn account_id(mut self, new_value: &str) -> PretargetingConfigInsertCall<'a, C, NC, A> {
         self._account_id = new_value.to_string();
         self
@@ -6152,7 +6227,7 @@ impl<'a, C, NC, A> PretargetingConfigInsertCall<'a, C, NC, A> where NC: hyper::n
 /// Retrieves a list of the authenticated user's pretargeting configurations.
 ///
 /// A builder for the *list* method supported by a *pretargetingConfig* resource.
-/// It is not used directly, but through a `PretargetingConfigMethods`.
+/// It is not used directly, but through a `PretargetingConfigMethods` instance.
 ///
 /// # Example
 ///
@@ -6210,7 +6285,7 @@ impl<'a, C, NC, A> PretargetingConfigListCall<'a, C, NC, A> where NC: hyper::net
         for &field in ["alt", "accountId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -6263,7 +6338,7 @@ impl<'a, C, NC, A> PretargetingConfigListCall<'a, C, NC, A> where NC: hyper::net
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -6275,7 +6350,6 @@ impl<'a, C, NC, A> PretargetingConfigListCall<'a, C, NC, A> where NC: hyper::net
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -6285,7 +6359,7 @@ impl<'a, C, NC, A> PretargetingConfigListCall<'a, C, NC, A> where NC: hyper::net
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -6296,7 +6370,7 @@ impl<'a, C, NC, A> PretargetingConfigListCall<'a, C, NC, A> where NC: hyper::net
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -6305,13 +6379,13 @@ impl<'a, C, NC, A> PretargetingConfigListCall<'a, C, NC, A> where NC: hyper::net
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -6323,7 +6397,7 @@ impl<'a, C, NC, A> PretargetingConfigListCall<'a, C, NC, A> where NC: hyper::net
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The account id to get the pretargeting configs for.    
+    /// The account id to get the pretargeting configs for.
     pub fn account_id(mut self, new_value: &str) -> PretargetingConfigListCall<'a, C, NC, A> {
         self._account_id = new_value.to_string();
         self
@@ -6384,7 +6458,7 @@ impl<'a, C, NC, A> PretargetingConfigListCall<'a, C, NC, A> where NC: hyper::net
 /// Updates an existing pretargeting config.
 ///
 /// A builder for the *update* method supported by a *pretargetingConfig* resource.
-/// It is not used directly, but through a `PretargetingConfigMethods`.
+/// It is not used directly, but through a `PretargetingConfigMethods` instance.
 ///
 /// # Example
 ///
@@ -6451,7 +6525,7 @@ impl<'a, C, NC, A> PretargetingConfigUpdateCall<'a, C, NC, A> where NC: hyper::n
         for &field in ["alt", "accountId", "configId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -6508,7 +6582,7 @@ impl<'a, C, NC, A> PretargetingConfigUpdateCall<'a, C, NC, A> where NC: hyper::n
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -6524,7 +6598,6 @@ impl<'a, C, NC, A> PretargetingConfigUpdateCall<'a, C, NC, A> where NC: hyper::n
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -6534,7 +6607,7 @@ impl<'a, C, NC, A> PretargetingConfigUpdateCall<'a, C, NC, A> where NC: hyper::n
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -6545,7 +6618,7 @@ impl<'a, C, NC, A> PretargetingConfigUpdateCall<'a, C, NC, A> where NC: hyper::n
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -6554,13 +6627,13 @@ impl<'a, C, NC, A> PretargetingConfigUpdateCall<'a, C, NC, A> where NC: hyper::n
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -6581,7 +6654,7 @@ impl<'a, C, NC, A> PretargetingConfigUpdateCall<'a, C, NC, A> where NC: hyper::n
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The account id to update the pretargeting config for.    
+    /// The account id to update the pretargeting config for.
     pub fn account_id(mut self, new_value: &str) -> PretargetingConfigUpdateCall<'a, C, NC, A> {
         self._account_id = new_value.to_string();
         self
@@ -6591,7 +6664,7 @@ impl<'a, C, NC, A> PretargetingConfigUpdateCall<'a, C, NC, A> where NC: hyper::n
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The specific id of the configuration to update.    
+    /// The specific id of the configuration to update.
     pub fn config_id(mut self, new_value: &str) -> PretargetingConfigUpdateCall<'a, C, NC, A> {
         self._config_id = new_value.to_string();
         self

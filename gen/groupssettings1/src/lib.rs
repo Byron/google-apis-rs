@@ -1,8 +1,8 @@
 // DO NOT EDIT !
-// This file was generated automatically from 'src/mako/lib.rs.mako'
+// This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *groupssettings* crate version *0.1.1+20140428*, where *20140428* is the exact revision of the *groupssettings:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.1*.
+//! This documentation was generated from *groupssettings* crate version *0.1.2+20140428*, where *20140428* is the exact revision of the *groupssettings:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.2*.
 //! 
 //! Everything else about the *groupssettings* *v1* API can be found at the
 //! [official documentation site](https://developers.google.com/google-apps/groups-settings/get_started).
@@ -25,6 +25,8 @@
 //! 
 //! * **[Hub](struct.Groupssettings.html)**
 //!     * a central object to maintain state and allow accessing all *Activities*
+//!     * creates [*Method Builders*](trait.MethodsBuilder.html) which in turn
+//!       allow access to individual [*Call Builders*](trait.CallBuilder.html)
 //! * **[Resources](trait.Resource.html)**
 //!     * primary types that you can apply *Activities* to
 //!     * a collection of properties and *Parts*
@@ -33,6 +35,8 @@
 //!         * never directly used in *Activities*
 //! * **[Activities](trait.CallBuilder.html)**
 //!     * operations to apply to *Resources*
+//! 
+//! All *structures* are marked with applicable traits to further categorize them and ease browsing.
 //! 
 //! Generally speaking, you can invoke *Activities* like this:
 //! 
@@ -71,7 +75,7 @@
 //! extern crate "yup-oauth2" as oauth2;
 //! extern crate "google-groupssettings1" as groupssettings1;
 //! use groupssettings1::Groups;
-//! use groupssettings1::Result;
+//! use groupssettings1::{Result, Error};
 //! # #[test] fn egal() {
 //! use std::default::Default;
 //! use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -101,15 +105,17 @@
 //!              .doit();
 //! 
 //! match result {
-//!     Result::HttpError(err) => println!("HTTPERROR: {:?}", err),
-//!     Result::MissingAPIKey => println!("Auth: Missing API Key - used if there are no scopes"),
-//!     Result::MissingToken => println!("OAuth2: Missing Token"),
-//!     Result::Cancelled => println!("Operation cancelled by user"),
-//!     Result::UploadSizeLimitExceeded(size, max_size) => println!("Upload size too big: {} of {}", size, max_size),
-//!     Result::Failure(_) => println!("General Failure (hyper::client::Response doesn't print)"),
-//!     Result::FieldClash(clashed_field) => println!("You added custom parameter which is part of builder: {:?}", clashed_field),
-//!     Result::JsonDecodeError(err) => println!("Couldn't understand server reply - maybe API needs update: {:?}", err),
-//!     Result::Success(_) => println!("Success (value doesn't print)"),
+//!     Err(e) => match e {
+//!         Error::HttpError(err) => println!("HTTPERROR: {:?}", err),
+//!         Error::MissingAPIKey => println!("Auth: Missing API Key - used if there are no scopes"),
+//!         Error::MissingToken => println!("OAuth2: Missing Token"),
+//!         Error::Cancelled => println!("Operation canceled by user"),
+//!         Error::UploadSizeLimitExceeded(size, max_size) => println!("Upload size too big: {} of {}", size, max_size),
+//!         Error::Failure(_) => println!("General Failure (hyper::client::Response doesn't print)"),
+//!         Error::FieldClash(clashed_field) => println!("You added custom parameter which is part of builder: {:?}", clashed_field),
+//!         Error::JsonDecodeError(err) => println!("Couldn't understand server reply - maybe API needs update: {:?}", err),
+//!     },
+//!     Ok(_) => println!("Success (value doesn't print)"),
 //! }
 //! # }
 //! ```
@@ -122,7 +128,7 @@
 //! When delegates handle errors or intermediate values, they may have a chance to instruct the system to retry. This 
 //! makes the system potentially resilient to all kinds of errors.
 //! 
-//! ## Uploads and Downlods
+//! ## Uploads and Downloads
 //! If a method supports downloads, the response body, which is part of the [Result](enum.Result.html), should be
 //! read by you to obtain the media.
 //! If such a method also supports a [Response Result](trait.ResponseResult.html), it will return that by default.
@@ -145,8 +151,9 @@
 //! ## Optional Parts in Server-Requests
 //! 
 //! All structures provided by this library are made to be [enocodable](trait.RequestValue.html) and 
-//! [decodable](trait.ResponseResult.html) via json. Optionals are used to indicate that partial requests are responses are valid.
-//! Most optionals are are considered [Parts](trait.Part.html) which are identifyable by name, which will be sent to 
+//! [decodable](trait.ResponseResult.html) via *json*. Optionals are used to indicate that partial requests are responses 
+//! are valid.
+//! Most optionals are are considered [Parts](trait.Part.html) which are identifiable by name, which will be sent to 
 //! the server to indicate either the set parts of the request or the desired parts in the response.
 //! 
 //! ## Builder Arguments
@@ -195,7 +202,7 @@ use std::io;
 use std::fs;
 use std::thread::sleep;
 
-pub use cmn::{MultiPartReader, ToParts, MethodInfo, Result, CallBuilder, Hub, ReadSeek, Part, ResponseResult, RequestValue, NestedType, Delegate, DefaultDelegate, ResourceMethodsBuilder, Resource, JsonServerError};
+pub use cmn::{MultiPartReader, ToParts, MethodInfo, Result, Error, CallBuilder, Hub, ReadSeek, Part, ResponseResult, RequestValue, NestedType, Delegate, DefaultDelegate, MethodsBuilder, Resource, JsonServerError};
 
 
 // ##############
@@ -242,7 +249,7 @@ impl Default for Scope {
 /// extern crate "yup-oauth2" as oauth2;
 /// extern crate "google-groupssettings1" as groupssettings1;
 /// use groupssettings1::Groups;
-/// use groupssettings1::Result;
+/// use groupssettings1::{Result, Error};
 /// # #[test] fn egal() {
 /// use std::default::Default;
 /// use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -272,15 +279,17 @@ impl Default for Scope {
 ///              .doit();
 /// 
 /// match result {
-///     Result::HttpError(err) => println!("HTTPERROR: {:?}", err),
-///     Result::MissingAPIKey => println!("Auth: Missing API Key - used if there are no scopes"),
-///     Result::MissingToken => println!("OAuth2: Missing Token"),
-///     Result::Cancelled => println!("Operation cancelled by user"),
-///     Result::UploadSizeLimitExceeded(size, max_size) => println!("Upload size too big: {} of {}", size, max_size),
-///     Result::Failure(_) => println!("General Failure (hyper::client::Response doesn't print)"),
-///     Result::FieldClash(clashed_field) => println!("You added custom parameter which is part of builder: {:?}", clashed_field),
-///     Result::JsonDecodeError(err) => println!("Couldn't understand server reply - maybe API needs update: {:?}", err),
-///     Result::Success(_) => println!("Success (value doesn't print)"),
+///     Err(e) => match e {
+///         Error::HttpError(err) => println!("HTTPERROR: {:?}", err),
+///         Error::MissingAPIKey => println!("Auth: Missing API Key - used if there are no scopes"),
+///         Error::MissingToken => println!("OAuth2: Missing Token"),
+///         Error::Cancelled => println!("Operation canceled by user"),
+///         Error::UploadSizeLimitExceeded(size, max_size) => println!("Upload size too big: {} of {}", size, max_size),
+///         Error::Failure(_) => println!("General Failure (hyper::client::Response doesn't print)"),
+///         Error::FieldClash(clashed_field) => println!("You added custom parameter which is part of builder: {:?}", clashed_field),
+///         Error::JsonDecodeError(err) => println!("Couldn't understand server reply - maybe API needs update: {:?}", err),
+///     },
+///     Ok(_) => println!("Success (value doesn't print)"),
 /// }
 /// # }
 /// ```
@@ -301,7 +310,7 @@ impl<'a, C, NC, A> Groupssettings<C, NC, A>
         Groupssettings {
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/0.1.1".to_string(),
+            _user_agent: "google-api-rust-client/0.1.2".to_string(),
             _m: PhantomData
         }
     }
@@ -311,7 +320,7 @@ impl<'a, C, NC, A> Groupssettings<C, NC, A>
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/0.1.1`.
+    /// It defaults to `google-api-rust-client/0.1.2`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -338,84 +347,84 @@ impl<'a, C, NC, A> Groupssettings<C, NC, A>
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Groups {
-    /// Moderation level for messages. Possible values are: MODERATE_ALL_MESSAGES MODERATE_NON_MEMBERS MODERATE_NEW_MEMBERS MODERATE_NONE    
+    /// Moderation level for messages. Possible values are: MODERATE_ALL_MESSAGES MODERATE_NON_MEMBERS MODERATE_NEW_MEMBERS MODERATE_NONE
     #[serde(alias="messageModerationLevel")]
     pub message_moderation_level: Option<String>,
-    /// Description of the group    
+    /// Description of the group
     pub description: Option<String>,
-    /// Are external members allowed to join the group.    
+    /// Are external members allowed to join the group.
     #[serde(alias="allowExternalMembers")]
     pub allow_external_members: Option<String>,
-    /// Whome should the default reply to a message go to. Possible values are: REPLY_TO_CUSTOM REPLY_TO_SENDER REPLY_TO_LIST REPLY_TO_OWNER REPLY_TO_IGNORE REPLY_TO_MANAGERS    
+    /// Whome should the default reply to a message go to. Possible values are: REPLY_TO_CUSTOM REPLY_TO_SENDER REPLY_TO_LIST REPLY_TO_OWNER REPLY_TO_IGNORE REPLY_TO_MANAGERS
     #[serde(alias="replyTo")]
     pub reply_to: Option<String>,
-    /// Default email to which reply to any message should go.    
+    /// Default email to which reply to any message should go.
     #[serde(alias="customReplyTo")]
     pub custom_reply_to: Option<String>,
-    /// Should the member be notified if his message is denied by owner.    
+    /// Should the member be notified if his message is denied by owner.
     #[serde(alias="sendMessageDenyNotification")]
     pub send_message_deny_notification: Option<String>,
-    /// Permission to contact owner of the group via web UI. Possbile values are: ANYONE_CAN_CONTACT ALL_IN_DOMAIN_CAN_CONTACT ALL_MEMBERS_CAN_CONTACT ALL_MANAGERS_CAN_CONTACT    
+    /// Permission to contact owner of the group via web UI. Possbile values are: ANYONE_CAN_CONTACT ALL_IN_DOMAIN_CAN_CONTACT ALL_MEMBERS_CAN_CONTACT ALL_MANAGERS_CAN_CONTACT
     #[serde(alias="whoCanContactOwner")]
     pub who_can_contact_owner: Option<String>,
-    /// Default message display font. Possible values are: DEFAULT_FONT FIXED_WIDTH_FONT    
+    /// Default message display font. Possible values are: DEFAULT_FONT FIXED_WIDTH_FONT
     #[serde(alias="messageDisplayFont")]
     pub message_display_font: Option<String>,
-    /// If the contents of the group are archived.    
+    /// If the contents of the group are archived.
     #[serde(alias="isArchived")]
     pub is_archived: Option<String>,
-    /// Permissions to post messages to the group. Possible values are: NONE_CAN_POST ALL_MANAGERS_CAN_POST ALL_MEMBERS_CAN_POST ALL_IN_DOMAIN_CAN_POST ANYONE_CAN_POST    
+    /// Permissions to post messages to the group. Possible values are: NONE_CAN_POST ALL_MANAGERS_CAN_POST ALL_MEMBERS_CAN_POST ALL_IN_DOMAIN_CAN_POST ANYONE_CAN_POST
     #[serde(alias="whoCanPostMessage")]
     pub who_can_post_message: Option<String>,
-    /// Primary language for the group.    
+    /// Primary language for the group.
     #[serde(alias="primaryLanguage")]
     pub primary_language: Option<String>,
-    /// Permissions to view membership. Possbile values are: ALL_IN_DOMAIN_CAN_VIEW ALL_MEMBERS_CAN_VIEW ALL_MANAGERS_CAN_VIEW    
+    /// Permissions to view membership. Possbile values are: ALL_IN_DOMAIN_CAN_VIEW ALL_MEMBERS_CAN_VIEW ALL_MANAGERS_CAN_VIEW
     #[serde(alias="whoCanViewMembership")]
     pub who_can_view_membership: Option<String>,
-    /// Permissions to invite members. Possbile values are: ALL_MEMBERS_CAN_INVITE ALL_MANAGERS_CAN_INVITE    
+    /// Permissions to invite members. Possbile values are: ALL_MEMBERS_CAN_INVITE ALL_MANAGERS_CAN_INVITE
     #[serde(alias="whoCanInvite")]
     pub who_can_invite: Option<String>,
-    /// Permissions to join the group. Possible values are: ANYONE_CAN_JOIN ALL_IN_DOMAIN_CAN_JOIN INVITED_CAN_JOIN CAN_REQUEST_TO_JOIN    
+    /// Permissions to join the group. Possible values are: ANYONE_CAN_JOIN ALL_IN_DOMAIN_CAN_JOIN INVITED_CAN_JOIN CAN_REQUEST_TO_JOIN
     #[serde(alias="whoCanJoin")]
     pub who_can_join: Option<String>,
-    /// The type of the resource.    
+    /// The type of the resource.
     pub kind: Option<String>,
-    /// Name of the Group    
+    /// Name of the Group
     pub name: Option<String>,
-    /// Moderation level for messages detected as spam. Possible values are: ALLOW MODERATE SILENTLY_MODERATE REJECT    
+    /// Moderation level for messages detected as spam. Possible values are: ALLOW MODERATE SILENTLY_MODERATE REJECT
     #[serde(alias="spamModerationLevel")]
     pub spam_moderation_level: Option<String>,
-    /// Default message deny notification message    
+    /// Default message deny notification message
     #[serde(alias="defaultMessageDenyNotificationText")]
     pub default_message_deny_notification_text: Option<String>,
-    /// Permissions to view group. Possbile values are: ANYONE_CAN_VIEW ALL_IN_DOMAIN_CAN_VIEW ALL_MEMBERS_CAN_VIEW ALL_MANAGERS_CAN_VIEW    
+    /// Permissions to view group. Possbile values are: ANYONE_CAN_VIEW ALL_IN_DOMAIN_CAN_VIEW ALL_MEMBERS_CAN_VIEW ALL_MANAGERS_CAN_VIEW
     #[serde(alias="whoCanViewGroup")]
     pub who_can_view_group: Option<String>,
-    /// If this groups should be included in global address list or not.    
+    /// If this groups should be included in global address list or not.
     #[serde(alias="includeInGlobalAddressList")]
     pub include_in_global_address_list: Option<String>,
-    /// If the group is archive only    
+    /// If the group is archive only
     #[serde(alias="archiveOnly")]
     pub archive_only: Option<String>,
-    /// Is the group listed in groups directory    
+    /// Is the group listed in groups directory
     #[serde(alias="showInGroupDirectory")]
     pub show_in_group_directory: Option<String>,
-    /// Permission to leave the group. Possible values are: ALL_MANAGERS_CAN_LEAVE ALL_MEMBERS_CAN_LEAVE    
+    /// Permission to leave the group. Possible values are: ALL_MANAGERS_CAN_LEAVE ALL_MEMBERS_CAN_LEAVE
     #[serde(alias="whoCanLeaveGroup")]
     pub who_can_leave_group: Option<String>,
-    /// Can members post using the group email address.    
+    /// Can members post using the group email address.
     #[serde(alias="membersCanPostAsTheGroup")]
     pub members_can_post_as_the_group: Option<String>,
-    /// Maximum message size allowed.    
+    /// Maximum message size allowed.
     #[serde(alias="maxMessageBytes")]
     pub max_message_bytes: Option<i32>,
-    /// If posting from web is allowed.    
+    /// If posting from web is allowed.
     #[serde(alias="allowWebPosting")]
     pub allow_web_posting: Option<String>,
-    /// Email id of the group    
+    /// Email id of the group
     pub email: Option<String>,
-    /// Is google allowed to contact admins.    
+    /// Is google allowed to contact admins.
     #[serde(alias="allowGoogleCommunication")]
     pub allow_google_communication: Option<String>,
 }
@@ -463,13 +472,18 @@ pub struct GroupMethods<'a, C, NC, A>
     hub: &'a Groupssettings<C, NC, A>,
 }
 
-impl<'a, C, NC, A> ResourceMethodsBuilder for GroupMethods<'a, C, NC, A> {}
+impl<'a, C, NC, A> MethodsBuilder for GroupMethods<'a, C, NC, A> {}
 
 impl<'a, C, NC, A> GroupMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Updates an existing resource.    
+    /// Updates an existing resource.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `groupUniqueId` - The resource ID
     pub fn update(&self, request: &Groups, group_unique_id: &str) -> GroupUpdateCall<'a, C, NC, A> {
         GroupUpdateCall {
             hub: self.hub,
@@ -483,7 +497,12 @@ impl<'a, C, NC, A> GroupMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Updates an existing resource. This method supports patch semantics.    
+    /// Updates an existing resource. This method supports patch semantics.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `groupUniqueId` - The resource ID
     pub fn patch(&self, request: &Groups, group_unique_id: &str) -> GroupPatchCall<'a, C, NC, A> {
         GroupPatchCall {
             hub: self.hub,
@@ -497,7 +516,11 @@ impl<'a, C, NC, A> GroupMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Gets one resource by id.    
+    /// Gets one resource by id.
+    /// 
+    /// # Arguments
+    ///
+    /// * `groupUniqueId` - The resource ID
     pub fn get(&self, group_unique_id: &str) -> GroupGetCall<'a, C, NC, A> {
         GroupGetCall {
             hub: self.hub,
@@ -520,7 +543,7 @@ impl<'a, C, NC, A> GroupMethods<'a, C, NC, A> {
 /// Updates an existing resource.
 ///
 /// A builder for the *update* method supported by a *group* resource.
-/// It is not used directly, but through a `GroupMethods`.
+/// It is not used directly, but through a `GroupMethods` instance.
 ///
 /// # Example
 ///
@@ -585,7 +608,7 @@ impl<'a, C, NC, A> GroupUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
         for &field in ["alt", "groupUniqueId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -642,7 +665,7 @@ impl<'a, C, NC, A> GroupUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -658,7 +681,6 @@ impl<'a, C, NC, A> GroupUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -668,7 +690,7 @@ impl<'a, C, NC, A> GroupUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -679,7 +701,7 @@ impl<'a, C, NC, A> GroupUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -688,13 +710,13 @@ impl<'a, C, NC, A> GroupUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -715,7 +737,7 @@ impl<'a, C, NC, A> GroupUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The resource ID    
+    /// The resource ID
     pub fn group_unique_id(mut self, new_value: &str) -> GroupUpdateCall<'a, C, NC, A> {
         self._group_unique_id = new_value.to_string();
         self
@@ -776,7 +798,7 @@ impl<'a, C, NC, A> GroupUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
 /// Updates an existing resource. This method supports patch semantics.
 ///
 /// A builder for the *patch* method supported by a *group* resource.
-/// It is not used directly, but through a `GroupMethods`.
+/// It is not used directly, but through a `GroupMethods` instance.
 ///
 /// # Example
 ///
@@ -841,7 +863,7 @@ impl<'a, C, NC, A> GroupPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
         for &field in ["alt", "groupUniqueId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -898,7 +920,7 @@ impl<'a, C, NC, A> GroupPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -914,7 +936,6 @@ impl<'a, C, NC, A> GroupPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -924,7 +945,7 @@ impl<'a, C, NC, A> GroupPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -935,7 +956,7 @@ impl<'a, C, NC, A> GroupPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -944,13 +965,13 @@ impl<'a, C, NC, A> GroupPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -971,7 +992,7 @@ impl<'a, C, NC, A> GroupPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The resource ID    
+    /// The resource ID
     pub fn group_unique_id(mut self, new_value: &str) -> GroupPatchCall<'a, C, NC, A> {
         self._group_unique_id = new_value.to_string();
         self
@@ -1032,7 +1053,7 @@ impl<'a, C, NC, A> GroupPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
 /// Gets one resource by id.
 ///
 /// A builder for the *get* method supported by a *group* resource.
-/// It is not used directly, but through a `GroupMethods`.
+/// It is not used directly, but through a `GroupMethods` instance.
 ///
 /// # Example
 ///
@@ -1090,7 +1111,7 @@ impl<'a, C, NC, A> GroupGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
         for &field in ["alt", "groupUniqueId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -1143,7 +1164,7 @@ impl<'a, C, NC, A> GroupGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -1155,7 +1176,6 @@ impl<'a, C, NC, A> GroupGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -1165,7 +1185,7 @@ impl<'a, C, NC, A> GroupGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -1176,7 +1196,7 @@ impl<'a, C, NC, A> GroupGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -1185,13 +1205,13 @@ impl<'a, C, NC, A> GroupGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -1203,7 +1223,7 @@ impl<'a, C, NC, A> GroupGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The resource ID    
+    /// The resource ID
     pub fn group_unique_id(mut self, new_value: &str) -> GroupGetCall<'a, C, NC, A> {
         self._group_unique_id = new_value.to_string();
         self

@@ -1,8 +1,8 @@
 // DO NOT EDIT !
-// This file was generated automatically from 'src/mako/lib.rs.mako'
+// This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *analytics* crate version *0.1.1+20150308*, where *20150308* is the exact revision of the *analytics:v3* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.1*.
+//! This documentation was generated from *analytics* crate version *0.1.2+20150308*, where *20150308* is the exact revision of the *analytics:v3* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.2*.
 //! 
 //! Everything else about the *analytics* *v3* API can be found at the
 //! [official documentation site](https://developers.google.com/analytics/).
@@ -35,6 +35,8 @@
 //! 
 //! * **[Hub](struct.Analytics.html)**
 //!     * a central object to maintain state and allow accessing all *Activities*
+//!     * creates [*Method Builders*](trait.MethodsBuilder.html) which in turn
+//!       allow access to individual [*Call Builders*](trait.CallBuilder.html)
 //! * **[Resources](trait.Resource.html)**
 //!     * primary types that you can apply *Activities* to
 //!     * a collection of properties and *Parts*
@@ -43,6 +45,8 @@
 //!         * never directly used in *Activities*
 //! * **[Activities](trait.CallBuilder.html)**
 //!     * operations to apply to *Resources*
+//! 
+//! All *structures* are marked with applicable traits to further categorize them and ease browsing.
 //! 
 //! Generally speaking, you can invoke *Activities* like this:
 //! 
@@ -84,7 +88,7 @@
 //! extern crate "yup-oauth2" as oauth2;
 //! extern crate "google-analytics3" as analytics3;
 //! use analytics3::EntityUserLink;
-//! use analytics3::Result;
+//! use analytics3::{Result, Error};
 //! # #[test] fn egal() {
 //! use std::default::Default;
 //! use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -114,15 +118,17 @@
 //!              .doit();
 //! 
 //! match result {
-//!     Result::HttpError(err) => println!("HTTPERROR: {:?}", err),
-//!     Result::MissingAPIKey => println!("Auth: Missing API Key - used if there are no scopes"),
-//!     Result::MissingToken => println!("OAuth2: Missing Token"),
-//!     Result::Cancelled => println!("Operation cancelled by user"),
-//!     Result::UploadSizeLimitExceeded(size, max_size) => println!("Upload size too big: {} of {}", size, max_size),
-//!     Result::Failure(_) => println!("General Failure (hyper::client::Response doesn't print)"),
-//!     Result::FieldClash(clashed_field) => println!("You added custom parameter which is part of builder: {:?}", clashed_field),
-//!     Result::JsonDecodeError(err) => println!("Couldn't understand server reply - maybe API needs update: {:?}", err),
-//!     Result::Success(_) => println!("Success (value doesn't print)"),
+//!     Err(e) => match e {
+//!         Error::HttpError(err) => println!("HTTPERROR: {:?}", err),
+//!         Error::MissingAPIKey => println!("Auth: Missing API Key - used if there are no scopes"),
+//!         Error::MissingToken => println!("OAuth2: Missing Token"),
+//!         Error::Cancelled => println!("Operation canceled by user"),
+//!         Error::UploadSizeLimitExceeded(size, max_size) => println!("Upload size too big: {} of {}", size, max_size),
+//!         Error::Failure(_) => println!("General Failure (hyper::client::Response doesn't print)"),
+//!         Error::FieldClash(clashed_field) => println!("You added custom parameter which is part of builder: {:?}", clashed_field),
+//!         Error::JsonDecodeError(err) => println!("Couldn't understand server reply - maybe API needs update: {:?}", err),
+//!     },
+//!     Ok(_) => println!("Success (value doesn't print)"),
 //! }
 //! # }
 //! ```
@@ -135,7 +141,7 @@
 //! When delegates handle errors or intermediate values, they may have a chance to instruct the system to retry. This 
 //! makes the system potentially resilient to all kinds of errors.
 //! 
-//! ## Uploads and Downlods
+//! ## Uploads and Downloads
 //! If a method supports downloads, the response body, which is part of the [Result](enum.Result.html), should be
 //! read by you to obtain the media.
 //! If such a method also supports a [Response Result](trait.ResponseResult.html), it will return that by default.
@@ -158,8 +164,9 @@
 //! ## Optional Parts in Server-Requests
 //! 
 //! All structures provided by this library are made to be [enocodable](trait.RequestValue.html) and 
-//! [decodable](trait.ResponseResult.html) via json. Optionals are used to indicate that partial requests are responses are valid.
-//! Most optionals are are considered [Parts](trait.Part.html) which are identifyable by name, which will be sent to 
+//! [decodable](trait.ResponseResult.html) via *json*. Optionals are used to indicate that partial requests are responses 
+//! are valid.
+//! Most optionals are are considered [Parts](trait.Part.html) which are identifiable by name, which will be sent to 
 //! the server to indicate either the set parts of the request or the desired parts in the response.
 //! 
 //! ## Builder Arguments
@@ -208,7 +215,7 @@ use std::io;
 use std::fs;
 use std::thread::sleep;
 
-pub use cmn::{MultiPartReader, ToParts, MethodInfo, Result, CallBuilder, Hub, ReadSeek, Part, ResponseResult, RequestValue, NestedType, Delegate, DefaultDelegate, ResourceMethodsBuilder, Resource, JsonServerError};
+pub use cmn::{MultiPartReader, ToParts, MethodInfo, Result, Error, CallBuilder, Hub, ReadSeek, Part, ResponseResult, RequestValue, NestedType, Delegate, DefaultDelegate, MethodsBuilder, Resource, JsonServerError};
 
 
 // ##############
@@ -275,7 +282,7 @@ impl Default for Scope {
 /// extern crate "yup-oauth2" as oauth2;
 /// extern crate "google-analytics3" as analytics3;
 /// use analytics3::EntityUserLink;
-/// use analytics3::Result;
+/// use analytics3::{Result, Error};
 /// # #[test] fn egal() {
 /// use std::default::Default;
 /// use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -305,15 +312,17 @@ impl Default for Scope {
 ///              .doit();
 /// 
 /// match result {
-///     Result::HttpError(err) => println!("HTTPERROR: {:?}", err),
-///     Result::MissingAPIKey => println!("Auth: Missing API Key - used if there are no scopes"),
-///     Result::MissingToken => println!("OAuth2: Missing Token"),
-///     Result::Cancelled => println!("Operation cancelled by user"),
-///     Result::UploadSizeLimitExceeded(size, max_size) => println!("Upload size too big: {} of {}", size, max_size),
-///     Result::Failure(_) => println!("General Failure (hyper::client::Response doesn't print)"),
-///     Result::FieldClash(clashed_field) => println!("You added custom parameter which is part of builder: {:?}", clashed_field),
-///     Result::JsonDecodeError(err) => println!("Couldn't understand server reply - maybe API needs update: {:?}", err),
-///     Result::Success(_) => println!("Success (value doesn't print)"),
+///     Err(e) => match e {
+///         Error::HttpError(err) => println!("HTTPERROR: {:?}", err),
+///         Error::MissingAPIKey => println!("Auth: Missing API Key - used if there are no scopes"),
+///         Error::MissingToken => println!("OAuth2: Missing Token"),
+///         Error::Cancelled => println!("Operation canceled by user"),
+///         Error::UploadSizeLimitExceeded(size, max_size) => println!("Upload size too big: {} of {}", size, max_size),
+///         Error::Failure(_) => println!("General Failure (hyper::client::Response doesn't print)"),
+///         Error::FieldClash(clashed_field) => println!("You added custom parameter which is part of builder: {:?}", clashed_field),
+///         Error::JsonDecodeError(err) => println!("Couldn't understand server reply - maybe API needs update: {:?}", err),
+///     },
+///     Ok(_) => println!("Success (value doesn't print)"),
 /// }
 /// # }
 /// ```
@@ -334,7 +343,7 @@ impl<'a, C, NC, A> Analytics<C, NC, A>
         Analytics {
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/0.1.1".to_string(),
+            _user_agent: "google-api-rust-client/0.1.2".to_string(),
             _m: PhantomData
         }
     }
@@ -353,7 +362,7 @@ impl<'a, C, NC, A> Analytics<C, NC, A>
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/0.1.1`.
+    /// It defaults to `google-api-rust-client/0.1.2`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -381,39 +390,39 @@ impl<'a, C, NC, A> Analytics<C, NC, A>
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct CustomMetric {
-    /// Index of the custom metric.    
+    /// Index of the custom metric.
     pub index: Option<i32>,
-    /// Kind value for a custom metric. Set to "analytics#customMetric". It is a read-only field.    
+    /// Kind value for a custom metric. Set to "analytics#customMetric". It is a read-only field.
     pub kind: Option<String>,
-    /// Name of the custom metric.    
+    /// Name of the custom metric.
     pub name: Option<String>,
-    /// Time the custom metric was created.    
+    /// Time the custom metric was created.
     pub created: Option<String>,
-    /// Max value of custom metric.    
+    /// Max value of custom metric.
     pub max_value: Option<String>,
-    /// Min value of custom metric.    
+    /// Min value of custom metric.
     pub min_value: Option<String>,
-    /// Time the custom metric was last modified.    
+    /// Time the custom metric was last modified.
     pub updated: Option<String>,
-    /// Property ID.    
+    /// Property ID.
     #[serde(alias="webPropertyId")]
     pub web_property_id: Option<String>,
-    /// Boolean indicating whether the custom metric is active.    
+    /// Boolean indicating whether the custom metric is active.
     pub active: Option<bool>,
-    /// Scope of the custom metric: HIT or PRODUCT.    
+    /// Scope of the custom metric: HIT or PRODUCT.
     pub scope: Option<String>,
-    /// Parent link for the custom metric. Points to the property to which the custom metric belongs.    
+    /// Parent link for the custom metric. Points to the property to which the custom metric belongs.
     #[serde(alias="parentLink")]
     pub parent_link: Option<CustomMetricParentLink>,
-    /// Data type of custom metric.    
+    /// Data type of custom metric.
     #[serde(alias="type")]
     pub type_: Option<String>,
-    /// Custom metric ID.    
+    /// Custom metric ID.
     pub id: Option<String>,
-    /// Link for the custom metric    
+    /// Link for the custom metric
     #[serde(alias="selfLink")]
     pub self_link: Option<String>,
-    /// Account ID.    
+    /// Account ID.
     #[serde(alias="accountId")]
     pub account_id: Option<String>,
 }
@@ -436,51 +445,51 @@ impl ResponseResult for CustomMetric {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Goal {
-    /// Time this goal was last modified.    
+    /// Time this goal was last modified.
     pub updated: Option<String>,
-    /// Internal ID for the web property to which this goal belongs.    
+    /// Internal ID for the web property to which this goal belongs.
     #[serde(alias="internalWebPropertyId")]
     pub internal_web_property_id: Option<String>,
-    /// Web property ID to which this goal belongs. The web property ID is of the form UA-XXXXX-YY.    
+    /// Web property ID to which this goal belongs. The web property ID is of the form UA-XXXXX-YY.
     #[serde(alias="webPropertyId")]
     pub web_property_id: Option<String>,
-    /// Determines whether this goal is active.    
+    /// Determines whether this goal is active.
     pub active: Option<bool>,
-    /// Goal ID.    
+    /// Goal ID.
     pub id: Option<String>,
-    /// Account ID to which this goal belongs.    
+    /// Account ID to which this goal belongs.
     #[serde(alias="accountId")]
     pub account_id: Option<String>,
-    /// Resource type for an Analytics goal.    
+    /// Resource type for an Analytics goal.
     pub kind: Option<String>,
-    /// Details for the goal of the type VISIT_TIME_ON_SITE.    
+    /// Details for the goal of the type VISIT_TIME_ON_SITE.
     #[serde(alias="visitTimeOnSiteDetails")]
     pub visit_time_on_site_details: Option<GoalVisitTimeOnSiteDetails>,
-    /// Goal name.    
+    /// Goal name.
     pub name: Option<String>,
-    /// Time this goal was created.    
+    /// Time this goal was created.
     pub created: Option<String>,
-    /// Goal type. Possible values are URL_DESTINATION, VISIT_TIME_ON_SITE, VISIT_NUM_PAGES, AND EVENT.    
+    /// Goal type. Possible values are URL_DESTINATION, VISIT_TIME_ON_SITE, VISIT_NUM_PAGES, AND EVENT.
     #[serde(alias="type")]
     pub type_: Option<String>,
-    /// Details for the goal of the type VISIT_NUM_PAGES.    
+    /// Details for the goal of the type VISIT_NUM_PAGES.
     #[serde(alias="visitNumPagesDetails")]
     pub visit_num_pages_details: Option<GoalVisitNumPagesDetails>,
-    /// Goal value.    
+    /// Goal value.
     pub value: Option<f32>,
-    /// Details for the goal of the type EVENT.    
+    /// Details for the goal of the type EVENT.
     #[serde(alias="eventDetails")]
     pub event_details: Option<GoalEventDetails>,
-    /// View (Profile) ID to which this goal belongs.    
+    /// View (Profile) ID to which this goal belongs.
     #[serde(alias="profileId")]
     pub profile_id: Option<String>,
-    /// Parent link for a goal. Points to the view (profile) to which this goal belongs.    
+    /// Parent link for a goal. Points to the view (profile) to which this goal belongs.
     #[serde(alias="parentLink")]
     pub parent_link: Option<GoalParentLink>,
-    /// Details for the goal of the type URL_DESTINATION.    
+    /// Details for the goal of the type URL_DESTINATION.
     #[serde(alias="urlDestinationDetails")]
     pub url_destination_details: Option<GoalUrlDestinationDetails>,
-    /// Link for this goal.    
+    /// Link for this goal.
     #[serde(alias="selfLink")]
     pub self_link: Option<String>,
 }
@@ -495,7 +504,7 @@ impl ResponseResult for Goal {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct WebpropertyPermissions {
-    /// All the permissions that the user has for this web property. These include any implied permissions (e.g., EDIT implies VIEW) or inherited permissions from the parent account.    
+    /// All the permissions that the user has for this web property. These include any implied permissions (e.g., EDIT implies VIEW) or inherited permissions from the parent account.
     pub effective: Vec<String>,
 }
 
@@ -509,16 +518,16 @@ impl Part for WebpropertyPermissions {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct FilterRef {
-    /// Kind value for filter reference.    
+    /// Kind value for filter reference.
     pub kind: String,
-    /// Link for this filter.    
+    /// Link for this filter.
     pub href: String,
-    /// Account ID to which this filter belongs.    
+    /// Account ID to which this filter belongs.
     #[serde(alias="accountId")]
     pub account_id: String,
-    /// Filter ID.    
+    /// Filter ID.
     pub id: String,
-    /// Name of this filter.    
+    /// Name of this filter.
     pub name: String,
 }
 
@@ -531,10 +540,10 @@ impl Part for FilterRef {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoalEventDetails {
-    /// List of event conditions.    
+    /// List of event conditions.
     #[serde(alias="eventConditions")]
     pub event_conditions: Vec<GoalEventDetailsEventConditions>,
-    /// Determines if the event value should be used as the value for this goal.    
+    /// Determines if the event value should be used as the value for this goal.
     #[serde(alias="useEventValue")]
     pub use_event_value: bool,
 }
@@ -554,7 +563,7 @@ impl Part for GoalEventDetails {}
 /// 
 #[derive(Default, Clone, Debug, Serialize)]
 pub struct AnalyticsDataimportDeleteUploadDataRequest {
-    /// A list of upload UIDs.    
+    /// A list of upload UIDs.
     #[serde(alias="customDataImportUids")]
     pub custom_data_import_uids: Option<Vec<String>>,
 }
@@ -568,22 +577,22 @@ impl RequestValue for AnalyticsDataimportDeleteUploadDataRequest {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct RealtimeDataProfileInfo {
-    /// Internal ID for the web property to which this view (profile) belongs.    
+    /// Internal ID for the web property to which this view (profile) belongs.
     #[serde(alias="internalWebPropertyId")]
     pub internal_web_property_id: String,
-    /// Table ID for view (profile).    
+    /// Table ID for view (profile).
     #[serde(alias="tableId")]
     pub table_id: String,
-    /// Web Property ID to which this view (profile) belongs.    
+    /// Web Property ID to which this view (profile) belongs.
     #[serde(alias="webPropertyId")]
     pub web_property_id: String,
-    /// View (Profile) ID.    
+    /// View (Profile) ID.
     #[serde(alias="profileId")]
     pub profile_id: String,
-    /// View (Profile) name.    
+    /// View (Profile) name.
     #[serde(alias="profileName")]
     pub profile_name: String,
-    /// Account ID to which this view (profile) belongs.    
+    /// Account ID to which this view (profile) belongs.
     #[serde(alias="accountId")]
     pub account_id: String,
 }
@@ -598,18 +607,18 @@ impl Part for RealtimeDataProfileInfo {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct RealtimeDataQuery {
-    /// Maximum results per page.    
+    /// Maximum results per page.
     #[serde(alias="max-results")]
     pub max_results: i32,
-    /// List of dimensions or metrics based on which real time data is sorted.    
+    /// List of dimensions or metrics based on which real time data is sorted.
     pub sort: Vec<String>,
-    /// List of real time metrics.    
+    /// List of real time metrics.
     pub metrics: Vec<String>,
-    /// List of real time dimensions.    
+    /// List of real time dimensions.
     pub dimensions: String,
-    /// Comma-separated list of dimension or metric filters.    
+    /// Comma-separated list of dimension or metric filters.
     pub filters: String,
-    /// Unique table ID.    
+    /// Unique table ID.
     pub ids: String,
 }
 
@@ -623,22 +632,22 @@ impl Part for RealtimeDataQuery {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ProfileRef {
-    /// Analytics view (profile) reference.    
+    /// Analytics view (profile) reference.
     pub kind: String,
-    /// Link for this view (profile).    
+    /// Link for this view (profile).
     pub href: String,
-    /// Name of this view (profile).    
+    /// Name of this view (profile).
     pub name: String,
-    /// Web property ID of the form UA-XXXXX-YY to which this view (profile) belongs.    
+    /// Web property ID of the form UA-XXXXX-YY to which this view (profile) belongs.
     #[serde(alias="webPropertyId")]
     pub web_property_id: String,
-    /// Account ID to which this view (profile) belongs.    
+    /// Account ID to which this view (profile) belongs.
     #[serde(alias="accountId")]
     pub account_id: String,
-    /// Internal ID for the web property to which this view (profile) belongs.    
+    /// Internal ID for the web property to which this view (profile) belongs.
     #[serde(alias="internalWebPropertyId")]
     pub internal_web_property_id: String,
-    /// View (Profile) ID.    
+    /// View (Profile) ID.
     pub id: String,
 }
 
@@ -656,45 +665,45 @@ impl Part for ProfileRef {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct McfData {
-    /// Resource type.    
+    /// Resource type.
     pub kind: String,
-    /// Analytics data rows, where each row contains a list of dimension values followed by the metric values. The order of dimensions and metrics is same as specified in the request.    
+    /// Analytics data rows, where each row contains a list of dimension values followed by the metric values. The order of dimensions and metrics is same as specified in the request.
     pub rows: Vec<Vec<McfDataRows>>,
-    /// Determines if the Analytics data contains sampled data.    
+    /// Determines if the Analytics data contains sampled data.
     #[serde(alias="containsSampledData")]
     pub contains_sampled_data: bool,
-    /// Column headers that list dimension names followed by the metric names. The order of dimensions and metrics is same as specified in the request.    
+    /// Column headers that list dimension names followed by the metric names. The order of dimensions and metrics is same as specified in the request.
     #[serde(alias="columnHeaders")]
     pub column_headers: Vec<McfDataColumnHeaders>,
-    /// The total number of rows for the query, regardless of the number of rows in the response.    
+    /// The total number of rows for the query, regardless of the number of rows in the response.
     #[serde(alias="totalResults")]
     pub total_results: i32,
-    /// The maximum number of rows the response can contain, regardless of the actual number of rows returned. Its value ranges from 1 to 10,000 with a value of 1000 by default, or otherwise specified by the max-results query parameter.    
+    /// The maximum number of rows the response can contain, regardless of the actual number of rows returned. Its value ranges from 1 to 10,000 with a value of 1000 by default, or otherwise specified by the max-results query parameter.
     #[serde(alias="itemsPerPage")]
     pub items_per_page: i32,
-    /// Total values for the requested metrics over all the results, not just the results returned in this response. The order of the metric totals is same as the metric order specified in the request.    
+    /// Total values for the requested metrics over all the results, not just the results returned in this response. The order of the metric totals is same as the metric order specified in the request.
     #[serde(alias="totalsForAllResults")]
     pub totals_for_all_results: HashMap<String, String>,
-    /// Link to next page for this Analytics data query.    
+    /// Link to next page for this Analytics data query.
     #[serde(alias="nextLink")]
     pub next_link: String,
-    /// The number of samples used to calculate the result.    
+    /// The number of samples used to calculate the result.
     #[serde(alias="sampleSize")]
     pub sample_size: String,
-    /// Analytics data request query parameters.    
+    /// Analytics data request query parameters.
     pub query: McfDataQuery,
-    /// Link to previous page for this Analytics data query.    
+    /// Link to previous page for this Analytics data query.
     #[serde(alias="previousLink")]
     pub previous_link: String,
-    /// Information for the view (profile), for which the Analytics data was requested.    
+    /// Information for the view (profile), for which the Analytics data was requested.
     #[serde(alias="profileInfo")]
     pub profile_info: McfDataProfileInfo,
-    /// Unique ID for this data response.    
+    /// Unique ID for this data response.
     pub id: String,
-    /// Link to this page.    
+    /// Link to this page.
     #[serde(alias="selfLink")]
     pub self_link: String,
-    /// Total size of the sample space from which the samples were selected.    
+    /// Total size of the sample space from which the samples were selected.
     #[serde(alias="sampleSpace")]
     pub sample_space: String,
 }
@@ -713,25 +722,25 @@ impl ResponseResult for McfData {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct CustomDataSources {
-    /// Email ID of the authenticated user    
+    /// Email ID of the authenticated user
     pub username: String,
-    /// Collection type.    
+    /// Collection type.
     pub kind: String,
-    /// Collection of custom data sources.    
+    /// Collection of custom data sources.
     pub items: Vec<CustomDataSource>,
-    /// The maximum number of resources the response can contain, regardless of the actual number of resources returned. Its value ranges from 1 to 1000 with a value of 1000 by default, or otherwise specified by the max-results query parameter.    
+    /// The maximum number of resources the response can contain, regardless of the actual number of resources returned. Its value ranges from 1 to 1000 with a value of 1000 by default, or otherwise specified by the max-results query parameter.
     #[serde(alias="itemsPerPage")]
     pub items_per_page: i32,
-    /// Link to previous page for this custom data source collection.    
+    /// Link to previous page for this custom data source collection.
     #[serde(alias="previousLink")]
     pub previous_link: String,
-    /// The starting index of the resources, which is 1 by default or otherwise specified by the start-index query parameter.    
+    /// The starting index of the resources, which is 1 by default or otherwise specified by the start-index query parameter.
     #[serde(alias="startIndex")]
     pub start_index: i32,
-    /// Link to next page for this custom data source collection.    
+    /// Link to next page for this custom data source collection.
     #[serde(alias="nextLink")]
     pub next_link: String,
-    /// The total number of results for the query, regardless of the number of results in the response.    
+    /// The total number of results for the query, regardless of the number of results in the response.
     #[serde(alias="totalResults")]
     pub total_results: i32,
 }
@@ -750,25 +759,25 @@ impl ResponseResult for CustomDataSources {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct Goals {
-    /// Email ID of the authenticated user    
+    /// Email ID of the authenticated user
     pub username: String,
-    /// Collection type.    
+    /// Collection type.
     pub kind: String,
-    /// A list of goals.    
+    /// A list of goals.
     pub items: Vec<Goal>,
-    /// The maximum number of resources the response can contain, regardless of the actual number of resources returned. Its value ranges from 1 to 1000 with a value of 1000 by default, or otherwise specified by the max-results query parameter.    
+    /// The maximum number of resources the response can contain, regardless of the actual number of resources returned. Its value ranges from 1 to 1000 with a value of 1000 by default, or otherwise specified by the max-results query parameter.
     #[serde(alias="itemsPerPage")]
     pub items_per_page: i32,
-    /// Link to previous page for this goal collection.    
+    /// Link to previous page for this goal collection.
     #[serde(alias="previousLink")]
     pub previous_link: String,
-    /// The starting index of the resources, which is 1 by default or otherwise specified by the start-index query parameter.    
+    /// The starting index of the resources, which is 1 by default or otherwise specified by the start-index query parameter.
     #[serde(alias="startIndex")]
     pub start_index: i32,
-    /// Link to next page for this goal collection.    
+    /// Link to next page for this goal collection.
     #[serde(alias="nextLink")]
     pub next_link: String,
-    /// The total number of results for the query, regardless of the number of resources in the result.    
+    /// The total number of results for the query, regardless of the number of resources in the result.
     #[serde(alias="totalResults")]
     pub total_results: i32,
 }
@@ -782,23 +791,23 @@ impl ResponseResult for Goals {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Account {
-    /// Resource type for Analytics account.    
+    /// Resource type for Analytics account.
     pub kind: String,
-    /// Account name.    
+    /// Account name.
     pub name: String,
-    /// Time the account was created.    
+    /// Time the account was created.
     pub created: String,
-    /// Time the account was last modified.    
+    /// Time the account was last modified.
     pub updated: String,
-    /// Child link for an account entry. Points to the list of web properties for this account.    
+    /// Child link for an account entry. Points to the list of web properties for this account.
     #[serde(alias="childLink")]
     pub child_link: AccountChildLink,
-    /// Account ID.    
+    /// Account ID.
     pub id: String,
-    /// Link for this account.    
+    /// Link for this account.
     #[serde(alias="selfLink")]
     pub self_link: String,
-    /// Permissions the user has for this account.    
+    /// Permissions the user has for this account.
     pub permissions: AccountPermissions,
 }
 
@@ -816,48 +825,48 @@ impl Part for Account {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct GaData {
-    /// Determines if Analytics data contains samples.    
+    /// Determines if Analytics data contains samples.
     #[serde(alias="containsSampledData")]
     pub contains_sampled_data: bool,
-    /// Link to previous page for this Analytics data query.    
+    /// Link to previous page for this Analytics data query.
     #[serde(alias="previousLink")]
     pub previous_link: String,
-    /// no description provided    
+    /// no description provided
     #[serde(alias="dataTable")]
     pub data_table: GaDataDataTable,
-    /// Analytics data request query parameters.    
+    /// Analytics data request query parameters.
     pub query: GaDataQuery,
-    /// Total values for the requested metrics over all the results, not just the results returned in this response. The order of the metric totals is same as the metric order specified in the request.    
+    /// Total values for the requested metrics over all the results, not just the results returned in this response. The order of the metric totals is same as the metric order specified in the request.
     #[serde(alias="totalsForAllResults")]
     pub totals_for_all_results: HashMap<String, String>,
-    /// Unique ID for this data response.    
+    /// Unique ID for this data response.
     pub id: String,
-    /// Resource type.    
+    /// Resource type.
     pub kind: String,
-    /// Analytics data rows, where each row contains a list of dimension values followed by the metric values. The order of dimensions and metrics is same as specified in the request.    
+    /// Analytics data rows, where each row contains a list of dimension values followed by the metric values. The order of dimensions and metrics is same as specified in the request.
     pub rows: Vec<Vec<String>>,
-    /// The total number of rows for the query, regardless of the number of rows in the response.    
+    /// The total number of rows for the query, regardless of the number of rows in the response.
     #[serde(alias="totalResults")]
     pub total_results: i32,
-    /// The maximum number of rows the response can contain, regardless of the actual number of rows returned. Its value ranges from 1 to 10,000 with a value of 1000 by default, or otherwise specified by the max-results query parameter.    
+    /// The maximum number of rows the response can contain, regardless of the actual number of rows returned. Its value ranges from 1 to 10,000 with a value of 1000 by default, or otherwise specified by the max-results query parameter.
     #[serde(alias="itemsPerPage")]
     pub items_per_page: i32,
-    /// Link to next page for this Analytics data query.    
+    /// Link to next page for this Analytics data query.
     #[serde(alias="nextLink")]
     pub next_link: String,
-    /// The number of samples used to calculate the result.    
+    /// The number of samples used to calculate the result.
     #[serde(alias="sampleSize")]
     pub sample_size: String,
-    /// Information for the view (profile), for which the Analytics data was requested.    
+    /// Information for the view (profile), for which the Analytics data was requested.
     #[serde(alias="profileInfo")]
     pub profile_info: GaDataProfileInfo,
-    /// Column headers that list dimension names followed by the metric names. The order of dimensions and metrics is same as specified in the request.    
+    /// Column headers that list dimension names followed by the metric names. The order of dimensions and metrics is same as specified in the request.
     #[serde(alias="columnHeaders")]
     pub column_headers: Vec<GaDataColumnHeaders>,
-    /// Link to this page.    
+    /// Link to this page.
     #[serde(alias="selfLink")]
     pub self_link: String,
-    /// Total size of the sample space from which the samples were selected.    
+    /// Total size of the sample space from which the samples were selected.
     #[serde(alias="sampleSpace")]
     pub sample_space: String,
 }
@@ -871,9 +880,9 @@ impl ResponseResult for GaData {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ExperimentParentLink {
-    /// Link to the view (profile) to which this experiment belongs. This field is read-only.    
+    /// Link to the view (profile) to which this experiment belongs. This field is read-only.
     pub href: String,
-    /// Value is "analytics#profile". This field is read-only.    
+    /// Value is "analytics#profile". This field is read-only.
     #[serde(alias="type")]
     pub type_: String,
 }
@@ -894,51 +903,51 @@ impl Part for ExperimentParentLink {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct UnsampledReport {
-    /// Status of this unsampled report. Possible values are PENDING, COMPLETED, or FAILED.    
+    /// Status of this unsampled report. Possible values are PENDING, COMPLETED, or FAILED.
     pub status: Option<String>,
-    /// Time this unsampled report was last modified.    
+    /// Time this unsampled report was last modified.
     pub updated: Option<String>,
-    /// The type of download you need to use for the report data file.    
+    /// The type of download you need to use for the report data file.
     #[serde(alias="downloadType")]
     pub download_type: Option<String>,
-    /// The start date for the unsampled report.    
+    /// The start date for the unsampled report.
     #[serde(alias="start-date")]
     pub start_date: Option<String>,
-    /// Download details for a file stored in Google Drive.    
+    /// Download details for a file stored in Google Drive.
     #[serde(alias="driveDownloadDetails")]
     pub drive_download_details: Option<UnsampledReportDriveDownloadDetails>,
-    /// The metrics for the unsampled report.    
+    /// The metrics for the unsampled report.
     pub metrics: Option<String>,
-    /// The filters for the unsampled report.    
+    /// The filters for the unsampled report.
     pub filters: Option<String>,
-    /// Web property ID to which this unsampled report belongs. The web property ID is of the form UA-XXXXX-YY.    
+    /// Web property ID to which this unsampled report belongs. The web property ID is of the form UA-XXXXX-YY.
     #[serde(alias="webPropertyId")]
     pub web_property_id: Option<String>,
-    /// The segment for the unsampled report.    
+    /// The segment for the unsampled report.
     pub segment: Option<String>,
-    /// Unsampled report ID.    
+    /// Unsampled report ID.
     pub id: Option<String>,
-    /// Account ID to which this unsampled report belongs.    
+    /// Account ID to which this unsampled report belongs.
     #[serde(alias="accountId")]
     pub account_id: Option<String>,
-    /// Resource type for an Analytics unsampled report.    
+    /// Resource type for an Analytics unsampled report.
     pub kind: Option<String>,
-    /// Download details for a file stored in Google Cloud Storage.    
+    /// Download details for a file stored in Google Cloud Storage.
     #[serde(alias="cloudStorageDownloadDetails")]
     pub cloud_storage_download_details: Option<UnsampledReportCloudStorageDownloadDetails>,
-    /// The dimensions for the unsampled report.    
+    /// The dimensions for the unsampled report.
     pub dimensions: Option<String>,
-    /// Time this unsampled report was created.    
+    /// Time this unsampled report was created.
     pub created: Option<String>,
-    /// Title of the unsampled report.    
+    /// Title of the unsampled report.
     pub title: Option<String>,
-    /// View (Profile) ID to which this unsampled report belongs.    
+    /// View (Profile) ID to which this unsampled report belongs.
     #[serde(alias="profileId")]
     pub profile_id: Option<String>,
-    /// The end date for the unsampled report.    
+    /// The end date for the unsampled report.
     #[serde(alias="end-date")]
     pub end_date: Option<String>,
-    /// Link for this unsampled report.    
+    /// Link for this unsampled report.
     #[serde(alias="selfLink")]
     pub self_link: Option<String>,
 }
@@ -953,9 +962,9 @@ impl ResponseResult for UnsampledReport {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct WebpropertyParentLink {
-    /// Link to the account for this web property.    
+    /// Link to the account for this web property.
     pub href: String,
-    /// Type of the parent link. Its value is "analytics#account".    
+    /// Type of the parent link. Its value is "analytics#account".
     #[serde(alias="type")]
     pub type_: String,
 }
@@ -970,9 +979,9 @@ impl Part for WebpropertyParentLink {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ProfileParentLink {
-    /// Link to the web property to which this view (profile) belongs.    
+    /// Link to the web property to which this view (profile) belongs.
     pub href: String,
-    /// Value is "analytics#webproperty".    
+    /// Value is "analytics#webproperty".
     #[serde(alias="type")]
     pub type_: String,
 }
@@ -987,11 +996,11 @@ impl Part for ProfileParentLink {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct UserRef {
-    /// no description provided    
+    /// no description provided
     pub kind: String,
-    /// Email ID of this user.    
+    /// Email ID of this user.
     pub email: String,
-    /// User ID.    
+    /// User ID.
     pub id: String,
 }
 
@@ -1009,25 +1018,25 @@ impl Part for UserRef {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct Accounts {
-    /// Email ID of the authenticated user    
+    /// Email ID of the authenticated user
     pub username: String,
-    /// Collection type.    
+    /// Collection type.
     pub kind: String,
-    /// A list of accounts.    
+    /// A list of accounts.
     pub items: Vec<Account>,
-    /// The maximum number of entries the response can contain, regardless of the actual number of entries returned. Its value ranges from 1 to 1000 with a value of 1000 by default, or otherwise specified by the max-results query parameter.    
+    /// The maximum number of entries the response can contain, regardless of the actual number of entries returned. Its value ranges from 1 to 1000 with a value of 1000 by default, or otherwise specified by the max-results query parameter.
     #[serde(alias="itemsPerPage")]
     pub items_per_page: i32,
-    /// Previous link for this account collection.    
+    /// Previous link for this account collection.
     #[serde(alias="previousLink")]
     pub previous_link: String,
-    /// The starting index of the entries, which is 1 by default or otherwise specified by the start-index query parameter.    
+    /// The starting index of the entries, which is 1 by default or otherwise specified by the start-index query parameter.
     #[serde(alias="startIndex")]
     pub start_index: i32,
-    /// Next link for this account collection.    
+    /// Next link for this account collection.
     #[serde(alias="nextLink")]
     pub next_link: String,
-    /// The total number of results for the query, regardless of the number of results in the response.    
+    /// The total number of results for the query, regardless of the number of results in the response.
     #[serde(alias="totalResults")]
     pub total_results: i32,
 }
@@ -1041,34 +1050,34 @@ impl ResponseResult for Accounts {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct FilterAdvancedDetails {
-    /// Field A.    
+    /// Field A.
     #[serde(alias="fieldA")]
     pub field_a: String,
-    /// Indicates if the existing value of the output field, if any, should be overridden by the output expression.    
+    /// Indicates if the existing value of the output field, if any, should be overridden by the output expression.
     #[serde(alias="overrideOutputField")]
     pub override_output_field: bool,
-    /// Indicates if field A is required to match.    
+    /// Indicates if field A is required to match.
     #[serde(alias="fieldARequired")]
     pub field_a_required: bool,
-    /// Expression used to construct the output value.    
+    /// Expression used to construct the output value.
     #[serde(alias="outputConstructor")]
     pub output_constructor: String,
-    /// Indicates if field B is required to match.    
+    /// Indicates if field B is required to match.
     #[serde(alias="fieldBRequired")]
     pub field_b_required: bool,
-    /// Indicates if the filter expressions are case sensitive.    
+    /// Indicates if the filter expressions are case sensitive.
     #[serde(alias="caseSensitive")]
     pub case_sensitive: bool,
-    /// Field B.    
+    /// Field B.
     #[serde(alias="fieldB")]
     pub field_b: String,
-    /// Expression to extract from field B.    
+    /// Expression to extract from field B.
     #[serde(alias="extractB")]
     pub extract_b: String,
-    /// Expression to extract from field A.    
+    /// Expression to extract from field A.
     #[serde(alias="extractA")]
     pub extract_a: String,
-    /// Output field.    
+    /// Output field.
     #[serde(alias="outputToField")]
     pub output_to_field: String,
 }
@@ -1083,21 +1092,21 @@ impl Part for FilterAdvancedDetails {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct WebPropertySummary {
-    /// Website url for this web property.    
+    /// Website url for this web property.
     #[serde(alias="websiteUrl")]
     pub website_url: String,
-    /// Resource type for Analytics WebPropertySummary.    
+    /// Resource type for Analytics WebPropertySummary.
     pub kind: String,
-    /// Web property name.    
+    /// Web property name.
     pub name: String,
-    /// Level for this web property. Possible values are STANDARD or PREMIUM.    
+    /// Level for this web property. Possible values are STANDARD or PREMIUM.
     pub level: String,
-    /// Internal ID for this web property.    
+    /// Internal ID for this web property.
     #[serde(alias="internalWebPropertyId")]
     pub internal_web_property_id: String,
-    /// List of profiles under this web property.    
+    /// List of profiles under this web property.
     pub profiles: Vec<ProfileSummary>,
-    /// Web property ID of the form UA-XXXXX-YY.    
+    /// Web property ID of the form UA-XXXXX-YY.
     pub id: String,
 }
 
@@ -1115,17 +1124,17 @@ impl Part for WebPropertySummary {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct AccountTicket {
-    /// View (Profile) for the account.    
+    /// View (Profile) for the account.
     pub profile: Option<Profile>,
-    /// Account for this ticket.    
+    /// Account for this ticket.
     pub account: Option<Account>,
-    /// Account ticket ID used to access the account ticket.    
+    /// Account ticket ID used to access the account ticket.
     pub id: Option<String>,
-    /// Web property for the account.    
+    /// Web property for the account.
     pub webproperty: Option<Webproperty>,
-    /// Resource type for account ticket.    
+    /// Resource type for account ticket.
     pub kind: Option<String>,
-    /// Redirect URI where the user will be sent after accepting Terms of Service. Must be configured in APIs console as a callback URL.    
+    /// Redirect URI where the user will be sent after accepting Terms of Service. Must be configured in APIs console as a callback URL.
     #[serde(alias="redirectUri")]
     pub redirect_uri: Option<String>,
 }
@@ -1140,22 +1149,22 @@ impl ResponseResult for AccountTicket {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct McfDataProfileInfo {
-    /// Internal ID for the web property to which this view (profile) belongs.    
+    /// Internal ID for the web property to which this view (profile) belongs.
     #[serde(alias="internalWebPropertyId")]
     pub internal_web_property_id: String,
-    /// Table ID for view (profile).    
+    /// Table ID for view (profile).
     #[serde(alias="tableId")]
     pub table_id: String,
-    /// Web Property ID to which this view (profile) belongs.    
+    /// Web Property ID to which this view (profile) belongs.
     #[serde(alias="webPropertyId")]
     pub web_property_id: String,
-    /// View (Profile) ID.    
+    /// View (Profile) ID.
     #[serde(alias="profileId")]
     pub profile_id: String,
-    /// View (Profile) name.    
+    /// View (Profile) name.
     #[serde(alias="profileName")]
     pub profile_name: String,
-    /// Account ID to which this view (profile) belongs.    
+    /// Account ID to which this view (profile) belongs.
     #[serde(alias="accountId")]
     pub account_id: String,
 }
@@ -1170,10 +1179,10 @@ impl Part for McfDataProfileInfo {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct UnsampledReportCloudStorageDownloadDetails {
-    /// Id of the bucket the file object is stored in.    
+    /// Id of the bucket the file object is stored in.
     #[serde(alias="bucketId")]
     pub bucket_id: String,
-    /// Id of the file object containing the report data.    
+    /// Id of the file object containing the report data.
     #[serde(alias="objectId")]
     pub object_id: String,
 }
@@ -1188,10 +1197,10 @@ impl Part for UnsampledReportCloudStorageDownloadDetails {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoalVisitTimeOnSiteDetails {
-    /// Type of comparison. Possible values are LESS_THAN or GREATER_THAN.    
+    /// Type of comparison. Possible values are LESS_THAN or GREATER_THAN.
     #[serde(alias="comparisonType")]
     pub comparison_type: String,
-    /// Value used for this comparison.    
+    /// Value used for this comparison.
     #[serde(alias="comparisonValue")]
     pub comparison_value: String,
 }
@@ -1206,9 +1215,9 @@ impl Part for GoalVisitTimeOnSiteDetails {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct GaDataDataTable {
-    /// no description provided    
+    /// no description provided
     pub rows: Vec<GaDataDataTableRows>,
-    /// no description provided    
+    /// no description provided
     pub cols: Vec<GaDataDataTableCols>,
 }
 
@@ -1232,19 +1241,19 @@ impl Part for GaDataDataTable {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct EntityUserLink {
-    /// Resource type for entity user link.    
+    /// Resource type for entity user link.
     pub kind: Option<String>,
-    /// User reference.    
+    /// User reference.
     #[serde(alias="userRef")]
     pub user_ref: Option<UserRef>,
-    /// Permissions the user has for this entity.    
+    /// Permissions the user has for this entity.
     pub permissions: Option<EntityUserLinkPermissions>,
-    /// Entity user link ID    
+    /// Entity user link ID
     pub id: Option<String>,
-    /// Self link for this resource.    
+    /// Self link for this resource.
     #[serde(alias="selfLink")]
     pub self_link: Option<String>,
-    /// Entity for this link. It can be an account, a web property, or a view (profile).    
+    /// Entity for this link. It can be an account, a web property, or a view (profile).
     pub entity: Option<EntityUserLinkEntity>,
 }
 
@@ -1263,25 +1272,25 @@ impl ResponseResult for EntityUserLink {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct AccountSummaries {
-    /// Email ID of the authenticated user    
+    /// Email ID of the authenticated user
     pub username: String,
-    /// Collection type.    
+    /// Collection type.
     pub kind: String,
-    /// A list of AccountSummaries.    
+    /// A list of AccountSummaries.
     pub items: Vec<AccountSummary>,
-    /// The maximum number of resources the response can contain, regardless of the actual number of resources returned. Its value ranges from 1 to 1000 with a value of 1000 by default, or otherwise specified by the max-results query parameter.    
+    /// The maximum number of resources the response can contain, regardless of the actual number of resources returned. Its value ranges from 1 to 1000 with a value of 1000 by default, or otherwise specified by the max-results query parameter.
     #[serde(alias="itemsPerPage")]
     pub items_per_page: i32,
-    /// Link to previous page for this AccountSummary collection.    
+    /// Link to previous page for this AccountSummary collection.
     #[serde(alias="previousLink")]
     pub previous_link: String,
-    /// The starting index of the resources, which is 1 by default or otherwise specified by the start-index query parameter.    
+    /// The starting index of the resources, which is 1 by default or otherwise specified by the start-index query parameter.
     #[serde(alias="startIndex")]
     pub start_index: i32,
-    /// Link to next page for this AccountSummary collection.    
+    /// Link to next page for this AccountSummary collection.
     #[serde(alias="nextLink")]
     pub next_link: String,
-    /// The total number of results for the query, regardless of the number of results in the response.    
+    /// The total number of results for the query, regardless of the number of results in the response.
     #[serde(alias="totalResults")]
     pub total_results: i32,
 }
@@ -1300,25 +1309,25 @@ impl ResponseResult for AccountSummaries {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct CustomDimensions {
-    /// Email ID of the authenticated user    
+    /// Email ID of the authenticated user
     pub username: String,
-    /// Collection type.    
+    /// Collection type.
     pub kind: String,
-    /// Collection of custom dimensions.    
+    /// Collection of custom dimensions.
     pub items: Vec<CustomDimension>,
-    /// The maximum number of resources the response can contain, regardless of the actual number of resources returned. Its value ranges from 1 to 1000 with a value of 1000 by default, or otherwise specified by the max-results query parameter.    
+    /// The maximum number of resources the response can contain, regardless of the actual number of resources returned. Its value ranges from 1 to 1000 with a value of 1000 by default, or otherwise specified by the max-results query parameter.
     #[serde(alias="itemsPerPage")]
     pub items_per_page: i32,
-    /// Link to previous page for this custom dimension collection.    
+    /// Link to previous page for this custom dimension collection.
     #[serde(alias="previousLink")]
     pub previous_link: String,
-    /// The starting index of the resources, which is 1 by default or otherwise specified by the start-index query parameter.    
+    /// The starting index of the resources, which is 1 by default or otherwise specified by the start-index query parameter.
     #[serde(alias="startIndex")]
     pub start_index: i32,
-    /// Link to next page for this custom dimension collection.    
+    /// Link to next page for this custom dimension collection.
     #[serde(alias="nextLink")]
     pub next_link: String,
-    /// The total number of results for the query, regardless of the number of results in the response.    
+    /// The total number of results for the query, regardless of the number of results in the response.
     #[serde(alias="totalResults")]
     pub total_results: i32,
 }
@@ -1332,7 +1341,7 @@ impl ResponseResult for CustomDimensions {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct UnsampledReportDriveDownloadDetails {
-    /// Id of the document/file containing the report data.    
+    /// Id of the document/file containing the report data.
     #[serde(alias="documentId")]
     pub document_id: String,
 }
@@ -1347,17 +1356,17 @@ impl Part for UnsampledReportDriveDownloadDetails {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoalUrlDestinationDetails {
-    /// URL for this goal.    
+    /// URL for this goal.
     pub url: String,
-    /// Determines if the goal URL must exactly match the capitalization of visited URLs.    
+    /// Determines if the goal URL must exactly match the capitalization of visited URLs.
     #[serde(alias="caseSensitive")]
     pub case_sensitive: bool,
-    /// Match type for the goal URL. Possible values are HEAD, EXACT, or REGEX.    
+    /// Match type for the goal URL. Possible values are HEAD, EXACT, or REGEX.
     #[serde(alias="matchType")]
     pub match_type: String,
-    /// List of steps configured for this goal funnel.    
+    /// List of steps configured for this goal funnel.
     pub steps: Vec<GoalUrlDestinationDetailsSteps>,
-    /// Determines if the first step in this goal is required.    
+    /// Determines if the first step in this goal is required.
     #[serde(alias="firstStepRequired")]
     pub first_step_required: bool,
 }
@@ -1378,18 +1387,18 @@ impl Part for GoalUrlDestinationDetails {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct Upload {
-    /// Upload status. Possible values: PENDING, COMPLETED, FAILED, DELETING, DELETED.    
+    /// Upload status. Possible values: PENDING, COMPLETED, FAILED, DELETING, DELETED.
     pub status: String,
-    /// Resource type for Analytics upload.    
+    /// Resource type for Analytics upload.
     pub kind: String,
-    /// Data import errors collection.    
+    /// Data import errors collection.
     pub errors: Vec<String>,
-    /// Custom data source Id to which this data import belongs.    
+    /// Custom data source Id to which this data import belongs.
     #[serde(alias="customDataSourceId")]
     pub custom_data_source_id: String,
-    /// A unique ID for this upload.    
+    /// A unique ID for this upload.
     pub id: String,
-    /// Account Id to which this upload belongs.    
+    /// Account Id to which this upload belongs.
     #[serde(alias="accountId")]
     pub account_id: String,
 }
@@ -1408,25 +1417,25 @@ impl ResponseResult for Upload {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct Profiles {
-    /// Email ID of the authenticated user    
+    /// Email ID of the authenticated user
     pub username: String,
-    /// Collection type.    
+    /// Collection type.
     pub kind: String,
-    /// A list of views (profiles).    
+    /// A list of views (profiles).
     pub items: Vec<Profile>,
-    /// The maximum number of resources the response can contain, regardless of the actual number of resources returned. Its value ranges from 1 to 1000 with a value of 1000 by default, or otherwise specified by the max-results query parameter.    
+    /// The maximum number of resources the response can contain, regardless of the actual number of resources returned. Its value ranges from 1 to 1000 with a value of 1000 by default, or otherwise specified by the max-results query parameter.
     #[serde(alias="itemsPerPage")]
     pub items_per_page: i32,
-    /// Link to previous page for this view (profile) collection.    
+    /// Link to previous page for this view (profile) collection.
     #[serde(alias="previousLink")]
     pub previous_link: String,
-    /// The starting index of the resources, which is 1 by default or otherwise specified by the start-index query parameter.    
+    /// The starting index of the resources, which is 1 by default or otherwise specified by the start-index query parameter.
     #[serde(alias="startIndex")]
     pub start_index: i32,
-    /// Link to next page for this view (profile) collection.    
+    /// Link to next page for this view (profile) collection.
     #[serde(alias="nextLink")]
     pub next_link: String,
-    /// The total number of results for the query, regardless of the number of results in the response.    
+    /// The total number of results for the query, regardless of the number of results in the response.
     #[serde(alias="totalResults")]
     pub total_results: i32,
 }
@@ -1440,7 +1449,7 @@ impl ResponseResult for Profiles {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct AccountPermissions {
-    /// All the permissions that the user has for this account. These include any implied permissions (e.g., EDIT implies VIEW).    
+    /// All the permissions that the user has for this account. These include any implied permissions (e.g., EDIT implies VIEW).
     pub effective: Vec<String>,
 }
 
@@ -1454,22 +1463,22 @@ impl Part for AccountPermissions {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct GaDataProfileInfo {
-    /// Internal ID for the web property to which this view (profile) belongs.    
+    /// Internal ID for the web property to which this view (profile) belongs.
     #[serde(alias="internalWebPropertyId")]
     pub internal_web_property_id: String,
-    /// Table ID for view (profile).    
+    /// Table ID for view (profile).
     #[serde(alias="tableId")]
     pub table_id: String,
-    /// Web Property ID to which this view (profile) belongs.    
+    /// Web Property ID to which this view (profile) belongs.
     #[serde(alias="webPropertyId")]
     pub web_property_id: String,
-    /// View (Profile) ID.    
+    /// View (Profile) ID.
     #[serde(alias="profileId")]
     pub profile_id: String,
-    /// View (Profile) name.    
+    /// View (Profile) name.
     #[serde(alias="profileName")]
     pub profile_name: String,
-    /// Account ID to which this view (profile) belongs.    
+    /// Account ID to which this view (profile) belongs.
     #[serde(alias="accountId")]
     pub account_id: String,
 }
@@ -1484,9 +1493,9 @@ impl Part for GaDataProfileInfo {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct FilterParentLink {
-    /// Link to the account to which this filter belongs.    
+    /// Link to the account to which this filter belongs.
     pub href: String,
-    /// Value is "analytics#account".    
+    /// Value is "analytics#account".
     #[serde(alias="type")]
     pub type_: String,
 }
@@ -1506,25 +1515,25 @@ impl Part for FilterParentLink {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct Webproperties {
-    /// Email ID of the authenticated user    
+    /// Email ID of the authenticated user
     pub username: String,
-    /// Collection type.    
+    /// Collection type.
     pub kind: String,
-    /// A list of web properties.    
+    /// A list of web properties.
     pub items: Vec<Webproperty>,
-    /// The maximum number of resources the response can contain, regardless of the actual number of resources returned. Its value ranges from 1 to 1000 with a value of 1000 by default, or otherwise specified by the max-results query parameter.    
+    /// The maximum number of resources the response can contain, regardless of the actual number of resources returned. Its value ranges from 1 to 1000 with a value of 1000 by default, or otherwise specified by the max-results query parameter.
     #[serde(alias="itemsPerPage")]
     pub items_per_page: i32,
-    /// Link to previous page for this web property collection.    
+    /// Link to previous page for this web property collection.
     #[serde(alias="previousLink")]
     pub previous_link: String,
-    /// The starting index of the resources, which is 1 by default or otherwise specified by the start-index query parameter.    
+    /// The starting index of the resources, which is 1 by default or otherwise specified by the start-index query parameter.
     #[serde(alias="startIndex")]
     pub start_index: i32,
-    /// Link to next page for this web property collection.    
+    /// Link to next page for this web property collection.
     #[serde(alias="nextLink")]
     pub next_link: String,
-    /// The total number of results for the query, regardless of the number of results in the response.    
+    /// The total number of results for the query, regardless of the number of results in the response.
     #[serde(alias="totalResults")]
     pub total_results: i32,
 }
@@ -1538,9 +1547,9 @@ impl ResponseResult for Webproperties {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct EntityUserLinkPermissions {
-    /// Permissions that a user has been assigned at this very level. Does not include any implied or inherited permissions. Local permissions are modifiable.    
+    /// Permissions that a user has been assigned at this very level. Does not include any implied or inherited permissions. Local permissions are modifiable.
     pub local: Vec<String>,
-    /// Effective permissions represent all the permissions that a user has for this entity. These include any implied permissions (e.g., EDIT implies VIEW) or inherited permissions from the parent entity. Effective permissions are read-only.    
+    /// Effective permissions represent all the permissions that a user has for this entity. These include any implied permissions (e.g., EDIT implies VIEW) or inherited permissions from the parent entity. Effective permissions are read-only.
     pub effective: Vec<String>,
 }
 
@@ -1562,18 +1571,18 @@ impl Part for EntityUserLinkPermissions {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ProfileFilterLink {
-    /// Filter for this link.    
+    /// Filter for this link.
     #[serde(alias="filterRef")]
     pub filter_ref: Option<FilterRef>,
-    /// Resource type for Analytics filter.    
+    /// Resource type for Analytics filter.
     pub kind: Option<String>,
-    /// Link for this profile filter link.    
+    /// Link for this profile filter link.
     #[serde(alias="selfLink")]
     pub self_link: Option<String>,
-    /// View (Profile) for this link.    
+    /// View (Profile) for this link.
     #[serde(alias="profileRef")]
     pub profile_ref: Option<ProfileRef>,
-    /// Profile filter link ID.    
+    /// Profile filter link ID.
     pub id: Option<String>,
     /// The rank of this profile filter link relative to the other filters linked to the same profile.
     /// For readonly (i.e., list and get) operations, the rank always starts at 1.
@@ -1591,14 +1600,14 @@ impl ResponseResult for ProfileFilterLink {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct AccountSummary {
-    /// Resource type for Analytics AccountSummary.    
+    /// Resource type for Analytics AccountSummary.
     pub kind: String,
-    /// List of web properties under this account.    
+    /// List of web properties under this account.
     #[serde(alias="webProperties")]
     pub web_properties: Vec<WebPropertySummary>,
-    /// Account ID.    
+    /// Account ID.
     pub id: String,
-    /// Account name.    
+    /// Account name.
     pub name: String,
 }
 
@@ -1619,45 +1628,45 @@ impl Part for AccountSummary {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Webproperty {
-    /// Time this web property was last modified.    
+    /// Time this web property was last modified.
     pub updated: Option<String>,
-    /// Default view (profile) ID.    
+    /// Default view (profile) ID.
     #[serde(alias="defaultProfileId")]
     pub default_profile_id: Option<String>,
-    /// View (Profile) count for this web property.    
+    /// View (Profile) count for this web property.
     #[serde(alias="profileCount")]
     pub profile_count: Option<i32>,
-    /// Internal ID for this web property.    
+    /// Internal ID for this web property.
     #[serde(alias="internalWebPropertyId")]
     pub internal_web_property_id: Option<String>,
-    /// Child link for this web property. Points to the list of views (profiles) for this web property.    
+    /// Child link for this web property. Points to the list of views (profiles) for this web property.
     #[serde(alias="childLink")]
     pub child_link: Option<WebpropertyChildLink>,
-    /// The industry vertical/category selected for this web property.    
+    /// The industry vertical/category selected for this web property.
     #[serde(alias="industryVertical")]
     pub industry_vertical: Option<String>,
-    /// Web property ID of the form UA-XXXXX-YY.    
+    /// Web property ID of the form UA-XXXXX-YY.
     pub id: Option<String>,
-    /// Account ID to which this web property belongs.    
+    /// Account ID to which this web property belongs.
     #[serde(alias="accountId")]
     pub account_id: Option<String>,
-    /// Resource type for Analytics WebProperty.    
+    /// Resource type for Analytics WebProperty.
     pub kind: Option<String>,
-    /// Name of this web property.    
+    /// Name of this web property.
     pub name: Option<String>,
-    /// Time this web property was created.    
+    /// Time this web property was created.
     pub created: Option<String>,
-    /// Level for this web property. Possible values are STANDARD or PREMIUM.    
+    /// Level for this web property. Possible values are STANDARD or PREMIUM.
     pub level: Option<String>,
-    /// Website url for this web property.    
+    /// Website url for this web property.
     #[serde(alias="websiteUrl")]
     pub website_url: Option<String>,
-    /// Parent link for this web property. Points to the account to which this web property belongs.    
+    /// Parent link for this web property. Points to the account to which this web property belongs.
     #[serde(alias="parentLink")]
     pub parent_link: Option<WebpropertyParentLink>,
-    /// Permissions the user has for this web property.    
+    /// Permissions the user has for this web property.
     pub permissions: Option<WebpropertyPermissions>,
-    /// Link for this web property.    
+    /// Link for this web property.
     #[serde(alias="selfLink")]
     pub self_link: Option<String>,
 }
@@ -1677,27 +1686,27 @@ impl ResponseResult for Webproperty {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct RealtimeData {
-    /// Resource type.    
+    /// Resource type.
     pub kind: String,
-    /// Real time data rows, where each row contains a list of dimension values followed by the metric values. The order of dimensions and metrics is same as specified in the request.    
+    /// Real time data rows, where each row contains a list of dimension values followed by the metric values. The order of dimensions and metrics is same as specified in the request.
     pub rows: Vec<Vec<String>>,
-    /// The total number of rows for the query, regardless of the number of rows in the response.    
+    /// The total number of rows for the query, regardless of the number of rows in the response.
     #[serde(alias="totalResults")]
     pub total_results: i32,
-    /// Information for the view (profile), for which the real time data was requested.    
+    /// Information for the view (profile), for which the real time data was requested.
     #[serde(alias="profileInfo")]
     pub profile_info: RealtimeDataProfileInfo,
-    /// Column headers that list dimension names followed by the metric names. The order of dimensions and metrics is same as specified in the request.    
+    /// Column headers that list dimension names followed by the metric names. The order of dimensions and metrics is same as specified in the request.
     #[serde(alias="columnHeaders")]
     pub column_headers: Vec<RealtimeDataColumnHeaders>,
-    /// Real time data request query parameters.    
+    /// Real time data request query parameters.
     pub query: RealtimeDataQuery,
-    /// Total values for the requested metrics over all the results, not just the results returned in this response. The order of the metric totals is same as the metric order specified in the request.    
+    /// Total values for the requested metrics over all the results, not just the results returned in this response. The order of the metric totals is same as the metric order specified in the request.
     #[serde(alias="totalsForAllResults")]
     pub totals_for_all_results: HashMap<String, String>,
-    /// Unique ID for this data response.    
+    /// Unique ID for this data response.
     pub id: String,
-    /// Link to this page.    
+    /// Link to this page.
     #[serde(alias="selfLink")]
     pub self_link: String,
 }
@@ -1711,16 +1720,16 @@ impl ResponseResult for RealtimeData {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct FilterSearchAndReplaceDetails {
-    /// Determines if the filter is case sensitive.    
+    /// Determines if the filter is case sensitive.
     #[serde(alias="caseSensitive")]
     pub case_sensitive: bool,
-    /// Term to search.    
+    /// Term to search.
     #[serde(alias="searchString")]
     pub search_string: String,
-    /// Term to replace the search term with.    
+    /// Term to replace the search term with.
     #[serde(alias="replaceString")]
     pub replace_string: String,
-    /// Field to use in the filter.    
+    /// Field to use in the filter.
     pub field: String,
 }
 
@@ -1742,73 +1751,73 @@ impl Part for FilterSearchAndReplaceDetails {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Experiment {
-    /// Experiment status. Possible values: "DRAFT", "READY_TO_RUN", "RUNNING", "ENDED". Experiments can be created in the "DRAFT", "READY_TO_RUN" or "RUNNING" state. This field is required when creating an experiment.    
+    /// Experiment status. Possible values: "DRAFT", "READY_TO_RUN", "RUNNING", "ENDED". Experiments can be created in the "DRAFT", "READY_TO_RUN" or "RUNNING" state. This field is required when creating an experiment.
     pub status: Option<String>,
-    /// A floating-point number between 0 and 1. Specifies the fraction of the traffic that participates in the experiment. Can be changed for a running experiment. This field may not be changed for an experiments whose status is ENDED.    
+    /// A floating-point number between 0 and 1. Specifies the fraction of the traffic that participates in the experiment. Can be changed for a running experiment. This field may not be changed for an experiments whose status is ENDED.
     #[serde(alias="trafficCoverage")]
     pub traffic_coverage: Option<f64>,
-    /// Notes about this experiment.    
+    /// Notes about this experiment.
     pub description: Option<String>,
-    /// Web property ID to which this experiment belongs. The web property ID is of the form UA-XXXXX-YY. This field is read-only.    
+    /// Web property ID to which this experiment belongs. The web property ID is of the form UA-XXXXX-YY. This field is read-only.
     #[serde(alias="webPropertyId")]
     pub web_property_id: Option<String>,
-    /// Time the experiment was last modified. This field is read-only.    
+    /// Time the experiment was last modified. This field is read-only.
     pub updated: Option<String>,
-    /// Internal ID for the web property to which this experiment belongs. This field is read-only.    
+    /// Internal ID for the web property to which this experiment belongs. This field is read-only.
     #[serde(alias="internalWebPropertyId")]
     pub internal_web_property_id: Option<String>,
-    /// A floating-point number between 0 and 1. Specifies the necessary confidence level to choose a winner. This field may not be changed for an experiments whose status is ENDED.    
+    /// A floating-point number between 0 and 1. Specifies the necessary confidence level to choose a winner. This field may not be changed for an experiments whose status is ENDED.
     #[serde(alias="winnerConfidenceLevel")]
     pub winner_confidence_level: Option<f64>,
-    /// The starting time of the experiment (the time the status changed from READY_TO_RUN to RUNNING). This field is present only if the experiment has started. This field is read-only.    
+    /// The starting time of the experiment (the time the status changed from READY_TO_RUN to RUNNING). This field is present only if the experiment has started. This field is read-only.
     #[serde(alias="startTime")]
     pub start_time: Option<String>,
-    /// Whether the objectiveMetric should be minimized or maximized. Possible values: "MAXIMUM", "MINIMUM". Optional--defaults to "MAXIMUM". Cannot be specified without objectiveMetric. Cannot be modified when status is "RUNNING" or "ENDED".    
+    /// Whether the objectiveMetric should be minimized or maximized. Possible values: "MAXIMUM", "MINIMUM". Optional--defaults to "MAXIMUM". Cannot be specified without objectiveMetric. Cannot be modified when status is "RUNNING" or "ENDED".
     #[serde(alias="optimizationType")]
     pub optimization_type: Option<String>,
-    /// Boolean specifying whether a winner has been found for this experiment. This field is read-only.    
+    /// Boolean specifying whether a winner has been found for this experiment. This field is read-only.
     #[serde(alias="winnerFound")]
     pub winner_found: Option<bool>,
-    /// The metric that the experiment is optimizing. Valid values: "ga:goal(n)Completions", "ga:adsenseAdsClicks", "ga:adsenseAdsViewed", "ga:adsenseRevenue", "ga:bounces", "ga:pageviews", "ga:sessionDuration", "ga:transactions", "ga:transactionRevenue". This field is required if status is "RUNNING" and servingFramework is one of "REDIRECT" or "API".    
+    /// The metric that the experiment is optimizing. Valid values: "ga:goal(n)Completions", "ga:adsenseAdsClicks", "ga:adsenseAdsViewed", "ga:adsenseRevenue", "ga:bounces", "ga:pageviews", "ga:sessionDuration", "ga:transactions", "ga:transactionRevenue". This field is required if status is "RUNNING" and servingFramework is one of "REDIRECT" or "API".
     #[serde(alias="objectiveMetric")]
     pub objective_metric: Option<String>,
-    /// Experiment ID. Required for patch and update. Disallowed for create.    
+    /// Experiment ID. Required for patch and update. Disallowed for create.
     pub id: Option<String>,
-    /// Boolean specifying whether to distribute traffic evenly across all variations. If the value is False, content experiments follows the default behavior of adjusting traffic dynamically based on variation performance. Optional -- defaults to False. This field may not be changed for an experiment whose status is ENDED.    
+    /// Boolean specifying whether to distribute traffic evenly across all variations. If the value is False, content experiments follows the default behavior of adjusting traffic dynamically based on variation performance. Optional -- defaults to False. This field may not be changed for an experiment whose status is ENDED.
     #[serde(alias="equalWeighting")]
     pub equal_weighting: Option<bool>,
-    /// Account ID to which this experiment belongs. This field is read-only.    
+    /// Account ID to which this experiment belongs. This field is read-only.
     #[serde(alias="accountId")]
     pub account_id: Option<String>,
-    /// Resource type for an Analytics experiment. This field is read-only.    
+    /// Resource type for an Analytics experiment. This field is read-only.
     pub kind: Option<String>,
-    /// Experiment name. This field may not be changed for an experiment whose status is ENDED. This field is required when creating an experiment.    
+    /// Experiment name. This field may not be changed for an experiment whose status is ENDED. This field is required when creating an experiment.
     pub name: Option<String>,
-    /// Time the experiment was created. This field is read-only.    
+    /// Time the experiment was created. This field is read-only.
     pub created: Option<String>,
-    /// Why the experiment ended. Possible values: "STOPPED_BY_USER", "WINNER_FOUND", "EXPERIMENT_EXPIRED", "ENDED_WITH_NO_WINNER", "GOAL_OBJECTIVE_CHANGED". "ENDED_WITH_NO_WINNER" means that the experiment didn't expire but no winner was projected to be found. If the experiment status is changed via the API to ENDED this field is set to STOPPED_BY_USER. This field is read-only.    
+    /// Why the experiment ended. Possible values: "STOPPED_BY_USER", "WINNER_FOUND", "EXPERIMENT_EXPIRED", "ENDED_WITH_NO_WINNER", "GOAL_OBJECTIVE_CHANGED". "ENDED_WITH_NO_WINNER" means that the experiment didn't expire but no winner was projected to be found. If the experiment status is changed via the API to ENDED this field is set to STOPPED_BY_USER. This field is read-only.
     #[serde(alias="reasonExperimentEnded")]
     pub reason_experiment_ended: Option<String>,
-    /// Array of variations. The first variation in the array is the original. The number of variations may not change once an experiment is in the RUNNING state. At least two variations are required before status can be set to RUNNING.    
+    /// Array of variations. The first variation in the array is the original. The number of variations may not change once an experiment is in the RUNNING state. At least two variations are required before status can be set to RUNNING.
     pub variations: Option<Vec<ExperimentVariations>>,
-    /// The snippet of code to include on the control page(s). This field is read-only.    
+    /// The snippet of code to include on the control page(s). This field is read-only.
     pub snippet: Option<String>,
-    /// If true, the end user will be able to edit the experiment via the Google Analytics user interface.    
+    /// If true, the end user will be able to edit the experiment via the Google Analytics user interface.
     #[serde(alias="editableInGaUi")]
     pub editable_in_ga_ui: Option<bool>,
-    /// Boolean specifying whether variations URLS are rewritten to match those of the original. This field may not be changed for an experiments whose status is ENDED.    
+    /// Boolean specifying whether variations URLS are rewritten to match those of the original. This field may not be changed for an experiments whose status is ENDED.
     #[serde(alias="rewriteVariationUrlsAsOriginal")]
     pub rewrite_variation_urls_as_original: Option<bool>,
-    /// An integer number in [3, 90]. Specifies the minimum length of the experiment. Can be changed for a running experiment. This field may not be changed for an experiments whose status is ENDED.    
+    /// An integer number in [3, 90]. Specifies the minimum length of the experiment. Can be changed for a running experiment. This field may not be changed for an experiments whose status is ENDED.
     #[serde(alias="minimumExperimentLengthInDays")]
     pub minimum_experiment_length_in_days: Option<i32>,
-    /// View (Profile) ID to which this experiment belongs. This field is read-only.    
+    /// View (Profile) ID to which this experiment belongs. This field is read-only.
     #[serde(alias="profileId")]
     pub profile_id: Option<String>,
-    /// Parent link for an experiment. Points to the view (profile) to which this experiment belongs.    
+    /// Parent link for an experiment. Points to the view (profile) to which this experiment belongs.
     #[serde(alias="parentLink")]
     pub parent_link: Option<ExperimentParentLink>,
-    /// The ending time of the experiment (the time the status changed from RUNNING to ENDED). This field is present only if the experiment has ended. This field is read-only.    
+    /// The ending time of the experiment (the time the status changed from RUNNING to ENDED). This field is present only if the experiment has ended. This field is read-only.
     #[serde(alias="endTime")]
     pub end_time: Option<String>,
     /// The framework used to serve the experiment variations and evaluate the results. One of:  
@@ -1817,7 +1826,7 @@ pub struct Experiment {
     /// - EXTERNAL: The variations will be served externally and the chosen variation reported to Google Analytics. The caller is responsible for serving the selected variation and evaluating the results.
     #[serde(alias="servingFramework")]
     pub serving_framework: Option<String>,
-    /// Link for this experiment. This field is read-only.    
+    /// Link for this experiment. This field is read-only.
     #[serde(alias="selfLink")]
     pub self_link: Option<String>,
 }
@@ -1837,25 +1846,25 @@ impl ResponseResult for Experiment {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct CustomMetrics {
-    /// Email ID of the authenticated user    
+    /// Email ID of the authenticated user
     pub username: String,
-    /// Collection type.    
+    /// Collection type.
     pub kind: String,
-    /// Collection of custom metrics.    
+    /// Collection of custom metrics.
     pub items: Vec<CustomMetric>,
-    /// The maximum number of resources the response can contain, regardless of the actual number of resources returned. Its value ranges from 1 to 1000 with a value of 1000 by default, or otherwise specified by the max-results query parameter.    
+    /// The maximum number of resources the response can contain, regardless of the actual number of resources returned. Its value ranges from 1 to 1000 with a value of 1000 by default, or otherwise specified by the max-results query parameter.
     #[serde(alias="itemsPerPage")]
     pub items_per_page: i32,
-    /// Link to previous page for this custom metric collection.    
+    /// Link to previous page for this custom metric collection.
     #[serde(alias="previousLink")]
     pub previous_link: String,
-    /// The starting index of the resources, which is 1 by default or otherwise specified by the start-index query parameter.    
+    /// The starting index of the resources, which is 1 by default or otherwise specified by the start-index query parameter.
     #[serde(alias="startIndex")]
     pub start_index: i32,
-    /// Link to next page for this custom metric collection.    
+    /// Link to next page for this custom metric collection.
     #[serde(alias="nextLink")]
     pub next_link: String,
-    /// The total number of results for the query, regardless of the number of results in the response.    
+    /// The total number of results for the query, regardless of the number of results in the response.
     #[serde(alias="totalResults")]
     pub total_results: i32,
 }
@@ -1869,32 +1878,32 @@ impl ResponseResult for CustomMetrics {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct GaDataQuery {
-    /// Maximum results per page.    
+    /// Maximum results per page.
     #[serde(alias="max-results")]
     pub max_results: i32,
-    /// List of dimensions or metrics based on which Analytics data is sorted.    
+    /// List of dimensions or metrics based on which Analytics data is sorted.
     pub sort: Vec<String>,
-    /// List of analytics dimensions.    
+    /// List of analytics dimensions.
     pub dimensions: String,
-    /// Start date.    
+    /// Start date.
     #[serde(alias="start-date")]
     pub start_date: String,
-    /// Start index.    
+    /// Start index.
     #[serde(alias="start-index")]
     pub start_index: i32,
-    /// End date.    
+    /// End date.
     #[serde(alias="end-date")]
     pub end_date: String,
-    /// Unique table ID.    
+    /// Unique table ID.
     pub ids: String,
-    /// List of analytics metrics.    
+    /// List of analytics metrics.
     pub metrics: Vec<String>,
-    /// Desired sampling level    
+    /// Desired sampling level
     #[serde(alias="samplingLevel")]
     pub sampling_level: String,
-    /// Comma-separated list of dimension or metric filters.    
+    /// Comma-separated list of dimension or metric filters.
     pub filters: String,
-    /// Analytics advanced segment.    
+    /// Analytics advanced segment.
     pub segment: String,
 }
 
@@ -1913,16 +1922,16 @@ impl Part for GaDataQuery {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct Columns {
-    /// List of columns for a report type.    
+    /// List of columns for a report type.
     pub items: Vec<Column>,
-    /// Collection type.    
+    /// Collection type.
     pub kind: String,
-    /// Etag of collection. This etag can be compared with the last response etag to check if response has changed.    
+    /// Etag of collection. This etag can be compared with the last response etag to check if response has changed.
     pub etag: String,
-    /// Total number of columns returned in the response.    
+    /// Total number of columns returned in the response.
     #[serde(alias="totalResults")]
     pub total_results: i32,
-    /// List of attributes names returned by columns.    
+    /// List of attributes names returned by columns.
     #[serde(alias="attributeNames")]
     pub attribute_names: Vec<String>,
 }
@@ -1936,15 +1945,15 @@ impl ResponseResult for Columns {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct FilterExpression {
-    /// Determines if the filter is case sensitive.    
+    /// Determines if the filter is case sensitive.
     #[serde(alias="caseSensitive")]
     pub case_sensitive: bool,
-    /// Kind value for filter expression    
+    /// Kind value for filter expression
     pub kind: String,
-    /// Match type for this filter. Possible values are BEGINS_WITH, EQUAL, ENDS_WITH, CONTAINS, MATCHES. Include and Exclude filters can use any match type. Match type is not applicable to Upper case and Lower case filters. Search and Replace expressions in the Search and Replace filter and all filter expressions in the Advanced filter default to MATCHES. User should not set match type for those filters.    
+    /// Match type for this filter. Possible values are BEGINS_WITH, EQUAL, ENDS_WITH, CONTAINS, MATCHES. Include and Exclude filters can use any match type. Match type is not applicable to Upper case and Lower case filters. Search and Replace expressions in the Search and Replace filter and all filter expressions in the Advanced filter default to MATCHES. User should not set match type for those filters.
     #[serde(alias="matchType")]
     pub match_type: String,
-    /// Filter expression value    
+    /// Filter expression value
     #[serde(alias="expressionValue")]
     pub expression_value: String,
     /// Field to filter. Possible values:  
@@ -2044,10 +2053,10 @@ impl Part for FilterExpression {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct McfDataRowsConversionPathValue {
-    /// Node value of an interaction on conversion path. Such as source, medium etc.    
+    /// Node value of an interaction on conversion path. Such as source, medium etc.
     #[serde(alias="nodeValue")]
     pub node_value: String,
-    /// Type of an interaction on conversion path. Such as CLICK, IMPRESSION etc.    
+    /// Type of an interaction on conversion path. Such as CLICK, IMPRESSION etc.
     #[serde(alias="interactionType")]
     pub interaction_type: String,
 }
@@ -2062,7 +2071,7 @@ impl Part for McfDataRowsConversionPathValue {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct GaDataDataTableRows {
-    /// no description provided    
+    /// no description provided
     pub c: Vec<GaDataDataTableRowsC>,
 }
 
@@ -2076,12 +2085,12 @@ impl Part for GaDataDataTableRows {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct AdWordsAccount {
-    /// Resource type for AdWords account.    
+    /// Resource type for AdWords account.
     pub kind: String,
-    /// Customer ID. This field is required when creating an AdWords link.    
+    /// Customer ID. This field is required when creating an AdWords link.
     #[serde(alias="customerId")]
     pub customer_id: String,
-    /// True if auto-tagging is enabled on the AdWords account. Read-only after the insert operation.    
+    /// True if auto-tagging is enabled on the AdWords account. Read-only after the insert operation.
     #[serde(alias="autoTaggingEnabled")]
     pub auto_tagging_enabled: bool,
 }
@@ -2095,19 +2104,19 @@ impl Part for AdWordsAccount {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct WebPropertyRef {
-    /// Analytics web property reference.    
+    /// Analytics web property reference.
     pub kind: String,
-    /// Link for this web property.    
+    /// Link for this web property.
     pub href: String,
-    /// Name of this web property.    
+    /// Name of this web property.
     pub name: String,
-    /// Account ID to which this web property belongs.    
+    /// Account ID to which this web property belongs.
     #[serde(alias="accountId")]
     pub account_id: String,
-    /// Internal ID for this web property.    
+    /// Internal ID for this web property.
     #[serde(alias="internalWebPropertyId")]
     pub internal_web_property_id: String,
-    /// Web property ID of the form UA-XXXXX-YY.    
+    /// Web property ID of the form UA-XXXXX-YY.
     pub id: String,
 }
 
@@ -2120,9 +2129,9 @@ impl Part for WebPropertyRef {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct WebpropertyChildLink {
-    /// Link to the list of views (profiles) for this web property.    
+    /// Link to the list of views (profiles) for this web property.
     pub href: String,
-    /// Type of the parent link. Its value is "analytics#profiles".    
+    /// Type of the parent link. Its value is "analytics#profiles".
     #[serde(alias="type")]
     pub type_: String,
 }
@@ -2137,7 +2146,7 @@ impl Part for WebpropertyChildLink {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct GaDataDataTableRowsC {
-    /// no description provided    
+    /// no description provided
     pub v: String,
 }
 
@@ -2151,11 +2160,11 @@ impl Part for GaDataDataTableRowsC {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct Column {
-    /// Map of attribute name and value for this column.    
+    /// Map of attribute name and value for this column.
     pub attributes: HashMap<String, String>,
-    /// Resource type for Analytics column.    
+    /// Resource type for Analytics column.
     pub kind: String,
-    /// Column id.    
+    /// Column id.
     pub id: String,
 }
 
@@ -2173,25 +2182,25 @@ impl Part for Column {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct ProfileFilterLinks {
-    /// Email ID of the authenticated user    
+    /// Email ID of the authenticated user
     pub username: String,
-    /// Collection type.    
+    /// Collection type.
     pub kind: String,
-    /// A list of profile filter links.    
+    /// A list of profile filter links.
     pub items: Vec<ProfileFilterLink>,
-    /// The maximum number of resources the response can contain, regardless of the actual number of resources returned. Its value ranges from 1 to 1,000 with a value of 1000 by default, or otherwise specified by the max-results query parameter.    
+    /// The maximum number of resources the response can contain, regardless of the actual number of resources returned. Its value ranges from 1 to 1,000 with a value of 1000 by default, or otherwise specified by the max-results query parameter.
     #[serde(alias="itemsPerPage")]
     pub items_per_page: i32,
-    /// Link to previous page for this profile filter link collection.    
+    /// Link to previous page for this profile filter link collection.
     #[serde(alias="previousLink")]
     pub previous_link: String,
-    /// The starting index of the resources, which is 1 by default or otherwise specified by the start-index query parameter.    
+    /// The starting index of the resources, which is 1 by default or otherwise specified by the start-index query parameter.
     #[serde(alias="startIndex")]
     pub start_index: i32,
-    /// Link to next page for this profile filter link collection.    
+    /// Link to next page for this profile filter link collection.
     #[serde(alias="nextLink")]
     pub next_link: String,
-    /// The total number of results for the query, regardless of the number of results in the response.    
+    /// The total number of results for the query, regardless of the number of results in the response.
     #[serde(alias="totalResults")]
     pub total_results: i32,
 }
@@ -2214,44 +2223,44 @@ impl ResponseResult for ProfileFilterLinks {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Filter {
-    /// Resource type for Analytics filter.    
+    /// Resource type for Analytics filter.
     pub kind: Option<String>,
-    /// Name of this filter.    
+    /// Name of this filter.
     pub name: Option<String>,
-    /// Time this filter was created.    
+    /// Time this filter was created.
     pub created: Option<String>,
-    /// Time this filter was last modified.    
+    /// Time this filter was last modified.
     pub updated: Option<String>,
-    /// Details for the filter of the type ADVANCED.    
+    /// Details for the filter of the type ADVANCED.
     #[serde(alias="advancedDetails")]
     pub advanced_details: Option<FilterAdvancedDetails>,
-    /// Details for the filter of the type LOWER.    
+    /// Details for the filter of the type LOWER.
     #[serde(alias="lowercaseDetails")]
     pub lowercase_details: Option<FilterLowercaseDetails>,
-    /// Parent link for this filter. Points to the account to which this filter belongs.    
+    /// Parent link for this filter. Points to the account to which this filter belongs.
     #[serde(alias="parentLink")]
     pub parent_link: Option<FilterParentLink>,
-    /// Details for the filter of the type EXCLUDE.    
+    /// Details for the filter of the type EXCLUDE.
     #[serde(alias="excludeDetails")]
     pub exclude_details: Option<FilterExpression>,
-    /// Details for the filter of the type INCLUDE.    
+    /// Details for the filter of the type INCLUDE.
     #[serde(alias="includeDetails")]
     pub include_details: Option<FilterExpression>,
-    /// Details for the filter of the type UPPER.    
+    /// Details for the filter of the type UPPER.
     #[serde(alias="uppercaseDetails")]
     pub uppercase_details: Option<FilterUppercaseDetails>,
-    /// Account ID to which this filter belongs.    
+    /// Account ID to which this filter belongs.
     #[serde(alias="accountId")]
     pub account_id: Option<String>,
-    /// Type of this filter. Possible values are INCLUDE, EXCLUDE, LOWERCASE, UPPERCASE, SEARCH_AND_REPLACE and ADVANCED.    
+    /// Type of this filter. Possible values are INCLUDE, EXCLUDE, LOWERCASE, UPPERCASE, SEARCH_AND_REPLACE and ADVANCED.
     #[serde(alias="type")]
     pub type_: Option<String>,
-    /// Filter ID.    
+    /// Filter ID.
     pub id: Option<String>,
-    /// Link for this filter.    
+    /// Link for this filter.
     #[serde(alias="selfLink")]
     pub self_link: Option<String>,
-    /// Details for the filter of the type SEARCH_AND_REPLACE.    
+    /// Details for the filter of the type SEARCH_AND_REPLACE.
     #[serde(alias="searchAndReplaceDetails")]
     pub search_and_replace_details: Option<FilterSearchAndReplaceDetails>,
 }
@@ -2274,22 +2283,22 @@ impl ResponseResult for Filter {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct EntityAdWordsLink {
-    /// Resource type for entity AdWords link.    
+    /// Resource type for entity AdWords link.
     pub kind: Option<String>,
-    /// Name of the link. This field is required when creating an AdWords link.    
+    /// Name of the link. This field is required when creating an AdWords link.
     pub name: Option<String>,
-    /// A list of AdWords client accounts. These cannot be MCC accounts. This field is required when creating an AdWords link. It cannot be empty.    
+    /// A list of AdWords client accounts. These cannot be MCC accounts. This field is required when creating an AdWords link. It cannot be empty.
     #[serde(alias="adWordsAccounts")]
     pub ad_words_accounts: Option<Vec<AdWordsAccount>>,
-    /// IDs of linked Views (Profiles) represented as strings.    
+    /// IDs of linked Views (Profiles) represented as strings.
     #[serde(alias="profileIds")]
     pub profile_ids: Option<Vec<String>>,
-    /// Entity AdWords link ID    
+    /// Entity AdWords link ID
     pub id: Option<String>,
-    /// URL link for this Google Analytics - Google AdWords link.    
+    /// URL link for this Google Analytics - Google AdWords link.
     #[serde(alias="selfLink")]
     pub self_link: Option<String>,
-    /// Web property being linked.    
+    /// Web property being linked.
     pub entity: Option<EntityAdWordsLinkEntity>,
 }
 
@@ -2308,23 +2317,23 @@ impl ResponseResult for EntityAdWordsLink {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct Uploads {
-    /// Collection type.    
+    /// Collection type.
     pub kind: String,
-    /// The total number of results for the query, regardless of the number of resources in the result.    
+    /// The total number of results for the query, regardless of the number of resources in the result.
     #[serde(alias="totalResults")]
     pub total_results: i32,
-    /// A list of uploads.    
+    /// A list of uploads.
     pub items: Vec<Upload>,
-    /// Link to previous page for this upload collection.    
+    /// Link to previous page for this upload collection.
     #[serde(alias="previousLink")]
     pub previous_link: String,
-    /// The maximum number of resources the response can contain, regardless of the actual number of resources returned. Its value ranges from 1 to 1000 with a value of 1000 by default, or otherwise specified by the max-results query parameter.    
+    /// The maximum number of resources the response can contain, regardless of the actual number of resources returned. Its value ranges from 1 to 1000 with a value of 1000 by default, or otherwise specified by the max-results query parameter.
     #[serde(alias="itemsPerPage")]
     pub items_per_page: i32,
-    /// The starting index of the resources, which is 1 by default or otherwise specified by the start-index query parameter.    
+    /// The starting index of the resources, which is 1 by default or otherwise specified by the start-index query parameter.
     #[serde(alias="startIndex")]
     pub start_index: i32,
-    /// Link to next page for this upload collection.    
+    /// Link to next page for this upload collection.
     #[serde(alias="nextLink")]
     pub next_link: String,
 }
@@ -2338,7 +2347,7 @@ impl ResponseResult for Uploads {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct FilterLowercaseDetails {
-    /// Field to use in the filter.    
+    /// Field to use in the filter.
     pub field: String,
 }
 
@@ -2352,18 +2361,18 @@ impl Part for FilterLowercaseDetails {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoalEventDetailsEventConditions {
-    /// Expression used for this match.    
+    /// Expression used for this match.
     pub expression: String,
-    /// Type of the match to be performed. Possible values are REGEXP, BEGINS_WITH, or EXACT.    
+    /// Type of the match to be performed. Possible values are REGEXP, BEGINS_WITH, or EXACT.
     #[serde(alias="matchType")]
     pub match_type: String,
-    /// Type of this event condition. Possible values are CATEGORY, ACTION, LABEL, or VALUE.    
+    /// Type of this event condition. Possible values are CATEGORY, ACTION, LABEL, or VALUE.
     #[serde(alias="type")]
     pub type_: String,
-    /// Type of comparison. Possible values are LESS_THAN, GREATER_THAN or EQUAL.    
+    /// Type of comparison. Possible values are LESS_THAN, GREATER_THAN or EQUAL.
     #[serde(alias="comparisonType")]
     pub comparison_type: String,
-    /// Value used for this comparison.    
+    /// Value used for this comparison.
     #[serde(alias="comparisonValue")]
     pub comparison_value: String,
 }
@@ -2378,11 +2387,11 @@ impl Part for GoalEventDetailsEventConditions {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoalUrlDestinationDetailsSteps {
-    /// URL for this step.    
+    /// URL for this step.
     pub url: String,
-    /// Step name.    
+    /// Step name.
     pub name: String,
-    /// Step number.    
+    /// Step number.
     pub number: i32,
 }
 
@@ -2396,9 +2405,9 @@ impl Part for GoalUrlDestinationDetailsSteps {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct CustomMetricParentLink {
-    /// Link to the property to which the custom metric belongs.    
+    /// Link to the property to which the custom metric belongs.
     pub href: String,
-    /// Type of the parent link. Set to "analytics#webproperty".    
+    /// Type of the parent link. Set to "analytics#webproperty".
     #[serde(alias="type")]
     pub type_: String,
 }
@@ -2413,13 +2422,13 @@ impl Part for CustomMetricParentLink {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct McfDataColumnHeaders {
-    /// Data type. Dimension and metric values data types such as INTEGER, DOUBLE, CURRENCY, MCF_SEQUENCE etc.    
+    /// Data type. Dimension and metric values data types such as INTEGER, DOUBLE, CURRENCY, MCF_SEQUENCE etc.
     #[serde(alias="dataType")]
     pub data_type: String,
-    /// Column Type. Either DIMENSION or METRIC.    
+    /// Column Type. Either DIMENSION or METRIC.
     #[serde(alias="columnType")]
     pub column_type: String,
-    /// Column name.    
+    /// Column name.
     pub name: String,
 }
 
@@ -2433,9 +2442,9 @@ impl Part for McfDataColumnHeaders {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoalParentLink {
-    /// Link to the view (profile) to which this goal belongs.    
+    /// Link to the view (profile) to which this goal belongs.
     pub href: String,
-    /// Value is "analytics#profile".    
+    /// Value is "analytics#profile".
     #[serde(alias="type")]
     pub type_: String,
 }
@@ -2455,23 +2464,23 @@ impl Part for GoalParentLink {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct EntityAdWordsLinks {
-    /// Collection type.    
+    /// Collection type.
     pub kind: String,
-    /// The total number of results for the query, regardless of the number of results in the response.    
+    /// The total number of results for the query, regardless of the number of results in the response.
     #[serde(alias="totalResults")]
     pub total_results: i32,
-    /// A list of entity AdWords links.    
+    /// A list of entity AdWords links.
     pub items: Vec<EntityAdWordsLink>,
-    /// Previous link for this AdWords link collection.    
+    /// Previous link for this AdWords link collection.
     #[serde(alias="previousLink")]
     pub previous_link: String,
-    /// The maximum number of entries the response can contain, regardless of the actual number of entries returned. Its value ranges from 1 to 1000 with a value of 1000 by default, or otherwise specified by the max-results query parameter.    
+    /// The maximum number of entries the response can contain, regardless of the actual number of entries returned. Its value ranges from 1 to 1000 with a value of 1000 by default, or otherwise specified by the max-results query parameter.
     #[serde(alias="itemsPerPage")]
     pub items_per_page: i32,
-    /// The starting index of the entries, which is 1 by default or otherwise specified by the start-index query parameter.    
+    /// The starting index of the entries, which is 1 by default or otherwise specified by the start-index query parameter.
     #[serde(alias="startIndex")]
     pub start_index: i32,
-    /// Next link for this AdWords link collection.    
+    /// Next link for this AdWords link collection.
     #[serde(alias="nextLink")]
     pub next_link: String,
 }
@@ -2485,13 +2494,13 @@ impl ResponseResult for EntityAdWordsLinks {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct EntityUserLinkEntity {
-    /// Account for this link.    
+    /// Account for this link.
     #[serde(alias="accountRef")]
     pub account_ref: AccountRef,
-    /// View (Profile) for this link.    
+    /// View (Profile) for this link.
     #[serde(alias="profileRef")]
     pub profile_ref: ProfileRef,
-    /// Web property for this link.    
+    /// Web property for this link.
     #[serde(alias="webPropertyRef")]
     pub web_property_ref: WebPropertyRef,
 }
@@ -2506,13 +2515,13 @@ impl Part for EntityUserLinkEntity {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct AccountRef {
-    /// Analytics account reference.    
+    /// Analytics account reference.
     pub kind: String,
-    /// Link for this account.    
+    /// Link for this account.
     pub href: String,
-    /// Account ID.    
+    /// Account ID.
     pub id: String,
-    /// Account name.    
+    /// Account name.
     pub name: String,
 }
 
@@ -2532,23 +2541,23 @@ impl Part for AccountRef {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct EntityUserLinks {
-    /// Collection type.    
+    /// Collection type.
     pub kind: String,
-    /// The total number of results for the query, regardless of the number of results in the response.    
+    /// The total number of results for the query, regardless of the number of results in the response.
     #[serde(alias="totalResults")]
     pub total_results: i32,
-    /// A list of entity user links.    
+    /// A list of entity user links.
     pub items: Vec<EntityUserLink>,
-    /// Previous link for this account collection.    
+    /// Previous link for this account collection.
     #[serde(alias="previousLink")]
     pub previous_link: String,
-    /// The maximum number of entries the response can contain, regardless of the actual number of entries returned. Its value ranges from 1 to 1000 with a value of 1000 by default, or otherwise specified by the max-results query parameter.    
+    /// The maximum number of entries the response can contain, regardless of the actual number of entries returned. Its value ranges from 1 to 1000 with a value of 1000 by default, or otherwise specified by the max-results query parameter.
     #[serde(alias="itemsPerPage")]
     pub items_per_page: i32,
-    /// The starting index of the entries, which is 1 by default or otherwise specified by the start-index query parameter.    
+    /// The starting index of the entries, which is 1 by default or otherwise specified by the start-index query parameter.
     #[serde(alias="startIndex")]
     pub start_index: i32,
-    /// Next link for this account collection.    
+    /// Next link for this account collection.
     #[serde(alias="nextLink")]
     pub next_link: String,
 }
@@ -2567,25 +2576,25 @@ impl ResponseResult for EntityUserLinks {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct Segments {
-    /// Email ID of the authenticated user    
+    /// Email ID of the authenticated user
     pub username: String,
-    /// Collection type for segments.    
+    /// Collection type for segments.
     pub kind: String,
-    /// A list of segments.    
+    /// A list of segments.
     pub items: Vec<Segment>,
-    /// The maximum number of resources the response can contain, regardless of the actual number of resources returned. Its value ranges from 1 to 1000 with a value of 1000 by default, or otherwise specified by the max-results query parameter.    
+    /// The maximum number of resources the response can contain, regardless of the actual number of resources returned. Its value ranges from 1 to 1000 with a value of 1000 by default, or otherwise specified by the max-results query parameter.
     #[serde(alias="itemsPerPage")]
     pub items_per_page: i32,
-    /// Link to previous page for this segment collection.    
+    /// Link to previous page for this segment collection.
     #[serde(alias="previousLink")]
     pub previous_link: String,
-    /// The starting index of the resources, which is 1 by default or otherwise specified by the start-index query parameter.    
+    /// The starting index of the resources, which is 1 by default or otherwise specified by the start-index query parameter.
     #[serde(alias="startIndex")]
     pub start_index: i32,
-    /// Link to next page for this segment collection.    
+    /// Link to next page for this segment collection.
     #[serde(alias="nextLink")]
     pub next_link: String,
-    /// The total number of results for the query, regardless of the number of results in the response.    
+    /// The total number of results for the query, regardless of the number of results in the response.
     #[serde(alias="totalResults")]
     pub total_results: i32,
 }
@@ -2599,9 +2608,9 @@ impl ResponseResult for Segments {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct AccountChildLink {
-    /// Link to the list of web properties for this account.    
+    /// Link to the list of web properties for this account.
     pub href: String,
-    /// Type of the child link. Its value is "analytics#webproperties".    
+    /// Type of the child link. Its value is "analytics#webproperties".
     #[serde(alias="type")]
     pub type_: String,
 }
@@ -2616,7 +2625,7 @@ impl Part for AccountChildLink {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct FilterUppercaseDetails {
-    /// Field to use in the filter.    
+    /// Field to use in the filter.
     pub field: String,
 }
 
@@ -2630,10 +2639,10 @@ impl Part for FilterUppercaseDetails {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct McfDataRows {
-    /// A primitive dimension value. A primitive metric value.    
+    /// A primitive dimension value. A primitive metric value.
     #[serde(alias="primitiveValue")]
     pub primitive_value: String,
-    /// A conversion path dimension value, containing a list of interactions with their attributes.    
+    /// A conversion path dimension value, containing a list of interactions with their attributes.
     #[serde(alias="conversionPathValue")]
     pub conversion_path_value: Vec<McfDataRowsConversionPathValue>,
 }
@@ -2648,14 +2657,14 @@ impl Part for McfDataRows {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct ProfileSummary {
-    /// Resource type for Analytics ProfileSummary.    
+    /// Resource type for Analytics ProfileSummary.
     pub kind: String,
-    /// View (Profile) type. Supported types: WEB or APP.    
+    /// View (Profile) type. Supported types: WEB or APP.
     #[serde(alias="type")]
     pub type_: String,
-    /// View (profile) ID.    
+    /// View (profile) ID.
     pub id: String,
-    /// View (profile) name.    
+    /// View (profile) name.
     pub name: String,
 }
 
@@ -2676,32 +2685,32 @@ impl Part for ProfileSummary {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct CustomDimension {
-    /// Index of the custom dimension.    
+    /// Index of the custom dimension.
     pub index: Option<i32>,
-    /// Kind value for a custom dimension. Set to "analytics#customDimension". It is a read-only field.    
+    /// Kind value for a custom dimension. Set to "analytics#customDimension". It is a read-only field.
     pub kind: Option<String>,
-    /// Name of the custom dimension.    
+    /// Name of the custom dimension.
     pub name: Option<String>,
-    /// Time the custom dimension was created.    
+    /// Time the custom dimension was created.
     pub created: Option<String>,
-    /// Time the custom dimension was last modified.    
+    /// Time the custom dimension was last modified.
     pub updated: Option<String>,
-    /// Property ID.    
+    /// Property ID.
     #[serde(alias="webPropertyId")]
     pub web_property_id: Option<String>,
-    /// Boolean indicating whether the custom dimension is active.    
+    /// Boolean indicating whether the custom dimension is active.
     pub active: Option<bool>,
-    /// Scope of the custom dimension: HIT, SESSION, USER or PRODUCT.    
+    /// Scope of the custom dimension: HIT, SESSION, USER or PRODUCT.
     pub scope: Option<String>,
-    /// Parent link for the custom dimension. Points to the property to which the custom dimension belongs.    
+    /// Parent link for the custom dimension. Points to the property to which the custom dimension belongs.
     #[serde(alias="parentLink")]
     pub parent_link: Option<CustomDimensionParentLink>,
-    /// Custom dimension ID.    
+    /// Custom dimension ID.
     pub id: Option<String>,
-    /// Link for the custom dimension    
+    /// Link for the custom dimension
     #[serde(alias="selfLink")]
     pub self_link: Option<String>,
-    /// Account ID.    
+    /// Account ID.
     #[serde(alias="accountId")]
     pub account_id: Option<String>,
 }
@@ -2716,7 +2725,7 @@ impl ResponseResult for CustomDimension {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ProfilePermissions {
-    /// All the permissions that the user has for this view (profile). These include any implied permissions (e.g., EDIT implies VIEW) or inherited permissions from the parent web property.    
+    /// All the permissions that the user has for this view (profile). These include any implied permissions (e.g., EDIT implies VIEW) or inherited permissions from the parent web property.
     pub effective: Vec<String>,
 }
 
@@ -2730,15 +2739,15 @@ impl Part for ProfilePermissions {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ExperimentVariations {
-    /// Status of the variation. Possible values: "ACTIVE", "INACTIVE". INACTIVE variations are not served. This field may not be changed for an experiment whose status is ENDED.    
+    /// Status of the variation. Possible values: "ACTIVE", "INACTIVE". INACTIVE variations are not served. This field may not be changed for an experiment whose status is ENDED.
     pub status: String,
-    /// The URL of the variation. This field may not be changed for an experiment whose status is RUNNING or ENDED.    
+    /// The URL of the variation. This field may not be changed for an experiment whose status is RUNNING or ENDED.
     pub url: String,
-    /// True if the experiment has ended and this variation performed (statistically) significantly better than the original. This field is read-only.    
+    /// True if the experiment has ended and this variation performed (statistically) significantly better than the original. This field is read-only.
     pub won: bool,
-    /// The name of the variation. This field is required when creating an experiment. This field may not be changed for an experiment whose status is ENDED.    
+    /// The name of the variation. This field is required when creating an experiment. This field may not be changed for an experiment whose status is ENDED.
     pub name: String,
-    /// Weight that this variation should receive. Only present if the experiment is running. This field is read-only.    
+    /// Weight that this variation should receive. Only present if the experiment is running. This field is read-only.
     pub weight: f64,
 }
 
@@ -2752,26 +2761,26 @@ impl Part for ExperimentVariations {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct Segment {
-    /// Segment definition.    
+    /// Segment definition.
     pub definition: String,
-    /// Resource type for Analytics segment.    
+    /// Resource type for Analytics segment.
     pub kind: String,
-    /// Segment ID. Can be used with the 'segment' parameter in Core Reporting API.    
+    /// Segment ID. Can be used with the 'segment' parameter in Core Reporting API.
     #[serde(alias="segmentId")]
     pub segment_id: String,
-    /// Time the segment was created.    
+    /// Time the segment was created.
     pub created: String,
-    /// Time the segment was last modified.    
+    /// Time the segment was last modified.
     pub updated: String,
-    /// Type for a segment. Possible values are "BUILT_IN" or "CUSTOM".    
+    /// Type for a segment. Possible values are "BUILT_IN" or "CUSTOM".
     #[serde(alias="type")]
     pub type_: String,
-    /// Segment ID.    
+    /// Segment ID.
     pub id: String,
-    /// Link for this segment.    
+    /// Link for this segment.
     #[serde(alias="selfLink")]
     pub self_link: String,
-    /// Segment name.    
+    /// Segment name.
     pub name: String,
 }
 
@@ -2784,32 +2793,32 @@ impl Part for Segment {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct McfDataQuery {
-    /// Maximum results per page.    
+    /// Maximum results per page.
     #[serde(alias="max-results")]
     pub max_results: i32,
-    /// List of dimensions or metrics based on which Analytics data is sorted.    
+    /// List of dimensions or metrics based on which Analytics data is sorted.
     pub sort: Vec<String>,
-    /// List of analytics dimensions.    
+    /// List of analytics dimensions.
     pub dimensions: String,
-    /// Start date.    
+    /// Start date.
     #[serde(alias="start-date")]
     pub start_date: String,
-    /// Start index.    
+    /// Start index.
     #[serde(alias="start-index")]
     pub start_index: i32,
-    /// End date.    
+    /// End date.
     #[serde(alias="end-date")]
     pub end_date: String,
-    /// Unique table ID.    
+    /// Unique table ID.
     pub ids: String,
-    /// List of analytics metrics.    
+    /// List of analytics metrics.
     pub metrics: Vec<String>,
-    /// Desired sampling level    
+    /// Desired sampling level
     #[serde(alias="samplingLevel")]
     pub sampling_level: String,
-    /// Comma-separated list of dimension or metric filters.    
+    /// Comma-separated list of dimension or metric filters.
     pub filters: String,
-    /// Analytics advanced segment.    
+    /// Analytics advanced segment.
     pub segment: String,
 }
 
@@ -2831,69 +2840,69 @@ impl Part for McfDataQuery {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Profile {
-    /// Time this view (profile) was last modified.    
+    /// Time this view (profile) was last modified.
     pub updated: Option<String>,
-    /// The query parameters that are excluded from this view (profile).    
+    /// The query parameters that are excluded from this view (profile).
     #[serde(alias="excludeQueryParameters")]
     pub exclude_query_parameters: Option<String>,
     /// The currency type associated with this view (profile). The supported values are:
     /// ARS, AUD, BGN, BRL, CAD, CHF, CNY, CZK, DKK, EUR, GBP, HKD, HUF, IDR, INR, JPY, KRW, LTL, MXN, NOK, NZD, PHP, PLN, RUB, SEK, THB, TRY, TWD, USD, VND, ZAR
     pub currency: Option<String>,
-    /// Internal ID for the web property to which this view (profile) belongs.    
+    /// Internal ID for the web property to which this view (profile) belongs.
     #[serde(alias="internalWebPropertyId")]
     pub internal_web_property_id: Option<String>,
-    /// Child link for this view (profile). Points to the list of goals for this view (profile).    
+    /// Child link for this view (profile). Points to the list of goals for this view (profile).
     #[serde(alias="childLink")]
     pub child_link: Option<ProfileChildLink>,
-    /// Indicates whether enhanced ecommerce tracking is enabled for this view (profile). This property can only be enabled if ecommerce tracking is enabled.    
+    /// Indicates whether enhanced ecommerce tracking is enabled for this view (profile). This property can only be enabled if ecommerce tracking is enabled.
     #[serde(alias="enhancedECommerceTracking")]
     pub enhanced_e_commerce_tracking: Option<bool>,
-    /// Indicates whether ecommerce tracking is enabled for this view (profile).    
+    /// Indicates whether ecommerce tracking is enabled for this view (profile).
     #[serde(alias="eCommerceTracking")]
     pub e_commerce_tracking: Option<bool>,
-    /// Web property ID of the form UA-XXXXX-YY to which this view (profile) belongs.    
+    /// Web property ID of the form UA-XXXXX-YY to which this view (profile) belongs.
     #[serde(alias="webPropertyId")]
     pub web_property_id: Option<String>,
-    /// Time zone for which this view (profile) has been configured. Time zones are identified by strings from the TZ database.    
+    /// Time zone for which this view (profile) has been configured. Time zones are identified by strings from the TZ database.
     pub timezone: Option<String>,
-    /// View (Profile) ID.    
+    /// View (Profile) ID.
     pub id: Option<String>,
-    /// Account ID to which this view (profile) belongs.    
+    /// Account ID to which this view (profile) belongs.
     #[serde(alias="accountId")]
     pub account_id: Option<String>,
-    /// Default page for this view (profile).    
+    /// Default page for this view (profile).
     #[serde(alias="defaultPage")]
     pub default_page: Option<String>,
-    /// Resource type for Analytics view (profile).    
+    /// Resource type for Analytics view (profile).
     pub kind: Option<String>,
-    /// Whether or not Analytics will strip search query parameters from the URLs in your reports.    
+    /// Whether or not Analytics will strip search query parameters from the URLs in your reports.
     #[serde(alias="stripSiteSearchQueryParameters")]
     pub strip_site_search_query_parameters: Option<bool>,
-    /// Name of this view (profile).    
+    /// Name of this view (profile).
     pub name: Option<String>,
-    /// Time this view (profile) was created.    
+    /// Time this view (profile) was created.
     pub created: Option<String>,
-    /// The site search query parameters for this view (profile).    
+    /// The site search query parameters for this view (profile).
     #[serde(alias="siteSearchQueryParameters")]
     pub site_search_query_parameters: Option<String>,
-    /// Website URL for this view (profile).    
+    /// Website URL for this view (profile).
     #[serde(alias="websiteUrl")]
     pub website_url: Option<String>,
-    /// Whether or not Analytics will strip search category parameters from the URLs in your reports.    
+    /// Whether or not Analytics will strip search category parameters from the URLs in your reports.
     #[serde(alias="stripSiteSearchCategoryParameters")]
     pub strip_site_search_category_parameters: Option<bool>,
-    /// Site search category parameters for this view (profile).    
+    /// Site search category parameters for this view (profile).
     #[serde(alias="siteSearchCategoryParameters")]
     pub site_search_category_parameters: Option<String>,
-    /// Parent link for this view (profile). Points to the web property to which this view (profile) belongs.    
+    /// Parent link for this view (profile). Points to the web property to which this view (profile) belongs.
     #[serde(alias="parentLink")]
     pub parent_link: Option<ProfileParentLink>,
-    /// Permissions the user has for this view (profile).    
+    /// Permissions the user has for this view (profile).
     pub permissions: Option<ProfilePermissions>,
-    /// View (Profile) type. Supported types: WEB or APP.    
+    /// View (Profile) type. Supported types: WEB or APP.
     #[serde(alias="type")]
     pub type_: Option<String>,
-    /// Link for this view (profile).    
+    /// Link for this view (profile).
     #[serde(alias="selfLink")]
     pub self_link: Option<String>,
 }
@@ -2908,13 +2917,13 @@ impl ResponseResult for Profile {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct GaDataColumnHeaders {
-    /// Data type. Dimension column headers have only STRING as the data type. Metric column headers have data types for metric values such as INTEGER, DOUBLE, CURRENCY etc.    
+    /// Data type. Dimension column headers have only STRING as the data type. Metric column headers have data types for metric values such as INTEGER, DOUBLE, CURRENCY etc.
     #[serde(alias="dataType")]
     pub data_type: String,
-    /// Column Type. Either DIMENSION or METRIC.    
+    /// Column Type. Either DIMENSION or METRIC.
     #[serde(alias="columnType")]
     pub column_type: String,
-    /// Column name.    
+    /// Column name.
     pub name: String,
 }
 
@@ -2928,12 +2937,12 @@ impl Part for GaDataColumnHeaders {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct GaDataDataTableCols {
-    /// no description provided    
+    /// no description provided
     #[serde(alias="type")]
     pub type_: String,
-    /// no description provided    
+    /// no description provided
     pub id: String,
-    /// no description provided    
+    /// no description provided
     pub label: String,
 }
 
@@ -2947,10 +2956,10 @@ impl Part for GaDataDataTableCols {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoalVisitNumPagesDetails {
-    /// Type of comparison. Possible values are LESS_THAN, GREATER_THAN, or EQUAL.    
+    /// Type of comparison. Possible values are LESS_THAN, GREATER_THAN, or EQUAL.
     #[serde(alias="comparisonType")]
     pub comparison_type: String,
-    /// Value used for this comparison.    
+    /// Value used for this comparison.
     #[serde(alias="comparisonValue")]
     pub comparison_value: String,
 }
@@ -2965,9 +2974,9 @@ impl Part for GoalVisitNumPagesDetails {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct CustomDataSourceChildLink {
-    /// Link to the list of daily uploads for this custom data source. Link to the list of uploads for this custom data source.    
+    /// Link to the list of daily uploads for this custom data source. Link to the list of uploads for this custom data source.
     pub href: String,
-    /// Value is "analytics#dailyUploads". Value is "analytics#uploads".    
+    /// Value is "analytics#dailyUploads". Value is "analytics#uploads".
     #[serde(alias="type")]
     pub type_: String,
 }
@@ -2987,25 +2996,25 @@ impl Part for CustomDataSourceChildLink {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct UnsampledReports {
-    /// Email ID of the authenticated user    
+    /// Email ID of the authenticated user
     pub username: String,
-    /// Collection type.    
+    /// Collection type.
     pub kind: String,
-    /// A list of unsampled reports.    
+    /// A list of unsampled reports.
     pub items: Vec<UnsampledReport>,
-    /// The maximum number of resources the response can contain, regardless of the actual number of resources returned. Its value ranges from 1 to 1000 with a value of 1000 by default, or otherwise specified by the max-results query parameter.    
+    /// The maximum number of resources the response can contain, regardless of the actual number of resources returned. Its value ranges from 1 to 1000 with a value of 1000 by default, or otherwise specified by the max-results query parameter.
     #[serde(alias="itemsPerPage")]
     pub items_per_page: i32,
-    /// Link to previous page for this unsampled report collection.    
+    /// Link to previous page for this unsampled report collection.
     #[serde(alias="previousLink")]
     pub previous_link: String,
-    /// The starting index of the resources, which is 1 by default or otherwise specified by the start-index query parameter.    
+    /// The starting index of the resources, which is 1 by default or otherwise specified by the start-index query parameter.
     #[serde(alias="startIndex")]
     pub start_index: i32,
-    /// Link to next page for this unsampled report collection.    
+    /// Link to next page for this unsampled report collection.
     #[serde(alias="nextLink")]
     pub next_link: String,
-    /// The total number of results for the query, regardless of the number of resources in the result.    
+    /// The total number of results for the query, regardless of the number of resources in the result.
     #[serde(alias="totalResults")]
     pub total_results: i32,
 }
@@ -3019,13 +3028,13 @@ impl ResponseResult for UnsampledReports {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct RealtimeDataColumnHeaders {
-    /// Data type. Dimension column headers have only STRING as the data type. Metric column headers have data types for metric values such as INTEGER, DOUBLE, CURRENCY etc.    
+    /// Data type. Dimension column headers have only STRING as the data type. Metric column headers have data types for metric values such as INTEGER, DOUBLE, CURRENCY etc.
     #[serde(alias="dataType")]
     pub data_type: String,
-    /// Column Type. Either DIMENSION or METRIC.    
+    /// Column Type. Either DIMENSION or METRIC.
     #[serde(alias="columnType")]
     pub column_type: String,
-    /// Column name.    
+    /// Column name.
     pub name: String,
 }
 
@@ -3039,7 +3048,7 @@ impl Part for RealtimeDataColumnHeaders {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct EntityAdWordsLinkEntity {
-    /// no description provided    
+    /// no description provided
     #[serde(alias="webPropertyRef")]
     pub web_property_ref: WebPropertyRef,
 }
@@ -3054,9 +3063,9 @@ impl Part for EntityAdWordsLinkEntity {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct CustomDataSourceParentLink {
-    /// Link to the web property to which this custom data source belongs.    
+    /// Link to the web property to which this custom data source belongs.
     pub href: String,
-    /// Value is "analytics#webproperty".    
+    /// Value is "analytics#webproperty".
     #[serde(alias="type")]
     pub type_: String,
 }
@@ -3071,44 +3080,44 @@ impl Part for CustomDataSourceParentLink {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct CustomDataSource {
-    /// Resource type for Analytics custom data source.    
+    /// Resource type for Analytics custom data source.
     pub kind: String,
-    /// Description of custom data source.    
+    /// Description of custom data source.
     pub description: String,
-    /// IDs of views (profiles) linked to the custom data source.    
+    /// IDs of views (profiles) linked to the custom data source.
     #[serde(alias="profilesLinked")]
     pub profiles_linked: Vec<String>,
-    /// no description provided    
+    /// no description provided
     #[serde(alias="uploadType")]
     pub upload_type: String,
-    /// Time this custom data source was created.    
+    /// Time this custom data source was created.
     pub created: String,
-    /// Time this custom data source was last modified.    
+    /// Time this custom data source was last modified.
     pub updated: String,
-    /// Account ID to which this custom data source belongs.    
+    /// Account ID to which this custom data source belongs.
     #[serde(alias="accountId")]
     pub account_id: String,
-    /// no description provided    
+    /// no description provided
     #[serde(alias="childLink")]
     pub child_link: CustomDataSourceChildLink,
-    /// Web property ID of the form UA-XXXXX-YY to which this custom data source belongs.    
+    /// Web property ID of the form UA-XXXXX-YY to which this custom data source belongs.
     #[serde(alias="webPropertyId")]
     pub web_property_id: String,
-    /// Parent link for this custom data source. Points to the web property to which this custom data source belongs.    
+    /// Parent link for this custom data source. Points to the web property to which this custom data source belongs.
     #[serde(alias="parentLink")]
     pub parent_link: CustomDataSourceParentLink,
-    /// no description provided    
+    /// no description provided
     #[serde(alias="importBehavior")]
     pub import_behavior: String,
-    /// Type of the custom data source.    
+    /// Type of the custom data source.
     #[serde(alias="type")]
     pub type_: String,
-    /// Custom data source ID.    
+    /// Custom data source ID.
     pub id: String,
-    /// Link for this Analytics custom data source.    
+    /// Link for this Analytics custom data source.
     #[serde(alias="selfLink")]
     pub self_link: String,
-    /// Name of this custom data source.    
+    /// Name of this custom data source.
     pub name: String,
 }
 
@@ -3121,9 +3130,9 @@ impl Part for CustomDataSource {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct CustomDimensionParentLink {
-    /// Link to the property to which the custom dimension belongs.    
+    /// Link to the property to which the custom dimension belongs.
     pub href: String,
-    /// Type of the parent link. Set to "analytics#webproperty".    
+    /// Type of the parent link. Set to "analytics#webproperty".
     #[serde(alias="type")]
     pub type_: String,
 }
@@ -3143,25 +3152,25 @@ impl Part for CustomDimensionParentLink {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct Experiments {
-    /// Email ID of the authenticated user    
+    /// Email ID of the authenticated user
     pub username: String,
-    /// Collection type.    
+    /// Collection type.
     pub kind: String,
-    /// A list of experiments.    
+    /// A list of experiments.
     pub items: Vec<Experiment>,
-    /// The maximum number of resources the response can contain, regardless of the actual number of resources returned. Its value ranges from 1 to 1000 with a value of 1000 by default, or otherwise specified by the max-results query parameter.    
+    /// The maximum number of resources the response can contain, regardless of the actual number of resources returned. Its value ranges from 1 to 1000 with a value of 1000 by default, or otherwise specified by the max-results query parameter.
     #[serde(alias="itemsPerPage")]
     pub items_per_page: i32,
-    /// Link to previous page for this experiment collection.    
+    /// Link to previous page for this experiment collection.
     #[serde(alias="previousLink")]
     pub previous_link: String,
-    /// The starting index of the resources, which is 1 by default or otherwise specified by the start-index query parameter.    
+    /// The starting index of the resources, which is 1 by default or otherwise specified by the start-index query parameter.
     #[serde(alias="startIndex")]
     pub start_index: i32,
-    /// Link to next page for this experiment collection.    
+    /// Link to next page for this experiment collection.
     #[serde(alias="nextLink")]
     pub next_link: String,
-    /// The total number of results for the query, regardless of the number of resources in the result.    
+    /// The total number of results for the query, regardless of the number of resources in the result.
     #[serde(alias="totalResults")]
     pub total_results: i32,
 }
@@ -3180,25 +3189,25 @@ impl ResponseResult for Experiments {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct Filters {
-    /// Email ID of the authenticated user    
+    /// Email ID of the authenticated user
     pub username: String,
-    /// Collection type.    
+    /// Collection type.
     pub kind: String,
-    /// A list of filters.    
+    /// A list of filters.
     pub items: Vec<Filter>,
-    /// The maximum number of resources the response can contain, regardless of the actual number of resources returned. Its value ranges from 1 to 1,000 with a value of 1000 by default, or otherwise specified by the max-results query parameter.    
+    /// The maximum number of resources the response can contain, regardless of the actual number of resources returned. Its value ranges from 1 to 1,000 with a value of 1000 by default, or otherwise specified by the max-results query parameter.
     #[serde(alias="itemsPerPage")]
     pub items_per_page: i32,
-    /// Link to previous page for this filter collection.    
+    /// Link to previous page for this filter collection.
     #[serde(alias="previousLink")]
     pub previous_link: String,
-    /// The starting index of the resources, which is 1 by default or otherwise specified by the start-index query parameter.    
+    /// The starting index of the resources, which is 1 by default or otherwise specified by the start-index query parameter.
     #[serde(alias="startIndex")]
     pub start_index: i32,
-    /// Link to next page for this filter collection.    
+    /// Link to next page for this filter collection.
     #[serde(alias="nextLink")]
     pub next_link: String,
-    /// The total number of results for the query, regardless of the number of results in the response.    
+    /// The total number of results for the query, regardless of the number of results in the response.
     #[serde(alias="totalResults")]
     pub total_results: i32,
 }
@@ -3212,9 +3221,9 @@ impl ResponseResult for Filters {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ProfileChildLink {
-    /// Link to the list of goals for this view (profile).    
+    /// Link to the list of goals for this view (profile).
     pub href: String,
-    /// Value is "analytics#goals".    
+    /// Value is "analytics#goals".
     #[serde(alias="type")]
     pub type_: String,
 }
@@ -3262,13 +3271,18 @@ pub struct ManagementMethods<'a, C, NC, A>
     hub: &'a Analytics<C, NC, A>,
 }
 
-impl<'a, C, NC, A> ResourceMethodsBuilder for ManagementMethods<'a, C, NC, A> {}
+impl<'a, C, NC, A> MethodsBuilder for ManagementMethods<'a, C, NC, A> {}
 
 impl<'a, C, NC, A> ManagementMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Create a new property if the account has fewer than 20 properties. Web properties are visible in the Google Analytics interface only if they have at least one profile.    
+    /// Create a new property if the account has fewer than 20 properties. Web properties are visible in the Google Analytics interface only if they have at least one profile.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `accountId` - Account ID to create the web property for.
     pub fn webproperties_insert(&self, request: &Webproperty, account_id: &str) -> ManagementWebpropertyInsertCall<'a, C, NC, A> {
         ManagementWebpropertyInsertCall {
             hub: self.hub,
@@ -3282,7 +3296,13 @@ impl<'a, C, NC, A> ManagementMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Gets a view (profile) to which the user has access.    
+    /// Gets a view (profile) to which the user has access.
+    /// 
+    /// # Arguments
+    ///
+    /// * `accountId` - Account ID to retrieve the goal for.
+    /// * `webPropertyId` - Web property ID to retrieve the goal for.
+    /// * `profileId` - View (Profile) ID to retrieve the goal for.
     pub fn profiles_get(&self, account_id: &str, web_property_id: &str, profile_id: &str) -> ManagementProfileGetCall<'a, C, NC, A> {
         ManagementProfileGetCall {
             hub: self.hub,
@@ -3297,7 +3317,7 @@ impl<'a, C, NC, A> ManagementMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Lists all accounts to which the user has access.    
+    /// Lists all accounts to which the user has access.
     pub fn accounts_list(&self) -> ManagementAccountListCall<'a, C, NC, A> {
         ManagementAccountListCall {
             hub: self.hub,
@@ -3311,7 +3331,15 @@ impl<'a, C, NC, A> ManagementMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Update an existing profile filter link. This method supports patch semantics.    
+    /// Update an existing profile filter link. This method supports patch semantics.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `accountId` - Account ID to which profile filter link belongs.
+    /// * `webPropertyId` - Web property Id to which profile filter link belongs
+    /// * `profileId` - Profile ID to which filter link belongs
+    /// * `linkId` - ID of the profile filter link to be updated.
     pub fn profile_filter_links_patch(&self, request: &ProfileFilterLink, account_id: &str, web_property_id: &str, profile_id: &str, link_id: &str) -> ManagementProfileFilterLinkPatchCall<'a, C, NC, A> {
         ManagementProfileFilterLinkPatchCall {
             hub: self.hub,
@@ -3328,7 +3356,13 @@ impl<'a, C, NC, A> ManagementMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Removes a user from the given web property.    
+    /// Removes a user from the given web property.
+    /// 
+    /// # Arguments
+    ///
+    /// * `accountId` - Account ID to delete the user link for.
+    /// * `webPropertyId` - Web Property ID to delete the user link for.
+    /// * `linkId` - Link ID to delete the user link for.
     pub fn webproperty_user_links_delete(&self, account_id: &str, web_property_id: &str, link_id: &str) -> ManagementWebpropertyUserLinkDeleteCall<'a, C, NC, A> {
         ManagementWebpropertyUserLinkDeleteCall {
             hub: self.hub,
@@ -3343,7 +3377,14 @@ impl<'a, C, NC, A> ManagementMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Removes a user from the given view (profile).    
+    /// Removes a user from the given view (profile).
+    /// 
+    /// # Arguments
+    ///
+    /// * `accountId` - Account ID to delete the user link for.
+    /// * `webPropertyId` - Web Property ID to delete the user link for.
+    /// * `profileId` - View (Profile) ID to delete the user link for.
+    /// * `linkId` - Link ID to delete the user link for.
     pub fn profile_user_links_delete(&self, account_id: &str, web_property_id: &str, profile_id: &str, link_id: &str) -> ManagementProfileUserLinkDeleteCall<'a, C, NC, A> {
         ManagementProfileUserLinkDeleteCall {
             hub: self.hub,
@@ -3359,7 +3400,15 @@ impl<'a, C, NC, A> ManagementMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Updates permissions for an existing user on the given view (profile).    
+    /// Updates permissions for an existing user on the given view (profile).
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `accountId` - Account ID to update the user link for.
+    /// * `webPropertyId` - Web Property ID to update the user link for.
+    /// * `profileId` - View (Profile ID) to update the user link for.
+    /// * `linkId` - Link ID to update the user link for.
     pub fn profile_user_links_update(&self, request: &EntityUserLink, account_id: &str, web_property_id: &str, profile_id: &str, link_id: &str) -> ManagementProfileUserLinkUpdateCall<'a, C, NC, A> {
         ManagementProfileUserLinkUpdateCall {
             hub: self.hub,
@@ -3376,7 +3425,12 @@ impl<'a, C, NC, A> ManagementMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Create a new filter.    
+    /// Create a new filter.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `accountId` - Account ID to create filter for.
     pub fn filters_insert(&self, request: &Filter, account_id: &str) -> ManagementFilterInsertCall<'a, C, NC, A> {
         ManagementFilterInsertCall {
             hub: self.hub,
@@ -3390,7 +3444,13 @@ impl<'a, C, NC, A> ManagementMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Updates permissions for an existing user on the given account.    
+    /// Updates permissions for an existing user on the given account.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `accountId` - Account ID to update the account-user link for.
+    /// * `linkId` - Link ID to update the account-user link for.
     pub fn account_user_links_update(&self, request: &EntityUserLink, account_id: &str, link_id: &str) -> ManagementAccountUserLinkUpdateCall<'a, C, NC, A> {
         ManagementAccountUserLinkUpdateCall {
             hub: self.hub,
@@ -3405,7 +3465,13 @@ impl<'a, C, NC, A> ManagementMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Updates an existing web property.    
+    /// Updates an existing web property.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `accountId` - Account ID to which the web property belongs
+    /// * `webPropertyId` - Web property ID
     pub fn webproperties_update(&self, request: &Webproperty, account_id: &str, web_property_id: &str) -> ManagementWebpropertyUpdateCall<'a, C, NC, A> {
         ManagementWebpropertyUpdateCall {
             hub: self.hub,
@@ -3420,7 +3486,14 @@ impl<'a, C, NC, A> ManagementMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Updates permissions for an existing user on the given web property.    
+    /// Updates permissions for an existing user on the given web property.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `accountId` - Account ID to update the account-user link for.
+    /// * `webPropertyId` - Web property ID to update the account-user link for.
+    /// * `linkId` - Link ID to update the account-user link for.
     pub fn webproperty_user_links_update(&self, request: &EntityUserLink, account_id: &str, web_property_id: &str, link_id: &str) -> ManagementWebpropertyUserLinkUpdateCall<'a, C, NC, A> {
         ManagementWebpropertyUserLinkUpdateCall {
             hub: self.hub,
@@ -3436,7 +3509,14 @@ impl<'a, C, NC, A> ManagementMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Create a new unsampled report.    
+    /// Create a new unsampled report.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `accountId` - Account ID to create the unsampled report for.
+    /// * `webPropertyId` - Web property ID to create the unsampled report for.
+    /// * `profileId` - View (Profile) ID to create the unsampled report for.
     pub fn unsampled_reports_insert(&self, request: &UnsampledReport, account_id: &str, web_property_id: &str, profile_id: &str) -> ManagementUnsampledReportInsertCall<'a, C, NC, A> {
         ManagementUnsampledReportInsertCall {
             hub: self.hub,
@@ -3452,7 +3532,13 @@ impl<'a, C, NC, A> ManagementMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Get a custom metric to which the user has access.    
+    /// Get a custom metric to which the user has access.
+    /// 
+    /// # Arguments
+    ///
+    /// * `accountId` - Account ID for the custom metric to retrieve.
+    /// * `webPropertyId` - Web property ID for the custom metric to retrieve.
+    /// * `customMetricId` - The ID of the custom metric to retrieve.
     pub fn custom_metrics_get(&self, account_id: &str, web_property_id: &str, custom_metric_id: &str) -> ManagementCustomMetricGetCall<'a, C, NC, A> {
         ManagementCustomMetricGetCall {
             hub: self.hub,
@@ -3467,7 +3553,14 @@ impl<'a, C, NC, A> ManagementMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// List uploads to which the user has access.    
+    /// List uploads to which the user has access.
+    /// 
+    /// # Arguments
+    ///
+    /// * `accountId` - Account Id for the upload to retrieve.
+    /// * `webPropertyId` - Web property Id for the upload to retrieve.
+    /// * `customDataSourceId` - Custom data source Id for upload to retrieve.
+    /// * `uploadId` - Upload Id to retrieve.
     pub fn uploads_get(&self, account_id: &str, web_property_id: &str, custom_data_source_id: &str, upload_id: &str) -> ManagementUploadGetCall<'a, C, NC, A> {
         ManagementUploadGetCall {
             hub: self.hub,
@@ -3483,7 +3576,13 @@ impl<'a, C, NC, A> ManagementMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Returns a web property-AdWords link to which the user has access.    
+    /// Returns a web property-AdWords link to which the user has access.
+    /// 
+    /// # Arguments
+    ///
+    /// * `accountId` - ID of the account which the given web property belongs to.
+    /// * `webPropertyId` - Web property ID to retrieve the AdWords link for.
+    /// * `webPropertyAdWordsLinkId` - Web property-AdWords link ID.
     pub fn web_property_ad_words_links_get(&self, account_id: &str, web_property_id: &str, web_property_ad_words_link_id: &str) -> ManagementWebPropertyAdWordsLinkGetCall<'a, C, NC, A> {
         ManagementWebPropertyAdWordsLinkGetCall {
             hub: self.hub,
@@ -3498,7 +3597,12 @@ impl<'a, C, NC, A> ManagementMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Lists webProperty-user links for a given web property.    
+    /// Lists webProperty-user links for a given web property.
+    /// 
+    /// # Arguments
+    ///
+    /// * `accountId` - Account ID which the given web property belongs to.
+    /// * `webPropertyId` - Web Property ID for the webProperty-user links to retrieve. Can either be a specific web property ID or '~all', which refers to all the web properties that user has access to.
     pub fn webproperty_user_links_list(&self, account_id: &str, web_property_id: &str) -> ManagementWebpropertyUserLinkListCall<'a, C, NC, A> {
         ManagementWebpropertyUserLinkListCall {
             hub: self.hub,
@@ -3514,7 +3618,15 @@ impl<'a, C, NC, A> ManagementMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Update an existing profile filter link.    
+    /// Update an existing profile filter link.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `accountId` - Account ID to which profile filter link belongs.
+    /// * `webPropertyId` - Web property Id to which profile filter link belongs
+    /// * `profileId` - Profile ID to which filter link belongs
+    /// * `linkId` - ID of the profile filter link to be updated.
     pub fn profile_filter_links_update(&self, request: &ProfileFilterLink, account_id: &str, web_property_id: &str, profile_id: &str, link_id: &str) -> ManagementProfileFilterLinkUpdateCall<'a, C, NC, A> {
         ManagementProfileFilterLinkUpdateCall {
             hub: self.hub,
@@ -3531,7 +3643,14 @@ impl<'a, C, NC, A> ManagementMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Returns an experiment to which the user has access.    
+    /// Returns an experiment to which the user has access.
+    /// 
+    /// # Arguments
+    ///
+    /// * `accountId` - Account ID to retrieve the experiment for.
+    /// * `webPropertyId` - Web property ID to retrieve the experiment for.
+    /// * `profileId` - View (Profile) ID to retrieve the experiment for.
+    /// * `experimentId` - Experiment ID to retrieve the experiment for.
     pub fn experiments_get(&self, account_id: &str, web_property_id: &str, profile_id: &str, experiment_id: &str) -> ManagementExperimentGetCall<'a, C, NC, A> {
         ManagementExperimentGetCall {
             hub: self.hub,
@@ -3547,7 +3666,14 @@ impl<'a, C, NC, A> ManagementMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Updates an existing custom dimension.    
+    /// Updates an existing custom dimension.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `accountId` - Account ID for the custom dimension to update.
+    /// * `webPropertyId` - Web property ID for the custom dimension to update.
+    /// * `customDimensionId` - Custom dimension ID for the custom dimension to update.
     pub fn custom_dimensions_update(&self, request: &CustomDimension, account_id: &str, web_property_id: &str, custom_dimension_id: &str) -> ManagementCustomDimensionUpdateCall<'a, C, NC, A> {
         ManagementCustomDimensionUpdateCall {
             hub: self.hub,
@@ -3564,7 +3690,14 @@ impl<'a, C, NC, A> ManagementMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Returns a single unsampled report.    
+    /// Returns a single unsampled report.
+    /// 
+    /// # Arguments
+    ///
+    /// * `accountId` - Account ID to retrieve unsampled report for.
+    /// * `webPropertyId` - Web property ID to retrieve unsampled reports for.
+    /// * `profileId` - View (Profile) ID to retrieve unsampled report for.
+    /// * `unsampledReportId` - ID of the unsampled report to retrieve.
     pub fn unsampled_reports_get(&self, account_id: &str, web_property_id: &str, profile_id: &str, unsampled_report_id: &str) -> ManagementUnsampledReportGetCall<'a, C, NC, A> {
         ManagementUnsampledReportGetCall {
             hub: self.hub,
@@ -3580,7 +3713,14 @@ impl<'a, C, NC, A> ManagementMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Create a new profile filter link.    
+    /// Create a new profile filter link.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `accountId` - Account ID to create profile filter link for.
+    /// * `webPropertyId` - Web property Id to create profile filter link for.
+    /// * `profileId` - Profile ID to create filter link for.
     pub fn profile_filter_links_insert(&self, request: &ProfileFilterLink, account_id: &str, web_property_id: &str, profile_id: &str) -> ManagementProfileFilterLinkInsertCall<'a, C, NC, A> {
         ManagementProfileFilterLinkInsertCall {
             hub: self.hub,
@@ -3596,7 +3736,13 @@ impl<'a, C, NC, A> ManagementMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Updates an existing filter.    
+    /// Updates an existing filter.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `accountId` - Account ID to which the filter belongs.
+    /// * `filterId` - ID of the filter to be updated.
     pub fn filters_update(&self, request: &Filter, account_id: &str, filter_id: &str) -> ManagementFilterUpdateCall<'a, C, NC, A> {
         ManagementFilterUpdateCall {
             hub: self.hub,
@@ -3611,7 +3757,14 @@ impl<'a, C, NC, A> ManagementMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Delete a profile filter link.    
+    /// Delete a profile filter link.
+    /// 
+    /// # Arguments
+    ///
+    /// * `accountId` - Account ID to which the profile filter link belongs.
+    /// * `webPropertyId` - Web property Id to which the profile filter link belongs.
+    /// * `profileId` - Profile ID to which the filter link belongs.
+    /// * `linkId` - ID of the profile filter link to delete.
     pub fn profile_filter_links_delete(&self, account_id: &str, web_property_id: &str, profile_id: &str, link_id: &str) -> ManagementProfileFilterLinkDeleteCall<'a, C, NC, A> {
         ManagementProfileFilterLinkDeleteCall {
             hub: self.hub,
@@ -3627,7 +3780,7 @@ impl<'a, C, NC, A> ManagementMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Lists segments to which the user has access.    
+    /// Lists segments to which the user has access.
     pub fn segments_list(&self) -> ManagementSegmentListCall<'a, C, NC, A> {
         ManagementSegmentListCall {
             hub: self.hub,
@@ -3641,7 +3794,13 @@ impl<'a, C, NC, A> ManagementMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Deletes a view (profile).    
+    /// Deletes a view (profile).
+    /// 
+    /// # Arguments
+    ///
+    /// * `accountId` - Account ID to delete the view (profile) for.
+    /// * `webPropertyId` - Web property ID to delete the view (profile) for.
+    /// * `profileId` - ID of the view (profile) to be deleted.
     pub fn profiles_delete(&self, account_id: &str, web_property_id: &str, profile_id: &str) -> ManagementProfileDeleteCall<'a, C, NC, A> {
         ManagementProfileDeleteCall {
             hub: self.hub,
@@ -3656,7 +3815,15 @@ impl<'a, C, NC, A> ManagementMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Updates an existing view (profile). This method supports patch semantics.    
+    /// Updates an existing view (profile). This method supports patch semantics.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `accountId` - Account ID to update the goal.
+    /// * `webPropertyId` - Web property ID to update the goal.
+    /// * `profileId` - View (Profile) ID to update the goal.
+    /// * `goalId` - Index of the goal to be updated.
     pub fn goals_patch(&self, request: &Goal, account_id: &str, web_property_id: &str, profile_id: &str, goal_id: &str) -> ManagementGoalPatchCall<'a, C, NC, A> {
         ManagementGoalPatchCall {
             hub: self.hub,
@@ -3673,7 +3840,14 @@ impl<'a, C, NC, A> ManagementMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Updates an existing custom dimension. This method supports patch semantics.    
+    /// Updates an existing custom dimension. This method supports patch semantics.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `accountId` - Account ID for the custom dimension to update.
+    /// * `webPropertyId` - Web property ID for the custom dimension to update.
+    /// * `customDimensionId` - Custom dimension ID for the custom dimension to update.
     pub fn custom_dimensions_patch(&self, request: &CustomDimension, account_id: &str, web_property_id: &str, custom_dimension_id: &str) -> ManagementCustomDimensionPatchCall<'a, C, NC, A> {
         ManagementCustomDimensionPatchCall {
             hub: self.hub,
@@ -3690,7 +3864,15 @@ impl<'a, C, NC, A> ManagementMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Update an existing experiment. This method supports patch semantics.    
+    /// Update an existing experiment. This method supports patch semantics.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `accountId` - Account ID of the experiment to update.
+    /// * `webPropertyId` - Web property ID of the experiment to update.
+    /// * `profileId` - View (Profile) ID of the experiment to update.
+    /// * `experimentId` - Experiment ID of the experiment to update.
     pub fn experiments_patch(&self, request: &Experiment, account_id: &str, web_property_id: &str, profile_id: &str, experiment_id: &str) -> ManagementExperimentPatchCall<'a, C, NC, A> {
         ManagementExperimentPatchCall {
             hub: self.hub,
@@ -3707,7 +3889,13 @@ impl<'a, C, NC, A> ManagementMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Lists experiments to which the user has access.    
+    /// Lists experiments to which the user has access.
+    /// 
+    /// # Arguments
+    ///
+    /// * `accountId` - Account ID to retrieve experiments for.
+    /// * `webPropertyId` - Web property ID to retrieve experiments for.
+    /// * `profileId` - View (Profile) ID to retrieve experiments for.
     pub fn experiments_list(&self, account_id: &str, web_property_id: &str, profile_id: &str) -> ManagementExperimentListCall<'a, C, NC, A> {
         ManagementExperimentListCall {
             hub: self.hub,
@@ -3724,7 +3912,12 @@ impl<'a, C, NC, A> ManagementMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Lists views (profiles) to which the user has access.    
+    /// Lists views (profiles) to which the user has access.
+    /// 
+    /// # Arguments
+    ///
+    /// * `accountId` - Account ID for the view (profiles) to retrieve. Can either be a specific account ID or '~all', which refers to all the accounts to which the user has access.
+    /// * `webPropertyId` - Web property ID for the views (profiles) to retrieve. Can either be a specific web property ID or '~all', which refers to all the web properties to which the user has access.
     pub fn profiles_list(&self, account_id: &str, web_property_id: &str) -> ManagementProfileListCall<'a, C, NC, A> {
         ManagementProfileListCall {
             hub: self.hub,
@@ -3740,7 +3933,13 @@ impl<'a, C, NC, A> ManagementMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Lists goals to which the user has access.    
+    /// Lists goals to which the user has access.
+    /// 
+    /// # Arguments
+    ///
+    /// * `accountId` - Account ID to retrieve goals for. Can either be a specific account ID or '~all', which refers to all the accounts that user has access to.
+    /// * `webPropertyId` - Web property ID to retrieve goals for. Can either be a specific web property ID or '~all', which refers to all the web properties that user has access to.
+    /// * `profileId` - View (Profile) ID to retrieve goals for. Can either be a specific view (profile) ID or '~all', which refers to all the views (profiles) that user has access to.
     pub fn goals_list(&self, account_id: &str, web_property_id: &str, profile_id: &str) -> ManagementGoalListCall<'a, C, NC, A> {
         ManagementGoalListCall {
             hub: self.hub,
@@ -3757,7 +3956,14 @@ impl<'a, C, NC, A> ManagementMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Create a new goal.    
+    /// Create a new goal.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `accountId` - Account ID to create the goal for.
+    /// * `webPropertyId` - Web property ID to create the goal for.
+    /// * `profileId` - View (Profile) ID to create the goal for.
     pub fn goals_insert(&self, request: &Goal, account_id: &str, web_property_id: &str, profile_id: &str) -> ManagementGoalInsertCall<'a, C, NC, A> {
         ManagementGoalInsertCall {
             hub: self.hub,
@@ -3773,7 +3979,14 @@ impl<'a, C, NC, A> ManagementMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Updates an existing custom metric. This method supports patch semantics.    
+    /// Updates an existing custom metric. This method supports patch semantics.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `accountId` - Account ID for the custom metric to update.
+    /// * `webPropertyId` - Web property ID for the custom metric to update.
+    /// * `customMetricId` - Custom metric ID for the custom metric to update.
     pub fn custom_metrics_patch(&self, request: &CustomMetric, account_id: &str, web_property_id: &str, custom_metric_id: &str) -> ManagementCustomMetricPatchCall<'a, C, NC, A> {
         ManagementCustomMetricPatchCall {
             hub: self.hub,
@@ -3790,7 +4003,13 @@ impl<'a, C, NC, A> ManagementMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Upload data for a custom data source.    
+    /// Upload data for a custom data source.
+    /// 
+    /// # Arguments
+    ///
+    /// * `accountId` - Account Id associated with the upload.
+    /// * `webPropertyId` - Web property UA-string associated with the upload.
+    /// * `customDataSourceId` - Custom data source Id to which the data being uploaded belongs.
     pub fn uploads_upload_data(&self, account_id: &str, web_property_id: &str, custom_data_source_id: &str) -> ManagementUploadUploadDataCall<'a, C, NC, A> {
         ManagementUploadUploadDataCall {
             hub: self.hub,
@@ -3805,7 +4024,12 @@ impl<'a, C, NC, A> ManagementMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Adds a new user to the given account.    
+    /// Adds a new user to the given account.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `accountId` - Account ID to create the user link for.
     pub fn account_user_links_insert(&self, request: &EntityUserLink, account_id: &str) -> ManagementAccountUserLinkInsertCall<'a, C, NC, A> {
         ManagementAccountUserLinkInsertCall {
             hub: self.hub,
@@ -3819,7 +4043,13 @@ impl<'a, C, NC, A> ManagementMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Adds a new user to the given web property.    
+    /// Adds a new user to the given web property.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `accountId` - Account ID to create the user link for.
+    /// * `webPropertyId` - Web Property ID to create the user link for.
     pub fn webproperty_user_links_insert(&self, request: &EntityUserLink, account_id: &str, web_property_id: &str) -> ManagementWebpropertyUserLinkInsertCall<'a, C, NC, A> {
         ManagementWebpropertyUserLinkInsertCall {
             hub: self.hub,
@@ -3834,7 +4064,14 @@ impl<'a, C, NC, A> ManagementMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Delete an experiment.    
+    /// Delete an experiment.
+    /// 
+    /// # Arguments
+    ///
+    /// * `accountId` - Account ID to which the experiment belongs
+    /// * `webPropertyId` - Web property ID to which the experiment belongs
+    /// * `profileId` - View (Profile) ID to which the experiment belongs
+    /// * `experimentId` - ID of the experiment to delete
     pub fn experiments_delete(&self, account_id: &str, web_property_id: &str, profile_id: &str, experiment_id: &str) -> ManagementExperimentDeleteCall<'a, C, NC, A> {
         ManagementExperimentDeleteCall {
             hub: self.hub,
@@ -3850,7 +4087,14 @@ impl<'a, C, NC, A> ManagementMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Updates an existing view (profile). This method supports patch semantics.    
+    /// Updates an existing view (profile). This method supports patch semantics.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `accountId` - Account ID to which the view (profile) belongs
+    /// * `webPropertyId` - Web property ID to which the view (profile) belongs
+    /// * `profileId` - ID of the view (profile) to be updated.
     pub fn profiles_patch(&self, request: &Profile, account_id: &str, web_property_id: &str, profile_id: &str) -> ManagementProfilePatchCall<'a, C, NC, A> {
         ManagementProfilePatchCall {
             hub: self.hub,
@@ -3866,7 +4110,12 @@ impl<'a, C, NC, A> ManagementMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Returns a filters to which the user has access.    
+    /// Returns a filters to which the user has access.
+    /// 
+    /// # Arguments
+    ///
+    /// * `accountId` - Account ID to retrieve filters for.
+    /// * `filterId` - Filter ID to retrieve filters for.
     pub fn filters_get(&self, account_id: &str, filter_id: &str) -> ManagementFilterGetCall<'a, C, NC, A> {
         ManagementFilterGetCall {
             hub: self.hub,
@@ -3880,7 +4129,12 @@ impl<'a, C, NC, A> ManagementMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Lists webProperty-AdWords links for a given web property.    
+    /// Lists webProperty-AdWords links for a given web property.
+    /// 
+    /// # Arguments
+    ///
+    /// * `accountId` - ID of the account which the given web property belongs to.
+    /// * `webPropertyId` - Web property ID to retrieve the AdWords links for.
     pub fn web_property_ad_words_links_list(&self, account_id: &str, web_property_id: &str) -> ManagementWebPropertyAdWordsLinkListCall<'a, C, NC, A> {
         ManagementWebPropertyAdWordsLinkListCall {
             hub: self.hub,
@@ -3896,7 +4150,7 @@ impl<'a, C, NC, A> ManagementMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Lists account summaries (lightweight tree comprised of accounts/properties/profiles) to which the user has access.    
+    /// Lists account summaries (lightweight tree comprised of accounts/properties/profiles) to which the user has access.
     pub fn account_summaries_list(&self) -> ManagementAccountSummaryListCall<'a, C, NC, A> {
         ManagementAccountSummaryListCall {
             hub: self.hub,
@@ -3910,7 +4164,12 @@ impl<'a, C, NC, A> ManagementMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Lists custom dimensions to which the user has access.    
+    /// Lists custom dimensions to which the user has access.
+    /// 
+    /// # Arguments
+    ///
+    /// * `accountId` - Account ID for the custom dimensions to retrieve.
+    /// * `webPropertyId` - Web property ID for the custom dimensions to retrieve.
     pub fn custom_dimensions_list(&self, account_id: &str, web_property_id: &str) -> ManagementCustomDimensionListCall<'a, C, NC, A> {
         ManagementCustomDimensionListCall {
             hub: self.hub,
@@ -3926,7 +4185,13 @@ impl<'a, C, NC, A> ManagementMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// List uploads to which the user has access.    
+    /// List uploads to which the user has access.
+    /// 
+    /// # Arguments
+    ///
+    /// * `accountId` - Account Id for the uploads to retrieve.
+    /// * `webPropertyId` - Web property Id for the uploads to retrieve.
+    /// * `customDataSourceId` - Custom data source Id for uploads to retrieve.
     pub fn uploads_list(&self, account_id: &str, web_property_id: &str, custom_data_source_id: &str) -> ManagementUploadListCall<'a, C, NC, A> {
         ManagementUploadListCall {
             hub: self.hub,
@@ -3943,7 +4208,13 @@ impl<'a, C, NC, A> ManagementMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Lists profile-user links for a given view (profile).    
+    /// Lists profile-user links for a given view (profile).
+    /// 
+    /// # Arguments
+    ///
+    /// * `accountId` - Account ID which the given view (profile) belongs to.
+    /// * `webPropertyId` - Web Property ID which the given view (profile) belongs to. Can either be a specific web property ID or '~all', which refers to all the web properties that user has access to.
+    /// * `profileId` - View (Profile) ID to retrieve the profile-user links for. Can either be a specific profile ID or '~all', which refers to all the profiles that user has access to.
     pub fn profile_user_links_list(&self, account_id: &str, web_property_id: &str, profile_id: &str) -> ManagementProfileUserLinkListCall<'a, C, NC, A> {
         ManagementProfileUserLinkListCall {
             hub: self.hub,
@@ -3960,7 +4231,11 @@ impl<'a, C, NC, A> ManagementMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Lists account-user links for a given account.    
+    /// Lists account-user links for a given account.
+    /// 
+    /// # Arguments
+    ///
+    /// * `accountId` - Account ID to retrieve the user links for.
     pub fn account_user_links_list(&self, account_id: &str) -> ManagementAccountUserLinkListCall<'a, C, NC, A> {
         ManagementAccountUserLinkListCall {
             hub: self.hub,
@@ -3975,7 +4250,14 @@ impl<'a, C, NC, A> ManagementMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Updates an existing custom metric.    
+    /// Updates an existing custom metric.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `accountId` - Account ID for the custom metric to update.
+    /// * `webPropertyId` - Web property ID for the custom metric to update.
+    /// * `customMetricId` - Custom metric ID for the custom metric to update.
     pub fn custom_metrics_update(&self, request: &CustomMetric, account_id: &str, web_property_id: &str, custom_metric_id: &str) -> ManagementCustomMetricUpdateCall<'a, C, NC, A> {
         ManagementCustomMetricUpdateCall {
             hub: self.hub,
@@ -3992,7 +4274,14 @@ impl<'a, C, NC, A> ManagementMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Delete data associated with a previous upload.    
+    /// Delete data associated with a previous upload.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `accountId` - Account Id for the uploads to be deleted.
+    /// * `webPropertyId` - Web property Id for the uploads to be deleted.
+    /// * `customDataSourceId` - Custom data source Id for the uploads to be deleted.
     pub fn uploads_delete_upload_data(&self, request: &AnalyticsDataimportDeleteUploadDataRequest, account_id: &str, web_property_id: &str, custom_data_source_id: &str) -> ManagementUploadDeleteUploadDataCall<'a, C, NC, A> {
         ManagementUploadDeleteUploadDataCall {
             hub: self.hub,
@@ -4008,7 +4297,15 @@ impl<'a, C, NC, A> ManagementMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Update an existing experiment.    
+    /// Update an existing experiment.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `accountId` - Account ID of the experiment to update.
+    /// * `webPropertyId` - Web property ID of the experiment to update.
+    /// * `profileId` - View (Profile) ID of the experiment to update.
+    /// * `experimentId` - Experiment ID of the experiment to update.
     pub fn experiments_update(&self, request: &Experiment, account_id: &str, web_property_id: &str, profile_id: &str, experiment_id: &str) -> ManagementExperimentUpdateCall<'a, C, NC, A> {
         ManagementExperimentUpdateCall {
             hub: self.hub,
@@ -4025,7 +4322,15 @@ impl<'a, C, NC, A> ManagementMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Updates an existing view (profile).    
+    /// Updates an existing view (profile).
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `accountId` - Account ID to update the goal.
+    /// * `webPropertyId` - Web property ID to update the goal.
+    /// * `profileId` - View (Profile) ID to update the goal.
+    /// * `goalId` - Index of the goal to be updated.
     pub fn goals_update(&self, request: &Goal, account_id: &str, web_property_id: &str, profile_id: &str, goal_id: &str) -> ManagementGoalUpdateCall<'a, C, NC, A> {
         ManagementGoalUpdateCall {
             hub: self.hub,
@@ -4042,7 +4347,12 @@ impl<'a, C, NC, A> ManagementMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// List custom data sources to which the user has access.    
+    /// List custom data sources to which the user has access.
+    /// 
+    /// # Arguments
+    ///
+    /// * `accountId` - Account Id for the custom data sources to retrieve.
+    /// * `webPropertyId` - Web property Id for the custom data sources to retrieve.
     pub fn custom_data_sources_list(&self, account_id: &str, web_property_id: &str) -> ManagementCustomDataSourceListCall<'a, C, NC, A> {
         ManagementCustomDataSourceListCall {
             hub: self.hub,
@@ -4058,7 +4368,12 @@ impl<'a, C, NC, A> ManagementMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Lists custom metrics to which the user has access.    
+    /// Lists custom metrics to which the user has access.
+    /// 
+    /// # Arguments
+    ///
+    /// * `accountId` - Account ID for the custom metrics to retrieve.
+    /// * `webPropertyId` - Web property ID for the custom metrics to retrieve.
     pub fn custom_metrics_list(&self, account_id: &str, web_property_id: &str) -> ManagementCustomMetricListCall<'a, C, NC, A> {
         ManagementCustomMetricListCall {
             hub: self.hub,
@@ -4074,7 +4389,13 @@ impl<'a, C, NC, A> ManagementMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Lists unsampled reports to which the user has access.    
+    /// Lists unsampled reports to which the user has access.
+    /// 
+    /// # Arguments
+    ///
+    /// * `accountId` - Account ID to retrieve unsampled reports for. Must be a specific account ID, ~all is not supported.
+    /// * `webPropertyId` - Web property ID to retrieve unsampled reports for. Must be a specific web property ID, ~all is not supported.
+    /// * `profileId` - View (Profile) ID to retrieve unsampled reports for. Must be a specific view (profile) ID, ~all is not supported.
     pub fn unsampled_reports_list(&self, account_id: &str, web_property_id: &str, profile_id: &str) -> ManagementUnsampledReportListCall<'a, C, NC, A> {
         ManagementUnsampledReportListCall {
             hub: self.hub,
@@ -4091,7 +4412,12 @@ impl<'a, C, NC, A> ManagementMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Gets a web property to which the user has access.    
+    /// Gets a web property to which the user has access.
+    /// 
+    /// # Arguments
+    ///
+    /// * `accountId` - Account ID to retrieve the web property for.
+    /// * `webPropertyId` - ID to retrieve the web property for.
     pub fn webproperties_get(&self, account_id: &str, web_property_id: &str) -> ManagementWebpropertyGetCall<'a, C, NC, A> {
         ManagementWebpropertyGetCall {
             hub: self.hub,
@@ -4105,7 +4431,14 @@ impl<'a, C, NC, A> ManagementMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Create a new experiment.    
+    /// Create a new experiment.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `accountId` - Account ID to create the experiment for.
+    /// * `webPropertyId` - Web property ID to create the experiment for.
+    /// * `profileId` - View (Profile) ID to create the experiment for.
     pub fn experiments_insert(&self, request: &Experiment, account_id: &str, web_property_id: &str, profile_id: &str) -> ManagementExperimentInsertCall<'a, C, NC, A> {
         ManagementExperimentInsertCall {
             hub: self.hub,
@@ -4121,7 +4454,13 @@ impl<'a, C, NC, A> ManagementMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Get a custom dimension to which the user has access.    
+    /// Get a custom dimension to which the user has access.
+    /// 
+    /// # Arguments
+    ///
+    /// * `accountId` - Account ID for the custom dimension to retrieve.
+    /// * `webPropertyId` - Web property ID for the custom dimension to retrieve.
+    /// * `customDimensionId` - The ID of the custom dimension to retrieve.
     pub fn custom_dimensions_get(&self, account_id: &str, web_property_id: &str, custom_dimension_id: &str) -> ManagementCustomDimensionGetCall<'a, C, NC, A> {
         ManagementCustomDimensionGetCall {
             hub: self.hub,
@@ -4136,7 +4475,13 @@ impl<'a, C, NC, A> ManagementMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Lists all profile filter links for a profile.    
+    /// Lists all profile filter links for a profile.
+    /// 
+    /// # Arguments
+    ///
+    /// * `accountId` - Account ID to retrieve profile filter links for.
+    /// * `webPropertyId` - Web property Id for profile filter links for. Can either be a specific web property ID or '~all', which refers to all the web properties that user has access to.
+    /// * `profileId` - Profile ID to retrieve filter links for. Can either be a specific profile ID or '~all', which refers to all the profiles that user has access to.
     pub fn profile_filter_links_list(&self, account_id: &str, web_property_id: &str, profile_id: &str) -> ManagementProfileFilterLinkListCall<'a, C, NC, A> {
         ManagementProfileFilterLinkListCall {
             hub: self.hub,
@@ -4153,7 +4498,13 @@ impl<'a, C, NC, A> ManagementMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Updates an existing web property. This method supports patch semantics.    
+    /// Updates an existing web property. This method supports patch semantics.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `accountId` - Account ID to which the web property belongs
+    /// * `webPropertyId` - Web property ID
     pub fn webproperties_patch(&self, request: &Webproperty, account_id: &str, web_property_id: &str) -> ManagementWebpropertyPatchCall<'a, C, NC, A> {
         ManagementWebpropertyPatchCall {
             hub: self.hub,
@@ -4168,7 +4519,13 @@ impl<'a, C, NC, A> ManagementMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Create a new custom dimension.    
+    /// Create a new custom dimension.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `accountId` - Account ID for the custom dimension to create.
+    /// * `webPropertyId` - Web property ID for the custom dimension to create.
     pub fn custom_dimensions_insert(&self, request: &CustomDimension, account_id: &str, web_property_id: &str) -> ManagementCustomDimensionInsertCall<'a, C, NC, A> {
         ManagementCustomDimensionInsertCall {
             hub: self.hub,
@@ -4183,7 +4540,13 @@ impl<'a, C, NC, A> ManagementMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Create a new custom metric.    
+    /// Create a new custom metric.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `accountId` - Account ID for the custom metric to create.
+    /// * `webPropertyId` - Web property ID for the custom dimension to create.
     pub fn custom_metrics_insert(&self, request: &CustomMetric, account_id: &str, web_property_id: &str) -> ManagementCustomMetricInsertCall<'a, C, NC, A> {
         ManagementCustomMetricInsertCall {
             hub: self.hub,
@@ -4198,7 +4561,14 @@ impl<'a, C, NC, A> ManagementMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Adds a new user to the given view (profile).    
+    /// Adds a new user to the given view (profile).
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `accountId` - Account ID to create the user link for.
+    /// * `webPropertyId` - Web Property ID to create the user link for.
+    /// * `profileId` - View (Profile) ID to create the user link for.
     pub fn profile_user_links_insert(&self, request: &EntityUserLink, account_id: &str, web_property_id: &str, profile_id: &str) -> ManagementProfileUserLinkInsertCall<'a, C, NC, A> {
         ManagementProfileUserLinkInsertCall {
             hub: self.hub,
@@ -4214,7 +4584,11 @@ impl<'a, C, NC, A> ManagementMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Lists web properties to which the user has access.    
+    /// Lists web properties to which the user has access.
+    /// 
+    /// # Arguments
+    ///
+    /// * `accountId` - Account ID to retrieve web properties for. Can either be a specific account ID or '~all', which refers to all the accounts that user has access to.
     pub fn webproperties_list(&self, account_id: &str) -> ManagementWebpropertyListCall<'a, C, NC, A> {
         ManagementWebpropertyListCall {
             hub: self.hub,
@@ -4229,7 +4603,13 @@ impl<'a, C, NC, A> ManagementMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Creates a webProperty-AdWords link.    
+    /// Creates a webProperty-AdWords link.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `accountId` - ID of the Google Analytics account to create the link for.
+    /// * `webPropertyId` - Web property ID to create the link for.
     pub fn web_property_ad_words_links_insert(&self, request: &EntityAdWordsLink, account_id: &str, web_property_id: &str) -> ManagementWebPropertyAdWordsLinkInsertCall<'a, C, NC, A> {
         ManagementWebPropertyAdWordsLinkInsertCall {
             hub: self.hub,
@@ -4244,7 +4624,14 @@ impl<'a, C, NC, A> ManagementMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Updates an existing webProperty-AdWords link. This method supports patch semantics.    
+    /// Updates an existing webProperty-AdWords link. This method supports patch semantics.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `accountId` - ID of the account which the given web property belongs to.
+    /// * `webPropertyId` - Web property ID to retrieve the AdWords link for.
+    /// * `webPropertyAdWordsLinkId` - Web property-AdWords link ID.
     pub fn web_property_ad_words_links_patch(&self, request: &EntityAdWordsLink, account_id: &str, web_property_id: &str, web_property_ad_words_link_id: &str) -> ManagementWebPropertyAdWordsLinkPatchCall<'a, C, NC, A> {
         ManagementWebPropertyAdWordsLinkPatchCall {
             hub: self.hub,
@@ -4260,7 +4647,14 @@ impl<'a, C, NC, A> ManagementMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Gets a goal to which the user has access.    
+    /// Gets a goal to which the user has access.
+    /// 
+    /// # Arguments
+    ///
+    /// * `accountId` - Account ID to retrieve the goal for.
+    /// * `webPropertyId` - Web property ID to retrieve the goal for.
+    /// * `profileId` - View (Profile) ID to retrieve the goal for.
+    /// * `goalId` - Goal ID to retrieve the goal for.
     pub fn goals_get(&self, account_id: &str, web_property_id: &str, profile_id: &str, goal_id: &str) -> ManagementGoalGetCall<'a, C, NC, A> {
         ManagementGoalGetCall {
             hub: self.hub,
@@ -4276,7 +4670,13 @@ impl<'a, C, NC, A> ManagementMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Deletes a web property-AdWords link.    
+    /// Deletes a web property-AdWords link.
+    /// 
+    /// # Arguments
+    ///
+    /// * `accountId` - ID of the account which the given web property belongs to.
+    /// * `webPropertyId` - Web property ID to delete the AdWords link for.
+    /// * `webPropertyAdWordsLinkId` - Web property AdWords link ID.
     pub fn web_property_ad_words_links_delete(&self, account_id: &str, web_property_id: &str, web_property_ad_words_link_id: &str) -> ManagementWebPropertyAdWordsLinkDeleteCall<'a, C, NC, A> {
         ManagementWebPropertyAdWordsLinkDeleteCall {
             hub: self.hub,
@@ -4291,7 +4691,14 @@ impl<'a, C, NC, A> ManagementMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Updates an existing webProperty-AdWords link.    
+    /// Updates an existing webProperty-AdWords link.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `accountId` - ID of the account which the given web property belongs to.
+    /// * `webPropertyId` - Web property ID to retrieve the AdWords link for.
+    /// * `webPropertyAdWordsLinkId` - Web property-AdWords link ID.
     pub fn web_property_ad_words_links_update(&self, request: &EntityAdWordsLink, account_id: &str, web_property_id: &str, web_property_ad_words_link_id: &str) -> ManagementWebPropertyAdWordsLinkUpdateCall<'a, C, NC, A> {
         ManagementWebPropertyAdWordsLinkUpdateCall {
             hub: self.hub,
@@ -4307,7 +4714,13 @@ impl<'a, C, NC, A> ManagementMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Updates an existing filter. This method supports patch semantics.    
+    /// Updates an existing filter. This method supports patch semantics.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `accountId` - Account ID to which the filter belongs.
+    /// * `filterId` - ID of the filter to be updated.
     pub fn filters_patch(&self, request: &Filter, account_id: &str, filter_id: &str) -> ManagementFilterPatchCall<'a, C, NC, A> {
         ManagementFilterPatchCall {
             hub: self.hub,
@@ -4322,7 +4735,11 @@ impl<'a, C, NC, A> ManagementMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Lists all filters for an account    
+    /// Lists all filters for an account
+    /// 
+    /// # Arguments
+    ///
+    /// * `accountId` - Account ID to retrieve filters for.
     pub fn filters_list(&self, account_id: &str) -> ManagementFilterListCall<'a, C, NC, A> {
         ManagementFilterListCall {
             hub: self.hub,
@@ -4337,7 +4754,12 @@ impl<'a, C, NC, A> ManagementMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Delete a filter.    
+    /// Delete a filter.
+    /// 
+    /// # Arguments
+    ///
+    /// * `accountId` - Account ID to delete the filter for.
+    /// * `filterId` - ID of the filter to be deleted.
     pub fn filters_delete(&self, account_id: &str, filter_id: &str) -> ManagementFilterDeleteCall<'a, C, NC, A> {
         ManagementFilterDeleteCall {
             hub: self.hub,
@@ -4351,7 +4773,13 @@ impl<'a, C, NC, A> ManagementMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Create a new view (profile).    
+    /// Create a new view (profile).
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `accountId` - Account ID to create the view (profile) for.
+    /// * `webPropertyId` - Web property ID to create the view (profile) for.
     pub fn profiles_insert(&self, request: &Profile, account_id: &str, web_property_id: &str) -> ManagementProfileInsertCall<'a, C, NC, A> {
         ManagementProfileInsertCall {
             hub: self.hub,
@@ -4366,7 +4794,12 @@ impl<'a, C, NC, A> ManagementMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Removes a user from the given account.    
+    /// Removes a user from the given account.
+    /// 
+    /// # Arguments
+    ///
+    /// * `accountId` - Account ID to delete the user link for.
+    /// * `linkId` - Link ID to delete the user link for.
     pub fn account_user_links_delete(&self, account_id: &str, link_id: &str) -> ManagementAccountUserLinkDeleteCall<'a, C, NC, A> {
         ManagementAccountUserLinkDeleteCall {
             hub: self.hub,
@@ -4380,7 +4813,14 @@ impl<'a, C, NC, A> ManagementMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Updates an existing view (profile).    
+    /// Updates an existing view (profile).
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `accountId` - Account ID to which the view (profile) belongs
+    /// * `webPropertyId` - Web property ID to which the view (profile) belongs
+    /// * `profileId` - ID of the view (profile) to be updated.
     pub fn profiles_update(&self, request: &Profile, account_id: &str, web_property_id: &str, profile_id: &str) -> ManagementProfileUpdateCall<'a, C, NC, A> {
         ManagementProfileUpdateCall {
             hub: self.hub,
@@ -4396,7 +4836,14 @@ impl<'a, C, NC, A> ManagementMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Returns a single profile filter link.    
+    /// Returns a single profile filter link.
+    /// 
+    /// # Arguments
+    ///
+    /// * `accountId` - Account ID to retrieve profile filter link for.
+    /// * `webPropertyId` - Web property Id to retrieve profile filter link for.
+    /// * `profileId` - Profile ID to retrieve filter link for.
+    /// * `linkId` - ID of the profile filter link.
     pub fn profile_filter_links_get(&self, account_id: &str, web_property_id: &str, profile_id: &str, link_id: &str) -> ManagementProfileFilterLinkGetCall<'a, C, NC, A> {
         ManagementProfileFilterLinkGetCall {
             hub: self.hub,
@@ -4447,13 +4894,20 @@ pub struct DataMethods<'a, C, NC, A>
     hub: &'a Analytics<C, NC, A>,
 }
 
-impl<'a, C, NC, A> ResourceMethodsBuilder for DataMethods<'a, C, NC, A> {}
+impl<'a, C, NC, A> MethodsBuilder for DataMethods<'a, C, NC, A> {}
 
 impl<'a, C, NC, A> DataMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Returns Analytics Multi-Channel Funnels data for a view (profile).    
+    /// Returns Analytics Multi-Channel Funnels data for a view (profile).
+    /// 
+    /// # Arguments
+    ///
+    /// * `ids` - Unique table ID for retrieving Analytics data. Table ID is of the form ga:XXXX, where XXXX is the Analytics view (profile) ID.
+    /// * `start-date` - Start date for fetching Analytics data. Requests can specify a start date formatted as YYYY-MM-DD, or as a relative date (e.g., today, yesterday, or 7daysAgo). The default value is 7daysAgo.
+    /// * `end-date` - End date for fetching Analytics data. Requests can specify a start date formatted as YYYY-MM-DD, or as a relative date (e.g., today, yesterday, or 7daysAgo). The default value is 7daysAgo.
+    /// * `metrics` - A comma-separated list of Multi-Channel Funnels metrics. E.g., 'mcf:totalConversions,mcf:totalConversionValue'. At least one metric must be specified.
     pub fn mcf_get(&self, ids: &str, start_date: &str, end_date: &str, metrics: &str) -> DataMcfGetCall<'a, C, NC, A> {
         DataMcfGetCall {
             hub: self.hub,
@@ -4475,7 +4929,14 @@ impl<'a, C, NC, A> DataMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Returns Analytics data for a view (profile).    
+    /// Returns Analytics data for a view (profile).
+    /// 
+    /// # Arguments
+    ///
+    /// * `ids` - Unique table ID for retrieving Analytics data. Table ID is of the form ga:XXXX, where XXXX is the Analytics view (profile) ID.
+    /// * `start-date` - Start date for fetching Analytics data. Requests can specify a start date formatted as YYYY-MM-DD, or as a relative date (e.g., today, yesterday, or 7daysAgo). The default value is 7daysAgo.
+    /// * `end-date` - End date for fetching Analytics data. Request can should specify an end date formatted as YYYY-MM-DD, or as a relative date (e.g., today, yesterday, or 7daysAgo). The default value is yesterday.
+    /// * `metrics` - A comma-separated list of Analytics metrics. E.g., 'ga:sessions,ga:pageviews'. At least one metric must be specified.
     pub fn ga_get(&self, ids: &str, start_date: &str, end_date: &str, metrics: &str) -> DataGaGetCall<'a, C, NC, A> {
         DataGaGetCall {
             hub: self.hub,
@@ -4499,7 +4960,12 @@ impl<'a, C, NC, A> DataMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Returns real time data for a view (profile).    
+    /// Returns real time data for a view (profile).
+    /// 
+    /// # Arguments
+    ///
+    /// * `ids` - Unique table ID for retrieving real time data. Table ID is of the form ga:XXXX, where XXXX is the Analytics view (profile) ID.
+    /// * `metrics` - A comma-separated list of real time metrics. E.g., 'rt:activeUsers'. At least one metric must be specified.
     pub fn realtime_get(&self, ids: &str, metrics: &str) -> DataRealtimeGetCall<'a, C, NC, A> {
         DataRealtimeGetCall {
             hub: self.hub,
@@ -4552,13 +5018,17 @@ pub struct ProvisioningMethods<'a, C, NC, A>
     hub: &'a Analytics<C, NC, A>,
 }
 
-impl<'a, C, NC, A> ResourceMethodsBuilder for ProvisioningMethods<'a, C, NC, A> {}
+impl<'a, C, NC, A> MethodsBuilder for ProvisioningMethods<'a, C, NC, A> {}
 
 impl<'a, C, NC, A> ProvisioningMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Creates an account ticket.    
+    /// Creates an account ticket.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
     pub fn create_account_ticket(&self, request: &AccountTicket) -> ProvisioningCreateAccountTicketCall<'a, C, NC, A> {
         ProvisioningCreateAccountTicketCall {
             hub: self.hub,
@@ -4606,13 +5076,17 @@ pub struct MetadataMethods<'a, C, NC, A>
     hub: &'a Analytics<C, NC, A>,
 }
 
-impl<'a, C, NC, A> ResourceMethodsBuilder for MetadataMethods<'a, C, NC, A> {}
+impl<'a, C, NC, A> MethodsBuilder for MetadataMethods<'a, C, NC, A> {}
 
 impl<'a, C, NC, A> MetadataMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Lists all columns for a report type    
+    /// Lists all columns for a report type
+    /// 
+    /// # Arguments
+    ///
+    /// * `reportType` - Report type. Allowed Values: 'ga'. Where 'ga' corresponds to the Core Reporting API
     pub fn columns_list(&self, report_type: &str) -> MetadataColumnListCall<'a, C, NC, A> {
         MetadataColumnListCall {
             hub: self.hub,
@@ -4635,7 +5109,7 @@ impl<'a, C, NC, A> MetadataMethods<'a, C, NC, A> {
 /// Create a new property if the account has fewer than 20 properties. Web properties are visible in the Google Analytics interface only if they have at least one profile.
 ///
 /// A builder for the *webproperties.insert* method supported by a *management* resource.
-/// It is not used directly, but through a `ManagementMethods`.
+/// It is not used directly, but through a `ManagementMethods` instance.
 ///
 /// # Example
 ///
@@ -4700,7 +5174,7 @@ impl<'a, C, NC, A> ManagementWebpropertyInsertCall<'a, C, NC, A> where NC: hyper
         for &field in ["alt", "accountId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -4757,7 +5231,7 @@ impl<'a, C, NC, A> ManagementWebpropertyInsertCall<'a, C, NC, A> where NC: hyper
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -4773,7 +5247,6 @@ impl<'a, C, NC, A> ManagementWebpropertyInsertCall<'a, C, NC, A> where NC: hyper
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -4783,7 +5256,7 @@ impl<'a, C, NC, A> ManagementWebpropertyInsertCall<'a, C, NC, A> where NC: hyper
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -4794,7 +5267,7 @@ impl<'a, C, NC, A> ManagementWebpropertyInsertCall<'a, C, NC, A> where NC: hyper
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -4803,13 +5276,13 @@ impl<'a, C, NC, A> ManagementWebpropertyInsertCall<'a, C, NC, A> where NC: hyper
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -4830,7 +5303,7 @@ impl<'a, C, NC, A> ManagementWebpropertyInsertCall<'a, C, NC, A> where NC: hyper
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Account ID to create the web property for.    
+    /// Account ID to create the web property for.
     pub fn account_id(mut self, new_value: &str) -> ManagementWebpropertyInsertCall<'a, C, NC, A> {
         self._account_id = new_value.to_string();
         self
@@ -4891,7 +5364,7 @@ impl<'a, C, NC, A> ManagementWebpropertyInsertCall<'a, C, NC, A> where NC: hyper
 /// Gets a view (profile) to which the user has access.
 ///
 /// A builder for the *profiles.get* method supported by a *management* resource.
-/// It is not used directly, but through a `ManagementMethods`.
+/// It is not used directly, but through a `ManagementMethods` instance.
 ///
 /// # Example
 ///
@@ -4953,7 +5426,7 @@ impl<'a, C, NC, A> ManagementProfileGetCall<'a, C, NC, A> where NC: hyper::net::
         for &field in ["alt", "accountId", "webPropertyId", "profileId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -5006,7 +5479,7 @@ impl<'a, C, NC, A> ManagementProfileGetCall<'a, C, NC, A> where NC: hyper::net::
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -5018,7 +5491,6 @@ impl<'a, C, NC, A> ManagementProfileGetCall<'a, C, NC, A> where NC: hyper::net::
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -5028,7 +5500,7 @@ impl<'a, C, NC, A> ManagementProfileGetCall<'a, C, NC, A> where NC: hyper::net::
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -5039,7 +5511,7 @@ impl<'a, C, NC, A> ManagementProfileGetCall<'a, C, NC, A> where NC: hyper::net::
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -5048,13 +5520,13 @@ impl<'a, C, NC, A> ManagementProfileGetCall<'a, C, NC, A> where NC: hyper::net::
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -5066,7 +5538,7 @@ impl<'a, C, NC, A> ManagementProfileGetCall<'a, C, NC, A> where NC: hyper::net::
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Account ID to retrieve the goal for.    
+    /// Account ID to retrieve the goal for.
     pub fn account_id(mut self, new_value: &str) -> ManagementProfileGetCall<'a, C, NC, A> {
         self._account_id = new_value.to_string();
         self
@@ -5076,7 +5548,7 @@ impl<'a, C, NC, A> ManagementProfileGetCall<'a, C, NC, A> where NC: hyper::net::
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Web property ID to retrieve the goal for.    
+    /// Web property ID to retrieve the goal for.
     pub fn web_property_id(mut self, new_value: &str) -> ManagementProfileGetCall<'a, C, NC, A> {
         self._web_property_id = new_value.to_string();
         self
@@ -5086,7 +5558,7 @@ impl<'a, C, NC, A> ManagementProfileGetCall<'a, C, NC, A> where NC: hyper::net::
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// View (Profile) ID to retrieve the goal for.    
+    /// View (Profile) ID to retrieve the goal for.
     pub fn profile_id(mut self, new_value: &str) -> ManagementProfileGetCall<'a, C, NC, A> {
         self._profile_id = new_value.to_string();
         self
@@ -5147,7 +5619,7 @@ impl<'a, C, NC, A> ManagementProfileGetCall<'a, C, NC, A> where NC: hyper::net::
 /// Lists all accounts to which the user has access.
 ///
 /// A builder for the *accounts.list* method supported by a *management* resource.
-/// It is not used directly, but through a `ManagementMethods`.
+/// It is not used directly, but through a `ManagementMethods` instance.
 ///
 /// # Example
 ///
@@ -5213,7 +5685,7 @@ impl<'a, C, NC, A> ManagementAccountListCall<'a, C, NC, A> where NC: hyper::net:
         for &field in ["alt", "start-index", "max-results"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -5242,7 +5714,7 @@ impl<'a, C, NC, A> ManagementAccountListCall<'a, C, NC, A> where NC: hyper::net:
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -5254,7 +5726,6 @@ impl<'a, C, NC, A> ManagementAccountListCall<'a, C, NC, A> where NC: hyper::net:
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -5264,7 +5735,7 @@ impl<'a, C, NC, A> ManagementAccountListCall<'a, C, NC, A> where NC: hyper::net:
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -5275,7 +5746,7 @@ impl<'a, C, NC, A> ManagementAccountListCall<'a, C, NC, A> where NC: hyper::net:
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -5284,13 +5755,13 @@ impl<'a, C, NC, A> ManagementAccountListCall<'a, C, NC, A> where NC: hyper::net:
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -5300,7 +5771,7 @@ impl<'a, C, NC, A> ManagementAccountListCall<'a, C, NC, A> where NC: hyper::net:
     /// Sets the *start-index* query property to the given value.
     ///
     /// 
-    /// An index of the first account to retrieve. Use this parameter as a pagination mechanism along with the max-results parameter.    
+    /// An index of the first account to retrieve. Use this parameter as a pagination mechanism along with the max-results parameter.
     pub fn start_index(mut self, new_value: i32) -> ManagementAccountListCall<'a, C, NC, A> {
         self._start_index = Some(new_value);
         self
@@ -5308,7 +5779,7 @@ impl<'a, C, NC, A> ManagementAccountListCall<'a, C, NC, A> where NC: hyper::net:
     /// Sets the *max-results* query property to the given value.
     ///
     /// 
-    /// The maximum number of accounts to include in this response.    
+    /// The maximum number of accounts to include in this response.
     pub fn max_results(mut self, new_value: i32) -> ManagementAccountListCall<'a, C, NC, A> {
         self._max_results = Some(new_value);
         self
@@ -5369,7 +5840,7 @@ impl<'a, C, NC, A> ManagementAccountListCall<'a, C, NC, A> where NC: hyper::net:
 /// Update an existing profile filter link. This method supports patch semantics.
 ///
 /// A builder for the *profileFilterLinks.patch* method supported by a *management* resource.
-/// It is not used directly, but through a `ManagementMethods`.
+/// It is not used directly, but through a `ManagementMethods` instance.
 ///
 /// # Example
 ///
@@ -5440,7 +5911,7 @@ impl<'a, C, NC, A> ManagementProfileFilterLinkPatchCall<'a, C, NC, A> where NC: 
         for &field in ["alt", "accountId", "webPropertyId", "profileId", "linkId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -5497,7 +5968,7 @@ impl<'a, C, NC, A> ManagementProfileFilterLinkPatchCall<'a, C, NC, A> where NC: 
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -5513,7 +5984,6 @@ impl<'a, C, NC, A> ManagementProfileFilterLinkPatchCall<'a, C, NC, A> where NC: 
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -5523,7 +5993,7 @@ impl<'a, C, NC, A> ManagementProfileFilterLinkPatchCall<'a, C, NC, A> where NC: 
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -5534,7 +6004,7 @@ impl<'a, C, NC, A> ManagementProfileFilterLinkPatchCall<'a, C, NC, A> where NC: 
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -5543,13 +6013,13 @@ impl<'a, C, NC, A> ManagementProfileFilterLinkPatchCall<'a, C, NC, A> where NC: 
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -5570,7 +6040,7 @@ impl<'a, C, NC, A> ManagementProfileFilterLinkPatchCall<'a, C, NC, A> where NC: 
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Account ID to which profile filter link belongs.    
+    /// Account ID to which profile filter link belongs.
     pub fn account_id(mut self, new_value: &str) -> ManagementProfileFilterLinkPatchCall<'a, C, NC, A> {
         self._account_id = new_value.to_string();
         self
@@ -5580,7 +6050,7 @@ impl<'a, C, NC, A> ManagementProfileFilterLinkPatchCall<'a, C, NC, A> where NC: 
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Web property Id to which profile filter link belongs    
+    /// Web property Id to which profile filter link belongs
     pub fn web_property_id(mut self, new_value: &str) -> ManagementProfileFilterLinkPatchCall<'a, C, NC, A> {
         self._web_property_id = new_value.to_string();
         self
@@ -5590,7 +6060,7 @@ impl<'a, C, NC, A> ManagementProfileFilterLinkPatchCall<'a, C, NC, A> where NC: 
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Profile ID to which filter link belongs    
+    /// Profile ID to which filter link belongs
     pub fn profile_id(mut self, new_value: &str) -> ManagementProfileFilterLinkPatchCall<'a, C, NC, A> {
         self._profile_id = new_value.to_string();
         self
@@ -5600,7 +6070,7 @@ impl<'a, C, NC, A> ManagementProfileFilterLinkPatchCall<'a, C, NC, A> where NC: 
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// ID of the profile filter link to be updated.    
+    /// ID of the profile filter link to be updated.
     pub fn link_id(mut self, new_value: &str) -> ManagementProfileFilterLinkPatchCall<'a, C, NC, A> {
         self._link_id = new_value.to_string();
         self
@@ -5661,7 +6131,7 @@ impl<'a, C, NC, A> ManagementProfileFilterLinkPatchCall<'a, C, NC, A> where NC: 
 /// Removes a user from the given web property.
 ///
 /// A builder for the *webpropertyUserLinks.delete* method supported by a *management* resource.
-/// It is not used directly, but through a `ManagementMethods`.
+/// It is not used directly, but through a `ManagementMethods` instance.
 ///
 /// # Example
 ///
@@ -5723,7 +6193,7 @@ impl<'a, C, NC, A> ManagementWebpropertyUserLinkDeleteCall<'a, C, NC, A> where N
         for &field in ["accountId", "webPropertyId", "linkId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -5775,7 +6245,7 @@ impl<'a, C, NC, A> ManagementWebpropertyUserLinkDeleteCall<'a, C, NC, A> where N
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -5787,7 +6257,6 @@ impl<'a, C, NC, A> ManagementWebpropertyUserLinkDeleteCall<'a, C, NC, A> where N
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -5797,7 +6266,7 @@ impl<'a, C, NC, A> ManagementWebpropertyUserLinkDeleteCall<'a, C, NC, A> where N
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -5808,12 +6277,12 @@ impl<'a, C, NC, A> ManagementWebpropertyUserLinkDeleteCall<'a, C, NC, A> where N
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = res;
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -5825,7 +6294,7 @@ impl<'a, C, NC, A> ManagementWebpropertyUserLinkDeleteCall<'a, C, NC, A> where N
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Account ID to delete the user link for.    
+    /// Account ID to delete the user link for.
     pub fn account_id(mut self, new_value: &str) -> ManagementWebpropertyUserLinkDeleteCall<'a, C, NC, A> {
         self._account_id = new_value.to_string();
         self
@@ -5835,7 +6304,7 @@ impl<'a, C, NC, A> ManagementWebpropertyUserLinkDeleteCall<'a, C, NC, A> where N
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Web Property ID to delete the user link for.    
+    /// Web Property ID to delete the user link for.
     pub fn web_property_id(mut self, new_value: &str) -> ManagementWebpropertyUserLinkDeleteCall<'a, C, NC, A> {
         self._web_property_id = new_value.to_string();
         self
@@ -5845,7 +6314,7 @@ impl<'a, C, NC, A> ManagementWebpropertyUserLinkDeleteCall<'a, C, NC, A> where N
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Link ID to delete the user link for.    
+    /// Link ID to delete the user link for.
     pub fn link_id(mut self, new_value: &str) -> ManagementWebpropertyUserLinkDeleteCall<'a, C, NC, A> {
         self._link_id = new_value.to_string();
         self
@@ -5906,7 +6375,7 @@ impl<'a, C, NC, A> ManagementWebpropertyUserLinkDeleteCall<'a, C, NC, A> where N
 /// Removes a user from the given view (profile).
 ///
 /// A builder for the *profileUserLinks.delete* method supported by a *management* resource.
-/// It is not used directly, but through a `ManagementMethods`.
+/// It is not used directly, but through a `ManagementMethods` instance.
 ///
 /// # Example
 ///
@@ -5970,7 +6439,7 @@ impl<'a, C, NC, A> ManagementProfileUserLinkDeleteCall<'a, C, NC, A> where NC: h
         for &field in ["accountId", "webPropertyId", "profileId", "linkId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -6022,7 +6491,7 @@ impl<'a, C, NC, A> ManagementProfileUserLinkDeleteCall<'a, C, NC, A> where NC: h
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -6034,7 +6503,6 @@ impl<'a, C, NC, A> ManagementProfileUserLinkDeleteCall<'a, C, NC, A> where NC: h
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -6044,7 +6512,7 @@ impl<'a, C, NC, A> ManagementProfileUserLinkDeleteCall<'a, C, NC, A> where NC: h
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -6055,12 +6523,12 @@ impl<'a, C, NC, A> ManagementProfileUserLinkDeleteCall<'a, C, NC, A> where NC: h
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = res;
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -6072,7 +6540,7 @@ impl<'a, C, NC, A> ManagementProfileUserLinkDeleteCall<'a, C, NC, A> where NC: h
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Account ID to delete the user link for.    
+    /// Account ID to delete the user link for.
     pub fn account_id(mut self, new_value: &str) -> ManagementProfileUserLinkDeleteCall<'a, C, NC, A> {
         self._account_id = new_value.to_string();
         self
@@ -6082,7 +6550,7 @@ impl<'a, C, NC, A> ManagementProfileUserLinkDeleteCall<'a, C, NC, A> where NC: h
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Web Property ID to delete the user link for.    
+    /// Web Property ID to delete the user link for.
     pub fn web_property_id(mut self, new_value: &str) -> ManagementProfileUserLinkDeleteCall<'a, C, NC, A> {
         self._web_property_id = new_value.to_string();
         self
@@ -6092,7 +6560,7 @@ impl<'a, C, NC, A> ManagementProfileUserLinkDeleteCall<'a, C, NC, A> where NC: h
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// View (Profile) ID to delete the user link for.    
+    /// View (Profile) ID to delete the user link for.
     pub fn profile_id(mut self, new_value: &str) -> ManagementProfileUserLinkDeleteCall<'a, C, NC, A> {
         self._profile_id = new_value.to_string();
         self
@@ -6102,7 +6570,7 @@ impl<'a, C, NC, A> ManagementProfileUserLinkDeleteCall<'a, C, NC, A> where NC: h
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Link ID to delete the user link for.    
+    /// Link ID to delete the user link for.
     pub fn link_id(mut self, new_value: &str) -> ManagementProfileUserLinkDeleteCall<'a, C, NC, A> {
         self._link_id = new_value.to_string();
         self
@@ -6163,7 +6631,7 @@ impl<'a, C, NC, A> ManagementProfileUserLinkDeleteCall<'a, C, NC, A> where NC: h
 /// Updates permissions for an existing user on the given view (profile).
 ///
 /// A builder for the *profileUserLinks.update* method supported by a *management* resource.
-/// It is not used directly, but through a `ManagementMethods`.
+/// It is not used directly, but through a `ManagementMethods` instance.
 ///
 /// # Example
 ///
@@ -6234,7 +6702,7 @@ impl<'a, C, NC, A> ManagementProfileUserLinkUpdateCall<'a, C, NC, A> where NC: h
         for &field in ["alt", "accountId", "webPropertyId", "profileId", "linkId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -6291,7 +6759,7 @@ impl<'a, C, NC, A> ManagementProfileUserLinkUpdateCall<'a, C, NC, A> where NC: h
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -6307,7 +6775,6 @@ impl<'a, C, NC, A> ManagementProfileUserLinkUpdateCall<'a, C, NC, A> where NC: h
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -6317,7 +6784,7 @@ impl<'a, C, NC, A> ManagementProfileUserLinkUpdateCall<'a, C, NC, A> where NC: h
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -6328,7 +6795,7 @@ impl<'a, C, NC, A> ManagementProfileUserLinkUpdateCall<'a, C, NC, A> where NC: h
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -6337,13 +6804,13 @@ impl<'a, C, NC, A> ManagementProfileUserLinkUpdateCall<'a, C, NC, A> where NC: h
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -6364,7 +6831,7 @@ impl<'a, C, NC, A> ManagementProfileUserLinkUpdateCall<'a, C, NC, A> where NC: h
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Account ID to update the user link for.    
+    /// Account ID to update the user link for.
     pub fn account_id(mut self, new_value: &str) -> ManagementProfileUserLinkUpdateCall<'a, C, NC, A> {
         self._account_id = new_value.to_string();
         self
@@ -6374,7 +6841,7 @@ impl<'a, C, NC, A> ManagementProfileUserLinkUpdateCall<'a, C, NC, A> where NC: h
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Web Property ID to update the user link for.    
+    /// Web Property ID to update the user link for.
     pub fn web_property_id(mut self, new_value: &str) -> ManagementProfileUserLinkUpdateCall<'a, C, NC, A> {
         self._web_property_id = new_value.to_string();
         self
@@ -6384,7 +6851,7 @@ impl<'a, C, NC, A> ManagementProfileUserLinkUpdateCall<'a, C, NC, A> where NC: h
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// View (Profile ID) to update the user link for.    
+    /// View (Profile ID) to update the user link for.
     pub fn profile_id(mut self, new_value: &str) -> ManagementProfileUserLinkUpdateCall<'a, C, NC, A> {
         self._profile_id = new_value.to_string();
         self
@@ -6394,7 +6861,7 @@ impl<'a, C, NC, A> ManagementProfileUserLinkUpdateCall<'a, C, NC, A> where NC: h
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Link ID to update the user link for.    
+    /// Link ID to update the user link for.
     pub fn link_id(mut self, new_value: &str) -> ManagementProfileUserLinkUpdateCall<'a, C, NC, A> {
         self._link_id = new_value.to_string();
         self
@@ -6455,7 +6922,7 @@ impl<'a, C, NC, A> ManagementProfileUserLinkUpdateCall<'a, C, NC, A> where NC: h
 /// Create a new filter.
 ///
 /// A builder for the *filters.insert* method supported by a *management* resource.
-/// It is not used directly, but through a `ManagementMethods`.
+/// It is not used directly, but through a `ManagementMethods` instance.
 ///
 /// # Example
 ///
@@ -6520,7 +6987,7 @@ impl<'a, C, NC, A> ManagementFilterInsertCall<'a, C, NC, A> where NC: hyper::net
         for &field in ["alt", "accountId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -6577,7 +7044,7 @@ impl<'a, C, NC, A> ManagementFilterInsertCall<'a, C, NC, A> where NC: hyper::net
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -6593,7 +7060,6 @@ impl<'a, C, NC, A> ManagementFilterInsertCall<'a, C, NC, A> where NC: hyper::net
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -6603,7 +7069,7 @@ impl<'a, C, NC, A> ManagementFilterInsertCall<'a, C, NC, A> where NC: hyper::net
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -6614,7 +7080,7 @@ impl<'a, C, NC, A> ManagementFilterInsertCall<'a, C, NC, A> where NC: hyper::net
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -6623,13 +7089,13 @@ impl<'a, C, NC, A> ManagementFilterInsertCall<'a, C, NC, A> where NC: hyper::net
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -6650,7 +7116,7 @@ impl<'a, C, NC, A> ManagementFilterInsertCall<'a, C, NC, A> where NC: hyper::net
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Account ID to create filter for.    
+    /// Account ID to create filter for.
     pub fn account_id(mut self, new_value: &str) -> ManagementFilterInsertCall<'a, C, NC, A> {
         self._account_id = new_value.to_string();
         self
@@ -6711,7 +7177,7 @@ impl<'a, C, NC, A> ManagementFilterInsertCall<'a, C, NC, A> where NC: hyper::net
 /// Updates permissions for an existing user on the given account.
 ///
 /// A builder for the *accountUserLinks.update* method supported by a *management* resource.
-/// It is not used directly, but through a `ManagementMethods`.
+/// It is not used directly, but through a `ManagementMethods` instance.
 ///
 /// # Example
 ///
@@ -6778,7 +7244,7 @@ impl<'a, C, NC, A> ManagementAccountUserLinkUpdateCall<'a, C, NC, A> where NC: h
         for &field in ["alt", "accountId", "linkId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -6835,7 +7301,7 @@ impl<'a, C, NC, A> ManagementAccountUserLinkUpdateCall<'a, C, NC, A> where NC: h
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -6851,7 +7317,6 @@ impl<'a, C, NC, A> ManagementAccountUserLinkUpdateCall<'a, C, NC, A> where NC: h
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -6861,7 +7326,7 @@ impl<'a, C, NC, A> ManagementAccountUserLinkUpdateCall<'a, C, NC, A> where NC: h
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -6872,7 +7337,7 @@ impl<'a, C, NC, A> ManagementAccountUserLinkUpdateCall<'a, C, NC, A> where NC: h
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -6881,13 +7346,13 @@ impl<'a, C, NC, A> ManagementAccountUserLinkUpdateCall<'a, C, NC, A> where NC: h
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -6908,7 +7373,7 @@ impl<'a, C, NC, A> ManagementAccountUserLinkUpdateCall<'a, C, NC, A> where NC: h
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Account ID to update the account-user link for.    
+    /// Account ID to update the account-user link for.
     pub fn account_id(mut self, new_value: &str) -> ManagementAccountUserLinkUpdateCall<'a, C, NC, A> {
         self._account_id = new_value.to_string();
         self
@@ -6918,7 +7383,7 @@ impl<'a, C, NC, A> ManagementAccountUserLinkUpdateCall<'a, C, NC, A> where NC: h
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Link ID to update the account-user link for.    
+    /// Link ID to update the account-user link for.
     pub fn link_id(mut self, new_value: &str) -> ManagementAccountUserLinkUpdateCall<'a, C, NC, A> {
         self._link_id = new_value.to_string();
         self
@@ -6979,7 +7444,7 @@ impl<'a, C, NC, A> ManagementAccountUserLinkUpdateCall<'a, C, NC, A> where NC: h
 /// Updates an existing web property.
 ///
 /// A builder for the *webproperties.update* method supported by a *management* resource.
-/// It is not used directly, but through a `ManagementMethods`.
+/// It is not used directly, but through a `ManagementMethods` instance.
 ///
 /// # Example
 ///
@@ -7046,7 +7511,7 @@ impl<'a, C, NC, A> ManagementWebpropertyUpdateCall<'a, C, NC, A> where NC: hyper
         for &field in ["alt", "accountId", "webPropertyId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -7103,7 +7568,7 @@ impl<'a, C, NC, A> ManagementWebpropertyUpdateCall<'a, C, NC, A> where NC: hyper
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -7119,7 +7584,6 @@ impl<'a, C, NC, A> ManagementWebpropertyUpdateCall<'a, C, NC, A> where NC: hyper
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -7129,7 +7593,7 @@ impl<'a, C, NC, A> ManagementWebpropertyUpdateCall<'a, C, NC, A> where NC: hyper
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -7140,7 +7604,7 @@ impl<'a, C, NC, A> ManagementWebpropertyUpdateCall<'a, C, NC, A> where NC: hyper
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -7149,13 +7613,13 @@ impl<'a, C, NC, A> ManagementWebpropertyUpdateCall<'a, C, NC, A> where NC: hyper
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -7176,7 +7640,7 @@ impl<'a, C, NC, A> ManagementWebpropertyUpdateCall<'a, C, NC, A> where NC: hyper
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Account ID to which the web property belongs    
+    /// Account ID to which the web property belongs
     pub fn account_id(mut self, new_value: &str) -> ManagementWebpropertyUpdateCall<'a, C, NC, A> {
         self._account_id = new_value.to_string();
         self
@@ -7186,7 +7650,7 @@ impl<'a, C, NC, A> ManagementWebpropertyUpdateCall<'a, C, NC, A> where NC: hyper
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Web property ID    
+    /// Web property ID
     pub fn web_property_id(mut self, new_value: &str) -> ManagementWebpropertyUpdateCall<'a, C, NC, A> {
         self._web_property_id = new_value.to_string();
         self
@@ -7247,7 +7711,7 @@ impl<'a, C, NC, A> ManagementWebpropertyUpdateCall<'a, C, NC, A> where NC: hyper
 /// Updates permissions for an existing user on the given web property.
 ///
 /// A builder for the *webpropertyUserLinks.update* method supported by a *management* resource.
-/// It is not used directly, but through a `ManagementMethods`.
+/// It is not used directly, but through a `ManagementMethods` instance.
 ///
 /// # Example
 ///
@@ -7316,7 +7780,7 @@ impl<'a, C, NC, A> ManagementWebpropertyUserLinkUpdateCall<'a, C, NC, A> where N
         for &field in ["alt", "accountId", "webPropertyId", "linkId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -7373,7 +7837,7 @@ impl<'a, C, NC, A> ManagementWebpropertyUserLinkUpdateCall<'a, C, NC, A> where N
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -7389,7 +7853,6 @@ impl<'a, C, NC, A> ManagementWebpropertyUserLinkUpdateCall<'a, C, NC, A> where N
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -7399,7 +7862,7 @@ impl<'a, C, NC, A> ManagementWebpropertyUserLinkUpdateCall<'a, C, NC, A> where N
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -7410,7 +7873,7 @@ impl<'a, C, NC, A> ManagementWebpropertyUserLinkUpdateCall<'a, C, NC, A> where N
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -7419,13 +7882,13 @@ impl<'a, C, NC, A> ManagementWebpropertyUserLinkUpdateCall<'a, C, NC, A> where N
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -7446,7 +7909,7 @@ impl<'a, C, NC, A> ManagementWebpropertyUserLinkUpdateCall<'a, C, NC, A> where N
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Account ID to update the account-user link for.    
+    /// Account ID to update the account-user link for.
     pub fn account_id(mut self, new_value: &str) -> ManagementWebpropertyUserLinkUpdateCall<'a, C, NC, A> {
         self._account_id = new_value.to_string();
         self
@@ -7456,7 +7919,7 @@ impl<'a, C, NC, A> ManagementWebpropertyUserLinkUpdateCall<'a, C, NC, A> where N
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Web property ID to update the account-user link for.    
+    /// Web property ID to update the account-user link for.
     pub fn web_property_id(mut self, new_value: &str) -> ManagementWebpropertyUserLinkUpdateCall<'a, C, NC, A> {
         self._web_property_id = new_value.to_string();
         self
@@ -7466,7 +7929,7 @@ impl<'a, C, NC, A> ManagementWebpropertyUserLinkUpdateCall<'a, C, NC, A> where N
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Link ID to update the account-user link for.    
+    /// Link ID to update the account-user link for.
     pub fn link_id(mut self, new_value: &str) -> ManagementWebpropertyUserLinkUpdateCall<'a, C, NC, A> {
         self._link_id = new_value.to_string();
         self
@@ -7527,7 +7990,7 @@ impl<'a, C, NC, A> ManagementWebpropertyUserLinkUpdateCall<'a, C, NC, A> where N
 /// Create a new unsampled report.
 ///
 /// A builder for the *unsampledReports.insert* method supported by a *management* resource.
-/// It is not used directly, but through a `ManagementMethods`.
+/// It is not used directly, but through a `ManagementMethods` instance.
 ///
 /// # Example
 ///
@@ -7596,7 +8059,7 @@ impl<'a, C, NC, A> ManagementUnsampledReportInsertCall<'a, C, NC, A> where NC: h
         for &field in ["alt", "accountId", "webPropertyId", "profileId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -7653,7 +8116,7 @@ impl<'a, C, NC, A> ManagementUnsampledReportInsertCall<'a, C, NC, A> where NC: h
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -7669,7 +8132,6 @@ impl<'a, C, NC, A> ManagementUnsampledReportInsertCall<'a, C, NC, A> where NC: h
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -7679,7 +8141,7 @@ impl<'a, C, NC, A> ManagementUnsampledReportInsertCall<'a, C, NC, A> where NC: h
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -7690,7 +8152,7 @@ impl<'a, C, NC, A> ManagementUnsampledReportInsertCall<'a, C, NC, A> where NC: h
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -7699,13 +8161,13 @@ impl<'a, C, NC, A> ManagementUnsampledReportInsertCall<'a, C, NC, A> where NC: h
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -7726,7 +8188,7 @@ impl<'a, C, NC, A> ManagementUnsampledReportInsertCall<'a, C, NC, A> where NC: h
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Account ID to create the unsampled report for.    
+    /// Account ID to create the unsampled report for.
     pub fn account_id(mut self, new_value: &str) -> ManagementUnsampledReportInsertCall<'a, C, NC, A> {
         self._account_id = new_value.to_string();
         self
@@ -7736,7 +8198,7 @@ impl<'a, C, NC, A> ManagementUnsampledReportInsertCall<'a, C, NC, A> where NC: h
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Web property ID to create the unsampled report for.    
+    /// Web property ID to create the unsampled report for.
     pub fn web_property_id(mut self, new_value: &str) -> ManagementUnsampledReportInsertCall<'a, C, NC, A> {
         self._web_property_id = new_value.to_string();
         self
@@ -7746,7 +8208,7 @@ impl<'a, C, NC, A> ManagementUnsampledReportInsertCall<'a, C, NC, A> where NC: h
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// View (Profile) ID to create the unsampled report for.    
+    /// View (Profile) ID to create the unsampled report for.
     pub fn profile_id(mut self, new_value: &str) -> ManagementUnsampledReportInsertCall<'a, C, NC, A> {
         self._profile_id = new_value.to_string();
         self
@@ -7807,7 +8269,7 @@ impl<'a, C, NC, A> ManagementUnsampledReportInsertCall<'a, C, NC, A> where NC: h
 /// Get a custom metric to which the user has access.
 ///
 /// A builder for the *customMetrics.get* method supported by a *management* resource.
-/// It is not used directly, but through a `ManagementMethods`.
+/// It is not used directly, but through a `ManagementMethods` instance.
 ///
 /// # Example
 ///
@@ -7869,7 +8331,7 @@ impl<'a, C, NC, A> ManagementCustomMetricGetCall<'a, C, NC, A> where NC: hyper::
         for &field in ["alt", "accountId", "webPropertyId", "customMetricId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -7922,7 +8384,7 @@ impl<'a, C, NC, A> ManagementCustomMetricGetCall<'a, C, NC, A> where NC: hyper::
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -7934,7 +8396,6 @@ impl<'a, C, NC, A> ManagementCustomMetricGetCall<'a, C, NC, A> where NC: hyper::
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -7944,7 +8405,7 @@ impl<'a, C, NC, A> ManagementCustomMetricGetCall<'a, C, NC, A> where NC: hyper::
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -7955,7 +8416,7 @@ impl<'a, C, NC, A> ManagementCustomMetricGetCall<'a, C, NC, A> where NC: hyper::
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -7964,13 +8425,13 @@ impl<'a, C, NC, A> ManagementCustomMetricGetCall<'a, C, NC, A> where NC: hyper::
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -7982,7 +8443,7 @@ impl<'a, C, NC, A> ManagementCustomMetricGetCall<'a, C, NC, A> where NC: hyper::
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Account ID for the custom metric to retrieve.    
+    /// Account ID for the custom metric to retrieve.
     pub fn account_id(mut self, new_value: &str) -> ManagementCustomMetricGetCall<'a, C, NC, A> {
         self._account_id = new_value.to_string();
         self
@@ -7992,7 +8453,7 @@ impl<'a, C, NC, A> ManagementCustomMetricGetCall<'a, C, NC, A> where NC: hyper::
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Web property ID for the custom metric to retrieve.    
+    /// Web property ID for the custom metric to retrieve.
     pub fn web_property_id(mut self, new_value: &str) -> ManagementCustomMetricGetCall<'a, C, NC, A> {
         self._web_property_id = new_value.to_string();
         self
@@ -8002,7 +8463,7 @@ impl<'a, C, NC, A> ManagementCustomMetricGetCall<'a, C, NC, A> where NC: hyper::
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The ID of the custom metric to retrieve.    
+    /// The ID of the custom metric to retrieve.
     pub fn custom_metric_id(mut self, new_value: &str) -> ManagementCustomMetricGetCall<'a, C, NC, A> {
         self._custom_metric_id = new_value.to_string();
         self
@@ -8063,7 +8524,7 @@ impl<'a, C, NC, A> ManagementCustomMetricGetCall<'a, C, NC, A> where NC: hyper::
 /// List uploads to which the user has access.
 ///
 /// A builder for the *uploads.get* method supported by a *management* resource.
-/// It is not used directly, but through a `ManagementMethods`.
+/// It is not used directly, but through a `ManagementMethods` instance.
 ///
 /// # Example
 ///
@@ -8127,7 +8588,7 @@ impl<'a, C, NC, A> ManagementUploadGetCall<'a, C, NC, A> where NC: hyper::net::N
         for &field in ["alt", "accountId", "webPropertyId", "customDataSourceId", "uploadId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -8180,7 +8641,7 @@ impl<'a, C, NC, A> ManagementUploadGetCall<'a, C, NC, A> where NC: hyper::net::N
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -8192,7 +8653,6 @@ impl<'a, C, NC, A> ManagementUploadGetCall<'a, C, NC, A> where NC: hyper::net::N
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -8202,7 +8662,7 @@ impl<'a, C, NC, A> ManagementUploadGetCall<'a, C, NC, A> where NC: hyper::net::N
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -8213,7 +8673,7 @@ impl<'a, C, NC, A> ManagementUploadGetCall<'a, C, NC, A> where NC: hyper::net::N
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -8222,13 +8682,13 @@ impl<'a, C, NC, A> ManagementUploadGetCall<'a, C, NC, A> where NC: hyper::net::N
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -8240,7 +8700,7 @@ impl<'a, C, NC, A> ManagementUploadGetCall<'a, C, NC, A> where NC: hyper::net::N
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Account Id for the upload to retrieve.    
+    /// Account Id for the upload to retrieve.
     pub fn account_id(mut self, new_value: &str) -> ManagementUploadGetCall<'a, C, NC, A> {
         self._account_id = new_value.to_string();
         self
@@ -8250,7 +8710,7 @@ impl<'a, C, NC, A> ManagementUploadGetCall<'a, C, NC, A> where NC: hyper::net::N
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Web property Id for the upload to retrieve.    
+    /// Web property Id for the upload to retrieve.
     pub fn web_property_id(mut self, new_value: &str) -> ManagementUploadGetCall<'a, C, NC, A> {
         self._web_property_id = new_value.to_string();
         self
@@ -8260,7 +8720,7 @@ impl<'a, C, NC, A> ManagementUploadGetCall<'a, C, NC, A> where NC: hyper::net::N
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Custom data source Id for upload to retrieve.    
+    /// Custom data source Id for upload to retrieve.
     pub fn custom_data_source_id(mut self, new_value: &str) -> ManagementUploadGetCall<'a, C, NC, A> {
         self._custom_data_source_id = new_value.to_string();
         self
@@ -8270,7 +8730,7 @@ impl<'a, C, NC, A> ManagementUploadGetCall<'a, C, NC, A> where NC: hyper::net::N
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Upload Id to retrieve.    
+    /// Upload Id to retrieve.
     pub fn upload_id(mut self, new_value: &str) -> ManagementUploadGetCall<'a, C, NC, A> {
         self._upload_id = new_value.to_string();
         self
@@ -8331,7 +8791,7 @@ impl<'a, C, NC, A> ManagementUploadGetCall<'a, C, NC, A> where NC: hyper::net::N
 /// Returns a web property-AdWords link to which the user has access.
 ///
 /// A builder for the *webPropertyAdWordsLinks.get* method supported by a *management* resource.
-/// It is not used directly, but through a `ManagementMethods`.
+/// It is not used directly, but through a `ManagementMethods` instance.
 ///
 /// # Example
 ///
@@ -8393,7 +8853,7 @@ impl<'a, C, NC, A> ManagementWebPropertyAdWordsLinkGetCall<'a, C, NC, A> where N
         for &field in ["alt", "accountId", "webPropertyId", "webPropertyAdWordsLinkId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -8446,7 +8906,7 @@ impl<'a, C, NC, A> ManagementWebPropertyAdWordsLinkGetCall<'a, C, NC, A> where N
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -8458,7 +8918,6 @@ impl<'a, C, NC, A> ManagementWebPropertyAdWordsLinkGetCall<'a, C, NC, A> where N
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -8468,7 +8927,7 @@ impl<'a, C, NC, A> ManagementWebPropertyAdWordsLinkGetCall<'a, C, NC, A> where N
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -8479,7 +8938,7 @@ impl<'a, C, NC, A> ManagementWebPropertyAdWordsLinkGetCall<'a, C, NC, A> where N
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -8488,13 +8947,13 @@ impl<'a, C, NC, A> ManagementWebPropertyAdWordsLinkGetCall<'a, C, NC, A> where N
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -8506,7 +8965,7 @@ impl<'a, C, NC, A> ManagementWebPropertyAdWordsLinkGetCall<'a, C, NC, A> where N
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// ID of the account which the given web property belongs to.    
+    /// ID of the account which the given web property belongs to.
     pub fn account_id(mut self, new_value: &str) -> ManagementWebPropertyAdWordsLinkGetCall<'a, C, NC, A> {
         self._account_id = new_value.to_string();
         self
@@ -8516,7 +8975,7 @@ impl<'a, C, NC, A> ManagementWebPropertyAdWordsLinkGetCall<'a, C, NC, A> where N
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Web property ID to retrieve the AdWords link for.    
+    /// Web property ID to retrieve the AdWords link for.
     pub fn web_property_id(mut self, new_value: &str) -> ManagementWebPropertyAdWordsLinkGetCall<'a, C, NC, A> {
         self._web_property_id = new_value.to_string();
         self
@@ -8526,7 +8985,7 @@ impl<'a, C, NC, A> ManagementWebPropertyAdWordsLinkGetCall<'a, C, NC, A> where N
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Web property-AdWords link ID.    
+    /// Web property-AdWords link ID.
     pub fn web_property_ad_words_link_id(mut self, new_value: &str) -> ManagementWebPropertyAdWordsLinkGetCall<'a, C, NC, A> {
         self._web_property_ad_words_link_id = new_value.to_string();
         self
@@ -8587,7 +9046,7 @@ impl<'a, C, NC, A> ManagementWebPropertyAdWordsLinkGetCall<'a, C, NC, A> where N
 /// Lists webProperty-user links for a given web property.
 ///
 /// A builder for the *webpropertyUserLinks.list* method supported by a *management* resource.
-/// It is not used directly, but through a `ManagementMethods`.
+/// It is not used directly, but through a `ManagementMethods` instance.
 ///
 /// # Example
 ///
@@ -8657,7 +9116,7 @@ impl<'a, C, NC, A> ManagementWebpropertyUserLinkListCall<'a, C, NC, A> where NC:
         for &field in ["alt", "accountId", "webPropertyId", "start-index", "max-results"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -8710,7 +9169,7 @@ impl<'a, C, NC, A> ManagementWebpropertyUserLinkListCall<'a, C, NC, A> where NC:
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -8722,7 +9181,6 @@ impl<'a, C, NC, A> ManagementWebpropertyUserLinkListCall<'a, C, NC, A> where NC:
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -8732,7 +9190,7 @@ impl<'a, C, NC, A> ManagementWebpropertyUserLinkListCall<'a, C, NC, A> where NC:
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -8743,7 +9201,7 @@ impl<'a, C, NC, A> ManagementWebpropertyUserLinkListCall<'a, C, NC, A> where NC:
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -8752,13 +9210,13 @@ impl<'a, C, NC, A> ManagementWebpropertyUserLinkListCall<'a, C, NC, A> where NC:
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -8770,7 +9228,7 @@ impl<'a, C, NC, A> ManagementWebpropertyUserLinkListCall<'a, C, NC, A> where NC:
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Account ID which the given web property belongs to.    
+    /// Account ID which the given web property belongs to.
     pub fn account_id(mut self, new_value: &str) -> ManagementWebpropertyUserLinkListCall<'a, C, NC, A> {
         self._account_id = new_value.to_string();
         self
@@ -8780,7 +9238,7 @@ impl<'a, C, NC, A> ManagementWebpropertyUserLinkListCall<'a, C, NC, A> where NC:
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Web Property ID for the webProperty-user links to retrieve. Can either be a specific web property ID or '~all', which refers to all the web properties that user has access to.    
+    /// Web Property ID for the webProperty-user links to retrieve. Can either be a specific web property ID or '~all', which refers to all the web properties that user has access to.
     pub fn web_property_id(mut self, new_value: &str) -> ManagementWebpropertyUserLinkListCall<'a, C, NC, A> {
         self._web_property_id = new_value.to_string();
         self
@@ -8788,7 +9246,7 @@ impl<'a, C, NC, A> ManagementWebpropertyUserLinkListCall<'a, C, NC, A> where NC:
     /// Sets the *start-index* query property to the given value.
     ///
     /// 
-    /// An index of the first webProperty-user link to retrieve. Use this parameter as a pagination mechanism along with the max-results parameter.    
+    /// An index of the first webProperty-user link to retrieve. Use this parameter as a pagination mechanism along with the max-results parameter.
     pub fn start_index(mut self, new_value: i32) -> ManagementWebpropertyUserLinkListCall<'a, C, NC, A> {
         self._start_index = Some(new_value);
         self
@@ -8796,7 +9254,7 @@ impl<'a, C, NC, A> ManagementWebpropertyUserLinkListCall<'a, C, NC, A> where NC:
     /// Sets the *max-results* query property to the given value.
     ///
     /// 
-    /// The maximum number of webProperty-user Links to include in this response.    
+    /// The maximum number of webProperty-user Links to include in this response.
     pub fn max_results(mut self, new_value: i32) -> ManagementWebpropertyUserLinkListCall<'a, C, NC, A> {
         self._max_results = Some(new_value);
         self
@@ -8857,7 +9315,7 @@ impl<'a, C, NC, A> ManagementWebpropertyUserLinkListCall<'a, C, NC, A> where NC:
 /// Update an existing profile filter link.
 ///
 /// A builder for the *profileFilterLinks.update* method supported by a *management* resource.
-/// It is not used directly, but through a `ManagementMethods`.
+/// It is not used directly, but through a `ManagementMethods` instance.
 ///
 /// # Example
 ///
@@ -8928,7 +9386,7 @@ impl<'a, C, NC, A> ManagementProfileFilterLinkUpdateCall<'a, C, NC, A> where NC:
         for &field in ["alt", "accountId", "webPropertyId", "profileId", "linkId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -8985,7 +9443,7 @@ impl<'a, C, NC, A> ManagementProfileFilterLinkUpdateCall<'a, C, NC, A> where NC:
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -9001,7 +9459,6 @@ impl<'a, C, NC, A> ManagementProfileFilterLinkUpdateCall<'a, C, NC, A> where NC:
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -9011,7 +9468,7 @@ impl<'a, C, NC, A> ManagementProfileFilterLinkUpdateCall<'a, C, NC, A> where NC:
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -9022,7 +9479,7 @@ impl<'a, C, NC, A> ManagementProfileFilterLinkUpdateCall<'a, C, NC, A> where NC:
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -9031,13 +9488,13 @@ impl<'a, C, NC, A> ManagementProfileFilterLinkUpdateCall<'a, C, NC, A> where NC:
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -9058,7 +9515,7 @@ impl<'a, C, NC, A> ManagementProfileFilterLinkUpdateCall<'a, C, NC, A> where NC:
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Account ID to which profile filter link belongs.    
+    /// Account ID to which profile filter link belongs.
     pub fn account_id(mut self, new_value: &str) -> ManagementProfileFilterLinkUpdateCall<'a, C, NC, A> {
         self._account_id = new_value.to_string();
         self
@@ -9068,7 +9525,7 @@ impl<'a, C, NC, A> ManagementProfileFilterLinkUpdateCall<'a, C, NC, A> where NC:
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Web property Id to which profile filter link belongs    
+    /// Web property Id to which profile filter link belongs
     pub fn web_property_id(mut self, new_value: &str) -> ManagementProfileFilterLinkUpdateCall<'a, C, NC, A> {
         self._web_property_id = new_value.to_string();
         self
@@ -9078,7 +9535,7 @@ impl<'a, C, NC, A> ManagementProfileFilterLinkUpdateCall<'a, C, NC, A> where NC:
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Profile ID to which filter link belongs    
+    /// Profile ID to which filter link belongs
     pub fn profile_id(mut self, new_value: &str) -> ManagementProfileFilterLinkUpdateCall<'a, C, NC, A> {
         self._profile_id = new_value.to_string();
         self
@@ -9088,7 +9545,7 @@ impl<'a, C, NC, A> ManagementProfileFilterLinkUpdateCall<'a, C, NC, A> where NC:
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// ID of the profile filter link to be updated.    
+    /// ID of the profile filter link to be updated.
     pub fn link_id(mut self, new_value: &str) -> ManagementProfileFilterLinkUpdateCall<'a, C, NC, A> {
         self._link_id = new_value.to_string();
         self
@@ -9149,7 +9606,7 @@ impl<'a, C, NC, A> ManagementProfileFilterLinkUpdateCall<'a, C, NC, A> where NC:
 /// Returns an experiment to which the user has access.
 ///
 /// A builder for the *experiments.get* method supported by a *management* resource.
-/// It is not used directly, but through a `ManagementMethods`.
+/// It is not used directly, but through a `ManagementMethods` instance.
 ///
 /// # Example
 ///
@@ -9213,7 +9670,7 @@ impl<'a, C, NC, A> ManagementExperimentGetCall<'a, C, NC, A> where NC: hyper::ne
         for &field in ["alt", "accountId", "webPropertyId", "profileId", "experimentId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -9266,7 +9723,7 @@ impl<'a, C, NC, A> ManagementExperimentGetCall<'a, C, NC, A> where NC: hyper::ne
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -9278,7 +9735,6 @@ impl<'a, C, NC, A> ManagementExperimentGetCall<'a, C, NC, A> where NC: hyper::ne
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -9288,7 +9744,7 @@ impl<'a, C, NC, A> ManagementExperimentGetCall<'a, C, NC, A> where NC: hyper::ne
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -9299,7 +9755,7 @@ impl<'a, C, NC, A> ManagementExperimentGetCall<'a, C, NC, A> where NC: hyper::ne
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -9308,13 +9764,13 @@ impl<'a, C, NC, A> ManagementExperimentGetCall<'a, C, NC, A> where NC: hyper::ne
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -9326,7 +9782,7 @@ impl<'a, C, NC, A> ManagementExperimentGetCall<'a, C, NC, A> where NC: hyper::ne
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Account ID to retrieve the experiment for.    
+    /// Account ID to retrieve the experiment for.
     pub fn account_id(mut self, new_value: &str) -> ManagementExperimentGetCall<'a, C, NC, A> {
         self._account_id = new_value.to_string();
         self
@@ -9336,7 +9792,7 @@ impl<'a, C, NC, A> ManagementExperimentGetCall<'a, C, NC, A> where NC: hyper::ne
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Web property ID to retrieve the experiment for.    
+    /// Web property ID to retrieve the experiment for.
     pub fn web_property_id(mut self, new_value: &str) -> ManagementExperimentGetCall<'a, C, NC, A> {
         self._web_property_id = new_value.to_string();
         self
@@ -9346,7 +9802,7 @@ impl<'a, C, NC, A> ManagementExperimentGetCall<'a, C, NC, A> where NC: hyper::ne
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// View (Profile) ID to retrieve the experiment for.    
+    /// View (Profile) ID to retrieve the experiment for.
     pub fn profile_id(mut self, new_value: &str) -> ManagementExperimentGetCall<'a, C, NC, A> {
         self._profile_id = new_value.to_string();
         self
@@ -9356,7 +9812,7 @@ impl<'a, C, NC, A> ManagementExperimentGetCall<'a, C, NC, A> where NC: hyper::ne
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Experiment ID to retrieve the experiment for.    
+    /// Experiment ID to retrieve the experiment for.
     pub fn experiment_id(mut self, new_value: &str) -> ManagementExperimentGetCall<'a, C, NC, A> {
         self._experiment_id = new_value.to_string();
         self
@@ -9417,7 +9873,7 @@ impl<'a, C, NC, A> ManagementExperimentGetCall<'a, C, NC, A> where NC: hyper::ne
 /// Updates an existing custom dimension.
 ///
 /// A builder for the *customDimensions.update* method supported by a *management* resource.
-/// It is not used directly, but through a `ManagementMethods`.
+/// It is not used directly, but through a `ManagementMethods` instance.
 ///
 /// # Example
 ///
@@ -9491,7 +9947,7 @@ impl<'a, C, NC, A> ManagementCustomDimensionUpdateCall<'a, C, NC, A> where NC: h
         for &field in ["alt", "accountId", "webPropertyId", "customDimensionId", "ignoreCustomDataSourceLinks"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -9548,7 +10004,7 @@ impl<'a, C, NC, A> ManagementCustomDimensionUpdateCall<'a, C, NC, A> where NC: h
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -9564,7 +10020,6 @@ impl<'a, C, NC, A> ManagementCustomDimensionUpdateCall<'a, C, NC, A> where NC: h
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -9574,7 +10029,7 @@ impl<'a, C, NC, A> ManagementCustomDimensionUpdateCall<'a, C, NC, A> where NC: h
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -9585,7 +10040,7 @@ impl<'a, C, NC, A> ManagementCustomDimensionUpdateCall<'a, C, NC, A> where NC: h
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -9594,13 +10049,13 @@ impl<'a, C, NC, A> ManagementCustomDimensionUpdateCall<'a, C, NC, A> where NC: h
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -9621,7 +10076,7 @@ impl<'a, C, NC, A> ManagementCustomDimensionUpdateCall<'a, C, NC, A> where NC: h
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Account ID for the custom dimension to update.    
+    /// Account ID for the custom dimension to update.
     pub fn account_id(mut self, new_value: &str) -> ManagementCustomDimensionUpdateCall<'a, C, NC, A> {
         self._account_id = new_value.to_string();
         self
@@ -9631,7 +10086,7 @@ impl<'a, C, NC, A> ManagementCustomDimensionUpdateCall<'a, C, NC, A> where NC: h
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Web property ID for the custom dimension to update.    
+    /// Web property ID for the custom dimension to update.
     pub fn web_property_id(mut self, new_value: &str) -> ManagementCustomDimensionUpdateCall<'a, C, NC, A> {
         self._web_property_id = new_value.to_string();
         self
@@ -9641,7 +10096,7 @@ impl<'a, C, NC, A> ManagementCustomDimensionUpdateCall<'a, C, NC, A> where NC: h
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Custom dimension ID for the custom dimension to update.    
+    /// Custom dimension ID for the custom dimension to update.
     pub fn custom_dimension_id(mut self, new_value: &str) -> ManagementCustomDimensionUpdateCall<'a, C, NC, A> {
         self._custom_dimension_id = new_value.to_string();
         self
@@ -9649,7 +10104,7 @@ impl<'a, C, NC, A> ManagementCustomDimensionUpdateCall<'a, C, NC, A> where NC: h
     /// Sets the *ignore custom data source links* query property to the given value.
     ///
     /// 
-    /// Force the update and ignore any warnings related to the custom dimension being linked to a custom data source / data set.    
+    /// Force the update and ignore any warnings related to the custom dimension being linked to a custom data source / data set.
     pub fn ignore_custom_data_source_links(mut self, new_value: bool) -> ManagementCustomDimensionUpdateCall<'a, C, NC, A> {
         self._ignore_custom_data_source_links = Some(new_value);
         self
@@ -9710,7 +10165,7 @@ impl<'a, C, NC, A> ManagementCustomDimensionUpdateCall<'a, C, NC, A> where NC: h
 /// Returns a single unsampled report.
 ///
 /// A builder for the *unsampledReports.get* method supported by a *management* resource.
-/// It is not used directly, but through a `ManagementMethods`.
+/// It is not used directly, but through a `ManagementMethods` instance.
 ///
 /// # Example
 ///
@@ -9774,7 +10229,7 @@ impl<'a, C, NC, A> ManagementUnsampledReportGetCall<'a, C, NC, A> where NC: hype
         for &field in ["alt", "accountId", "webPropertyId", "profileId", "unsampledReportId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -9827,7 +10282,7 @@ impl<'a, C, NC, A> ManagementUnsampledReportGetCall<'a, C, NC, A> where NC: hype
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -9839,7 +10294,6 @@ impl<'a, C, NC, A> ManagementUnsampledReportGetCall<'a, C, NC, A> where NC: hype
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -9849,7 +10303,7 @@ impl<'a, C, NC, A> ManagementUnsampledReportGetCall<'a, C, NC, A> where NC: hype
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -9860,7 +10314,7 @@ impl<'a, C, NC, A> ManagementUnsampledReportGetCall<'a, C, NC, A> where NC: hype
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -9869,13 +10323,13 @@ impl<'a, C, NC, A> ManagementUnsampledReportGetCall<'a, C, NC, A> where NC: hype
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -9887,7 +10341,7 @@ impl<'a, C, NC, A> ManagementUnsampledReportGetCall<'a, C, NC, A> where NC: hype
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Account ID to retrieve unsampled report for.    
+    /// Account ID to retrieve unsampled report for.
     pub fn account_id(mut self, new_value: &str) -> ManagementUnsampledReportGetCall<'a, C, NC, A> {
         self._account_id = new_value.to_string();
         self
@@ -9897,7 +10351,7 @@ impl<'a, C, NC, A> ManagementUnsampledReportGetCall<'a, C, NC, A> where NC: hype
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Web property ID to retrieve unsampled reports for.    
+    /// Web property ID to retrieve unsampled reports for.
     pub fn web_property_id(mut self, new_value: &str) -> ManagementUnsampledReportGetCall<'a, C, NC, A> {
         self._web_property_id = new_value.to_string();
         self
@@ -9907,7 +10361,7 @@ impl<'a, C, NC, A> ManagementUnsampledReportGetCall<'a, C, NC, A> where NC: hype
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// View (Profile) ID to retrieve unsampled report for.    
+    /// View (Profile) ID to retrieve unsampled report for.
     pub fn profile_id(mut self, new_value: &str) -> ManagementUnsampledReportGetCall<'a, C, NC, A> {
         self._profile_id = new_value.to_string();
         self
@@ -9917,7 +10371,7 @@ impl<'a, C, NC, A> ManagementUnsampledReportGetCall<'a, C, NC, A> where NC: hype
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// ID of the unsampled report to retrieve.    
+    /// ID of the unsampled report to retrieve.
     pub fn unsampled_report_id(mut self, new_value: &str) -> ManagementUnsampledReportGetCall<'a, C, NC, A> {
         self._unsampled_report_id = new_value.to_string();
         self
@@ -9978,7 +10432,7 @@ impl<'a, C, NC, A> ManagementUnsampledReportGetCall<'a, C, NC, A> where NC: hype
 /// Create a new profile filter link.
 ///
 /// A builder for the *profileFilterLinks.insert* method supported by a *management* resource.
-/// It is not used directly, but through a `ManagementMethods`.
+/// It is not used directly, but through a `ManagementMethods` instance.
 ///
 /// # Example
 ///
@@ -10047,7 +10501,7 @@ impl<'a, C, NC, A> ManagementProfileFilterLinkInsertCall<'a, C, NC, A> where NC:
         for &field in ["alt", "accountId", "webPropertyId", "profileId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -10104,7 +10558,7 @@ impl<'a, C, NC, A> ManagementProfileFilterLinkInsertCall<'a, C, NC, A> where NC:
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -10120,7 +10574,6 @@ impl<'a, C, NC, A> ManagementProfileFilterLinkInsertCall<'a, C, NC, A> where NC:
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -10130,7 +10583,7 @@ impl<'a, C, NC, A> ManagementProfileFilterLinkInsertCall<'a, C, NC, A> where NC:
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -10141,7 +10594,7 @@ impl<'a, C, NC, A> ManagementProfileFilterLinkInsertCall<'a, C, NC, A> where NC:
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -10150,13 +10603,13 @@ impl<'a, C, NC, A> ManagementProfileFilterLinkInsertCall<'a, C, NC, A> where NC:
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -10177,7 +10630,7 @@ impl<'a, C, NC, A> ManagementProfileFilterLinkInsertCall<'a, C, NC, A> where NC:
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Account ID to create profile filter link for.    
+    /// Account ID to create profile filter link for.
     pub fn account_id(mut self, new_value: &str) -> ManagementProfileFilterLinkInsertCall<'a, C, NC, A> {
         self._account_id = new_value.to_string();
         self
@@ -10187,7 +10640,7 @@ impl<'a, C, NC, A> ManagementProfileFilterLinkInsertCall<'a, C, NC, A> where NC:
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Web property Id to create profile filter link for.    
+    /// Web property Id to create profile filter link for.
     pub fn web_property_id(mut self, new_value: &str) -> ManagementProfileFilterLinkInsertCall<'a, C, NC, A> {
         self._web_property_id = new_value.to_string();
         self
@@ -10197,7 +10650,7 @@ impl<'a, C, NC, A> ManagementProfileFilterLinkInsertCall<'a, C, NC, A> where NC:
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Profile ID to create filter link for.    
+    /// Profile ID to create filter link for.
     pub fn profile_id(mut self, new_value: &str) -> ManagementProfileFilterLinkInsertCall<'a, C, NC, A> {
         self._profile_id = new_value.to_string();
         self
@@ -10258,7 +10711,7 @@ impl<'a, C, NC, A> ManagementProfileFilterLinkInsertCall<'a, C, NC, A> where NC:
 /// Updates an existing filter.
 ///
 /// A builder for the *filters.update* method supported by a *management* resource.
-/// It is not used directly, but through a `ManagementMethods`.
+/// It is not used directly, but through a `ManagementMethods` instance.
 ///
 /// # Example
 ///
@@ -10325,7 +10778,7 @@ impl<'a, C, NC, A> ManagementFilterUpdateCall<'a, C, NC, A> where NC: hyper::net
         for &field in ["alt", "accountId", "filterId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -10382,7 +10835,7 @@ impl<'a, C, NC, A> ManagementFilterUpdateCall<'a, C, NC, A> where NC: hyper::net
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -10398,7 +10851,6 @@ impl<'a, C, NC, A> ManagementFilterUpdateCall<'a, C, NC, A> where NC: hyper::net
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -10408,7 +10860,7 @@ impl<'a, C, NC, A> ManagementFilterUpdateCall<'a, C, NC, A> where NC: hyper::net
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -10419,7 +10871,7 @@ impl<'a, C, NC, A> ManagementFilterUpdateCall<'a, C, NC, A> where NC: hyper::net
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -10428,13 +10880,13 @@ impl<'a, C, NC, A> ManagementFilterUpdateCall<'a, C, NC, A> where NC: hyper::net
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -10455,7 +10907,7 @@ impl<'a, C, NC, A> ManagementFilterUpdateCall<'a, C, NC, A> where NC: hyper::net
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Account ID to which the filter belongs.    
+    /// Account ID to which the filter belongs.
     pub fn account_id(mut self, new_value: &str) -> ManagementFilterUpdateCall<'a, C, NC, A> {
         self._account_id = new_value.to_string();
         self
@@ -10465,7 +10917,7 @@ impl<'a, C, NC, A> ManagementFilterUpdateCall<'a, C, NC, A> where NC: hyper::net
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// ID of the filter to be updated.    
+    /// ID of the filter to be updated.
     pub fn filter_id(mut self, new_value: &str) -> ManagementFilterUpdateCall<'a, C, NC, A> {
         self._filter_id = new_value.to_string();
         self
@@ -10526,7 +10978,7 @@ impl<'a, C, NC, A> ManagementFilterUpdateCall<'a, C, NC, A> where NC: hyper::net
 /// Delete a profile filter link.
 ///
 /// A builder for the *profileFilterLinks.delete* method supported by a *management* resource.
-/// It is not used directly, but through a `ManagementMethods`.
+/// It is not used directly, but through a `ManagementMethods` instance.
 ///
 /// # Example
 ///
@@ -10590,7 +11042,7 @@ impl<'a, C, NC, A> ManagementProfileFilterLinkDeleteCall<'a, C, NC, A> where NC:
         for &field in ["accountId", "webPropertyId", "profileId", "linkId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -10642,7 +11094,7 @@ impl<'a, C, NC, A> ManagementProfileFilterLinkDeleteCall<'a, C, NC, A> where NC:
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -10654,7 +11106,6 @@ impl<'a, C, NC, A> ManagementProfileFilterLinkDeleteCall<'a, C, NC, A> where NC:
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -10664,7 +11115,7 @@ impl<'a, C, NC, A> ManagementProfileFilterLinkDeleteCall<'a, C, NC, A> where NC:
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -10675,12 +11126,12 @@ impl<'a, C, NC, A> ManagementProfileFilterLinkDeleteCall<'a, C, NC, A> where NC:
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = res;
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -10692,7 +11143,7 @@ impl<'a, C, NC, A> ManagementProfileFilterLinkDeleteCall<'a, C, NC, A> where NC:
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Account ID to which the profile filter link belongs.    
+    /// Account ID to which the profile filter link belongs.
     pub fn account_id(mut self, new_value: &str) -> ManagementProfileFilterLinkDeleteCall<'a, C, NC, A> {
         self._account_id = new_value.to_string();
         self
@@ -10702,7 +11153,7 @@ impl<'a, C, NC, A> ManagementProfileFilterLinkDeleteCall<'a, C, NC, A> where NC:
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Web property Id to which the profile filter link belongs.    
+    /// Web property Id to which the profile filter link belongs.
     pub fn web_property_id(mut self, new_value: &str) -> ManagementProfileFilterLinkDeleteCall<'a, C, NC, A> {
         self._web_property_id = new_value.to_string();
         self
@@ -10712,7 +11163,7 @@ impl<'a, C, NC, A> ManagementProfileFilterLinkDeleteCall<'a, C, NC, A> where NC:
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Profile ID to which the filter link belongs.    
+    /// Profile ID to which the filter link belongs.
     pub fn profile_id(mut self, new_value: &str) -> ManagementProfileFilterLinkDeleteCall<'a, C, NC, A> {
         self._profile_id = new_value.to_string();
         self
@@ -10722,7 +11173,7 @@ impl<'a, C, NC, A> ManagementProfileFilterLinkDeleteCall<'a, C, NC, A> where NC:
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// ID of the profile filter link to delete.    
+    /// ID of the profile filter link to delete.
     pub fn link_id(mut self, new_value: &str) -> ManagementProfileFilterLinkDeleteCall<'a, C, NC, A> {
         self._link_id = new_value.to_string();
         self
@@ -10783,7 +11234,7 @@ impl<'a, C, NC, A> ManagementProfileFilterLinkDeleteCall<'a, C, NC, A> where NC:
 /// Lists segments to which the user has access.
 ///
 /// A builder for the *segments.list* method supported by a *management* resource.
-/// It is not used directly, but through a `ManagementMethods`.
+/// It is not used directly, but through a `ManagementMethods` instance.
 ///
 /// # Example
 ///
@@ -10849,7 +11300,7 @@ impl<'a, C, NC, A> ManagementSegmentListCall<'a, C, NC, A> where NC: hyper::net:
         for &field in ["alt", "start-index", "max-results"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -10878,7 +11329,7 @@ impl<'a, C, NC, A> ManagementSegmentListCall<'a, C, NC, A> where NC: hyper::net:
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -10890,7 +11341,6 @@ impl<'a, C, NC, A> ManagementSegmentListCall<'a, C, NC, A> where NC: hyper::net:
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -10900,7 +11350,7 @@ impl<'a, C, NC, A> ManagementSegmentListCall<'a, C, NC, A> where NC: hyper::net:
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -10911,7 +11361,7 @@ impl<'a, C, NC, A> ManagementSegmentListCall<'a, C, NC, A> where NC: hyper::net:
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -10920,13 +11370,13 @@ impl<'a, C, NC, A> ManagementSegmentListCall<'a, C, NC, A> where NC: hyper::net:
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -10936,7 +11386,7 @@ impl<'a, C, NC, A> ManagementSegmentListCall<'a, C, NC, A> where NC: hyper::net:
     /// Sets the *start-index* query property to the given value.
     ///
     /// 
-    /// An index of the first segment to retrieve. Use this parameter as a pagination mechanism along with the max-results parameter.    
+    /// An index of the first segment to retrieve. Use this parameter as a pagination mechanism along with the max-results parameter.
     pub fn start_index(mut self, new_value: i32) -> ManagementSegmentListCall<'a, C, NC, A> {
         self._start_index = Some(new_value);
         self
@@ -10944,7 +11394,7 @@ impl<'a, C, NC, A> ManagementSegmentListCall<'a, C, NC, A> where NC: hyper::net:
     /// Sets the *max-results* query property to the given value.
     ///
     /// 
-    /// The maximum number of segments to include in this response.    
+    /// The maximum number of segments to include in this response.
     pub fn max_results(mut self, new_value: i32) -> ManagementSegmentListCall<'a, C, NC, A> {
         self._max_results = Some(new_value);
         self
@@ -11005,7 +11455,7 @@ impl<'a, C, NC, A> ManagementSegmentListCall<'a, C, NC, A> where NC: hyper::net:
 /// Deletes a view (profile).
 ///
 /// A builder for the *profiles.delete* method supported by a *management* resource.
-/// It is not used directly, but through a `ManagementMethods`.
+/// It is not used directly, but through a `ManagementMethods` instance.
 ///
 /// # Example
 ///
@@ -11067,7 +11517,7 @@ impl<'a, C, NC, A> ManagementProfileDeleteCall<'a, C, NC, A> where NC: hyper::ne
         for &field in ["accountId", "webPropertyId", "profileId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -11119,7 +11569,7 @@ impl<'a, C, NC, A> ManagementProfileDeleteCall<'a, C, NC, A> where NC: hyper::ne
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -11131,7 +11581,6 @@ impl<'a, C, NC, A> ManagementProfileDeleteCall<'a, C, NC, A> where NC: hyper::ne
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -11141,7 +11590,7 @@ impl<'a, C, NC, A> ManagementProfileDeleteCall<'a, C, NC, A> where NC: hyper::ne
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -11152,12 +11601,12 @@ impl<'a, C, NC, A> ManagementProfileDeleteCall<'a, C, NC, A> where NC: hyper::ne
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = res;
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -11169,7 +11618,7 @@ impl<'a, C, NC, A> ManagementProfileDeleteCall<'a, C, NC, A> where NC: hyper::ne
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Account ID to delete the view (profile) for.    
+    /// Account ID to delete the view (profile) for.
     pub fn account_id(mut self, new_value: &str) -> ManagementProfileDeleteCall<'a, C, NC, A> {
         self._account_id = new_value.to_string();
         self
@@ -11179,7 +11628,7 @@ impl<'a, C, NC, A> ManagementProfileDeleteCall<'a, C, NC, A> where NC: hyper::ne
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Web property ID to delete the view (profile) for.    
+    /// Web property ID to delete the view (profile) for.
     pub fn web_property_id(mut self, new_value: &str) -> ManagementProfileDeleteCall<'a, C, NC, A> {
         self._web_property_id = new_value.to_string();
         self
@@ -11189,7 +11638,7 @@ impl<'a, C, NC, A> ManagementProfileDeleteCall<'a, C, NC, A> where NC: hyper::ne
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// ID of the view (profile) to be deleted.    
+    /// ID of the view (profile) to be deleted.
     pub fn profile_id(mut self, new_value: &str) -> ManagementProfileDeleteCall<'a, C, NC, A> {
         self._profile_id = new_value.to_string();
         self
@@ -11250,7 +11699,7 @@ impl<'a, C, NC, A> ManagementProfileDeleteCall<'a, C, NC, A> where NC: hyper::ne
 /// Updates an existing view (profile). This method supports patch semantics.
 ///
 /// A builder for the *goals.patch* method supported by a *management* resource.
-/// It is not used directly, but through a `ManagementMethods`.
+/// It is not used directly, but through a `ManagementMethods` instance.
 ///
 /// # Example
 ///
@@ -11321,7 +11770,7 @@ impl<'a, C, NC, A> ManagementGoalPatchCall<'a, C, NC, A> where NC: hyper::net::N
         for &field in ["alt", "accountId", "webPropertyId", "profileId", "goalId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -11378,7 +11827,7 @@ impl<'a, C, NC, A> ManagementGoalPatchCall<'a, C, NC, A> where NC: hyper::net::N
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -11394,7 +11843,6 @@ impl<'a, C, NC, A> ManagementGoalPatchCall<'a, C, NC, A> where NC: hyper::net::N
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -11404,7 +11852,7 @@ impl<'a, C, NC, A> ManagementGoalPatchCall<'a, C, NC, A> where NC: hyper::net::N
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -11415,7 +11863,7 @@ impl<'a, C, NC, A> ManagementGoalPatchCall<'a, C, NC, A> where NC: hyper::net::N
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -11424,13 +11872,13 @@ impl<'a, C, NC, A> ManagementGoalPatchCall<'a, C, NC, A> where NC: hyper::net::N
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -11451,7 +11899,7 @@ impl<'a, C, NC, A> ManagementGoalPatchCall<'a, C, NC, A> where NC: hyper::net::N
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Account ID to update the goal.    
+    /// Account ID to update the goal.
     pub fn account_id(mut self, new_value: &str) -> ManagementGoalPatchCall<'a, C, NC, A> {
         self._account_id = new_value.to_string();
         self
@@ -11461,7 +11909,7 @@ impl<'a, C, NC, A> ManagementGoalPatchCall<'a, C, NC, A> where NC: hyper::net::N
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Web property ID to update the goal.    
+    /// Web property ID to update the goal.
     pub fn web_property_id(mut self, new_value: &str) -> ManagementGoalPatchCall<'a, C, NC, A> {
         self._web_property_id = new_value.to_string();
         self
@@ -11471,7 +11919,7 @@ impl<'a, C, NC, A> ManagementGoalPatchCall<'a, C, NC, A> where NC: hyper::net::N
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// View (Profile) ID to update the goal.    
+    /// View (Profile) ID to update the goal.
     pub fn profile_id(mut self, new_value: &str) -> ManagementGoalPatchCall<'a, C, NC, A> {
         self._profile_id = new_value.to_string();
         self
@@ -11481,7 +11929,7 @@ impl<'a, C, NC, A> ManagementGoalPatchCall<'a, C, NC, A> where NC: hyper::net::N
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Index of the goal to be updated.    
+    /// Index of the goal to be updated.
     pub fn goal_id(mut self, new_value: &str) -> ManagementGoalPatchCall<'a, C, NC, A> {
         self._goal_id = new_value.to_string();
         self
@@ -11542,7 +11990,7 @@ impl<'a, C, NC, A> ManagementGoalPatchCall<'a, C, NC, A> where NC: hyper::net::N
 /// Updates an existing custom dimension. This method supports patch semantics.
 ///
 /// A builder for the *customDimensions.patch* method supported by a *management* resource.
-/// It is not used directly, but through a `ManagementMethods`.
+/// It is not used directly, but through a `ManagementMethods` instance.
 ///
 /// # Example
 ///
@@ -11616,7 +12064,7 @@ impl<'a, C, NC, A> ManagementCustomDimensionPatchCall<'a, C, NC, A> where NC: hy
         for &field in ["alt", "accountId", "webPropertyId", "customDimensionId", "ignoreCustomDataSourceLinks"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -11673,7 +12121,7 @@ impl<'a, C, NC, A> ManagementCustomDimensionPatchCall<'a, C, NC, A> where NC: hy
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -11689,7 +12137,6 @@ impl<'a, C, NC, A> ManagementCustomDimensionPatchCall<'a, C, NC, A> where NC: hy
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -11699,7 +12146,7 @@ impl<'a, C, NC, A> ManagementCustomDimensionPatchCall<'a, C, NC, A> where NC: hy
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -11710,7 +12157,7 @@ impl<'a, C, NC, A> ManagementCustomDimensionPatchCall<'a, C, NC, A> where NC: hy
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -11719,13 +12166,13 @@ impl<'a, C, NC, A> ManagementCustomDimensionPatchCall<'a, C, NC, A> where NC: hy
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -11746,7 +12193,7 @@ impl<'a, C, NC, A> ManagementCustomDimensionPatchCall<'a, C, NC, A> where NC: hy
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Account ID for the custom dimension to update.    
+    /// Account ID for the custom dimension to update.
     pub fn account_id(mut self, new_value: &str) -> ManagementCustomDimensionPatchCall<'a, C, NC, A> {
         self._account_id = new_value.to_string();
         self
@@ -11756,7 +12203,7 @@ impl<'a, C, NC, A> ManagementCustomDimensionPatchCall<'a, C, NC, A> where NC: hy
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Web property ID for the custom dimension to update.    
+    /// Web property ID for the custom dimension to update.
     pub fn web_property_id(mut self, new_value: &str) -> ManagementCustomDimensionPatchCall<'a, C, NC, A> {
         self._web_property_id = new_value.to_string();
         self
@@ -11766,7 +12213,7 @@ impl<'a, C, NC, A> ManagementCustomDimensionPatchCall<'a, C, NC, A> where NC: hy
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Custom dimension ID for the custom dimension to update.    
+    /// Custom dimension ID for the custom dimension to update.
     pub fn custom_dimension_id(mut self, new_value: &str) -> ManagementCustomDimensionPatchCall<'a, C, NC, A> {
         self._custom_dimension_id = new_value.to_string();
         self
@@ -11774,7 +12221,7 @@ impl<'a, C, NC, A> ManagementCustomDimensionPatchCall<'a, C, NC, A> where NC: hy
     /// Sets the *ignore custom data source links* query property to the given value.
     ///
     /// 
-    /// Force the update and ignore any warnings related to the custom dimension being linked to a custom data source / data set.    
+    /// Force the update and ignore any warnings related to the custom dimension being linked to a custom data source / data set.
     pub fn ignore_custom_data_source_links(mut self, new_value: bool) -> ManagementCustomDimensionPatchCall<'a, C, NC, A> {
         self._ignore_custom_data_source_links = Some(new_value);
         self
@@ -11835,7 +12282,7 @@ impl<'a, C, NC, A> ManagementCustomDimensionPatchCall<'a, C, NC, A> where NC: hy
 /// Update an existing experiment. This method supports patch semantics.
 ///
 /// A builder for the *experiments.patch* method supported by a *management* resource.
-/// It is not used directly, but through a `ManagementMethods`.
+/// It is not used directly, but through a `ManagementMethods` instance.
 ///
 /// # Example
 ///
@@ -11906,7 +12353,7 @@ impl<'a, C, NC, A> ManagementExperimentPatchCall<'a, C, NC, A> where NC: hyper::
         for &field in ["alt", "accountId", "webPropertyId", "profileId", "experimentId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -11963,7 +12410,7 @@ impl<'a, C, NC, A> ManagementExperimentPatchCall<'a, C, NC, A> where NC: hyper::
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -11979,7 +12426,6 @@ impl<'a, C, NC, A> ManagementExperimentPatchCall<'a, C, NC, A> where NC: hyper::
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -11989,7 +12435,7 @@ impl<'a, C, NC, A> ManagementExperimentPatchCall<'a, C, NC, A> where NC: hyper::
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -12000,7 +12446,7 @@ impl<'a, C, NC, A> ManagementExperimentPatchCall<'a, C, NC, A> where NC: hyper::
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -12009,13 +12455,13 @@ impl<'a, C, NC, A> ManagementExperimentPatchCall<'a, C, NC, A> where NC: hyper::
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -12036,7 +12482,7 @@ impl<'a, C, NC, A> ManagementExperimentPatchCall<'a, C, NC, A> where NC: hyper::
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Account ID of the experiment to update.    
+    /// Account ID of the experiment to update.
     pub fn account_id(mut self, new_value: &str) -> ManagementExperimentPatchCall<'a, C, NC, A> {
         self._account_id = new_value.to_string();
         self
@@ -12046,7 +12492,7 @@ impl<'a, C, NC, A> ManagementExperimentPatchCall<'a, C, NC, A> where NC: hyper::
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Web property ID of the experiment to update.    
+    /// Web property ID of the experiment to update.
     pub fn web_property_id(mut self, new_value: &str) -> ManagementExperimentPatchCall<'a, C, NC, A> {
         self._web_property_id = new_value.to_string();
         self
@@ -12056,7 +12502,7 @@ impl<'a, C, NC, A> ManagementExperimentPatchCall<'a, C, NC, A> where NC: hyper::
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// View (Profile) ID of the experiment to update.    
+    /// View (Profile) ID of the experiment to update.
     pub fn profile_id(mut self, new_value: &str) -> ManagementExperimentPatchCall<'a, C, NC, A> {
         self._profile_id = new_value.to_string();
         self
@@ -12066,7 +12512,7 @@ impl<'a, C, NC, A> ManagementExperimentPatchCall<'a, C, NC, A> where NC: hyper::
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Experiment ID of the experiment to update.    
+    /// Experiment ID of the experiment to update.
     pub fn experiment_id(mut self, new_value: &str) -> ManagementExperimentPatchCall<'a, C, NC, A> {
         self._experiment_id = new_value.to_string();
         self
@@ -12127,7 +12573,7 @@ impl<'a, C, NC, A> ManagementExperimentPatchCall<'a, C, NC, A> where NC: hyper::
 /// Lists experiments to which the user has access.
 ///
 /// A builder for the *experiments.list* method supported by a *management* resource.
-/// It is not used directly, but through a `ManagementMethods`.
+/// It is not used directly, but through a `ManagementMethods` instance.
 ///
 /// # Example
 ///
@@ -12199,7 +12645,7 @@ impl<'a, C, NC, A> ManagementExperimentListCall<'a, C, NC, A> where NC: hyper::n
         for &field in ["alt", "accountId", "webPropertyId", "profileId", "start-index", "max-results"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -12252,7 +12698,7 @@ impl<'a, C, NC, A> ManagementExperimentListCall<'a, C, NC, A> where NC: hyper::n
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -12264,7 +12710,6 @@ impl<'a, C, NC, A> ManagementExperimentListCall<'a, C, NC, A> where NC: hyper::n
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -12274,7 +12719,7 @@ impl<'a, C, NC, A> ManagementExperimentListCall<'a, C, NC, A> where NC: hyper::n
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -12285,7 +12730,7 @@ impl<'a, C, NC, A> ManagementExperimentListCall<'a, C, NC, A> where NC: hyper::n
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -12294,13 +12739,13 @@ impl<'a, C, NC, A> ManagementExperimentListCall<'a, C, NC, A> where NC: hyper::n
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -12312,7 +12757,7 @@ impl<'a, C, NC, A> ManagementExperimentListCall<'a, C, NC, A> where NC: hyper::n
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Account ID to retrieve experiments for.    
+    /// Account ID to retrieve experiments for.
     pub fn account_id(mut self, new_value: &str) -> ManagementExperimentListCall<'a, C, NC, A> {
         self._account_id = new_value.to_string();
         self
@@ -12322,7 +12767,7 @@ impl<'a, C, NC, A> ManagementExperimentListCall<'a, C, NC, A> where NC: hyper::n
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Web property ID to retrieve experiments for.    
+    /// Web property ID to retrieve experiments for.
     pub fn web_property_id(mut self, new_value: &str) -> ManagementExperimentListCall<'a, C, NC, A> {
         self._web_property_id = new_value.to_string();
         self
@@ -12332,7 +12777,7 @@ impl<'a, C, NC, A> ManagementExperimentListCall<'a, C, NC, A> where NC: hyper::n
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// View (Profile) ID to retrieve experiments for.    
+    /// View (Profile) ID to retrieve experiments for.
     pub fn profile_id(mut self, new_value: &str) -> ManagementExperimentListCall<'a, C, NC, A> {
         self._profile_id = new_value.to_string();
         self
@@ -12340,7 +12785,7 @@ impl<'a, C, NC, A> ManagementExperimentListCall<'a, C, NC, A> where NC: hyper::n
     /// Sets the *start-index* query property to the given value.
     ///
     /// 
-    /// An index of the first experiment to retrieve. Use this parameter as a pagination mechanism along with the max-results parameter.    
+    /// An index of the first experiment to retrieve. Use this parameter as a pagination mechanism along with the max-results parameter.
     pub fn start_index(mut self, new_value: i32) -> ManagementExperimentListCall<'a, C, NC, A> {
         self._start_index = Some(new_value);
         self
@@ -12348,7 +12793,7 @@ impl<'a, C, NC, A> ManagementExperimentListCall<'a, C, NC, A> where NC: hyper::n
     /// Sets the *max-results* query property to the given value.
     ///
     /// 
-    /// The maximum number of experiments to include in this response.    
+    /// The maximum number of experiments to include in this response.
     pub fn max_results(mut self, new_value: i32) -> ManagementExperimentListCall<'a, C, NC, A> {
         self._max_results = Some(new_value);
         self
@@ -12409,7 +12854,7 @@ impl<'a, C, NC, A> ManagementExperimentListCall<'a, C, NC, A> where NC: hyper::n
 /// Lists views (profiles) to which the user has access.
 ///
 /// A builder for the *profiles.list* method supported by a *management* resource.
-/// It is not used directly, but through a `ManagementMethods`.
+/// It is not used directly, but through a `ManagementMethods` instance.
 ///
 /// # Example
 ///
@@ -12479,7 +12924,7 @@ impl<'a, C, NC, A> ManagementProfileListCall<'a, C, NC, A> where NC: hyper::net:
         for &field in ["alt", "accountId", "webPropertyId", "start-index", "max-results"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -12532,7 +12977,7 @@ impl<'a, C, NC, A> ManagementProfileListCall<'a, C, NC, A> where NC: hyper::net:
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -12544,7 +12989,6 @@ impl<'a, C, NC, A> ManagementProfileListCall<'a, C, NC, A> where NC: hyper::net:
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -12554,7 +12998,7 @@ impl<'a, C, NC, A> ManagementProfileListCall<'a, C, NC, A> where NC: hyper::net:
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -12565,7 +13009,7 @@ impl<'a, C, NC, A> ManagementProfileListCall<'a, C, NC, A> where NC: hyper::net:
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -12574,13 +13018,13 @@ impl<'a, C, NC, A> ManagementProfileListCall<'a, C, NC, A> where NC: hyper::net:
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -12592,7 +13036,7 @@ impl<'a, C, NC, A> ManagementProfileListCall<'a, C, NC, A> where NC: hyper::net:
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Account ID for the view (profiles) to retrieve. Can either be a specific account ID or '~all', which refers to all the accounts to which the user has access.    
+    /// Account ID for the view (profiles) to retrieve. Can either be a specific account ID or '~all', which refers to all the accounts to which the user has access.
     pub fn account_id(mut self, new_value: &str) -> ManagementProfileListCall<'a, C, NC, A> {
         self._account_id = new_value.to_string();
         self
@@ -12602,7 +13046,7 @@ impl<'a, C, NC, A> ManagementProfileListCall<'a, C, NC, A> where NC: hyper::net:
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Web property ID for the views (profiles) to retrieve. Can either be a specific web property ID or '~all', which refers to all the web properties to which the user has access.    
+    /// Web property ID for the views (profiles) to retrieve. Can either be a specific web property ID or '~all', which refers to all the web properties to which the user has access.
     pub fn web_property_id(mut self, new_value: &str) -> ManagementProfileListCall<'a, C, NC, A> {
         self._web_property_id = new_value.to_string();
         self
@@ -12610,7 +13054,7 @@ impl<'a, C, NC, A> ManagementProfileListCall<'a, C, NC, A> where NC: hyper::net:
     /// Sets the *start-index* query property to the given value.
     ///
     /// 
-    /// An index of the first entity to retrieve. Use this parameter as a pagination mechanism along with the max-results parameter.    
+    /// An index of the first entity to retrieve. Use this parameter as a pagination mechanism along with the max-results parameter.
     pub fn start_index(mut self, new_value: i32) -> ManagementProfileListCall<'a, C, NC, A> {
         self._start_index = Some(new_value);
         self
@@ -12618,7 +13062,7 @@ impl<'a, C, NC, A> ManagementProfileListCall<'a, C, NC, A> where NC: hyper::net:
     /// Sets the *max-results* query property to the given value.
     ///
     /// 
-    /// The maximum number of views (profiles) to include in this response.    
+    /// The maximum number of views (profiles) to include in this response.
     pub fn max_results(mut self, new_value: i32) -> ManagementProfileListCall<'a, C, NC, A> {
         self._max_results = Some(new_value);
         self
@@ -12679,7 +13123,7 @@ impl<'a, C, NC, A> ManagementProfileListCall<'a, C, NC, A> where NC: hyper::net:
 /// Lists goals to which the user has access.
 ///
 /// A builder for the *goals.list* method supported by a *management* resource.
-/// It is not used directly, but through a `ManagementMethods`.
+/// It is not used directly, but through a `ManagementMethods` instance.
 ///
 /// # Example
 ///
@@ -12751,7 +13195,7 @@ impl<'a, C, NC, A> ManagementGoalListCall<'a, C, NC, A> where NC: hyper::net::Ne
         for &field in ["alt", "accountId", "webPropertyId", "profileId", "start-index", "max-results"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -12804,7 +13248,7 @@ impl<'a, C, NC, A> ManagementGoalListCall<'a, C, NC, A> where NC: hyper::net::Ne
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -12816,7 +13260,6 @@ impl<'a, C, NC, A> ManagementGoalListCall<'a, C, NC, A> where NC: hyper::net::Ne
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -12826,7 +13269,7 @@ impl<'a, C, NC, A> ManagementGoalListCall<'a, C, NC, A> where NC: hyper::net::Ne
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -12837,7 +13280,7 @@ impl<'a, C, NC, A> ManagementGoalListCall<'a, C, NC, A> where NC: hyper::net::Ne
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -12846,13 +13289,13 @@ impl<'a, C, NC, A> ManagementGoalListCall<'a, C, NC, A> where NC: hyper::net::Ne
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -12864,7 +13307,7 @@ impl<'a, C, NC, A> ManagementGoalListCall<'a, C, NC, A> where NC: hyper::net::Ne
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Account ID to retrieve goals for. Can either be a specific account ID or '~all', which refers to all the accounts that user has access to.    
+    /// Account ID to retrieve goals for. Can either be a specific account ID or '~all', which refers to all the accounts that user has access to.
     pub fn account_id(mut self, new_value: &str) -> ManagementGoalListCall<'a, C, NC, A> {
         self._account_id = new_value.to_string();
         self
@@ -12874,7 +13317,7 @@ impl<'a, C, NC, A> ManagementGoalListCall<'a, C, NC, A> where NC: hyper::net::Ne
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Web property ID to retrieve goals for. Can either be a specific web property ID or '~all', which refers to all the web properties that user has access to.    
+    /// Web property ID to retrieve goals for. Can either be a specific web property ID or '~all', which refers to all the web properties that user has access to.
     pub fn web_property_id(mut self, new_value: &str) -> ManagementGoalListCall<'a, C, NC, A> {
         self._web_property_id = new_value.to_string();
         self
@@ -12884,7 +13327,7 @@ impl<'a, C, NC, A> ManagementGoalListCall<'a, C, NC, A> where NC: hyper::net::Ne
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// View (Profile) ID to retrieve goals for. Can either be a specific view (profile) ID or '~all', which refers to all the views (profiles) that user has access to.    
+    /// View (Profile) ID to retrieve goals for. Can either be a specific view (profile) ID or '~all', which refers to all the views (profiles) that user has access to.
     pub fn profile_id(mut self, new_value: &str) -> ManagementGoalListCall<'a, C, NC, A> {
         self._profile_id = new_value.to_string();
         self
@@ -12892,7 +13335,7 @@ impl<'a, C, NC, A> ManagementGoalListCall<'a, C, NC, A> where NC: hyper::net::Ne
     /// Sets the *start-index* query property to the given value.
     ///
     /// 
-    /// An index of the first goal to retrieve. Use this parameter as a pagination mechanism along with the max-results parameter.    
+    /// An index of the first goal to retrieve. Use this parameter as a pagination mechanism along with the max-results parameter.
     pub fn start_index(mut self, new_value: i32) -> ManagementGoalListCall<'a, C, NC, A> {
         self._start_index = Some(new_value);
         self
@@ -12900,7 +13343,7 @@ impl<'a, C, NC, A> ManagementGoalListCall<'a, C, NC, A> where NC: hyper::net::Ne
     /// Sets the *max-results* query property to the given value.
     ///
     /// 
-    /// The maximum number of goals to include in this response.    
+    /// The maximum number of goals to include in this response.
     pub fn max_results(mut self, new_value: i32) -> ManagementGoalListCall<'a, C, NC, A> {
         self._max_results = Some(new_value);
         self
@@ -12961,7 +13404,7 @@ impl<'a, C, NC, A> ManagementGoalListCall<'a, C, NC, A> where NC: hyper::net::Ne
 /// Create a new goal.
 ///
 /// A builder for the *goals.insert* method supported by a *management* resource.
-/// It is not used directly, but through a `ManagementMethods`.
+/// It is not used directly, but through a `ManagementMethods` instance.
 ///
 /// # Example
 ///
@@ -13030,7 +13473,7 @@ impl<'a, C, NC, A> ManagementGoalInsertCall<'a, C, NC, A> where NC: hyper::net::
         for &field in ["alt", "accountId", "webPropertyId", "profileId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -13087,7 +13530,7 @@ impl<'a, C, NC, A> ManagementGoalInsertCall<'a, C, NC, A> where NC: hyper::net::
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -13103,7 +13546,6 @@ impl<'a, C, NC, A> ManagementGoalInsertCall<'a, C, NC, A> where NC: hyper::net::
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -13113,7 +13555,7 @@ impl<'a, C, NC, A> ManagementGoalInsertCall<'a, C, NC, A> where NC: hyper::net::
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -13124,7 +13566,7 @@ impl<'a, C, NC, A> ManagementGoalInsertCall<'a, C, NC, A> where NC: hyper::net::
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -13133,13 +13575,13 @@ impl<'a, C, NC, A> ManagementGoalInsertCall<'a, C, NC, A> where NC: hyper::net::
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -13160,7 +13602,7 @@ impl<'a, C, NC, A> ManagementGoalInsertCall<'a, C, NC, A> where NC: hyper::net::
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Account ID to create the goal for.    
+    /// Account ID to create the goal for.
     pub fn account_id(mut self, new_value: &str) -> ManagementGoalInsertCall<'a, C, NC, A> {
         self._account_id = new_value.to_string();
         self
@@ -13170,7 +13612,7 @@ impl<'a, C, NC, A> ManagementGoalInsertCall<'a, C, NC, A> where NC: hyper::net::
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Web property ID to create the goal for.    
+    /// Web property ID to create the goal for.
     pub fn web_property_id(mut self, new_value: &str) -> ManagementGoalInsertCall<'a, C, NC, A> {
         self._web_property_id = new_value.to_string();
         self
@@ -13180,7 +13622,7 @@ impl<'a, C, NC, A> ManagementGoalInsertCall<'a, C, NC, A> where NC: hyper::net::
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// View (Profile) ID to create the goal for.    
+    /// View (Profile) ID to create the goal for.
     pub fn profile_id(mut self, new_value: &str) -> ManagementGoalInsertCall<'a, C, NC, A> {
         self._profile_id = new_value.to_string();
         self
@@ -13241,7 +13683,7 @@ impl<'a, C, NC, A> ManagementGoalInsertCall<'a, C, NC, A> where NC: hyper::net::
 /// Updates an existing custom metric. This method supports patch semantics.
 ///
 /// A builder for the *customMetrics.patch* method supported by a *management* resource.
-/// It is not used directly, but through a `ManagementMethods`.
+/// It is not used directly, but through a `ManagementMethods` instance.
 ///
 /// # Example
 ///
@@ -13315,7 +13757,7 @@ impl<'a, C, NC, A> ManagementCustomMetricPatchCall<'a, C, NC, A> where NC: hyper
         for &field in ["alt", "accountId", "webPropertyId", "customMetricId", "ignoreCustomDataSourceLinks"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -13372,7 +13814,7 @@ impl<'a, C, NC, A> ManagementCustomMetricPatchCall<'a, C, NC, A> where NC: hyper
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -13388,7 +13830,6 @@ impl<'a, C, NC, A> ManagementCustomMetricPatchCall<'a, C, NC, A> where NC: hyper
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -13398,7 +13839,7 @@ impl<'a, C, NC, A> ManagementCustomMetricPatchCall<'a, C, NC, A> where NC: hyper
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -13409,7 +13850,7 @@ impl<'a, C, NC, A> ManagementCustomMetricPatchCall<'a, C, NC, A> where NC: hyper
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -13418,13 +13859,13 @@ impl<'a, C, NC, A> ManagementCustomMetricPatchCall<'a, C, NC, A> where NC: hyper
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -13445,7 +13886,7 @@ impl<'a, C, NC, A> ManagementCustomMetricPatchCall<'a, C, NC, A> where NC: hyper
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Account ID for the custom metric to update.    
+    /// Account ID for the custom metric to update.
     pub fn account_id(mut self, new_value: &str) -> ManagementCustomMetricPatchCall<'a, C, NC, A> {
         self._account_id = new_value.to_string();
         self
@@ -13455,7 +13896,7 @@ impl<'a, C, NC, A> ManagementCustomMetricPatchCall<'a, C, NC, A> where NC: hyper
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Web property ID for the custom metric to update.    
+    /// Web property ID for the custom metric to update.
     pub fn web_property_id(mut self, new_value: &str) -> ManagementCustomMetricPatchCall<'a, C, NC, A> {
         self._web_property_id = new_value.to_string();
         self
@@ -13465,7 +13906,7 @@ impl<'a, C, NC, A> ManagementCustomMetricPatchCall<'a, C, NC, A> where NC: hyper
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Custom metric ID for the custom metric to update.    
+    /// Custom metric ID for the custom metric to update.
     pub fn custom_metric_id(mut self, new_value: &str) -> ManagementCustomMetricPatchCall<'a, C, NC, A> {
         self._custom_metric_id = new_value.to_string();
         self
@@ -13473,7 +13914,7 @@ impl<'a, C, NC, A> ManagementCustomMetricPatchCall<'a, C, NC, A> where NC: hyper
     /// Sets the *ignore custom data source links* query property to the given value.
     ///
     /// 
-    /// Force the update and ignore any warnings related to the custom metric being linked to a custom data source / data set.    
+    /// Force the update and ignore any warnings related to the custom metric being linked to a custom data source / data set.
     pub fn ignore_custom_data_source_links(mut self, new_value: bool) -> ManagementCustomMetricPatchCall<'a, C, NC, A> {
         self._ignore_custom_data_source_links = Some(new_value);
         self
@@ -13534,7 +13975,7 @@ impl<'a, C, NC, A> ManagementCustomMetricPatchCall<'a, C, NC, A> where NC: hyper
 /// Upload data for a custom data source.
 ///
 /// A builder for the *uploads.uploadData* method supported by a *management* resource.
-/// It is not used directly, but through a `ManagementMethods`.
+/// It is not used directly, but through a `ManagementMethods` instance.
 ///
 /// # Example
 ///
@@ -13598,7 +14039,7 @@ impl<'a, C, NC, A> ManagementUploadUploadDataCall<'a, C, NC, A> where NC: hyper:
         for &field in ["alt", "accountId", "webPropertyId", "customDataSourceId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -13661,7 +14102,7 @@ impl<'a, C, NC, A> ManagementUploadUploadDataCall<'a, C, NC, A> where NC: hyper:
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -13687,7 +14128,7 @@ impl<'a, C, NC, A> ManagementUploadUploadDataCall<'a, C, NC, A> where NC: hyper:
                         let size = reader.seek(io::SeekFrom::End(0)).unwrap();
                     reader.seek(io::SeekFrom::Start(0)).unwrap();
                     if size > 1073741824 {
-                    	return Result::UploadSizeLimitExceeded(size, 1073741824)
+                    	return Err(Error::UploadSizeLimitExceeded(size, 1073741824))
                     }
                         req = req.header(ContentType(reader_mime_type.clone()))
                                  .header(ContentLength(size))
@@ -13700,7 +14141,6 @@ impl<'a, C, NC, A> ManagementUploadUploadDataCall<'a, C, NC, A> where NC: hyper:
     
                     dlg.pre_request();
                     req.send()
-    
                 }
             };
 
@@ -13711,7 +14151,7 @@ impl<'a, C, NC, A> ManagementUploadUploadDataCall<'a, C, NC, A> where NC: hyper:
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -13722,13 +14162,13 @@ impl<'a, C, NC, A> ManagementUploadUploadDataCall<'a, C, NC, A> where NC: hyper:
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     if protocol == "resumable" {
                         let size = reader.seek(io::SeekFrom::End(0)).unwrap();
                         reader.seek(io::SeekFrom::Start(0)).unwrap();
                         if size > 1073741824 {
-                        	return Result::UploadSizeLimitExceeded(size, 1073741824)
+                        	return Err(Error::UploadSizeLimitExceeded(size, 1073741824))
                         }
                         let mut client = &mut *self.hub.client.borrow_mut();
                         let upload_result = {
@@ -13753,17 +14193,17 @@ impl<'a, C, NC, A> ManagementUploadUploadDataCall<'a, C, NC, A> where NC: hyper:
                         match upload_result {
                             None => {
                                 dlg.finished(false);
-                                return Result::Cancelled
+                                return Err(Error::Cancelled)
                             }
                             Some(Err(err)) => {
                                 dlg.finished(false);
-                                return Result::HttpError(err)
+                                return Err(Error::HttpError(err))
                             }
                             Some(Ok(upload_result)) => {
                                 res = upload_result;
                                 if !res.status.is_success() {
                                     dlg.finished(false);
-                                    return Result::Failure(res)
+                                    return Err(Error::Failure(res))
                                 }
                             }
                         }
@@ -13775,13 +14215,13 @@ impl<'a, C, NC, A> ManagementUploadUploadDataCall<'a, C, NC, A> where NC: hyper:
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -13797,11 +14237,14 @@ impl<'a, C, NC, A> ManagementUploadUploadDataCall<'a, C, NC, A> where NC: hyper:
                 where RS: ReadSeek {
         self.doit(stream, mime_type, "simple")
     }
-    /// Upload media in a resumeable fashion.
+    /// Upload media in a resumable fashion.
     /// Even if the upload fails or is interrupted, it can be resumed for a 
     /// certain amount of time as the server maintains state temporarily.
     /// 
-    /// TODO: Write more about how delegation works in this particular case.
+    /// The delegate will be asked for an `upload_url()`, and if not provided, will be asked to store an upload URL 
+    /// that was provided by the server, using `store_upload_url(...)`. The upload will be done in chunks, the delegate
+    /// may specify the `chunk_size()` and may cancel the operation before each chunk is uploaded, using
+    /// `cancel_chunk_upload(...)`.
     ///
     /// * *max size*: 1GB
     /// * *multipart*: yes
@@ -13816,7 +14259,7 @@ impl<'a, C, NC, A> ManagementUploadUploadDataCall<'a, C, NC, A> where NC: hyper:
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Account Id associated with the upload.    
+    /// Account Id associated with the upload.
     pub fn account_id(mut self, new_value: &str) -> ManagementUploadUploadDataCall<'a, C, NC, A> {
         self._account_id = new_value.to_string();
         self
@@ -13826,7 +14269,7 @@ impl<'a, C, NC, A> ManagementUploadUploadDataCall<'a, C, NC, A> where NC: hyper:
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Web property UA-string associated with the upload.    
+    /// Web property UA-string associated with the upload.
     pub fn web_property_id(mut self, new_value: &str) -> ManagementUploadUploadDataCall<'a, C, NC, A> {
         self._web_property_id = new_value.to_string();
         self
@@ -13836,7 +14279,7 @@ impl<'a, C, NC, A> ManagementUploadUploadDataCall<'a, C, NC, A> where NC: hyper:
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Custom data source Id to which the data being uploaded belongs.    
+    /// Custom data source Id to which the data being uploaded belongs.
     pub fn custom_data_source_id(mut self, new_value: &str) -> ManagementUploadUploadDataCall<'a, C, NC, A> {
         self._custom_data_source_id = new_value.to_string();
         self
@@ -13897,7 +14340,7 @@ impl<'a, C, NC, A> ManagementUploadUploadDataCall<'a, C, NC, A> where NC: hyper:
 /// Adds a new user to the given account.
 ///
 /// A builder for the *accountUserLinks.insert* method supported by a *management* resource.
-/// It is not used directly, but through a `ManagementMethods`.
+/// It is not used directly, but through a `ManagementMethods` instance.
 ///
 /// # Example
 ///
@@ -13962,7 +14405,7 @@ impl<'a, C, NC, A> ManagementAccountUserLinkInsertCall<'a, C, NC, A> where NC: h
         for &field in ["alt", "accountId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -14019,7 +14462,7 @@ impl<'a, C, NC, A> ManagementAccountUserLinkInsertCall<'a, C, NC, A> where NC: h
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -14035,7 +14478,6 @@ impl<'a, C, NC, A> ManagementAccountUserLinkInsertCall<'a, C, NC, A> where NC: h
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -14045,7 +14487,7 @@ impl<'a, C, NC, A> ManagementAccountUserLinkInsertCall<'a, C, NC, A> where NC: h
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -14056,7 +14498,7 @@ impl<'a, C, NC, A> ManagementAccountUserLinkInsertCall<'a, C, NC, A> where NC: h
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -14065,13 +14507,13 @@ impl<'a, C, NC, A> ManagementAccountUserLinkInsertCall<'a, C, NC, A> where NC: h
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -14092,7 +14534,7 @@ impl<'a, C, NC, A> ManagementAccountUserLinkInsertCall<'a, C, NC, A> where NC: h
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Account ID to create the user link for.    
+    /// Account ID to create the user link for.
     pub fn account_id(mut self, new_value: &str) -> ManagementAccountUserLinkInsertCall<'a, C, NC, A> {
         self._account_id = new_value.to_string();
         self
@@ -14153,7 +14595,7 @@ impl<'a, C, NC, A> ManagementAccountUserLinkInsertCall<'a, C, NC, A> where NC: h
 /// Adds a new user to the given web property.
 ///
 /// A builder for the *webpropertyUserLinks.insert* method supported by a *management* resource.
-/// It is not used directly, but through a `ManagementMethods`.
+/// It is not used directly, but through a `ManagementMethods` instance.
 ///
 /// # Example
 ///
@@ -14220,7 +14662,7 @@ impl<'a, C, NC, A> ManagementWebpropertyUserLinkInsertCall<'a, C, NC, A> where N
         for &field in ["alt", "accountId", "webPropertyId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -14277,7 +14719,7 @@ impl<'a, C, NC, A> ManagementWebpropertyUserLinkInsertCall<'a, C, NC, A> where N
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -14293,7 +14735,6 @@ impl<'a, C, NC, A> ManagementWebpropertyUserLinkInsertCall<'a, C, NC, A> where N
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -14303,7 +14744,7 @@ impl<'a, C, NC, A> ManagementWebpropertyUserLinkInsertCall<'a, C, NC, A> where N
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -14314,7 +14755,7 @@ impl<'a, C, NC, A> ManagementWebpropertyUserLinkInsertCall<'a, C, NC, A> where N
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -14323,13 +14764,13 @@ impl<'a, C, NC, A> ManagementWebpropertyUserLinkInsertCall<'a, C, NC, A> where N
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -14350,7 +14791,7 @@ impl<'a, C, NC, A> ManagementWebpropertyUserLinkInsertCall<'a, C, NC, A> where N
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Account ID to create the user link for.    
+    /// Account ID to create the user link for.
     pub fn account_id(mut self, new_value: &str) -> ManagementWebpropertyUserLinkInsertCall<'a, C, NC, A> {
         self._account_id = new_value.to_string();
         self
@@ -14360,7 +14801,7 @@ impl<'a, C, NC, A> ManagementWebpropertyUserLinkInsertCall<'a, C, NC, A> where N
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Web Property ID to create the user link for.    
+    /// Web Property ID to create the user link for.
     pub fn web_property_id(mut self, new_value: &str) -> ManagementWebpropertyUserLinkInsertCall<'a, C, NC, A> {
         self._web_property_id = new_value.to_string();
         self
@@ -14421,7 +14862,7 @@ impl<'a, C, NC, A> ManagementWebpropertyUserLinkInsertCall<'a, C, NC, A> where N
 /// Delete an experiment.
 ///
 /// A builder for the *experiments.delete* method supported by a *management* resource.
-/// It is not used directly, but through a `ManagementMethods`.
+/// It is not used directly, but through a `ManagementMethods` instance.
 ///
 /// # Example
 ///
@@ -14485,7 +14926,7 @@ impl<'a, C, NC, A> ManagementExperimentDeleteCall<'a, C, NC, A> where NC: hyper:
         for &field in ["accountId", "webPropertyId", "profileId", "experimentId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -14537,7 +14978,7 @@ impl<'a, C, NC, A> ManagementExperimentDeleteCall<'a, C, NC, A> where NC: hyper:
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -14549,7 +14990,6 @@ impl<'a, C, NC, A> ManagementExperimentDeleteCall<'a, C, NC, A> where NC: hyper:
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -14559,7 +14999,7 @@ impl<'a, C, NC, A> ManagementExperimentDeleteCall<'a, C, NC, A> where NC: hyper:
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -14570,12 +15010,12 @@ impl<'a, C, NC, A> ManagementExperimentDeleteCall<'a, C, NC, A> where NC: hyper:
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = res;
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -14587,7 +15027,7 @@ impl<'a, C, NC, A> ManagementExperimentDeleteCall<'a, C, NC, A> where NC: hyper:
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Account ID to which the experiment belongs    
+    /// Account ID to which the experiment belongs
     pub fn account_id(mut self, new_value: &str) -> ManagementExperimentDeleteCall<'a, C, NC, A> {
         self._account_id = new_value.to_string();
         self
@@ -14597,7 +15037,7 @@ impl<'a, C, NC, A> ManagementExperimentDeleteCall<'a, C, NC, A> where NC: hyper:
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Web property ID to which the experiment belongs    
+    /// Web property ID to which the experiment belongs
     pub fn web_property_id(mut self, new_value: &str) -> ManagementExperimentDeleteCall<'a, C, NC, A> {
         self._web_property_id = new_value.to_string();
         self
@@ -14607,7 +15047,7 @@ impl<'a, C, NC, A> ManagementExperimentDeleteCall<'a, C, NC, A> where NC: hyper:
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// View (Profile) ID to which the experiment belongs    
+    /// View (Profile) ID to which the experiment belongs
     pub fn profile_id(mut self, new_value: &str) -> ManagementExperimentDeleteCall<'a, C, NC, A> {
         self._profile_id = new_value.to_string();
         self
@@ -14617,7 +15057,7 @@ impl<'a, C, NC, A> ManagementExperimentDeleteCall<'a, C, NC, A> where NC: hyper:
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// ID of the experiment to delete    
+    /// ID of the experiment to delete
     pub fn experiment_id(mut self, new_value: &str) -> ManagementExperimentDeleteCall<'a, C, NC, A> {
         self._experiment_id = new_value.to_string();
         self
@@ -14678,7 +15118,7 @@ impl<'a, C, NC, A> ManagementExperimentDeleteCall<'a, C, NC, A> where NC: hyper:
 /// Updates an existing view (profile). This method supports patch semantics.
 ///
 /// A builder for the *profiles.patch* method supported by a *management* resource.
-/// It is not used directly, but through a `ManagementMethods`.
+/// It is not used directly, but through a `ManagementMethods` instance.
 ///
 /// # Example
 ///
@@ -14747,7 +15187,7 @@ impl<'a, C, NC, A> ManagementProfilePatchCall<'a, C, NC, A> where NC: hyper::net
         for &field in ["alt", "accountId", "webPropertyId", "profileId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -14804,7 +15244,7 @@ impl<'a, C, NC, A> ManagementProfilePatchCall<'a, C, NC, A> where NC: hyper::net
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -14820,7 +15260,6 @@ impl<'a, C, NC, A> ManagementProfilePatchCall<'a, C, NC, A> where NC: hyper::net
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -14830,7 +15269,7 @@ impl<'a, C, NC, A> ManagementProfilePatchCall<'a, C, NC, A> where NC: hyper::net
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -14841,7 +15280,7 @@ impl<'a, C, NC, A> ManagementProfilePatchCall<'a, C, NC, A> where NC: hyper::net
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -14850,13 +15289,13 @@ impl<'a, C, NC, A> ManagementProfilePatchCall<'a, C, NC, A> where NC: hyper::net
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -14877,7 +15316,7 @@ impl<'a, C, NC, A> ManagementProfilePatchCall<'a, C, NC, A> where NC: hyper::net
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Account ID to which the view (profile) belongs    
+    /// Account ID to which the view (profile) belongs
     pub fn account_id(mut self, new_value: &str) -> ManagementProfilePatchCall<'a, C, NC, A> {
         self._account_id = new_value.to_string();
         self
@@ -14887,7 +15326,7 @@ impl<'a, C, NC, A> ManagementProfilePatchCall<'a, C, NC, A> where NC: hyper::net
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Web property ID to which the view (profile) belongs    
+    /// Web property ID to which the view (profile) belongs
     pub fn web_property_id(mut self, new_value: &str) -> ManagementProfilePatchCall<'a, C, NC, A> {
         self._web_property_id = new_value.to_string();
         self
@@ -14897,7 +15336,7 @@ impl<'a, C, NC, A> ManagementProfilePatchCall<'a, C, NC, A> where NC: hyper::net
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// ID of the view (profile) to be updated.    
+    /// ID of the view (profile) to be updated.
     pub fn profile_id(mut self, new_value: &str) -> ManagementProfilePatchCall<'a, C, NC, A> {
         self._profile_id = new_value.to_string();
         self
@@ -14958,7 +15397,7 @@ impl<'a, C, NC, A> ManagementProfilePatchCall<'a, C, NC, A> where NC: hyper::net
 /// Returns a filters to which the user has access.
 ///
 /// A builder for the *filters.get* method supported by a *management* resource.
-/// It is not used directly, but through a `ManagementMethods`.
+/// It is not used directly, but through a `ManagementMethods` instance.
 ///
 /// # Example
 ///
@@ -15018,7 +15457,7 @@ impl<'a, C, NC, A> ManagementFilterGetCall<'a, C, NC, A> where NC: hyper::net::N
         for &field in ["alt", "accountId", "filterId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -15071,7 +15510,7 @@ impl<'a, C, NC, A> ManagementFilterGetCall<'a, C, NC, A> where NC: hyper::net::N
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -15083,7 +15522,6 @@ impl<'a, C, NC, A> ManagementFilterGetCall<'a, C, NC, A> where NC: hyper::net::N
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -15093,7 +15531,7 @@ impl<'a, C, NC, A> ManagementFilterGetCall<'a, C, NC, A> where NC: hyper::net::N
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -15104,7 +15542,7 @@ impl<'a, C, NC, A> ManagementFilterGetCall<'a, C, NC, A> where NC: hyper::net::N
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -15113,13 +15551,13 @@ impl<'a, C, NC, A> ManagementFilterGetCall<'a, C, NC, A> where NC: hyper::net::N
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -15131,7 +15569,7 @@ impl<'a, C, NC, A> ManagementFilterGetCall<'a, C, NC, A> where NC: hyper::net::N
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Account ID to retrieve filters for.    
+    /// Account ID to retrieve filters for.
     pub fn account_id(mut self, new_value: &str) -> ManagementFilterGetCall<'a, C, NC, A> {
         self._account_id = new_value.to_string();
         self
@@ -15141,7 +15579,7 @@ impl<'a, C, NC, A> ManagementFilterGetCall<'a, C, NC, A> where NC: hyper::net::N
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Filter ID to retrieve filters for.    
+    /// Filter ID to retrieve filters for.
     pub fn filter_id(mut self, new_value: &str) -> ManagementFilterGetCall<'a, C, NC, A> {
         self._filter_id = new_value.to_string();
         self
@@ -15202,7 +15640,7 @@ impl<'a, C, NC, A> ManagementFilterGetCall<'a, C, NC, A> where NC: hyper::net::N
 /// Lists webProperty-AdWords links for a given web property.
 ///
 /// A builder for the *webPropertyAdWordsLinks.list* method supported by a *management* resource.
-/// It is not used directly, but through a `ManagementMethods`.
+/// It is not used directly, but through a `ManagementMethods` instance.
 ///
 /// # Example
 ///
@@ -15272,7 +15710,7 @@ impl<'a, C, NC, A> ManagementWebPropertyAdWordsLinkListCall<'a, C, NC, A> where 
         for &field in ["alt", "accountId", "webPropertyId", "start-index", "max-results"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -15325,7 +15763,7 @@ impl<'a, C, NC, A> ManagementWebPropertyAdWordsLinkListCall<'a, C, NC, A> where 
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -15337,7 +15775,6 @@ impl<'a, C, NC, A> ManagementWebPropertyAdWordsLinkListCall<'a, C, NC, A> where 
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -15347,7 +15784,7 @@ impl<'a, C, NC, A> ManagementWebPropertyAdWordsLinkListCall<'a, C, NC, A> where 
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -15358,7 +15795,7 @@ impl<'a, C, NC, A> ManagementWebPropertyAdWordsLinkListCall<'a, C, NC, A> where 
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -15367,13 +15804,13 @@ impl<'a, C, NC, A> ManagementWebPropertyAdWordsLinkListCall<'a, C, NC, A> where 
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -15385,7 +15822,7 @@ impl<'a, C, NC, A> ManagementWebPropertyAdWordsLinkListCall<'a, C, NC, A> where 
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// ID of the account which the given web property belongs to.    
+    /// ID of the account which the given web property belongs to.
     pub fn account_id(mut self, new_value: &str) -> ManagementWebPropertyAdWordsLinkListCall<'a, C, NC, A> {
         self._account_id = new_value.to_string();
         self
@@ -15395,7 +15832,7 @@ impl<'a, C, NC, A> ManagementWebPropertyAdWordsLinkListCall<'a, C, NC, A> where 
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Web property ID to retrieve the AdWords links for.    
+    /// Web property ID to retrieve the AdWords links for.
     pub fn web_property_id(mut self, new_value: &str) -> ManagementWebPropertyAdWordsLinkListCall<'a, C, NC, A> {
         self._web_property_id = new_value.to_string();
         self
@@ -15403,7 +15840,7 @@ impl<'a, C, NC, A> ManagementWebPropertyAdWordsLinkListCall<'a, C, NC, A> where 
     /// Sets the *start-index* query property to the given value.
     ///
     /// 
-    /// An index of the first webProperty-AdWords link to retrieve. Use this parameter as a pagination mechanism along with the max-results parameter.    
+    /// An index of the first webProperty-AdWords link to retrieve. Use this parameter as a pagination mechanism along with the max-results parameter.
     pub fn start_index(mut self, new_value: i32) -> ManagementWebPropertyAdWordsLinkListCall<'a, C, NC, A> {
         self._start_index = Some(new_value);
         self
@@ -15411,7 +15848,7 @@ impl<'a, C, NC, A> ManagementWebPropertyAdWordsLinkListCall<'a, C, NC, A> where 
     /// Sets the *max-results* query property to the given value.
     ///
     /// 
-    /// The maximum number of webProperty-AdWords links to include in this response.    
+    /// The maximum number of webProperty-AdWords links to include in this response.
     pub fn max_results(mut self, new_value: i32) -> ManagementWebPropertyAdWordsLinkListCall<'a, C, NC, A> {
         self._max_results = Some(new_value);
         self
@@ -15472,7 +15909,7 @@ impl<'a, C, NC, A> ManagementWebPropertyAdWordsLinkListCall<'a, C, NC, A> where 
 /// Lists account summaries (lightweight tree comprised of accounts/properties/profiles) to which the user has access.
 ///
 /// A builder for the *accountSummaries.list* method supported by a *management* resource.
-/// It is not used directly, but through a `ManagementMethods`.
+/// It is not used directly, but through a `ManagementMethods` instance.
 ///
 /// # Example
 ///
@@ -15538,7 +15975,7 @@ impl<'a, C, NC, A> ManagementAccountSummaryListCall<'a, C, NC, A> where NC: hype
         for &field in ["alt", "start-index", "max-results"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -15567,7 +16004,7 @@ impl<'a, C, NC, A> ManagementAccountSummaryListCall<'a, C, NC, A> where NC: hype
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -15579,7 +16016,6 @@ impl<'a, C, NC, A> ManagementAccountSummaryListCall<'a, C, NC, A> where NC: hype
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -15589,7 +16025,7 @@ impl<'a, C, NC, A> ManagementAccountSummaryListCall<'a, C, NC, A> where NC: hype
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -15600,7 +16036,7 @@ impl<'a, C, NC, A> ManagementAccountSummaryListCall<'a, C, NC, A> where NC: hype
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -15609,13 +16045,13 @@ impl<'a, C, NC, A> ManagementAccountSummaryListCall<'a, C, NC, A> where NC: hype
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -15625,7 +16061,7 @@ impl<'a, C, NC, A> ManagementAccountSummaryListCall<'a, C, NC, A> where NC: hype
     /// Sets the *start-index* query property to the given value.
     ///
     /// 
-    /// An index of the first entity to retrieve. Use this parameter as a pagination mechanism along with the max-results parameter.    
+    /// An index of the first entity to retrieve. Use this parameter as a pagination mechanism along with the max-results parameter.
     pub fn start_index(mut self, new_value: i32) -> ManagementAccountSummaryListCall<'a, C, NC, A> {
         self._start_index = Some(new_value);
         self
@@ -15633,7 +16069,7 @@ impl<'a, C, NC, A> ManagementAccountSummaryListCall<'a, C, NC, A> where NC: hype
     /// Sets the *max-results* query property to the given value.
     ///
     /// 
-    /// The maximum number of account summaries to include in this response, where the largest acceptable value is 1000.    
+    /// The maximum number of account summaries to include in this response, where the largest acceptable value is 1000.
     pub fn max_results(mut self, new_value: i32) -> ManagementAccountSummaryListCall<'a, C, NC, A> {
         self._max_results = Some(new_value);
         self
@@ -15694,7 +16130,7 @@ impl<'a, C, NC, A> ManagementAccountSummaryListCall<'a, C, NC, A> where NC: hype
 /// Lists custom dimensions to which the user has access.
 ///
 /// A builder for the *customDimensions.list* method supported by a *management* resource.
-/// It is not used directly, but through a `ManagementMethods`.
+/// It is not used directly, but through a `ManagementMethods` instance.
 ///
 /// # Example
 ///
@@ -15764,7 +16200,7 @@ impl<'a, C, NC, A> ManagementCustomDimensionListCall<'a, C, NC, A> where NC: hyp
         for &field in ["alt", "accountId", "webPropertyId", "start-index", "max-results"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -15817,7 +16253,7 @@ impl<'a, C, NC, A> ManagementCustomDimensionListCall<'a, C, NC, A> where NC: hyp
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -15829,7 +16265,6 @@ impl<'a, C, NC, A> ManagementCustomDimensionListCall<'a, C, NC, A> where NC: hyp
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -15839,7 +16274,7 @@ impl<'a, C, NC, A> ManagementCustomDimensionListCall<'a, C, NC, A> where NC: hyp
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -15850,7 +16285,7 @@ impl<'a, C, NC, A> ManagementCustomDimensionListCall<'a, C, NC, A> where NC: hyp
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -15859,13 +16294,13 @@ impl<'a, C, NC, A> ManagementCustomDimensionListCall<'a, C, NC, A> where NC: hyp
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -15877,7 +16312,7 @@ impl<'a, C, NC, A> ManagementCustomDimensionListCall<'a, C, NC, A> where NC: hyp
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Account ID for the custom dimensions to retrieve.    
+    /// Account ID for the custom dimensions to retrieve.
     pub fn account_id(mut self, new_value: &str) -> ManagementCustomDimensionListCall<'a, C, NC, A> {
         self._account_id = new_value.to_string();
         self
@@ -15887,7 +16322,7 @@ impl<'a, C, NC, A> ManagementCustomDimensionListCall<'a, C, NC, A> where NC: hyp
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Web property ID for the custom dimensions to retrieve.    
+    /// Web property ID for the custom dimensions to retrieve.
     pub fn web_property_id(mut self, new_value: &str) -> ManagementCustomDimensionListCall<'a, C, NC, A> {
         self._web_property_id = new_value.to_string();
         self
@@ -15895,7 +16330,7 @@ impl<'a, C, NC, A> ManagementCustomDimensionListCall<'a, C, NC, A> where NC: hyp
     /// Sets the *start-index* query property to the given value.
     ///
     /// 
-    /// An index of the first entity to retrieve. Use this parameter as a pagination mechanism along with the max-results parameter.    
+    /// An index of the first entity to retrieve. Use this parameter as a pagination mechanism along with the max-results parameter.
     pub fn start_index(mut self, new_value: i32) -> ManagementCustomDimensionListCall<'a, C, NC, A> {
         self._start_index = Some(new_value);
         self
@@ -15903,7 +16338,7 @@ impl<'a, C, NC, A> ManagementCustomDimensionListCall<'a, C, NC, A> where NC: hyp
     /// Sets the *max-results* query property to the given value.
     ///
     /// 
-    /// The maximum number of custom dimensions to include in this response.    
+    /// The maximum number of custom dimensions to include in this response.
     pub fn max_results(mut self, new_value: i32) -> ManagementCustomDimensionListCall<'a, C, NC, A> {
         self._max_results = Some(new_value);
         self
@@ -15964,7 +16399,7 @@ impl<'a, C, NC, A> ManagementCustomDimensionListCall<'a, C, NC, A> where NC: hyp
 /// List uploads to which the user has access.
 ///
 /// A builder for the *uploads.list* method supported by a *management* resource.
-/// It is not used directly, but through a `ManagementMethods`.
+/// It is not used directly, but through a `ManagementMethods` instance.
 ///
 /// # Example
 ///
@@ -16036,7 +16471,7 @@ impl<'a, C, NC, A> ManagementUploadListCall<'a, C, NC, A> where NC: hyper::net::
         for &field in ["alt", "accountId", "webPropertyId", "customDataSourceId", "start-index", "max-results"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -16089,7 +16524,7 @@ impl<'a, C, NC, A> ManagementUploadListCall<'a, C, NC, A> where NC: hyper::net::
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -16101,7 +16536,6 @@ impl<'a, C, NC, A> ManagementUploadListCall<'a, C, NC, A> where NC: hyper::net::
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -16111,7 +16545,7 @@ impl<'a, C, NC, A> ManagementUploadListCall<'a, C, NC, A> where NC: hyper::net::
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -16122,7 +16556,7 @@ impl<'a, C, NC, A> ManagementUploadListCall<'a, C, NC, A> where NC: hyper::net::
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -16131,13 +16565,13 @@ impl<'a, C, NC, A> ManagementUploadListCall<'a, C, NC, A> where NC: hyper::net::
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -16149,7 +16583,7 @@ impl<'a, C, NC, A> ManagementUploadListCall<'a, C, NC, A> where NC: hyper::net::
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Account Id for the uploads to retrieve.    
+    /// Account Id for the uploads to retrieve.
     pub fn account_id(mut self, new_value: &str) -> ManagementUploadListCall<'a, C, NC, A> {
         self._account_id = new_value.to_string();
         self
@@ -16159,7 +16593,7 @@ impl<'a, C, NC, A> ManagementUploadListCall<'a, C, NC, A> where NC: hyper::net::
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Web property Id for the uploads to retrieve.    
+    /// Web property Id for the uploads to retrieve.
     pub fn web_property_id(mut self, new_value: &str) -> ManagementUploadListCall<'a, C, NC, A> {
         self._web_property_id = new_value.to_string();
         self
@@ -16169,7 +16603,7 @@ impl<'a, C, NC, A> ManagementUploadListCall<'a, C, NC, A> where NC: hyper::net::
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Custom data source Id for uploads to retrieve.    
+    /// Custom data source Id for uploads to retrieve.
     pub fn custom_data_source_id(mut self, new_value: &str) -> ManagementUploadListCall<'a, C, NC, A> {
         self._custom_data_source_id = new_value.to_string();
         self
@@ -16177,7 +16611,7 @@ impl<'a, C, NC, A> ManagementUploadListCall<'a, C, NC, A> where NC: hyper::net::
     /// Sets the *start-index* query property to the given value.
     ///
     /// 
-    /// A 1-based index of the first upload to retrieve. Use this parameter as a pagination mechanism along with the max-results parameter.    
+    /// A 1-based index of the first upload to retrieve. Use this parameter as a pagination mechanism along with the max-results parameter.
     pub fn start_index(mut self, new_value: i32) -> ManagementUploadListCall<'a, C, NC, A> {
         self._start_index = Some(new_value);
         self
@@ -16185,7 +16619,7 @@ impl<'a, C, NC, A> ManagementUploadListCall<'a, C, NC, A> where NC: hyper::net::
     /// Sets the *max-results* query property to the given value.
     ///
     /// 
-    /// The maximum number of uploads to include in this response.    
+    /// The maximum number of uploads to include in this response.
     pub fn max_results(mut self, new_value: i32) -> ManagementUploadListCall<'a, C, NC, A> {
         self._max_results = Some(new_value);
         self
@@ -16246,7 +16680,7 @@ impl<'a, C, NC, A> ManagementUploadListCall<'a, C, NC, A> where NC: hyper::net::
 /// Lists profile-user links for a given view (profile).
 ///
 /// A builder for the *profileUserLinks.list* method supported by a *management* resource.
-/// It is not used directly, but through a `ManagementMethods`.
+/// It is not used directly, but through a `ManagementMethods` instance.
 ///
 /// # Example
 ///
@@ -16318,7 +16752,7 @@ impl<'a, C, NC, A> ManagementProfileUserLinkListCall<'a, C, NC, A> where NC: hyp
         for &field in ["alt", "accountId", "webPropertyId", "profileId", "start-index", "max-results"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -16371,7 +16805,7 @@ impl<'a, C, NC, A> ManagementProfileUserLinkListCall<'a, C, NC, A> where NC: hyp
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -16383,7 +16817,6 @@ impl<'a, C, NC, A> ManagementProfileUserLinkListCall<'a, C, NC, A> where NC: hyp
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -16393,7 +16826,7 @@ impl<'a, C, NC, A> ManagementProfileUserLinkListCall<'a, C, NC, A> where NC: hyp
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -16404,7 +16837,7 @@ impl<'a, C, NC, A> ManagementProfileUserLinkListCall<'a, C, NC, A> where NC: hyp
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -16413,13 +16846,13 @@ impl<'a, C, NC, A> ManagementProfileUserLinkListCall<'a, C, NC, A> where NC: hyp
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -16431,7 +16864,7 @@ impl<'a, C, NC, A> ManagementProfileUserLinkListCall<'a, C, NC, A> where NC: hyp
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Account ID which the given view (profile) belongs to.    
+    /// Account ID which the given view (profile) belongs to.
     pub fn account_id(mut self, new_value: &str) -> ManagementProfileUserLinkListCall<'a, C, NC, A> {
         self._account_id = new_value.to_string();
         self
@@ -16441,7 +16874,7 @@ impl<'a, C, NC, A> ManagementProfileUserLinkListCall<'a, C, NC, A> where NC: hyp
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Web Property ID which the given view (profile) belongs to. Can either be a specific web property ID or '~all', which refers to all the web properties that user has access to.    
+    /// Web Property ID which the given view (profile) belongs to. Can either be a specific web property ID or '~all', which refers to all the web properties that user has access to.
     pub fn web_property_id(mut self, new_value: &str) -> ManagementProfileUserLinkListCall<'a, C, NC, A> {
         self._web_property_id = new_value.to_string();
         self
@@ -16451,7 +16884,7 @@ impl<'a, C, NC, A> ManagementProfileUserLinkListCall<'a, C, NC, A> where NC: hyp
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// View (Profile) ID to retrieve the profile-user links for. Can either be a specific profile ID or '~all', which refers to all the profiles that user has access to.    
+    /// View (Profile) ID to retrieve the profile-user links for. Can either be a specific profile ID or '~all', which refers to all the profiles that user has access to.
     pub fn profile_id(mut self, new_value: &str) -> ManagementProfileUserLinkListCall<'a, C, NC, A> {
         self._profile_id = new_value.to_string();
         self
@@ -16459,7 +16892,7 @@ impl<'a, C, NC, A> ManagementProfileUserLinkListCall<'a, C, NC, A> where NC: hyp
     /// Sets the *start-index* query property to the given value.
     ///
     /// 
-    /// An index of the first profile-user link to retrieve. Use this parameter as a pagination mechanism along with the max-results parameter.    
+    /// An index of the first profile-user link to retrieve. Use this parameter as a pagination mechanism along with the max-results parameter.
     pub fn start_index(mut self, new_value: i32) -> ManagementProfileUserLinkListCall<'a, C, NC, A> {
         self._start_index = Some(new_value);
         self
@@ -16467,7 +16900,7 @@ impl<'a, C, NC, A> ManagementProfileUserLinkListCall<'a, C, NC, A> where NC: hyp
     /// Sets the *max-results* query property to the given value.
     ///
     /// 
-    /// The maximum number of profile-user links to include in this response.    
+    /// The maximum number of profile-user links to include in this response.
     pub fn max_results(mut self, new_value: i32) -> ManagementProfileUserLinkListCall<'a, C, NC, A> {
         self._max_results = Some(new_value);
         self
@@ -16528,7 +16961,7 @@ impl<'a, C, NC, A> ManagementProfileUserLinkListCall<'a, C, NC, A> where NC: hyp
 /// Lists account-user links for a given account.
 ///
 /// A builder for the *accountUserLinks.list* method supported by a *management* resource.
-/// It is not used directly, but through a `ManagementMethods`.
+/// It is not used directly, but through a `ManagementMethods` instance.
 ///
 /// # Example
 ///
@@ -16596,7 +17029,7 @@ impl<'a, C, NC, A> ManagementAccountUserLinkListCall<'a, C, NC, A> where NC: hyp
         for &field in ["alt", "accountId", "start-index", "max-results"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -16649,7 +17082,7 @@ impl<'a, C, NC, A> ManagementAccountUserLinkListCall<'a, C, NC, A> where NC: hyp
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -16661,7 +17094,6 @@ impl<'a, C, NC, A> ManagementAccountUserLinkListCall<'a, C, NC, A> where NC: hyp
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -16671,7 +17103,7 @@ impl<'a, C, NC, A> ManagementAccountUserLinkListCall<'a, C, NC, A> where NC: hyp
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -16682,7 +17114,7 @@ impl<'a, C, NC, A> ManagementAccountUserLinkListCall<'a, C, NC, A> where NC: hyp
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -16691,13 +17123,13 @@ impl<'a, C, NC, A> ManagementAccountUserLinkListCall<'a, C, NC, A> where NC: hyp
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -16709,7 +17141,7 @@ impl<'a, C, NC, A> ManagementAccountUserLinkListCall<'a, C, NC, A> where NC: hyp
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Account ID to retrieve the user links for.    
+    /// Account ID to retrieve the user links for.
     pub fn account_id(mut self, new_value: &str) -> ManagementAccountUserLinkListCall<'a, C, NC, A> {
         self._account_id = new_value.to_string();
         self
@@ -16717,7 +17149,7 @@ impl<'a, C, NC, A> ManagementAccountUserLinkListCall<'a, C, NC, A> where NC: hyp
     /// Sets the *start-index* query property to the given value.
     ///
     /// 
-    /// An index of the first account-user link to retrieve. Use this parameter as a pagination mechanism along with the max-results parameter.    
+    /// An index of the first account-user link to retrieve. Use this parameter as a pagination mechanism along with the max-results parameter.
     pub fn start_index(mut self, new_value: i32) -> ManagementAccountUserLinkListCall<'a, C, NC, A> {
         self._start_index = Some(new_value);
         self
@@ -16725,7 +17157,7 @@ impl<'a, C, NC, A> ManagementAccountUserLinkListCall<'a, C, NC, A> where NC: hyp
     /// Sets the *max-results* query property to the given value.
     ///
     /// 
-    /// The maximum number of account-user links to include in this response.    
+    /// The maximum number of account-user links to include in this response.
     pub fn max_results(mut self, new_value: i32) -> ManagementAccountUserLinkListCall<'a, C, NC, A> {
         self._max_results = Some(new_value);
         self
@@ -16786,7 +17218,7 @@ impl<'a, C, NC, A> ManagementAccountUserLinkListCall<'a, C, NC, A> where NC: hyp
 /// Updates an existing custom metric.
 ///
 /// A builder for the *customMetrics.update* method supported by a *management* resource.
-/// It is not used directly, but through a `ManagementMethods`.
+/// It is not used directly, but through a `ManagementMethods` instance.
 ///
 /// # Example
 ///
@@ -16860,7 +17292,7 @@ impl<'a, C, NC, A> ManagementCustomMetricUpdateCall<'a, C, NC, A> where NC: hype
         for &field in ["alt", "accountId", "webPropertyId", "customMetricId", "ignoreCustomDataSourceLinks"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -16917,7 +17349,7 @@ impl<'a, C, NC, A> ManagementCustomMetricUpdateCall<'a, C, NC, A> where NC: hype
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -16933,7 +17365,6 @@ impl<'a, C, NC, A> ManagementCustomMetricUpdateCall<'a, C, NC, A> where NC: hype
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -16943,7 +17374,7 @@ impl<'a, C, NC, A> ManagementCustomMetricUpdateCall<'a, C, NC, A> where NC: hype
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -16954,7 +17385,7 @@ impl<'a, C, NC, A> ManagementCustomMetricUpdateCall<'a, C, NC, A> where NC: hype
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -16963,13 +17394,13 @@ impl<'a, C, NC, A> ManagementCustomMetricUpdateCall<'a, C, NC, A> where NC: hype
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -16990,7 +17421,7 @@ impl<'a, C, NC, A> ManagementCustomMetricUpdateCall<'a, C, NC, A> where NC: hype
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Account ID for the custom metric to update.    
+    /// Account ID for the custom metric to update.
     pub fn account_id(mut self, new_value: &str) -> ManagementCustomMetricUpdateCall<'a, C, NC, A> {
         self._account_id = new_value.to_string();
         self
@@ -17000,7 +17431,7 @@ impl<'a, C, NC, A> ManagementCustomMetricUpdateCall<'a, C, NC, A> where NC: hype
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Web property ID for the custom metric to update.    
+    /// Web property ID for the custom metric to update.
     pub fn web_property_id(mut self, new_value: &str) -> ManagementCustomMetricUpdateCall<'a, C, NC, A> {
         self._web_property_id = new_value.to_string();
         self
@@ -17010,7 +17441,7 @@ impl<'a, C, NC, A> ManagementCustomMetricUpdateCall<'a, C, NC, A> where NC: hype
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Custom metric ID for the custom metric to update.    
+    /// Custom metric ID for the custom metric to update.
     pub fn custom_metric_id(mut self, new_value: &str) -> ManagementCustomMetricUpdateCall<'a, C, NC, A> {
         self._custom_metric_id = new_value.to_string();
         self
@@ -17018,7 +17449,7 @@ impl<'a, C, NC, A> ManagementCustomMetricUpdateCall<'a, C, NC, A> where NC: hype
     /// Sets the *ignore custom data source links* query property to the given value.
     ///
     /// 
-    /// Force the update and ignore any warnings related to the custom metric being linked to a custom data source / data set.    
+    /// Force the update and ignore any warnings related to the custom metric being linked to a custom data source / data set.
     pub fn ignore_custom_data_source_links(mut self, new_value: bool) -> ManagementCustomMetricUpdateCall<'a, C, NC, A> {
         self._ignore_custom_data_source_links = Some(new_value);
         self
@@ -17079,7 +17510,7 @@ impl<'a, C, NC, A> ManagementCustomMetricUpdateCall<'a, C, NC, A> where NC: hype
 /// Delete data associated with a previous upload.
 ///
 /// A builder for the *uploads.deleteUploadData* method supported by a *management* resource.
-/// It is not used directly, but through a `ManagementMethods`.
+/// It is not used directly, but through a `ManagementMethods` instance.
 ///
 /// # Example
 ///
@@ -17148,7 +17579,7 @@ impl<'a, C, NC, A> ManagementUploadDeleteUploadDataCall<'a, C, NC, A> where NC: 
         for &field in ["accountId", "webPropertyId", "customDataSourceId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -17204,7 +17635,7 @@ impl<'a, C, NC, A> ManagementUploadDeleteUploadDataCall<'a, C, NC, A> where NC: 
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -17220,7 +17651,6 @@ impl<'a, C, NC, A> ManagementUploadDeleteUploadDataCall<'a, C, NC, A> where NC: 
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -17230,7 +17660,7 @@ impl<'a, C, NC, A> ManagementUploadDeleteUploadDataCall<'a, C, NC, A> where NC: 
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -17241,12 +17671,12 @@ impl<'a, C, NC, A> ManagementUploadDeleteUploadDataCall<'a, C, NC, A> where NC: 
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = res;
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -17267,7 +17697,7 @@ impl<'a, C, NC, A> ManagementUploadDeleteUploadDataCall<'a, C, NC, A> where NC: 
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Account Id for the uploads to be deleted.    
+    /// Account Id for the uploads to be deleted.
     pub fn account_id(mut self, new_value: &str) -> ManagementUploadDeleteUploadDataCall<'a, C, NC, A> {
         self._account_id = new_value.to_string();
         self
@@ -17277,7 +17707,7 @@ impl<'a, C, NC, A> ManagementUploadDeleteUploadDataCall<'a, C, NC, A> where NC: 
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Web property Id for the uploads to be deleted.    
+    /// Web property Id for the uploads to be deleted.
     pub fn web_property_id(mut self, new_value: &str) -> ManagementUploadDeleteUploadDataCall<'a, C, NC, A> {
         self._web_property_id = new_value.to_string();
         self
@@ -17287,7 +17717,7 @@ impl<'a, C, NC, A> ManagementUploadDeleteUploadDataCall<'a, C, NC, A> where NC: 
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Custom data source Id for the uploads to be deleted.    
+    /// Custom data source Id for the uploads to be deleted.
     pub fn custom_data_source_id(mut self, new_value: &str) -> ManagementUploadDeleteUploadDataCall<'a, C, NC, A> {
         self._custom_data_source_id = new_value.to_string();
         self
@@ -17348,7 +17778,7 @@ impl<'a, C, NC, A> ManagementUploadDeleteUploadDataCall<'a, C, NC, A> where NC: 
 /// Update an existing experiment.
 ///
 /// A builder for the *experiments.update* method supported by a *management* resource.
-/// It is not used directly, but through a `ManagementMethods`.
+/// It is not used directly, but through a `ManagementMethods` instance.
 ///
 /// # Example
 ///
@@ -17419,7 +17849,7 @@ impl<'a, C, NC, A> ManagementExperimentUpdateCall<'a, C, NC, A> where NC: hyper:
         for &field in ["alt", "accountId", "webPropertyId", "profileId", "experimentId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -17476,7 +17906,7 @@ impl<'a, C, NC, A> ManagementExperimentUpdateCall<'a, C, NC, A> where NC: hyper:
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -17492,7 +17922,6 @@ impl<'a, C, NC, A> ManagementExperimentUpdateCall<'a, C, NC, A> where NC: hyper:
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -17502,7 +17931,7 @@ impl<'a, C, NC, A> ManagementExperimentUpdateCall<'a, C, NC, A> where NC: hyper:
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -17513,7 +17942,7 @@ impl<'a, C, NC, A> ManagementExperimentUpdateCall<'a, C, NC, A> where NC: hyper:
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -17522,13 +17951,13 @@ impl<'a, C, NC, A> ManagementExperimentUpdateCall<'a, C, NC, A> where NC: hyper:
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -17549,7 +17978,7 @@ impl<'a, C, NC, A> ManagementExperimentUpdateCall<'a, C, NC, A> where NC: hyper:
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Account ID of the experiment to update.    
+    /// Account ID of the experiment to update.
     pub fn account_id(mut self, new_value: &str) -> ManagementExperimentUpdateCall<'a, C, NC, A> {
         self._account_id = new_value.to_string();
         self
@@ -17559,7 +17988,7 @@ impl<'a, C, NC, A> ManagementExperimentUpdateCall<'a, C, NC, A> where NC: hyper:
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Web property ID of the experiment to update.    
+    /// Web property ID of the experiment to update.
     pub fn web_property_id(mut self, new_value: &str) -> ManagementExperimentUpdateCall<'a, C, NC, A> {
         self._web_property_id = new_value.to_string();
         self
@@ -17569,7 +17998,7 @@ impl<'a, C, NC, A> ManagementExperimentUpdateCall<'a, C, NC, A> where NC: hyper:
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// View (Profile) ID of the experiment to update.    
+    /// View (Profile) ID of the experiment to update.
     pub fn profile_id(mut self, new_value: &str) -> ManagementExperimentUpdateCall<'a, C, NC, A> {
         self._profile_id = new_value.to_string();
         self
@@ -17579,7 +18008,7 @@ impl<'a, C, NC, A> ManagementExperimentUpdateCall<'a, C, NC, A> where NC: hyper:
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Experiment ID of the experiment to update.    
+    /// Experiment ID of the experiment to update.
     pub fn experiment_id(mut self, new_value: &str) -> ManagementExperimentUpdateCall<'a, C, NC, A> {
         self._experiment_id = new_value.to_string();
         self
@@ -17640,7 +18069,7 @@ impl<'a, C, NC, A> ManagementExperimentUpdateCall<'a, C, NC, A> where NC: hyper:
 /// Updates an existing view (profile).
 ///
 /// A builder for the *goals.update* method supported by a *management* resource.
-/// It is not used directly, but through a `ManagementMethods`.
+/// It is not used directly, but through a `ManagementMethods` instance.
 ///
 /// # Example
 ///
@@ -17711,7 +18140,7 @@ impl<'a, C, NC, A> ManagementGoalUpdateCall<'a, C, NC, A> where NC: hyper::net::
         for &field in ["alt", "accountId", "webPropertyId", "profileId", "goalId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -17768,7 +18197,7 @@ impl<'a, C, NC, A> ManagementGoalUpdateCall<'a, C, NC, A> where NC: hyper::net::
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -17784,7 +18213,6 @@ impl<'a, C, NC, A> ManagementGoalUpdateCall<'a, C, NC, A> where NC: hyper::net::
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -17794,7 +18222,7 @@ impl<'a, C, NC, A> ManagementGoalUpdateCall<'a, C, NC, A> where NC: hyper::net::
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -17805,7 +18233,7 @@ impl<'a, C, NC, A> ManagementGoalUpdateCall<'a, C, NC, A> where NC: hyper::net::
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -17814,13 +18242,13 @@ impl<'a, C, NC, A> ManagementGoalUpdateCall<'a, C, NC, A> where NC: hyper::net::
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -17841,7 +18269,7 @@ impl<'a, C, NC, A> ManagementGoalUpdateCall<'a, C, NC, A> where NC: hyper::net::
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Account ID to update the goal.    
+    /// Account ID to update the goal.
     pub fn account_id(mut self, new_value: &str) -> ManagementGoalUpdateCall<'a, C, NC, A> {
         self._account_id = new_value.to_string();
         self
@@ -17851,7 +18279,7 @@ impl<'a, C, NC, A> ManagementGoalUpdateCall<'a, C, NC, A> where NC: hyper::net::
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Web property ID to update the goal.    
+    /// Web property ID to update the goal.
     pub fn web_property_id(mut self, new_value: &str) -> ManagementGoalUpdateCall<'a, C, NC, A> {
         self._web_property_id = new_value.to_string();
         self
@@ -17861,7 +18289,7 @@ impl<'a, C, NC, A> ManagementGoalUpdateCall<'a, C, NC, A> where NC: hyper::net::
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// View (Profile) ID to update the goal.    
+    /// View (Profile) ID to update the goal.
     pub fn profile_id(mut self, new_value: &str) -> ManagementGoalUpdateCall<'a, C, NC, A> {
         self._profile_id = new_value.to_string();
         self
@@ -17871,7 +18299,7 @@ impl<'a, C, NC, A> ManagementGoalUpdateCall<'a, C, NC, A> where NC: hyper::net::
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Index of the goal to be updated.    
+    /// Index of the goal to be updated.
     pub fn goal_id(mut self, new_value: &str) -> ManagementGoalUpdateCall<'a, C, NC, A> {
         self._goal_id = new_value.to_string();
         self
@@ -17932,7 +18360,7 @@ impl<'a, C, NC, A> ManagementGoalUpdateCall<'a, C, NC, A> where NC: hyper::net::
 /// List custom data sources to which the user has access.
 ///
 /// A builder for the *customDataSources.list* method supported by a *management* resource.
-/// It is not used directly, but through a `ManagementMethods`.
+/// It is not used directly, but through a `ManagementMethods` instance.
 ///
 /// # Example
 ///
@@ -18002,7 +18430,7 @@ impl<'a, C, NC, A> ManagementCustomDataSourceListCall<'a, C, NC, A> where NC: hy
         for &field in ["alt", "accountId", "webPropertyId", "start-index", "max-results"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -18055,7 +18483,7 @@ impl<'a, C, NC, A> ManagementCustomDataSourceListCall<'a, C, NC, A> where NC: hy
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -18067,7 +18495,6 @@ impl<'a, C, NC, A> ManagementCustomDataSourceListCall<'a, C, NC, A> where NC: hy
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -18077,7 +18504,7 @@ impl<'a, C, NC, A> ManagementCustomDataSourceListCall<'a, C, NC, A> where NC: hy
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -18088,7 +18515,7 @@ impl<'a, C, NC, A> ManagementCustomDataSourceListCall<'a, C, NC, A> where NC: hy
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -18097,13 +18524,13 @@ impl<'a, C, NC, A> ManagementCustomDataSourceListCall<'a, C, NC, A> where NC: hy
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -18115,7 +18542,7 @@ impl<'a, C, NC, A> ManagementCustomDataSourceListCall<'a, C, NC, A> where NC: hy
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Account Id for the custom data sources to retrieve.    
+    /// Account Id for the custom data sources to retrieve.
     pub fn account_id(mut self, new_value: &str) -> ManagementCustomDataSourceListCall<'a, C, NC, A> {
         self._account_id = new_value.to_string();
         self
@@ -18125,7 +18552,7 @@ impl<'a, C, NC, A> ManagementCustomDataSourceListCall<'a, C, NC, A> where NC: hy
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Web property Id for the custom data sources to retrieve.    
+    /// Web property Id for the custom data sources to retrieve.
     pub fn web_property_id(mut self, new_value: &str) -> ManagementCustomDataSourceListCall<'a, C, NC, A> {
         self._web_property_id = new_value.to_string();
         self
@@ -18133,7 +18560,7 @@ impl<'a, C, NC, A> ManagementCustomDataSourceListCall<'a, C, NC, A> where NC: hy
     /// Sets the *start-index* query property to the given value.
     ///
     /// 
-    /// A 1-based index of the first custom data source to retrieve. Use this parameter as a pagination mechanism along with the max-results parameter.    
+    /// A 1-based index of the first custom data source to retrieve. Use this parameter as a pagination mechanism along with the max-results parameter.
     pub fn start_index(mut self, new_value: i32) -> ManagementCustomDataSourceListCall<'a, C, NC, A> {
         self._start_index = Some(new_value);
         self
@@ -18141,7 +18568,7 @@ impl<'a, C, NC, A> ManagementCustomDataSourceListCall<'a, C, NC, A> where NC: hy
     /// Sets the *max-results* query property to the given value.
     ///
     /// 
-    /// The maximum number of custom data sources to include in this response.    
+    /// The maximum number of custom data sources to include in this response.
     pub fn max_results(mut self, new_value: i32) -> ManagementCustomDataSourceListCall<'a, C, NC, A> {
         self._max_results = Some(new_value);
         self
@@ -18202,7 +18629,7 @@ impl<'a, C, NC, A> ManagementCustomDataSourceListCall<'a, C, NC, A> where NC: hy
 /// Lists custom metrics to which the user has access.
 ///
 /// A builder for the *customMetrics.list* method supported by a *management* resource.
-/// It is not used directly, but through a `ManagementMethods`.
+/// It is not used directly, but through a `ManagementMethods` instance.
 ///
 /// # Example
 ///
@@ -18272,7 +18699,7 @@ impl<'a, C, NC, A> ManagementCustomMetricListCall<'a, C, NC, A> where NC: hyper:
         for &field in ["alt", "accountId", "webPropertyId", "start-index", "max-results"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -18325,7 +18752,7 @@ impl<'a, C, NC, A> ManagementCustomMetricListCall<'a, C, NC, A> where NC: hyper:
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -18337,7 +18764,6 @@ impl<'a, C, NC, A> ManagementCustomMetricListCall<'a, C, NC, A> where NC: hyper:
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -18347,7 +18773,7 @@ impl<'a, C, NC, A> ManagementCustomMetricListCall<'a, C, NC, A> where NC: hyper:
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -18358,7 +18784,7 @@ impl<'a, C, NC, A> ManagementCustomMetricListCall<'a, C, NC, A> where NC: hyper:
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -18367,13 +18793,13 @@ impl<'a, C, NC, A> ManagementCustomMetricListCall<'a, C, NC, A> where NC: hyper:
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -18385,7 +18811,7 @@ impl<'a, C, NC, A> ManagementCustomMetricListCall<'a, C, NC, A> where NC: hyper:
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Account ID for the custom metrics to retrieve.    
+    /// Account ID for the custom metrics to retrieve.
     pub fn account_id(mut self, new_value: &str) -> ManagementCustomMetricListCall<'a, C, NC, A> {
         self._account_id = new_value.to_string();
         self
@@ -18395,7 +18821,7 @@ impl<'a, C, NC, A> ManagementCustomMetricListCall<'a, C, NC, A> where NC: hyper:
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Web property ID for the custom metrics to retrieve.    
+    /// Web property ID for the custom metrics to retrieve.
     pub fn web_property_id(mut self, new_value: &str) -> ManagementCustomMetricListCall<'a, C, NC, A> {
         self._web_property_id = new_value.to_string();
         self
@@ -18403,7 +18829,7 @@ impl<'a, C, NC, A> ManagementCustomMetricListCall<'a, C, NC, A> where NC: hyper:
     /// Sets the *start-index* query property to the given value.
     ///
     /// 
-    /// An index of the first entity to retrieve. Use this parameter as a pagination mechanism along with the max-results parameter.    
+    /// An index of the first entity to retrieve. Use this parameter as a pagination mechanism along with the max-results parameter.
     pub fn start_index(mut self, new_value: i32) -> ManagementCustomMetricListCall<'a, C, NC, A> {
         self._start_index = Some(new_value);
         self
@@ -18411,7 +18837,7 @@ impl<'a, C, NC, A> ManagementCustomMetricListCall<'a, C, NC, A> where NC: hyper:
     /// Sets the *max-results* query property to the given value.
     ///
     /// 
-    /// The maximum number of custom metrics to include in this response.    
+    /// The maximum number of custom metrics to include in this response.
     pub fn max_results(mut self, new_value: i32) -> ManagementCustomMetricListCall<'a, C, NC, A> {
         self._max_results = Some(new_value);
         self
@@ -18472,7 +18898,7 @@ impl<'a, C, NC, A> ManagementCustomMetricListCall<'a, C, NC, A> where NC: hyper:
 /// Lists unsampled reports to which the user has access.
 ///
 /// A builder for the *unsampledReports.list* method supported by a *management* resource.
-/// It is not used directly, but through a `ManagementMethods`.
+/// It is not used directly, but through a `ManagementMethods` instance.
 ///
 /// # Example
 ///
@@ -18544,7 +18970,7 @@ impl<'a, C, NC, A> ManagementUnsampledReportListCall<'a, C, NC, A> where NC: hyp
         for &field in ["alt", "accountId", "webPropertyId", "profileId", "start-index", "max-results"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -18597,7 +19023,7 @@ impl<'a, C, NC, A> ManagementUnsampledReportListCall<'a, C, NC, A> where NC: hyp
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -18609,7 +19035,6 @@ impl<'a, C, NC, A> ManagementUnsampledReportListCall<'a, C, NC, A> where NC: hyp
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -18619,7 +19044,7 @@ impl<'a, C, NC, A> ManagementUnsampledReportListCall<'a, C, NC, A> where NC: hyp
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -18630,7 +19055,7 @@ impl<'a, C, NC, A> ManagementUnsampledReportListCall<'a, C, NC, A> where NC: hyp
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -18639,13 +19064,13 @@ impl<'a, C, NC, A> ManagementUnsampledReportListCall<'a, C, NC, A> where NC: hyp
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -18657,7 +19082,7 @@ impl<'a, C, NC, A> ManagementUnsampledReportListCall<'a, C, NC, A> where NC: hyp
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Account ID to retrieve unsampled reports for. Must be a specific account ID, ~all is not supported.    
+    /// Account ID to retrieve unsampled reports for. Must be a specific account ID, ~all is not supported.
     pub fn account_id(mut self, new_value: &str) -> ManagementUnsampledReportListCall<'a, C, NC, A> {
         self._account_id = new_value.to_string();
         self
@@ -18667,7 +19092,7 @@ impl<'a, C, NC, A> ManagementUnsampledReportListCall<'a, C, NC, A> where NC: hyp
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Web property ID to retrieve unsampled reports for. Must be a specific web property ID, ~all is not supported.    
+    /// Web property ID to retrieve unsampled reports for. Must be a specific web property ID, ~all is not supported.
     pub fn web_property_id(mut self, new_value: &str) -> ManagementUnsampledReportListCall<'a, C, NC, A> {
         self._web_property_id = new_value.to_string();
         self
@@ -18677,7 +19102,7 @@ impl<'a, C, NC, A> ManagementUnsampledReportListCall<'a, C, NC, A> where NC: hyp
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// View (Profile) ID to retrieve unsampled reports for. Must be a specific view (profile) ID, ~all is not supported.    
+    /// View (Profile) ID to retrieve unsampled reports for. Must be a specific view (profile) ID, ~all is not supported.
     pub fn profile_id(mut self, new_value: &str) -> ManagementUnsampledReportListCall<'a, C, NC, A> {
         self._profile_id = new_value.to_string();
         self
@@ -18685,7 +19110,7 @@ impl<'a, C, NC, A> ManagementUnsampledReportListCall<'a, C, NC, A> where NC: hyp
     /// Sets the *start-index* query property to the given value.
     ///
     /// 
-    /// An index of the first unsampled report to retrieve. Use this parameter as a pagination mechanism along with the max-results parameter.    
+    /// An index of the first unsampled report to retrieve. Use this parameter as a pagination mechanism along with the max-results parameter.
     pub fn start_index(mut self, new_value: i32) -> ManagementUnsampledReportListCall<'a, C, NC, A> {
         self._start_index = Some(new_value);
         self
@@ -18693,7 +19118,7 @@ impl<'a, C, NC, A> ManagementUnsampledReportListCall<'a, C, NC, A> where NC: hyp
     /// Sets the *max-results* query property to the given value.
     ///
     /// 
-    /// The maximum number of unsampled reports to include in this response.    
+    /// The maximum number of unsampled reports to include in this response.
     pub fn max_results(mut self, new_value: i32) -> ManagementUnsampledReportListCall<'a, C, NC, A> {
         self._max_results = Some(new_value);
         self
@@ -18754,7 +19179,7 @@ impl<'a, C, NC, A> ManagementUnsampledReportListCall<'a, C, NC, A> where NC: hyp
 /// Gets a web property to which the user has access.
 ///
 /// A builder for the *webproperties.get* method supported by a *management* resource.
-/// It is not used directly, but through a `ManagementMethods`.
+/// It is not used directly, but through a `ManagementMethods` instance.
 ///
 /// # Example
 ///
@@ -18814,7 +19239,7 @@ impl<'a, C, NC, A> ManagementWebpropertyGetCall<'a, C, NC, A> where NC: hyper::n
         for &field in ["alt", "accountId", "webPropertyId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -18867,7 +19292,7 @@ impl<'a, C, NC, A> ManagementWebpropertyGetCall<'a, C, NC, A> where NC: hyper::n
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -18879,7 +19304,6 @@ impl<'a, C, NC, A> ManagementWebpropertyGetCall<'a, C, NC, A> where NC: hyper::n
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -18889,7 +19313,7 @@ impl<'a, C, NC, A> ManagementWebpropertyGetCall<'a, C, NC, A> where NC: hyper::n
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -18900,7 +19324,7 @@ impl<'a, C, NC, A> ManagementWebpropertyGetCall<'a, C, NC, A> where NC: hyper::n
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -18909,13 +19333,13 @@ impl<'a, C, NC, A> ManagementWebpropertyGetCall<'a, C, NC, A> where NC: hyper::n
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -18927,7 +19351,7 @@ impl<'a, C, NC, A> ManagementWebpropertyGetCall<'a, C, NC, A> where NC: hyper::n
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Account ID to retrieve the web property for.    
+    /// Account ID to retrieve the web property for.
     pub fn account_id(mut self, new_value: &str) -> ManagementWebpropertyGetCall<'a, C, NC, A> {
         self._account_id = new_value.to_string();
         self
@@ -18937,7 +19361,7 @@ impl<'a, C, NC, A> ManagementWebpropertyGetCall<'a, C, NC, A> where NC: hyper::n
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// ID to retrieve the web property for.    
+    /// ID to retrieve the web property for.
     pub fn web_property_id(mut self, new_value: &str) -> ManagementWebpropertyGetCall<'a, C, NC, A> {
         self._web_property_id = new_value.to_string();
         self
@@ -18998,7 +19422,7 @@ impl<'a, C, NC, A> ManagementWebpropertyGetCall<'a, C, NC, A> where NC: hyper::n
 /// Create a new experiment.
 ///
 /// A builder for the *experiments.insert* method supported by a *management* resource.
-/// It is not used directly, but through a `ManagementMethods`.
+/// It is not used directly, but through a `ManagementMethods` instance.
 ///
 /// # Example
 ///
@@ -19067,7 +19491,7 @@ impl<'a, C, NC, A> ManagementExperimentInsertCall<'a, C, NC, A> where NC: hyper:
         for &field in ["alt", "accountId", "webPropertyId", "profileId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -19124,7 +19548,7 @@ impl<'a, C, NC, A> ManagementExperimentInsertCall<'a, C, NC, A> where NC: hyper:
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -19140,7 +19564,6 @@ impl<'a, C, NC, A> ManagementExperimentInsertCall<'a, C, NC, A> where NC: hyper:
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -19150,7 +19573,7 @@ impl<'a, C, NC, A> ManagementExperimentInsertCall<'a, C, NC, A> where NC: hyper:
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -19161,7 +19584,7 @@ impl<'a, C, NC, A> ManagementExperimentInsertCall<'a, C, NC, A> where NC: hyper:
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -19170,13 +19593,13 @@ impl<'a, C, NC, A> ManagementExperimentInsertCall<'a, C, NC, A> where NC: hyper:
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -19197,7 +19620,7 @@ impl<'a, C, NC, A> ManagementExperimentInsertCall<'a, C, NC, A> where NC: hyper:
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Account ID to create the experiment for.    
+    /// Account ID to create the experiment for.
     pub fn account_id(mut self, new_value: &str) -> ManagementExperimentInsertCall<'a, C, NC, A> {
         self._account_id = new_value.to_string();
         self
@@ -19207,7 +19630,7 @@ impl<'a, C, NC, A> ManagementExperimentInsertCall<'a, C, NC, A> where NC: hyper:
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Web property ID to create the experiment for.    
+    /// Web property ID to create the experiment for.
     pub fn web_property_id(mut self, new_value: &str) -> ManagementExperimentInsertCall<'a, C, NC, A> {
         self._web_property_id = new_value.to_string();
         self
@@ -19217,7 +19640,7 @@ impl<'a, C, NC, A> ManagementExperimentInsertCall<'a, C, NC, A> where NC: hyper:
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// View (Profile) ID to create the experiment for.    
+    /// View (Profile) ID to create the experiment for.
     pub fn profile_id(mut self, new_value: &str) -> ManagementExperimentInsertCall<'a, C, NC, A> {
         self._profile_id = new_value.to_string();
         self
@@ -19278,7 +19701,7 @@ impl<'a, C, NC, A> ManagementExperimentInsertCall<'a, C, NC, A> where NC: hyper:
 /// Get a custom dimension to which the user has access.
 ///
 /// A builder for the *customDimensions.get* method supported by a *management* resource.
-/// It is not used directly, but through a `ManagementMethods`.
+/// It is not used directly, but through a `ManagementMethods` instance.
 ///
 /// # Example
 ///
@@ -19340,7 +19763,7 @@ impl<'a, C, NC, A> ManagementCustomDimensionGetCall<'a, C, NC, A> where NC: hype
         for &field in ["alt", "accountId", "webPropertyId", "customDimensionId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -19393,7 +19816,7 @@ impl<'a, C, NC, A> ManagementCustomDimensionGetCall<'a, C, NC, A> where NC: hype
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -19405,7 +19828,6 @@ impl<'a, C, NC, A> ManagementCustomDimensionGetCall<'a, C, NC, A> where NC: hype
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -19415,7 +19837,7 @@ impl<'a, C, NC, A> ManagementCustomDimensionGetCall<'a, C, NC, A> where NC: hype
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -19426,7 +19848,7 @@ impl<'a, C, NC, A> ManagementCustomDimensionGetCall<'a, C, NC, A> where NC: hype
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -19435,13 +19857,13 @@ impl<'a, C, NC, A> ManagementCustomDimensionGetCall<'a, C, NC, A> where NC: hype
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -19453,7 +19875,7 @@ impl<'a, C, NC, A> ManagementCustomDimensionGetCall<'a, C, NC, A> where NC: hype
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Account ID for the custom dimension to retrieve.    
+    /// Account ID for the custom dimension to retrieve.
     pub fn account_id(mut self, new_value: &str) -> ManagementCustomDimensionGetCall<'a, C, NC, A> {
         self._account_id = new_value.to_string();
         self
@@ -19463,7 +19885,7 @@ impl<'a, C, NC, A> ManagementCustomDimensionGetCall<'a, C, NC, A> where NC: hype
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Web property ID for the custom dimension to retrieve.    
+    /// Web property ID for the custom dimension to retrieve.
     pub fn web_property_id(mut self, new_value: &str) -> ManagementCustomDimensionGetCall<'a, C, NC, A> {
         self._web_property_id = new_value.to_string();
         self
@@ -19473,7 +19895,7 @@ impl<'a, C, NC, A> ManagementCustomDimensionGetCall<'a, C, NC, A> where NC: hype
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The ID of the custom dimension to retrieve.    
+    /// The ID of the custom dimension to retrieve.
     pub fn custom_dimension_id(mut self, new_value: &str) -> ManagementCustomDimensionGetCall<'a, C, NC, A> {
         self._custom_dimension_id = new_value.to_string();
         self
@@ -19534,7 +19956,7 @@ impl<'a, C, NC, A> ManagementCustomDimensionGetCall<'a, C, NC, A> where NC: hype
 /// Lists all profile filter links for a profile.
 ///
 /// A builder for the *profileFilterLinks.list* method supported by a *management* resource.
-/// It is not used directly, but through a `ManagementMethods`.
+/// It is not used directly, but through a `ManagementMethods` instance.
 ///
 /// # Example
 ///
@@ -19606,7 +20028,7 @@ impl<'a, C, NC, A> ManagementProfileFilterLinkListCall<'a, C, NC, A> where NC: h
         for &field in ["alt", "accountId", "webPropertyId", "profileId", "start-index", "max-results"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -19659,7 +20081,7 @@ impl<'a, C, NC, A> ManagementProfileFilterLinkListCall<'a, C, NC, A> where NC: h
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -19671,7 +20093,6 @@ impl<'a, C, NC, A> ManagementProfileFilterLinkListCall<'a, C, NC, A> where NC: h
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -19681,7 +20102,7 @@ impl<'a, C, NC, A> ManagementProfileFilterLinkListCall<'a, C, NC, A> where NC: h
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -19692,7 +20113,7 @@ impl<'a, C, NC, A> ManagementProfileFilterLinkListCall<'a, C, NC, A> where NC: h
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -19701,13 +20122,13 @@ impl<'a, C, NC, A> ManagementProfileFilterLinkListCall<'a, C, NC, A> where NC: h
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -19719,7 +20140,7 @@ impl<'a, C, NC, A> ManagementProfileFilterLinkListCall<'a, C, NC, A> where NC: h
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Account ID to retrieve profile filter links for.    
+    /// Account ID to retrieve profile filter links for.
     pub fn account_id(mut self, new_value: &str) -> ManagementProfileFilterLinkListCall<'a, C, NC, A> {
         self._account_id = new_value.to_string();
         self
@@ -19729,7 +20150,7 @@ impl<'a, C, NC, A> ManagementProfileFilterLinkListCall<'a, C, NC, A> where NC: h
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Web property Id for profile filter links for. Can either be a specific web property ID or '~all', which refers to all the web properties that user has access to.    
+    /// Web property Id for profile filter links for. Can either be a specific web property ID or '~all', which refers to all the web properties that user has access to.
     pub fn web_property_id(mut self, new_value: &str) -> ManagementProfileFilterLinkListCall<'a, C, NC, A> {
         self._web_property_id = new_value.to_string();
         self
@@ -19739,7 +20160,7 @@ impl<'a, C, NC, A> ManagementProfileFilterLinkListCall<'a, C, NC, A> where NC: h
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Profile ID to retrieve filter links for. Can either be a specific profile ID or '~all', which refers to all the profiles that user has access to.    
+    /// Profile ID to retrieve filter links for. Can either be a specific profile ID or '~all', which refers to all the profiles that user has access to.
     pub fn profile_id(mut self, new_value: &str) -> ManagementProfileFilterLinkListCall<'a, C, NC, A> {
         self._profile_id = new_value.to_string();
         self
@@ -19747,7 +20168,7 @@ impl<'a, C, NC, A> ManagementProfileFilterLinkListCall<'a, C, NC, A> where NC: h
     /// Sets the *start-index* query property to the given value.
     ///
     /// 
-    /// An index of the first entity to retrieve. Use this parameter as a pagination mechanism along with the max-results parameter.    
+    /// An index of the first entity to retrieve. Use this parameter as a pagination mechanism along with the max-results parameter.
     pub fn start_index(mut self, new_value: i32) -> ManagementProfileFilterLinkListCall<'a, C, NC, A> {
         self._start_index = Some(new_value);
         self
@@ -19755,7 +20176,7 @@ impl<'a, C, NC, A> ManagementProfileFilterLinkListCall<'a, C, NC, A> where NC: h
     /// Sets the *max-results* query property to the given value.
     ///
     /// 
-    /// The maximum number of profile filter links to include in this response.    
+    /// The maximum number of profile filter links to include in this response.
     pub fn max_results(mut self, new_value: i32) -> ManagementProfileFilterLinkListCall<'a, C, NC, A> {
         self._max_results = Some(new_value);
         self
@@ -19816,7 +20237,7 @@ impl<'a, C, NC, A> ManagementProfileFilterLinkListCall<'a, C, NC, A> where NC: h
 /// Updates an existing web property. This method supports patch semantics.
 ///
 /// A builder for the *webproperties.patch* method supported by a *management* resource.
-/// It is not used directly, but through a `ManagementMethods`.
+/// It is not used directly, but through a `ManagementMethods` instance.
 ///
 /// # Example
 ///
@@ -19883,7 +20304,7 @@ impl<'a, C, NC, A> ManagementWebpropertyPatchCall<'a, C, NC, A> where NC: hyper:
         for &field in ["alt", "accountId", "webPropertyId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -19940,7 +20361,7 @@ impl<'a, C, NC, A> ManagementWebpropertyPatchCall<'a, C, NC, A> where NC: hyper:
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -19956,7 +20377,6 @@ impl<'a, C, NC, A> ManagementWebpropertyPatchCall<'a, C, NC, A> where NC: hyper:
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -19966,7 +20386,7 @@ impl<'a, C, NC, A> ManagementWebpropertyPatchCall<'a, C, NC, A> where NC: hyper:
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -19977,7 +20397,7 @@ impl<'a, C, NC, A> ManagementWebpropertyPatchCall<'a, C, NC, A> where NC: hyper:
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -19986,13 +20406,13 @@ impl<'a, C, NC, A> ManagementWebpropertyPatchCall<'a, C, NC, A> where NC: hyper:
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -20013,7 +20433,7 @@ impl<'a, C, NC, A> ManagementWebpropertyPatchCall<'a, C, NC, A> where NC: hyper:
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Account ID to which the web property belongs    
+    /// Account ID to which the web property belongs
     pub fn account_id(mut self, new_value: &str) -> ManagementWebpropertyPatchCall<'a, C, NC, A> {
         self._account_id = new_value.to_string();
         self
@@ -20023,7 +20443,7 @@ impl<'a, C, NC, A> ManagementWebpropertyPatchCall<'a, C, NC, A> where NC: hyper:
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Web property ID    
+    /// Web property ID
     pub fn web_property_id(mut self, new_value: &str) -> ManagementWebpropertyPatchCall<'a, C, NC, A> {
         self._web_property_id = new_value.to_string();
         self
@@ -20084,7 +20504,7 @@ impl<'a, C, NC, A> ManagementWebpropertyPatchCall<'a, C, NC, A> where NC: hyper:
 /// Create a new custom dimension.
 ///
 /// A builder for the *customDimensions.insert* method supported by a *management* resource.
-/// It is not used directly, but through a `ManagementMethods`.
+/// It is not used directly, but through a `ManagementMethods` instance.
 ///
 /// # Example
 ///
@@ -20151,7 +20571,7 @@ impl<'a, C, NC, A> ManagementCustomDimensionInsertCall<'a, C, NC, A> where NC: h
         for &field in ["alt", "accountId", "webPropertyId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -20208,7 +20628,7 @@ impl<'a, C, NC, A> ManagementCustomDimensionInsertCall<'a, C, NC, A> where NC: h
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -20224,7 +20644,6 @@ impl<'a, C, NC, A> ManagementCustomDimensionInsertCall<'a, C, NC, A> where NC: h
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -20234,7 +20653,7 @@ impl<'a, C, NC, A> ManagementCustomDimensionInsertCall<'a, C, NC, A> where NC: h
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -20245,7 +20664,7 @@ impl<'a, C, NC, A> ManagementCustomDimensionInsertCall<'a, C, NC, A> where NC: h
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -20254,13 +20673,13 @@ impl<'a, C, NC, A> ManagementCustomDimensionInsertCall<'a, C, NC, A> where NC: h
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -20281,7 +20700,7 @@ impl<'a, C, NC, A> ManagementCustomDimensionInsertCall<'a, C, NC, A> where NC: h
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Account ID for the custom dimension to create.    
+    /// Account ID for the custom dimension to create.
     pub fn account_id(mut self, new_value: &str) -> ManagementCustomDimensionInsertCall<'a, C, NC, A> {
         self._account_id = new_value.to_string();
         self
@@ -20291,7 +20710,7 @@ impl<'a, C, NC, A> ManagementCustomDimensionInsertCall<'a, C, NC, A> where NC: h
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Web property ID for the custom dimension to create.    
+    /// Web property ID for the custom dimension to create.
     pub fn web_property_id(mut self, new_value: &str) -> ManagementCustomDimensionInsertCall<'a, C, NC, A> {
         self._web_property_id = new_value.to_string();
         self
@@ -20352,7 +20771,7 @@ impl<'a, C, NC, A> ManagementCustomDimensionInsertCall<'a, C, NC, A> where NC: h
 /// Create a new custom metric.
 ///
 /// A builder for the *customMetrics.insert* method supported by a *management* resource.
-/// It is not used directly, but through a `ManagementMethods`.
+/// It is not used directly, but through a `ManagementMethods` instance.
 ///
 /// # Example
 ///
@@ -20419,7 +20838,7 @@ impl<'a, C, NC, A> ManagementCustomMetricInsertCall<'a, C, NC, A> where NC: hype
         for &field in ["alt", "accountId", "webPropertyId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -20476,7 +20895,7 @@ impl<'a, C, NC, A> ManagementCustomMetricInsertCall<'a, C, NC, A> where NC: hype
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -20492,7 +20911,6 @@ impl<'a, C, NC, A> ManagementCustomMetricInsertCall<'a, C, NC, A> where NC: hype
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -20502,7 +20920,7 @@ impl<'a, C, NC, A> ManagementCustomMetricInsertCall<'a, C, NC, A> where NC: hype
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -20513,7 +20931,7 @@ impl<'a, C, NC, A> ManagementCustomMetricInsertCall<'a, C, NC, A> where NC: hype
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -20522,13 +20940,13 @@ impl<'a, C, NC, A> ManagementCustomMetricInsertCall<'a, C, NC, A> where NC: hype
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -20549,7 +20967,7 @@ impl<'a, C, NC, A> ManagementCustomMetricInsertCall<'a, C, NC, A> where NC: hype
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Account ID for the custom metric to create.    
+    /// Account ID for the custom metric to create.
     pub fn account_id(mut self, new_value: &str) -> ManagementCustomMetricInsertCall<'a, C, NC, A> {
         self._account_id = new_value.to_string();
         self
@@ -20559,7 +20977,7 @@ impl<'a, C, NC, A> ManagementCustomMetricInsertCall<'a, C, NC, A> where NC: hype
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Web property ID for the custom dimension to create.    
+    /// Web property ID for the custom dimension to create.
     pub fn web_property_id(mut self, new_value: &str) -> ManagementCustomMetricInsertCall<'a, C, NC, A> {
         self._web_property_id = new_value.to_string();
         self
@@ -20620,7 +21038,7 @@ impl<'a, C, NC, A> ManagementCustomMetricInsertCall<'a, C, NC, A> where NC: hype
 /// Adds a new user to the given view (profile).
 ///
 /// A builder for the *profileUserLinks.insert* method supported by a *management* resource.
-/// It is not used directly, but through a `ManagementMethods`.
+/// It is not used directly, but through a `ManagementMethods` instance.
 ///
 /// # Example
 ///
@@ -20689,7 +21107,7 @@ impl<'a, C, NC, A> ManagementProfileUserLinkInsertCall<'a, C, NC, A> where NC: h
         for &field in ["alt", "accountId", "webPropertyId", "profileId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -20746,7 +21164,7 @@ impl<'a, C, NC, A> ManagementProfileUserLinkInsertCall<'a, C, NC, A> where NC: h
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -20762,7 +21180,6 @@ impl<'a, C, NC, A> ManagementProfileUserLinkInsertCall<'a, C, NC, A> where NC: h
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -20772,7 +21189,7 @@ impl<'a, C, NC, A> ManagementProfileUserLinkInsertCall<'a, C, NC, A> where NC: h
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -20783,7 +21200,7 @@ impl<'a, C, NC, A> ManagementProfileUserLinkInsertCall<'a, C, NC, A> where NC: h
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -20792,13 +21209,13 @@ impl<'a, C, NC, A> ManagementProfileUserLinkInsertCall<'a, C, NC, A> where NC: h
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -20819,7 +21236,7 @@ impl<'a, C, NC, A> ManagementProfileUserLinkInsertCall<'a, C, NC, A> where NC: h
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Account ID to create the user link for.    
+    /// Account ID to create the user link for.
     pub fn account_id(mut self, new_value: &str) -> ManagementProfileUserLinkInsertCall<'a, C, NC, A> {
         self._account_id = new_value.to_string();
         self
@@ -20829,7 +21246,7 @@ impl<'a, C, NC, A> ManagementProfileUserLinkInsertCall<'a, C, NC, A> where NC: h
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Web Property ID to create the user link for.    
+    /// Web Property ID to create the user link for.
     pub fn web_property_id(mut self, new_value: &str) -> ManagementProfileUserLinkInsertCall<'a, C, NC, A> {
         self._web_property_id = new_value.to_string();
         self
@@ -20839,7 +21256,7 @@ impl<'a, C, NC, A> ManagementProfileUserLinkInsertCall<'a, C, NC, A> where NC: h
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// View (Profile) ID to create the user link for.    
+    /// View (Profile) ID to create the user link for.
     pub fn profile_id(mut self, new_value: &str) -> ManagementProfileUserLinkInsertCall<'a, C, NC, A> {
         self._profile_id = new_value.to_string();
         self
@@ -20900,7 +21317,7 @@ impl<'a, C, NC, A> ManagementProfileUserLinkInsertCall<'a, C, NC, A> where NC: h
 /// Lists web properties to which the user has access.
 ///
 /// A builder for the *webproperties.list* method supported by a *management* resource.
-/// It is not used directly, but through a `ManagementMethods`.
+/// It is not used directly, but through a `ManagementMethods` instance.
 ///
 /// # Example
 ///
@@ -20968,7 +21385,7 @@ impl<'a, C, NC, A> ManagementWebpropertyListCall<'a, C, NC, A> where NC: hyper::
         for &field in ["alt", "accountId", "start-index", "max-results"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -21021,7 +21438,7 @@ impl<'a, C, NC, A> ManagementWebpropertyListCall<'a, C, NC, A> where NC: hyper::
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -21033,7 +21450,6 @@ impl<'a, C, NC, A> ManagementWebpropertyListCall<'a, C, NC, A> where NC: hyper::
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -21043,7 +21459,7 @@ impl<'a, C, NC, A> ManagementWebpropertyListCall<'a, C, NC, A> where NC: hyper::
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -21054,7 +21470,7 @@ impl<'a, C, NC, A> ManagementWebpropertyListCall<'a, C, NC, A> where NC: hyper::
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -21063,13 +21479,13 @@ impl<'a, C, NC, A> ManagementWebpropertyListCall<'a, C, NC, A> where NC: hyper::
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -21081,7 +21497,7 @@ impl<'a, C, NC, A> ManagementWebpropertyListCall<'a, C, NC, A> where NC: hyper::
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Account ID to retrieve web properties for. Can either be a specific account ID or '~all', which refers to all the accounts that user has access to.    
+    /// Account ID to retrieve web properties for. Can either be a specific account ID or '~all', which refers to all the accounts that user has access to.
     pub fn account_id(mut self, new_value: &str) -> ManagementWebpropertyListCall<'a, C, NC, A> {
         self._account_id = new_value.to_string();
         self
@@ -21089,7 +21505,7 @@ impl<'a, C, NC, A> ManagementWebpropertyListCall<'a, C, NC, A> where NC: hyper::
     /// Sets the *start-index* query property to the given value.
     ///
     /// 
-    /// An index of the first entity to retrieve. Use this parameter as a pagination mechanism along with the max-results parameter.    
+    /// An index of the first entity to retrieve. Use this parameter as a pagination mechanism along with the max-results parameter.
     pub fn start_index(mut self, new_value: i32) -> ManagementWebpropertyListCall<'a, C, NC, A> {
         self._start_index = Some(new_value);
         self
@@ -21097,7 +21513,7 @@ impl<'a, C, NC, A> ManagementWebpropertyListCall<'a, C, NC, A> where NC: hyper::
     /// Sets the *max-results* query property to the given value.
     ///
     /// 
-    /// The maximum number of web properties to include in this response.    
+    /// The maximum number of web properties to include in this response.
     pub fn max_results(mut self, new_value: i32) -> ManagementWebpropertyListCall<'a, C, NC, A> {
         self._max_results = Some(new_value);
         self
@@ -21158,7 +21574,7 @@ impl<'a, C, NC, A> ManagementWebpropertyListCall<'a, C, NC, A> where NC: hyper::
 /// Creates a webProperty-AdWords link.
 ///
 /// A builder for the *webPropertyAdWordsLinks.insert* method supported by a *management* resource.
-/// It is not used directly, but through a `ManagementMethods`.
+/// It is not used directly, but through a `ManagementMethods` instance.
 ///
 /// # Example
 ///
@@ -21225,7 +21641,7 @@ impl<'a, C, NC, A> ManagementWebPropertyAdWordsLinkInsertCall<'a, C, NC, A> wher
         for &field in ["alt", "accountId", "webPropertyId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -21282,7 +21698,7 @@ impl<'a, C, NC, A> ManagementWebPropertyAdWordsLinkInsertCall<'a, C, NC, A> wher
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -21298,7 +21714,6 @@ impl<'a, C, NC, A> ManagementWebPropertyAdWordsLinkInsertCall<'a, C, NC, A> wher
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -21308,7 +21723,7 @@ impl<'a, C, NC, A> ManagementWebPropertyAdWordsLinkInsertCall<'a, C, NC, A> wher
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -21319,7 +21734,7 @@ impl<'a, C, NC, A> ManagementWebPropertyAdWordsLinkInsertCall<'a, C, NC, A> wher
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -21328,13 +21743,13 @@ impl<'a, C, NC, A> ManagementWebPropertyAdWordsLinkInsertCall<'a, C, NC, A> wher
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -21355,7 +21770,7 @@ impl<'a, C, NC, A> ManagementWebPropertyAdWordsLinkInsertCall<'a, C, NC, A> wher
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// ID of the Google Analytics account to create the link for.    
+    /// ID of the Google Analytics account to create the link for.
     pub fn account_id(mut self, new_value: &str) -> ManagementWebPropertyAdWordsLinkInsertCall<'a, C, NC, A> {
         self._account_id = new_value.to_string();
         self
@@ -21365,7 +21780,7 @@ impl<'a, C, NC, A> ManagementWebPropertyAdWordsLinkInsertCall<'a, C, NC, A> wher
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Web property ID to create the link for.    
+    /// Web property ID to create the link for.
     pub fn web_property_id(mut self, new_value: &str) -> ManagementWebPropertyAdWordsLinkInsertCall<'a, C, NC, A> {
         self._web_property_id = new_value.to_string();
         self
@@ -21426,7 +21841,7 @@ impl<'a, C, NC, A> ManagementWebPropertyAdWordsLinkInsertCall<'a, C, NC, A> wher
 /// Updates an existing webProperty-AdWords link. This method supports patch semantics.
 ///
 /// A builder for the *webPropertyAdWordsLinks.patch* method supported by a *management* resource.
-/// It is not used directly, but through a `ManagementMethods`.
+/// It is not used directly, but through a `ManagementMethods` instance.
 ///
 /// # Example
 ///
@@ -21495,7 +21910,7 @@ impl<'a, C, NC, A> ManagementWebPropertyAdWordsLinkPatchCall<'a, C, NC, A> where
         for &field in ["alt", "accountId", "webPropertyId", "webPropertyAdWordsLinkId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -21552,7 +21967,7 @@ impl<'a, C, NC, A> ManagementWebPropertyAdWordsLinkPatchCall<'a, C, NC, A> where
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -21568,7 +21983,6 @@ impl<'a, C, NC, A> ManagementWebPropertyAdWordsLinkPatchCall<'a, C, NC, A> where
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -21578,7 +21992,7 @@ impl<'a, C, NC, A> ManagementWebPropertyAdWordsLinkPatchCall<'a, C, NC, A> where
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -21589,7 +22003,7 @@ impl<'a, C, NC, A> ManagementWebPropertyAdWordsLinkPatchCall<'a, C, NC, A> where
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -21598,13 +22012,13 @@ impl<'a, C, NC, A> ManagementWebPropertyAdWordsLinkPatchCall<'a, C, NC, A> where
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -21625,7 +22039,7 @@ impl<'a, C, NC, A> ManagementWebPropertyAdWordsLinkPatchCall<'a, C, NC, A> where
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// ID of the account which the given web property belongs to.    
+    /// ID of the account which the given web property belongs to.
     pub fn account_id(mut self, new_value: &str) -> ManagementWebPropertyAdWordsLinkPatchCall<'a, C, NC, A> {
         self._account_id = new_value.to_string();
         self
@@ -21635,7 +22049,7 @@ impl<'a, C, NC, A> ManagementWebPropertyAdWordsLinkPatchCall<'a, C, NC, A> where
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Web property ID to retrieve the AdWords link for.    
+    /// Web property ID to retrieve the AdWords link for.
     pub fn web_property_id(mut self, new_value: &str) -> ManagementWebPropertyAdWordsLinkPatchCall<'a, C, NC, A> {
         self._web_property_id = new_value.to_string();
         self
@@ -21645,7 +22059,7 @@ impl<'a, C, NC, A> ManagementWebPropertyAdWordsLinkPatchCall<'a, C, NC, A> where
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Web property-AdWords link ID.    
+    /// Web property-AdWords link ID.
     pub fn web_property_ad_words_link_id(mut self, new_value: &str) -> ManagementWebPropertyAdWordsLinkPatchCall<'a, C, NC, A> {
         self._web_property_ad_words_link_id = new_value.to_string();
         self
@@ -21706,7 +22120,7 @@ impl<'a, C, NC, A> ManagementWebPropertyAdWordsLinkPatchCall<'a, C, NC, A> where
 /// Gets a goal to which the user has access.
 ///
 /// A builder for the *goals.get* method supported by a *management* resource.
-/// It is not used directly, but through a `ManagementMethods`.
+/// It is not used directly, but through a `ManagementMethods` instance.
 ///
 /// # Example
 ///
@@ -21770,7 +22184,7 @@ impl<'a, C, NC, A> ManagementGoalGetCall<'a, C, NC, A> where NC: hyper::net::Net
         for &field in ["alt", "accountId", "webPropertyId", "profileId", "goalId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -21823,7 +22237,7 @@ impl<'a, C, NC, A> ManagementGoalGetCall<'a, C, NC, A> where NC: hyper::net::Net
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -21835,7 +22249,6 @@ impl<'a, C, NC, A> ManagementGoalGetCall<'a, C, NC, A> where NC: hyper::net::Net
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -21845,7 +22258,7 @@ impl<'a, C, NC, A> ManagementGoalGetCall<'a, C, NC, A> where NC: hyper::net::Net
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -21856,7 +22269,7 @@ impl<'a, C, NC, A> ManagementGoalGetCall<'a, C, NC, A> where NC: hyper::net::Net
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -21865,13 +22278,13 @@ impl<'a, C, NC, A> ManagementGoalGetCall<'a, C, NC, A> where NC: hyper::net::Net
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -21883,7 +22296,7 @@ impl<'a, C, NC, A> ManagementGoalGetCall<'a, C, NC, A> where NC: hyper::net::Net
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Account ID to retrieve the goal for.    
+    /// Account ID to retrieve the goal for.
     pub fn account_id(mut self, new_value: &str) -> ManagementGoalGetCall<'a, C, NC, A> {
         self._account_id = new_value.to_string();
         self
@@ -21893,7 +22306,7 @@ impl<'a, C, NC, A> ManagementGoalGetCall<'a, C, NC, A> where NC: hyper::net::Net
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Web property ID to retrieve the goal for.    
+    /// Web property ID to retrieve the goal for.
     pub fn web_property_id(mut self, new_value: &str) -> ManagementGoalGetCall<'a, C, NC, A> {
         self._web_property_id = new_value.to_string();
         self
@@ -21903,7 +22316,7 @@ impl<'a, C, NC, A> ManagementGoalGetCall<'a, C, NC, A> where NC: hyper::net::Net
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// View (Profile) ID to retrieve the goal for.    
+    /// View (Profile) ID to retrieve the goal for.
     pub fn profile_id(mut self, new_value: &str) -> ManagementGoalGetCall<'a, C, NC, A> {
         self._profile_id = new_value.to_string();
         self
@@ -21913,7 +22326,7 @@ impl<'a, C, NC, A> ManagementGoalGetCall<'a, C, NC, A> where NC: hyper::net::Net
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Goal ID to retrieve the goal for.    
+    /// Goal ID to retrieve the goal for.
     pub fn goal_id(mut self, new_value: &str) -> ManagementGoalGetCall<'a, C, NC, A> {
         self._goal_id = new_value.to_string();
         self
@@ -21974,7 +22387,7 @@ impl<'a, C, NC, A> ManagementGoalGetCall<'a, C, NC, A> where NC: hyper::net::Net
 /// Deletes a web property-AdWords link.
 ///
 /// A builder for the *webPropertyAdWordsLinks.delete* method supported by a *management* resource.
-/// It is not used directly, but through a `ManagementMethods`.
+/// It is not used directly, but through a `ManagementMethods` instance.
 ///
 /// # Example
 ///
@@ -22036,7 +22449,7 @@ impl<'a, C, NC, A> ManagementWebPropertyAdWordsLinkDeleteCall<'a, C, NC, A> wher
         for &field in ["accountId", "webPropertyId", "webPropertyAdWordsLinkId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -22088,7 +22501,7 @@ impl<'a, C, NC, A> ManagementWebPropertyAdWordsLinkDeleteCall<'a, C, NC, A> wher
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -22100,7 +22513,6 @@ impl<'a, C, NC, A> ManagementWebPropertyAdWordsLinkDeleteCall<'a, C, NC, A> wher
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -22110,7 +22522,7 @@ impl<'a, C, NC, A> ManagementWebPropertyAdWordsLinkDeleteCall<'a, C, NC, A> wher
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -22121,12 +22533,12 @@ impl<'a, C, NC, A> ManagementWebPropertyAdWordsLinkDeleteCall<'a, C, NC, A> wher
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = res;
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -22138,7 +22550,7 @@ impl<'a, C, NC, A> ManagementWebPropertyAdWordsLinkDeleteCall<'a, C, NC, A> wher
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// ID of the account which the given web property belongs to.    
+    /// ID of the account which the given web property belongs to.
     pub fn account_id(mut self, new_value: &str) -> ManagementWebPropertyAdWordsLinkDeleteCall<'a, C, NC, A> {
         self._account_id = new_value.to_string();
         self
@@ -22148,7 +22560,7 @@ impl<'a, C, NC, A> ManagementWebPropertyAdWordsLinkDeleteCall<'a, C, NC, A> wher
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Web property ID to delete the AdWords link for.    
+    /// Web property ID to delete the AdWords link for.
     pub fn web_property_id(mut self, new_value: &str) -> ManagementWebPropertyAdWordsLinkDeleteCall<'a, C, NC, A> {
         self._web_property_id = new_value.to_string();
         self
@@ -22158,7 +22570,7 @@ impl<'a, C, NC, A> ManagementWebPropertyAdWordsLinkDeleteCall<'a, C, NC, A> wher
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Web property AdWords link ID.    
+    /// Web property AdWords link ID.
     pub fn web_property_ad_words_link_id(mut self, new_value: &str) -> ManagementWebPropertyAdWordsLinkDeleteCall<'a, C, NC, A> {
         self._web_property_ad_words_link_id = new_value.to_string();
         self
@@ -22219,7 +22631,7 @@ impl<'a, C, NC, A> ManagementWebPropertyAdWordsLinkDeleteCall<'a, C, NC, A> wher
 /// Updates an existing webProperty-AdWords link.
 ///
 /// A builder for the *webPropertyAdWordsLinks.update* method supported by a *management* resource.
-/// It is not used directly, but through a `ManagementMethods`.
+/// It is not used directly, but through a `ManagementMethods` instance.
 ///
 /// # Example
 ///
@@ -22288,7 +22700,7 @@ impl<'a, C, NC, A> ManagementWebPropertyAdWordsLinkUpdateCall<'a, C, NC, A> wher
         for &field in ["alt", "accountId", "webPropertyId", "webPropertyAdWordsLinkId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -22345,7 +22757,7 @@ impl<'a, C, NC, A> ManagementWebPropertyAdWordsLinkUpdateCall<'a, C, NC, A> wher
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -22361,7 +22773,6 @@ impl<'a, C, NC, A> ManagementWebPropertyAdWordsLinkUpdateCall<'a, C, NC, A> wher
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -22371,7 +22782,7 @@ impl<'a, C, NC, A> ManagementWebPropertyAdWordsLinkUpdateCall<'a, C, NC, A> wher
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -22382,7 +22793,7 @@ impl<'a, C, NC, A> ManagementWebPropertyAdWordsLinkUpdateCall<'a, C, NC, A> wher
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -22391,13 +22802,13 @@ impl<'a, C, NC, A> ManagementWebPropertyAdWordsLinkUpdateCall<'a, C, NC, A> wher
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -22418,7 +22829,7 @@ impl<'a, C, NC, A> ManagementWebPropertyAdWordsLinkUpdateCall<'a, C, NC, A> wher
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// ID of the account which the given web property belongs to.    
+    /// ID of the account which the given web property belongs to.
     pub fn account_id(mut self, new_value: &str) -> ManagementWebPropertyAdWordsLinkUpdateCall<'a, C, NC, A> {
         self._account_id = new_value.to_string();
         self
@@ -22428,7 +22839,7 @@ impl<'a, C, NC, A> ManagementWebPropertyAdWordsLinkUpdateCall<'a, C, NC, A> wher
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Web property ID to retrieve the AdWords link for.    
+    /// Web property ID to retrieve the AdWords link for.
     pub fn web_property_id(mut self, new_value: &str) -> ManagementWebPropertyAdWordsLinkUpdateCall<'a, C, NC, A> {
         self._web_property_id = new_value.to_string();
         self
@@ -22438,7 +22849,7 @@ impl<'a, C, NC, A> ManagementWebPropertyAdWordsLinkUpdateCall<'a, C, NC, A> wher
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Web property-AdWords link ID.    
+    /// Web property-AdWords link ID.
     pub fn web_property_ad_words_link_id(mut self, new_value: &str) -> ManagementWebPropertyAdWordsLinkUpdateCall<'a, C, NC, A> {
         self._web_property_ad_words_link_id = new_value.to_string();
         self
@@ -22499,7 +22910,7 @@ impl<'a, C, NC, A> ManagementWebPropertyAdWordsLinkUpdateCall<'a, C, NC, A> wher
 /// Updates an existing filter. This method supports patch semantics.
 ///
 /// A builder for the *filters.patch* method supported by a *management* resource.
-/// It is not used directly, but through a `ManagementMethods`.
+/// It is not used directly, but through a `ManagementMethods` instance.
 ///
 /// # Example
 ///
@@ -22566,7 +22977,7 @@ impl<'a, C, NC, A> ManagementFilterPatchCall<'a, C, NC, A> where NC: hyper::net:
         for &field in ["alt", "accountId", "filterId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -22623,7 +23034,7 @@ impl<'a, C, NC, A> ManagementFilterPatchCall<'a, C, NC, A> where NC: hyper::net:
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -22639,7 +23050,6 @@ impl<'a, C, NC, A> ManagementFilterPatchCall<'a, C, NC, A> where NC: hyper::net:
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -22649,7 +23059,7 @@ impl<'a, C, NC, A> ManagementFilterPatchCall<'a, C, NC, A> where NC: hyper::net:
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -22660,7 +23070,7 @@ impl<'a, C, NC, A> ManagementFilterPatchCall<'a, C, NC, A> where NC: hyper::net:
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -22669,13 +23079,13 @@ impl<'a, C, NC, A> ManagementFilterPatchCall<'a, C, NC, A> where NC: hyper::net:
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -22696,7 +23106,7 @@ impl<'a, C, NC, A> ManagementFilterPatchCall<'a, C, NC, A> where NC: hyper::net:
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Account ID to which the filter belongs.    
+    /// Account ID to which the filter belongs.
     pub fn account_id(mut self, new_value: &str) -> ManagementFilterPatchCall<'a, C, NC, A> {
         self._account_id = new_value.to_string();
         self
@@ -22706,7 +23116,7 @@ impl<'a, C, NC, A> ManagementFilterPatchCall<'a, C, NC, A> where NC: hyper::net:
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// ID of the filter to be updated.    
+    /// ID of the filter to be updated.
     pub fn filter_id(mut self, new_value: &str) -> ManagementFilterPatchCall<'a, C, NC, A> {
         self._filter_id = new_value.to_string();
         self
@@ -22767,7 +23177,7 @@ impl<'a, C, NC, A> ManagementFilterPatchCall<'a, C, NC, A> where NC: hyper::net:
 /// Lists all filters for an account
 ///
 /// A builder for the *filters.list* method supported by a *management* resource.
-/// It is not used directly, but through a `ManagementMethods`.
+/// It is not used directly, but through a `ManagementMethods` instance.
 ///
 /// # Example
 ///
@@ -22835,7 +23245,7 @@ impl<'a, C, NC, A> ManagementFilterListCall<'a, C, NC, A> where NC: hyper::net::
         for &field in ["alt", "accountId", "start-index", "max-results"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -22888,7 +23298,7 @@ impl<'a, C, NC, A> ManagementFilterListCall<'a, C, NC, A> where NC: hyper::net::
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -22900,7 +23310,6 @@ impl<'a, C, NC, A> ManagementFilterListCall<'a, C, NC, A> where NC: hyper::net::
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -22910,7 +23319,7 @@ impl<'a, C, NC, A> ManagementFilterListCall<'a, C, NC, A> where NC: hyper::net::
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -22921,7 +23330,7 @@ impl<'a, C, NC, A> ManagementFilterListCall<'a, C, NC, A> where NC: hyper::net::
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -22930,13 +23339,13 @@ impl<'a, C, NC, A> ManagementFilterListCall<'a, C, NC, A> where NC: hyper::net::
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -22948,7 +23357,7 @@ impl<'a, C, NC, A> ManagementFilterListCall<'a, C, NC, A> where NC: hyper::net::
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Account ID to retrieve filters for.    
+    /// Account ID to retrieve filters for.
     pub fn account_id(mut self, new_value: &str) -> ManagementFilterListCall<'a, C, NC, A> {
         self._account_id = new_value.to_string();
         self
@@ -22956,7 +23365,7 @@ impl<'a, C, NC, A> ManagementFilterListCall<'a, C, NC, A> where NC: hyper::net::
     /// Sets the *start-index* query property to the given value.
     ///
     /// 
-    /// An index of the first entity to retrieve. Use this parameter as a pagination mechanism along with the max-results parameter.    
+    /// An index of the first entity to retrieve. Use this parameter as a pagination mechanism along with the max-results parameter.
     pub fn start_index(mut self, new_value: i32) -> ManagementFilterListCall<'a, C, NC, A> {
         self._start_index = Some(new_value);
         self
@@ -22964,7 +23373,7 @@ impl<'a, C, NC, A> ManagementFilterListCall<'a, C, NC, A> where NC: hyper::net::
     /// Sets the *max-results* query property to the given value.
     ///
     /// 
-    /// The maximum number of filters to include in this response.    
+    /// The maximum number of filters to include in this response.
     pub fn max_results(mut self, new_value: i32) -> ManagementFilterListCall<'a, C, NC, A> {
         self._max_results = Some(new_value);
         self
@@ -23025,7 +23434,7 @@ impl<'a, C, NC, A> ManagementFilterListCall<'a, C, NC, A> where NC: hyper::net::
 /// Delete a filter.
 ///
 /// A builder for the *filters.delete* method supported by a *management* resource.
-/// It is not used directly, but through a `ManagementMethods`.
+/// It is not used directly, but through a `ManagementMethods` instance.
 ///
 /// # Example
 ///
@@ -23085,7 +23494,7 @@ impl<'a, C, NC, A> ManagementFilterDeleteCall<'a, C, NC, A> where NC: hyper::net
         for &field in ["alt", "accountId", "filterId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -23138,7 +23547,7 @@ impl<'a, C, NC, A> ManagementFilterDeleteCall<'a, C, NC, A> where NC: hyper::net
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -23150,7 +23559,6 @@ impl<'a, C, NC, A> ManagementFilterDeleteCall<'a, C, NC, A> where NC: hyper::net
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -23160,7 +23568,7 @@ impl<'a, C, NC, A> ManagementFilterDeleteCall<'a, C, NC, A> where NC: hyper::net
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -23171,7 +23579,7 @@ impl<'a, C, NC, A> ManagementFilterDeleteCall<'a, C, NC, A> where NC: hyper::net
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -23180,13 +23588,13 @@ impl<'a, C, NC, A> ManagementFilterDeleteCall<'a, C, NC, A> where NC: hyper::net
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -23198,7 +23606,7 @@ impl<'a, C, NC, A> ManagementFilterDeleteCall<'a, C, NC, A> where NC: hyper::net
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Account ID to delete the filter for.    
+    /// Account ID to delete the filter for.
     pub fn account_id(mut self, new_value: &str) -> ManagementFilterDeleteCall<'a, C, NC, A> {
         self._account_id = new_value.to_string();
         self
@@ -23208,7 +23616,7 @@ impl<'a, C, NC, A> ManagementFilterDeleteCall<'a, C, NC, A> where NC: hyper::net
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// ID of the filter to be deleted.    
+    /// ID of the filter to be deleted.
     pub fn filter_id(mut self, new_value: &str) -> ManagementFilterDeleteCall<'a, C, NC, A> {
         self._filter_id = new_value.to_string();
         self
@@ -23269,7 +23677,7 @@ impl<'a, C, NC, A> ManagementFilterDeleteCall<'a, C, NC, A> where NC: hyper::net
 /// Create a new view (profile).
 ///
 /// A builder for the *profiles.insert* method supported by a *management* resource.
-/// It is not used directly, but through a `ManagementMethods`.
+/// It is not used directly, but through a `ManagementMethods` instance.
 ///
 /// # Example
 ///
@@ -23336,7 +23744,7 @@ impl<'a, C, NC, A> ManagementProfileInsertCall<'a, C, NC, A> where NC: hyper::ne
         for &field in ["alt", "accountId", "webPropertyId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -23393,7 +23801,7 @@ impl<'a, C, NC, A> ManagementProfileInsertCall<'a, C, NC, A> where NC: hyper::ne
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -23409,7 +23817,6 @@ impl<'a, C, NC, A> ManagementProfileInsertCall<'a, C, NC, A> where NC: hyper::ne
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -23419,7 +23826,7 @@ impl<'a, C, NC, A> ManagementProfileInsertCall<'a, C, NC, A> where NC: hyper::ne
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -23430,7 +23837,7 @@ impl<'a, C, NC, A> ManagementProfileInsertCall<'a, C, NC, A> where NC: hyper::ne
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -23439,13 +23846,13 @@ impl<'a, C, NC, A> ManagementProfileInsertCall<'a, C, NC, A> where NC: hyper::ne
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -23466,7 +23873,7 @@ impl<'a, C, NC, A> ManagementProfileInsertCall<'a, C, NC, A> where NC: hyper::ne
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Account ID to create the view (profile) for.    
+    /// Account ID to create the view (profile) for.
     pub fn account_id(mut self, new_value: &str) -> ManagementProfileInsertCall<'a, C, NC, A> {
         self._account_id = new_value.to_string();
         self
@@ -23476,7 +23883,7 @@ impl<'a, C, NC, A> ManagementProfileInsertCall<'a, C, NC, A> where NC: hyper::ne
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Web property ID to create the view (profile) for.    
+    /// Web property ID to create the view (profile) for.
     pub fn web_property_id(mut self, new_value: &str) -> ManagementProfileInsertCall<'a, C, NC, A> {
         self._web_property_id = new_value.to_string();
         self
@@ -23537,7 +23944,7 @@ impl<'a, C, NC, A> ManagementProfileInsertCall<'a, C, NC, A> where NC: hyper::ne
 /// Removes a user from the given account.
 ///
 /// A builder for the *accountUserLinks.delete* method supported by a *management* resource.
-/// It is not used directly, but through a `ManagementMethods`.
+/// It is not used directly, but through a `ManagementMethods` instance.
 ///
 /// # Example
 ///
@@ -23597,7 +24004,7 @@ impl<'a, C, NC, A> ManagementAccountUserLinkDeleteCall<'a, C, NC, A> where NC: h
         for &field in ["accountId", "linkId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -23649,7 +24056,7 @@ impl<'a, C, NC, A> ManagementAccountUserLinkDeleteCall<'a, C, NC, A> where NC: h
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -23661,7 +24068,6 @@ impl<'a, C, NC, A> ManagementAccountUserLinkDeleteCall<'a, C, NC, A> where NC: h
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -23671,7 +24077,7 @@ impl<'a, C, NC, A> ManagementAccountUserLinkDeleteCall<'a, C, NC, A> where NC: h
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -23682,12 +24088,12 @@ impl<'a, C, NC, A> ManagementAccountUserLinkDeleteCall<'a, C, NC, A> where NC: h
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = res;
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -23699,7 +24105,7 @@ impl<'a, C, NC, A> ManagementAccountUserLinkDeleteCall<'a, C, NC, A> where NC: h
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Account ID to delete the user link for.    
+    /// Account ID to delete the user link for.
     pub fn account_id(mut self, new_value: &str) -> ManagementAccountUserLinkDeleteCall<'a, C, NC, A> {
         self._account_id = new_value.to_string();
         self
@@ -23709,7 +24115,7 @@ impl<'a, C, NC, A> ManagementAccountUserLinkDeleteCall<'a, C, NC, A> where NC: h
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Link ID to delete the user link for.    
+    /// Link ID to delete the user link for.
     pub fn link_id(mut self, new_value: &str) -> ManagementAccountUserLinkDeleteCall<'a, C, NC, A> {
         self._link_id = new_value.to_string();
         self
@@ -23770,7 +24176,7 @@ impl<'a, C, NC, A> ManagementAccountUserLinkDeleteCall<'a, C, NC, A> where NC: h
 /// Updates an existing view (profile).
 ///
 /// A builder for the *profiles.update* method supported by a *management* resource.
-/// It is not used directly, but through a `ManagementMethods`.
+/// It is not used directly, but through a `ManagementMethods` instance.
 ///
 /// # Example
 ///
@@ -23839,7 +24245,7 @@ impl<'a, C, NC, A> ManagementProfileUpdateCall<'a, C, NC, A> where NC: hyper::ne
         for &field in ["alt", "accountId", "webPropertyId", "profileId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -23896,7 +24302,7 @@ impl<'a, C, NC, A> ManagementProfileUpdateCall<'a, C, NC, A> where NC: hyper::ne
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -23912,7 +24318,6 @@ impl<'a, C, NC, A> ManagementProfileUpdateCall<'a, C, NC, A> where NC: hyper::ne
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -23922,7 +24327,7 @@ impl<'a, C, NC, A> ManagementProfileUpdateCall<'a, C, NC, A> where NC: hyper::ne
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -23933,7 +24338,7 @@ impl<'a, C, NC, A> ManagementProfileUpdateCall<'a, C, NC, A> where NC: hyper::ne
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -23942,13 +24347,13 @@ impl<'a, C, NC, A> ManagementProfileUpdateCall<'a, C, NC, A> where NC: hyper::ne
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -23969,7 +24374,7 @@ impl<'a, C, NC, A> ManagementProfileUpdateCall<'a, C, NC, A> where NC: hyper::ne
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Account ID to which the view (profile) belongs    
+    /// Account ID to which the view (profile) belongs
     pub fn account_id(mut self, new_value: &str) -> ManagementProfileUpdateCall<'a, C, NC, A> {
         self._account_id = new_value.to_string();
         self
@@ -23979,7 +24384,7 @@ impl<'a, C, NC, A> ManagementProfileUpdateCall<'a, C, NC, A> where NC: hyper::ne
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Web property ID to which the view (profile) belongs    
+    /// Web property ID to which the view (profile) belongs
     pub fn web_property_id(mut self, new_value: &str) -> ManagementProfileUpdateCall<'a, C, NC, A> {
         self._web_property_id = new_value.to_string();
         self
@@ -23989,7 +24394,7 @@ impl<'a, C, NC, A> ManagementProfileUpdateCall<'a, C, NC, A> where NC: hyper::ne
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// ID of the view (profile) to be updated.    
+    /// ID of the view (profile) to be updated.
     pub fn profile_id(mut self, new_value: &str) -> ManagementProfileUpdateCall<'a, C, NC, A> {
         self._profile_id = new_value.to_string();
         self
@@ -24050,7 +24455,7 @@ impl<'a, C, NC, A> ManagementProfileUpdateCall<'a, C, NC, A> where NC: hyper::ne
 /// Returns a single profile filter link.
 ///
 /// A builder for the *profileFilterLinks.get* method supported by a *management* resource.
-/// It is not used directly, but through a `ManagementMethods`.
+/// It is not used directly, but through a `ManagementMethods` instance.
 ///
 /// # Example
 ///
@@ -24114,7 +24519,7 @@ impl<'a, C, NC, A> ManagementProfileFilterLinkGetCall<'a, C, NC, A> where NC: hy
         for &field in ["alt", "accountId", "webPropertyId", "profileId", "linkId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -24167,7 +24572,7 @@ impl<'a, C, NC, A> ManagementProfileFilterLinkGetCall<'a, C, NC, A> where NC: hy
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -24179,7 +24584,6 @@ impl<'a, C, NC, A> ManagementProfileFilterLinkGetCall<'a, C, NC, A> where NC: hy
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -24189,7 +24593,7 @@ impl<'a, C, NC, A> ManagementProfileFilterLinkGetCall<'a, C, NC, A> where NC: hy
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -24200,7 +24604,7 @@ impl<'a, C, NC, A> ManagementProfileFilterLinkGetCall<'a, C, NC, A> where NC: hy
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -24209,13 +24613,13 @@ impl<'a, C, NC, A> ManagementProfileFilterLinkGetCall<'a, C, NC, A> where NC: hy
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -24227,7 +24631,7 @@ impl<'a, C, NC, A> ManagementProfileFilterLinkGetCall<'a, C, NC, A> where NC: hy
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Account ID to retrieve profile filter link for.    
+    /// Account ID to retrieve profile filter link for.
     pub fn account_id(mut self, new_value: &str) -> ManagementProfileFilterLinkGetCall<'a, C, NC, A> {
         self._account_id = new_value.to_string();
         self
@@ -24237,7 +24641,7 @@ impl<'a, C, NC, A> ManagementProfileFilterLinkGetCall<'a, C, NC, A> where NC: hy
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Web property Id to retrieve profile filter link for.    
+    /// Web property Id to retrieve profile filter link for.
     pub fn web_property_id(mut self, new_value: &str) -> ManagementProfileFilterLinkGetCall<'a, C, NC, A> {
         self._web_property_id = new_value.to_string();
         self
@@ -24247,7 +24651,7 @@ impl<'a, C, NC, A> ManagementProfileFilterLinkGetCall<'a, C, NC, A> where NC: hy
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Profile ID to retrieve filter link for.    
+    /// Profile ID to retrieve filter link for.
     pub fn profile_id(mut self, new_value: &str) -> ManagementProfileFilterLinkGetCall<'a, C, NC, A> {
         self._profile_id = new_value.to_string();
         self
@@ -24257,7 +24661,7 @@ impl<'a, C, NC, A> ManagementProfileFilterLinkGetCall<'a, C, NC, A> where NC: hy
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// ID of the profile filter link.    
+    /// ID of the profile filter link.
     pub fn link_id(mut self, new_value: &str) -> ManagementProfileFilterLinkGetCall<'a, C, NC, A> {
         self._link_id = new_value.to_string();
         self
@@ -24318,7 +24722,7 @@ impl<'a, C, NC, A> ManagementProfileFilterLinkGetCall<'a, C, NC, A> where NC: hy
 /// Returns Analytics Multi-Channel Funnels data for a view (profile).
 ///
 /// A builder for the *mcf.get* method supported by a *data* resource.
-/// It is not used directly, but through a `DataMethods`.
+/// It is not used directly, but through a `DataMethods` instance.
 ///
 /// # Example
 ///
@@ -24412,7 +24816,7 @@ impl<'a, C, NC, A> DataMcfGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
         for &field in ["alt", "ids", "start-date", "end-date", "metrics", "start-index", "sort", "samplingLevel", "max-results", "filters", "dimensions"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -24441,7 +24845,7 @@ impl<'a, C, NC, A> DataMcfGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -24453,7 +24857,6 @@ impl<'a, C, NC, A> DataMcfGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -24463,7 +24866,7 @@ impl<'a, C, NC, A> DataMcfGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -24474,7 +24877,7 @@ impl<'a, C, NC, A> DataMcfGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -24483,13 +24886,13 @@ impl<'a, C, NC, A> DataMcfGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -24501,7 +24904,7 @@ impl<'a, C, NC, A> DataMcfGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Unique table ID for retrieving Analytics data. Table ID is of the form ga:XXXX, where XXXX is the Analytics view (profile) ID.    
+    /// Unique table ID for retrieving Analytics data. Table ID is of the form ga:XXXX, where XXXX is the Analytics view (profile) ID.
     pub fn ids(mut self, new_value: &str) -> DataMcfGetCall<'a, C, NC, A> {
         self._ids = new_value.to_string();
         self
@@ -24511,7 +24914,7 @@ impl<'a, C, NC, A> DataMcfGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Start date for fetching Analytics data. Requests can specify a start date formatted as YYYY-MM-DD, or as a relative date (e.g., today, yesterday, or 7daysAgo). The default value is 7daysAgo.    
+    /// Start date for fetching Analytics data. Requests can specify a start date formatted as YYYY-MM-DD, or as a relative date (e.g., today, yesterday, or 7daysAgo). The default value is 7daysAgo.
     pub fn start_date(mut self, new_value: &str) -> DataMcfGetCall<'a, C, NC, A> {
         self._start_date = new_value.to_string();
         self
@@ -24521,7 +24924,7 @@ impl<'a, C, NC, A> DataMcfGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// End date for fetching Analytics data. Requests can specify a start date formatted as YYYY-MM-DD, or as a relative date (e.g., today, yesterday, or 7daysAgo). The default value is 7daysAgo.    
+    /// End date for fetching Analytics data. Requests can specify a start date formatted as YYYY-MM-DD, or as a relative date (e.g., today, yesterday, or 7daysAgo). The default value is 7daysAgo.
     pub fn end_date(mut self, new_value: &str) -> DataMcfGetCall<'a, C, NC, A> {
         self._end_date = new_value.to_string();
         self
@@ -24531,7 +24934,7 @@ impl<'a, C, NC, A> DataMcfGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// A comma-separated list of Multi-Channel Funnels metrics. E.g., 'mcf:totalConversions,mcf:totalConversionValue'. At least one metric must be specified.    
+    /// A comma-separated list of Multi-Channel Funnels metrics. E.g., 'mcf:totalConversions,mcf:totalConversionValue'. At least one metric must be specified.
     pub fn metrics(mut self, new_value: &str) -> DataMcfGetCall<'a, C, NC, A> {
         self._metrics = new_value.to_string();
         self
@@ -24539,7 +24942,7 @@ impl<'a, C, NC, A> DataMcfGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// Sets the *start-index* query property to the given value.
     ///
     /// 
-    /// An index of the first entity to retrieve. Use this parameter as a pagination mechanism along with the max-results parameter.    
+    /// An index of the first entity to retrieve. Use this parameter as a pagination mechanism along with the max-results parameter.
     pub fn start_index(mut self, new_value: i32) -> DataMcfGetCall<'a, C, NC, A> {
         self._start_index = Some(new_value);
         self
@@ -24547,7 +24950,7 @@ impl<'a, C, NC, A> DataMcfGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// Sets the *sort* query property to the given value.
     ///
     /// 
-    /// A comma-separated list of dimensions or metrics that determine the sort order for the Analytics data.    
+    /// A comma-separated list of dimensions or metrics that determine the sort order for the Analytics data.
     pub fn sort(mut self, new_value: &str) -> DataMcfGetCall<'a, C, NC, A> {
         self._sort = Some(new_value.to_string());
         self
@@ -24555,7 +24958,7 @@ impl<'a, C, NC, A> DataMcfGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// Sets the *sampling level* query property to the given value.
     ///
     /// 
-    /// The desired sampling level.    
+    /// The desired sampling level.
     pub fn sampling_level(mut self, new_value: &str) -> DataMcfGetCall<'a, C, NC, A> {
         self._sampling_level = Some(new_value.to_string());
         self
@@ -24563,7 +24966,7 @@ impl<'a, C, NC, A> DataMcfGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// Sets the *max-results* query property to the given value.
     ///
     /// 
-    /// The maximum number of entries to include in this feed.    
+    /// The maximum number of entries to include in this feed.
     pub fn max_results(mut self, new_value: i32) -> DataMcfGetCall<'a, C, NC, A> {
         self._max_results = Some(new_value);
         self
@@ -24571,7 +24974,7 @@ impl<'a, C, NC, A> DataMcfGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// Sets the *filters* query property to the given value.
     ///
     /// 
-    /// A comma-separated list of dimension or metric filters to be applied to the Analytics data.    
+    /// A comma-separated list of dimension or metric filters to be applied to the Analytics data.
     pub fn filters(mut self, new_value: &str) -> DataMcfGetCall<'a, C, NC, A> {
         self._filters = Some(new_value.to_string());
         self
@@ -24579,7 +24982,7 @@ impl<'a, C, NC, A> DataMcfGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// Sets the *dimensions* query property to the given value.
     ///
     /// 
-    /// A comma-separated list of Multi-Channel Funnels dimensions. E.g., 'mcf:source,mcf:medium'.    
+    /// A comma-separated list of Multi-Channel Funnels dimensions. E.g., 'mcf:source,mcf:medium'.
     pub fn dimensions(mut self, new_value: &str) -> DataMcfGetCall<'a, C, NC, A> {
         self._dimensions = Some(new_value.to_string());
         self
@@ -24640,7 +25043,7 @@ impl<'a, C, NC, A> DataMcfGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
 /// Returns Analytics data for a view (profile).
 ///
 /// A builder for the *ga.get* method supported by a *data* resource.
-/// It is not used directly, but through a `DataMethods`.
+/// It is not used directly, but through a `DataMethods` instance.
 ///
 /// # Example
 ///
@@ -24744,7 +25147,7 @@ impl<'a, C, NC, A> DataGaGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
         for &field in ["alt", "ids", "start-date", "end-date", "metrics", "start-index", "sort", "segment", "samplingLevel", "output", "max-results", "filters", "dimensions"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -24773,7 +25176,7 @@ impl<'a, C, NC, A> DataGaGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -24785,7 +25188,6 @@ impl<'a, C, NC, A> DataGaGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -24795,7 +25197,7 @@ impl<'a, C, NC, A> DataGaGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -24806,7 +25208,7 @@ impl<'a, C, NC, A> DataGaGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -24815,13 +25217,13 @@ impl<'a, C, NC, A> DataGaGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -24833,7 +25235,7 @@ impl<'a, C, NC, A> DataGaGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Unique table ID for retrieving Analytics data. Table ID is of the form ga:XXXX, where XXXX is the Analytics view (profile) ID.    
+    /// Unique table ID for retrieving Analytics data. Table ID is of the form ga:XXXX, where XXXX is the Analytics view (profile) ID.
     pub fn ids(mut self, new_value: &str) -> DataGaGetCall<'a, C, NC, A> {
         self._ids = new_value.to_string();
         self
@@ -24843,7 +25245,7 @@ impl<'a, C, NC, A> DataGaGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Start date for fetching Analytics data. Requests can specify a start date formatted as YYYY-MM-DD, or as a relative date (e.g., today, yesterday, or 7daysAgo). The default value is 7daysAgo.    
+    /// Start date for fetching Analytics data. Requests can specify a start date formatted as YYYY-MM-DD, or as a relative date (e.g., today, yesterday, or 7daysAgo). The default value is 7daysAgo.
     pub fn start_date(mut self, new_value: &str) -> DataGaGetCall<'a, C, NC, A> {
         self._start_date = new_value.to_string();
         self
@@ -24853,7 +25255,7 @@ impl<'a, C, NC, A> DataGaGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// End date for fetching Analytics data. Request can should specify an end date formatted as YYYY-MM-DD, or as a relative date (e.g., today, yesterday, or 7daysAgo). The default value is yesterday.    
+    /// End date for fetching Analytics data. Request can should specify an end date formatted as YYYY-MM-DD, or as a relative date (e.g., today, yesterday, or 7daysAgo). The default value is yesterday.
     pub fn end_date(mut self, new_value: &str) -> DataGaGetCall<'a, C, NC, A> {
         self._end_date = new_value.to_string();
         self
@@ -24863,7 +25265,7 @@ impl<'a, C, NC, A> DataGaGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// A comma-separated list of Analytics metrics. E.g., 'ga:sessions,ga:pageviews'. At least one metric must be specified.    
+    /// A comma-separated list of Analytics metrics. E.g., 'ga:sessions,ga:pageviews'. At least one metric must be specified.
     pub fn metrics(mut self, new_value: &str) -> DataGaGetCall<'a, C, NC, A> {
         self._metrics = new_value.to_string();
         self
@@ -24871,7 +25273,7 @@ impl<'a, C, NC, A> DataGaGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     /// Sets the *start-index* query property to the given value.
     ///
     /// 
-    /// An index of the first entity to retrieve. Use this parameter as a pagination mechanism along with the max-results parameter.    
+    /// An index of the first entity to retrieve. Use this parameter as a pagination mechanism along with the max-results parameter.
     pub fn start_index(mut self, new_value: i32) -> DataGaGetCall<'a, C, NC, A> {
         self._start_index = Some(new_value);
         self
@@ -24879,7 +25281,7 @@ impl<'a, C, NC, A> DataGaGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     /// Sets the *sort* query property to the given value.
     ///
     /// 
-    /// A comma-separated list of dimensions or metrics that determine the sort order for Analytics data.    
+    /// A comma-separated list of dimensions or metrics that determine the sort order for Analytics data.
     pub fn sort(mut self, new_value: &str) -> DataGaGetCall<'a, C, NC, A> {
         self._sort = Some(new_value.to_string());
         self
@@ -24887,7 +25289,7 @@ impl<'a, C, NC, A> DataGaGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     /// Sets the *segment* query property to the given value.
     ///
     /// 
-    /// An Analytics segment to be applied to data.    
+    /// An Analytics segment to be applied to data.
     pub fn segment(mut self, new_value: &str) -> DataGaGetCall<'a, C, NC, A> {
         self._segment = Some(new_value.to_string());
         self
@@ -24895,7 +25297,7 @@ impl<'a, C, NC, A> DataGaGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     /// Sets the *sampling level* query property to the given value.
     ///
     /// 
-    /// The desired sampling level.    
+    /// The desired sampling level.
     pub fn sampling_level(mut self, new_value: &str) -> DataGaGetCall<'a, C, NC, A> {
         self._sampling_level = Some(new_value.to_string());
         self
@@ -24903,7 +25305,7 @@ impl<'a, C, NC, A> DataGaGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     /// Sets the *output* query property to the given value.
     ///
     /// 
-    /// The selected format for the response. Default format is JSON.    
+    /// The selected format for the response. Default format is JSON.
     pub fn output(mut self, new_value: &str) -> DataGaGetCall<'a, C, NC, A> {
         self._output = Some(new_value.to_string());
         self
@@ -24911,7 +25313,7 @@ impl<'a, C, NC, A> DataGaGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     /// Sets the *max-results* query property to the given value.
     ///
     /// 
-    /// The maximum number of entries to include in this feed.    
+    /// The maximum number of entries to include in this feed.
     pub fn max_results(mut self, new_value: i32) -> DataGaGetCall<'a, C, NC, A> {
         self._max_results = Some(new_value);
         self
@@ -24919,7 +25321,7 @@ impl<'a, C, NC, A> DataGaGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     /// Sets the *filters* query property to the given value.
     ///
     /// 
-    /// A comma-separated list of dimension or metric filters to be applied to Analytics data.    
+    /// A comma-separated list of dimension or metric filters to be applied to Analytics data.
     pub fn filters(mut self, new_value: &str) -> DataGaGetCall<'a, C, NC, A> {
         self._filters = Some(new_value.to_string());
         self
@@ -24927,7 +25329,7 @@ impl<'a, C, NC, A> DataGaGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     /// Sets the *dimensions* query property to the given value.
     ///
     /// 
-    /// A comma-separated list of Analytics dimensions. E.g., 'ga:browser,ga:city'.    
+    /// A comma-separated list of Analytics dimensions. E.g., 'ga:browser,ga:city'.
     pub fn dimensions(mut self, new_value: &str) -> DataGaGetCall<'a, C, NC, A> {
         self._dimensions = Some(new_value.to_string());
         self
@@ -24988,7 +25390,7 @@ impl<'a, C, NC, A> DataGaGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
 /// Returns real time data for a view (profile).
 ///
 /// A builder for the *realtime.get* method supported by a *data* resource.
-/// It is not used directly, but through a `DataMethods`.
+/// It is not used directly, but through a `DataMethods` instance.
 ///
 /// # Example
 ///
@@ -25068,7 +25470,7 @@ impl<'a, C, NC, A> DataRealtimeGetCall<'a, C, NC, A> where NC: hyper::net::Netwo
         for &field in ["alt", "ids", "metrics", "sort", "max-results", "filters", "dimensions"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -25097,7 +25499,7 @@ impl<'a, C, NC, A> DataRealtimeGetCall<'a, C, NC, A> where NC: hyper::net::Netwo
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -25109,7 +25511,6 @@ impl<'a, C, NC, A> DataRealtimeGetCall<'a, C, NC, A> where NC: hyper::net::Netwo
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -25119,7 +25520,7 @@ impl<'a, C, NC, A> DataRealtimeGetCall<'a, C, NC, A> where NC: hyper::net::Netwo
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -25130,7 +25531,7 @@ impl<'a, C, NC, A> DataRealtimeGetCall<'a, C, NC, A> where NC: hyper::net::Netwo
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -25139,13 +25540,13 @@ impl<'a, C, NC, A> DataRealtimeGetCall<'a, C, NC, A> where NC: hyper::net::Netwo
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -25157,7 +25558,7 @@ impl<'a, C, NC, A> DataRealtimeGetCall<'a, C, NC, A> where NC: hyper::net::Netwo
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Unique table ID for retrieving real time data. Table ID is of the form ga:XXXX, where XXXX is the Analytics view (profile) ID.    
+    /// Unique table ID for retrieving real time data. Table ID is of the form ga:XXXX, where XXXX is the Analytics view (profile) ID.
     pub fn ids(mut self, new_value: &str) -> DataRealtimeGetCall<'a, C, NC, A> {
         self._ids = new_value.to_string();
         self
@@ -25167,7 +25568,7 @@ impl<'a, C, NC, A> DataRealtimeGetCall<'a, C, NC, A> where NC: hyper::net::Netwo
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// A comma-separated list of real time metrics. E.g., 'rt:activeUsers'. At least one metric must be specified.    
+    /// A comma-separated list of real time metrics. E.g., 'rt:activeUsers'. At least one metric must be specified.
     pub fn metrics(mut self, new_value: &str) -> DataRealtimeGetCall<'a, C, NC, A> {
         self._metrics = new_value.to_string();
         self
@@ -25175,7 +25576,7 @@ impl<'a, C, NC, A> DataRealtimeGetCall<'a, C, NC, A> where NC: hyper::net::Netwo
     /// Sets the *sort* query property to the given value.
     ///
     /// 
-    /// A comma-separated list of dimensions or metrics that determine the sort order for real time data.    
+    /// A comma-separated list of dimensions or metrics that determine the sort order for real time data.
     pub fn sort(mut self, new_value: &str) -> DataRealtimeGetCall<'a, C, NC, A> {
         self._sort = Some(new_value.to_string());
         self
@@ -25183,7 +25584,7 @@ impl<'a, C, NC, A> DataRealtimeGetCall<'a, C, NC, A> where NC: hyper::net::Netwo
     /// Sets the *max-results* query property to the given value.
     ///
     /// 
-    /// The maximum number of entries to include in this feed.    
+    /// The maximum number of entries to include in this feed.
     pub fn max_results(mut self, new_value: i32) -> DataRealtimeGetCall<'a, C, NC, A> {
         self._max_results = Some(new_value);
         self
@@ -25191,7 +25592,7 @@ impl<'a, C, NC, A> DataRealtimeGetCall<'a, C, NC, A> where NC: hyper::net::Netwo
     /// Sets the *filters* query property to the given value.
     ///
     /// 
-    /// A comma-separated list of dimension or metric filters to be applied to real time data.    
+    /// A comma-separated list of dimension or metric filters to be applied to real time data.
     pub fn filters(mut self, new_value: &str) -> DataRealtimeGetCall<'a, C, NC, A> {
         self._filters = Some(new_value.to_string());
         self
@@ -25199,7 +25600,7 @@ impl<'a, C, NC, A> DataRealtimeGetCall<'a, C, NC, A> where NC: hyper::net::Netwo
     /// Sets the *dimensions* query property to the given value.
     ///
     /// 
-    /// A comma-separated list of real time dimensions. E.g., 'rt:medium,rt:city'.    
+    /// A comma-separated list of real time dimensions. E.g., 'rt:medium,rt:city'.
     pub fn dimensions(mut self, new_value: &str) -> DataRealtimeGetCall<'a, C, NC, A> {
         self._dimensions = Some(new_value.to_string());
         self
@@ -25260,7 +25661,7 @@ impl<'a, C, NC, A> DataRealtimeGetCall<'a, C, NC, A> where NC: hyper::net::Netwo
 /// Creates an account ticket.
 ///
 /// A builder for the *createAccountTicket* method supported by a *provisioning* resource.
-/// It is not used directly, but through a `ProvisioningMethods`.
+/// It is not used directly, but through a `ProvisioningMethods` instance.
 ///
 /// # Example
 ///
@@ -25323,7 +25724,7 @@ impl<'a, C, NC, A> ProvisioningCreateAccountTicketCall<'a, C, NC, A> where NC: h
         for &field in ["alt"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -25356,7 +25757,7 @@ impl<'a, C, NC, A> ProvisioningCreateAccountTicketCall<'a, C, NC, A> where NC: h
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -25372,7 +25773,6 @@ impl<'a, C, NC, A> ProvisioningCreateAccountTicketCall<'a, C, NC, A> where NC: h
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -25382,7 +25782,7 @@ impl<'a, C, NC, A> ProvisioningCreateAccountTicketCall<'a, C, NC, A> where NC: h
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -25393,7 +25793,7 @@ impl<'a, C, NC, A> ProvisioningCreateAccountTicketCall<'a, C, NC, A> where NC: h
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -25402,13 +25802,13 @@ impl<'a, C, NC, A> ProvisioningCreateAccountTicketCall<'a, C, NC, A> where NC: h
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -25480,7 +25880,7 @@ impl<'a, C, NC, A> ProvisioningCreateAccountTicketCall<'a, C, NC, A> where NC: h
 /// Lists all columns for a report type
 ///
 /// A builder for the *columns.list* method supported by a *metadata* resource.
-/// It is not used directly, but through a `MetadataMethods`.
+/// It is not used directly, but through a `MetadataMethods` instance.
 ///
 /// # Example
 ///
@@ -25538,7 +25938,7 @@ impl<'a, C, NC, A> MetadataColumnListCall<'a, C, NC, A> where NC: hyper::net::Ne
         for &field in ["alt", "reportType"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -25591,7 +25991,7 @@ impl<'a, C, NC, A> MetadataColumnListCall<'a, C, NC, A> where NC: hyper::net::Ne
             }
             if token.is_none() {
                 dlg.finished(false);
-                return Result::MissingToken
+                return Err(Error::MissingToken)
             }
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.unwrap().access_token });
@@ -25603,7 +26003,6 @@ impl<'a, C, NC, A> MetadataColumnListCall<'a, C, NC, A> where NC: hyper::net::Ne
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -25613,7 +26012,7 @@ impl<'a, C, NC, A> MetadataColumnListCall<'a, C, NC, A> where NC: hyper::net::Ne
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -25624,7 +26023,7 @@ impl<'a, C, NC, A> MetadataColumnListCall<'a, C, NC, A> where NC: hyper::net::Ne
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -25633,13 +26032,13 @@ impl<'a, C, NC, A> MetadataColumnListCall<'a, C, NC, A> where NC: hyper::net::Ne
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -25651,7 +26050,7 @@ impl<'a, C, NC, A> MetadataColumnListCall<'a, C, NC, A> where NC: hyper::net::Ne
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Report type. Allowed Values: 'ga'. Where 'ga' corresponds to the Core Reporting API    
+    /// Report type. Allowed Values: 'ga'. Where 'ga' corresponds to the Core Reporting API
     pub fn report_type(mut self, new_value: &str) -> MetadataColumnListCall<'a, C, NC, A> {
         self._report_type = new_value.to_string();
         self

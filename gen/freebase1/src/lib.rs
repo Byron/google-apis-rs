@@ -1,8 +1,8 @@
 // DO NOT EDIT !
-// This file was generated automatically from 'src/mako/lib.rs.mako'
+// This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *freebase* crate version *0.1.1+20150313*, where *20150313* is the exact revision of the *freebase:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.1*.
+//! This documentation was generated from *freebase* crate version *0.1.2+20150313*, where *20150313* is the exact revision of the *freebase:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.2*.
 //! 
 //! Everything else about the *freebase* *v1* API can be found at the
 //! [official documentation site](https://developers.google.com/freebase/).
@@ -29,6 +29,8 @@
 //! 
 //! * **[Hub](struct.Freebase.html)**
 //!     * a central object to maintain state and allow accessing all *Activities*
+//!     * creates [*Method Builders*](trait.MethodsBuilder.html) which in turn
+//!       allow access to individual [*Call Builders*](trait.CallBuilder.html)
 //! * **[Resources](trait.Resource.html)**
 //!     * primary types that you can apply *Activities* to
 //!     * a collection of properties and *Parts*
@@ -37,6 +39,8 @@
 //!         * never directly used in *Activities*
 //! * **[Activities](trait.CallBuilder.html)**
 //!     * operations to apply to *Resources*
+//! 
+//! All *structures* are marked with applicable traits to further categorize them and ease browsing.
 //! 
 //! Generally speaking, you can invoke *Activities* like this:
 //! 
@@ -72,7 +76,7 @@
 //! extern crate hyper;
 //! extern crate "yup-oauth2" as oauth2;
 //! extern crate "google-freebase1" as freebase1;
-//! use freebase1::Result;
+//! use freebase1::{Result, Error};
 //! # #[test] fn egal() {
 //! use std::default::Default;
 //! use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -103,15 +107,17 @@
 //!              .doit();
 //! 
 //! match result {
-//!     Result::HttpError(err) => println!("HTTPERROR: {:?}", err),
-//!     Result::MissingAPIKey => println!("Auth: Missing API Key - used if there are no scopes"),
-//!     Result::MissingToken => println!("OAuth2: Missing Token"),
-//!     Result::Cancelled => println!("Operation cancelled by user"),
-//!     Result::UploadSizeLimitExceeded(size, max_size) => println!("Upload size too big: {} of {}", size, max_size),
-//!     Result::Failure(_) => println!("General Failure (hyper::client::Response doesn't print)"),
-//!     Result::FieldClash(clashed_field) => println!("You added custom parameter which is part of builder: {:?}", clashed_field),
-//!     Result::JsonDecodeError(err) => println!("Couldn't understand server reply - maybe API needs update: {:?}", err),
-//!     Result::Success(_) => println!("Success (value doesn't print)"),
+//!     Err(e) => match e {
+//!         Error::HttpError(err) => println!("HTTPERROR: {:?}", err),
+//!         Error::MissingAPIKey => println!("Auth: Missing API Key - used if there are no scopes"),
+//!         Error::MissingToken => println!("OAuth2: Missing Token"),
+//!         Error::Cancelled => println!("Operation canceled by user"),
+//!         Error::UploadSizeLimitExceeded(size, max_size) => println!("Upload size too big: {} of {}", size, max_size),
+//!         Error::Failure(_) => println!("General Failure (hyper::client::Response doesn't print)"),
+//!         Error::FieldClash(clashed_field) => println!("You added custom parameter which is part of builder: {:?}", clashed_field),
+//!         Error::JsonDecodeError(err) => println!("Couldn't understand server reply - maybe API needs update: {:?}", err),
+//!     },
+//!     Ok(_) => println!("Success (value doesn't print)"),
 //! }
 //! # }
 //! ```
@@ -124,7 +130,7 @@
 //! When delegates handle errors or intermediate values, they may have a chance to instruct the system to retry. This 
 //! makes the system potentially resilient to all kinds of errors.
 //! 
-//! ## Uploads and Downlods
+//! ## Uploads and Downloads
 //! If a method supports downloads, the response body, which is part of the [Result](enum.Result.html), should be
 //! read by you to obtain the media.
 //! If such a method also supports a [Response Result](trait.ResponseResult.html), it will return that by default.
@@ -147,8 +153,9 @@
 //! ## Optional Parts in Server-Requests
 //! 
 //! All structures provided by this library are made to be [enocodable](trait.RequestValue.html) and 
-//! [decodable](trait.ResponseResult.html) via json. Optionals are used to indicate that partial requests are responses are valid.
-//! Most optionals are are considered [Parts](trait.Part.html) which are identifyable by name, which will be sent to 
+//! [decodable](trait.ResponseResult.html) via *json*. Optionals are used to indicate that partial requests are responses 
+//! are valid.
+//! Most optionals are are considered [Parts](trait.Part.html) which are identifiable by name, which will be sent to 
 //! the server to indicate either the set parts of the request or the desired parts in the response.
 //! 
 //! ## Builder Arguments
@@ -197,7 +204,7 @@ use std::io;
 use std::fs;
 use std::thread::sleep;
 
-pub use cmn::{MultiPartReader, ToParts, MethodInfo, Result, CallBuilder, Hub, ReadSeek, Part, ResponseResult, RequestValue, NestedType, Delegate, DefaultDelegate, ResourceMethodsBuilder, Resource, JsonServerError};
+pub use cmn::{MultiPartReader, ToParts, MethodInfo, Result, Error, CallBuilder, Hub, ReadSeek, Part, ResponseResult, RequestValue, NestedType, Delegate, DefaultDelegate, MethodsBuilder, Resource, JsonServerError};
 
 
 // ##############
@@ -221,7 +228,7 @@ pub use cmn::{MultiPartReader, ToParts, MethodInfo, Result, CallBuilder, Hub, Re
 /// extern crate hyper;
 /// extern crate "yup-oauth2" as oauth2;
 /// extern crate "google-freebase1" as freebase1;
-/// use freebase1::Result;
+/// use freebase1::{Result, Error};
 /// # #[test] fn egal() {
 /// use std::default::Default;
 /// use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -252,15 +259,17 @@ pub use cmn::{MultiPartReader, ToParts, MethodInfo, Result, CallBuilder, Hub, Re
 ///              .doit();
 /// 
 /// match result {
-///     Result::HttpError(err) => println!("HTTPERROR: {:?}", err),
-///     Result::MissingAPIKey => println!("Auth: Missing API Key - used if there are no scopes"),
-///     Result::MissingToken => println!("OAuth2: Missing Token"),
-///     Result::Cancelled => println!("Operation cancelled by user"),
-///     Result::UploadSizeLimitExceeded(size, max_size) => println!("Upload size too big: {} of {}", size, max_size),
-///     Result::Failure(_) => println!("General Failure (hyper::client::Response doesn't print)"),
-///     Result::FieldClash(clashed_field) => println!("You added custom parameter which is part of builder: {:?}", clashed_field),
-///     Result::JsonDecodeError(err) => println!("Couldn't understand server reply - maybe API needs update: {:?}", err),
-///     Result::Success(_) => println!("Success (value doesn't print)"),
+///     Err(e) => match e {
+///         Error::HttpError(err) => println!("HTTPERROR: {:?}", err),
+///         Error::MissingAPIKey => println!("Auth: Missing API Key - used if there are no scopes"),
+///         Error::MissingToken => println!("OAuth2: Missing Token"),
+///         Error::Cancelled => println!("Operation canceled by user"),
+///         Error::UploadSizeLimitExceeded(size, max_size) => println!("Upload size too big: {} of {}", size, max_size),
+///         Error::Failure(_) => println!("General Failure (hyper::client::Response doesn't print)"),
+///         Error::FieldClash(clashed_field) => println!("You added custom parameter which is part of builder: {:?}", clashed_field),
+///         Error::JsonDecodeError(err) => println!("Couldn't understand server reply - maybe API needs update: {:?}", err),
+///     },
+///     Ok(_) => println!("Success (value doesn't print)"),
 /// }
 /// # }
 /// ```
@@ -281,7 +290,7 @@ impl<'a, C, NC, A> Freebase<C, NC, A>
         Freebase {
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/0.1.1".to_string(),
+            _user_agent: "google-api-rust-client/0.1.2".to_string(),
             _m: PhantomData
         }
     }
@@ -291,7 +300,7 @@ impl<'a, C, NC, A> Freebase<C, NC, A>
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/0.1.1`.
+    /// It defaults to `google-api-rust-client/0.1.2`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -311,15 +320,15 @@ impl<'a, C, NC, A> Freebase<C, NC, A>
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct ReconcileCandidate {
-    /// Language code that candidate and notable names are displayed in.    
+    /// Language code that candidate and notable names are displayed in.
     pub lang: String,
-    /// Percentage likelihood that this candidate is the unique matching entity. Value will be between 0.0 and 1.0    
+    /// Percentage likelihood that this candidate is the unique matching entity. Value will be between 0.0 and 1.0
     pub confidence: f32,
-    /// Type or profession the candidate is notable for.    
+    /// Type or profession the candidate is notable for.
     pub notable: ReconcileCandidateNotable,
-    /// Freebase MID of candidate entity.    
+    /// Freebase MID of candidate entity.
     pub mid: String,
-    /// Freebase name of matching entity in specified language.    
+    /// Freebase name of matching entity in specified language.
     pub name: String,
 }
 
@@ -332,11 +341,11 @@ impl Part for ReconcileCandidate {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct ReconcileGetWarning {
-    /// Code for identifying classes of warnings.    
+    /// Code for identifying classes of warnings.
     pub reason: String,
-    /// Warning message to display to the user.    
+    /// Warning message to display to the user.
     pub message: String,
-    /// Location of warning in the request e.g. invalid predicate.    
+    /// Location of warning in the request e.g. invalid predicate.
     pub location: String,
 }
 
@@ -350,9 +359,9 @@ impl Part for ReconcileGetWarning {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct ReconcileGetCosts {
-    /// Total number of hits found.    
+    /// Total number of hits found.
     pub hits: i32,
-    /// Total milliseconds spent.    
+    /// Total milliseconds spent.
     pub ms: i32,
 }
 
@@ -371,13 +380,13 @@ impl Part for ReconcileGetCosts {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct ReconcileGet {
-    /// Server costs for reconciling.    
+    /// Server costs for reconciling.
     pub costs: ReconcileGetCosts,
-    /// If filled, then there were recoverable problems that affected the request. For example, some of the properties were ignored because they either are not valid Freebase predicates or are not indexed for reconciliation. The candidates returned should be considered valid results, with the caveat that sections of the request were ignored as specified by the warning text.    
+    /// If filled, then there were recoverable problems that affected the request. For example, some of the properties were ignored because they either are not valid Freebase predicates or are not indexed for reconciliation. The candidates returned should be considered valid results, with the caveat that sections of the request were ignored as specified by the warning text.
     pub warning: Vec<ReconcileGetWarning>,
-    /// If filled, then the listed candidates are potential matches, and such should be evaluated by a more discerning algorithm or human. The matches are ordered by confidence.    
+    /// If filled, then the listed candidates are potential matches, and such should be evaluated by a more discerning algorithm or human. The matches are ordered by confidence.
     pub candidate: Vec<ReconcileCandidate>,
-    /// If filled, this entity is guaranteed to match at requested confidence probability (default 99%).    
+    /// If filled, this entity is guaranteed to match at requested confidence probability (default 99%).
     #[serde(alias="match")]
     pub match_: ReconcileCandidate,
 }
@@ -391,9 +400,9 @@ impl ResponseResult for ReconcileGet {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct ReconcileCandidateNotable {
-    /// MID of notable category.    
+    /// MID of notable category.
     pub id: String,
-    /// Name of notable category in specified language.    
+    /// Name of notable category in specified language.
     pub name: String,
 }
 
@@ -440,13 +449,13 @@ pub struct MethodMethods<'a, C, NC, A>
     hub: &'a Freebase<C, NC, A>,
 }
 
-impl<'a, C, NC, A> ResourceMethodsBuilder for MethodMethods<'a, C, NC, A> {}
+impl<'a, C, NC, A> MethodsBuilder for MethodMethods<'a, C, NC, A> {}
 
 impl<'a, C, NC, A> MethodMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Reconcile entities to Freebase open data.    
+    /// Reconcile entities to Freebase open data.
     pub fn reconcile(&self) -> MethodReconcileCall<'a, C, NC, A> {
         MethodReconcileCall {
             hub: self.hub,
@@ -463,7 +472,7 @@ impl<'a, C, NC, A> MethodMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Search Freebase open data.    
+    /// Search Freebase open data.
     pub fn search(&self) -> MethodSearchCall<'a, C, NC, A> {
         MethodSearchCall {
             hub: self.hub,
@@ -507,7 +516,7 @@ impl<'a, C, NC, A> MethodMethods<'a, C, NC, A> {
 /// Reconcile entities to Freebase open data.
 ///
 /// A builder for the *reconcile* method.
-/// It is not used directly, but through a `MethodMethods`.
+/// It is not used directly, but through a `MethodMethods` instance.
 ///
 /// # Example
 ///
@@ -604,7 +613,7 @@ impl<'a, C, NC, A> MethodReconcileCall<'a, C, NC, A> where NC: hyper::net::Netwo
         for &field in ["alt", "prop", "name", "limit", "lang", "kind", "confidence"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -623,7 +632,7 @@ impl<'a, C, NC, A> MethodReconcileCall<'a, C, NC, A> where NC: hyper::net::Netwo
             Some(value) => params.push(("key", value)),
             None => {
                 dlg.finished(false);
-                return Result::MissingAPIKey
+                return Err(Error::MissingAPIKey)
             }
         }
 
@@ -643,7 +652,6 @@ impl<'a, C, NC, A> MethodReconcileCall<'a, C, NC, A> where NC: hyper::net::Netwo
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -653,7 +661,7 @@ impl<'a, C, NC, A> MethodReconcileCall<'a, C, NC, A> where NC: hyper::net::Netwo
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -664,7 +672,7 @@ impl<'a, C, NC, A> MethodReconcileCall<'a, C, NC, A> where NC: hyper::net::Netwo
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -673,13 +681,13 @@ impl<'a, C, NC, A> MethodReconcileCall<'a, C, NC, A> where NC: hyper::net::Netwo
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Result::JsonDecodeError(err);
+                                return Err(Error::JsonDecodeError(err));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -699,7 +707,7 @@ impl<'a, C, NC, A> MethodReconcileCall<'a, C, NC, A> where NC: hyper::net::Netwo
     /// Sets the *name* query property to the given value.
     ///
     /// 
-    /// Name of entity.    
+    /// Name of entity.
     pub fn name(mut self, new_value: &str) -> MethodReconcileCall<'a, C, NC, A> {
         self._name = Some(new_value.to_string());
         self
@@ -707,7 +715,7 @@ impl<'a, C, NC, A> MethodReconcileCall<'a, C, NC, A> where NC: hyper::net::Netwo
     /// Sets the *limit* query property to the given value.
     ///
     /// 
-    /// Maximum number of candidates to return.    
+    /// Maximum number of candidates to return.
     pub fn limit(mut self, new_value: i32) -> MethodReconcileCall<'a, C, NC, A> {
         self._limit = Some(new_value);
         self
@@ -716,7 +724,7 @@ impl<'a, C, NC, A> MethodReconcileCall<'a, C, NC, A> where NC: hyper::net::Netwo
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
     ///
     /// 
-    /// Languages for names and values. First language is used for display. Default is 'en'.    
+    /// Languages for names and values. First language is used for display. Default is 'en'.
     pub fn add_lang(mut self, new_value: &str) -> MethodReconcileCall<'a, C, NC, A> {
         self._lang.push(new_value.to_string());
         self
@@ -725,7 +733,7 @@ impl<'a, C, NC, A> MethodReconcileCall<'a, C, NC, A> where NC: hyper::net::Netwo
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
     ///
     /// 
-    /// Classifications of entity e.g. type, category, title.    
+    /// Classifications of entity e.g. type, category, title.
     pub fn add_kind(mut self, new_value: &str) -> MethodReconcileCall<'a, C, NC, A> {
         self._kind.push(new_value.to_string());
         self
@@ -733,7 +741,7 @@ impl<'a, C, NC, A> MethodReconcileCall<'a, C, NC, A> where NC: hyper::net::Netwo
     /// Sets the *confidence* query property to the given value.
     ///
     /// 
-    /// Required confidence for a candidate to match. Must be between .5 and 1.0    
+    /// Required confidence for a candidate to match. Must be between .5 and 1.0
     pub fn confidence(mut self, new_value: f32) -> MethodReconcileCall<'a, C, NC, A> {
         self._confidence = Some(new_value);
         self
@@ -781,7 +789,7 @@ impl<'a, C, NC, A> MethodReconcileCall<'a, C, NC, A> where NC: hyper::net::Netwo
 /// `.param("alt", "media")`.
 ///
 /// A builder for the *search* method.
-/// It is not used directly, but through a `MethodMethods`.
+/// It is not used directly, but through a `MethodMethods` instance.
 ///
 /// # Example
 ///
@@ -979,7 +987,7 @@ impl<'a, C, NC, A> MethodSearchCall<'a, C, NC, A> where NC: hyper::net::NetworkC
         for &field in ["without", "with", "type", "stemmed", "spell", "scoring", "query", "prefixed", "output", "mql_output", "mid", "limit", "lang", "indent", "help", "format", "filter", "exact", "encode", "domain", "cursor", "callback", "as_of_time"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Result::FieldClash(field);
+                return Err(Error::FieldClash(field));
             }
         }
         for (name, value) in self._additional_params.iter() {
@@ -997,7 +1005,7 @@ impl<'a, C, NC, A> MethodSearchCall<'a, C, NC, A> where NC: hyper::net::NetworkC
             Some(value) => params.push(("key", value)),
             None => {
                 dlg.finished(false);
-                return Result::MissingAPIKey
+                return Err(Error::MissingAPIKey)
             }
         }
 
@@ -1017,7 +1025,6 @@ impl<'a, C, NC, A> MethodSearchCall<'a, C, NC, A> where NC: hyper::net::NetworkC
 
                 dlg.pre_request();
                 req.send()
-
             };
 
             match req_result {
@@ -1027,7 +1034,7 @@ impl<'a, C, NC, A> MethodSearchCall<'a, C, NC, A> where NC: hyper::net::NetworkC
                         continue;
                     }
                     dlg.finished(false);
-                    return Result::HttpError(err)
+                    return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
                     if !res.status.is_success() {
@@ -1038,12 +1045,12 @@ impl<'a, C, NC, A> MethodSearchCall<'a, C, NC, A> where NC: hyper::net::NetworkC
                             continue;
                         }
                         dlg.finished(false);
-                        return Result::Failure(res)
+                        return Err(Error::Failure(res))
                     }
                     let result_value = res;
 
                     dlg.finished(true);
-                    return Result::Success(result_value)
+                    return Ok(result_value)
                 }
             }
         }
@@ -1054,7 +1061,7 @@ impl<'a, C, NC, A> MethodSearchCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
     ///
     /// 
-    /// A rule to not match against.    
+    /// A rule to not match against.
     pub fn add_without(mut self, new_value: &str) -> MethodSearchCall<'a, C, NC, A> {
         self._without.push(new_value.to_string());
         self
@@ -1063,7 +1070,7 @@ impl<'a, C, NC, A> MethodSearchCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
     ///
     /// 
-    /// A rule to match against.    
+    /// A rule to match against.
     pub fn add_with(mut self, new_value: &str) -> MethodSearchCall<'a, C, NC, A> {
         self._with.push(new_value.to_string());
         self
@@ -1072,7 +1079,7 @@ impl<'a, C, NC, A> MethodSearchCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
     ///
     /// 
-    /// Restrict to topics with this Freebase type id.    
+    /// Restrict to topics with this Freebase type id.
     pub fn add_type(mut self, new_value: &str) -> MethodSearchCall<'a, C, NC, A> {
         self._type_.push(new_value.to_string());
         self
@@ -1080,7 +1087,7 @@ impl<'a, C, NC, A> MethodSearchCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// Sets the *stemmed* query property to the given value.
     ///
     /// 
-    /// Query on stemmed names and aliases. May not be used with prefixed.    
+    /// Query on stemmed names and aliases. May not be used with prefixed.
     pub fn stemmed(mut self, new_value: bool) -> MethodSearchCall<'a, C, NC, A> {
         self._stemmed = Some(new_value);
         self
@@ -1088,7 +1095,7 @@ impl<'a, C, NC, A> MethodSearchCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// Sets the *spell* query property to the given value.
     ///
     /// 
-    /// Request 'did you mean' suggestions    
+    /// Request 'did you mean' suggestions
     pub fn spell(mut self, new_value: &str) -> MethodSearchCall<'a, C, NC, A> {
         self._spell = Some(new_value.to_string());
         self
@@ -1096,7 +1103,7 @@ impl<'a, C, NC, A> MethodSearchCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// Sets the *scoring* query property to the given value.
     ///
     /// 
-    /// Relevance scoring algorithm to use.    
+    /// Relevance scoring algorithm to use.
     pub fn scoring(mut self, new_value: &str) -> MethodSearchCall<'a, C, NC, A> {
         self._scoring = Some(new_value.to_string());
         self
@@ -1104,7 +1111,7 @@ impl<'a, C, NC, A> MethodSearchCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// Sets the *query* query property to the given value.
     ///
     /// 
-    /// Query term to search for.    
+    /// Query term to search for.
     pub fn query(mut self, new_value: &str) -> MethodSearchCall<'a, C, NC, A> {
         self._query = Some(new_value.to_string());
         self
@@ -1112,7 +1119,7 @@ impl<'a, C, NC, A> MethodSearchCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// Sets the *prefixed* query property to the given value.
     ///
     /// 
-    /// Prefix match against names and aliases.    
+    /// Prefix match against names and aliases.
     pub fn prefixed(mut self, new_value: bool) -> MethodSearchCall<'a, C, NC, A> {
         self._prefixed = Some(new_value);
         self
@@ -1120,7 +1127,7 @@ impl<'a, C, NC, A> MethodSearchCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// Sets the *output* query property to the given value.
     ///
     /// 
-    /// An output expression to request data from matches.    
+    /// An output expression to request data from matches.
     pub fn output(mut self, new_value: &str) -> MethodSearchCall<'a, C, NC, A> {
         self._output = Some(new_value.to_string());
         self
@@ -1128,7 +1135,7 @@ impl<'a, C, NC, A> MethodSearchCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// Sets the *mql_output* query property to the given value.
     ///
     /// 
-    /// The MQL query to run againist the results to extract more data.    
+    /// The MQL query to run againist the results to extract more data.
     pub fn mql_output(mut self, new_value: &str) -> MethodSearchCall<'a, C, NC, A> {
         self._mql_output = Some(new_value.to_string());
         self
@@ -1137,7 +1144,7 @@ impl<'a, C, NC, A> MethodSearchCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
     ///
     /// 
-    /// A mid to use instead of a query.    
+    /// A mid to use instead of a query.
     pub fn add_mid(mut self, new_value: &str) -> MethodSearchCall<'a, C, NC, A> {
         self._mid.push(new_value.to_string());
         self
@@ -1145,7 +1152,7 @@ impl<'a, C, NC, A> MethodSearchCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// Sets the *limit* query property to the given value.
     ///
     /// 
-    /// Maximum number of results to return.    
+    /// Maximum number of results to return.
     pub fn limit(mut self, new_value: i32) -> MethodSearchCall<'a, C, NC, A> {
         self._limit = Some(new_value);
         self
@@ -1154,7 +1161,7 @@ impl<'a, C, NC, A> MethodSearchCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
     ///
     /// 
-    /// The code of the language to run the query with. Default is 'en'.    
+    /// The code of the language to run the query with. Default is 'en'.
     pub fn add_lang(mut self, new_value: &str) -> MethodSearchCall<'a, C, NC, A> {
         self._lang.push(new_value.to_string());
         self
@@ -1162,7 +1169,7 @@ impl<'a, C, NC, A> MethodSearchCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// Sets the *indent* query property to the given value.
     ///
     /// 
-    /// Whether to indent the json results or not.    
+    /// Whether to indent the json results or not.
     pub fn indent(mut self, new_value: bool) -> MethodSearchCall<'a, C, NC, A> {
         self._indent = Some(new_value);
         self
@@ -1170,7 +1177,7 @@ impl<'a, C, NC, A> MethodSearchCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// Sets the *help* query property to the given value.
     ///
     /// 
-    /// The keyword to request help on.    
+    /// The keyword to request help on.
     pub fn help(mut self, new_value: &str) -> MethodSearchCall<'a, C, NC, A> {
         self._help = Some(new_value.to_string());
         self
@@ -1178,7 +1185,7 @@ impl<'a, C, NC, A> MethodSearchCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// Sets the *format* query property to the given value.
     ///
     /// 
-    /// Structural format of the json response.    
+    /// Structural format of the json response.
     pub fn format(mut self, new_value: &str) -> MethodSearchCall<'a, C, NC, A> {
         self._format = Some(new_value.to_string());
         self
@@ -1187,7 +1194,7 @@ impl<'a, C, NC, A> MethodSearchCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
     ///
     /// 
-    /// A filter to apply to the query.    
+    /// A filter to apply to the query.
     pub fn add_filter(mut self, new_value: &str) -> MethodSearchCall<'a, C, NC, A> {
         self._filter.push(new_value.to_string());
         self
@@ -1195,7 +1202,7 @@ impl<'a, C, NC, A> MethodSearchCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// Sets the *exact* query property to the given value.
     ///
     /// 
-    /// Query on exact name and keys only.    
+    /// Query on exact name and keys only.
     pub fn exact(mut self, new_value: bool) -> MethodSearchCall<'a, C, NC, A> {
         self._exact = Some(new_value);
         self
@@ -1203,7 +1210,7 @@ impl<'a, C, NC, A> MethodSearchCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// Sets the *encode* query property to the given value.
     ///
     /// 
-    /// The encoding of the response. You can use this parameter to enable html encoding.    
+    /// The encoding of the response. You can use this parameter to enable html encoding.
     pub fn encode(mut self, new_value: &str) -> MethodSearchCall<'a, C, NC, A> {
         self._encode = Some(new_value.to_string());
         self
@@ -1212,7 +1219,7 @@ impl<'a, C, NC, A> MethodSearchCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
     ///
     /// 
-    /// Restrict to topics with this Freebase domain id.    
+    /// Restrict to topics with this Freebase domain id.
     pub fn add_domain(mut self, new_value: &str) -> MethodSearchCall<'a, C, NC, A> {
         self._domain.push(new_value.to_string());
         self
@@ -1220,7 +1227,7 @@ impl<'a, C, NC, A> MethodSearchCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// Sets the *cursor* query property to the given value.
     ///
     /// 
-    /// The cursor value to use for the next page of results.    
+    /// The cursor value to use for the next page of results.
     pub fn cursor(mut self, new_value: i32) -> MethodSearchCall<'a, C, NC, A> {
         self._cursor = Some(new_value);
         self
@@ -1228,7 +1235,7 @@ impl<'a, C, NC, A> MethodSearchCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// Sets the *callback* query property to the given value.
     ///
     /// 
-    /// JS method name for JSONP callbacks.    
+    /// JS method name for JSONP callbacks.
     pub fn callback(mut self, new_value: &str) -> MethodSearchCall<'a, C, NC, A> {
         self._callback = Some(new_value.to_string());
         self
@@ -1236,7 +1243,7 @@ impl<'a, C, NC, A> MethodSearchCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// Sets the *as_of_time* query property to the given value.
     ///
     /// 
-    /// A mql as_of_time value to use with mql_output queries.    
+    /// A mql as_of_time value to use with mql_output queries.
     pub fn as_of_time(mut self, new_value: &str) -> MethodSearchCall<'a, C, NC, A> {
         self._as_of_time = Some(new_value.to_string());
         self
