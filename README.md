@@ -48,21 +48,22 @@ The makefile is written to be self-documenting. Just calling `make` will yield a
 using template engine: '.pyenv/bin/python etc/bin/mako-render'
 
 Targets
-docs         -   cargo-doc on all APIs, assemble them together and generate index
-github-pages -   invoke ghp-import on all documentation
-apis         -   make all APIs
-cargo        -   run cargo on all APIs, use ARGS="args ..." to specify cargo arguments
-regen-apis   -   clear out all generated apis, and regenerate them
-clean-apis   -   delete all generated APIs
-help-api     -   show all api targets to build individually
-help         -   print this help
-license      -   regenerate the main license file
-update-json  -   rediscover API schema json files and update api-list.yaml with latest versions
-api-deps     -   generate a file to tell make what API file dependencies will be
+help-api       -   show all api targets to build individually
+help-cli       -   show all cli targets to build individually
+docs-all       -   cargo-doc on all APIs and associates, assemble them together and generate index
+docs-all-clean -   remove the entire set of generated documentation
+github-pages   -   invoke ghp-import on all documentation
+regen-apis     -   clear out all generated apis, and regenerate them
+license        -   regenerate the main license file
+update-json    -   rediscover API schema json files and update api-list.yaml with latest versions
+deps           -   generate a file to tell how to build libraries and programs
+help           -   print this help
 make: Nothing to be done for `help'.
 ```
 
-You can easily build the documentation index using `make docs` and individual API documentation using `make <api-name>-doc`. Run doctests on all apis with `make cargo ARGS=test` or on individual ones using `make <api-name>-cargo ARGS=test`. To see which API targets exist, run `make help-api`.
+You can easily build the documentation index using `make docs-all` and individual API documentation using `make <api-name>-doc`. Run doctests on all apis with `make cargo-api ARGS=test` or on individual ones using `make <api-name>-cargo ARGS=test`. To see which API targets exist, run `make help-api`.
+
+The same goes for commandline programs, just ust `-cli` instead of `-api`, and have a look at `help-cli` for individual targets.
 
 ## Make and parallel job execution
 
@@ -80,7 +81,7 @@ For example, to update all json files and possibly retrieve new API schemas, do 
 
 ```bash
 # -j8 will allow 8 parallel schema downloads
-rm -f .api.deps && make update-json -j8
+rm -f .api.deps .cli.deps && make update-json -j8
 ```
 
 # License
