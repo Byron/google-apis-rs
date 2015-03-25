@@ -26,7 +26,7 @@ make:
     - source: lib.rs
       output_dir: src
 cargo:
-  build_version: "0.1.1"
+  build_version: "0.1.2"
   keywords: [protocol, web, api]
   dependencies:
     - url = "*"
