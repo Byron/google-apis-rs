@@ -62,7 +62,8 @@
 	api_crate_publish_file = api_meta_dir + '/crates/' + util.crate_version(cargo.build_version + make.aggregated_target_suffix,
 																		 	json.load(open(api_json, 'r'))['revision'])
 	api_json_overrides = api_meta_dir + '/' + an + '-api_overrides.json'
-	api_json_inputs = api_json + ' $(API_SHARED_INFO) $(API_DIR)/type-' + make.id + '.yaml'
+	type_specific_json = '$(API_DIR)/type-' + make.id + '.yaml'
+	api_json_inputs = api_json + ' $(API_SHARED_INFO) ' + type_specific_json
 	if os.path.isfile(api_json_overrides):
 		api_json_inputs += ' ' + api_json_overrides
 	api_info.append((api_target, api_clean, api_cargo, api_doc, api_crate_publish_file, gen_root))
@@ -120,8 +121,8 @@ publish${agsuffix}: | gen-all${agsuffix} ${space_join(4)}
 gen-all${agsuffix}: ${space_join(0)}
 
 % if global_targets:
-${doc_index}: docs${agsuffix} ## TODO: all type dependencies: docs-api, docs-cli
-	$(MAKO) --var DOC_ROOT=${doc_root} -io $(MAKO_SRC)/index.html.mako=$@ --data-files $(API_SHARED_INFO) $(API_LIST)
+${doc_index}: docs${agsuffix} ${type_specific_json} ## TODO: all type dependencies: docs-api, docs-cli
+	$(MAKO) --var DOC_ROOT=${doc_root} -io $(MAKO_SRC)/index.html.mako=$@ --data-files $(API_SHARED_INFO) $(API_LIST) ${type_specific_json}
 	@echo Documentation index created at '$@'
 docs-all: ${doc_index}
 docs-all-clean:
