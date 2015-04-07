@@ -96,8 +96,8 @@ google-fusiontables2 = "*"
 
 ```Rust
 extern crate hyper;
-extern crate "yup-oauth2" as oauth2;
-extern crate "google-fusiontables2" as fusiontables2;
+extern crate yup_oauth2 as oauth2;
+extern crate google_fusiontables2 as fusiontables2;
 use fusiontables2::{Result, Error};
 use std::fs;
 use std::default::Default;

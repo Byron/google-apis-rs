@@ -5,7 +5,7 @@ DO NOT EDIT !
 -->
 The `google-freebase1` library allows access to all features of the *Google freebase* service.
 
-This documentation was generated from *freebase* crate version *0.1.2+20150313*, where *20150313* is the exact revision of the *freebase:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.2*.
+This documentation was generated from *freebase* crate version *0.1.2+20150330*, where *20150330* is the exact revision of the *freebase:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.2*.
 
 Everything else about the *freebase* *v1* API can be found at the
 [official documentation site](https://developers.google.com/freebase/).
@@ -74,8 +74,8 @@ google-freebase1 = "*"
 
 ```Rust
 extern crate hyper;
-extern crate "yup-oauth2" as oauth2;
-extern crate "google-freebase1" as freebase1;
+extern crate yup_oauth2 as oauth2;
+extern crate google_freebase1 as freebase1;
 use freebase1::{Result, Error};
 use std::default::Default;
 use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};

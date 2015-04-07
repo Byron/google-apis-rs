@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *bigquery* crate version *0.1.2+20150303*, where *20150303* is the exact revision of the *bigquery:v2* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.2*.
+//! This documentation was generated from *bigquery* crate version *0.1.2+20150326*, where *20150326* is the exact revision of the *bigquery:v2* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.2*.
 //! 
 //! Everything else about the *bigquery* *v2* API can be found at the
 //! [official documentation site](https://developers.google.com/bigquery/docs/overview).
@@ -87,8 +87,8 @@
 //! 
 //! ```test_harness,no_run
 //! extern crate hyper;
-//! extern crate "yup-oauth2" as oauth2;
-//! extern crate "google-bigquery2" as bigquery2;
+//! extern crate yup_oauth2 as oauth2;
+//! extern crate google_bigquery2 as bigquery2;
 //! use bigquery2::Table;
 //! use bigquery2::{Result, Error};
 //! # #[test] fn egal() {
@@ -187,20 +187,20 @@
 //! [google-go-api]: https://github.com/google/google-api-go-client
 //! 
 //! 
-#![feature(core,io,thread_sleep)]
+#![feature(std_misc)]
 // Unused attributes happen thanks to defined, but unused structures
 // We don't warn about this, as depending on the API, some data structures or facilities are never used.
 // Instead of pre-determining this, we just disable the lint. It's manually tuned to not have any 
 // unused imports in fully featured APIs. Same with unused_mut ... .
 #![allow(unused_imports, unused_mut, dead_code)]
 // Required for serde annotations
-#![feature(custom_derive, custom_attribute, plugin)]
+#![feature(custom_derive, custom_attribute, plugin, slice_patterns)]
 #![plugin(serde_macros)]
 
 #[macro_use]
 extern crate hyper;
 extern crate serde;
-extern crate "yup-oauth2" as oauth2;
+extern crate yup_oauth2 as oauth2;
 extern crate mime;
 extern crate url;
 
@@ -215,7 +215,7 @@ use std::marker::PhantomData;
 use serde::json;
 use std::io;
 use std::fs;
-use std::thread::sleep;
+use std::thread::sleep_ms;
 
 pub use cmn::{MultiPartReader, ToParts, MethodInfo, Result, Error, CallBuilder, Hub, ReadSeek, Part, ResponseResult, RequestValue, NestedType, Delegate, DefaultDelegate, MethodsBuilder, Resource, JsonServerError};
 
@@ -248,8 +248,8 @@ pub enum Scope {
     Full,
 }
 
-impl Str for Scope {
-    fn as_slice(&self) -> &str {
+impl AsRef<str> for Scope {
+    fn as_ref(&self) -> &str {
         match *self {
             Scope::DevstorageFullControl => "https://www.googleapis.com/auth/devstorage.full_control",
             Scope::DevstorageReadOnly => "https://www.googleapis.com/auth/devstorage.read_only",
@@ -281,8 +281,8 @@ impl Default for Scope {
 ///
 /// ```test_harness,no_run
 /// extern crate hyper;
-/// extern crate "yup-oauth2" as oauth2;
-/// extern crate "google-bigquery2" as bigquery2;
+/// extern crate yup_oauth2 as oauth2;
+/// extern crate google_bigquery2 as bigquery2;
 /// use bigquery2::Table;
 /// use bigquery2::{Result, Error};
 /// # #[test] fn egal() {
@@ -578,6 +578,9 @@ pub struct Dataset {
     pub creation_time: Option<String>,
     /// [Optional] An array of objects that define dataset access for one or more entities. You can set this property when inserting or updating a dataset in order to control who is allowed to access the data. If unspecified at dataset creation time, BigQuery adds default dataset access for the following entities: access.specialGroup: projectReaders; access.role: READER; access.specialGroup: projectWriters; access.role: WRITER; access.specialGroup: projectOwners; access.role: OWNER; access.userByEmail: [dataset creator email]; access.role: OWNER;
     pub access: Option<Vec<DatasetAccess>>,
+    /// [Experimental] The default lifetime of all tables in the dataset, in milliseconds. The minimum value is 3600000 milliseconds (one hour). Once this property is set, all newly-created tables in the dataset will have an expirationTime property set to the creation time plus the value in this property, and changing the value will only affect new tables, not existing ones. When the expirationTime for a given table is reached, that table will be deleted automatically. If a table's expirationTime is modified or removed before the table expires, or if you provide an explicit expirationTime when creating a table, that value takes precedence over the default expiration time indicated by this property.
+    #[serde(alias="defaultTableExpirationMs")]
+    pub default_table_expiration_ms: Option<String>,
     /// [Output-only] A hash of the resource.
     pub etag: Option<String>,
     /// [Optional] A descriptive name for the dataset.
@@ -848,7 +851,7 @@ pub struct JobConfigurationLoad {
     /// [Required] The destination table to load the data into.
     #[serde(alias="destinationTable")]
     pub destination_table: TableReference,
-    /// [Required] The fully-qualified URIs that point to your data in Google Cloud Storage. Wildcard names are only supported when they appear at the end of the URI.
+    /// [Required] The fully-qualified URIs that point to your data in Google Cloud Storage. Each URI can contain one '*' wildcard character and it must come after the 'bucket' name.
     #[serde(alias="sourceUris")]
     pub source_uris: Vec<String>,
     /// Indicates if BigQuery should allow quoted data sections that contain newline characters in a CSV file. The default value is false.
@@ -857,7 +860,7 @@ pub struct JobConfigurationLoad {
     /// [Experimental] Names(case-sensitive) of properties to keep when importing data. If this is populated, only the specified properties will be imported for each entity. Currently, this is only supported for DATASTORE_BACKUP imports and only top level properties are supported. If any specified property is not found in the Datastore 'Kind' being imported, that is an error. Note: This feature is experimental and can change in the future.
     #[serde(alias="projectionFields")]
     pub projection_fields: Vec<String>,
-    /// [Optional] Accept rows that are missing trailing optional columns. The missing values are treated as nulls. Default is false which treats short rows as errors. Only applicable to CSV, ignored for other formats.
+    /// [Optional] Accept rows that are missing trailing optional columns. The missing values are treated as nulls. If false, records with missing trailing columns are treated as bad records, and if there are too many bad records, an invalid error is returned in the job result. The default value is false. Only applicable to CSV, ignored for other formats.
     #[serde(alias="allowJaggedRows")]
     pub allow_jagged_rows: bool,
     /// [Optional] The separator for fields in a CSV file. BigQuery converts the string to ISO-8859-1 encoding, and then uses the first byte of the encoded string to split the data in its raw, binary state. BigQuery also supports the escape sequence "\t" to specify a tab separator. The default value is a comma (',').
@@ -866,10 +869,10 @@ pub struct JobConfigurationLoad {
     /// [Optional] The format of the data files. For CSV files, specify "CSV". For datastore backups, specify "DATASTORE_BACKUP". For newline-delimited JSON, specify "NEWLINE_DELIMITED_JSON". The default value is CSV.
     #[serde(alias="sourceFormat")]
     pub source_format: String,
-    /// [Optional] The maximum number of bad records that BigQuery can ignore when running the job. If the number of bad records exceeds this value, an 'invalid' error is returned in the job result and the job fails. The default value is 0, which requires that all records are valid.
+    /// [Optional] The maximum number of bad records that BigQuery can ignore when running the job. If the number of bad records exceeds this value, an invalid error is returned in the job result. The default value is 0, which requires that all records are valid.
     #[serde(alias="maxBadRecords")]
     pub max_bad_records: i32,
-    /// [Optional] Accept rows that contain values that do not match the schema. The unknown values are ignored. Default is false which treats unknown values as errors. For CSV this ignores extra values at the end of a line. For JSON this ignores named values that do not match any column name.
+    /// [Optional] Indicates if BigQuery should allow extra values that are not represented in the table schema. If true, the extra values are ignored. If false, records with extra columns are treated as bad records, and if there are too many bad records, an invalid error is returned in the job result. The default value is false. The sourceFormat property determines what BigQuery treats as an extra value: CSV: Trailing columns JSON: Named values that don't match any column names
     #[serde(alias="ignoreUnknownValues")]
     pub ignore_unknown_values: bool,
     /// [Optional] Specifies the action that occurs if the destination table already exists. The following values are supported: WRITE_TRUNCATE: If the table already exists, BigQuery overwrites the table data. WRITE_APPEND: If the table already exists, BigQuery appends the data to the table. WRITE_EMPTY: If the table already exists and contains data, a 'duplicate' error is returned in the job result. The default value is WRITE_EMPTY. Each action is atomic and only occurs if BigQuery is able to complete the job successfully. Creation, truncation and append actions occur as one atomic update upon job completion.
@@ -993,6 +996,63 @@ pub struct GetQueryResultsResponse {
 }
 
 impl ResponseResult for GetQueryResultsResponse {}
+
+
+/// There is no detailed description.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct CsvOptions {
+    /// [Optional] Indicates if BigQuery should accept rows that are missing trailing optional columns. If true, BigQuery treats missing trailing columns as null values. If false, records with missing trailing columns are treated as bad records, and if there are too many bad records, an invalid error is returned in the job result. The default value is false.
+    #[serde(alias="allowJaggedRows")]
+    pub allow_jagged_rows: bool,
+    /// [Optional] The number of rows at the top of a CSV file that BigQuery will skip when reading the data. The default value is 0. This property is useful if you have header rows in the file that should be skipped.
+    #[serde(alias="skipLeadingRows")]
+    pub skip_leading_rows: i32,
+    /// [Optional] The separator for fields in a CSV file. BigQuery converts the string to ISO-8859-1 encoding, and then uses the first byte of the encoded string to split the data in its raw, binary state. BigQuery also supports the escape sequence "\t" to specify a tab separator. The default value is a comma (',').
+    #[serde(alias="fieldDelimiter")]
+    pub field_delimiter: String,
+    /// [Optional] The character encoding of the data. The supported values are UTF-8 or ISO-8859-1. The default value is UTF-8. BigQuery decodes the data after the raw, binary data has been split using the values of the quote and fieldDelimiter properties.
+    pub encoding: String,
+    /// [Optional] The value that is used to quote data sections in a CSV file. BigQuery converts the string to ISO-8859-1 encoding, and then uses the first byte of the encoded string to split the data in its raw, binary state. The default value is a double-quote ('"'). If your data does not contain quoted sections, set the property value to an empty string. If your data contains quoted newline characters, you must also set the allowQuotedNewlines property to true.
+    pub quote: String,
+    /// [Optional] Indicates if BigQuery should allow quoted data sections that contain newline characters in a CSV file. The default value is false.
+    #[serde(alias="allowQuotedNewlines")]
+    pub allow_quoted_newlines: bool,
+}
+
+impl Part for CsvOptions {}
+
+
+/// There is no detailed description.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct ExternalDataConfiguration {
+    /// [Optional] Indicates if BigQuery should allow extra values that are not represented in the table schema. If true, the extra values are ignored. If false, records with extra columns are treated as bad records, and if there are too many bad records, an invalid error is returned in the job result. The default value is false. The sourceFormat property determines what BigQuery treats as an extra value: CSV: Trailing columns
+    #[serde(alias="ignoreUnknownValues")]
+    pub ignore_unknown_values: bool,
+    /// [Required] The fully-qualified URIs that point to your data in Google Cloud Storage. Each URI can contain one '*' wildcard character and it must come after the 'bucket' name. CSV limits related to load jobs apply to external data sources, plus an additional limit of 10 GB maximum size across all URIs.
+    #[serde(alias="sourceUris")]
+    pub source_uris: Vec<String>,
+    /// [Optional] The compression type of the data source. Possible values include GZIP and NONE. The default value is NONE.
+    pub compression: String,
+    /// Additional properties to set if sourceFormat is set to CSV.
+    #[serde(alias="csvOptions")]
+    pub csv_options: CsvOptions,
+    /// [Optional] The data format. External data sources must be in CSV format. The default value is CSV.
+    #[serde(alias="sourceFormat")]
+    pub source_format: String,
+    /// [Optional] The maximum number of bad records that BigQuery can ignore when reading data. If the number of bad records exceeds this value, an invalid error is returned in the job result. The default value is 0, which requires that all records are valid.
+    #[serde(alias="maxBadRecords")]
+    pub max_bad_records: i32,
+    /// [Required] The schema for the data.
+    pub schema: TableSchema,
+}
+
+impl Part for ExternalDataConfiguration {}
 
 
 /// There is no detailed description.
@@ -1241,6 +1301,9 @@ pub struct JobConfigurationQuery {
     /// [Deprecated] This property is deprecated.
     #[serde(alias="preserveNulls")]
     pub preserve_nulls: bool,
+    /// [Experimental] If querying an external data source outside of BigQuery, describes the data format, location and other properties of the data source. By defining these properties, the data source can then be queried as if it were a standard BigQuery table.
+    #[serde(alias="tableDefinitions")]
+    pub table_definitions: HashMap<String, ExternalDataConfiguration>,
 }
 
 impl Part for JobConfigurationQuery {}
@@ -1508,8 +1571,8 @@ impl Part for JobConfigurationTableCopy {}
 ///
 /// ```test_harness,no_run
 /// extern crate hyper;
-/// extern crate "yup-oauth2" as oauth2;
-/// extern crate "google-bigquery2" as bigquery2;
+/// extern crate yup_oauth2 as oauth2;
+/// extern crate google_bigquery2 as bigquery2;
 /// 
 /// # #[test] fn egal() {
 /// use std::default::Default;
@@ -1679,8 +1742,8 @@ impl<'a, C, NC, A> TableMethods<'a, C, NC, A> {
 ///
 /// ```test_harness,no_run
 /// extern crate hyper;
-/// extern crate "yup-oauth2" as oauth2;
-/// extern crate "google-bigquery2" as bigquery2;
+/// extern crate yup_oauth2 as oauth2;
+/// extern crate google_bigquery2 as bigquery2;
 /// 
 /// # #[test] fn egal() {
 /// use std::default::Default;
@@ -1840,8 +1903,8 @@ impl<'a, C, NC, A> DatasetMethods<'a, C, NC, A> {
 ///
 /// ```test_harness,no_run
 /// extern crate hyper;
-/// extern crate "yup-oauth2" as oauth2;
-/// extern crate "google-bigquery2" as bigquery2;
+/// extern crate yup_oauth2 as oauth2;
+/// extern crate google_bigquery2 as bigquery2;
 /// 
 /// # #[test] fn egal() {
 /// use std::default::Default;
@@ -1983,8 +2046,8 @@ impl<'a, C, NC, A> JobMethods<'a, C, NC, A> {
 ///
 /// ```test_harness,no_run
 /// extern crate hyper;
-/// extern crate "yup-oauth2" as oauth2;
-/// extern crate "google-bigquery2" as bigquery2;
+/// extern crate yup_oauth2 as oauth2;
+/// extern crate google_bigquery2 as bigquery2;
 /// 
 /// # #[test] fn egal() {
 /// use std::default::Default;
@@ -2071,8 +2134,8 @@ impl<'a, C, NC, A> TabledataMethods<'a, C, NC, A> {
 ///
 /// ```test_harness,no_run
 /// extern crate hyper;
-/// extern crate "yup-oauth2" as oauth2;
-/// extern crate "google-bigquery2" as bigquery2;
+/// extern crate yup_oauth2 as oauth2;
+/// extern crate google_bigquery2 as bigquery2;
 /// 
 /// # #[test] fn egal() {
 /// use std::default::Default;
@@ -2134,8 +2197,8 @@ impl<'a, C, NC, A> ProjectMethods<'a, C, NC, A> {
 ///
 /// ```test_harness,no_run
 /// # extern crate hyper;
-/// # extern crate "yup-oauth2" as oauth2;
-/// # extern crate "google-bigquery2" as bigquery2;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_bigquery2 as bigquery2;
 /// use bigquery2::Table;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
@@ -2206,7 +2269,7 @@ impl<'a, C, NC, A> TableUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
 
         let mut url = "https://www.googleapis.com/bigquery/v2/projects/{projectId}/datasets/{datasetId}/tables/{tableId}".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Full.as_slice().to_string(), ());
+            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{projectId}", "projectId"), ("{datasetId}", "datasetId"), ("{tableId}", "tableId")].iter() {
@@ -2236,7 +2299,7 @@ impl<'a, C, NC, A> TableUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
         
         if params.len() > 0 {
             url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
+            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_ref()))));
         }
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
@@ -2259,7 +2322,7 @@ impl<'a, C, NC, A> TableUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Put, url.as_slice())
+                let mut req = client.borrow_mut().request(hyper::method::Method::Put, url.as_ref())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -2273,7 +2336,7 @@ impl<'a, C, NC, A> TableUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
             match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
+                        sleep_ms(d.num_milliseconds() as u32);
                         continue;
                     }
                     dlg.finished(false);
@@ -2284,7 +2347,7 @@ impl<'a, C, NC, A> TableUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
-                            sleep(d);
+                            sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
@@ -2378,8 +2441,8 @@ impl<'a, C, NC, A> TableUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> TableUpdateCall<'a, C, NC, A>
-                                                        where T: Str {
-        self._additional_params.insert(name.as_slice().to_string(), value.as_slice().to_string());
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
     }
 
@@ -2395,8 +2458,8 @@ impl<'a, C, NC, A> TableUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T>(mut self, scope: T) -> TableUpdateCall<'a, C, NC, A> 
-                                                        where T: Str {
-        self._scopes.insert(scope.as_slice().to_string(), ());
+                                                        where T: AsRef<str> {
+        self._scopes.insert(scope.as_ref().to_string(), ());
         self
     }
 }
@@ -2413,8 +2476,8 @@ impl<'a, C, NC, A> TableUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
 ///
 /// ```test_harness,no_run
 /// # extern crate hyper;
-/// # extern crate "yup-oauth2" as oauth2;
-/// # extern crate "google-bigquery2" as bigquery2;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_bigquery2 as bigquery2;
 /// use bigquery2::Table;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
@@ -2483,7 +2546,7 @@ impl<'a, C, NC, A> TableInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
 
         let mut url = "https://www.googleapis.com/bigquery/v2/projects/{projectId}/datasets/{datasetId}/tables".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Full.as_slice().to_string(), ());
+            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{projectId}", "projectId"), ("{datasetId}", "datasetId")].iter() {
@@ -2513,7 +2576,7 @@ impl<'a, C, NC, A> TableInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
         
         if params.len() > 0 {
             url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
+            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_ref()))));
         }
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
@@ -2536,7 +2599,7 @@ impl<'a, C, NC, A> TableInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.as_slice())
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.as_ref())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -2550,7 +2613,7 @@ impl<'a, C, NC, A> TableInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
             match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
+                        sleep_ms(d.num_milliseconds() as u32);
                         continue;
                     }
                     dlg.finished(false);
@@ -2561,7 +2624,7 @@ impl<'a, C, NC, A> TableInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
-                            sleep(d);
+                            sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
@@ -2645,8 +2708,8 @@ impl<'a, C, NC, A> TableInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> TableInsertCall<'a, C, NC, A>
-                                                        where T: Str {
-        self._additional_params.insert(name.as_slice().to_string(), value.as_slice().to_string());
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
     }
 
@@ -2662,8 +2725,8 @@ impl<'a, C, NC, A> TableInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T>(mut self, scope: T) -> TableInsertCall<'a, C, NC, A> 
-                                                        where T: Str {
-        self._scopes.insert(scope.as_slice().to_string(), ());
+                                                        where T: AsRef<str> {
+        self._scopes.insert(scope.as_ref().to_string(), ());
         self
     }
 }
@@ -2680,8 +2743,8 @@ impl<'a, C, NC, A> TableInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
 ///
 /// ```test_harness,no_run
 /// # extern crate hyper;
-/// # extern crate "yup-oauth2" as oauth2;
-/// # extern crate "google-bigquery2" as bigquery2;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_bigquery2 as bigquery2;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -2753,7 +2816,7 @@ impl<'a, C, NC, A> TableListCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
 
         let mut url = "https://www.googleapis.com/bigquery/v2/projects/{projectId}/datasets/{datasetId}/tables".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Full.as_slice().to_string(), ());
+            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{projectId}", "projectId"), ("{datasetId}", "datasetId")].iter() {
@@ -2783,7 +2846,7 @@ impl<'a, C, NC, A> TableListCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
         
         if params.len() > 0 {
             url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
+            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_ref()))));
         }
 
 
@@ -2801,7 +2864,7 @@ impl<'a, C, NC, A> TableListCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
                                                              access_token: token.unwrap().access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_slice())
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_ref())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -2812,7 +2875,7 @@ impl<'a, C, NC, A> TableListCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
             match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
+                        sleep_ms(d.num_milliseconds() as u32);
                         continue;
                     }
                     dlg.finished(false);
@@ -2823,7 +2886,7 @@ impl<'a, C, NC, A> TableListCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
-                            sleep(d);
+                            sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
@@ -2914,8 +2977,8 @@ impl<'a, C, NC, A> TableListCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> TableListCall<'a, C, NC, A>
-                                                        where T: Str {
-        self._additional_params.insert(name.as_slice().to_string(), value.as_slice().to_string());
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
     }
 
@@ -2931,8 +2994,8 @@ impl<'a, C, NC, A> TableListCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T>(mut self, scope: T) -> TableListCall<'a, C, NC, A> 
-                                                        where T: Str {
-        self._scopes.insert(scope.as_slice().to_string(), ());
+                                                        where T: AsRef<str> {
+        self._scopes.insert(scope.as_ref().to_string(), ());
         self
     }
 }
@@ -2949,8 +3012,8 @@ impl<'a, C, NC, A> TableListCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
 ///
 /// ```test_harness,no_run
 /// # extern crate hyper;
-/// # extern crate "yup-oauth2" as oauth2;
-/// # extern crate "google-bigquery2" as bigquery2;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_bigquery2 as bigquery2;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -3013,7 +3076,7 @@ impl<'a, C, NC, A> TableDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
 
         let mut url = "https://www.googleapis.com/bigquery/v2/projects/{projectId}/datasets/{datasetId}/tables/{tableId}".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Full.as_slice().to_string(), ());
+            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{projectId}", "projectId"), ("{datasetId}", "datasetId"), ("{tableId}", "tableId")].iter() {
@@ -3043,7 +3106,7 @@ impl<'a, C, NC, A> TableDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
         
         if params.len() > 0 {
             url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
+            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_ref()))));
         }
 
 
@@ -3061,7 +3124,7 @@ impl<'a, C, NC, A> TableDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
                                                              access_token: token.unwrap().access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Delete, url.as_slice())
+                let mut req = client.borrow_mut().request(hyper::method::Method::Delete, url.as_ref())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -3072,7 +3135,7 @@ impl<'a, C, NC, A> TableDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
             match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
+                        sleep_ms(d.num_milliseconds() as u32);
                         continue;
                     }
                     dlg.finished(false);
@@ -3083,7 +3146,7 @@ impl<'a, C, NC, A> TableDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
-                            sleep(d);
+                            sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
@@ -3158,8 +3221,8 @@ impl<'a, C, NC, A> TableDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> TableDeleteCall<'a, C, NC, A>
-                                                        where T: Str {
-        self._additional_params.insert(name.as_slice().to_string(), value.as_slice().to_string());
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
     }
 
@@ -3175,8 +3238,8 @@ impl<'a, C, NC, A> TableDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T>(mut self, scope: T) -> TableDeleteCall<'a, C, NC, A> 
-                                                        where T: Str {
-        self._scopes.insert(scope.as_slice().to_string(), ());
+                                                        where T: AsRef<str> {
+        self._scopes.insert(scope.as_ref().to_string(), ());
         self
     }
 }
@@ -3193,8 +3256,8 @@ impl<'a, C, NC, A> TableDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
 ///
 /// ```test_harness,no_run
 /// # extern crate hyper;
-/// # extern crate "yup-oauth2" as oauth2;
-/// # extern crate "google-bigquery2" as bigquery2;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_bigquery2 as bigquery2;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -3258,7 +3321,7 @@ impl<'a, C, NC, A> TableGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
 
         let mut url = "https://www.googleapis.com/bigquery/v2/projects/{projectId}/datasets/{datasetId}/tables/{tableId}".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Full.as_slice().to_string(), ());
+            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{projectId}", "projectId"), ("{datasetId}", "datasetId"), ("{tableId}", "tableId")].iter() {
@@ -3288,7 +3351,7 @@ impl<'a, C, NC, A> TableGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
         
         if params.len() > 0 {
             url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
+            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_ref()))));
         }
 
 
@@ -3306,7 +3369,7 @@ impl<'a, C, NC, A> TableGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
                                                              access_token: token.unwrap().access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_slice())
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_ref())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -3317,7 +3380,7 @@ impl<'a, C, NC, A> TableGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
             match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
+                        sleep_ms(d.num_milliseconds() as u32);
                         continue;
                     }
                     dlg.finished(false);
@@ -3328,7 +3391,7 @@ impl<'a, C, NC, A> TableGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
-                            sleep(d);
+                            sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
@@ -3413,8 +3476,8 @@ impl<'a, C, NC, A> TableGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> TableGetCall<'a, C, NC, A>
-                                                        where T: Str {
-        self._additional_params.insert(name.as_slice().to_string(), value.as_slice().to_string());
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
     }
 
@@ -3430,8 +3493,8 @@ impl<'a, C, NC, A> TableGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T>(mut self, scope: T) -> TableGetCall<'a, C, NC, A> 
-                                                        where T: Str {
-        self._scopes.insert(scope.as_slice().to_string(), ());
+                                                        where T: AsRef<str> {
+        self._scopes.insert(scope.as_ref().to_string(), ());
         self
     }
 }
@@ -3448,8 +3511,8 @@ impl<'a, C, NC, A> TableGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
 ///
 /// ```test_harness,no_run
 /// # extern crate hyper;
-/// # extern crate "yup-oauth2" as oauth2;
-/// # extern crate "google-bigquery2" as bigquery2;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_bigquery2 as bigquery2;
 /// use bigquery2::Table;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
@@ -3520,7 +3583,7 @@ impl<'a, C, NC, A> TablePatchCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
 
         let mut url = "https://www.googleapis.com/bigquery/v2/projects/{projectId}/datasets/{datasetId}/tables/{tableId}".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Full.as_slice().to_string(), ());
+            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{projectId}", "projectId"), ("{datasetId}", "datasetId"), ("{tableId}", "tableId")].iter() {
@@ -3550,7 +3613,7 @@ impl<'a, C, NC, A> TablePatchCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
         
         if params.len() > 0 {
             url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
+            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_ref()))));
         }
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
@@ -3573,7 +3636,7 @@ impl<'a, C, NC, A> TablePatchCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Patch, url.as_slice())
+                let mut req = client.borrow_mut().request(hyper::method::Method::Patch, url.as_ref())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -3587,7 +3650,7 @@ impl<'a, C, NC, A> TablePatchCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
             match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
+                        sleep_ms(d.num_milliseconds() as u32);
                         continue;
                     }
                     dlg.finished(false);
@@ -3598,7 +3661,7 @@ impl<'a, C, NC, A> TablePatchCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
-                            sleep(d);
+                            sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
@@ -3692,8 +3755,8 @@ impl<'a, C, NC, A> TablePatchCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> TablePatchCall<'a, C, NC, A>
-                                                        where T: Str {
-        self._additional_params.insert(name.as_slice().to_string(), value.as_slice().to_string());
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
     }
 
@@ -3709,8 +3772,8 @@ impl<'a, C, NC, A> TablePatchCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T>(mut self, scope: T) -> TablePatchCall<'a, C, NC, A> 
-                                                        where T: Str {
-        self._scopes.insert(scope.as_slice().to_string(), ());
+                                                        where T: AsRef<str> {
+        self._scopes.insert(scope.as_ref().to_string(), ());
         self
     }
 }
@@ -3727,8 +3790,8 @@ impl<'a, C, NC, A> TablePatchCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
 ///
 /// ```test_harness,no_run
 /// # extern crate hyper;
-/// # extern crate "yup-oauth2" as oauth2;
-/// # extern crate "google-bigquery2" as bigquery2;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_bigquery2 as bigquery2;
 /// use bigquery2::Dataset;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
@@ -3797,7 +3860,7 @@ impl<'a, C, NC, A> DatasetPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkC
 
         let mut url = "https://www.googleapis.com/bigquery/v2/projects/{projectId}/datasets/{datasetId}".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Full.as_slice().to_string(), ());
+            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{projectId}", "projectId"), ("{datasetId}", "datasetId")].iter() {
@@ -3827,7 +3890,7 @@ impl<'a, C, NC, A> DatasetPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkC
         
         if params.len() > 0 {
             url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
+            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_ref()))));
         }
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
@@ -3850,7 +3913,7 @@ impl<'a, C, NC, A> DatasetPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkC
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Patch, url.as_slice())
+                let mut req = client.borrow_mut().request(hyper::method::Method::Patch, url.as_ref())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -3864,7 +3927,7 @@ impl<'a, C, NC, A> DatasetPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkC
             match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
+                        sleep_ms(d.num_milliseconds() as u32);
                         continue;
                     }
                     dlg.finished(false);
@@ -3875,7 +3938,7 @@ impl<'a, C, NC, A> DatasetPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkC
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
-                            sleep(d);
+                            sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
@@ -3959,8 +4022,8 @@ impl<'a, C, NC, A> DatasetPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> DatasetPatchCall<'a, C, NC, A>
-                                                        where T: Str {
-        self._additional_params.insert(name.as_slice().to_string(), value.as_slice().to_string());
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
     }
 
@@ -3976,8 +4039,8 @@ impl<'a, C, NC, A> DatasetPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T>(mut self, scope: T) -> DatasetPatchCall<'a, C, NC, A> 
-                                                        where T: Str {
-        self._scopes.insert(scope.as_slice().to_string(), ());
+                                                        where T: AsRef<str> {
+        self._scopes.insert(scope.as_ref().to_string(), ());
         self
     }
 }
@@ -3994,8 +4057,8 @@ impl<'a, C, NC, A> DatasetPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkC
 ///
 /// ```test_harness,no_run
 /// # extern crate hyper;
-/// # extern crate "yup-oauth2" as oauth2;
-/// # extern crate "google-bigquery2" as bigquery2;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_bigquery2 as bigquery2;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -4057,7 +4120,7 @@ impl<'a, C, NC, A> DatasetGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
 
         let mut url = "https://www.googleapis.com/bigquery/v2/projects/{projectId}/datasets/{datasetId}".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Full.as_slice().to_string(), ());
+            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{projectId}", "projectId"), ("{datasetId}", "datasetId")].iter() {
@@ -4087,7 +4150,7 @@ impl<'a, C, NC, A> DatasetGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
         
         if params.len() > 0 {
             url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
+            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_ref()))));
         }
 
 
@@ -4105,7 +4168,7 @@ impl<'a, C, NC, A> DatasetGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
                                                              access_token: token.unwrap().access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_slice())
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_ref())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -4116,7 +4179,7 @@ impl<'a, C, NC, A> DatasetGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
             match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
+                        sleep_ms(d.num_milliseconds() as u32);
                         continue;
                     }
                     dlg.finished(false);
@@ -4127,7 +4190,7 @@ impl<'a, C, NC, A> DatasetGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
-                            sleep(d);
+                            sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
@@ -4202,8 +4265,8 @@ impl<'a, C, NC, A> DatasetGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> DatasetGetCall<'a, C, NC, A>
-                                                        where T: Str {
-        self._additional_params.insert(name.as_slice().to_string(), value.as_slice().to_string());
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
     }
 
@@ -4219,8 +4282,8 @@ impl<'a, C, NC, A> DatasetGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T>(mut self, scope: T) -> DatasetGetCall<'a, C, NC, A> 
-                                                        where T: Str {
-        self._scopes.insert(scope.as_slice().to_string(), ());
+                                                        where T: AsRef<str> {
+        self._scopes.insert(scope.as_ref().to_string(), ());
         self
     }
 }
@@ -4237,8 +4300,8 @@ impl<'a, C, NC, A> DatasetGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
 ///
 /// ```test_harness,no_run
 /// # extern crate hyper;
-/// # extern crate "yup-oauth2" as oauth2;
-/// # extern crate "google-bigquery2" as bigquery2;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_bigquery2 as bigquery2;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -4313,7 +4376,7 @@ impl<'a, C, NC, A> DatasetListCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
 
         let mut url = "https://www.googleapis.com/bigquery/v2/projects/{projectId}/datasets".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Full.as_slice().to_string(), ());
+            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{projectId}", "projectId")].iter() {
@@ -4343,7 +4406,7 @@ impl<'a, C, NC, A> DatasetListCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
         
         if params.len() > 0 {
             url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
+            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_ref()))));
         }
 
 
@@ -4361,7 +4424,7 @@ impl<'a, C, NC, A> DatasetListCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
                                                              access_token: token.unwrap().access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_slice())
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_ref())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -4372,7 +4435,7 @@ impl<'a, C, NC, A> DatasetListCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
             match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
+                        sleep_ms(d.num_milliseconds() as u32);
                         continue;
                     }
                     dlg.finished(false);
@@ -4383,7 +4446,7 @@ impl<'a, C, NC, A> DatasetListCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
-                            sleep(d);
+                            sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
@@ -4472,8 +4535,8 @@ impl<'a, C, NC, A> DatasetListCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> DatasetListCall<'a, C, NC, A>
-                                                        where T: Str {
-        self._additional_params.insert(name.as_slice().to_string(), value.as_slice().to_string());
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
     }
 
@@ -4489,8 +4552,8 @@ impl<'a, C, NC, A> DatasetListCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T>(mut self, scope: T) -> DatasetListCall<'a, C, NC, A> 
-                                                        where T: Str {
-        self._scopes.insert(scope.as_slice().to_string(), ());
+                                                        where T: AsRef<str> {
+        self._scopes.insert(scope.as_ref().to_string(), ());
         self
     }
 }
@@ -4507,8 +4570,8 @@ impl<'a, C, NC, A> DatasetListCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
 ///
 /// ```test_harness,no_run
 /// # extern crate hyper;
-/// # extern crate "yup-oauth2" as oauth2;
-/// # extern crate "google-bigquery2" as bigquery2;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_bigquery2 as bigquery2;
 /// use bigquery2::Dataset;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
@@ -4577,7 +4640,7 @@ impl<'a, C, NC, A> DatasetUpdateCall<'a, C, NC, A> where NC: hyper::net::Network
 
         let mut url = "https://www.googleapis.com/bigquery/v2/projects/{projectId}/datasets/{datasetId}".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Full.as_slice().to_string(), ());
+            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{projectId}", "projectId"), ("{datasetId}", "datasetId")].iter() {
@@ -4607,7 +4670,7 @@ impl<'a, C, NC, A> DatasetUpdateCall<'a, C, NC, A> where NC: hyper::net::Network
         
         if params.len() > 0 {
             url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
+            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_ref()))));
         }
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
@@ -4630,7 +4693,7 @@ impl<'a, C, NC, A> DatasetUpdateCall<'a, C, NC, A> where NC: hyper::net::Network
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Put, url.as_slice())
+                let mut req = client.borrow_mut().request(hyper::method::Method::Put, url.as_ref())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -4644,7 +4707,7 @@ impl<'a, C, NC, A> DatasetUpdateCall<'a, C, NC, A> where NC: hyper::net::Network
             match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
+                        sleep_ms(d.num_milliseconds() as u32);
                         continue;
                     }
                     dlg.finished(false);
@@ -4655,7 +4718,7 @@ impl<'a, C, NC, A> DatasetUpdateCall<'a, C, NC, A> where NC: hyper::net::Network
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
-                            sleep(d);
+                            sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
@@ -4739,8 +4802,8 @@ impl<'a, C, NC, A> DatasetUpdateCall<'a, C, NC, A> where NC: hyper::net::Network
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> DatasetUpdateCall<'a, C, NC, A>
-                                                        where T: Str {
-        self._additional_params.insert(name.as_slice().to_string(), value.as_slice().to_string());
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
     }
 
@@ -4756,8 +4819,8 @@ impl<'a, C, NC, A> DatasetUpdateCall<'a, C, NC, A> where NC: hyper::net::Network
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T>(mut self, scope: T) -> DatasetUpdateCall<'a, C, NC, A> 
-                                                        where T: Str {
-        self._scopes.insert(scope.as_slice().to_string(), ());
+                                                        where T: AsRef<str> {
+        self._scopes.insert(scope.as_ref().to_string(), ());
         self
     }
 }
@@ -4774,8 +4837,8 @@ impl<'a, C, NC, A> DatasetUpdateCall<'a, C, NC, A> where NC: hyper::net::Network
 ///
 /// ```test_harness,no_run
 /// # extern crate hyper;
-/// # extern crate "yup-oauth2" as oauth2;
-/// # extern crate "google-bigquery2" as bigquery2;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_bigquery2 as bigquery2;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -4841,7 +4904,7 @@ impl<'a, C, NC, A> DatasetDeleteCall<'a, C, NC, A> where NC: hyper::net::Network
 
         let mut url = "https://www.googleapis.com/bigquery/v2/projects/{projectId}/datasets/{datasetId}".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Full.as_slice().to_string(), ());
+            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{projectId}", "projectId"), ("{datasetId}", "datasetId")].iter() {
@@ -4871,7 +4934,7 @@ impl<'a, C, NC, A> DatasetDeleteCall<'a, C, NC, A> where NC: hyper::net::Network
         
         if params.len() > 0 {
             url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
+            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_ref()))));
         }
 
 
@@ -4889,7 +4952,7 @@ impl<'a, C, NC, A> DatasetDeleteCall<'a, C, NC, A> where NC: hyper::net::Network
                                                              access_token: token.unwrap().access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Delete, url.as_slice())
+                let mut req = client.borrow_mut().request(hyper::method::Method::Delete, url.as_ref())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -4900,7 +4963,7 @@ impl<'a, C, NC, A> DatasetDeleteCall<'a, C, NC, A> where NC: hyper::net::Network
             match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
+                        sleep_ms(d.num_milliseconds() as u32);
                         continue;
                     }
                     dlg.finished(false);
@@ -4911,7 +4974,7 @@ impl<'a, C, NC, A> DatasetDeleteCall<'a, C, NC, A> where NC: hyper::net::Network
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
-                            sleep(d);
+                            sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
@@ -4984,8 +5047,8 @@ impl<'a, C, NC, A> DatasetDeleteCall<'a, C, NC, A> where NC: hyper::net::Network
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> DatasetDeleteCall<'a, C, NC, A>
-                                                        where T: Str {
-        self._additional_params.insert(name.as_slice().to_string(), value.as_slice().to_string());
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
     }
 
@@ -5001,8 +5064,8 @@ impl<'a, C, NC, A> DatasetDeleteCall<'a, C, NC, A> where NC: hyper::net::Network
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T>(mut self, scope: T) -> DatasetDeleteCall<'a, C, NC, A> 
-                                                        where T: Str {
-        self._scopes.insert(scope.as_slice().to_string(), ());
+                                                        where T: AsRef<str> {
+        self._scopes.insert(scope.as_ref().to_string(), ());
         self
     }
 }
@@ -5019,8 +5082,8 @@ impl<'a, C, NC, A> DatasetDeleteCall<'a, C, NC, A> where NC: hyper::net::Network
 ///
 /// ```test_harness,no_run
 /// # extern crate hyper;
-/// # extern crate "yup-oauth2" as oauth2;
-/// # extern crate "google-bigquery2" as bigquery2;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_bigquery2 as bigquery2;
 /// use bigquery2::Dataset;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
@@ -5087,7 +5150,7 @@ impl<'a, C, NC, A> DatasetInsertCall<'a, C, NC, A> where NC: hyper::net::Network
 
         let mut url = "https://www.googleapis.com/bigquery/v2/projects/{projectId}/datasets".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Full.as_slice().to_string(), ());
+            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{projectId}", "projectId")].iter() {
@@ -5117,7 +5180,7 @@ impl<'a, C, NC, A> DatasetInsertCall<'a, C, NC, A> where NC: hyper::net::Network
         
         if params.len() > 0 {
             url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
+            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_ref()))));
         }
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
@@ -5140,7 +5203,7 @@ impl<'a, C, NC, A> DatasetInsertCall<'a, C, NC, A> where NC: hyper::net::Network
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.as_slice())
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.as_ref())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -5154,7 +5217,7 @@ impl<'a, C, NC, A> DatasetInsertCall<'a, C, NC, A> where NC: hyper::net::Network
             match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
+                        sleep_ms(d.num_milliseconds() as u32);
                         continue;
                     }
                     dlg.finished(false);
@@ -5165,7 +5228,7 @@ impl<'a, C, NC, A> DatasetInsertCall<'a, C, NC, A> where NC: hyper::net::Network
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
-                            sleep(d);
+                            sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
@@ -5239,8 +5302,8 @@ impl<'a, C, NC, A> DatasetInsertCall<'a, C, NC, A> where NC: hyper::net::Network
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> DatasetInsertCall<'a, C, NC, A>
-                                                        where T: Str {
-        self._additional_params.insert(name.as_slice().to_string(), value.as_slice().to_string());
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
     }
 
@@ -5256,8 +5319,8 @@ impl<'a, C, NC, A> DatasetInsertCall<'a, C, NC, A> where NC: hyper::net::Network
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T>(mut self, scope: T) -> DatasetInsertCall<'a, C, NC, A> 
-                                                        where T: Str {
-        self._scopes.insert(scope.as_slice().to_string(), ());
+                                                        where T: AsRef<str> {
+        self._scopes.insert(scope.as_ref().to_string(), ());
         self
     }
 }
@@ -5274,8 +5337,8 @@ impl<'a, C, NC, A> DatasetInsertCall<'a, C, NC, A> where NC: hyper::net::Network
 ///
 /// ```test_harness,no_run
 /// # extern crate hyper;
-/// # extern crate "yup-oauth2" as oauth2;
-/// # extern crate "google-bigquery2" as bigquery2;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_bigquery2 as bigquery2;
 /// use bigquery2::QueryRequest;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
@@ -5342,7 +5405,7 @@ impl<'a, C, NC, A> JobQueryCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
 
         let mut url = "https://www.googleapis.com/bigquery/v2/projects/{projectId}/queries".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Full.as_slice().to_string(), ());
+            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{projectId}", "projectId")].iter() {
@@ -5372,7 +5435,7 @@ impl<'a, C, NC, A> JobQueryCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
         
         if params.len() > 0 {
             url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
+            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_ref()))));
         }
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
@@ -5395,7 +5458,7 @@ impl<'a, C, NC, A> JobQueryCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.as_slice())
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.as_ref())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -5409,7 +5472,7 @@ impl<'a, C, NC, A> JobQueryCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
             match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
+                        sleep_ms(d.num_milliseconds() as u32);
                         continue;
                     }
                     dlg.finished(false);
@@ -5420,7 +5483,7 @@ impl<'a, C, NC, A> JobQueryCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
-                            sleep(d);
+                            sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
@@ -5494,8 +5557,8 @@ impl<'a, C, NC, A> JobQueryCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> JobQueryCall<'a, C, NC, A>
-                                                        where T: Str {
-        self._additional_params.insert(name.as_slice().to_string(), value.as_slice().to_string());
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
     }
 
@@ -5511,8 +5574,8 @@ impl<'a, C, NC, A> JobQueryCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T>(mut self, scope: T) -> JobQueryCall<'a, C, NC, A> 
-                                                        where T: Str {
-        self._scopes.insert(scope.as_slice().to_string(), ());
+                                                        where T: AsRef<str> {
+        self._scopes.insert(scope.as_ref().to_string(), ());
         self
     }
 }
@@ -5529,8 +5592,8 @@ impl<'a, C, NC, A> JobQueryCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
 ///
 /// ```test_harness,no_run
 /// # extern crate hyper;
-/// # extern crate "yup-oauth2" as oauth2;
-/// # extern crate "google-bigquery2" as bigquery2;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_bigquery2 as bigquery2;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -5612,7 +5675,7 @@ impl<'a, C, NC, A> JobGetQueryResultCall<'a, C, NC, A> where NC: hyper::net::Net
 
         let mut url = "https://www.googleapis.com/bigquery/v2/projects/{projectId}/queries/{jobId}".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Full.as_slice().to_string(), ());
+            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{projectId}", "projectId"), ("{jobId}", "jobId")].iter() {
@@ -5642,7 +5705,7 @@ impl<'a, C, NC, A> JobGetQueryResultCall<'a, C, NC, A> where NC: hyper::net::Net
         
         if params.len() > 0 {
             url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
+            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_ref()))));
         }
 
 
@@ -5660,7 +5723,7 @@ impl<'a, C, NC, A> JobGetQueryResultCall<'a, C, NC, A> where NC: hyper::net::Net
                                                              access_token: token.unwrap().access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_slice())
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_ref())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -5671,7 +5734,7 @@ impl<'a, C, NC, A> JobGetQueryResultCall<'a, C, NC, A> where NC: hyper::net::Net
             match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
+                        sleep_ms(d.num_milliseconds() as u32);
                         continue;
                     }
                     dlg.finished(false);
@@ -5682,7 +5745,7 @@ impl<'a, C, NC, A> JobGetQueryResultCall<'a, C, NC, A> where NC: hyper::net::Net
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
-                            sleep(d);
+                            sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
@@ -5789,8 +5852,8 @@ impl<'a, C, NC, A> JobGetQueryResultCall<'a, C, NC, A> where NC: hyper::net::Net
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> JobGetQueryResultCall<'a, C, NC, A>
-                                                        where T: Str {
-        self._additional_params.insert(name.as_slice().to_string(), value.as_slice().to_string());
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
     }
 
@@ -5806,8 +5869,8 @@ impl<'a, C, NC, A> JobGetQueryResultCall<'a, C, NC, A> where NC: hyper::net::Net
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T>(mut self, scope: T) -> JobGetQueryResultCall<'a, C, NC, A> 
-                                                        where T: Str {
-        self._scopes.insert(scope.as_slice().to_string(), ());
+                                                        where T: AsRef<str> {
+        self._scopes.insert(scope.as_ref().to_string(), ());
         self
     }
 }
@@ -5824,8 +5887,8 @@ impl<'a, C, NC, A> JobGetQueryResultCall<'a, C, NC, A> where NC: hyper::net::Net
 ///
 /// ```test_harness,no_run
 /// # extern crate hyper;
-/// # extern crate "yup-oauth2" as oauth2;
-/// # extern crate "google-bigquery2" as bigquery2;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_bigquery2 as bigquery2;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -5914,7 +5977,7 @@ impl<'a, C, NC, A> JobListCall<'a, C, NC, A> where NC: hyper::net::NetworkConnec
 
         let mut url = "https://www.googleapis.com/bigquery/v2/projects/{projectId}/jobs".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Full.as_slice().to_string(), ());
+            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{projectId}", "projectId")].iter() {
@@ -5944,7 +6007,7 @@ impl<'a, C, NC, A> JobListCall<'a, C, NC, A> where NC: hyper::net::NetworkConnec
         
         if params.len() > 0 {
             url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
+            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_ref()))));
         }
 
 
@@ -5962,7 +6025,7 @@ impl<'a, C, NC, A> JobListCall<'a, C, NC, A> where NC: hyper::net::NetworkConnec
                                                              access_token: token.unwrap().access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_slice())
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_ref())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -5973,7 +6036,7 @@ impl<'a, C, NC, A> JobListCall<'a, C, NC, A> where NC: hyper::net::NetworkConnec
             match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
+                        sleep_ms(d.num_milliseconds() as u32);
                         continue;
                     }
                     dlg.finished(false);
@@ -5984,7 +6047,7 @@ impl<'a, C, NC, A> JobListCall<'a, C, NC, A> where NC: hyper::net::NetworkConnec
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
-                            sleep(d);
+                            sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
@@ -6090,8 +6153,8 @@ impl<'a, C, NC, A> JobListCall<'a, C, NC, A> where NC: hyper::net::NetworkConnec
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> JobListCall<'a, C, NC, A>
-                                                        where T: Str {
-        self._additional_params.insert(name.as_slice().to_string(), value.as_slice().to_string());
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
     }
 
@@ -6107,8 +6170,8 @@ impl<'a, C, NC, A> JobListCall<'a, C, NC, A> where NC: hyper::net::NetworkConnec
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T>(mut self, scope: T) -> JobListCall<'a, C, NC, A> 
-                                                        where T: Str {
-        self._scopes.insert(scope.as_slice().to_string(), ());
+                                                        where T: AsRef<str> {
+        self._scopes.insert(scope.as_ref().to_string(), ());
         self
     }
 }
@@ -6125,8 +6188,8 @@ impl<'a, C, NC, A> JobListCall<'a, C, NC, A> where NC: hyper::net::NetworkConnec
 ///
 /// ```test_harness,no_run
 /// # extern crate hyper;
-/// # extern crate "yup-oauth2" as oauth2;
-/// # extern crate "google-bigquery2" as bigquery2;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_bigquery2 as bigquery2;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -6188,7 +6251,7 @@ impl<'a, C, NC, A> JobGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnect
 
         let mut url = "https://www.googleapis.com/bigquery/v2/projects/{projectId}/jobs/{jobId}".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Full.as_slice().to_string(), ());
+            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{projectId}", "projectId"), ("{jobId}", "jobId")].iter() {
@@ -6218,7 +6281,7 @@ impl<'a, C, NC, A> JobGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnect
         
         if params.len() > 0 {
             url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
+            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_ref()))));
         }
 
 
@@ -6236,7 +6299,7 @@ impl<'a, C, NC, A> JobGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnect
                                                              access_token: token.unwrap().access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_slice())
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_ref())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -6247,7 +6310,7 @@ impl<'a, C, NC, A> JobGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnect
             match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
+                        sleep_ms(d.num_milliseconds() as u32);
                         continue;
                     }
                     dlg.finished(false);
@@ -6258,7 +6321,7 @@ impl<'a, C, NC, A> JobGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnect
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
-                            sleep(d);
+                            sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
@@ -6333,8 +6396,8 @@ impl<'a, C, NC, A> JobGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnect
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> JobGetCall<'a, C, NC, A>
-                                                        where T: Str {
-        self._additional_params.insert(name.as_slice().to_string(), value.as_slice().to_string());
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
     }
 
@@ -6350,8 +6413,8 @@ impl<'a, C, NC, A> JobGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnect
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T>(mut self, scope: T) -> JobGetCall<'a, C, NC, A> 
-                                                        where T: Str {
-        self._scopes.insert(scope.as_slice().to_string(), ());
+                                                        where T: AsRef<str> {
+        self._scopes.insert(scope.as_ref().to_string(), ());
         self
     }
 }
@@ -6368,8 +6431,8 @@ impl<'a, C, NC, A> JobGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnect
 ///
 /// ```test_harness,no_run
 /// # extern crate hyper;
-/// # extern crate "yup-oauth2" as oauth2;
-/// # extern crate "google-bigquery2" as bigquery2;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_bigquery2 as bigquery2;
 /// use bigquery2::Job;
 /// use std::fs;
 /// # #[test] fn egal() {
@@ -6445,7 +6508,7 @@ impl<'a, C, NC, A> JobInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
         };
         params.push(("uploadType", protocol.to_string()));
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Full.as_slice().to_string(), ());
+            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{projectId}", "projectId")].iter() {
@@ -6475,7 +6538,7 @@ impl<'a, C, NC, A> JobInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
         
         if params.len() > 0 {
             url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
+            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_ref()))));
         }
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
@@ -6528,7 +6591,7 @@ impl<'a, C, NC, A> JobInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
                         _ => (&mut request_value_reader as &mut io::Read, ContentType(json_mime_type.clone())),
                     };
                     let mut client = &mut *self.hub.client.borrow_mut();
-                    let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.as_slice())
+                    let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.as_ref())
                         .header(UserAgent(self.hub._user_agent.clone()))
                         .header(auth_header.clone())
                         .header(content_type)
@@ -6546,7 +6609,7 @@ impl<'a, C, NC, A> JobInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
             match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
+                        sleep_ms(d.num_milliseconds() as u32);
                         continue;
                     }
                     dlg.finished(false);
@@ -6557,7 +6620,7 @@ impl<'a, C, NC, A> JobInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
-                            sleep(d);
+                            sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
@@ -6699,8 +6762,8 @@ impl<'a, C, NC, A> JobInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> JobInsertCall<'a, C, NC, A>
-                                                        where T: Str {
-        self._additional_params.insert(name.as_slice().to_string(), value.as_slice().to_string());
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
     }
 
@@ -6716,8 +6779,8 @@ impl<'a, C, NC, A> JobInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T>(mut self, scope: T) -> JobInsertCall<'a, C, NC, A> 
-                                                        where T: Str {
-        self._scopes.insert(scope.as_slice().to_string(), ());
+                                                        where T: AsRef<str> {
+        self._scopes.insert(scope.as_ref().to_string(), ());
         self
     }
 }
@@ -6734,8 +6797,8 @@ impl<'a, C, NC, A> JobInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
 ///
 /// ```test_harness,no_run
 /// # extern crate hyper;
-/// # extern crate "yup-oauth2" as oauth2;
-/// # extern crate "google-bigquery2" as bigquery2;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_bigquery2 as bigquery2;
 /// use bigquery2::TableDataInsertAllRequest;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
@@ -6806,7 +6869,7 @@ impl<'a, C, NC, A> TabledataInsertAllCall<'a, C, NC, A> where NC: hyper::net::Ne
 
         let mut url = "https://www.googleapis.com/bigquery/v2/projects/{projectId}/datasets/{datasetId}/tables/{tableId}/insertAll".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Full.as_slice().to_string(), ());
+            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{projectId}", "projectId"), ("{datasetId}", "datasetId"), ("{tableId}", "tableId")].iter() {
@@ -6836,7 +6899,7 @@ impl<'a, C, NC, A> TabledataInsertAllCall<'a, C, NC, A> where NC: hyper::net::Ne
         
         if params.len() > 0 {
             url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
+            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_ref()))));
         }
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
@@ -6859,7 +6922,7 @@ impl<'a, C, NC, A> TabledataInsertAllCall<'a, C, NC, A> where NC: hyper::net::Ne
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.as_slice())
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.as_ref())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -6873,7 +6936,7 @@ impl<'a, C, NC, A> TabledataInsertAllCall<'a, C, NC, A> where NC: hyper::net::Ne
             match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
+                        sleep_ms(d.num_milliseconds() as u32);
                         continue;
                     }
                     dlg.finished(false);
@@ -6884,7 +6947,7 @@ impl<'a, C, NC, A> TabledataInsertAllCall<'a, C, NC, A> where NC: hyper::net::Ne
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
-                            sleep(d);
+                            sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
@@ -6978,8 +7041,8 @@ impl<'a, C, NC, A> TabledataInsertAllCall<'a, C, NC, A> where NC: hyper::net::Ne
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> TabledataInsertAllCall<'a, C, NC, A>
-                                                        where T: Str {
-        self._additional_params.insert(name.as_slice().to_string(), value.as_slice().to_string());
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
     }
 
@@ -6995,8 +7058,8 @@ impl<'a, C, NC, A> TabledataInsertAllCall<'a, C, NC, A> where NC: hyper::net::Ne
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T>(mut self, scope: T) -> TabledataInsertAllCall<'a, C, NC, A> 
-                                                        where T: Str {
-        self._scopes.insert(scope.as_slice().to_string(), ());
+                                                        where T: AsRef<str> {
+        self._scopes.insert(scope.as_ref().to_string(), ());
         self
     }
 }
@@ -7013,8 +7076,8 @@ impl<'a, C, NC, A> TabledataInsertAllCall<'a, C, NC, A> where NC: hyper::net::Ne
 ///
 /// ```test_harness,no_run
 /// # extern crate hyper;
-/// # extern crate "yup-oauth2" as oauth2;
-/// # extern crate "google-bigquery2" as bigquery2;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_bigquery2 as bigquery2;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -7093,7 +7156,7 @@ impl<'a, C, NC, A> TabledataListCall<'a, C, NC, A> where NC: hyper::net::Network
 
         let mut url = "https://www.googleapis.com/bigquery/v2/projects/{projectId}/datasets/{datasetId}/tables/{tableId}/data".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Full.as_slice().to_string(), ());
+            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{projectId}", "projectId"), ("{datasetId}", "datasetId"), ("{tableId}", "tableId")].iter() {
@@ -7123,7 +7186,7 @@ impl<'a, C, NC, A> TabledataListCall<'a, C, NC, A> where NC: hyper::net::Network
         
         if params.len() > 0 {
             url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
+            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_ref()))));
         }
 
 
@@ -7141,7 +7204,7 @@ impl<'a, C, NC, A> TabledataListCall<'a, C, NC, A> where NC: hyper::net::Network
                                                              access_token: token.unwrap().access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_slice())
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_ref())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -7152,7 +7215,7 @@ impl<'a, C, NC, A> TabledataListCall<'a, C, NC, A> where NC: hyper::net::Network
             match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
+                        sleep_ms(d.num_milliseconds() as u32);
                         continue;
                     }
                     dlg.finished(false);
@@ -7163,7 +7226,7 @@ impl<'a, C, NC, A> TabledataListCall<'a, C, NC, A> where NC: hyper::net::Network
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
-                            sleep(d);
+                            sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
@@ -7272,8 +7335,8 @@ impl<'a, C, NC, A> TabledataListCall<'a, C, NC, A> where NC: hyper::net::Network
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> TabledataListCall<'a, C, NC, A>
-                                                        where T: Str {
-        self._additional_params.insert(name.as_slice().to_string(), value.as_slice().to_string());
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
     }
 
@@ -7289,8 +7352,8 @@ impl<'a, C, NC, A> TabledataListCall<'a, C, NC, A> where NC: hyper::net::Network
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T>(mut self, scope: T) -> TabledataListCall<'a, C, NC, A> 
-                                                        where T: Str {
-        self._scopes.insert(scope.as_slice().to_string(), ());
+                                                        where T: AsRef<str> {
+        self._scopes.insert(scope.as_ref().to_string(), ());
         self
     }
 }
@@ -7307,8 +7370,8 @@ impl<'a, C, NC, A> TabledataListCall<'a, C, NC, A> where NC: hyper::net::Network
 ///
 /// ```test_harness,no_run
 /// # extern crate hyper;
-/// # extern crate "yup-oauth2" as oauth2;
-/// # extern crate "google-bigquery2" as bigquery2;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_bigquery2 as bigquery2;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -7376,13 +7439,13 @@ impl<'a, C, NC, A> ProjectListCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
 
         let mut url = "https://www.googleapis.com/bigquery/v2/projects".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Full.as_slice().to_string(), ());
+            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
 
         
         if params.len() > 0 {
             url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
+            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_ref()))));
         }
 
 
@@ -7400,7 +7463,7 @@ impl<'a, C, NC, A> ProjectListCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
                                                              access_token: token.unwrap().access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_slice())
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_ref())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -7411,7 +7474,7 @@ impl<'a, C, NC, A> ProjectListCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
             match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
+                        sleep_ms(d.num_milliseconds() as u32);
                         continue;
                     }
                     dlg.finished(false);
@@ -7422,7 +7485,7 @@ impl<'a, C, NC, A> ProjectListCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
-                            sleep(d);
+                            sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
@@ -7493,8 +7556,8 @@ impl<'a, C, NC, A> ProjectListCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> ProjectListCall<'a, C, NC, A>
-                                                        where T: Str {
-        self._additional_params.insert(name.as_slice().to_string(), value.as_slice().to_string());
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
     }
 
@@ -7510,8 +7573,8 @@ impl<'a, C, NC, A> ProjectListCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T>(mut self, scope: T) -> ProjectListCall<'a, C, NC, A> 
-                                                        where T: Str {
-        self._scopes.insert(scope.as_slice().to_string(), ());
+                                                        where T: AsRef<str> {
+        self._scopes.insert(scope.as_ref().to_string(), ());
         self
     }
 }

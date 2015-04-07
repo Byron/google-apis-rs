@@ -1,0 +1,22 @@
+# DO NOT EDIT !
+# This file was generated automatically from 'src/mako/Cargo.toml.mako'
+# DO NOT EDIT !
+[package]
+
+name = "google-civicinfo2"
+version = "0.1.2+20150302"
+authors = ["Sebastian Thiel <byronimo@gmail>"]
+description = "A complete library to interact with Civic Info (protocol v2)"
+repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/civicinfo2"
+homepage = "https://developers.google.com/civic-information"
+documentation = "http://byron.github.io/google-apis-rs/google-civicinfo2"
+license = "MIT"
+keywords = ["civicinfo", "google", "protocol", "web", "api"]
+
+[dependencies]
+hyper = "*"
+mime = "*"
+yup-oauth2 = "*"
+url = "*"
+serde = "*"
+serde_macros = "*"

@@ -70,8 +70,8 @@ google-spectrum1_explorer = "*"
 
 ```Rust
 extern crate hyper;
-extern crate "yup-oauth2" as oauth2;
-extern crate "google-spectrum1_explorer" as spectrum1_explorer;
+extern crate yup_oauth2 as oauth2;
+extern crate google_spectrum1_explorer as spectrum1_explorer;
 use spectrum1_explorer::PawsGetSpectrumBatchRequest;
 use spectrum1_explorer::{Result, Error};
 use std::default::Default;

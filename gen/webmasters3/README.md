@@ -76,8 +76,8 @@ google-webmasters3 = "*"
 
 ```Rust
 extern crate hyper;
-extern crate "yup-oauth2" as oauth2;
-extern crate "google-webmasters3" as webmasters3;
+extern crate yup_oauth2 as oauth2;
+extern crate google_webmasters3 as webmasters3;
 use webmasters3::{Result, Error};
 use std::default::Default;
 use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};

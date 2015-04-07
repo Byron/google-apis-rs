@@ -76,8 +76,8 @@
 //! 
 //! ```test_harness,no_run
 //! extern crate hyper;
-//! extern crate "yup-oauth2" as oauth2;
-//! extern crate "google-licensing1" as licensing1;
+//! extern crate yup_oauth2 as oauth2;
+//! extern crate google_licensing1 as licensing1;
 //! use licensing1::{Result, Error};
 //! # #[test] fn egal() {
 //! use std::default::Default;
@@ -172,20 +172,20 @@
 //! [google-go-api]: https://github.com/google/google-api-go-client
 //! 
 //! 
-#![feature(core,io,thread_sleep)]
+#![feature(std_misc)]
 // Unused attributes happen thanks to defined, but unused structures
 // We don't warn about this, as depending on the API, some data structures or facilities are never used.
 // Instead of pre-determining this, we just disable the lint. It's manually tuned to not have any 
 // unused imports in fully featured APIs. Same with unused_mut ... .
 #![allow(unused_imports, unused_mut, dead_code)]
 // Required for serde annotations
-#![feature(custom_derive, custom_attribute, plugin)]
+#![feature(custom_derive, custom_attribute, plugin, slice_patterns)]
 #![plugin(serde_macros)]
 
 #[macro_use]
 extern crate hyper;
 extern crate serde;
-extern crate "yup-oauth2" as oauth2;
+extern crate yup_oauth2 as oauth2;
 extern crate mime;
 extern crate url;
 
@@ -200,7 +200,7 @@ use std::marker::PhantomData;
 use serde::json;
 use std::io;
 use std::fs;
-use std::thread::sleep;
+use std::thread::sleep_ms;
 
 pub use cmn::{MultiPartReader, ToParts, MethodInfo, Result, Error, CallBuilder, Hub, ReadSeek, Part, ResponseResult, RequestValue, NestedType, Delegate, DefaultDelegate, MethodsBuilder, Resource, JsonServerError};
 
@@ -218,8 +218,8 @@ pub enum Scope {
     AppLicensing,
 }
 
-impl Str for Scope {
-    fn as_slice(&self) -> &str {
+impl AsRef<str> for Scope {
+    fn as_ref(&self) -> &str {
         match *self {
             Scope::AppLicensing => "https://www.googleapis.com/auth/apps.licensing",
         }
@@ -246,8 +246,8 @@ impl Default for Scope {
 ///
 /// ```test_harness,no_run
 /// extern crate hyper;
-/// extern crate "yup-oauth2" as oauth2;
-/// extern crate "google-licensing1" as licensing1;
+/// extern crate yup_oauth2 as oauth2;
+/// extern crate google_licensing1 as licensing1;
 /// use licensing1::{Result, Error};
 /// # #[test] fn egal() {
 /// use std::default::Default;
@@ -429,8 +429,8 @@ impl ResponseResult for LicenseAssignmentList {}
 ///
 /// ```test_harness,no_run
 /// extern crate hyper;
-/// extern crate "yup-oauth2" as oauth2;
-/// extern crate "google-licensing1" as licensing1;
+/// extern crate yup_oauth2 as oauth2;
+/// extern crate google_licensing1 as licensing1;
 /// 
 /// # #[test] fn egal() {
 /// use std::default::Default;
@@ -631,8 +631,8 @@ impl<'a, C, NC, A> LicenseAssignmentMethods<'a, C, NC, A> {
 ///
 /// ```test_harness,no_run
 /// # extern crate hyper;
-/// # extern crate "yup-oauth2" as oauth2;
-/// # extern crate "google-licensing1" as licensing1;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_licensing1 as licensing1;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -695,7 +695,7 @@ impl<'a, C, NC, A> LicenseAssignmentDeleteCall<'a, C, NC, A> where NC: hyper::ne
 
         let mut url = "https://www.googleapis.com/apps/licensing/v1/product/{productId}/sku/{skuId}/user/{userId}".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::AppLicensing.as_slice().to_string(), ());
+            self._scopes.insert(Scope::AppLicensing.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{productId}", "productId"), ("{skuId}", "skuId"), ("{userId}", "userId")].iter() {
@@ -725,7 +725,7 @@ impl<'a, C, NC, A> LicenseAssignmentDeleteCall<'a, C, NC, A> where NC: hyper::ne
         
         if params.len() > 0 {
             url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
+            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_ref()))));
         }
 
 
@@ -743,7 +743,7 @@ impl<'a, C, NC, A> LicenseAssignmentDeleteCall<'a, C, NC, A> where NC: hyper::ne
                                                              access_token: token.unwrap().access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Delete, url.as_slice())
+                let mut req = client.borrow_mut().request(hyper::method::Method::Delete, url.as_ref())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -754,7 +754,7 @@ impl<'a, C, NC, A> LicenseAssignmentDeleteCall<'a, C, NC, A> where NC: hyper::ne
             match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
+                        sleep_ms(d.num_milliseconds() as u32);
                         continue;
                     }
                     dlg.finished(false);
@@ -765,7 +765,7 @@ impl<'a, C, NC, A> LicenseAssignmentDeleteCall<'a, C, NC, A> where NC: hyper::ne
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
-                            sleep(d);
+                            sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
@@ -840,8 +840,8 @@ impl<'a, C, NC, A> LicenseAssignmentDeleteCall<'a, C, NC, A> where NC: hyper::ne
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> LicenseAssignmentDeleteCall<'a, C, NC, A>
-                                                        where T: Str {
-        self._additional_params.insert(name.as_slice().to_string(), value.as_slice().to_string());
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
     }
 
@@ -857,8 +857,8 @@ impl<'a, C, NC, A> LicenseAssignmentDeleteCall<'a, C, NC, A> where NC: hyper::ne
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T>(mut self, scope: T) -> LicenseAssignmentDeleteCall<'a, C, NC, A> 
-                                                        where T: Str {
-        self._scopes.insert(scope.as_slice().to_string(), ());
+                                                        where T: AsRef<str> {
+        self._scopes.insert(scope.as_ref().to_string(), ());
         self
     }
 }
@@ -875,8 +875,8 @@ impl<'a, C, NC, A> LicenseAssignmentDeleteCall<'a, C, NC, A> where NC: hyper::ne
 ///
 /// ```test_harness,no_run
 /// # extern crate hyper;
-/// # extern crate "yup-oauth2" as oauth2;
-/// # extern crate "google-licensing1" as licensing1;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_licensing1 as licensing1;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -948,7 +948,7 @@ impl<'a, C, NC, A> LicenseAssignmentListForProductCall<'a, C, NC, A> where NC: h
 
         let mut url = "https://www.googleapis.com/apps/licensing/v1/product/{productId}/users".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::AppLicensing.as_slice().to_string(), ());
+            self._scopes.insert(Scope::AppLicensing.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{productId}", "productId")].iter() {
@@ -978,7 +978,7 @@ impl<'a, C, NC, A> LicenseAssignmentListForProductCall<'a, C, NC, A> where NC: h
         
         if params.len() > 0 {
             url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
+            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_ref()))));
         }
 
 
@@ -996,7 +996,7 @@ impl<'a, C, NC, A> LicenseAssignmentListForProductCall<'a, C, NC, A> where NC: h
                                                              access_token: token.unwrap().access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_slice())
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_ref())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -1007,7 +1007,7 @@ impl<'a, C, NC, A> LicenseAssignmentListForProductCall<'a, C, NC, A> where NC: h
             match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
+                        sleep_ms(d.num_milliseconds() as u32);
                         continue;
                     }
                     dlg.finished(false);
@@ -1018,7 +1018,7 @@ impl<'a, C, NC, A> LicenseAssignmentListForProductCall<'a, C, NC, A> where NC: h
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
-                            sleep(d);
+                            sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
@@ -1109,8 +1109,8 @@ impl<'a, C, NC, A> LicenseAssignmentListForProductCall<'a, C, NC, A> where NC: h
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> LicenseAssignmentListForProductCall<'a, C, NC, A>
-                                                        where T: Str {
-        self._additional_params.insert(name.as_slice().to_string(), value.as_slice().to_string());
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
     }
 
@@ -1126,8 +1126,8 @@ impl<'a, C, NC, A> LicenseAssignmentListForProductCall<'a, C, NC, A> where NC: h
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T>(mut self, scope: T) -> LicenseAssignmentListForProductCall<'a, C, NC, A> 
-                                                        where T: Str {
-        self._scopes.insert(scope.as_slice().to_string(), ());
+                                                        where T: AsRef<str> {
+        self._scopes.insert(scope.as_ref().to_string(), ());
         self
     }
 }
@@ -1144,8 +1144,8 @@ impl<'a, C, NC, A> LicenseAssignmentListForProductCall<'a, C, NC, A> where NC: h
 ///
 /// ```test_harness,no_run
 /// # extern crate hyper;
-/// # extern crate "yup-oauth2" as oauth2;
-/// # extern crate "google-licensing1" as licensing1;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_licensing1 as licensing1;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -1209,7 +1209,7 @@ impl<'a, C, NC, A> LicenseAssignmentGetCall<'a, C, NC, A> where NC: hyper::net::
 
         let mut url = "https://www.googleapis.com/apps/licensing/v1/product/{productId}/sku/{skuId}/user/{userId}".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::AppLicensing.as_slice().to_string(), ());
+            self._scopes.insert(Scope::AppLicensing.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{productId}", "productId"), ("{skuId}", "skuId"), ("{userId}", "userId")].iter() {
@@ -1239,7 +1239,7 @@ impl<'a, C, NC, A> LicenseAssignmentGetCall<'a, C, NC, A> where NC: hyper::net::
         
         if params.len() > 0 {
             url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
+            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_ref()))));
         }
 
 
@@ -1257,7 +1257,7 @@ impl<'a, C, NC, A> LicenseAssignmentGetCall<'a, C, NC, A> where NC: hyper::net::
                                                              access_token: token.unwrap().access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_slice())
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_ref())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -1268,7 +1268,7 @@ impl<'a, C, NC, A> LicenseAssignmentGetCall<'a, C, NC, A> where NC: hyper::net::
             match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
+                        sleep_ms(d.num_milliseconds() as u32);
                         continue;
                     }
                     dlg.finished(false);
@@ -1279,7 +1279,7 @@ impl<'a, C, NC, A> LicenseAssignmentGetCall<'a, C, NC, A> where NC: hyper::net::
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
-                            sleep(d);
+                            sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
@@ -1364,8 +1364,8 @@ impl<'a, C, NC, A> LicenseAssignmentGetCall<'a, C, NC, A> where NC: hyper::net::
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> LicenseAssignmentGetCall<'a, C, NC, A>
-                                                        where T: Str {
-        self._additional_params.insert(name.as_slice().to_string(), value.as_slice().to_string());
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
     }
 
@@ -1381,8 +1381,8 @@ impl<'a, C, NC, A> LicenseAssignmentGetCall<'a, C, NC, A> where NC: hyper::net::
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T>(mut self, scope: T) -> LicenseAssignmentGetCall<'a, C, NC, A> 
-                                                        where T: Str {
-        self._scopes.insert(scope.as_slice().to_string(), ());
+                                                        where T: AsRef<str> {
+        self._scopes.insert(scope.as_ref().to_string(), ());
         self
     }
 }
@@ -1399,8 +1399,8 @@ impl<'a, C, NC, A> LicenseAssignmentGetCall<'a, C, NC, A> where NC: hyper::net::
 ///
 /// ```test_harness,no_run
 /// # extern crate hyper;
-/// # extern crate "yup-oauth2" as oauth2;
-/// # extern crate "google-licensing1" as licensing1;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_licensing1 as licensing1;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -1474,7 +1474,7 @@ impl<'a, C, NC, A> LicenseAssignmentListForProductAndSkuCall<'a, C, NC, A> where
 
         let mut url = "https://www.googleapis.com/apps/licensing/v1/product/{productId}/sku/{skuId}/users".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::AppLicensing.as_slice().to_string(), ());
+            self._scopes.insert(Scope::AppLicensing.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{productId}", "productId"), ("{skuId}", "skuId")].iter() {
@@ -1504,7 +1504,7 @@ impl<'a, C, NC, A> LicenseAssignmentListForProductAndSkuCall<'a, C, NC, A> where
         
         if params.len() > 0 {
             url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
+            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_ref()))));
         }
 
 
@@ -1522,7 +1522,7 @@ impl<'a, C, NC, A> LicenseAssignmentListForProductAndSkuCall<'a, C, NC, A> where
                                                              access_token: token.unwrap().access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_slice())
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_ref())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -1533,7 +1533,7 @@ impl<'a, C, NC, A> LicenseAssignmentListForProductAndSkuCall<'a, C, NC, A> where
             match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
+                        sleep_ms(d.num_milliseconds() as u32);
                         continue;
                     }
                     dlg.finished(false);
@@ -1544,7 +1544,7 @@ impl<'a, C, NC, A> LicenseAssignmentListForProductAndSkuCall<'a, C, NC, A> where
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
-                            sleep(d);
+                            sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
@@ -1645,8 +1645,8 @@ impl<'a, C, NC, A> LicenseAssignmentListForProductAndSkuCall<'a, C, NC, A> where
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> LicenseAssignmentListForProductAndSkuCall<'a, C, NC, A>
-                                                        where T: Str {
-        self._additional_params.insert(name.as_slice().to_string(), value.as_slice().to_string());
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
     }
 
@@ -1662,8 +1662,8 @@ impl<'a, C, NC, A> LicenseAssignmentListForProductAndSkuCall<'a, C, NC, A> where
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T>(mut self, scope: T) -> LicenseAssignmentListForProductAndSkuCall<'a, C, NC, A> 
-                                                        where T: Str {
-        self._scopes.insert(scope.as_slice().to_string(), ());
+                                                        where T: AsRef<str> {
+        self._scopes.insert(scope.as_ref().to_string(), ());
         self
     }
 }
@@ -1680,8 +1680,8 @@ impl<'a, C, NC, A> LicenseAssignmentListForProductAndSkuCall<'a, C, NC, A> where
 ///
 /// ```test_harness,no_run
 /// # extern crate hyper;
-/// # extern crate "yup-oauth2" as oauth2;
-/// # extern crate "google-licensing1" as licensing1;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_licensing1 as licensing1;
 /// use licensing1::LicenseAssignment;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
@@ -1752,7 +1752,7 @@ impl<'a, C, NC, A> LicenseAssignmentUpdateCall<'a, C, NC, A> where NC: hyper::ne
 
         let mut url = "https://www.googleapis.com/apps/licensing/v1/product/{productId}/sku/{skuId}/user/{userId}".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::AppLicensing.as_slice().to_string(), ());
+            self._scopes.insert(Scope::AppLicensing.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{productId}", "productId"), ("{skuId}", "skuId"), ("{userId}", "userId")].iter() {
@@ -1782,7 +1782,7 @@ impl<'a, C, NC, A> LicenseAssignmentUpdateCall<'a, C, NC, A> where NC: hyper::ne
         
         if params.len() > 0 {
             url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
+            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_ref()))));
         }
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
@@ -1805,7 +1805,7 @@ impl<'a, C, NC, A> LicenseAssignmentUpdateCall<'a, C, NC, A> where NC: hyper::ne
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Put, url.as_slice())
+                let mut req = client.borrow_mut().request(hyper::method::Method::Put, url.as_ref())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -1819,7 +1819,7 @@ impl<'a, C, NC, A> LicenseAssignmentUpdateCall<'a, C, NC, A> where NC: hyper::ne
             match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
+                        sleep_ms(d.num_milliseconds() as u32);
                         continue;
                     }
                     dlg.finished(false);
@@ -1830,7 +1830,7 @@ impl<'a, C, NC, A> LicenseAssignmentUpdateCall<'a, C, NC, A> where NC: hyper::ne
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
-                            sleep(d);
+                            sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
@@ -1924,8 +1924,8 @@ impl<'a, C, NC, A> LicenseAssignmentUpdateCall<'a, C, NC, A> where NC: hyper::ne
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> LicenseAssignmentUpdateCall<'a, C, NC, A>
-                                                        where T: Str {
-        self._additional_params.insert(name.as_slice().to_string(), value.as_slice().to_string());
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
     }
 
@@ -1941,8 +1941,8 @@ impl<'a, C, NC, A> LicenseAssignmentUpdateCall<'a, C, NC, A> where NC: hyper::ne
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T>(mut self, scope: T) -> LicenseAssignmentUpdateCall<'a, C, NC, A> 
-                                                        where T: Str {
-        self._scopes.insert(scope.as_slice().to_string(), ());
+                                                        where T: AsRef<str> {
+        self._scopes.insert(scope.as_ref().to_string(), ());
         self
     }
 }
@@ -1959,8 +1959,8 @@ impl<'a, C, NC, A> LicenseAssignmentUpdateCall<'a, C, NC, A> where NC: hyper::ne
 ///
 /// ```test_harness,no_run
 /// # extern crate hyper;
-/// # extern crate "yup-oauth2" as oauth2;
-/// # extern crate "google-licensing1" as licensing1;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_licensing1 as licensing1;
 /// use licensing1::LicenseAssignment;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
@@ -2031,7 +2031,7 @@ impl<'a, C, NC, A> LicenseAssignmentPatchCall<'a, C, NC, A> where NC: hyper::net
 
         let mut url = "https://www.googleapis.com/apps/licensing/v1/product/{productId}/sku/{skuId}/user/{userId}".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::AppLicensing.as_slice().to_string(), ());
+            self._scopes.insert(Scope::AppLicensing.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{productId}", "productId"), ("{skuId}", "skuId"), ("{userId}", "userId")].iter() {
@@ -2061,7 +2061,7 @@ impl<'a, C, NC, A> LicenseAssignmentPatchCall<'a, C, NC, A> where NC: hyper::net
         
         if params.len() > 0 {
             url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
+            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_ref()))));
         }
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
@@ -2084,7 +2084,7 @@ impl<'a, C, NC, A> LicenseAssignmentPatchCall<'a, C, NC, A> where NC: hyper::net
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Patch, url.as_slice())
+                let mut req = client.borrow_mut().request(hyper::method::Method::Patch, url.as_ref())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -2098,7 +2098,7 @@ impl<'a, C, NC, A> LicenseAssignmentPatchCall<'a, C, NC, A> where NC: hyper::net
             match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
+                        sleep_ms(d.num_milliseconds() as u32);
                         continue;
                     }
                     dlg.finished(false);
@@ -2109,7 +2109,7 @@ impl<'a, C, NC, A> LicenseAssignmentPatchCall<'a, C, NC, A> where NC: hyper::net
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
-                            sleep(d);
+                            sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
@@ -2203,8 +2203,8 @@ impl<'a, C, NC, A> LicenseAssignmentPatchCall<'a, C, NC, A> where NC: hyper::net
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> LicenseAssignmentPatchCall<'a, C, NC, A>
-                                                        where T: Str {
-        self._additional_params.insert(name.as_slice().to_string(), value.as_slice().to_string());
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
     }
 
@@ -2220,8 +2220,8 @@ impl<'a, C, NC, A> LicenseAssignmentPatchCall<'a, C, NC, A> where NC: hyper::net
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T>(mut self, scope: T) -> LicenseAssignmentPatchCall<'a, C, NC, A> 
-                                                        where T: Str {
-        self._scopes.insert(scope.as_slice().to_string(), ());
+                                                        where T: AsRef<str> {
+        self._scopes.insert(scope.as_ref().to_string(), ());
         self
     }
 }
@@ -2238,8 +2238,8 @@ impl<'a, C, NC, A> LicenseAssignmentPatchCall<'a, C, NC, A> where NC: hyper::net
 ///
 /// ```test_harness,no_run
 /// # extern crate hyper;
-/// # extern crate "yup-oauth2" as oauth2;
-/// # extern crate "google-licensing1" as licensing1;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_licensing1 as licensing1;
 /// use licensing1::LicenseAssignmentInsert;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
@@ -2308,7 +2308,7 @@ impl<'a, C, NC, A> LicenseAssignmentInsertCall<'a, C, NC, A> where NC: hyper::ne
 
         let mut url = "https://www.googleapis.com/apps/licensing/v1/product/{productId}/sku/{skuId}/user".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::AppLicensing.as_slice().to_string(), ());
+            self._scopes.insert(Scope::AppLicensing.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{productId}", "productId"), ("{skuId}", "skuId")].iter() {
@@ -2338,7 +2338,7 @@ impl<'a, C, NC, A> LicenseAssignmentInsertCall<'a, C, NC, A> where NC: hyper::ne
         
         if params.len() > 0 {
             url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
+            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_ref()))));
         }
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
@@ -2361,7 +2361,7 @@ impl<'a, C, NC, A> LicenseAssignmentInsertCall<'a, C, NC, A> where NC: hyper::ne
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.as_slice())
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.as_ref())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -2375,7 +2375,7 @@ impl<'a, C, NC, A> LicenseAssignmentInsertCall<'a, C, NC, A> where NC: hyper::ne
             match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
+                        sleep_ms(d.num_milliseconds() as u32);
                         continue;
                     }
                     dlg.finished(false);
@@ -2386,7 +2386,7 @@ impl<'a, C, NC, A> LicenseAssignmentInsertCall<'a, C, NC, A> where NC: hyper::ne
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
-                            sleep(d);
+                            sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
@@ -2470,8 +2470,8 @@ impl<'a, C, NC, A> LicenseAssignmentInsertCall<'a, C, NC, A> where NC: hyper::ne
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> LicenseAssignmentInsertCall<'a, C, NC, A>
-                                                        where T: Str {
-        self._additional_params.insert(name.as_slice().to_string(), value.as_slice().to_string());
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
     }
 
@@ -2487,8 +2487,8 @@ impl<'a, C, NC, A> LicenseAssignmentInsertCall<'a, C, NC, A> where NC: hyper::ne
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T>(mut self, scope: T) -> LicenseAssignmentInsertCall<'a, C, NC, A> 
-                                                        where T: Str {
-        self._scopes.insert(scope.as_slice().to_string(), ());
+                                                        where T: AsRef<str> {
+        self._scopes.insert(scope.as_ref().to_string(), ());
         self
     }
 }

@@ -56,7 +56,7 @@
     # end for each method
     header_methods = (('Upload', upload_methods), ('Download', download_methods), ('Subscription', subscription_methods))
 %>\
-This documentation was generated from *${util.canonical_name()}* crate version *${util.crate_version()}*, where *${revision}* is the exact revision of the *${id}* schema built by the [mako](http://www.makotemplates.org/) code generator *v${cargo.build_version}*.
+This documentation was generated from *${util.canonical_name()}* crate version *${util.crate_version()}*, where *${revision is UNDEFINED and '00000000' or revision}* is the exact revision of the *${id}* schema built by the [mako](http://www.makotemplates.org/) code generator *v${cargo.build_version}*.
 % if documentationLink:
 
 Everything else about the *${util.canonical_name()}* *${api_version}* API can be found at the
@@ -340,8 +340,8 @@ pub enum Scope {
 % endfor
 }
 
-impl Str for Scope {
-    fn as_slice(&self) -> &str {
+impl AsRef<str> for Scope {
+    fn as_ref(&self) -> &str {
         match *self {
             % for url in auth.oauth2.scopes.keys():
             ${scope_url_to_variant(name, url)} => "${url}",

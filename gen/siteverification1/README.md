@@ -73,8 +73,8 @@ google-siteverification1 = "*"
 
 ```Rust
 extern crate hyper;
-extern crate "yup-oauth2" as oauth2;
-extern crate "google-siteverification1" as siteverification1;
+extern crate yup_oauth2 as oauth2;
+extern crate google_siteverification1 as siteverification1;
 use siteverification1::SiteVerificationWebResourceResource;
 use siteverification1::{Result, Error};
 use std::default::Default;

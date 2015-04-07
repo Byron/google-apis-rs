@@ -75,8 +75,8 @@ google-manager1_beta2 = "*"
 
 ```Rust
 extern crate hyper;
-extern crate "yup-oauth2" as oauth2;
-extern crate "google-manager1_beta2" as manager1_beta2;
+extern crate yup_oauth2 as oauth2;
+extern crate google_manager1_beta2 as manager1_beta2;
 use manager1_beta2::{Result, Error};
 use std::default::Default;
 use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};

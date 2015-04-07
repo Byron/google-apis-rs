@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *Cloud Monitoring* crate version *0.1.2+20150305*, where *20150305* is the exact revision of the *cloudmonitoring:v2beta2* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.2*.
+//! This documentation was generated from *Cloud Monitoring* crate version *0.1.2+20150303*, where *20150303* is the exact revision of the *cloudmonitoring:v2beta2* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.2*.
 //! 
 //! Everything else about the *Cloud Monitoring* *v2_beta2* API can be found at the
 //! [official documentation site](https://cloud.google.com/monitoring/v2beta2/).
@@ -76,8 +76,8 @@
 //! 
 //! ```test_harness,no_run
 //! extern crate hyper;
-//! extern crate "yup-oauth2" as oauth2;
-//! extern crate "google-cloudmonitoring2_beta2" as cloudmonitoring2_beta2;
+//! extern crate yup_oauth2 as oauth2;
+//! extern crate google_cloudmonitoring2_beta2 as cloudmonitoring2_beta2;
 //! use cloudmonitoring2_beta2::ListMetricDescriptorsRequest;
 //! use cloudmonitoring2_beta2::{Result, Error};
 //! # #[test] fn egal() {
@@ -179,20 +179,20 @@
 //! [google-go-api]: https://github.com/google/google-api-go-client
 //! 
 //! 
-#![feature(core,io,thread_sleep)]
+#![feature(std_misc)]
 // Unused attributes happen thanks to defined, but unused structures
 // We don't warn about this, as depending on the API, some data structures or facilities are never used.
 // Instead of pre-determining this, we just disable the lint. It's manually tuned to not have any 
 // unused imports in fully featured APIs. Same with unused_mut ... .
 #![allow(unused_imports, unused_mut, dead_code)]
 // Required for serde annotations
-#![feature(custom_derive, custom_attribute, plugin)]
+#![feature(custom_derive, custom_attribute, plugin, slice_patterns)]
 #![plugin(serde_macros)]
 
 #[macro_use]
 extern crate hyper;
 extern crate serde;
-extern crate "yup-oauth2" as oauth2;
+extern crate yup_oauth2 as oauth2;
 extern crate mime;
 extern crate url;
 
@@ -207,7 +207,7 @@ use std::marker::PhantomData;
 use serde::json;
 use std::io;
 use std::fs;
-use std::thread::sleep;
+use std::thread::sleep_ms;
 
 pub use cmn::{MultiPartReader, ToParts, MethodInfo, Result, Error, CallBuilder, Hub, ReadSeek, Part, ResponseResult, RequestValue, NestedType, Delegate, DefaultDelegate, MethodsBuilder, Resource, JsonServerError};
 
@@ -225,8 +225,8 @@ pub enum Scope {
     Monitoring,
 }
 
-impl Str for Scope {
-    fn as_slice(&self) -> &str {
+impl AsRef<str> for Scope {
+    fn as_ref(&self) -> &str {
         match *self {
             Scope::Monitoring => "https://www.googleapis.com/auth/monitoring",
         }
@@ -253,8 +253,8 @@ impl Default for Scope {
 ///
 /// ```test_harness,no_run
 /// extern crate hyper;
-/// extern crate "yup-oauth2" as oauth2;
-/// extern crate "google-cloudmonitoring2_beta2" as cloudmonitoring2_beta2;
+/// extern crate yup_oauth2 as oauth2;
+/// extern crate google_cloudmonitoring2_beta2 as cloudmonitoring2_beta2;
 /// use cloudmonitoring2_beta2::ListMetricDescriptorsRequest;
 /// use cloudmonitoring2_beta2::{Result, Error};
 /// # #[test] fn egal() {
@@ -769,8 +769,8 @@ impl ResponseResult for ListTimeseriesResponse {}
 ///
 /// ```test_harness,no_run
 /// extern crate hyper;
-/// extern crate "yup-oauth2" as oauth2;
-/// extern crate "google-cloudmonitoring2_beta2" as cloudmonitoring2_beta2;
+/// extern crate yup_oauth2 as oauth2;
+/// extern crate google_cloudmonitoring2_beta2 as cloudmonitoring2_beta2;
 /// 
 /// # #[test] fn egal() {
 /// use std::default::Default;
@@ -840,8 +840,8 @@ impl<'a, C, NC, A> TimeseriesDescriptorMethods<'a, C, NC, A> {
 ///
 /// ```test_harness,no_run
 /// extern crate hyper;
-/// extern crate "yup-oauth2" as oauth2;
-/// extern crate "google-cloudmonitoring2_beta2" as cloudmonitoring2_beta2;
+/// extern crate yup_oauth2 as oauth2;
+/// extern crate google_cloudmonitoring2_beta2 as cloudmonitoring2_beta2;
 /// 
 /// # #[test] fn egal() {
 /// use std::default::Default;
@@ -930,8 +930,8 @@ impl<'a, C, NC, A> TimeseryMethods<'a, C, NC, A> {
 ///
 /// ```test_harness,no_run
 /// extern crate hyper;
-/// extern crate "yup-oauth2" as oauth2;
-/// extern crate "google-cloudmonitoring2_beta2" as cloudmonitoring2_beta2;
+/// extern crate yup_oauth2 as oauth2;
+/// extern crate google_cloudmonitoring2_beta2 as cloudmonitoring2_beta2;
 /// 
 /// # #[test] fn egal() {
 /// use std::default::Default;
@@ -1039,8 +1039,8 @@ impl<'a, C, NC, A> MetricDescriptorMethods<'a, C, NC, A> {
 ///
 /// ```test_harness,no_run
 /// # extern crate hyper;
-/// # extern crate "yup-oauth2" as oauth2;
-/// # extern crate "google-cloudmonitoring2_beta2" as cloudmonitoring2_beta2;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_cloudmonitoring2_beta2 as cloudmonitoring2_beta2;
 /// use cloudmonitoring2_beta2::ListTimeseriesDescriptorsRequest;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
@@ -1150,7 +1150,7 @@ impl<'a, C, NC, A> TimeseriesDescriptorListCall<'a, C, NC, A> where NC: hyper::n
 
         let mut url = "https://www.googleapis.com/cloudmonitoring/v2beta2/projects/{project}/timeseriesDescriptors/{metric}".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Monitoring.as_slice().to_string(), ());
+            self._scopes.insert(Scope::Monitoring.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{project}", "project"), ("{metric}", "metric")].iter() {
@@ -1180,7 +1180,7 @@ impl<'a, C, NC, A> TimeseriesDescriptorListCall<'a, C, NC, A> where NC: hyper::n
         
         if params.len() > 0 {
             url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
+            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_ref()))));
         }
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
@@ -1203,7 +1203,7 @@ impl<'a, C, NC, A> TimeseriesDescriptorListCall<'a, C, NC, A> where NC: hyper::n
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_slice())
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_ref())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -1217,7 +1217,7 @@ impl<'a, C, NC, A> TimeseriesDescriptorListCall<'a, C, NC, A> where NC: hyper::n
             match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
+                        sleep_ms(d.num_milliseconds() as u32);
                         continue;
                     }
                     dlg.finished(false);
@@ -1228,7 +1228,7 @@ impl<'a, C, NC, A> TimeseriesDescriptorListCall<'a, C, NC, A> where NC: hyper::n
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
-                            sleep(d);
+                            sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
@@ -1361,7 +1361,7 @@ impl<'a, C, NC, A> TimeseriesDescriptorListCall<'a, C, NC, A> where NC: hyper::n
     /// Sets the *aggregator* query property to the given value.
     ///
     /// 
-    /// The aggregation function that will reduce the data points in each window to a single point. This parameter is only valid for non-cumulative metric types.
+    /// The aggregation function that will reduce the data points in each window to a single point. This parameter is only valid for non-cumulative metrics with a value type of INT64 or DOUBLE.
     pub fn aggregator(mut self, new_value: &str) -> TimeseriesDescriptorListCall<'a, C, NC, A> {
         self._aggregator = Some(new_value.to_string());
         self
@@ -1395,8 +1395,8 @@ impl<'a, C, NC, A> TimeseriesDescriptorListCall<'a, C, NC, A> where NC: hyper::n
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> TimeseriesDescriptorListCall<'a, C, NC, A>
-                                                        where T: Str {
-        self._additional_params.insert(name.as_slice().to_string(), value.as_slice().to_string());
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
     }
 
@@ -1412,8 +1412,8 @@ impl<'a, C, NC, A> TimeseriesDescriptorListCall<'a, C, NC, A> where NC: hyper::n
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T>(mut self, scope: T) -> TimeseriesDescriptorListCall<'a, C, NC, A> 
-                                                        where T: Str {
-        self._scopes.insert(scope.as_slice().to_string(), ());
+                                                        where T: AsRef<str> {
+        self._scopes.insert(scope.as_ref().to_string(), ());
         self
     }
 }
@@ -1430,8 +1430,8 @@ impl<'a, C, NC, A> TimeseriesDescriptorListCall<'a, C, NC, A> where NC: hyper::n
 ///
 /// ```test_harness,no_run
 /// # extern crate hyper;
-/// # extern crate "yup-oauth2" as oauth2;
-/// # extern crate "google-cloudmonitoring2_beta2" as cloudmonitoring2_beta2;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_cloudmonitoring2_beta2 as cloudmonitoring2_beta2;
 /// use cloudmonitoring2_beta2::WriteTimeseriesRequest;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
@@ -1498,7 +1498,7 @@ impl<'a, C, NC, A> TimeseryWriteCall<'a, C, NC, A> where NC: hyper::net::Network
 
         let mut url = "https://www.googleapis.com/cloudmonitoring/v2beta2/projects/{project}/timeseries:write".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Monitoring.as_slice().to_string(), ());
+            self._scopes.insert(Scope::Monitoring.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{project}", "project")].iter() {
@@ -1528,7 +1528,7 @@ impl<'a, C, NC, A> TimeseryWriteCall<'a, C, NC, A> where NC: hyper::net::Network
         
         if params.len() > 0 {
             url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
+            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_ref()))));
         }
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
@@ -1551,7 +1551,7 @@ impl<'a, C, NC, A> TimeseryWriteCall<'a, C, NC, A> where NC: hyper::net::Network
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.as_slice())
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.as_ref())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -1565,7 +1565,7 @@ impl<'a, C, NC, A> TimeseryWriteCall<'a, C, NC, A> where NC: hyper::net::Network
             match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
+                        sleep_ms(d.num_milliseconds() as u32);
                         continue;
                     }
                     dlg.finished(false);
@@ -1576,7 +1576,7 @@ impl<'a, C, NC, A> TimeseryWriteCall<'a, C, NC, A> where NC: hyper::net::Network
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
-                            sleep(d);
+                            sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
@@ -1650,8 +1650,8 @@ impl<'a, C, NC, A> TimeseryWriteCall<'a, C, NC, A> where NC: hyper::net::Network
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> TimeseryWriteCall<'a, C, NC, A>
-                                                        where T: Str {
-        self._additional_params.insert(name.as_slice().to_string(), value.as_slice().to_string());
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
     }
 
@@ -1667,8 +1667,8 @@ impl<'a, C, NC, A> TimeseryWriteCall<'a, C, NC, A> where NC: hyper::net::Network
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T>(mut self, scope: T) -> TimeseryWriteCall<'a, C, NC, A> 
-                                                        where T: Str {
-        self._scopes.insert(scope.as_slice().to_string(), ());
+                                                        where T: AsRef<str> {
+        self._scopes.insert(scope.as_ref().to_string(), ());
         self
     }
 }
@@ -1685,8 +1685,8 @@ impl<'a, C, NC, A> TimeseryWriteCall<'a, C, NC, A> where NC: hyper::net::Network
 ///
 /// ```test_harness,no_run
 /// # extern crate hyper;
-/// # extern crate "yup-oauth2" as oauth2;
-/// # extern crate "google-cloudmonitoring2_beta2" as cloudmonitoring2_beta2;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_cloudmonitoring2_beta2 as cloudmonitoring2_beta2;
 /// use cloudmonitoring2_beta2::ListTimeseriesRequest;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
@@ -1796,7 +1796,7 @@ impl<'a, C, NC, A> TimeseryListCall<'a, C, NC, A> where NC: hyper::net::NetworkC
 
         let mut url = "https://www.googleapis.com/cloudmonitoring/v2beta2/projects/{project}/timeseries/{metric}".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Monitoring.as_slice().to_string(), ());
+            self._scopes.insert(Scope::Monitoring.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{project}", "project"), ("{metric}", "metric")].iter() {
@@ -1826,7 +1826,7 @@ impl<'a, C, NC, A> TimeseryListCall<'a, C, NC, A> where NC: hyper::net::NetworkC
         
         if params.len() > 0 {
             url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
+            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_ref()))));
         }
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
@@ -1849,7 +1849,7 @@ impl<'a, C, NC, A> TimeseryListCall<'a, C, NC, A> where NC: hyper::net::NetworkC
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_slice())
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_ref())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -1863,7 +1863,7 @@ impl<'a, C, NC, A> TimeseryListCall<'a, C, NC, A> where NC: hyper::net::NetworkC
             match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
+                        sleep_ms(d.num_milliseconds() as u32);
                         continue;
                     }
                     dlg.finished(false);
@@ -1874,7 +1874,7 @@ impl<'a, C, NC, A> TimeseryListCall<'a, C, NC, A> where NC: hyper::net::NetworkC
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
-                            sleep(d);
+                            sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
@@ -2007,7 +2007,7 @@ impl<'a, C, NC, A> TimeseryListCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// Sets the *aggregator* query property to the given value.
     ///
     /// 
-    /// The aggregation function that will reduce the data points in each window to a single point. This parameter is only valid for non-cumulative metric types.
+    /// The aggregation function that will reduce the data points in each window to a single point. This parameter is only valid for non-cumulative metrics with a value type of INT64 or DOUBLE.
     pub fn aggregator(mut self, new_value: &str) -> TimeseryListCall<'a, C, NC, A> {
         self._aggregator = Some(new_value.to_string());
         self
@@ -2041,8 +2041,8 @@ impl<'a, C, NC, A> TimeseryListCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> TimeseryListCall<'a, C, NC, A>
-                                                        where T: Str {
-        self._additional_params.insert(name.as_slice().to_string(), value.as_slice().to_string());
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
     }
 
@@ -2058,8 +2058,8 @@ impl<'a, C, NC, A> TimeseryListCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T>(mut self, scope: T) -> TimeseryListCall<'a, C, NC, A> 
-                                                        where T: Str {
-        self._scopes.insert(scope.as_slice().to_string(), ());
+                                                        where T: AsRef<str> {
+        self._scopes.insert(scope.as_ref().to_string(), ());
         self
     }
 }
@@ -2076,8 +2076,8 @@ impl<'a, C, NC, A> TimeseryListCall<'a, C, NC, A> where NC: hyper::net::NetworkC
 ///
 /// ```test_harness,no_run
 /// # extern crate hyper;
-/// # extern crate "yup-oauth2" as oauth2;
-/// # extern crate "google-cloudmonitoring2_beta2" as cloudmonitoring2_beta2;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_cloudmonitoring2_beta2 as cloudmonitoring2_beta2;
 /// use cloudmonitoring2_beta2::ListMetricDescriptorsRequest;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
@@ -2159,7 +2159,7 @@ impl<'a, C, NC, A> MetricDescriptorListCall<'a, C, NC, A> where NC: hyper::net::
 
         let mut url = "https://www.googleapis.com/cloudmonitoring/v2beta2/projects/{project}/metricDescriptors".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Monitoring.as_slice().to_string(), ());
+            self._scopes.insert(Scope::Monitoring.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{project}", "project")].iter() {
@@ -2189,7 +2189,7 @@ impl<'a, C, NC, A> MetricDescriptorListCall<'a, C, NC, A> where NC: hyper::net::
         
         if params.len() > 0 {
             url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
+            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_ref()))));
         }
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
@@ -2212,7 +2212,7 @@ impl<'a, C, NC, A> MetricDescriptorListCall<'a, C, NC, A> where NC: hyper::net::
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_slice())
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_ref())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -2226,7 +2226,7 @@ impl<'a, C, NC, A> MetricDescriptorListCall<'a, C, NC, A> where NC: hyper::net::
             match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
+                        sleep_ms(d.num_milliseconds() as u32);
                         continue;
                     }
                     dlg.finished(false);
@@ -2237,7 +2237,7 @@ impl<'a, C, NC, A> MetricDescriptorListCall<'a, C, NC, A> where NC: hyper::net::
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
-                            sleep(d);
+                            sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
@@ -2335,8 +2335,8 @@ impl<'a, C, NC, A> MetricDescriptorListCall<'a, C, NC, A> where NC: hyper::net::
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> MetricDescriptorListCall<'a, C, NC, A>
-                                                        where T: Str {
-        self._additional_params.insert(name.as_slice().to_string(), value.as_slice().to_string());
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
     }
 
@@ -2352,8 +2352,8 @@ impl<'a, C, NC, A> MetricDescriptorListCall<'a, C, NC, A> where NC: hyper::net::
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T>(mut self, scope: T) -> MetricDescriptorListCall<'a, C, NC, A> 
-                                                        where T: Str {
-        self._scopes.insert(scope.as_slice().to_string(), ());
+                                                        where T: AsRef<str> {
+        self._scopes.insert(scope.as_ref().to_string(), ());
         self
     }
 }
@@ -2370,8 +2370,8 @@ impl<'a, C, NC, A> MetricDescriptorListCall<'a, C, NC, A> where NC: hyper::net::
 ///
 /// ```test_harness,no_run
 /// # extern crate hyper;
-/// # extern crate "yup-oauth2" as oauth2;
-/// # extern crate "google-cloudmonitoring2_beta2" as cloudmonitoring2_beta2;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_cloudmonitoring2_beta2 as cloudmonitoring2_beta2;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -2433,7 +2433,7 @@ impl<'a, C, NC, A> MetricDescriptorDeleteCall<'a, C, NC, A> where NC: hyper::net
 
         let mut url = "https://www.googleapis.com/cloudmonitoring/v2beta2/projects/{project}/metricDescriptors/{metric}".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Monitoring.as_slice().to_string(), ());
+            self._scopes.insert(Scope::Monitoring.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{project}", "project"), ("{metric}", "metric")].iter() {
@@ -2463,7 +2463,7 @@ impl<'a, C, NC, A> MetricDescriptorDeleteCall<'a, C, NC, A> where NC: hyper::net
         
         if params.len() > 0 {
             url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
+            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_ref()))));
         }
 
 
@@ -2481,7 +2481,7 @@ impl<'a, C, NC, A> MetricDescriptorDeleteCall<'a, C, NC, A> where NC: hyper::net
                                                              access_token: token.unwrap().access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Delete, url.as_slice())
+                let mut req = client.borrow_mut().request(hyper::method::Method::Delete, url.as_ref())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -2492,7 +2492,7 @@ impl<'a, C, NC, A> MetricDescriptorDeleteCall<'a, C, NC, A> where NC: hyper::net
             match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
+                        sleep_ms(d.num_milliseconds() as u32);
                         continue;
                     }
                     dlg.finished(false);
@@ -2503,7 +2503,7 @@ impl<'a, C, NC, A> MetricDescriptorDeleteCall<'a, C, NC, A> where NC: hyper::net
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
-                            sleep(d);
+                            sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
@@ -2578,8 +2578,8 @@ impl<'a, C, NC, A> MetricDescriptorDeleteCall<'a, C, NC, A> where NC: hyper::net
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> MetricDescriptorDeleteCall<'a, C, NC, A>
-                                                        where T: Str {
-        self._additional_params.insert(name.as_slice().to_string(), value.as_slice().to_string());
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
     }
 
@@ -2595,8 +2595,8 @@ impl<'a, C, NC, A> MetricDescriptorDeleteCall<'a, C, NC, A> where NC: hyper::net
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T>(mut self, scope: T) -> MetricDescriptorDeleteCall<'a, C, NC, A> 
-                                                        where T: Str {
-        self._scopes.insert(scope.as_slice().to_string(), ());
+                                                        where T: AsRef<str> {
+        self._scopes.insert(scope.as_ref().to_string(), ());
         self
     }
 }
@@ -2613,8 +2613,8 @@ impl<'a, C, NC, A> MetricDescriptorDeleteCall<'a, C, NC, A> where NC: hyper::net
 ///
 /// ```test_harness,no_run
 /// # extern crate hyper;
-/// # extern crate "yup-oauth2" as oauth2;
-/// # extern crate "google-cloudmonitoring2_beta2" as cloudmonitoring2_beta2;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_cloudmonitoring2_beta2 as cloudmonitoring2_beta2;
 /// use cloudmonitoring2_beta2::MetricDescriptor;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
@@ -2681,7 +2681,7 @@ impl<'a, C, NC, A> MetricDescriptorCreateCall<'a, C, NC, A> where NC: hyper::net
 
         let mut url = "https://www.googleapis.com/cloudmonitoring/v2beta2/projects/{project}/metricDescriptors".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Monitoring.as_slice().to_string(), ());
+            self._scopes.insert(Scope::Monitoring.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{project}", "project")].iter() {
@@ -2711,7 +2711,7 @@ impl<'a, C, NC, A> MetricDescriptorCreateCall<'a, C, NC, A> where NC: hyper::net
         
         if params.len() > 0 {
             url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
+            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_ref()))));
         }
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
@@ -2734,7 +2734,7 @@ impl<'a, C, NC, A> MetricDescriptorCreateCall<'a, C, NC, A> where NC: hyper::net
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.as_slice())
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.as_ref())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -2748,7 +2748,7 @@ impl<'a, C, NC, A> MetricDescriptorCreateCall<'a, C, NC, A> where NC: hyper::net
             match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
+                        sleep_ms(d.num_milliseconds() as u32);
                         continue;
                     }
                     dlg.finished(false);
@@ -2759,7 +2759,7 @@ impl<'a, C, NC, A> MetricDescriptorCreateCall<'a, C, NC, A> where NC: hyper::net
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
-                            sleep(d);
+                            sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
@@ -2833,8 +2833,8 @@ impl<'a, C, NC, A> MetricDescriptorCreateCall<'a, C, NC, A> where NC: hyper::net
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> MetricDescriptorCreateCall<'a, C, NC, A>
-                                                        where T: Str {
-        self._additional_params.insert(name.as_slice().to_string(), value.as_slice().to_string());
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
     }
 
@@ -2850,8 +2850,8 @@ impl<'a, C, NC, A> MetricDescriptorCreateCall<'a, C, NC, A> where NC: hyper::net
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T>(mut self, scope: T) -> MetricDescriptorCreateCall<'a, C, NC, A> 
-                                                        where T: Str {
-        self._scopes.insert(scope.as_slice().to_string(), ());
+                                                        where T: AsRef<str> {
+        self._scopes.insert(scope.as_ref().to_string(), ());
         self
     }
 }

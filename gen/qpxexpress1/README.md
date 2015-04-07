@@ -70,8 +70,8 @@ google-qpxexpress1 = "*"
 
 ```Rust
 extern crate hyper;
-extern crate "yup-oauth2" as oauth2;
-extern crate "google-qpxexpress1" as qpxexpress1;
+extern crate yup_oauth2 as oauth2;
+extern crate google_qpxexpress1 as qpxexpress1;
 use qpxexpress1::TripsSearchRequest;
 use qpxexpress1::{Result, Error};
 use std::default::Default;

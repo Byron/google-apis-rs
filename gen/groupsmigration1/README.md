@@ -74,8 +74,8 @@ google-groupsmigration1 = "*"
 
 ```Rust
 extern crate hyper;
-extern crate "yup-oauth2" as oauth2;
-extern crate "google-groupsmigration1" as groupsmigration1;
+extern crate yup_oauth2 as oauth2;
+extern crate google_groupsmigration1 as groupsmigration1;
 use groupsmigration1::{Result, Error};
 use std::fs;
 use std::default::Default;

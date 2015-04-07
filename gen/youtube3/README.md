@@ -5,7 +5,7 @@ DO NOT EDIT !
 -->
 The `google-youtube3` library allows access to all features of the *Google YouTube* service.
 
-This documentation was generated from *YouTube* crate version *0.1.2+20150309*, where *20150309* is the exact revision of the *youtube:v3* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.2*.
+This documentation was generated from *YouTube* crate version *0.1.2+20150327*, where *20150327* is the exact revision of the *youtube:v3* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.2*.
 
 Everything else about the *YouTube* *v3* API can be found at the
 [official documentation site](https://developers.google.com/youtube/v3).
@@ -15,6 +15,8 @@ Handle the following *Resources* with ease from the central [hub](http://byron.g
 
 * [activities](http://byron.github.io/google-apis-rs/google-youtube3/struct.Activity.html)
  * [*insert*](http://byron.github.io/google-apis-rs/google-youtube3/struct.ActivityInsertCall.html) and [*list*](http://byron.github.io/google-apis-rs/google-youtube3/struct.ActivityListCall.html)
+* [captions](http://byron.github.io/google-apis-rs/google-youtube3/struct.Caption.html)
+ * [*delete*](http://byron.github.io/google-apis-rs/google-youtube3/struct.CaptionDeleteCall.html), [*download*](http://byron.github.io/google-apis-rs/google-youtube3/struct.CaptionDownloadCall.html), [*insert*](http://byron.github.io/google-apis-rs/google-youtube3/struct.CaptionInsertCall.html), [*list*](http://byron.github.io/google-apis-rs/google-youtube3/struct.CaptionListCall.html) and [*update*](http://byron.github.io/google-apis-rs/google-youtube3/struct.CaptionUpdateCall.html)
 * channel banners
  * [*insert*](http://byron.github.io/google-apis-rs/google-youtube3/struct.ChannelBannerInsertCall.html)
 * [channel sections](http://byron.github.io/google-apis-rs/google-youtube3/struct.ChannelSection.html)
@@ -54,7 +56,13 @@ Upload supported by ...
 * [*set watermarks*](http://byron.github.io/google-apis-rs/google-youtube3/struct.WatermarkSetCall.html)
 * [*insert channel banners*](http://byron.github.io/google-apis-rs/google-youtube3/struct.ChannelBannerInsertCall.html)
 * [*set thumbnails*](http://byron.github.io/google-apis-rs/google-youtube3/struct.ThumbnailSetCall.html)
+* [*insert captions*](http://byron.github.io/google-apis-rs/google-youtube3/struct.CaptionInsertCall.html)
+* [*update captions*](http://byron.github.io/google-apis-rs/google-youtube3/struct.CaptionUpdateCall.html)
 * [*insert videos*](http://byron.github.io/google-apis-rs/google-youtube3/struct.VideoInsertCall.html)
+
+Download supported by ...
+
+* [*download captions*](http://byron.github.io/google-apis-rs/google-youtube3/struct.CaptionDownloadCall.html)
 
 Subscription supported by ...
 
@@ -119,8 +127,8 @@ google-youtube3 = "*"
 
 ```Rust
 extern crate hyper;
-extern crate "yup-oauth2" as oauth2;
-extern crate "google-youtube3" as youtube3;
+extern crate yup_oauth2 as oauth2;
+extern crate google_youtube3 as youtube3;
 use youtube3::{Result, Error};
 use std::default::Default;
 use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};

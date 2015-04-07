@@ -5,7 +5,7 @@ DO NOT EDIT !
 -->
 The `google-doubleclicksearch2` library allows access to all features of the *Google doubleclicksearch* service.
 
-This documentation was generated from *doubleclicksearch* crate version *0.1.2+20150224*, where *20150224* is the exact revision of the *doubleclicksearch:v2* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.2*.
+This documentation was generated from *doubleclicksearch* crate version *0.1.2+20150303*, where *20150303* is the exact revision of the *doubleclicksearch:v2* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.2*.
 
 Everything else about the *doubleclicksearch* *v2* API can be found at the
 [official documentation site](https://developers.google.com/doubleclick-search/).
@@ -81,8 +81,8 @@ google-doubleclicksearch2 = "*"
 
 ```Rust
 extern crate hyper;
-extern crate "yup-oauth2" as oauth2;
-extern crate "google-doubleclicksearch2" as doubleclicksearch2;
+extern crate yup_oauth2 as oauth2;
+extern crate google_doubleclicksearch2 as doubleclicksearch2;
 use doubleclicksearch2::{Result, Error};
 use std::default::Default;
 use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};

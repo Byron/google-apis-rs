@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *deploymentmanager* crate version *0.1.2+20141215*, where *20141215* is the exact revision of the *deploymentmanager:v2beta1* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.2*.
+//! This documentation was generated from *deploymentmanager* crate version *0.1.2+20150303*, where *20150303* is the exact revision of the *deploymentmanager:v2beta1* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.2*.
 //! 
 //! Everything else about the *deploymentmanager* *v2_beta1* API can be found at the
 //! [official documentation site](https://developers.google.com/deployment-manager/).
@@ -81,8 +81,8 @@
 //! 
 //! ```test_harness,no_run
 //! extern crate hyper;
-//! extern crate "yup-oauth2" as oauth2;
-//! extern crate "google-deploymentmanager2_beta1" as deploymentmanager2_beta1;
+//! extern crate yup_oauth2 as oauth2;
+//! extern crate google_deploymentmanager2_beta1 as deploymentmanager2_beta1;
 //! use deploymentmanager2_beta1::{Result, Error};
 //! # #[test] fn egal() {
 //! use std::default::Default;
@@ -177,20 +177,20 @@
 //! [google-go-api]: https://github.com/google/google-api-go-client
 //! 
 //! 
-#![feature(core,io,thread_sleep)]
+#![feature(std_misc)]
 // Unused attributes happen thanks to defined, but unused structures
 // We don't warn about this, as depending on the API, some data structures or facilities are never used.
 // Instead of pre-determining this, we just disable the lint. It's manually tuned to not have any 
 // unused imports in fully featured APIs. Same with unused_mut ... .
 #![allow(unused_imports, unused_mut, dead_code)]
 // Required for serde annotations
-#![feature(custom_derive, custom_attribute, plugin)]
+#![feature(custom_derive, custom_attribute, plugin, slice_patterns)]
 #![plugin(serde_macros)]
 
 #[macro_use]
 extern crate hyper;
 extern crate serde;
-extern crate "yup-oauth2" as oauth2;
+extern crate yup_oauth2 as oauth2;
 extern crate mime;
 extern crate url;
 
@@ -205,7 +205,7 @@ use std::marker::PhantomData;
 use serde::json;
 use std::io;
 use std::fs;
-use std::thread::sleep;
+use std::thread::sleep_ms;
 
 pub use cmn::{MultiPartReader, ToParts, MethodInfo, Result, Error, CallBuilder, Hub, ReadSeek, Part, ResponseResult, RequestValue, NestedType, Delegate, DefaultDelegate, MethodsBuilder, Resource, JsonServerError};
 
@@ -229,8 +229,8 @@ pub enum Scope {
     NdevCloudman,
 }
 
-impl Str for Scope {
-    fn as_slice(&self) -> &str {
+impl AsRef<str> for Scope {
+    fn as_ref(&self) -> &str {
         match *self {
             Scope::NdevCloudmanReadonly => "https://www.googleapis.com/auth/ndev.cloudman.readonly",
             Scope::CloudPlatform => "https://www.googleapis.com/auth/cloud-platform",
@@ -259,8 +259,8 @@ impl Default for Scope {
 ///
 /// ```test_harness,no_run
 /// extern crate hyper;
-/// extern crate "yup-oauth2" as oauth2;
-/// extern crate "google-deploymentmanager2_beta1" as deploymentmanager2_beta1;
+/// extern crate yup_oauth2 as oauth2;
+/// extern crate google_deploymentmanager2_beta1 as deploymentmanager2_beta1;
 /// use deploymentmanager2_beta1::{Result, Error};
 /// # #[test] fn egal() {
 /// use std::default::Default;
@@ -355,7 +355,7 @@ impl<'a, C, NC, A> Deploymentmanager<C, NC, A>
 // ############
 // SCHEMAS ###
 // ##########
-/// There is no detailed description.
+/// Next available tag: 12
 /// 
 /// # Activities
 /// 
@@ -367,19 +367,19 @@ impl<'a, C, NC, A> Deploymentmanager<C, NC, A>
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct ResourceType {
-    /// [Output Only] A list of any errors that occurred during deployment.
+    /// ! [Output Only] A list of any errors that occurred during deployment.
     pub errors: Vec<String>,
-    /// [Output Only] The name of the resource as it appears in the YAML config.
+    /// ! [Output Only] The name of the resource as it appears in the YAML config.
     pub name: String,
-    /// [Output Only] The URL of the actual resource.
+    /// ! [Output Only] The URL of the actual resource.
     pub url: String,
-    /// [Output Only] URL of the manifest representing the current configuration of this resource.
+    /// ! [Output Only] URL of the manifest representing the current configuration ! of this resource.
     pub manifest: String,
-    /// [Output Only] The state of the resource.
+    /// ! [Output Only] The state of the resource.
     pub state: String,
-    /// [Output Only] The intended state of the resource.
+    /// ! [Output Only] The intended state of the resource.
     pub intent: String,
-    /// [Output Only] The type of the resource, for example ?compute.v1.instance?, or ?replicaPools.v1beta2.instanceGroupManager?
+    /// ! [Output Only] The type of the resource, for example ! ?compute.v1.instance?, or ?replicaPools.v1beta2.instanceGroupManager?
     #[serde(alias="type")]
     pub type_: String,
     /// [Output Only] Unique identifier for the resource; defined by the server.
@@ -390,15 +390,15 @@ impl Resource for ResourceType {}
 impl ResponseResult for ResourceType {}
 
 
-/// Metadata for this warning in 'key: value' format.
+/// ! Metadata for this warning in 'key: value' format.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct OperationWarningsData {
-    /// A key for the warning data.
+    /// ! A key for the warning data.
     pub key: String,
-    /// A warning data value corresponding to the key.
+    /// ! A warning data value corresponding to the key.
     pub value: String,
 }
 
@@ -406,17 +406,17 @@ impl NestedType for OperationWarningsData {}
 impl Part for OperationWarningsData {}
 
 
-/// [Output Only] If warning messages generated during processing of this operation, this field will be populated.
+/// ! [Output Only] If warning messages generated during processing of this ! operation, this field will be populated.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct OperationWarnings {
-    /// Optional human-readable details for this warning.
+    /// ! Optional human-readable details for this warning.
     pub message: String,
-    /// The warning type identifier for this warning.
+    /// ! The warning type identifier for this warning.
     pub code: String,
-    /// Metadata for this warning in 'key: value' format.
+    /// ! Metadata for this warning in 'key: value' format.
     pub data: Vec<OperationWarningsData>,
 }
 
@@ -424,7 +424,7 @@ impl NestedType for OperationWarnings {}
 impl Part for OperationWarnings {}
 
 
-/// A response containing a partial list of resources and a page token used to build the next request if the request has been truncated.
+/// ! A response containing a partial list of resources and a page token used ! to build the next request if the request has been truncated. Next available tag: 4
 /// 
 /// # Activities
 /// 
@@ -435,27 +435,27 @@ impl Part for OperationWarnings {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct ResourcesListResponse {
-    /// A token used to continue a truncated list request.
+    /// ! A token used to continue a truncated list request.
     #[serde(alias="nextPageToken")]
     pub next_page_token: String,
-    /// Resources contained in this list response.
+    /// ! Resources contained in this list response.
     pub resources: Vec<ResourceType>,
 }
 
 impl ResponseResult for ResourcesListResponse {}
 
 
-/// The array of errors encountered while processing this operation.
+/// ! The array of errors encountered while processing this operation.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct OperationErrorErrors {
-    /// An optional, human-readable error message.
+    /// ! An optional, human-readable error message.
     pub message: String,
-    /// The error type identifier for this error.
+    /// ! The error type identifier for this error.
     pub code: String,
-    /// Indicates the field in the request which caused the error. This property is optional.
+    /// ! Indicates the field in the request which caused the error. ! This property is optional.
     pub location: String,
 }
 
@@ -463,7 +463,7 @@ impl NestedType for OperationErrorErrors {}
 impl Part for OperationErrorErrors {}
 
 
-/// There is no detailed description.
+/// Next available tag: 10
 /// 
 /// # Activities
 /// 
@@ -475,17 +475,17 @@ impl Part for OperationErrorErrors {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct Manifest {
-    /// [Output Only] The fully-expanded configuration file, including any templates and references.
+    /// ! [Output Only] The fully-expanded configuration file, including any ! templates and references.
     #[serde(alias="evaluatedConfig")]
     pub evaluated_config: String,
-    /// The YAML configuration for this manifest.
+    /// v2beta1: YAML with config - described above v2beta2: YAML + templates. ! The YAML configuration for this manifest.
     pub config: String,
     /// [Output Only] Unique identifier for the resource; defined by the server.
     pub id: String,
     /// [Output Only] Self link for the manifest.
     #[serde(alias="selfLink")]
     pub self_link: String,
-    /// [Output Only] The name of the manifest.
+    /// ! [Output Only] The name of the manifest.
     pub name: String,
 }
 
@@ -493,13 +493,13 @@ impl Resource for Manifest {}
 impl ResponseResult for Manifest {}
 
 
-/// [Output Only] If errors occurred during processing of this operation, this field will be populated.
+/// ! [Output Only] If errors occurred during processing of this operation, ! this field will be populated.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct OperationError {
-    /// The array of errors encountered while processing this operation.
+    /// ! The array of errors encountered while processing this operation.
     pub errors: Vec<OperationErrorErrors>,
 }
 
@@ -507,7 +507,7 @@ impl NestedType for OperationError {}
 impl Part for OperationError {}
 
 
-/// A response that returns all Types supported by Deployment Manager
+/// ! A response that returns all Types supported by Deployment Manager Next available tag: 3
 /// 
 /// # Activities
 /// 
@@ -518,14 +518,14 @@ impl Part for OperationError {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct TypesListResponse {
-    /// Types supported by Deployment Manager
+    /// ! Types supported by Deployment Manager
     pub types: Vec<Type>,
 }
 
 impl ResponseResult for TypesListResponse {}
 
 
-/// A response containing a partial list of deployments and a page token used to build the next request if the request has been truncated.
+/// ! A response containing a partial list of deployments and a page token used ! to build the next request if the request has been truncated. Next available tag: 4
 /// 
 /// # Activities
 /// 
@@ -536,17 +536,17 @@ impl ResponseResult for TypesListResponse {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct DeploymentsListResponse {
-    /// A token used to continue a truncated list request.
+    /// ! A token used to continue a truncated list request.
     #[serde(alias="nextPageToken")]
     pub next_page_token: String,
-    /// The deployments contained in this response.
+    /// ! The deployments contained in this response.
     pub deployments: Vec<Deployment>,
 }
 
 impl ResponseResult for DeploymentsListResponse {}
 
 
-/// There is no detailed description.
+/// Next available tag: 8
 /// 
 /// # Activities
 /// 
@@ -562,16 +562,14 @@ impl ResponseResult for DeploymentsListResponse {}
 pub struct Deployment {
     /// [Output Only] Unique identifier for the resource; defined by the server.
     pub id: Option<String>,
-    /// An optional user-provided description of the deployment.
+    /// ! An optional user-provided description of the deployment.
     pub description: Option<String>,
-    /// [Input Only] The YAML configuration to use in processing this deployment.
-    /// 
-    /// When you create a deployment, the server creates a new manifest with the given YAML configuration and sets the `manifest` property to the URL of the manifest resource.
+    /// ! [Input Only] The YAML configuration to use in processing this deployment. ! ! When you create a deployment, the server creates a new manifest with the ! given YAML configuration and sets the `manifest` property to the URL of ! the manifest resource.
     #[serde(alias="targetConfig")]
     pub target_config: Option<String>,
-    /// The name of the deployment, which must be unique within the project.
+    /// ! The name of the deployment, which must be unique within the project.
     pub name: Option<String>,
-    /// [Output Only] URL of the manifest representing the full configuration of this deployment.
+    /// ! [Output Only] URL of the manifest representing the full configuration ! of this deployment.
     pub manifest: Option<String>,
 }
 
@@ -580,7 +578,7 @@ impl Resource for Deployment {}
 impl ResponseResult for Deployment {}
 
 
-/// A response containing a partial list of operations and a page token used to build the next request if the request has been truncated.
+/// ! A response containing a partial list of operations and a page token used ! to build the next request if the request has been truncated. Next available tag: 4
 /// 
 /// # Activities
 /// 
@@ -591,17 +589,17 @@ impl ResponseResult for Deployment {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct OperationsListResponse {
-    /// A token used to continue a truncated list request.
+    /// ! A token used to continue a truncated list request.
     #[serde(alias="nextPageToken")]
     pub next_page_token: String,
-    /// Operations contained in this list response.
+    /// ! Operations contained in this list response.
     pub operations: Vec<Operation>,
 }
 
 impl ResponseResult for OperationsListResponse {}
 
 
-/// An operation resource, used to manage asynchronous API requests.
+/// ! An operation resource, used to manage asynchronous API requests. Next available tag: 24
 /// 
 /// # Activities
 /// 
@@ -615,52 +613,52 @@ impl ResponseResult for OperationsListResponse {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct Operation {
-    /// [Output Only] Status of the operation. Can be one of the following: "PENDING", "RUNNING", or "DONE".
+    /// ! [Output Only] Status of the operation. Can be one of the following: ! "PENDING", "RUNNING", or "DONE".
     pub status: String,
-    /// [Output Only] The time that this operation was requested. This is in RFC 3339 format.
+    /// ! [Output Only] The time that this operation was requested. ! This is in RFC 3339 format.
     #[serde(alias="insertTime")]
     pub insert_time: String,
-    /// [Output Only] If warning messages generated during processing of this operation, this field will be populated.
+    /// ! [Output Only] If warning messages generated during processing of this ! operation, this field will be populated.
     pub warnings: Vec<OperationWarnings>,
-    /// [Output Only] If operation fails, the HTTP error message returned, e.g. NOT FOUND.
+    /// ! [Output Only] If operation fails, the HTTP error message returned, ! e.g. NOT FOUND.
     #[serde(alias="httpErrorMessage")]
     pub http_error_message: String,
-    /// [Output Only] Unique target id which identifies a particular incarnation of the target.
+    /// ! [Output Only] Unique target id which identifies a particular ! incarnation of the target.
     #[serde(alias="targetId")]
     pub target_id: String,
-    /// [Output Only] URL of the resource the operation is mutating.
+    /// ! [Output Only] URL of the resource the operation is mutating.
     #[serde(alias="targetLink")]
     pub target_link: String,
-    /// [Output Only] The time that this operation was started by the server. This is in RFC 3339 format.
+    /// ! [Output Only] The time that this operation was started by the server. ! This is in RFC 3339 format.
     #[serde(alias="startTime")]
     pub start_time: String,
-    /// [Output Only] Creation timestamp in RFC3339 text format.
+    /// ! [Output Only] Creation timestamp in RFC3339 text format.
     #[serde(alias="creationTimestamp")]
     pub creation_timestamp: String,
-    /// [Output Only] Unique identifier for the resource; defined by the server.
+    /// ! [Output Only] Unique identifier for the resource; defined by the server.
     pub id: String,
-    /// [Output Only] Name of the operation.
+    /// ! [Output Only] Name of the operation.
     pub name: String,
     /// [Output Only] Self link for the manifest.
     #[serde(alias="selfLink")]
     pub self_link: String,
-    /// [Output Only] Type of the operation. Examples include "insert", or "delete"
+    /// ! [Output Only] Type of the operation. Examples include "insert", or ! "delete"
     #[serde(alias="operationType")]
     pub operation_type: String,
-    /// [Output Only] If errors occurred during processing of this operation, this field will be populated.
+    /// ! [Output Only] If errors occurred during processing of this operation, ! this field will be populated.
     pub error: OperationError,
-    /// [Output Only] An optional progress indicator that ranges from 0 to 100. There is no requirement that this be linear or support any granularity of operations. This should not be used to guess at when the operation will be complete. This number should be monotonically increasing as the operation progresses.
+    /// ! [Output Only] An optional progress indicator that ranges from 0 to 100. ! There is no requirement that this be linear or support any granularity ! of operations. This should not be used to guess at when the operation will ! be complete. This number should be monotonically increasing as the ! operation progresses.
     pub progress: i32,
-    /// [Output Only] The time that this operation was completed. This is in RFC3339 format.
+    /// ! [Output Only] The time that this operation was completed. This is in ! RFC3339 format.
     #[serde(alias="endTime")]
     pub end_time: String,
-    /// [Output Only] If operation fails, the HTTP error status code returned, e.g. 404.
+    /// ! [Output Only] If operation fails, the HTTP error status code returned, ! e.g. 404.
     #[serde(alias="httpErrorStatusCode")]
     pub http_error_status_code: i32,
-    /// [Output Only] An optional textual description of the current status of the operation.
+    /// ! [Output Only] An optional textual description of the current status of ! the operation.
     #[serde(alias="statusMessage")]
     pub status_message: String,
-    /// [Output Only] User who requested the operation, for example "user@example.com"
+    /// ! [Output Only] User who requested the operation, for example ! "user@example.com"
     pub user: String,
 }
 
@@ -668,7 +666,7 @@ impl Resource for Operation {}
 impl ResponseResult for Operation {}
 
 
-/// A type supported by Deployment Manager.
+/// ! A type supported by Deployment Manager. Next available tag: 4
 /// 
 /// # Activities
 /// 
@@ -679,14 +677,14 @@ impl ResponseResult for Operation {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct Type {
-    /// Name of the type.
+    /// ! Name of the type.
     pub name: Option<String>,
 }
 
 impl Resource for Type {}
 
 
-/// A response containing a partial list of manifests and a page token used to build the next request if the request has been truncated.
+/// ! A response containing a partial list of manifests and a page token used ! to build the next request if the request has been truncated. Next available tag: 4
 /// 
 /// # Activities
 /// 
@@ -697,10 +695,10 @@ impl Resource for Type {}
 /// 
 #[derive(Default, Clone, Debug, Deserialize)]
 pub struct ManifestsListResponse {
-    /// A token used to continue a truncated list request.
+    /// ! A token used to continue a truncated list request.
     #[serde(alias="nextPageToken")]
     pub next_page_token: String,
-    /// Manifests contained in this list response.
+    /// ! Manifests contained in this list response.
     pub manifests: Vec<Manifest>,
 }
 
@@ -721,8 +719,8 @@ impl ResponseResult for ManifestsListResponse {}
 ///
 /// ```test_harness,no_run
 /// extern crate hyper;
-/// extern crate "yup-oauth2" as oauth2;
-/// extern crate "google-deploymentmanager2_beta1" as deploymentmanager2_beta1;
+/// extern crate yup_oauth2 as oauth2;
+/// extern crate google_deploymentmanager2_beta1 as deploymentmanager2_beta1;
 /// 
 /// # #[test] fn egal() {
 /// use std::default::Default;
@@ -752,12 +750,12 @@ impl<'a, C, NC, A> OperationMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Gets information about a specific Operation.
+    /// ! Gets information about a specific Operation.
     /// 
     /// # Arguments
     ///
-    /// * `project` - The project ID for this request.
-    /// * `operation` - The name of the operation for this request.
+    /// * `project` - ! The project ID for this request.
+    /// * `operation` - ! The name of the operation for this request.
     pub fn get(&self, project: &str, operation: &str) -> OperationGetCall<'a, C, NC, A> {
         OperationGetCall {
             hub: self.hub,
@@ -771,11 +769,11 @@ impl<'a, C, NC, A> OperationMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Lists all Operations for a project.
+    /// ! Lists all Operations for a project.
     /// 
     /// # Arguments
     ///
-    /// * `project` - The project ID for this request.
+    /// * `project` - ! The project ID for this request.
     pub fn list(&self, project: &str) -> OperationListCall<'a, C, NC, A> {
         OperationListCall {
             hub: self.hub,
@@ -800,8 +798,8 @@ impl<'a, C, NC, A> OperationMethods<'a, C, NC, A> {
 ///
 /// ```test_harness,no_run
 /// extern crate hyper;
-/// extern crate "yup-oauth2" as oauth2;
-/// extern crate "google-deploymentmanager2_beta1" as deploymentmanager2_beta1;
+/// extern crate yup_oauth2 as oauth2;
+/// extern crate google_deploymentmanager2_beta1 as deploymentmanager2_beta1;
 /// 
 /// # #[test] fn egal() {
 /// use std::default::Default;
@@ -831,12 +829,12 @@ impl<'a, C, NC, A> DeploymentMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Creates a deployment and all of the resources described by the deployment manifest.
+    /// ! Creates a deployment and all of the resources described by the ! deployment manifest.
     /// 
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `project` - The project ID for this request.
+    /// * `project` - ! The project ID for this request.
     pub fn insert(&self, request: &Deployment, project: &str) -> DeploymentInsertCall<'a, C, NC, A> {
         DeploymentInsertCall {
             hub: self.hub,
@@ -850,12 +848,12 @@ impl<'a, C, NC, A> DeploymentMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Gets information about a specific deployment.
+    /// ! Gets information about a specific deployment.
     /// 
     /// # Arguments
     ///
-    /// * `project` - The project ID for this request.
-    /// * `deployment` - The name of the deployment for this request.
+    /// * `project` - ! The project ID for this request.
+    /// * `deployment` - ! The name of the deployment for this request.
     pub fn get(&self, project: &str, deployment: &str) -> DeploymentGetCall<'a, C, NC, A> {
         DeploymentGetCall {
             hub: self.hub,
@@ -869,11 +867,11 @@ impl<'a, C, NC, A> DeploymentMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Lists all deployments for a given project.
+    /// ! Lists all deployments for a given project.
     /// 
     /// # Arguments
     ///
-    /// * `project` - The project ID for this request.
+    /// * `project` - ! The project ID for this request.
     pub fn list(&self, project: &str) -> DeploymentListCall<'a, C, NC, A> {
         DeploymentListCall {
             hub: self.hub,
@@ -888,12 +886,12 @@ impl<'a, C, NC, A> DeploymentMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Deletes a deployment and all of the resources in the deployment.
+    /// ! Deletes a deployment and all of the resources in the deployment.
     /// 
     /// # Arguments
     ///
-    /// * `project` - The project ID for this request.
-    /// * `deployment` - The name of the deployment for this request.
+    /// * `project` - ! The project ID for this request.
+    /// * `deployment` - ! The name of the deployment for this request.
     pub fn delete(&self, project: &str, deployment: &str) -> DeploymentDeleteCall<'a, C, NC, A> {
         DeploymentDeleteCall {
             hub: self.hub,
@@ -917,8 +915,8 @@ impl<'a, C, NC, A> DeploymentMethods<'a, C, NC, A> {
 ///
 /// ```test_harness,no_run
 /// extern crate hyper;
-/// extern crate "yup-oauth2" as oauth2;
-/// extern crate "google-deploymentmanager2_beta1" as deploymentmanager2_beta1;
+/// extern crate yup_oauth2 as oauth2;
+/// extern crate google_deploymentmanager2_beta1 as deploymentmanager2_beta1;
 /// 
 /// # #[test] fn egal() {
 /// use std::default::Default;
@@ -948,11 +946,11 @@ impl<'a, C, NC, A> TypeMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Lists all Types for Deployment Manager.
+    /// ! Lists all Types for Deployment Manager.
     /// 
     /// # Arguments
     ///
-    /// * `project` - The project ID for this request.
+    /// * `project` - ! The project ID for this request.
     pub fn list(&self, project: &str) -> TypeListCall<'a, C, NC, A> {
         TypeListCall {
             hub: self.hub,
@@ -977,8 +975,8 @@ impl<'a, C, NC, A> TypeMethods<'a, C, NC, A> {
 ///
 /// ```test_harness,no_run
 /// extern crate hyper;
-/// extern crate "yup-oauth2" as oauth2;
-/// extern crate "google-deploymentmanager2_beta1" as deploymentmanager2_beta1;
+/// extern crate yup_oauth2 as oauth2;
+/// extern crate google_deploymentmanager2_beta1 as deploymentmanager2_beta1;
 /// 
 /// # #[test] fn egal() {
 /// use std::default::Default;
@@ -1008,13 +1006,13 @@ impl<'a, C, NC, A> ResourceMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Gets information about a single resource.
+    /// ! Gets information about a single resource.
     /// 
     /// # Arguments
     ///
-    /// * `project` - The project ID for this request.
-    /// * `deployment` - The name of the deployment for this request.
-    /// * `resource` - The name of the resource for this request.
+    /// * `project` - ! The project ID for this request.
+    /// * `deployment` - ! The name of the deployment for this request.
+    /// * `resource` - ! The name of the resource for this request.
     pub fn get(&self, project: &str, deployment: &str, resource: &str) -> ResourceGetCall<'a, C, NC, A> {
         ResourceGetCall {
             hub: self.hub,
@@ -1029,12 +1027,12 @@ impl<'a, C, NC, A> ResourceMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Lists all resources in a given deployment.
+    /// ! Lists all resources in a given deployment.
     /// 
     /// # Arguments
     ///
-    /// * `project` - The project ID for this request.
-    /// * `deployment` - The name of the deployment for this request.
+    /// * `project` - ! The project ID for this request.
+    /// * `deployment` - ! The name of the deployment for this request.
     pub fn list(&self, project: &str, deployment: &str) -> ResourceListCall<'a, C, NC, A> {
         ResourceListCall {
             hub: self.hub,
@@ -1060,8 +1058,8 @@ impl<'a, C, NC, A> ResourceMethods<'a, C, NC, A> {
 ///
 /// ```test_harness,no_run
 /// extern crate hyper;
-/// extern crate "yup-oauth2" as oauth2;
-/// extern crate "google-deploymentmanager2_beta1" as deploymentmanager2_beta1;
+/// extern crate yup_oauth2 as oauth2;
+/// extern crate google_deploymentmanager2_beta1 as deploymentmanager2_beta1;
 /// 
 /// # #[test] fn egal() {
 /// use std::default::Default;
@@ -1091,12 +1089,12 @@ impl<'a, C, NC, A> ManifestMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Lists all manifests for a given deployment.
+    /// ! Lists all manifests for a given deployment.
     /// 
     /// # Arguments
     ///
-    /// * `project` - The project ID for this request.
-    /// * `deployment` - The name of the deployment for this request.
+    /// * `project` - ! The project ID for this request.
+    /// * `deployment` - ! The name of the deployment for this request.
     pub fn list(&self, project: &str, deployment: &str) -> ManifestListCall<'a, C, NC, A> {
         ManifestListCall {
             hub: self.hub,
@@ -1112,13 +1110,13 @@ impl<'a, C, NC, A> ManifestMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Gets information about a specific manifest.
+    /// ! Gets information about a specific manifest.
     /// 
     /// # Arguments
     ///
-    /// * `project` - The project ID for this request.
-    /// * `deployment` - The name of the deployment for this request.
-    /// * `manifest` - The name of the manifest for this request.
+    /// * `project` - ! The project ID for this request.
+    /// * `deployment` - ! The name of the deployment for this request.
+    /// * `manifest` - ! The name of the manifest for this request.
     pub fn get(&self, project: &str, deployment: &str, manifest: &str) -> ManifestGetCall<'a, C, NC, A> {
         ManifestGetCall {
             hub: self.hub,
@@ -1140,7 +1138,7 @@ impl<'a, C, NC, A> ManifestMethods<'a, C, NC, A> {
 // CallBuilders   ###
 // #################
 
-/// Gets information about a specific Operation.
+/// ! Gets information about a specific Operation.
 ///
 /// A builder for the *get* method supported by a *operation* resource.
 /// It is not used directly, but through a `OperationMethods` instance.
@@ -1151,8 +1149,8 @@ impl<'a, C, NC, A> ManifestMethods<'a, C, NC, A> {
 ///
 /// ```test_harness,no_run
 /// # extern crate hyper;
-/// # extern crate "yup-oauth2" as oauth2;
-/// # extern crate "google-deploymentmanager2_beta1" as deploymentmanager2_beta1;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_deploymentmanager2_beta1 as deploymentmanager2_beta1;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -1214,7 +1212,7 @@ impl<'a, C, NC, A> OperationGetCall<'a, C, NC, A> where NC: hyper::net::NetworkC
 
         let mut url = "https://www.googleapis.com/deploymentmanager/v2beta1/projects/{project}/global/operations/{operation}".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::NdevCloudmanReadonly.as_slice().to_string(), ());
+            self._scopes.insert(Scope::NdevCloudmanReadonly.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{project}", "project"), ("{operation}", "operation")].iter() {
@@ -1244,7 +1242,7 @@ impl<'a, C, NC, A> OperationGetCall<'a, C, NC, A> where NC: hyper::net::NetworkC
         
         if params.len() > 0 {
             url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
+            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_ref()))));
         }
 
 
@@ -1262,7 +1260,7 @@ impl<'a, C, NC, A> OperationGetCall<'a, C, NC, A> where NC: hyper::net::NetworkC
                                                              access_token: token.unwrap().access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_slice())
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_ref())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -1273,7 +1271,7 @@ impl<'a, C, NC, A> OperationGetCall<'a, C, NC, A> where NC: hyper::net::NetworkC
             match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
+                        sleep_ms(d.num_milliseconds() as u32);
                         continue;
                     }
                     dlg.finished(false);
@@ -1284,7 +1282,7 @@ impl<'a, C, NC, A> OperationGetCall<'a, C, NC, A> where NC: hyper::net::NetworkC
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
-                            sleep(d);
+                            sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
@@ -1315,7 +1313,7 @@ impl<'a, C, NC, A> OperationGetCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The project ID for this request.
+    /// ! The project ID for this request.
     pub fn project(mut self, new_value: &str) -> OperationGetCall<'a, C, NC, A> {
         self._project = new_value.to_string();
         self
@@ -1325,7 +1323,7 @@ impl<'a, C, NC, A> OperationGetCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The name of the operation for this request.
+    /// ! The name of the operation for this request.
     pub fn operation(mut self, new_value: &str) -> OperationGetCall<'a, C, NC, A> {
         self._operation = new_value.to_string();
         self
@@ -1359,8 +1357,8 @@ impl<'a, C, NC, A> OperationGetCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> OperationGetCall<'a, C, NC, A>
-                                                        where T: Str {
-        self._additional_params.insert(name.as_slice().to_string(), value.as_slice().to_string());
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
     }
 
@@ -1376,14 +1374,14 @@ impl<'a, C, NC, A> OperationGetCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T>(mut self, scope: T) -> OperationGetCall<'a, C, NC, A> 
-                                                        where T: Str {
-        self._scopes.insert(scope.as_slice().to_string(), ());
+                                                        where T: AsRef<str> {
+        self._scopes.insert(scope.as_ref().to_string(), ());
         self
     }
 }
 
 
-/// Lists all Operations for a project.
+/// ! Lists all Operations for a project.
 ///
 /// A builder for the *list* method supported by a *operation* resource.
 /// It is not used directly, but through a `OperationMethods` instance.
@@ -1394,8 +1392,8 @@ impl<'a, C, NC, A> OperationGetCall<'a, C, NC, A> where NC: hyper::net::NetworkC
 ///
 /// ```test_harness,no_run
 /// # extern crate hyper;
-/// # extern crate "yup-oauth2" as oauth2;
-/// # extern crate "google-deploymentmanager2_beta1" as deploymentmanager2_beta1;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_deploymentmanager2_beta1 as deploymentmanager2_beta1;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -1465,7 +1463,7 @@ impl<'a, C, NC, A> OperationListCall<'a, C, NC, A> where NC: hyper::net::Network
 
         let mut url = "https://www.googleapis.com/deploymentmanager/v2beta1/projects/{project}/global/operations".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::NdevCloudmanReadonly.as_slice().to_string(), ());
+            self._scopes.insert(Scope::NdevCloudmanReadonly.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{project}", "project")].iter() {
@@ -1495,7 +1493,7 @@ impl<'a, C, NC, A> OperationListCall<'a, C, NC, A> where NC: hyper::net::Network
         
         if params.len() > 0 {
             url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
+            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_ref()))));
         }
 
 
@@ -1513,7 +1511,7 @@ impl<'a, C, NC, A> OperationListCall<'a, C, NC, A> where NC: hyper::net::Network
                                                              access_token: token.unwrap().access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_slice())
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_ref())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -1524,7 +1522,7 @@ impl<'a, C, NC, A> OperationListCall<'a, C, NC, A> where NC: hyper::net::Network
             match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
+                        sleep_ms(d.num_milliseconds() as u32);
                         continue;
                     }
                     dlg.finished(false);
@@ -1535,7 +1533,7 @@ impl<'a, C, NC, A> OperationListCall<'a, C, NC, A> where NC: hyper::net::Network
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
-                            sleep(d);
+                            sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
@@ -1566,7 +1564,7 @@ impl<'a, C, NC, A> OperationListCall<'a, C, NC, A> where NC: hyper::net::Network
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The project ID for this request.
+    /// ! The project ID for this request.
     pub fn project(mut self, new_value: &str) -> OperationListCall<'a, C, NC, A> {
         self._project = new_value.to_string();
         self
@@ -1574,7 +1572,7 @@ impl<'a, C, NC, A> OperationListCall<'a, C, NC, A> where NC: hyper::net::Network
     /// Sets the *page token* query property to the given value.
     ///
     /// 
-    /// Specifies a nextPageToken returned by a previous list request. This token can be used to request the next page of results from a previous list request.
+    /// ! Specifies a nextPageToken returned by a previous list request. This ! token can be used to request the next page of results from a previous ! list request.
     pub fn page_token(mut self, new_value: &str) -> OperationListCall<'a, C, NC, A> {
         self._page_token = Some(new_value.to_string());
         self
@@ -1582,7 +1580,7 @@ impl<'a, C, NC, A> OperationListCall<'a, C, NC, A> where NC: hyper::net::Network
     /// Sets the *max results* query property to the given value.
     ///
     /// 
-    /// Maximum count of results to be returned. Acceptable values are 0 to 100, inclusive. (Default: 50)
+    /// ! Maximum count of results to be returned. ! Acceptable values are 0 to 100, inclusive. (Default: 50)
     pub fn max_results(mut self, new_value: i32) -> OperationListCall<'a, C, NC, A> {
         self._max_results = Some(new_value);
         self
@@ -1616,8 +1614,8 @@ impl<'a, C, NC, A> OperationListCall<'a, C, NC, A> where NC: hyper::net::Network
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> OperationListCall<'a, C, NC, A>
-                                                        where T: Str {
-        self._additional_params.insert(name.as_slice().to_string(), value.as_slice().to_string());
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
     }
 
@@ -1633,14 +1631,14 @@ impl<'a, C, NC, A> OperationListCall<'a, C, NC, A> where NC: hyper::net::Network
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T>(mut self, scope: T) -> OperationListCall<'a, C, NC, A> 
-                                                        where T: Str {
-        self._scopes.insert(scope.as_slice().to_string(), ());
+                                                        where T: AsRef<str> {
+        self._scopes.insert(scope.as_ref().to_string(), ());
         self
     }
 }
 
 
-/// Creates a deployment and all of the resources described by the deployment manifest.
+/// ! Creates a deployment and all of the resources described by the ! deployment manifest.
 ///
 /// A builder for the *insert* method supported by a *deployment* resource.
 /// It is not used directly, but through a `DeploymentMethods` instance.
@@ -1651,8 +1649,8 @@ impl<'a, C, NC, A> OperationListCall<'a, C, NC, A> where NC: hyper::net::Network
 ///
 /// ```test_harness,no_run
 /// # extern crate hyper;
-/// # extern crate "yup-oauth2" as oauth2;
-/// # extern crate "google-deploymentmanager2_beta1" as deploymentmanager2_beta1;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_deploymentmanager2_beta1 as deploymentmanager2_beta1;
 /// use deploymentmanager2_beta1::Deployment;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
@@ -1719,7 +1717,7 @@ impl<'a, C, NC, A> DeploymentInsertCall<'a, C, NC, A> where NC: hyper::net::Netw
 
         let mut url = "https://www.googleapis.com/deploymentmanager/v2beta1/projects/{project}/global/deployments".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::CloudPlatform.as_slice().to_string(), ());
+            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{project}", "project")].iter() {
@@ -1749,7 +1747,7 @@ impl<'a, C, NC, A> DeploymentInsertCall<'a, C, NC, A> where NC: hyper::net::Netw
         
         if params.len() > 0 {
             url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
+            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_ref()))));
         }
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
@@ -1772,7 +1770,7 @@ impl<'a, C, NC, A> DeploymentInsertCall<'a, C, NC, A> where NC: hyper::net::Netw
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.as_slice())
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.as_ref())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -1786,7 +1784,7 @@ impl<'a, C, NC, A> DeploymentInsertCall<'a, C, NC, A> where NC: hyper::net::Netw
             match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
+                        sleep_ms(d.num_milliseconds() as u32);
                         continue;
                     }
                     dlg.finished(false);
@@ -1797,7 +1795,7 @@ impl<'a, C, NC, A> DeploymentInsertCall<'a, C, NC, A> where NC: hyper::net::Netw
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
-                            sleep(d);
+                            sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
@@ -1837,7 +1835,7 @@ impl<'a, C, NC, A> DeploymentInsertCall<'a, C, NC, A> where NC: hyper::net::Netw
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The project ID for this request.
+    /// ! The project ID for this request.
     pub fn project(mut self, new_value: &str) -> DeploymentInsertCall<'a, C, NC, A> {
         self._project = new_value.to_string();
         self
@@ -1871,8 +1869,8 @@ impl<'a, C, NC, A> DeploymentInsertCall<'a, C, NC, A> where NC: hyper::net::Netw
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> DeploymentInsertCall<'a, C, NC, A>
-                                                        where T: Str {
-        self._additional_params.insert(name.as_slice().to_string(), value.as_slice().to_string());
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
     }
 
@@ -1888,14 +1886,14 @@ impl<'a, C, NC, A> DeploymentInsertCall<'a, C, NC, A> where NC: hyper::net::Netw
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T>(mut self, scope: T) -> DeploymentInsertCall<'a, C, NC, A> 
-                                                        where T: Str {
-        self._scopes.insert(scope.as_slice().to_string(), ());
+                                                        where T: AsRef<str> {
+        self._scopes.insert(scope.as_ref().to_string(), ());
         self
     }
 }
 
 
-/// Gets information about a specific deployment.
+/// ! Gets information about a specific deployment.
 ///
 /// A builder for the *get* method supported by a *deployment* resource.
 /// It is not used directly, but through a `DeploymentMethods` instance.
@@ -1906,8 +1904,8 @@ impl<'a, C, NC, A> DeploymentInsertCall<'a, C, NC, A> where NC: hyper::net::Netw
 ///
 /// ```test_harness,no_run
 /// # extern crate hyper;
-/// # extern crate "yup-oauth2" as oauth2;
-/// # extern crate "google-deploymentmanager2_beta1" as deploymentmanager2_beta1;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_deploymentmanager2_beta1 as deploymentmanager2_beta1;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -1969,7 +1967,7 @@ impl<'a, C, NC, A> DeploymentGetCall<'a, C, NC, A> where NC: hyper::net::Network
 
         let mut url = "https://www.googleapis.com/deploymentmanager/v2beta1/projects/{project}/global/deployments/{deployment}".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::NdevCloudmanReadonly.as_slice().to_string(), ());
+            self._scopes.insert(Scope::NdevCloudmanReadonly.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{project}", "project"), ("{deployment}", "deployment")].iter() {
@@ -1999,7 +1997,7 @@ impl<'a, C, NC, A> DeploymentGetCall<'a, C, NC, A> where NC: hyper::net::Network
         
         if params.len() > 0 {
             url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
+            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_ref()))));
         }
 
 
@@ -2017,7 +2015,7 @@ impl<'a, C, NC, A> DeploymentGetCall<'a, C, NC, A> where NC: hyper::net::Network
                                                              access_token: token.unwrap().access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_slice())
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_ref())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -2028,7 +2026,7 @@ impl<'a, C, NC, A> DeploymentGetCall<'a, C, NC, A> where NC: hyper::net::Network
             match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
+                        sleep_ms(d.num_milliseconds() as u32);
                         continue;
                     }
                     dlg.finished(false);
@@ -2039,7 +2037,7 @@ impl<'a, C, NC, A> DeploymentGetCall<'a, C, NC, A> where NC: hyper::net::Network
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
-                            sleep(d);
+                            sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
@@ -2070,7 +2068,7 @@ impl<'a, C, NC, A> DeploymentGetCall<'a, C, NC, A> where NC: hyper::net::Network
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The project ID for this request.
+    /// ! The project ID for this request.
     pub fn project(mut self, new_value: &str) -> DeploymentGetCall<'a, C, NC, A> {
         self._project = new_value.to_string();
         self
@@ -2080,7 +2078,7 @@ impl<'a, C, NC, A> DeploymentGetCall<'a, C, NC, A> where NC: hyper::net::Network
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The name of the deployment for this request.
+    /// ! The name of the deployment for this request.
     pub fn deployment(mut self, new_value: &str) -> DeploymentGetCall<'a, C, NC, A> {
         self._deployment = new_value.to_string();
         self
@@ -2114,8 +2112,8 @@ impl<'a, C, NC, A> DeploymentGetCall<'a, C, NC, A> where NC: hyper::net::Network
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> DeploymentGetCall<'a, C, NC, A>
-                                                        where T: Str {
-        self._additional_params.insert(name.as_slice().to_string(), value.as_slice().to_string());
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
     }
 
@@ -2131,14 +2129,14 @@ impl<'a, C, NC, A> DeploymentGetCall<'a, C, NC, A> where NC: hyper::net::Network
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T>(mut self, scope: T) -> DeploymentGetCall<'a, C, NC, A> 
-                                                        where T: Str {
-        self._scopes.insert(scope.as_slice().to_string(), ());
+                                                        where T: AsRef<str> {
+        self._scopes.insert(scope.as_ref().to_string(), ());
         self
     }
 }
 
 
-/// Lists all deployments for a given project.
+/// ! Lists all deployments for a given project.
 ///
 /// A builder for the *list* method supported by a *deployment* resource.
 /// It is not used directly, but through a `DeploymentMethods` instance.
@@ -2149,8 +2147,8 @@ impl<'a, C, NC, A> DeploymentGetCall<'a, C, NC, A> where NC: hyper::net::Network
 ///
 /// ```test_harness,no_run
 /// # extern crate hyper;
-/// # extern crate "yup-oauth2" as oauth2;
-/// # extern crate "google-deploymentmanager2_beta1" as deploymentmanager2_beta1;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_deploymentmanager2_beta1 as deploymentmanager2_beta1;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -2220,7 +2218,7 @@ impl<'a, C, NC, A> DeploymentListCall<'a, C, NC, A> where NC: hyper::net::Networ
 
         let mut url = "https://www.googleapis.com/deploymentmanager/v2beta1/projects/{project}/global/deployments".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::NdevCloudmanReadonly.as_slice().to_string(), ());
+            self._scopes.insert(Scope::NdevCloudmanReadonly.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{project}", "project")].iter() {
@@ -2250,7 +2248,7 @@ impl<'a, C, NC, A> DeploymentListCall<'a, C, NC, A> where NC: hyper::net::Networ
         
         if params.len() > 0 {
             url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
+            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_ref()))));
         }
 
 
@@ -2268,7 +2266,7 @@ impl<'a, C, NC, A> DeploymentListCall<'a, C, NC, A> where NC: hyper::net::Networ
                                                              access_token: token.unwrap().access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_slice())
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_ref())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -2279,7 +2277,7 @@ impl<'a, C, NC, A> DeploymentListCall<'a, C, NC, A> where NC: hyper::net::Networ
             match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
+                        sleep_ms(d.num_milliseconds() as u32);
                         continue;
                     }
                     dlg.finished(false);
@@ -2290,7 +2288,7 @@ impl<'a, C, NC, A> DeploymentListCall<'a, C, NC, A> where NC: hyper::net::Networ
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
-                            sleep(d);
+                            sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
@@ -2321,7 +2319,7 @@ impl<'a, C, NC, A> DeploymentListCall<'a, C, NC, A> where NC: hyper::net::Networ
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The project ID for this request.
+    /// ! The project ID for this request.
     pub fn project(mut self, new_value: &str) -> DeploymentListCall<'a, C, NC, A> {
         self._project = new_value.to_string();
         self
@@ -2329,7 +2327,7 @@ impl<'a, C, NC, A> DeploymentListCall<'a, C, NC, A> where NC: hyper::net::Networ
     /// Sets the *page token* query property to the given value.
     ///
     /// 
-    /// Specifies a nextPageToken returned by a previous list request. This token can be used to request the next page of results from a previous list request.
+    /// ! Specifies a nextPageToken returned by a previous list request. This ! token can be used to request the next page of results from a previous ! list request.
     pub fn page_token(mut self, new_value: &str) -> DeploymentListCall<'a, C, NC, A> {
         self._page_token = Some(new_value.to_string());
         self
@@ -2337,7 +2335,7 @@ impl<'a, C, NC, A> DeploymentListCall<'a, C, NC, A> where NC: hyper::net::Networ
     /// Sets the *max results* query property to the given value.
     ///
     /// 
-    /// Maximum count of results to be returned. Acceptable values are 0 to 100, inclusive. (Default: 50)
+    /// ! Maximum count of results to be returned. ! Acceptable values are 0 to 100, inclusive. (Default: 50)
     pub fn max_results(mut self, new_value: i32) -> DeploymentListCall<'a, C, NC, A> {
         self._max_results = Some(new_value);
         self
@@ -2371,8 +2369,8 @@ impl<'a, C, NC, A> DeploymentListCall<'a, C, NC, A> where NC: hyper::net::Networ
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> DeploymentListCall<'a, C, NC, A>
-                                                        where T: Str {
-        self._additional_params.insert(name.as_slice().to_string(), value.as_slice().to_string());
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
     }
 
@@ -2388,14 +2386,14 @@ impl<'a, C, NC, A> DeploymentListCall<'a, C, NC, A> where NC: hyper::net::Networ
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T>(mut self, scope: T) -> DeploymentListCall<'a, C, NC, A> 
-                                                        where T: Str {
-        self._scopes.insert(scope.as_slice().to_string(), ());
+                                                        where T: AsRef<str> {
+        self._scopes.insert(scope.as_ref().to_string(), ());
         self
     }
 }
 
 
-/// Deletes a deployment and all of the resources in the deployment.
+/// ! Deletes a deployment and all of the resources in the deployment.
 ///
 /// A builder for the *delete* method supported by a *deployment* resource.
 /// It is not used directly, but through a `DeploymentMethods` instance.
@@ -2406,8 +2404,8 @@ impl<'a, C, NC, A> DeploymentListCall<'a, C, NC, A> where NC: hyper::net::Networ
 ///
 /// ```test_harness,no_run
 /// # extern crate hyper;
-/// # extern crate "yup-oauth2" as oauth2;
-/// # extern crate "google-deploymentmanager2_beta1" as deploymentmanager2_beta1;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_deploymentmanager2_beta1 as deploymentmanager2_beta1;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -2469,7 +2467,7 @@ impl<'a, C, NC, A> DeploymentDeleteCall<'a, C, NC, A> where NC: hyper::net::Netw
 
         let mut url = "https://www.googleapis.com/deploymentmanager/v2beta1/projects/{project}/global/deployments/{deployment}".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::CloudPlatform.as_slice().to_string(), ());
+            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{project}", "project"), ("{deployment}", "deployment")].iter() {
@@ -2499,7 +2497,7 @@ impl<'a, C, NC, A> DeploymentDeleteCall<'a, C, NC, A> where NC: hyper::net::Netw
         
         if params.len() > 0 {
             url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
+            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_ref()))));
         }
 
 
@@ -2517,7 +2515,7 @@ impl<'a, C, NC, A> DeploymentDeleteCall<'a, C, NC, A> where NC: hyper::net::Netw
                                                              access_token: token.unwrap().access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Delete, url.as_slice())
+                let mut req = client.borrow_mut().request(hyper::method::Method::Delete, url.as_ref())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -2528,7 +2526,7 @@ impl<'a, C, NC, A> DeploymentDeleteCall<'a, C, NC, A> where NC: hyper::net::Netw
             match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
+                        sleep_ms(d.num_milliseconds() as u32);
                         continue;
                     }
                     dlg.finished(false);
@@ -2539,7 +2537,7 @@ impl<'a, C, NC, A> DeploymentDeleteCall<'a, C, NC, A> where NC: hyper::net::Netw
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
-                            sleep(d);
+                            sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
@@ -2570,7 +2568,7 @@ impl<'a, C, NC, A> DeploymentDeleteCall<'a, C, NC, A> where NC: hyper::net::Netw
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The project ID for this request.
+    /// ! The project ID for this request.
     pub fn project(mut self, new_value: &str) -> DeploymentDeleteCall<'a, C, NC, A> {
         self._project = new_value.to_string();
         self
@@ -2580,7 +2578,7 @@ impl<'a, C, NC, A> DeploymentDeleteCall<'a, C, NC, A> where NC: hyper::net::Netw
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The name of the deployment for this request.
+    /// ! The name of the deployment for this request.
     pub fn deployment(mut self, new_value: &str) -> DeploymentDeleteCall<'a, C, NC, A> {
         self._deployment = new_value.to_string();
         self
@@ -2614,8 +2612,8 @@ impl<'a, C, NC, A> DeploymentDeleteCall<'a, C, NC, A> where NC: hyper::net::Netw
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> DeploymentDeleteCall<'a, C, NC, A>
-                                                        where T: Str {
-        self._additional_params.insert(name.as_slice().to_string(), value.as_slice().to_string());
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
     }
 
@@ -2631,14 +2629,14 @@ impl<'a, C, NC, A> DeploymentDeleteCall<'a, C, NC, A> where NC: hyper::net::Netw
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T>(mut self, scope: T) -> DeploymentDeleteCall<'a, C, NC, A> 
-                                                        where T: Str {
-        self._scopes.insert(scope.as_slice().to_string(), ());
+                                                        where T: AsRef<str> {
+        self._scopes.insert(scope.as_ref().to_string(), ());
         self
     }
 }
 
 
-/// Lists all Types for Deployment Manager.
+/// ! Lists all Types for Deployment Manager.
 ///
 /// A builder for the *list* method supported by a *type* resource.
 /// It is not used directly, but through a `TypeMethods` instance.
@@ -2649,8 +2647,8 @@ impl<'a, C, NC, A> DeploymentDeleteCall<'a, C, NC, A> where NC: hyper::net::Netw
 ///
 /// ```test_harness,no_run
 /// # extern crate hyper;
-/// # extern crate "yup-oauth2" as oauth2;
-/// # extern crate "google-deploymentmanager2_beta1" as deploymentmanager2_beta1;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_deploymentmanager2_beta1 as deploymentmanager2_beta1;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -2720,7 +2718,7 @@ impl<'a, C, NC, A> TypeListCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
 
         let mut url = "https://www.googleapis.com/deploymentmanager/v2beta1/projects/{project}/global/types".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::NdevCloudmanReadonly.as_slice().to_string(), ());
+            self._scopes.insert(Scope::NdevCloudmanReadonly.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{project}", "project")].iter() {
@@ -2750,7 +2748,7 @@ impl<'a, C, NC, A> TypeListCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
         
         if params.len() > 0 {
             url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
+            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_ref()))));
         }
 
 
@@ -2768,7 +2766,7 @@ impl<'a, C, NC, A> TypeListCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
                                                              access_token: token.unwrap().access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_slice())
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_ref())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -2779,7 +2777,7 @@ impl<'a, C, NC, A> TypeListCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
             match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
+                        sleep_ms(d.num_milliseconds() as u32);
                         continue;
                     }
                     dlg.finished(false);
@@ -2790,7 +2788,7 @@ impl<'a, C, NC, A> TypeListCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
-                            sleep(d);
+                            sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
@@ -2821,7 +2819,7 @@ impl<'a, C, NC, A> TypeListCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The project ID for this request.
+    /// ! The project ID for this request.
     pub fn project(mut self, new_value: &str) -> TypeListCall<'a, C, NC, A> {
         self._project = new_value.to_string();
         self
@@ -2829,7 +2827,7 @@ impl<'a, C, NC, A> TypeListCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
     /// Sets the *page token* query property to the given value.
     ///
     /// 
-    /// Specifies a nextPageToken returned by a previous list request. This token can be used to request the next page of results from a previous list request.
+    /// ! Specifies a nextPageToken returned by a previous list request. This ! token can be used to request the next page of results from a previous ! list request.
     pub fn page_token(mut self, new_value: &str) -> TypeListCall<'a, C, NC, A> {
         self._page_token = Some(new_value.to_string());
         self
@@ -2837,7 +2835,7 @@ impl<'a, C, NC, A> TypeListCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
     /// Sets the *max results* query property to the given value.
     ///
     /// 
-    /// Maximum count of results to be returned. Acceptable values are 0 to 100, inclusive. (Default: 50)
+    /// ! Maximum count of results to be returned. ! Acceptable values are 0 to 100, inclusive. (Default: 50)
     pub fn max_results(mut self, new_value: i32) -> TypeListCall<'a, C, NC, A> {
         self._max_results = Some(new_value);
         self
@@ -2871,8 +2869,8 @@ impl<'a, C, NC, A> TypeListCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> TypeListCall<'a, C, NC, A>
-                                                        where T: Str {
-        self._additional_params.insert(name.as_slice().to_string(), value.as_slice().to_string());
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
     }
 
@@ -2888,14 +2886,14 @@ impl<'a, C, NC, A> TypeListCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T>(mut self, scope: T) -> TypeListCall<'a, C, NC, A> 
-                                                        where T: Str {
-        self._scopes.insert(scope.as_slice().to_string(), ());
+                                                        where T: AsRef<str> {
+        self._scopes.insert(scope.as_ref().to_string(), ());
         self
     }
 }
 
 
-/// Gets information about a single resource.
+/// ! Gets information about a single resource.
 ///
 /// A builder for the *get* method supported by a *resource* resource.
 /// It is not used directly, but through a `ResourceMethods` instance.
@@ -2906,8 +2904,8 @@ impl<'a, C, NC, A> TypeListCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
 ///
 /// ```test_harness,no_run
 /// # extern crate hyper;
-/// # extern crate "yup-oauth2" as oauth2;
-/// # extern crate "google-deploymentmanager2_beta1" as deploymentmanager2_beta1;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_deploymentmanager2_beta1 as deploymentmanager2_beta1;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -2971,7 +2969,7 @@ impl<'a, C, NC, A> ResourceGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
 
         let mut url = "https://www.googleapis.com/deploymentmanager/v2beta1/projects/{project}/global/deployments/{deployment}/resources/{resource}".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::NdevCloudmanReadonly.as_slice().to_string(), ());
+            self._scopes.insert(Scope::NdevCloudmanReadonly.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{project}", "project"), ("{deployment}", "deployment"), ("{resource}", "resource")].iter() {
@@ -3001,7 +2999,7 @@ impl<'a, C, NC, A> ResourceGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
         
         if params.len() > 0 {
             url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
+            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_ref()))));
         }
 
 
@@ -3019,7 +3017,7 @@ impl<'a, C, NC, A> ResourceGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
                                                              access_token: token.unwrap().access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_slice())
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_ref())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -3030,7 +3028,7 @@ impl<'a, C, NC, A> ResourceGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
             match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
+                        sleep_ms(d.num_milliseconds() as u32);
                         continue;
                     }
                     dlg.finished(false);
@@ -3041,7 +3039,7 @@ impl<'a, C, NC, A> ResourceGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
-                            sleep(d);
+                            sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
@@ -3072,7 +3070,7 @@ impl<'a, C, NC, A> ResourceGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The project ID for this request.
+    /// ! The project ID for this request.
     pub fn project(mut self, new_value: &str) -> ResourceGetCall<'a, C, NC, A> {
         self._project = new_value.to_string();
         self
@@ -3082,7 +3080,7 @@ impl<'a, C, NC, A> ResourceGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The name of the deployment for this request.
+    /// ! The name of the deployment for this request.
     pub fn deployment(mut self, new_value: &str) -> ResourceGetCall<'a, C, NC, A> {
         self._deployment = new_value.to_string();
         self
@@ -3092,7 +3090,7 @@ impl<'a, C, NC, A> ResourceGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The name of the resource for this request.
+    /// ! The name of the resource for this request.
     pub fn resource(mut self, new_value: &str) -> ResourceGetCall<'a, C, NC, A> {
         self._resource = new_value.to_string();
         self
@@ -3126,8 +3124,8 @@ impl<'a, C, NC, A> ResourceGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> ResourceGetCall<'a, C, NC, A>
-                                                        where T: Str {
-        self._additional_params.insert(name.as_slice().to_string(), value.as_slice().to_string());
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
     }
 
@@ -3143,14 +3141,14 @@ impl<'a, C, NC, A> ResourceGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T>(mut self, scope: T) -> ResourceGetCall<'a, C, NC, A> 
-                                                        where T: Str {
-        self._scopes.insert(scope.as_slice().to_string(), ());
+                                                        where T: AsRef<str> {
+        self._scopes.insert(scope.as_ref().to_string(), ());
         self
     }
 }
 
 
-/// Lists all resources in a given deployment.
+/// ! Lists all resources in a given deployment.
 ///
 /// A builder for the *list* method supported by a *resource* resource.
 /// It is not used directly, but through a `ResourceMethods` instance.
@@ -3161,8 +3159,8 @@ impl<'a, C, NC, A> ResourceGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
 ///
 /// ```test_harness,no_run
 /// # extern crate hyper;
-/// # extern crate "yup-oauth2" as oauth2;
-/// # extern crate "google-deploymentmanager2_beta1" as deploymentmanager2_beta1;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_deploymentmanager2_beta1 as deploymentmanager2_beta1;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -3234,7 +3232,7 @@ impl<'a, C, NC, A> ResourceListCall<'a, C, NC, A> where NC: hyper::net::NetworkC
 
         let mut url = "https://www.googleapis.com/deploymentmanager/v2beta1/projects/{project}/global/deployments/{deployment}/resources".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::NdevCloudmanReadonly.as_slice().to_string(), ());
+            self._scopes.insert(Scope::NdevCloudmanReadonly.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{project}", "project"), ("{deployment}", "deployment")].iter() {
@@ -3264,7 +3262,7 @@ impl<'a, C, NC, A> ResourceListCall<'a, C, NC, A> where NC: hyper::net::NetworkC
         
         if params.len() > 0 {
             url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
+            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_ref()))));
         }
 
 
@@ -3282,7 +3280,7 @@ impl<'a, C, NC, A> ResourceListCall<'a, C, NC, A> where NC: hyper::net::NetworkC
                                                              access_token: token.unwrap().access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_slice())
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_ref())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -3293,7 +3291,7 @@ impl<'a, C, NC, A> ResourceListCall<'a, C, NC, A> where NC: hyper::net::NetworkC
             match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
+                        sleep_ms(d.num_milliseconds() as u32);
                         continue;
                     }
                     dlg.finished(false);
@@ -3304,7 +3302,7 @@ impl<'a, C, NC, A> ResourceListCall<'a, C, NC, A> where NC: hyper::net::NetworkC
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
-                            sleep(d);
+                            sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
@@ -3335,7 +3333,7 @@ impl<'a, C, NC, A> ResourceListCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The project ID for this request.
+    /// ! The project ID for this request.
     pub fn project(mut self, new_value: &str) -> ResourceListCall<'a, C, NC, A> {
         self._project = new_value.to_string();
         self
@@ -3345,7 +3343,7 @@ impl<'a, C, NC, A> ResourceListCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The name of the deployment for this request.
+    /// ! The name of the deployment for this request.
     pub fn deployment(mut self, new_value: &str) -> ResourceListCall<'a, C, NC, A> {
         self._deployment = new_value.to_string();
         self
@@ -3353,7 +3351,7 @@ impl<'a, C, NC, A> ResourceListCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// Sets the *page token* query property to the given value.
     ///
     /// 
-    /// Specifies a nextPageToken returned by a previous list request. This token can be used to request the next page of results from a previous list request.
+    /// ! Specifies a nextPageToken returned by a previous list request. This ! token can be used to request the next page of results from a previous ! list request.
     pub fn page_token(mut self, new_value: &str) -> ResourceListCall<'a, C, NC, A> {
         self._page_token = Some(new_value.to_string());
         self
@@ -3361,7 +3359,7 @@ impl<'a, C, NC, A> ResourceListCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// Sets the *max results* query property to the given value.
     ///
     /// 
-    /// Maximum count of results to be returned. Acceptable values are 0 to 100, inclusive. (Default: 50)
+    /// ! Maximum count of results to be returned. ! Acceptable values are 0 to 100, inclusive. (Default: 50)
     pub fn max_results(mut self, new_value: i32) -> ResourceListCall<'a, C, NC, A> {
         self._max_results = Some(new_value);
         self
@@ -3395,8 +3393,8 @@ impl<'a, C, NC, A> ResourceListCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> ResourceListCall<'a, C, NC, A>
-                                                        where T: Str {
-        self._additional_params.insert(name.as_slice().to_string(), value.as_slice().to_string());
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
     }
 
@@ -3412,14 +3410,14 @@ impl<'a, C, NC, A> ResourceListCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T>(mut self, scope: T) -> ResourceListCall<'a, C, NC, A> 
-                                                        where T: Str {
-        self._scopes.insert(scope.as_slice().to_string(), ());
+                                                        where T: AsRef<str> {
+        self._scopes.insert(scope.as_ref().to_string(), ());
         self
     }
 }
 
 
-/// Lists all manifests for a given deployment.
+/// ! Lists all manifests for a given deployment.
 ///
 /// A builder for the *list* method supported by a *manifest* resource.
 /// It is not used directly, but through a `ManifestMethods` instance.
@@ -3430,8 +3428,8 @@ impl<'a, C, NC, A> ResourceListCall<'a, C, NC, A> where NC: hyper::net::NetworkC
 ///
 /// ```test_harness,no_run
 /// # extern crate hyper;
-/// # extern crate "yup-oauth2" as oauth2;
-/// # extern crate "google-deploymentmanager2_beta1" as deploymentmanager2_beta1;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_deploymentmanager2_beta1 as deploymentmanager2_beta1;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -3503,7 +3501,7 @@ impl<'a, C, NC, A> ManifestListCall<'a, C, NC, A> where NC: hyper::net::NetworkC
 
         let mut url = "https://www.googleapis.com/deploymentmanager/v2beta1/projects/{project}/global/deployments/{deployment}/manifests".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::NdevCloudmanReadonly.as_slice().to_string(), ());
+            self._scopes.insert(Scope::NdevCloudmanReadonly.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{project}", "project"), ("{deployment}", "deployment")].iter() {
@@ -3533,7 +3531,7 @@ impl<'a, C, NC, A> ManifestListCall<'a, C, NC, A> where NC: hyper::net::NetworkC
         
         if params.len() > 0 {
             url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
+            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_ref()))));
         }
 
 
@@ -3551,7 +3549,7 @@ impl<'a, C, NC, A> ManifestListCall<'a, C, NC, A> where NC: hyper::net::NetworkC
                                                              access_token: token.unwrap().access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_slice())
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_ref())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -3562,7 +3560,7 @@ impl<'a, C, NC, A> ManifestListCall<'a, C, NC, A> where NC: hyper::net::NetworkC
             match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
+                        sleep_ms(d.num_milliseconds() as u32);
                         continue;
                     }
                     dlg.finished(false);
@@ -3573,7 +3571,7 @@ impl<'a, C, NC, A> ManifestListCall<'a, C, NC, A> where NC: hyper::net::NetworkC
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
-                            sleep(d);
+                            sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
@@ -3604,7 +3602,7 @@ impl<'a, C, NC, A> ManifestListCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The project ID for this request.
+    /// ! The project ID for this request.
     pub fn project(mut self, new_value: &str) -> ManifestListCall<'a, C, NC, A> {
         self._project = new_value.to_string();
         self
@@ -3614,7 +3612,7 @@ impl<'a, C, NC, A> ManifestListCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The name of the deployment for this request.
+    /// ! The name of the deployment for this request.
     pub fn deployment(mut self, new_value: &str) -> ManifestListCall<'a, C, NC, A> {
         self._deployment = new_value.to_string();
         self
@@ -3622,7 +3620,7 @@ impl<'a, C, NC, A> ManifestListCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// Sets the *page token* query property to the given value.
     ///
     /// 
-    /// Specifies a nextPageToken returned by a previous list request. This token can be used to request the next page of results from a previous list request.
+    /// ! Specifies a nextPageToken returned by a previous list request. This ! token can be used to request the next page of results from a previous ! list request.
     pub fn page_token(mut self, new_value: &str) -> ManifestListCall<'a, C, NC, A> {
         self._page_token = Some(new_value.to_string());
         self
@@ -3630,7 +3628,7 @@ impl<'a, C, NC, A> ManifestListCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// Sets the *max results* query property to the given value.
     ///
     /// 
-    /// Maximum count of results to be returned. Acceptable values are 0 to 100, inclusive. (Default: 50)
+    /// ! Maximum count of results to be returned. ! Acceptable values are 0 to 100, inclusive. (Default: 50)
     pub fn max_results(mut self, new_value: i32) -> ManifestListCall<'a, C, NC, A> {
         self._max_results = Some(new_value);
         self
@@ -3664,8 +3662,8 @@ impl<'a, C, NC, A> ManifestListCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> ManifestListCall<'a, C, NC, A>
-                                                        where T: Str {
-        self._additional_params.insert(name.as_slice().to_string(), value.as_slice().to_string());
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
     }
 
@@ -3681,14 +3679,14 @@ impl<'a, C, NC, A> ManifestListCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T>(mut self, scope: T) -> ManifestListCall<'a, C, NC, A> 
-                                                        where T: Str {
-        self._scopes.insert(scope.as_slice().to_string(), ());
+                                                        where T: AsRef<str> {
+        self._scopes.insert(scope.as_ref().to_string(), ());
         self
     }
 }
 
 
-/// Gets information about a specific manifest.
+/// ! Gets information about a specific manifest.
 ///
 /// A builder for the *get* method supported by a *manifest* resource.
 /// It is not used directly, but through a `ManifestMethods` instance.
@@ -3699,8 +3697,8 @@ impl<'a, C, NC, A> ManifestListCall<'a, C, NC, A> where NC: hyper::net::NetworkC
 ///
 /// ```test_harness,no_run
 /// # extern crate hyper;
-/// # extern crate "yup-oauth2" as oauth2;
-/// # extern crate "google-deploymentmanager2_beta1" as deploymentmanager2_beta1;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_deploymentmanager2_beta1 as deploymentmanager2_beta1;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -3764,7 +3762,7 @@ impl<'a, C, NC, A> ManifestGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
 
         let mut url = "https://www.googleapis.com/deploymentmanager/v2beta1/projects/{project}/global/deployments/{deployment}/manifests/{manifest}".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::NdevCloudmanReadonly.as_slice().to_string(), ());
+            self._scopes.insert(Scope::NdevCloudmanReadonly.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{project}", "project"), ("{deployment}", "deployment"), ("{manifest}", "manifest")].iter() {
@@ -3794,7 +3792,7 @@ impl<'a, C, NC, A> ManifestGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
         
         if params.len() > 0 {
             url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
+            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_ref()))));
         }
 
 
@@ -3812,7 +3810,7 @@ impl<'a, C, NC, A> ManifestGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
                                                              access_token: token.unwrap().access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_slice())
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_ref())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -3823,7 +3821,7 @@ impl<'a, C, NC, A> ManifestGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
             match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
+                        sleep_ms(d.num_milliseconds() as u32);
                         continue;
                     }
                     dlg.finished(false);
@@ -3834,7 +3832,7 @@ impl<'a, C, NC, A> ManifestGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
-                            sleep(d);
+                            sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
@@ -3865,7 +3863,7 @@ impl<'a, C, NC, A> ManifestGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The project ID for this request.
+    /// ! The project ID for this request.
     pub fn project(mut self, new_value: &str) -> ManifestGetCall<'a, C, NC, A> {
         self._project = new_value.to_string();
         self
@@ -3875,7 +3873,7 @@ impl<'a, C, NC, A> ManifestGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The name of the deployment for this request.
+    /// ! The name of the deployment for this request.
     pub fn deployment(mut self, new_value: &str) -> ManifestGetCall<'a, C, NC, A> {
         self._deployment = new_value.to_string();
         self
@@ -3885,7 +3883,7 @@ impl<'a, C, NC, A> ManifestGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// The name of the manifest for this request.
+    /// ! The name of the manifest for this request.
     pub fn manifest(mut self, new_value: &str) -> ManifestGetCall<'a, C, NC, A> {
         self._manifest = new_value.to_string();
         self
@@ -3919,8 +3917,8 @@ impl<'a, C, NC, A> ManifestGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> ManifestGetCall<'a, C, NC, A>
-                                                        where T: Str {
-        self._additional_params.insert(name.as_slice().to_string(), value.as_slice().to_string());
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
     }
 
@@ -3936,8 +3934,8 @@ impl<'a, C, NC, A> ManifestGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T>(mut self, scope: T) -> ManifestGetCall<'a, C, NC, A> 
-                                                        where T: Str {
-        self._scopes.insert(scope.as_slice().to_string(), ());
+                                                        where T: AsRef<str> {
+        self._scopes.insert(scope.as_ref().to_string(), ());
         self
     }
 }

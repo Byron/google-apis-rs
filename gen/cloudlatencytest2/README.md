@@ -67,8 +67,8 @@ google-cloudlatencytest2 = "*"
 
 ```Rust
 extern crate hyper;
-extern crate "yup-oauth2" as oauth2;
-extern crate "google-cloudlatencytest2" as cloudlatencytest2;
+extern crate yup_oauth2 as oauth2;
+extern crate google_cloudlatencytest2 as cloudlatencytest2;
 use cloudlatencytest2::Stats;
 use cloudlatencytest2::{Result, Error};
 use std::default::Default;

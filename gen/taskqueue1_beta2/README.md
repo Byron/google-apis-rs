@@ -78,8 +78,8 @@ google-taskqueue1_beta2 = "*"
 
 ```Rust
 extern crate hyper;
-extern crate "yup-oauth2" as oauth2;
-extern crate "google-taskqueue1_beta2" as taskqueue1_beta2;
+extern crate yup_oauth2 as oauth2;
+extern crate google_taskqueue1_beta2 as taskqueue1_beta2;
 use taskqueue1_beta2::{Result, Error};
 use std::default::Default;
 use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};

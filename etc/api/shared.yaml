@@ -1,11 +1,8 @@
 api:
   blacklist:
-    # All of these require Box<> support in serde
-    # See https://github.com/erickt/rust-serde/issues/45
-    - civicinfo
-    - discovery
-    - gan
-    - plus
+    # exclude APIs which currently don't build correctly. State the reason for the exclusion as well
+    # to allow looking at it at a later point.
+    - 
 # Contains values shared among all API implementations
 directories:
   # directory under which all generated sources should reside

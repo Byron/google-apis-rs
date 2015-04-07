@@ -81,8 +81,8 @@
 //! 
 //! ```test_harness,no_run
 //! extern crate hyper;
-//! extern crate "yup-oauth2" as oauth2;
-//! extern crate "google-youtubeanalytics1" as youtubeanalytics1;
+//! extern crate yup_oauth2 as oauth2;
+//! extern crate google_youtubeanalytics1 as youtubeanalytics1;
 //! use youtubeanalytics1::{Result, Error};
 //! # #[test] fn egal() {
 //! use std::default::Default;
@@ -178,20 +178,20 @@
 //! [google-go-api]: https://github.com/google/google-api-go-client
 //! 
 //! 
-#![feature(core,io,thread_sleep)]
+#![feature(std_misc)]
 // Unused attributes happen thanks to defined, but unused structures
 // We don't warn about this, as depending on the API, some data structures or facilities are never used.
 // Instead of pre-determining this, we just disable the lint. It's manually tuned to not have any 
 // unused imports in fully featured APIs. Same with unused_mut ... .
 #![allow(unused_imports, unused_mut, dead_code)]
 // Required for serde annotations
-#![feature(custom_derive, custom_attribute, plugin)]
+#![feature(custom_derive, custom_attribute, plugin, slice_patterns)]
 #![plugin(serde_macros)]
 
 #[macro_use]
 extern crate hyper;
 extern crate serde;
-extern crate "yup-oauth2" as oauth2;
+extern crate yup_oauth2 as oauth2;
 extern crate mime;
 extern crate url;
 
@@ -206,7 +206,7 @@ use std::marker::PhantomData;
 use serde::json;
 use std::io;
 use std::fs;
-use std::thread::sleep;
+use std::thread::sleep_ms;
 
 pub use cmn::{MultiPartReader, ToParts, MethodInfo, Result, Error, CallBuilder, Hub, ReadSeek, Part, ResponseResult, RequestValue, NestedType, Delegate, DefaultDelegate, MethodsBuilder, Resource, JsonServerError};
 
@@ -236,8 +236,8 @@ pub enum Scope {
     YtAnalyticMonetaryReadonly,
 }
 
-impl Str for Scope {
-    fn as_slice(&self) -> &str {
+impl AsRef<str> for Scope {
+    fn as_ref(&self) -> &str {
         match *self {
             Scope::YoutubeReadonly => "https://www.googleapis.com/auth/youtube.readonly",
             Scope::YtAnalyticReadonly => "https://www.googleapis.com/auth/yt-analytics.readonly",
@@ -268,8 +268,8 @@ impl Default for Scope {
 ///
 /// ```test_harness,no_run
 /// extern crate hyper;
-/// extern crate "yup-oauth2" as oauth2;
-/// extern crate "google-youtubeanalytics1" as youtubeanalytics1;
+/// extern crate yup_oauth2 as oauth2;
+/// extern crate google_youtubeanalytics1 as youtubeanalytics1;
 /// use youtubeanalytics1::{Result, Error};
 /// # #[test] fn egal() {
 /// use std::default::Default;
@@ -716,8 +716,8 @@ impl ResponseResult for BatchReportList {}
 ///
 /// ```test_harness,no_run
 /// extern crate hyper;
-/// extern crate "yup-oauth2" as oauth2;
-/// extern crate "google-youtubeanalytics1" as youtubeanalytics1;
+/// extern crate yup_oauth2 as oauth2;
+/// extern crate google_youtubeanalytics1 as youtubeanalytics1;
 /// 
 /// # #[test] fn egal() {
 /// use std::default::Default;
@@ -788,8 +788,8 @@ impl<'a, C, NC, A> ReportMethods<'a, C, NC, A> {
 ///
 /// ```test_harness,no_run
 /// extern crate hyper;
-/// extern crate "yup-oauth2" as oauth2;
-/// extern crate "google-youtubeanalytics1" as youtubeanalytics1;
+/// extern crate yup_oauth2 as oauth2;
+/// extern crate google_youtubeanalytics1 as youtubeanalytics1;
 /// 
 /// # #[test] fn egal() {
 /// use std::default::Default;
@@ -846,8 +846,8 @@ impl<'a, C, NC, A> BatchReportDefinitionMethods<'a, C, NC, A> {
 ///
 /// ```test_harness,no_run
 /// extern crate hyper;
-/// extern crate "yup-oauth2" as oauth2;
-/// extern crate "google-youtubeanalytics1" as youtubeanalytics1;
+/// extern crate yup_oauth2 as oauth2;
+/// extern crate google_youtubeanalytics1 as youtubeanalytics1;
 /// 
 /// # #[test] fn egal() {
 /// use std::default::Default;
@@ -941,8 +941,8 @@ impl<'a, C, NC, A> GroupItemMethods<'a, C, NC, A> {
 ///
 /// ```test_harness,no_run
 /// extern crate hyper;
-/// extern crate "yup-oauth2" as oauth2;
-/// extern crate "google-youtubeanalytics1" as youtubeanalytics1;
+/// extern crate yup_oauth2 as oauth2;
+/// extern crate google_youtubeanalytics1 as youtubeanalytics1;
 /// 
 /// # #[test] fn egal() {
 /// use std::default::Default;
@@ -1051,8 +1051,8 @@ impl<'a, C, NC, A> GroupMethods<'a, C, NC, A> {
 ///
 /// ```test_harness,no_run
 /// extern crate hyper;
-/// extern crate "yup-oauth2" as oauth2;
-/// extern crate "google-youtubeanalytics1" as youtubeanalytics1;
+/// extern crate yup_oauth2 as oauth2;
+/// extern crate google_youtubeanalytics1 as youtubeanalytics1;
 /// 
 /// # #[test] fn egal() {
 /// use std::default::Default;
@@ -1119,8 +1119,8 @@ impl<'a, C, NC, A> BatchReportMethods<'a, C, NC, A> {
 ///
 /// ```test_harness,no_run
 /// # extern crate hyper;
-/// # extern crate "yup-oauth2" as oauth2;
-/// # extern crate "google-youtubeanalytics1" as youtubeanalytics1;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_youtubeanalytics1 as youtubeanalytics1;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -1216,13 +1216,13 @@ impl<'a, C, NC, A> ReportQueryCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
 
         let mut url = "https://www.googleapis.com/youtube/analytics/v1/reports".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::YoutubeReadonly.as_slice().to_string(), ());
+            self._scopes.insert(Scope::YoutubeReadonly.as_ref().to_string(), ());
         }
 
         
         if params.len() > 0 {
             url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
+            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_ref()))));
         }
 
 
@@ -1240,7 +1240,7 @@ impl<'a, C, NC, A> ReportQueryCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
                                                              access_token: token.unwrap().access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_slice())
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_ref())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -1251,7 +1251,7 @@ impl<'a, C, NC, A> ReportQueryCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
             match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
+                        sleep_ms(d.num_milliseconds() as u32);
                         continue;
                     }
                     dlg.finished(false);
@@ -1262,7 +1262,7 @@ impl<'a, C, NC, A> ReportQueryCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
-                            sleep(d);
+                            sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
@@ -1407,8 +1407,8 @@ impl<'a, C, NC, A> ReportQueryCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> ReportQueryCall<'a, C, NC, A>
-                                                        where T: Str {
-        self._additional_params.insert(name.as_slice().to_string(), value.as_slice().to_string());
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
     }
 
@@ -1424,8 +1424,8 @@ impl<'a, C, NC, A> ReportQueryCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T>(mut self, scope: T) -> ReportQueryCall<'a, C, NC, A> 
-                                                        where T: Str {
-        self._scopes.insert(scope.as_slice().to_string(), ());
+                                                        where T: AsRef<str> {
+        self._scopes.insert(scope.as_ref().to_string(), ());
         self
     }
 }
@@ -1442,8 +1442,8 @@ impl<'a, C, NC, A> ReportQueryCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
 ///
 /// ```test_harness,no_run
 /// # extern crate hyper;
-/// # extern crate "yup-oauth2" as oauth2;
-/// # extern crate "google-youtubeanalytics1" as youtubeanalytics1;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_youtubeanalytics1 as youtubeanalytics1;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -1503,13 +1503,13 @@ impl<'a, C, NC, A> BatchReportDefinitionListCall<'a, C, NC, A> where NC: hyper::
 
         let mut url = "https://www.googleapis.com/youtube/analytics/v1/batchReportDefinitions".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::YoutubeReadonly.as_slice().to_string(), ());
+            self._scopes.insert(Scope::YoutubeReadonly.as_ref().to_string(), ());
         }
 
         
         if params.len() > 0 {
             url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
+            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_ref()))));
         }
 
 
@@ -1527,7 +1527,7 @@ impl<'a, C, NC, A> BatchReportDefinitionListCall<'a, C, NC, A> where NC: hyper::
                                                              access_token: token.unwrap().access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_slice())
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_ref())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -1538,7 +1538,7 @@ impl<'a, C, NC, A> BatchReportDefinitionListCall<'a, C, NC, A> where NC: hyper::
             match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
+                        sleep_ms(d.num_milliseconds() as u32);
                         continue;
                     }
                     dlg.finished(false);
@@ -1549,7 +1549,7 @@ impl<'a, C, NC, A> BatchReportDefinitionListCall<'a, C, NC, A> where NC: hyper::
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
-                            sleep(d);
+                            sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
@@ -1614,8 +1614,8 @@ impl<'a, C, NC, A> BatchReportDefinitionListCall<'a, C, NC, A> where NC: hyper::
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> BatchReportDefinitionListCall<'a, C, NC, A>
-                                                        where T: Str {
-        self._additional_params.insert(name.as_slice().to_string(), value.as_slice().to_string());
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
     }
 
@@ -1631,8 +1631,8 @@ impl<'a, C, NC, A> BatchReportDefinitionListCall<'a, C, NC, A> where NC: hyper::
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T>(mut self, scope: T) -> BatchReportDefinitionListCall<'a, C, NC, A> 
-                                                        where T: Str {
-        self._scopes.insert(scope.as_slice().to_string(), ());
+                                                        where T: AsRef<str> {
+        self._scopes.insert(scope.as_ref().to_string(), ());
         self
     }
 }
@@ -1649,8 +1649,8 @@ impl<'a, C, NC, A> BatchReportDefinitionListCall<'a, C, NC, A> where NC: hyper::
 ///
 /// ```test_harness,no_run
 /// # extern crate hyper;
-/// # extern crate "yup-oauth2" as oauth2;
-/// # extern crate "google-youtubeanalytics1" as youtubeanalytics1;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_youtubeanalytics1 as youtubeanalytics1;
 /// use youtubeanalytics1::GroupItem;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
@@ -1720,13 +1720,13 @@ impl<'a, C, NC, A> GroupItemInsertCall<'a, C, NC, A> where NC: hyper::net::Netwo
 
         let mut url = "https://www.googleapis.com/youtube/analytics/v1/groupItems".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Youtube.as_slice().to_string(), ());
+            self._scopes.insert(Scope::Youtube.as_ref().to_string(), ());
         }
 
         
         if params.len() > 0 {
             url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
+            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_ref()))));
         }
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
@@ -1749,7 +1749,7 @@ impl<'a, C, NC, A> GroupItemInsertCall<'a, C, NC, A> where NC: hyper::net::Netwo
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.as_slice())
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.as_ref())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -1763,7 +1763,7 @@ impl<'a, C, NC, A> GroupItemInsertCall<'a, C, NC, A> where NC: hyper::net::Netwo
             match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
+                        sleep_ms(d.num_milliseconds() as u32);
                         continue;
                     }
                     dlg.finished(false);
@@ -1774,7 +1774,7 @@ impl<'a, C, NC, A> GroupItemInsertCall<'a, C, NC, A> where NC: hyper::net::Netwo
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
-                            sleep(d);
+                            sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
@@ -1848,8 +1848,8 @@ impl<'a, C, NC, A> GroupItemInsertCall<'a, C, NC, A> where NC: hyper::net::Netwo
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> GroupItemInsertCall<'a, C, NC, A>
-                                                        where T: Str {
-        self._additional_params.insert(name.as_slice().to_string(), value.as_slice().to_string());
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
     }
 
@@ -1865,8 +1865,8 @@ impl<'a, C, NC, A> GroupItemInsertCall<'a, C, NC, A> where NC: hyper::net::Netwo
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T>(mut self, scope: T) -> GroupItemInsertCall<'a, C, NC, A> 
-                                                        where T: Str {
-        self._scopes.insert(scope.as_slice().to_string(), ());
+                                                        where T: AsRef<str> {
+        self._scopes.insert(scope.as_ref().to_string(), ());
         self
     }
 }
@@ -1883,8 +1883,8 @@ impl<'a, C, NC, A> GroupItemInsertCall<'a, C, NC, A> where NC: hyper::net::Netwo
 ///
 /// ```test_harness,no_run
 /// # extern crate hyper;
-/// # extern crate "yup-oauth2" as oauth2;
-/// # extern crate "google-youtubeanalytics1" as youtubeanalytics1;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_youtubeanalytics1 as youtubeanalytics1;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -1949,13 +1949,13 @@ impl<'a, C, NC, A> GroupItemListCall<'a, C, NC, A> where NC: hyper::net::Network
 
         let mut url = "https://www.googleapis.com/youtube/analytics/v1/groupItems".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::YoutubeReadonly.as_slice().to_string(), ());
+            self._scopes.insert(Scope::YoutubeReadonly.as_ref().to_string(), ());
         }
 
         
         if params.len() > 0 {
             url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
+            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_ref()))));
         }
 
 
@@ -1973,7 +1973,7 @@ impl<'a, C, NC, A> GroupItemListCall<'a, C, NC, A> where NC: hyper::net::Network
                                                              access_token: token.unwrap().access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_slice())
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_ref())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -1984,7 +1984,7 @@ impl<'a, C, NC, A> GroupItemListCall<'a, C, NC, A> where NC: hyper::net::Network
             match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
+                        sleep_ms(d.num_milliseconds() as u32);
                         continue;
                     }
                     dlg.finished(false);
@@ -1995,7 +1995,7 @@ impl<'a, C, NC, A> GroupItemListCall<'a, C, NC, A> where NC: hyper::net::Network
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
-                            sleep(d);
+                            sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
@@ -2070,8 +2070,8 @@ impl<'a, C, NC, A> GroupItemListCall<'a, C, NC, A> where NC: hyper::net::Network
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> GroupItemListCall<'a, C, NC, A>
-                                                        where T: Str {
-        self._additional_params.insert(name.as_slice().to_string(), value.as_slice().to_string());
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
     }
 
@@ -2087,8 +2087,8 @@ impl<'a, C, NC, A> GroupItemListCall<'a, C, NC, A> where NC: hyper::net::Network
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T>(mut self, scope: T) -> GroupItemListCall<'a, C, NC, A> 
-                                                        where T: Str {
-        self._scopes.insert(scope.as_slice().to_string(), ());
+                                                        where T: AsRef<str> {
+        self._scopes.insert(scope.as_ref().to_string(), ());
         self
     }
 }
@@ -2105,8 +2105,8 @@ impl<'a, C, NC, A> GroupItemListCall<'a, C, NC, A> where NC: hyper::net::Network
 ///
 /// ```test_harness,no_run
 /// # extern crate hyper;
-/// # extern crate "yup-oauth2" as oauth2;
-/// # extern crate "google-youtubeanalytics1" as youtubeanalytics1;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_youtubeanalytics1 as youtubeanalytics1;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -2170,13 +2170,13 @@ impl<'a, C, NC, A> GroupItemDeleteCall<'a, C, NC, A> where NC: hyper::net::Netwo
 
         let mut url = "https://www.googleapis.com/youtube/analytics/v1/groupItems".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Youtube.as_slice().to_string(), ());
+            self._scopes.insert(Scope::Youtube.as_ref().to_string(), ());
         }
 
         
         if params.len() > 0 {
             url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
+            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_ref()))));
         }
 
 
@@ -2194,7 +2194,7 @@ impl<'a, C, NC, A> GroupItemDeleteCall<'a, C, NC, A> where NC: hyper::net::Netwo
                                                              access_token: token.unwrap().access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Delete, url.as_slice())
+                let mut req = client.borrow_mut().request(hyper::method::Method::Delete, url.as_ref())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -2205,7 +2205,7 @@ impl<'a, C, NC, A> GroupItemDeleteCall<'a, C, NC, A> where NC: hyper::net::Netwo
             match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
+                        sleep_ms(d.num_milliseconds() as u32);
                         continue;
                     }
                     dlg.finished(false);
@@ -2216,7 +2216,7 @@ impl<'a, C, NC, A> GroupItemDeleteCall<'a, C, NC, A> where NC: hyper::net::Netwo
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
-                            sleep(d);
+                            sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
@@ -2281,8 +2281,8 @@ impl<'a, C, NC, A> GroupItemDeleteCall<'a, C, NC, A> where NC: hyper::net::Netwo
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> GroupItemDeleteCall<'a, C, NC, A>
-                                                        where T: Str {
-        self._additional_params.insert(name.as_slice().to_string(), value.as_slice().to_string());
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
     }
 
@@ -2298,8 +2298,8 @@ impl<'a, C, NC, A> GroupItemDeleteCall<'a, C, NC, A> where NC: hyper::net::Netwo
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T>(mut self, scope: T) -> GroupItemDeleteCall<'a, C, NC, A> 
-                                                        where T: Str {
-        self._scopes.insert(scope.as_slice().to_string(), ());
+                                                        where T: AsRef<str> {
+        self._scopes.insert(scope.as_ref().to_string(), ());
         self
     }
 }
@@ -2316,8 +2316,8 @@ impl<'a, C, NC, A> GroupItemDeleteCall<'a, C, NC, A> where NC: hyper::net::Netwo
 ///
 /// ```test_harness,no_run
 /// # extern crate hyper;
-/// # extern crate "yup-oauth2" as oauth2;
-/// # extern crate "google-youtubeanalytics1" as youtubeanalytics1;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_youtubeanalytics1 as youtubeanalytics1;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -2381,13 +2381,13 @@ impl<'a, C, NC, A> GroupDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
 
         let mut url = "https://www.googleapis.com/youtube/analytics/v1/groups".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Youtube.as_slice().to_string(), ());
+            self._scopes.insert(Scope::Youtube.as_ref().to_string(), ());
         }
 
         
         if params.len() > 0 {
             url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
+            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_ref()))));
         }
 
 
@@ -2405,7 +2405,7 @@ impl<'a, C, NC, A> GroupDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
                                                              access_token: token.unwrap().access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Delete, url.as_slice())
+                let mut req = client.borrow_mut().request(hyper::method::Method::Delete, url.as_ref())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -2416,7 +2416,7 @@ impl<'a, C, NC, A> GroupDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
             match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
+                        sleep_ms(d.num_milliseconds() as u32);
                         continue;
                     }
                     dlg.finished(false);
@@ -2427,7 +2427,7 @@ impl<'a, C, NC, A> GroupDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
-                            sleep(d);
+                            sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
@@ -2492,8 +2492,8 @@ impl<'a, C, NC, A> GroupDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> GroupDeleteCall<'a, C, NC, A>
-                                                        where T: Str {
-        self._additional_params.insert(name.as_slice().to_string(), value.as_slice().to_string());
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
     }
 
@@ -2509,8 +2509,8 @@ impl<'a, C, NC, A> GroupDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T>(mut self, scope: T) -> GroupDeleteCall<'a, C, NC, A> 
-                                                        where T: Str {
-        self._scopes.insert(scope.as_slice().to_string(), ());
+                                                        where T: AsRef<str> {
+        self._scopes.insert(scope.as_ref().to_string(), ());
         self
     }
 }
@@ -2527,8 +2527,8 @@ impl<'a, C, NC, A> GroupDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
 ///
 /// ```test_harness,no_run
 /// # extern crate hyper;
-/// # extern crate "yup-oauth2" as oauth2;
-/// # extern crate "google-youtubeanalytics1" as youtubeanalytics1;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_youtubeanalytics1 as youtubeanalytics1;
 /// use youtubeanalytics1::Group;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
@@ -2598,13 +2598,13 @@ impl<'a, C, NC, A> GroupInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
 
         let mut url = "https://www.googleapis.com/youtube/analytics/v1/groups".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Youtube.as_slice().to_string(), ());
+            self._scopes.insert(Scope::Youtube.as_ref().to_string(), ());
         }
 
         
         if params.len() > 0 {
             url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
+            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_ref()))));
         }
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
@@ -2627,7 +2627,7 @@ impl<'a, C, NC, A> GroupInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.as_slice())
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.as_ref())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -2641,7 +2641,7 @@ impl<'a, C, NC, A> GroupInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
             match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
+                        sleep_ms(d.num_milliseconds() as u32);
                         continue;
                     }
                     dlg.finished(false);
@@ -2652,7 +2652,7 @@ impl<'a, C, NC, A> GroupInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
-                            sleep(d);
+                            sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
@@ -2726,8 +2726,8 @@ impl<'a, C, NC, A> GroupInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> GroupInsertCall<'a, C, NC, A>
-                                                        where T: Str {
-        self._additional_params.insert(name.as_slice().to_string(), value.as_slice().to_string());
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
     }
 
@@ -2743,8 +2743,8 @@ impl<'a, C, NC, A> GroupInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T>(mut self, scope: T) -> GroupInsertCall<'a, C, NC, A> 
-                                                        where T: Str {
-        self._scopes.insert(scope.as_slice().to_string(), ());
+                                                        where T: AsRef<str> {
+        self._scopes.insert(scope.as_ref().to_string(), ());
         self
     }
 }
@@ -2761,8 +2761,8 @@ impl<'a, C, NC, A> GroupInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
 ///
 /// ```test_harness,no_run
 /// # extern crate hyper;
-/// # extern crate "yup-oauth2" as oauth2;
-/// # extern crate "google-youtubeanalytics1" as youtubeanalytics1;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_youtubeanalytics1 as youtubeanalytics1;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -2835,13 +2835,13 @@ impl<'a, C, NC, A> GroupListCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
 
         let mut url = "https://www.googleapis.com/youtube/analytics/v1/groups".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::YoutubeReadonly.as_slice().to_string(), ());
+            self._scopes.insert(Scope::YoutubeReadonly.as_ref().to_string(), ());
         }
 
         
         if params.len() > 0 {
             url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
+            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_ref()))));
         }
 
 
@@ -2859,7 +2859,7 @@ impl<'a, C, NC, A> GroupListCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
                                                              access_token: token.unwrap().access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_slice())
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_ref())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -2870,7 +2870,7 @@ impl<'a, C, NC, A> GroupListCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
             match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
+                        sleep_ms(d.num_milliseconds() as u32);
                         continue;
                     }
                     dlg.finished(false);
@@ -2881,7 +2881,7 @@ impl<'a, C, NC, A> GroupListCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
-                            sleep(d);
+                            sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
@@ -2962,8 +2962,8 @@ impl<'a, C, NC, A> GroupListCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> GroupListCall<'a, C, NC, A>
-                                                        where T: Str {
-        self._additional_params.insert(name.as_slice().to_string(), value.as_slice().to_string());
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
     }
 
@@ -2979,8 +2979,8 @@ impl<'a, C, NC, A> GroupListCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T>(mut self, scope: T) -> GroupListCall<'a, C, NC, A> 
-                                                        where T: Str {
-        self._scopes.insert(scope.as_slice().to_string(), ());
+                                                        where T: AsRef<str> {
+        self._scopes.insert(scope.as_ref().to_string(), ());
         self
     }
 }
@@ -2997,8 +2997,8 @@ impl<'a, C, NC, A> GroupListCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
 ///
 /// ```test_harness,no_run
 /// # extern crate hyper;
-/// # extern crate "yup-oauth2" as oauth2;
-/// # extern crate "google-youtubeanalytics1" as youtubeanalytics1;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_youtubeanalytics1 as youtubeanalytics1;
 /// use youtubeanalytics1::Group;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
@@ -3068,13 +3068,13 @@ impl<'a, C, NC, A> GroupUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
 
         let mut url = "https://www.googleapis.com/youtube/analytics/v1/groups".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Youtube.as_slice().to_string(), ());
+            self._scopes.insert(Scope::Youtube.as_ref().to_string(), ());
         }
 
         
         if params.len() > 0 {
             url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
+            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_ref()))));
         }
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
@@ -3097,7 +3097,7 @@ impl<'a, C, NC, A> GroupUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Put, url.as_slice())
+                let mut req = client.borrow_mut().request(hyper::method::Method::Put, url.as_ref())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -3111,7 +3111,7 @@ impl<'a, C, NC, A> GroupUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
             match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
+                        sleep_ms(d.num_milliseconds() as u32);
                         continue;
                     }
                     dlg.finished(false);
@@ -3122,7 +3122,7 @@ impl<'a, C, NC, A> GroupUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
-                            sleep(d);
+                            sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
@@ -3196,8 +3196,8 @@ impl<'a, C, NC, A> GroupUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> GroupUpdateCall<'a, C, NC, A>
-                                                        where T: Str {
-        self._additional_params.insert(name.as_slice().to_string(), value.as_slice().to_string());
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
     }
 
@@ -3213,8 +3213,8 @@ impl<'a, C, NC, A> GroupUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T>(mut self, scope: T) -> GroupUpdateCall<'a, C, NC, A> 
-                                                        where T: Str {
-        self._scopes.insert(scope.as_slice().to_string(), ());
+                                                        where T: AsRef<str> {
+        self._scopes.insert(scope.as_ref().to_string(), ());
         self
     }
 }
@@ -3231,8 +3231,8 @@ impl<'a, C, NC, A> GroupUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
 ///
 /// ```test_harness,no_run
 /// # extern crate hyper;
-/// # extern crate "yup-oauth2" as oauth2;
-/// # extern crate "google-youtubeanalytics1" as youtubeanalytics1;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_youtubeanalytics1 as youtubeanalytics1;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -3294,13 +3294,13 @@ impl<'a, C, NC, A> BatchReportListCall<'a, C, NC, A> where NC: hyper::net::Netwo
 
         let mut url = "https://www.googleapis.com/youtube/analytics/v1/batchReports".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::YoutubeReadonly.as_slice().to_string(), ());
+            self._scopes.insert(Scope::YoutubeReadonly.as_ref().to_string(), ());
         }
 
         
         if params.len() > 0 {
             url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
+            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_ref()))));
         }
 
 
@@ -3318,7 +3318,7 @@ impl<'a, C, NC, A> BatchReportListCall<'a, C, NC, A> where NC: hyper::net::Netwo
                                                              access_token: token.unwrap().access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_slice())
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_ref())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -3329,7 +3329,7 @@ impl<'a, C, NC, A> BatchReportListCall<'a, C, NC, A> where NC: hyper::net::Netwo
             match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
+                        sleep_ms(d.num_milliseconds() as u32);
                         continue;
                     }
                     dlg.finished(false);
@@ -3340,7 +3340,7 @@ impl<'a, C, NC, A> BatchReportListCall<'a, C, NC, A> where NC: hyper::net::Netwo
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
-                            sleep(d);
+                            sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
@@ -3415,8 +3415,8 @@ impl<'a, C, NC, A> BatchReportListCall<'a, C, NC, A> where NC: hyper::net::Netwo
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> BatchReportListCall<'a, C, NC, A>
-                                                        where T: Str {
-        self._additional_params.insert(name.as_slice().to_string(), value.as_slice().to_string());
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
     }
 
@@ -3432,8 +3432,8 @@ impl<'a, C, NC, A> BatchReportListCall<'a, C, NC, A> where NC: hyper::net::Netwo
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T>(mut self, scope: T) -> BatchReportListCall<'a, C, NC, A> 
-                                                        where T: Str {
-        self._scopes.insert(scope.as_slice().to_string(), ());
+                                                        where T: AsRef<str> {
+        self._scopes.insert(scope.as_ref().to_string(), ());
         self
     }
 }

@@ -5,7 +5,7 @@ DO NOT EDIT !
 -->
 The `google-adsensehost4d1` library allows access to all features of the *Google AdSense Host* service.
 
-This documentation was generated from *AdSense Host* crate version *0.1.2+20150309*, where *20150309* is the exact revision of the *adsensehost:v4.1* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.2*.
+This documentation was generated from *AdSense Host* crate version *0.1.2+20150326*, where *20150326* is the exact revision of the *adsensehost:v4.1* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.2*.
 
 Everything else about the *AdSense Host* *v4d1* API can be found at the
 [official documentation site](https://developers.google.com/adsense/host/).
@@ -91,8 +91,8 @@ google-adsensehost4d1 = "*"
 
 ```Rust
 extern crate hyper;
-extern crate "yup-oauth2" as oauth2;
-extern crate "google-adsensehost4d1" as adsensehost4d1;
+extern crate yup_oauth2 as oauth2;
+extern crate google_adsensehost4d1 as adsensehost4d1;
 use adsensehost4d1::{Result, Error};
 use std::default::Default;
 use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};

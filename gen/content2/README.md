@@ -93,8 +93,8 @@ google-content2 = "*"
 
 ```Rust
 extern crate hyper;
-extern crate "yup-oauth2" as oauth2;
-extern crate "google-content2" as content2;
+extern crate yup_oauth2 as oauth2;
+extern crate google_content2 as content2;
 use content2::Account;
 use content2::{Result, Error};
 use std::default::Default;

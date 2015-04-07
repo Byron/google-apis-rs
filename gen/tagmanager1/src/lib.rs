@@ -115,8 +115,8 @@
 //! 
 //! ```test_harness,no_run
 //! extern crate hyper;
-//! extern crate "yup-oauth2" as oauth2;
-//! extern crate "google-tagmanager1" as tagmanager1;
+//! extern crate yup_oauth2 as oauth2;
+//! extern crate google_tagmanager1 as tagmanager1;
 //! use tagmanager1::Trigger;
 //! use tagmanager1::{Result, Error};
 //! # #[test] fn egal() {
@@ -216,20 +216,20 @@
 //! [google-go-api]: https://github.com/google/google-api-go-client
 //! 
 //! 
-#![feature(core,io,thread_sleep)]
+#![feature(std_misc)]
 // Unused attributes happen thanks to defined, but unused structures
 // We don't warn about this, as depending on the API, some data structures or facilities are never used.
 // Instead of pre-determining this, we just disable the lint. It's manually tuned to not have any 
 // unused imports in fully featured APIs. Same with unused_mut ... .
 #![allow(unused_imports, unused_mut, dead_code)]
 // Required for serde annotations
-#![feature(custom_derive, custom_attribute, plugin)]
+#![feature(custom_derive, custom_attribute, plugin, slice_patterns)]
 #![plugin(serde_macros)]
 
 #[macro_use]
 extern crate hyper;
 extern crate serde;
-extern crate "yup-oauth2" as oauth2;
+extern crate yup_oauth2 as oauth2;
 extern crate mime;
 extern crate url;
 
@@ -244,7 +244,7 @@ use std::marker::PhantomData;
 use serde::json;
 use std::io;
 use std::fs;
-use std::thread::sleep;
+use std::thread::sleep_ms;
 
 pub use cmn::{MultiPartReader, ToParts, MethodInfo, Result, Error, CallBuilder, Hub, ReadSeek, Part, ResponseResult, RequestValue, NestedType, Delegate, DefaultDelegate, MethodsBuilder, Resource, JsonServerError};
 
@@ -280,8 +280,8 @@ pub enum Scope {
     Publish,
 }
 
-impl Str for Scope {
-    fn as_slice(&self) -> &str {
+impl AsRef<str> for Scope {
+    fn as_ref(&self) -> &str {
         match *self {
             Scope::ManageUser => "https://www.googleapis.com/auth/tagmanager.manage.users",
             Scope::ManageAccount => "https://www.googleapis.com/auth/tagmanager.manage.accounts",
@@ -314,8 +314,8 @@ impl Default for Scope {
 ///
 /// ```test_harness,no_run
 /// extern crate hyper;
-/// extern crate "yup-oauth2" as oauth2;
-/// extern crate "google-tagmanager1" as tagmanager1;
+/// extern crate yup_oauth2 as oauth2;
+/// extern crate google_tagmanager1 as tagmanager1;
 /// use tagmanager1::Trigger;
 /// use tagmanager1::{Result, Error};
 /// # #[test] fn egal() {
@@ -1240,8 +1240,8 @@ impl Part for Condition {}
 ///
 /// ```test_harness,no_run
 /// extern crate hyper;
-/// extern crate "yup-oauth2" as oauth2;
-/// extern crate "google-tagmanager1" as tagmanager1;
+/// extern crate yup_oauth2 as oauth2;
+/// extern crate google_tagmanager1 as tagmanager1;
 /// 
 /// # #[test] fn egal() {
 /// use std::default::Default;
@@ -2230,8 +2230,8 @@ impl<'a, C, NC, A> AccountMethods<'a, C, NC, A> {
 ///
 /// ```test_harness,no_run
 /// # extern crate hyper;
-/// # extern crate "yup-oauth2" as oauth2;
-/// # extern crate "google-tagmanager1" as tagmanager1;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_tagmanager1 as tagmanager1;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -2291,7 +2291,7 @@ impl<'a, C, NC, A> AccountContainerListCall<'a, C, NC, A> where NC: hyper::net::
 
         let mut url = "https://www.googleapis.com/tagmanager/v1/accounts/{accountId}/containers".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Readonly.as_slice().to_string(), ());
+            self._scopes.insert(Scope::Readonly.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{accountId}", "accountId")].iter() {
@@ -2321,7 +2321,7 @@ impl<'a, C, NC, A> AccountContainerListCall<'a, C, NC, A> where NC: hyper::net::
         
         if params.len() > 0 {
             url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
+            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_ref()))));
         }
 
 
@@ -2339,7 +2339,7 @@ impl<'a, C, NC, A> AccountContainerListCall<'a, C, NC, A> where NC: hyper::net::
                                                              access_token: token.unwrap().access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_slice())
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_ref())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -2350,7 +2350,7 @@ impl<'a, C, NC, A> AccountContainerListCall<'a, C, NC, A> where NC: hyper::net::
             match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
+                        sleep_ms(d.num_milliseconds() as u32);
                         continue;
                     }
                     dlg.finished(false);
@@ -2361,7 +2361,7 @@ impl<'a, C, NC, A> AccountContainerListCall<'a, C, NC, A> where NC: hyper::net::
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
-                            sleep(d);
+                            sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
@@ -2426,8 +2426,8 @@ impl<'a, C, NC, A> AccountContainerListCall<'a, C, NC, A> where NC: hyper::net::
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> AccountContainerListCall<'a, C, NC, A>
-                                                        where T: Str {
-        self._additional_params.insert(name.as_slice().to_string(), value.as_slice().to_string());
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
     }
 
@@ -2443,8 +2443,8 @@ impl<'a, C, NC, A> AccountContainerListCall<'a, C, NC, A> where NC: hyper::net::
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T>(mut self, scope: T) -> AccountContainerListCall<'a, C, NC, A> 
-                                                        where T: Str {
-        self._scopes.insert(scope.as_slice().to_string(), ());
+                                                        where T: AsRef<str> {
+        self._scopes.insert(scope.as_ref().to_string(), ());
         self
     }
 }
@@ -2461,8 +2461,8 @@ impl<'a, C, NC, A> AccountContainerListCall<'a, C, NC, A> where NC: hyper::net::
 ///
 /// ```test_harness,no_run
 /// # extern crate hyper;
-/// # extern crate "yup-oauth2" as oauth2;
-/// # extern crate "google-tagmanager1" as tagmanager1;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_tagmanager1 as tagmanager1;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -2522,7 +2522,7 @@ impl<'a, C, NC, A> AccountPermissionListCall<'a, C, NC, A> where NC: hyper::net:
 
         let mut url = "https://www.googleapis.com/tagmanager/v1/accounts/{accountId}/permissions".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Readonly.as_slice().to_string(), ());
+            self._scopes.insert(Scope::Readonly.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{accountId}", "accountId")].iter() {
@@ -2552,7 +2552,7 @@ impl<'a, C, NC, A> AccountPermissionListCall<'a, C, NC, A> where NC: hyper::net:
         
         if params.len() > 0 {
             url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
+            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_ref()))));
         }
 
 
@@ -2570,7 +2570,7 @@ impl<'a, C, NC, A> AccountPermissionListCall<'a, C, NC, A> where NC: hyper::net:
                                                              access_token: token.unwrap().access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_slice())
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_ref())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -2581,7 +2581,7 @@ impl<'a, C, NC, A> AccountPermissionListCall<'a, C, NC, A> where NC: hyper::net:
             match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
+                        sleep_ms(d.num_milliseconds() as u32);
                         continue;
                     }
                     dlg.finished(false);
@@ -2592,7 +2592,7 @@ impl<'a, C, NC, A> AccountPermissionListCall<'a, C, NC, A> where NC: hyper::net:
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
-                            sleep(d);
+                            sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
@@ -2657,8 +2657,8 @@ impl<'a, C, NC, A> AccountPermissionListCall<'a, C, NC, A> where NC: hyper::net:
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> AccountPermissionListCall<'a, C, NC, A>
-                                                        where T: Str {
-        self._additional_params.insert(name.as_slice().to_string(), value.as_slice().to_string());
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
     }
 
@@ -2674,8 +2674,8 @@ impl<'a, C, NC, A> AccountPermissionListCall<'a, C, NC, A> where NC: hyper::net:
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T>(mut self, scope: T) -> AccountPermissionListCall<'a, C, NC, A> 
-                                                        where T: Str {
-        self._scopes.insert(scope.as_slice().to_string(), ());
+                                                        where T: AsRef<str> {
+        self._scopes.insert(scope.as_ref().to_string(), ());
         self
     }
 }
@@ -2692,8 +2692,8 @@ impl<'a, C, NC, A> AccountPermissionListCall<'a, C, NC, A> where NC: hyper::net:
 ///
 /// ```test_harness,no_run
 /// # extern crate hyper;
-/// # extern crate "yup-oauth2" as oauth2;
-/// # extern crate "google-tagmanager1" as tagmanager1;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_tagmanager1 as tagmanager1;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -2757,7 +2757,7 @@ impl<'a, C, NC, A> AccountContainerVersionUndeleteCall<'a, C, NC, A> where NC: h
 
         let mut url = "https://www.googleapis.com/tagmanager/v1/accounts/{accountId}/containers/{containerId}/versions/{containerVersionId}/undelete".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::DeleteContainer.as_slice().to_string(), ());
+            self._scopes.insert(Scope::DeleteContainer.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{accountId}", "accountId"), ("{containerId}", "containerId"), ("{containerVersionId}", "containerVersionId")].iter() {
@@ -2787,7 +2787,7 @@ impl<'a, C, NC, A> AccountContainerVersionUndeleteCall<'a, C, NC, A> where NC: h
         
         if params.len() > 0 {
             url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
+            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_ref()))));
         }
 
 
@@ -2805,7 +2805,7 @@ impl<'a, C, NC, A> AccountContainerVersionUndeleteCall<'a, C, NC, A> where NC: h
                                                              access_token: token.unwrap().access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.as_slice())
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.as_ref())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -2816,7 +2816,7 @@ impl<'a, C, NC, A> AccountContainerVersionUndeleteCall<'a, C, NC, A> where NC: h
             match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
+                        sleep_ms(d.num_milliseconds() as u32);
                         continue;
                     }
                     dlg.finished(false);
@@ -2827,7 +2827,7 @@ impl<'a, C, NC, A> AccountContainerVersionUndeleteCall<'a, C, NC, A> where NC: h
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
-                            sleep(d);
+                            sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
@@ -2912,8 +2912,8 @@ impl<'a, C, NC, A> AccountContainerVersionUndeleteCall<'a, C, NC, A> where NC: h
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> AccountContainerVersionUndeleteCall<'a, C, NC, A>
-                                                        where T: Str {
-        self._additional_params.insert(name.as_slice().to_string(), value.as_slice().to_string());
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
     }
 
@@ -2929,8 +2929,8 @@ impl<'a, C, NC, A> AccountContainerVersionUndeleteCall<'a, C, NC, A> where NC: h
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T>(mut self, scope: T) -> AccountContainerVersionUndeleteCall<'a, C, NC, A> 
-                                                        where T: Str {
-        self._scopes.insert(scope.as_slice().to_string(), ());
+                                                        where T: AsRef<str> {
+        self._scopes.insert(scope.as_ref().to_string(), ());
         self
     }
 }
@@ -2947,8 +2947,8 @@ impl<'a, C, NC, A> AccountContainerVersionUndeleteCall<'a, C, NC, A> where NC: h
 ///
 /// ```test_harness,no_run
 /// # extern crate hyper;
-/// # extern crate "yup-oauth2" as oauth2;
-/// # extern crate "google-tagmanager1" as tagmanager1;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_tagmanager1 as tagmanager1;
 /// use tagmanager1::UserAccess;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
@@ -3015,7 +3015,7 @@ impl<'a, C, NC, A> AccountPermissionCreateCall<'a, C, NC, A> where NC: hyper::ne
 
         let mut url = "https://www.googleapis.com/tagmanager/v1/accounts/{accountId}/permissions".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::DeleteContainer.as_slice().to_string(), ());
+            self._scopes.insert(Scope::DeleteContainer.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{accountId}", "accountId")].iter() {
@@ -3045,7 +3045,7 @@ impl<'a, C, NC, A> AccountPermissionCreateCall<'a, C, NC, A> where NC: hyper::ne
         
         if params.len() > 0 {
             url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
+            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_ref()))));
         }
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
@@ -3068,7 +3068,7 @@ impl<'a, C, NC, A> AccountPermissionCreateCall<'a, C, NC, A> where NC: hyper::ne
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.as_slice())
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.as_ref())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -3082,7 +3082,7 @@ impl<'a, C, NC, A> AccountPermissionCreateCall<'a, C, NC, A> where NC: hyper::ne
             match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
+                        sleep_ms(d.num_milliseconds() as u32);
                         continue;
                     }
                     dlg.finished(false);
@@ -3093,7 +3093,7 @@ impl<'a, C, NC, A> AccountPermissionCreateCall<'a, C, NC, A> where NC: hyper::ne
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
-                            sleep(d);
+                            sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
@@ -3167,8 +3167,8 @@ impl<'a, C, NC, A> AccountPermissionCreateCall<'a, C, NC, A> where NC: hyper::ne
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> AccountPermissionCreateCall<'a, C, NC, A>
-                                                        where T: Str {
-        self._additional_params.insert(name.as_slice().to_string(), value.as_slice().to_string());
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
     }
 
@@ -3184,8 +3184,8 @@ impl<'a, C, NC, A> AccountPermissionCreateCall<'a, C, NC, A> where NC: hyper::ne
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T>(mut self, scope: T) -> AccountPermissionCreateCall<'a, C, NC, A> 
-                                                        where T: Str {
-        self._scopes.insert(scope.as_slice().to_string(), ());
+                                                        where T: AsRef<str> {
+        self._scopes.insert(scope.as_ref().to_string(), ());
         self
     }
 }
@@ -3202,8 +3202,8 @@ impl<'a, C, NC, A> AccountPermissionCreateCall<'a, C, NC, A> where NC: hyper::ne
 ///
 /// ```test_harness,no_run
 /// # extern crate hyper;
-/// # extern crate "yup-oauth2" as oauth2;
-/// # extern crate "google-tagmanager1" as tagmanager1;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_tagmanager1 as tagmanager1;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -3264,7 +3264,7 @@ impl<'a, C, NC, A> AccountPermissionDeleteCall<'a, C, NC, A> where NC: hyper::ne
 
         let mut url = "https://www.googleapis.com/tagmanager/v1/accounts/{accountId}/permissions/{permissionId}".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::DeleteContainer.as_slice().to_string(), ());
+            self._scopes.insert(Scope::DeleteContainer.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{accountId}", "accountId"), ("{permissionId}", "permissionId")].iter() {
@@ -3294,7 +3294,7 @@ impl<'a, C, NC, A> AccountPermissionDeleteCall<'a, C, NC, A> where NC: hyper::ne
         
         if params.len() > 0 {
             url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
+            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_ref()))));
         }
 
 
@@ -3312,7 +3312,7 @@ impl<'a, C, NC, A> AccountPermissionDeleteCall<'a, C, NC, A> where NC: hyper::ne
                                                              access_token: token.unwrap().access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Delete, url.as_slice())
+                let mut req = client.borrow_mut().request(hyper::method::Method::Delete, url.as_ref())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -3323,7 +3323,7 @@ impl<'a, C, NC, A> AccountPermissionDeleteCall<'a, C, NC, A> where NC: hyper::ne
             match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
+                        sleep_ms(d.num_milliseconds() as u32);
                         continue;
                     }
                     dlg.finished(false);
@@ -3334,7 +3334,7 @@ impl<'a, C, NC, A> AccountPermissionDeleteCall<'a, C, NC, A> where NC: hyper::ne
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
-                            sleep(d);
+                            sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
@@ -3399,8 +3399,8 @@ impl<'a, C, NC, A> AccountPermissionDeleteCall<'a, C, NC, A> where NC: hyper::ne
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> AccountPermissionDeleteCall<'a, C, NC, A>
-                                                        where T: Str {
-        self._additional_params.insert(name.as_slice().to_string(), value.as_slice().to_string());
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
     }
 
@@ -3416,8 +3416,8 @@ impl<'a, C, NC, A> AccountPermissionDeleteCall<'a, C, NC, A> where NC: hyper::ne
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T>(mut self, scope: T) -> AccountPermissionDeleteCall<'a, C, NC, A> 
-                                                        where T: Str {
-        self._scopes.insert(scope.as_slice().to_string(), ());
+                                                        where T: AsRef<str> {
+        self._scopes.insert(scope.as_ref().to_string(), ());
         self
     }
 }
@@ -3434,8 +3434,8 @@ impl<'a, C, NC, A> AccountPermissionDeleteCall<'a, C, NC, A> where NC: hyper::ne
 ///
 /// ```test_harness,no_run
 /// # extern crate hyper;
-/// # extern crate "yup-oauth2" as oauth2;
-/// # extern crate "google-tagmanager1" as tagmanager1;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_tagmanager1 as tagmanager1;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -3497,7 +3497,7 @@ impl<'a, C, NC, A> AccountContainerGetCall<'a, C, NC, A> where NC: hyper::net::N
 
         let mut url = "https://www.googleapis.com/tagmanager/v1/accounts/{accountId}/containers/{containerId}".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Readonly.as_slice().to_string(), ());
+            self._scopes.insert(Scope::Readonly.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{accountId}", "accountId"), ("{containerId}", "containerId")].iter() {
@@ -3527,7 +3527,7 @@ impl<'a, C, NC, A> AccountContainerGetCall<'a, C, NC, A> where NC: hyper::net::N
         
         if params.len() > 0 {
             url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
+            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_ref()))));
         }
 
 
@@ -3545,7 +3545,7 @@ impl<'a, C, NC, A> AccountContainerGetCall<'a, C, NC, A> where NC: hyper::net::N
                                                              access_token: token.unwrap().access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_slice())
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_ref())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -3556,7 +3556,7 @@ impl<'a, C, NC, A> AccountContainerGetCall<'a, C, NC, A> where NC: hyper::net::N
             match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
+                        sleep_ms(d.num_milliseconds() as u32);
                         continue;
                     }
                     dlg.finished(false);
@@ -3567,7 +3567,7 @@ impl<'a, C, NC, A> AccountContainerGetCall<'a, C, NC, A> where NC: hyper::net::N
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
-                            sleep(d);
+                            sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
@@ -3642,8 +3642,8 @@ impl<'a, C, NC, A> AccountContainerGetCall<'a, C, NC, A> where NC: hyper::net::N
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> AccountContainerGetCall<'a, C, NC, A>
-                                                        where T: Str {
-        self._additional_params.insert(name.as_slice().to_string(), value.as_slice().to_string());
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
     }
 
@@ -3659,8 +3659,8 @@ impl<'a, C, NC, A> AccountContainerGetCall<'a, C, NC, A> where NC: hyper::net::N
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T>(mut self, scope: T) -> AccountContainerGetCall<'a, C, NC, A> 
-                                                        where T: Str {
-        self._scopes.insert(scope.as_slice().to_string(), ());
+                                                        where T: AsRef<str> {
+        self._scopes.insert(scope.as_ref().to_string(), ());
         self
     }
 }
@@ -3677,8 +3677,8 @@ impl<'a, C, NC, A> AccountContainerGetCall<'a, C, NC, A> where NC: hyper::net::N
 ///
 /// ```test_harness,no_run
 /// # extern crate hyper;
-/// # extern crate "yup-oauth2" as oauth2;
-/// # extern crate "google-tagmanager1" as tagmanager1;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_tagmanager1 as tagmanager1;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -3745,7 +3745,7 @@ impl<'a, C, NC, A> AccountContainerVersionListCall<'a, C, NC, A> where NC: hyper
 
         let mut url = "https://www.googleapis.com/tagmanager/v1/accounts/{accountId}/containers/{containerId}/versions".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Readonly.as_slice().to_string(), ());
+            self._scopes.insert(Scope::Readonly.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{accountId}", "accountId"), ("{containerId}", "containerId")].iter() {
@@ -3775,7 +3775,7 @@ impl<'a, C, NC, A> AccountContainerVersionListCall<'a, C, NC, A> where NC: hyper
         
         if params.len() > 0 {
             url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
+            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_ref()))));
         }
 
 
@@ -3793,7 +3793,7 @@ impl<'a, C, NC, A> AccountContainerVersionListCall<'a, C, NC, A> where NC: hyper
                                                              access_token: token.unwrap().access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_slice())
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_ref())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -3804,7 +3804,7 @@ impl<'a, C, NC, A> AccountContainerVersionListCall<'a, C, NC, A> where NC: hyper
             match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
+                        sleep_ms(d.num_milliseconds() as u32);
                         continue;
                     }
                     dlg.finished(false);
@@ -3815,7 +3815,7 @@ impl<'a, C, NC, A> AccountContainerVersionListCall<'a, C, NC, A> where NC: hyper
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
-                            sleep(d);
+                            sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
@@ -3898,8 +3898,8 @@ impl<'a, C, NC, A> AccountContainerVersionListCall<'a, C, NC, A> where NC: hyper
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> AccountContainerVersionListCall<'a, C, NC, A>
-                                                        where T: Str {
-        self._additional_params.insert(name.as_slice().to_string(), value.as_slice().to_string());
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
     }
 
@@ -3915,8 +3915,8 @@ impl<'a, C, NC, A> AccountContainerVersionListCall<'a, C, NC, A> where NC: hyper
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T>(mut self, scope: T) -> AccountContainerVersionListCall<'a, C, NC, A> 
-                                                        where T: Str {
-        self._scopes.insert(scope.as_slice().to_string(), ());
+                                                        where T: AsRef<str> {
+        self._scopes.insert(scope.as_ref().to_string(), ());
         self
     }
 }
@@ -3933,8 +3933,8 @@ impl<'a, C, NC, A> AccountContainerVersionListCall<'a, C, NC, A> where NC: hyper
 ///
 /// ```test_harness,no_run
 /// # extern crate hyper;
-/// # extern crate "yup-oauth2" as oauth2;
-/// # extern crate "google-tagmanager1" as tagmanager1;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_tagmanager1 as tagmanager1;
 /// use tagmanager1::Trigger;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
@@ -4010,7 +4010,7 @@ impl<'a, C, NC, A> AccountContainerTriggerUpdateCall<'a, C, NC, A> where NC: hyp
 
         let mut url = "https://www.googleapis.com/tagmanager/v1/accounts/{accountId}/containers/{containerId}/triggers/{triggerId}".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::DeleteContainer.as_slice().to_string(), ());
+            self._scopes.insert(Scope::DeleteContainer.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{accountId}", "accountId"), ("{containerId}", "containerId"), ("{triggerId}", "triggerId")].iter() {
@@ -4040,7 +4040,7 @@ impl<'a, C, NC, A> AccountContainerTriggerUpdateCall<'a, C, NC, A> where NC: hyp
         
         if params.len() > 0 {
             url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
+            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_ref()))));
         }
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
@@ -4063,7 +4063,7 @@ impl<'a, C, NC, A> AccountContainerTriggerUpdateCall<'a, C, NC, A> where NC: hyp
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Put, url.as_slice())
+                let mut req = client.borrow_mut().request(hyper::method::Method::Put, url.as_ref())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -4077,7 +4077,7 @@ impl<'a, C, NC, A> AccountContainerTriggerUpdateCall<'a, C, NC, A> where NC: hyp
             match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
+                        sleep_ms(d.num_milliseconds() as u32);
                         continue;
                     }
                     dlg.finished(false);
@@ -4088,7 +4088,7 @@ impl<'a, C, NC, A> AccountContainerTriggerUpdateCall<'a, C, NC, A> where NC: hyp
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
-                            sleep(d);
+                            sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
@@ -4190,8 +4190,8 @@ impl<'a, C, NC, A> AccountContainerTriggerUpdateCall<'a, C, NC, A> where NC: hyp
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> AccountContainerTriggerUpdateCall<'a, C, NC, A>
-                                                        where T: Str {
-        self._additional_params.insert(name.as_slice().to_string(), value.as_slice().to_string());
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
     }
 
@@ -4207,8 +4207,8 @@ impl<'a, C, NC, A> AccountContainerTriggerUpdateCall<'a, C, NC, A> where NC: hyp
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T>(mut self, scope: T) -> AccountContainerTriggerUpdateCall<'a, C, NC, A> 
-                                                        where T: Str {
-        self._scopes.insert(scope.as_slice().to_string(), ());
+                                                        where T: AsRef<str> {
+        self._scopes.insert(scope.as_ref().to_string(), ());
         self
     }
 }
@@ -4225,8 +4225,8 @@ impl<'a, C, NC, A> AccountContainerTriggerUpdateCall<'a, C, NC, A> where NC: hyp
 ///
 /// ```test_harness,no_run
 /// # extern crate hyper;
-/// # extern crate "yup-oauth2" as oauth2;
-/// # extern crate "google-tagmanager1" as tagmanager1;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_tagmanager1 as tagmanager1;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -4290,7 +4290,7 @@ impl<'a, C, NC, A> AccountContainerTriggerGetCall<'a, C, NC, A> where NC: hyper:
 
         let mut url = "https://www.googleapis.com/tagmanager/v1/accounts/{accountId}/containers/{containerId}/triggers/{triggerId}".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Readonly.as_slice().to_string(), ());
+            self._scopes.insert(Scope::Readonly.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{accountId}", "accountId"), ("{containerId}", "containerId"), ("{triggerId}", "triggerId")].iter() {
@@ -4320,7 +4320,7 @@ impl<'a, C, NC, A> AccountContainerTriggerGetCall<'a, C, NC, A> where NC: hyper:
         
         if params.len() > 0 {
             url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
+            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_ref()))));
         }
 
 
@@ -4338,7 +4338,7 @@ impl<'a, C, NC, A> AccountContainerTriggerGetCall<'a, C, NC, A> where NC: hyper:
                                                              access_token: token.unwrap().access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_slice())
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_ref())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -4349,7 +4349,7 @@ impl<'a, C, NC, A> AccountContainerTriggerGetCall<'a, C, NC, A> where NC: hyper:
             match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
+                        sleep_ms(d.num_milliseconds() as u32);
                         continue;
                     }
                     dlg.finished(false);
@@ -4360,7 +4360,7 @@ impl<'a, C, NC, A> AccountContainerTriggerGetCall<'a, C, NC, A> where NC: hyper:
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
-                            sleep(d);
+                            sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
@@ -4445,8 +4445,8 @@ impl<'a, C, NC, A> AccountContainerTriggerGetCall<'a, C, NC, A> where NC: hyper:
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> AccountContainerTriggerGetCall<'a, C, NC, A>
-                                                        where T: Str {
-        self._additional_params.insert(name.as_slice().to_string(), value.as_slice().to_string());
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
     }
 
@@ -4462,8 +4462,8 @@ impl<'a, C, NC, A> AccountContainerTriggerGetCall<'a, C, NC, A> where NC: hyper:
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T>(mut self, scope: T) -> AccountContainerTriggerGetCall<'a, C, NC, A> 
-                                                        where T: Str {
-        self._scopes.insert(scope.as_slice().to_string(), ());
+                                                        where T: AsRef<str> {
+        self._scopes.insert(scope.as_ref().to_string(), ());
         self
     }
 }
@@ -4480,8 +4480,8 @@ impl<'a, C, NC, A> AccountContainerTriggerGetCall<'a, C, NC, A> where NC: hyper:
 ///
 /// ```test_harness,no_run
 /// # extern crate hyper;
-/// # extern crate "yup-oauth2" as oauth2;
-/// # extern crate "google-tagmanager1" as tagmanager1;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_tagmanager1 as tagmanager1;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -4542,7 +4542,7 @@ impl<'a, C, NC, A> AccountContainerDeleteCall<'a, C, NC, A> where NC: hyper::net
 
         let mut url = "https://www.googleapis.com/tagmanager/v1/accounts/{accountId}/containers/{containerId}".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::DeleteContainer.as_slice().to_string(), ());
+            self._scopes.insert(Scope::DeleteContainer.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{accountId}", "accountId"), ("{containerId}", "containerId")].iter() {
@@ -4572,7 +4572,7 @@ impl<'a, C, NC, A> AccountContainerDeleteCall<'a, C, NC, A> where NC: hyper::net
         
         if params.len() > 0 {
             url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
+            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_ref()))));
         }
 
 
@@ -4590,7 +4590,7 @@ impl<'a, C, NC, A> AccountContainerDeleteCall<'a, C, NC, A> where NC: hyper::net
                                                              access_token: token.unwrap().access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Delete, url.as_slice())
+                let mut req = client.borrow_mut().request(hyper::method::Method::Delete, url.as_ref())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -4601,7 +4601,7 @@ impl<'a, C, NC, A> AccountContainerDeleteCall<'a, C, NC, A> where NC: hyper::net
             match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
+                        sleep_ms(d.num_milliseconds() as u32);
                         continue;
                     }
                     dlg.finished(false);
@@ -4612,7 +4612,7 @@ impl<'a, C, NC, A> AccountContainerDeleteCall<'a, C, NC, A> where NC: hyper::net
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
-                            sleep(d);
+                            sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
@@ -4677,8 +4677,8 @@ impl<'a, C, NC, A> AccountContainerDeleteCall<'a, C, NC, A> where NC: hyper::net
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> AccountContainerDeleteCall<'a, C, NC, A>
-                                                        where T: Str {
-        self._additional_params.insert(name.as_slice().to_string(), value.as_slice().to_string());
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
     }
 
@@ -4694,8 +4694,8 @@ impl<'a, C, NC, A> AccountContainerDeleteCall<'a, C, NC, A> where NC: hyper::net
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T>(mut self, scope: T) -> AccountContainerDeleteCall<'a, C, NC, A> 
-                                                        where T: Str {
-        self._scopes.insert(scope.as_slice().to_string(), ());
+                                                        where T: AsRef<str> {
+        self._scopes.insert(scope.as_ref().to_string(), ());
         self
     }
 }
@@ -4712,8 +4712,8 @@ impl<'a, C, NC, A> AccountContainerDeleteCall<'a, C, NC, A> where NC: hyper::net
 ///
 /// ```test_harness,no_run
 /// # extern crate hyper;
-/// # extern crate "yup-oauth2" as oauth2;
-/// # extern crate "google-tagmanager1" as tagmanager1;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_tagmanager1 as tagmanager1;
 /// use tagmanager1::Container;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
@@ -4780,7 +4780,7 @@ impl<'a, C, NC, A> AccountContainerCreateCall<'a, C, NC, A> where NC: hyper::net
 
         let mut url = "https://www.googleapis.com/tagmanager/v1/accounts/{accountId}/containers".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::DeleteContainer.as_slice().to_string(), ());
+            self._scopes.insert(Scope::DeleteContainer.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{accountId}", "accountId")].iter() {
@@ -4810,7 +4810,7 @@ impl<'a, C, NC, A> AccountContainerCreateCall<'a, C, NC, A> where NC: hyper::net
         
         if params.len() > 0 {
             url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
+            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_ref()))));
         }
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
@@ -4833,7 +4833,7 @@ impl<'a, C, NC, A> AccountContainerCreateCall<'a, C, NC, A> where NC: hyper::net
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.as_slice())
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.as_ref())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -4847,7 +4847,7 @@ impl<'a, C, NC, A> AccountContainerCreateCall<'a, C, NC, A> where NC: hyper::net
             match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
+                        sleep_ms(d.num_milliseconds() as u32);
                         continue;
                     }
                     dlg.finished(false);
@@ -4858,7 +4858,7 @@ impl<'a, C, NC, A> AccountContainerCreateCall<'a, C, NC, A> where NC: hyper::net
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
-                            sleep(d);
+                            sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
@@ -4932,8 +4932,8 @@ impl<'a, C, NC, A> AccountContainerCreateCall<'a, C, NC, A> where NC: hyper::net
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> AccountContainerCreateCall<'a, C, NC, A>
-                                                        where T: Str {
-        self._additional_params.insert(name.as_slice().to_string(), value.as_slice().to_string());
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
     }
 
@@ -4949,8 +4949,8 @@ impl<'a, C, NC, A> AccountContainerCreateCall<'a, C, NC, A> where NC: hyper::net
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T>(mut self, scope: T) -> AccountContainerCreateCall<'a, C, NC, A> 
-                                                        where T: Str {
-        self._scopes.insert(scope.as_slice().to_string(), ());
+                                                        where T: AsRef<str> {
+        self._scopes.insert(scope.as_ref().to_string(), ());
         self
     }
 }
@@ -4967,8 +4967,8 @@ impl<'a, C, NC, A> AccountContainerCreateCall<'a, C, NC, A> where NC: hyper::net
 ///
 /// ```test_harness,no_run
 /// # extern crate hyper;
-/// # extern crate "yup-oauth2" as oauth2;
-/// # extern crate "google-tagmanager1" as tagmanager1;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_tagmanager1 as tagmanager1;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -5031,7 +5031,7 @@ impl<'a, C, NC, A> AccountContainerTagDeleteCall<'a, C, NC, A> where NC: hyper::
 
         let mut url = "https://www.googleapis.com/tagmanager/v1/accounts/{accountId}/containers/{containerId}/tags/{tagId}".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::DeleteContainer.as_slice().to_string(), ());
+            self._scopes.insert(Scope::DeleteContainer.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{accountId}", "accountId"), ("{containerId}", "containerId"), ("{tagId}", "tagId")].iter() {
@@ -5061,7 +5061,7 @@ impl<'a, C, NC, A> AccountContainerTagDeleteCall<'a, C, NC, A> where NC: hyper::
         
         if params.len() > 0 {
             url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
+            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_ref()))));
         }
 
 
@@ -5079,7 +5079,7 @@ impl<'a, C, NC, A> AccountContainerTagDeleteCall<'a, C, NC, A> where NC: hyper::
                                                              access_token: token.unwrap().access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Delete, url.as_slice())
+                let mut req = client.borrow_mut().request(hyper::method::Method::Delete, url.as_ref())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -5090,7 +5090,7 @@ impl<'a, C, NC, A> AccountContainerTagDeleteCall<'a, C, NC, A> where NC: hyper::
             match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
+                        sleep_ms(d.num_milliseconds() as u32);
                         continue;
                     }
                     dlg.finished(false);
@@ -5101,7 +5101,7 @@ impl<'a, C, NC, A> AccountContainerTagDeleteCall<'a, C, NC, A> where NC: hyper::
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
-                            sleep(d);
+                            sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
@@ -5176,8 +5176,8 @@ impl<'a, C, NC, A> AccountContainerTagDeleteCall<'a, C, NC, A> where NC: hyper::
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> AccountContainerTagDeleteCall<'a, C, NC, A>
-                                                        where T: Str {
-        self._additional_params.insert(name.as_slice().to_string(), value.as_slice().to_string());
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
     }
 
@@ -5193,8 +5193,8 @@ impl<'a, C, NC, A> AccountContainerTagDeleteCall<'a, C, NC, A> where NC: hyper::
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T>(mut self, scope: T) -> AccountContainerTagDeleteCall<'a, C, NC, A> 
-                                                        where T: Str {
-        self._scopes.insert(scope.as_slice().to_string(), ());
+                                                        where T: AsRef<str> {
+        self._scopes.insert(scope.as_ref().to_string(), ());
         self
     }
 }
@@ -5211,8 +5211,8 @@ impl<'a, C, NC, A> AccountContainerTagDeleteCall<'a, C, NC, A> where NC: hyper::
 ///
 /// ```test_harness,no_run
 /// # extern crate hyper;
-/// # extern crate "yup-oauth2" as oauth2;
-/// # extern crate "google-tagmanager1" as tagmanager1;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_tagmanager1 as tagmanager1;
 /// use tagmanager1::Rule;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
@@ -5288,7 +5288,7 @@ impl<'a, C, NC, A> AccountContainerRuleUpdateCall<'a, C, NC, A> where NC: hyper:
 
         let mut url = "https://www.googleapis.com/tagmanager/v1/accounts/{accountId}/containers/{containerId}/rules/{ruleId}".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::DeleteContainer.as_slice().to_string(), ());
+            self._scopes.insert(Scope::DeleteContainer.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{accountId}", "accountId"), ("{containerId}", "containerId"), ("{ruleId}", "ruleId")].iter() {
@@ -5318,7 +5318,7 @@ impl<'a, C, NC, A> AccountContainerRuleUpdateCall<'a, C, NC, A> where NC: hyper:
         
         if params.len() > 0 {
             url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
+            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_ref()))));
         }
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
@@ -5341,7 +5341,7 @@ impl<'a, C, NC, A> AccountContainerRuleUpdateCall<'a, C, NC, A> where NC: hyper:
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Put, url.as_slice())
+                let mut req = client.borrow_mut().request(hyper::method::Method::Put, url.as_ref())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -5355,7 +5355,7 @@ impl<'a, C, NC, A> AccountContainerRuleUpdateCall<'a, C, NC, A> where NC: hyper:
             match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
+                        sleep_ms(d.num_milliseconds() as u32);
                         continue;
                     }
                     dlg.finished(false);
@@ -5366,7 +5366,7 @@ impl<'a, C, NC, A> AccountContainerRuleUpdateCall<'a, C, NC, A> where NC: hyper:
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
-                            sleep(d);
+                            sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
@@ -5468,8 +5468,8 @@ impl<'a, C, NC, A> AccountContainerRuleUpdateCall<'a, C, NC, A> where NC: hyper:
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> AccountContainerRuleUpdateCall<'a, C, NC, A>
-                                                        where T: Str {
-        self._additional_params.insert(name.as_slice().to_string(), value.as_slice().to_string());
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
     }
 
@@ -5485,8 +5485,8 @@ impl<'a, C, NC, A> AccountContainerRuleUpdateCall<'a, C, NC, A> where NC: hyper:
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T>(mut self, scope: T) -> AccountContainerRuleUpdateCall<'a, C, NC, A> 
-                                                        where T: Str {
-        self._scopes.insert(scope.as_slice().to_string(), ());
+                                                        where T: AsRef<str> {
+        self._scopes.insert(scope.as_ref().to_string(), ());
         self
     }
 }
@@ -5503,8 +5503,8 @@ impl<'a, C, NC, A> AccountContainerRuleUpdateCall<'a, C, NC, A> where NC: hyper:
 ///
 /// ```test_harness,no_run
 /// # extern crate hyper;
-/// # extern crate "yup-oauth2" as oauth2;
-/// # extern crate "google-tagmanager1" as tagmanager1;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_tagmanager1 as tagmanager1;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -5567,7 +5567,7 @@ impl<'a, C, NC, A> AccountContainerRuleDeleteCall<'a, C, NC, A> where NC: hyper:
 
         let mut url = "https://www.googleapis.com/tagmanager/v1/accounts/{accountId}/containers/{containerId}/rules/{ruleId}".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::DeleteContainer.as_slice().to_string(), ());
+            self._scopes.insert(Scope::DeleteContainer.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{accountId}", "accountId"), ("{containerId}", "containerId"), ("{ruleId}", "ruleId")].iter() {
@@ -5597,7 +5597,7 @@ impl<'a, C, NC, A> AccountContainerRuleDeleteCall<'a, C, NC, A> where NC: hyper:
         
         if params.len() > 0 {
             url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
+            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_ref()))));
         }
 
 
@@ -5615,7 +5615,7 @@ impl<'a, C, NC, A> AccountContainerRuleDeleteCall<'a, C, NC, A> where NC: hyper:
                                                              access_token: token.unwrap().access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Delete, url.as_slice())
+                let mut req = client.borrow_mut().request(hyper::method::Method::Delete, url.as_ref())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -5626,7 +5626,7 @@ impl<'a, C, NC, A> AccountContainerRuleDeleteCall<'a, C, NC, A> where NC: hyper:
             match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
+                        sleep_ms(d.num_milliseconds() as u32);
                         continue;
                     }
                     dlg.finished(false);
@@ -5637,7 +5637,7 @@ impl<'a, C, NC, A> AccountContainerRuleDeleteCall<'a, C, NC, A> where NC: hyper:
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
-                            sleep(d);
+                            sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
@@ -5712,8 +5712,8 @@ impl<'a, C, NC, A> AccountContainerRuleDeleteCall<'a, C, NC, A> where NC: hyper:
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> AccountContainerRuleDeleteCall<'a, C, NC, A>
-                                                        where T: Str {
-        self._additional_params.insert(name.as_slice().to_string(), value.as_slice().to_string());
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
     }
 
@@ -5729,8 +5729,8 @@ impl<'a, C, NC, A> AccountContainerRuleDeleteCall<'a, C, NC, A> where NC: hyper:
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T>(mut self, scope: T) -> AccountContainerRuleDeleteCall<'a, C, NC, A> 
-                                                        where T: Str {
-        self._scopes.insert(scope.as_slice().to_string(), ());
+                                                        where T: AsRef<str> {
+        self._scopes.insert(scope.as_ref().to_string(), ());
         self
     }
 }
@@ -5747,8 +5747,8 @@ impl<'a, C, NC, A> AccountContainerRuleDeleteCall<'a, C, NC, A> where NC: hyper:
 ///
 /// ```test_harness,no_run
 /// # extern crate hyper;
-/// # extern crate "yup-oauth2" as oauth2;
-/// # extern crate "google-tagmanager1" as tagmanager1;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_tagmanager1 as tagmanager1;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -5810,7 +5810,7 @@ impl<'a, C, NC, A> AccountContainerTagListCall<'a, C, NC, A> where NC: hyper::ne
 
         let mut url = "https://www.googleapis.com/tagmanager/v1/accounts/{accountId}/containers/{containerId}/tags".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Readonly.as_slice().to_string(), ());
+            self._scopes.insert(Scope::Readonly.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{accountId}", "accountId"), ("{containerId}", "containerId")].iter() {
@@ -5840,7 +5840,7 @@ impl<'a, C, NC, A> AccountContainerTagListCall<'a, C, NC, A> where NC: hyper::ne
         
         if params.len() > 0 {
             url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
+            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_ref()))));
         }
 
 
@@ -5858,7 +5858,7 @@ impl<'a, C, NC, A> AccountContainerTagListCall<'a, C, NC, A> where NC: hyper::ne
                                                              access_token: token.unwrap().access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_slice())
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_ref())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -5869,7 +5869,7 @@ impl<'a, C, NC, A> AccountContainerTagListCall<'a, C, NC, A> where NC: hyper::ne
             match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
+                        sleep_ms(d.num_milliseconds() as u32);
                         continue;
                     }
                     dlg.finished(false);
@@ -5880,7 +5880,7 @@ impl<'a, C, NC, A> AccountContainerTagListCall<'a, C, NC, A> where NC: hyper::ne
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
-                            sleep(d);
+                            sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
@@ -5955,8 +5955,8 @@ impl<'a, C, NC, A> AccountContainerTagListCall<'a, C, NC, A> where NC: hyper::ne
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> AccountContainerTagListCall<'a, C, NC, A>
-                                                        where T: Str {
-        self._additional_params.insert(name.as_slice().to_string(), value.as_slice().to_string());
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
     }
 
@@ -5972,8 +5972,8 @@ impl<'a, C, NC, A> AccountContainerTagListCall<'a, C, NC, A> where NC: hyper::ne
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T>(mut self, scope: T) -> AccountContainerTagListCall<'a, C, NC, A> 
-                                                        where T: Str {
-        self._scopes.insert(scope.as_slice().to_string(), ());
+                                                        where T: AsRef<str> {
+        self._scopes.insert(scope.as_ref().to_string(), ());
         self
     }
 }
@@ -5990,8 +5990,8 @@ impl<'a, C, NC, A> AccountContainerTagListCall<'a, C, NC, A> where NC: hyper::ne
 ///
 /// ```test_harness,no_run
 /// # extern crate hyper;
-/// # extern crate "yup-oauth2" as oauth2;
-/// # extern crate "google-tagmanager1" as tagmanager1;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_tagmanager1 as tagmanager1;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -6060,7 +6060,7 @@ impl<'a, C, NC, A> AccountContainerVersionPublishCall<'a, C, NC, A> where NC: hy
 
         let mut url = "https://www.googleapis.com/tagmanager/v1/accounts/{accountId}/containers/{containerId}/versions/{containerVersionId}/publish".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::DeleteContainer.as_slice().to_string(), ());
+            self._scopes.insert(Scope::DeleteContainer.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{accountId}", "accountId"), ("{containerId}", "containerId"), ("{containerVersionId}", "containerVersionId")].iter() {
@@ -6090,7 +6090,7 @@ impl<'a, C, NC, A> AccountContainerVersionPublishCall<'a, C, NC, A> where NC: hy
         
         if params.len() > 0 {
             url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
+            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_ref()))));
         }
 
 
@@ -6108,7 +6108,7 @@ impl<'a, C, NC, A> AccountContainerVersionPublishCall<'a, C, NC, A> where NC: hy
                                                              access_token: token.unwrap().access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.as_slice())
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.as_ref())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -6119,7 +6119,7 @@ impl<'a, C, NC, A> AccountContainerVersionPublishCall<'a, C, NC, A> where NC: hy
             match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
+                        sleep_ms(d.num_milliseconds() as u32);
                         continue;
                     }
                     dlg.finished(false);
@@ -6130,7 +6130,7 @@ impl<'a, C, NC, A> AccountContainerVersionPublishCall<'a, C, NC, A> where NC: hy
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
-                            sleep(d);
+                            sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
@@ -6223,8 +6223,8 @@ impl<'a, C, NC, A> AccountContainerVersionPublishCall<'a, C, NC, A> where NC: hy
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> AccountContainerVersionPublishCall<'a, C, NC, A>
-                                                        where T: Str {
-        self._additional_params.insert(name.as_slice().to_string(), value.as_slice().to_string());
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
     }
 
@@ -6240,8 +6240,8 @@ impl<'a, C, NC, A> AccountContainerVersionPublishCall<'a, C, NC, A> where NC: hy
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T>(mut self, scope: T) -> AccountContainerVersionPublishCall<'a, C, NC, A> 
-                                                        where T: Str {
-        self._scopes.insert(scope.as_slice().to_string(), ());
+                                                        where T: AsRef<str> {
+        self._scopes.insert(scope.as_ref().to_string(), ());
         self
     }
 }
@@ -6258,8 +6258,8 @@ impl<'a, C, NC, A> AccountContainerVersionPublishCall<'a, C, NC, A> where NC: hy
 ///
 /// ```test_harness,no_run
 /// # extern crate hyper;
-/// # extern crate "yup-oauth2" as oauth2;
-/// # extern crate "google-tagmanager1" as tagmanager1;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_tagmanager1 as tagmanager1;
 /// use tagmanager1::Tag;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
@@ -6328,7 +6328,7 @@ impl<'a, C, NC, A> AccountContainerTagCreateCall<'a, C, NC, A> where NC: hyper::
 
         let mut url = "https://www.googleapis.com/tagmanager/v1/accounts/{accountId}/containers/{containerId}/tags".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::DeleteContainer.as_slice().to_string(), ());
+            self._scopes.insert(Scope::DeleteContainer.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{accountId}", "accountId"), ("{containerId}", "containerId")].iter() {
@@ -6358,7 +6358,7 @@ impl<'a, C, NC, A> AccountContainerTagCreateCall<'a, C, NC, A> where NC: hyper::
         
         if params.len() > 0 {
             url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
+            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_ref()))));
         }
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
@@ -6381,7 +6381,7 @@ impl<'a, C, NC, A> AccountContainerTagCreateCall<'a, C, NC, A> where NC: hyper::
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.as_slice())
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.as_ref())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -6395,7 +6395,7 @@ impl<'a, C, NC, A> AccountContainerTagCreateCall<'a, C, NC, A> where NC: hyper::
             match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
+                        sleep_ms(d.num_milliseconds() as u32);
                         continue;
                     }
                     dlg.finished(false);
@@ -6406,7 +6406,7 @@ impl<'a, C, NC, A> AccountContainerTagCreateCall<'a, C, NC, A> where NC: hyper::
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
-                            sleep(d);
+                            sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
@@ -6490,8 +6490,8 @@ impl<'a, C, NC, A> AccountContainerTagCreateCall<'a, C, NC, A> where NC: hyper::
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> AccountContainerTagCreateCall<'a, C, NC, A>
-                                                        where T: Str {
-        self._additional_params.insert(name.as_slice().to_string(), value.as_slice().to_string());
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
     }
 
@@ -6507,8 +6507,8 @@ impl<'a, C, NC, A> AccountContainerTagCreateCall<'a, C, NC, A> where NC: hyper::
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T>(mut self, scope: T) -> AccountContainerTagCreateCall<'a, C, NC, A> 
-                                                        where T: Str {
-        self._scopes.insert(scope.as_slice().to_string(), ());
+                                                        where T: AsRef<str> {
+        self._scopes.insert(scope.as_ref().to_string(), ());
         self
     }
 }
@@ -6525,8 +6525,8 @@ impl<'a, C, NC, A> AccountContainerTagCreateCall<'a, C, NC, A> where NC: hyper::
 ///
 /// ```test_harness,no_run
 /// # extern crate hyper;
-/// # extern crate "yup-oauth2" as oauth2;
-/// # extern crate "google-tagmanager1" as tagmanager1;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_tagmanager1 as tagmanager1;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -6588,7 +6588,7 @@ impl<'a, C, NC, A> AccountContainerTriggerListCall<'a, C, NC, A> where NC: hyper
 
         let mut url = "https://www.googleapis.com/tagmanager/v1/accounts/{accountId}/containers/{containerId}/triggers".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Readonly.as_slice().to_string(), ());
+            self._scopes.insert(Scope::Readonly.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{accountId}", "accountId"), ("{containerId}", "containerId")].iter() {
@@ -6618,7 +6618,7 @@ impl<'a, C, NC, A> AccountContainerTriggerListCall<'a, C, NC, A> where NC: hyper
         
         if params.len() > 0 {
             url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
+            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_ref()))));
         }
 
 
@@ -6636,7 +6636,7 @@ impl<'a, C, NC, A> AccountContainerTriggerListCall<'a, C, NC, A> where NC: hyper
                                                              access_token: token.unwrap().access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_slice())
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_ref())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -6647,7 +6647,7 @@ impl<'a, C, NC, A> AccountContainerTriggerListCall<'a, C, NC, A> where NC: hyper
             match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
+                        sleep_ms(d.num_milliseconds() as u32);
                         continue;
                     }
                     dlg.finished(false);
@@ -6658,7 +6658,7 @@ impl<'a, C, NC, A> AccountContainerTriggerListCall<'a, C, NC, A> where NC: hyper
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
-                            sleep(d);
+                            sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
@@ -6733,8 +6733,8 @@ impl<'a, C, NC, A> AccountContainerTriggerListCall<'a, C, NC, A> where NC: hyper
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> AccountContainerTriggerListCall<'a, C, NC, A>
-                                                        where T: Str {
-        self._additional_params.insert(name.as_slice().to_string(), value.as_slice().to_string());
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
     }
 
@@ -6750,8 +6750,8 @@ impl<'a, C, NC, A> AccountContainerTriggerListCall<'a, C, NC, A> where NC: hyper
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T>(mut self, scope: T) -> AccountContainerTriggerListCall<'a, C, NC, A> 
-                                                        where T: Str {
-        self._scopes.insert(scope.as_slice().to_string(), ());
+                                                        where T: AsRef<str> {
+        self._scopes.insert(scope.as_ref().to_string(), ());
         self
     }
 }
@@ -6768,8 +6768,8 @@ impl<'a, C, NC, A> AccountContainerTriggerListCall<'a, C, NC, A> where NC: hyper
 ///
 /// ```test_harness,no_run
 /// # extern crate hyper;
-/// # extern crate "yup-oauth2" as oauth2;
-/// # extern crate "google-tagmanager1" as tagmanager1;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_tagmanager1 as tagmanager1;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -6832,7 +6832,7 @@ impl<'a, C, NC, A> AccountContainerVersionDeleteCall<'a, C, NC, A> where NC: hyp
 
         let mut url = "https://www.googleapis.com/tagmanager/v1/accounts/{accountId}/containers/{containerId}/versions/{containerVersionId}".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::DeleteContainer.as_slice().to_string(), ());
+            self._scopes.insert(Scope::DeleteContainer.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{accountId}", "accountId"), ("{containerId}", "containerId"), ("{containerVersionId}", "containerVersionId")].iter() {
@@ -6862,7 +6862,7 @@ impl<'a, C, NC, A> AccountContainerVersionDeleteCall<'a, C, NC, A> where NC: hyp
         
         if params.len() > 0 {
             url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
+            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_ref()))));
         }
 
 
@@ -6880,7 +6880,7 @@ impl<'a, C, NC, A> AccountContainerVersionDeleteCall<'a, C, NC, A> where NC: hyp
                                                              access_token: token.unwrap().access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Delete, url.as_slice())
+                let mut req = client.borrow_mut().request(hyper::method::Method::Delete, url.as_ref())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -6891,7 +6891,7 @@ impl<'a, C, NC, A> AccountContainerVersionDeleteCall<'a, C, NC, A> where NC: hyp
             match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
+                        sleep_ms(d.num_milliseconds() as u32);
                         continue;
                     }
                     dlg.finished(false);
@@ -6902,7 +6902,7 @@ impl<'a, C, NC, A> AccountContainerVersionDeleteCall<'a, C, NC, A> where NC: hyp
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
-                            sleep(d);
+                            sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
@@ -6977,8 +6977,8 @@ impl<'a, C, NC, A> AccountContainerVersionDeleteCall<'a, C, NC, A> where NC: hyp
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> AccountContainerVersionDeleteCall<'a, C, NC, A>
-                                                        where T: Str {
-        self._additional_params.insert(name.as_slice().to_string(), value.as_slice().to_string());
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
     }
 
@@ -6994,8 +6994,8 @@ impl<'a, C, NC, A> AccountContainerVersionDeleteCall<'a, C, NC, A> where NC: hyp
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T>(mut self, scope: T) -> AccountContainerVersionDeleteCall<'a, C, NC, A> 
-                                                        where T: Str {
-        self._scopes.insert(scope.as_slice().to_string(), ());
+                                                        where T: AsRef<str> {
+        self._scopes.insert(scope.as_ref().to_string(), ());
         self
     }
 }
@@ -7012,8 +7012,8 @@ impl<'a, C, NC, A> AccountContainerVersionDeleteCall<'a, C, NC, A> where NC: hyp
 ///
 /// ```test_harness,no_run
 /// # extern crate hyper;
-/// # extern crate "yup-oauth2" as oauth2;
-/// # extern crate "google-tagmanager1" as tagmanager1;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_tagmanager1 as tagmanager1;
 /// use tagmanager1::Account;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
@@ -7085,7 +7085,7 @@ impl<'a, C, NC, A> AccountUpdateCall<'a, C, NC, A> where NC: hyper::net::Network
 
         let mut url = "https://www.googleapis.com/tagmanager/v1/accounts/{accountId}".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::DeleteContainer.as_slice().to_string(), ());
+            self._scopes.insert(Scope::DeleteContainer.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{accountId}", "accountId")].iter() {
@@ -7115,7 +7115,7 @@ impl<'a, C, NC, A> AccountUpdateCall<'a, C, NC, A> where NC: hyper::net::Network
         
         if params.len() > 0 {
             url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
+            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_ref()))));
         }
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
@@ -7138,7 +7138,7 @@ impl<'a, C, NC, A> AccountUpdateCall<'a, C, NC, A> where NC: hyper::net::Network
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Put, url.as_slice())
+                let mut req = client.borrow_mut().request(hyper::method::Method::Put, url.as_ref())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -7152,7 +7152,7 @@ impl<'a, C, NC, A> AccountUpdateCall<'a, C, NC, A> where NC: hyper::net::Network
             match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
+                        sleep_ms(d.num_milliseconds() as u32);
                         continue;
                     }
                     dlg.finished(false);
@@ -7163,7 +7163,7 @@ impl<'a, C, NC, A> AccountUpdateCall<'a, C, NC, A> where NC: hyper::net::Network
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
-                            sleep(d);
+                            sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
@@ -7245,8 +7245,8 @@ impl<'a, C, NC, A> AccountUpdateCall<'a, C, NC, A> where NC: hyper::net::Network
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> AccountUpdateCall<'a, C, NC, A>
-                                                        where T: Str {
-        self._additional_params.insert(name.as_slice().to_string(), value.as_slice().to_string());
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
     }
 
@@ -7262,8 +7262,8 @@ impl<'a, C, NC, A> AccountUpdateCall<'a, C, NC, A> where NC: hyper::net::Network
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T>(mut self, scope: T) -> AccountUpdateCall<'a, C, NC, A> 
-                                                        where T: Str {
-        self._scopes.insert(scope.as_slice().to_string(), ());
+                                                        where T: AsRef<str> {
+        self._scopes.insert(scope.as_ref().to_string(), ());
         self
     }
 }
@@ -7280,8 +7280,8 @@ impl<'a, C, NC, A> AccountUpdateCall<'a, C, NC, A> where NC: hyper::net::Network
 ///
 /// ```test_harness,no_run
 /// # extern crate hyper;
-/// # extern crate "yup-oauth2" as oauth2;
-/// # extern crate "google-tagmanager1" as tagmanager1;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_tagmanager1 as tagmanager1;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -7344,7 +7344,7 @@ impl<'a, C, NC, A> AccountContainerMacroDeleteCall<'a, C, NC, A> where NC: hyper
 
         let mut url = "https://www.googleapis.com/tagmanager/v1/accounts/{accountId}/containers/{containerId}/macros/{macroId}".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::DeleteContainer.as_slice().to_string(), ());
+            self._scopes.insert(Scope::DeleteContainer.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{accountId}", "accountId"), ("{containerId}", "containerId"), ("{macroId}", "macroId")].iter() {
@@ -7374,7 +7374,7 @@ impl<'a, C, NC, A> AccountContainerMacroDeleteCall<'a, C, NC, A> where NC: hyper
         
         if params.len() > 0 {
             url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
+            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_ref()))));
         }
 
 
@@ -7392,7 +7392,7 @@ impl<'a, C, NC, A> AccountContainerMacroDeleteCall<'a, C, NC, A> where NC: hyper
                                                              access_token: token.unwrap().access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Delete, url.as_slice())
+                let mut req = client.borrow_mut().request(hyper::method::Method::Delete, url.as_ref())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -7403,7 +7403,7 @@ impl<'a, C, NC, A> AccountContainerMacroDeleteCall<'a, C, NC, A> where NC: hyper
             match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
+                        sleep_ms(d.num_milliseconds() as u32);
                         continue;
                     }
                     dlg.finished(false);
@@ -7414,7 +7414,7 @@ impl<'a, C, NC, A> AccountContainerMacroDeleteCall<'a, C, NC, A> where NC: hyper
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
-                            sleep(d);
+                            sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
@@ -7489,8 +7489,8 @@ impl<'a, C, NC, A> AccountContainerMacroDeleteCall<'a, C, NC, A> where NC: hyper
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> AccountContainerMacroDeleteCall<'a, C, NC, A>
-                                                        where T: Str {
-        self._additional_params.insert(name.as_slice().to_string(), value.as_slice().to_string());
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
     }
 
@@ -7506,8 +7506,8 @@ impl<'a, C, NC, A> AccountContainerMacroDeleteCall<'a, C, NC, A> where NC: hyper
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T>(mut self, scope: T) -> AccountContainerMacroDeleteCall<'a, C, NC, A> 
-                                                        where T: Str {
-        self._scopes.insert(scope.as_slice().to_string(), ());
+                                                        where T: AsRef<str> {
+        self._scopes.insert(scope.as_ref().to_string(), ());
         self
     }
 }
@@ -7524,8 +7524,8 @@ impl<'a, C, NC, A> AccountContainerMacroDeleteCall<'a, C, NC, A> where NC: hyper
 ///
 /// ```test_harness,no_run
 /// # extern crate hyper;
-/// # extern crate "yup-oauth2" as oauth2;
-/// # extern crate "google-tagmanager1" as tagmanager1;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_tagmanager1 as tagmanager1;
 /// use tagmanager1::CreateContainerVersionRequestVersionOptions;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
@@ -7594,7 +7594,7 @@ impl<'a, C, NC, A> AccountContainerVersionCreateCall<'a, C, NC, A> where NC: hyp
 
         let mut url = "https://www.googleapis.com/tagmanager/v1/accounts/{accountId}/containers/{containerId}/versions".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::DeleteContainer.as_slice().to_string(), ());
+            self._scopes.insert(Scope::DeleteContainer.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{accountId}", "accountId"), ("{containerId}", "containerId")].iter() {
@@ -7624,7 +7624,7 @@ impl<'a, C, NC, A> AccountContainerVersionCreateCall<'a, C, NC, A> where NC: hyp
         
         if params.len() > 0 {
             url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
+            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_ref()))));
         }
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
@@ -7647,7 +7647,7 @@ impl<'a, C, NC, A> AccountContainerVersionCreateCall<'a, C, NC, A> where NC: hyp
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.as_slice())
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.as_ref())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -7661,7 +7661,7 @@ impl<'a, C, NC, A> AccountContainerVersionCreateCall<'a, C, NC, A> where NC: hyp
             match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
+                        sleep_ms(d.num_milliseconds() as u32);
                         continue;
                     }
                     dlg.finished(false);
@@ -7672,7 +7672,7 @@ impl<'a, C, NC, A> AccountContainerVersionCreateCall<'a, C, NC, A> where NC: hyp
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
-                            sleep(d);
+                            sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
@@ -7756,8 +7756,8 @@ impl<'a, C, NC, A> AccountContainerVersionCreateCall<'a, C, NC, A> where NC: hyp
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> AccountContainerVersionCreateCall<'a, C, NC, A>
-                                                        where T: Str {
-        self._additional_params.insert(name.as_slice().to_string(), value.as_slice().to_string());
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
     }
 
@@ -7773,8 +7773,8 @@ impl<'a, C, NC, A> AccountContainerVersionCreateCall<'a, C, NC, A> where NC: hyp
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T>(mut self, scope: T) -> AccountContainerVersionCreateCall<'a, C, NC, A> 
-                                                        where T: Str {
-        self._scopes.insert(scope.as_slice().to_string(), ());
+                                                        where T: AsRef<str> {
+        self._scopes.insert(scope.as_ref().to_string(), ());
         self
     }
 }
@@ -7791,8 +7791,8 @@ impl<'a, C, NC, A> AccountContainerVersionCreateCall<'a, C, NC, A> where NC: hyp
 ///
 /// ```test_harness,no_run
 /// # extern crate hyper;
-/// # extern crate "yup-oauth2" as oauth2;
-/// # extern crate "google-tagmanager1" as tagmanager1;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_tagmanager1 as tagmanager1;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -7854,7 +7854,7 @@ impl<'a, C, NC, A> AccountPermissionGetCall<'a, C, NC, A> where NC: hyper::net::
 
         let mut url = "https://www.googleapis.com/tagmanager/v1/accounts/{accountId}/permissions/{permissionId}".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Readonly.as_slice().to_string(), ());
+            self._scopes.insert(Scope::Readonly.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{accountId}", "accountId"), ("{permissionId}", "permissionId")].iter() {
@@ -7884,7 +7884,7 @@ impl<'a, C, NC, A> AccountPermissionGetCall<'a, C, NC, A> where NC: hyper::net::
         
         if params.len() > 0 {
             url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
+            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_ref()))));
         }
 
 
@@ -7902,7 +7902,7 @@ impl<'a, C, NC, A> AccountPermissionGetCall<'a, C, NC, A> where NC: hyper::net::
                                                              access_token: token.unwrap().access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_slice())
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_ref())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -7913,7 +7913,7 @@ impl<'a, C, NC, A> AccountPermissionGetCall<'a, C, NC, A> where NC: hyper::net::
             match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
+                        sleep_ms(d.num_milliseconds() as u32);
                         continue;
                     }
                     dlg.finished(false);
@@ -7924,7 +7924,7 @@ impl<'a, C, NC, A> AccountPermissionGetCall<'a, C, NC, A> where NC: hyper::net::
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
-                            sleep(d);
+                            sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
@@ -7999,8 +7999,8 @@ impl<'a, C, NC, A> AccountPermissionGetCall<'a, C, NC, A> where NC: hyper::net::
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> AccountPermissionGetCall<'a, C, NC, A>
-                                                        where T: Str {
-        self._additional_params.insert(name.as_slice().to_string(), value.as_slice().to_string());
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
     }
 
@@ -8016,8 +8016,8 @@ impl<'a, C, NC, A> AccountPermissionGetCall<'a, C, NC, A> where NC: hyper::net::
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T>(mut self, scope: T) -> AccountPermissionGetCall<'a, C, NC, A> 
-                                                        where T: Str {
-        self._scopes.insert(scope.as_slice().to_string(), ());
+                                                        where T: AsRef<str> {
+        self._scopes.insert(scope.as_ref().to_string(), ());
         self
     }
 }
@@ -8034,8 +8034,8 @@ impl<'a, C, NC, A> AccountPermissionGetCall<'a, C, NC, A> where NC: hyper::net::
 ///
 /// ```test_harness,no_run
 /// # extern crate hyper;
-/// # extern crate "yup-oauth2" as oauth2;
-/// # extern crate "google-tagmanager1" as tagmanager1;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_tagmanager1 as tagmanager1;
 /// use tagmanager1::Rule;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
@@ -8104,7 +8104,7 @@ impl<'a, C, NC, A> AccountContainerRuleCreateCall<'a, C, NC, A> where NC: hyper:
 
         let mut url = "https://www.googleapis.com/tagmanager/v1/accounts/{accountId}/containers/{containerId}/rules".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::DeleteContainer.as_slice().to_string(), ());
+            self._scopes.insert(Scope::DeleteContainer.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{accountId}", "accountId"), ("{containerId}", "containerId")].iter() {
@@ -8134,7 +8134,7 @@ impl<'a, C, NC, A> AccountContainerRuleCreateCall<'a, C, NC, A> where NC: hyper:
         
         if params.len() > 0 {
             url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
+            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_ref()))));
         }
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
@@ -8157,7 +8157,7 @@ impl<'a, C, NC, A> AccountContainerRuleCreateCall<'a, C, NC, A> where NC: hyper:
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.as_slice())
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.as_ref())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -8171,7 +8171,7 @@ impl<'a, C, NC, A> AccountContainerRuleCreateCall<'a, C, NC, A> where NC: hyper:
             match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
+                        sleep_ms(d.num_milliseconds() as u32);
                         continue;
                     }
                     dlg.finished(false);
@@ -8182,7 +8182,7 @@ impl<'a, C, NC, A> AccountContainerRuleCreateCall<'a, C, NC, A> where NC: hyper:
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
-                            sleep(d);
+                            sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
@@ -8266,8 +8266,8 @@ impl<'a, C, NC, A> AccountContainerRuleCreateCall<'a, C, NC, A> where NC: hyper:
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> AccountContainerRuleCreateCall<'a, C, NC, A>
-                                                        where T: Str {
-        self._additional_params.insert(name.as_slice().to_string(), value.as_slice().to_string());
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
     }
 
@@ -8283,8 +8283,8 @@ impl<'a, C, NC, A> AccountContainerRuleCreateCall<'a, C, NC, A> where NC: hyper:
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T>(mut self, scope: T) -> AccountContainerRuleCreateCall<'a, C, NC, A> 
-                                                        where T: Str {
-        self._scopes.insert(scope.as_slice().to_string(), ());
+                                                        where T: AsRef<str> {
+        self._scopes.insert(scope.as_ref().to_string(), ());
         self
     }
 }
@@ -8301,8 +8301,8 @@ impl<'a, C, NC, A> AccountContainerRuleCreateCall<'a, C, NC, A> where NC: hyper:
 ///
 /// ```test_harness,no_run
 /// # extern crate hyper;
-/// # extern crate "yup-oauth2" as oauth2;
-/// # extern crate "google-tagmanager1" as tagmanager1;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_tagmanager1 as tagmanager1;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -8366,7 +8366,7 @@ impl<'a, C, NC, A> AccountContainerVersionRestoreCall<'a, C, NC, A> where NC: hy
 
         let mut url = "https://www.googleapis.com/tagmanager/v1/accounts/{accountId}/containers/{containerId}/versions/{containerVersionId}/restore".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::DeleteContainer.as_slice().to_string(), ());
+            self._scopes.insert(Scope::DeleteContainer.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{accountId}", "accountId"), ("{containerId}", "containerId"), ("{containerVersionId}", "containerVersionId")].iter() {
@@ -8396,7 +8396,7 @@ impl<'a, C, NC, A> AccountContainerVersionRestoreCall<'a, C, NC, A> where NC: hy
         
         if params.len() > 0 {
             url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
+            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_ref()))));
         }
 
 
@@ -8414,7 +8414,7 @@ impl<'a, C, NC, A> AccountContainerVersionRestoreCall<'a, C, NC, A> where NC: hy
                                                              access_token: token.unwrap().access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.as_slice())
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.as_ref())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -8425,7 +8425,7 @@ impl<'a, C, NC, A> AccountContainerVersionRestoreCall<'a, C, NC, A> where NC: hy
             match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
+                        sleep_ms(d.num_milliseconds() as u32);
                         continue;
                     }
                     dlg.finished(false);
@@ -8436,7 +8436,7 @@ impl<'a, C, NC, A> AccountContainerVersionRestoreCall<'a, C, NC, A> where NC: hy
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
-                            sleep(d);
+                            sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
@@ -8521,8 +8521,8 @@ impl<'a, C, NC, A> AccountContainerVersionRestoreCall<'a, C, NC, A> where NC: hy
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> AccountContainerVersionRestoreCall<'a, C, NC, A>
-                                                        where T: Str {
-        self._additional_params.insert(name.as_slice().to_string(), value.as_slice().to_string());
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
     }
 
@@ -8538,8 +8538,8 @@ impl<'a, C, NC, A> AccountContainerVersionRestoreCall<'a, C, NC, A> where NC: hy
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T>(mut self, scope: T) -> AccountContainerVersionRestoreCall<'a, C, NC, A> 
-                                                        where T: Str {
-        self._scopes.insert(scope.as_slice().to_string(), ());
+                                                        where T: AsRef<str> {
+        self._scopes.insert(scope.as_ref().to_string(), ());
         self
     }
 }
@@ -8556,8 +8556,8 @@ impl<'a, C, NC, A> AccountContainerVersionRestoreCall<'a, C, NC, A> where NC: hy
 ///
 /// ```test_harness,no_run
 /// # extern crate hyper;
-/// # extern crate "yup-oauth2" as oauth2;
-/// # extern crate "google-tagmanager1" as tagmanager1;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_tagmanager1 as tagmanager1;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -8621,7 +8621,7 @@ impl<'a, C, NC, A> AccountContainerRuleGetCall<'a, C, NC, A> where NC: hyper::ne
 
         let mut url = "https://www.googleapis.com/tagmanager/v1/accounts/{accountId}/containers/{containerId}/rules/{ruleId}".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Readonly.as_slice().to_string(), ());
+            self._scopes.insert(Scope::Readonly.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{accountId}", "accountId"), ("{containerId}", "containerId"), ("{ruleId}", "ruleId")].iter() {
@@ -8651,7 +8651,7 @@ impl<'a, C, NC, A> AccountContainerRuleGetCall<'a, C, NC, A> where NC: hyper::ne
         
         if params.len() > 0 {
             url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
+            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_ref()))));
         }
 
 
@@ -8669,7 +8669,7 @@ impl<'a, C, NC, A> AccountContainerRuleGetCall<'a, C, NC, A> where NC: hyper::ne
                                                              access_token: token.unwrap().access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_slice())
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_ref())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -8680,7 +8680,7 @@ impl<'a, C, NC, A> AccountContainerRuleGetCall<'a, C, NC, A> where NC: hyper::ne
             match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
+                        sleep_ms(d.num_milliseconds() as u32);
                         continue;
                     }
                     dlg.finished(false);
@@ -8691,7 +8691,7 @@ impl<'a, C, NC, A> AccountContainerRuleGetCall<'a, C, NC, A> where NC: hyper::ne
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
-                            sleep(d);
+                            sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
@@ -8776,8 +8776,8 @@ impl<'a, C, NC, A> AccountContainerRuleGetCall<'a, C, NC, A> where NC: hyper::ne
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> AccountContainerRuleGetCall<'a, C, NC, A>
-                                                        where T: Str {
-        self._additional_params.insert(name.as_slice().to_string(), value.as_slice().to_string());
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
     }
 
@@ -8793,8 +8793,8 @@ impl<'a, C, NC, A> AccountContainerRuleGetCall<'a, C, NC, A> where NC: hyper::ne
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T>(mut self, scope: T) -> AccountContainerRuleGetCall<'a, C, NC, A> 
-                                                        where T: Str {
-        self._scopes.insert(scope.as_slice().to_string(), ());
+                                                        where T: AsRef<str> {
+        self._scopes.insert(scope.as_ref().to_string(), ());
         self
     }
 }
@@ -8811,8 +8811,8 @@ impl<'a, C, NC, A> AccountContainerRuleGetCall<'a, C, NC, A> where NC: hyper::ne
 ///
 /// ```test_harness,no_run
 /// # extern crate hyper;
-/// # extern crate "yup-oauth2" as oauth2;
-/// # extern crate "google-tagmanager1" as tagmanager1;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_tagmanager1 as tagmanager1;
 /// use tagmanager1::Variable;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
@@ -8881,7 +8881,7 @@ impl<'a, C, NC, A> AccountContainerVariableCreateCall<'a, C, NC, A> where NC: hy
 
         let mut url = "https://www.googleapis.com/tagmanager/v1/accounts/{accountId}/containers/{containerId}/variables".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::DeleteContainer.as_slice().to_string(), ());
+            self._scopes.insert(Scope::DeleteContainer.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{accountId}", "accountId"), ("{containerId}", "containerId")].iter() {
@@ -8911,7 +8911,7 @@ impl<'a, C, NC, A> AccountContainerVariableCreateCall<'a, C, NC, A> where NC: hy
         
         if params.len() > 0 {
             url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
+            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_ref()))));
         }
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
@@ -8934,7 +8934,7 @@ impl<'a, C, NC, A> AccountContainerVariableCreateCall<'a, C, NC, A> where NC: hy
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.as_slice())
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.as_ref())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -8948,7 +8948,7 @@ impl<'a, C, NC, A> AccountContainerVariableCreateCall<'a, C, NC, A> where NC: hy
             match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
+                        sleep_ms(d.num_milliseconds() as u32);
                         continue;
                     }
                     dlg.finished(false);
@@ -8959,7 +8959,7 @@ impl<'a, C, NC, A> AccountContainerVariableCreateCall<'a, C, NC, A> where NC: hy
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
-                            sleep(d);
+                            sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
@@ -9043,8 +9043,8 @@ impl<'a, C, NC, A> AccountContainerVariableCreateCall<'a, C, NC, A> where NC: hy
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> AccountContainerVariableCreateCall<'a, C, NC, A>
-                                                        where T: Str {
-        self._additional_params.insert(name.as_slice().to_string(), value.as_slice().to_string());
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
     }
 
@@ -9060,8 +9060,8 @@ impl<'a, C, NC, A> AccountContainerVariableCreateCall<'a, C, NC, A> where NC: hy
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T>(mut self, scope: T) -> AccountContainerVariableCreateCall<'a, C, NC, A> 
-                                                        where T: Str {
-        self._scopes.insert(scope.as_slice().to_string(), ());
+                                                        where T: AsRef<str> {
+        self._scopes.insert(scope.as_ref().to_string(), ());
         self
     }
 }
@@ -9078,8 +9078,8 @@ impl<'a, C, NC, A> AccountContainerVariableCreateCall<'a, C, NC, A> where NC: hy
 ///
 /// ```test_harness,no_run
 /// # extern crate hyper;
-/// # extern crate "yup-oauth2" as oauth2;
-/// # extern crate "google-tagmanager1" as tagmanager1;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_tagmanager1 as tagmanager1;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -9141,7 +9141,7 @@ impl<'a, C, NC, A> AccountContainerVariableListCall<'a, C, NC, A> where NC: hype
 
         let mut url = "https://www.googleapis.com/tagmanager/v1/accounts/{accountId}/containers/{containerId}/variables".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Readonly.as_slice().to_string(), ());
+            self._scopes.insert(Scope::Readonly.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{accountId}", "accountId"), ("{containerId}", "containerId")].iter() {
@@ -9171,7 +9171,7 @@ impl<'a, C, NC, A> AccountContainerVariableListCall<'a, C, NC, A> where NC: hype
         
         if params.len() > 0 {
             url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
+            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_ref()))));
         }
 
 
@@ -9189,7 +9189,7 @@ impl<'a, C, NC, A> AccountContainerVariableListCall<'a, C, NC, A> where NC: hype
                                                              access_token: token.unwrap().access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_slice())
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_ref())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -9200,7 +9200,7 @@ impl<'a, C, NC, A> AccountContainerVariableListCall<'a, C, NC, A> where NC: hype
             match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
+                        sleep_ms(d.num_milliseconds() as u32);
                         continue;
                     }
                     dlg.finished(false);
@@ -9211,7 +9211,7 @@ impl<'a, C, NC, A> AccountContainerVariableListCall<'a, C, NC, A> where NC: hype
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
-                            sleep(d);
+                            sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
@@ -9286,8 +9286,8 @@ impl<'a, C, NC, A> AccountContainerVariableListCall<'a, C, NC, A> where NC: hype
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> AccountContainerVariableListCall<'a, C, NC, A>
-                                                        where T: Str {
-        self._additional_params.insert(name.as_slice().to_string(), value.as_slice().to_string());
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
     }
 
@@ -9303,8 +9303,8 @@ impl<'a, C, NC, A> AccountContainerVariableListCall<'a, C, NC, A> where NC: hype
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T>(mut self, scope: T) -> AccountContainerVariableListCall<'a, C, NC, A> 
-                                                        where T: Str {
-        self._scopes.insert(scope.as_slice().to_string(), ());
+                                                        where T: AsRef<str> {
+        self._scopes.insert(scope.as_ref().to_string(), ());
         self
     }
 }
@@ -9321,8 +9321,8 @@ impl<'a, C, NC, A> AccountContainerVariableListCall<'a, C, NC, A> where NC: hype
 ///
 /// ```test_harness,no_run
 /// # extern crate hyper;
-/// # extern crate "yup-oauth2" as oauth2;
-/// # extern crate "google-tagmanager1" as tagmanager1;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_tagmanager1 as tagmanager1;
 /// use tagmanager1::Macro;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
@@ -9391,7 +9391,7 @@ impl<'a, C, NC, A> AccountContainerMacroCreateCall<'a, C, NC, A> where NC: hyper
 
         let mut url = "https://www.googleapis.com/tagmanager/v1/accounts/{accountId}/containers/{containerId}/macros".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::DeleteContainer.as_slice().to_string(), ());
+            self._scopes.insert(Scope::DeleteContainer.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{accountId}", "accountId"), ("{containerId}", "containerId")].iter() {
@@ -9421,7 +9421,7 @@ impl<'a, C, NC, A> AccountContainerMacroCreateCall<'a, C, NC, A> where NC: hyper
         
         if params.len() > 0 {
             url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
+            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_ref()))));
         }
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
@@ -9444,7 +9444,7 @@ impl<'a, C, NC, A> AccountContainerMacroCreateCall<'a, C, NC, A> where NC: hyper
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.as_slice())
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.as_ref())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -9458,7 +9458,7 @@ impl<'a, C, NC, A> AccountContainerMacroCreateCall<'a, C, NC, A> where NC: hyper
             match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
+                        sleep_ms(d.num_milliseconds() as u32);
                         continue;
                     }
                     dlg.finished(false);
@@ -9469,7 +9469,7 @@ impl<'a, C, NC, A> AccountContainerMacroCreateCall<'a, C, NC, A> where NC: hyper
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
-                            sleep(d);
+                            sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
@@ -9553,8 +9553,8 @@ impl<'a, C, NC, A> AccountContainerMacroCreateCall<'a, C, NC, A> where NC: hyper
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> AccountContainerMacroCreateCall<'a, C, NC, A>
-                                                        where T: Str {
-        self._additional_params.insert(name.as_slice().to_string(), value.as_slice().to_string());
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
     }
 
@@ -9570,8 +9570,8 @@ impl<'a, C, NC, A> AccountContainerMacroCreateCall<'a, C, NC, A> where NC: hyper
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T>(mut self, scope: T) -> AccountContainerMacroCreateCall<'a, C, NC, A> 
-                                                        where T: Str {
-        self._scopes.insert(scope.as_slice().to_string(), ());
+                                                        where T: AsRef<str> {
+        self._scopes.insert(scope.as_ref().to_string(), ());
         self
     }
 }
@@ -9588,8 +9588,8 @@ impl<'a, C, NC, A> AccountContainerMacroCreateCall<'a, C, NC, A> where NC: hyper
 ///
 /// ```test_harness,no_run
 /// # extern crate hyper;
-/// # extern crate "yup-oauth2" as oauth2;
-/// # extern crate "google-tagmanager1" as tagmanager1;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_tagmanager1 as tagmanager1;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -9653,7 +9653,7 @@ impl<'a, C, NC, A> AccountContainerTagGetCall<'a, C, NC, A> where NC: hyper::net
 
         let mut url = "https://www.googleapis.com/tagmanager/v1/accounts/{accountId}/containers/{containerId}/tags/{tagId}".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Readonly.as_slice().to_string(), ());
+            self._scopes.insert(Scope::Readonly.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{accountId}", "accountId"), ("{containerId}", "containerId"), ("{tagId}", "tagId")].iter() {
@@ -9683,7 +9683,7 @@ impl<'a, C, NC, A> AccountContainerTagGetCall<'a, C, NC, A> where NC: hyper::net
         
         if params.len() > 0 {
             url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
+            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_ref()))));
         }
 
 
@@ -9701,7 +9701,7 @@ impl<'a, C, NC, A> AccountContainerTagGetCall<'a, C, NC, A> where NC: hyper::net
                                                              access_token: token.unwrap().access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_slice())
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_ref())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -9712,7 +9712,7 @@ impl<'a, C, NC, A> AccountContainerTagGetCall<'a, C, NC, A> where NC: hyper::net
             match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
+                        sleep_ms(d.num_milliseconds() as u32);
                         continue;
                     }
                     dlg.finished(false);
@@ -9723,7 +9723,7 @@ impl<'a, C, NC, A> AccountContainerTagGetCall<'a, C, NC, A> where NC: hyper::net
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
-                            sleep(d);
+                            sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
@@ -9808,8 +9808,8 @@ impl<'a, C, NC, A> AccountContainerTagGetCall<'a, C, NC, A> where NC: hyper::net
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> AccountContainerTagGetCall<'a, C, NC, A>
-                                                        where T: Str {
-        self._additional_params.insert(name.as_slice().to_string(), value.as_slice().to_string());
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
     }
 
@@ -9825,8 +9825,8 @@ impl<'a, C, NC, A> AccountContainerTagGetCall<'a, C, NC, A> where NC: hyper::net
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T>(mut self, scope: T) -> AccountContainerTagGetCall<'a, C, NC, A> 
-                                                        where T: Str {
-        self._scopes.insert(scope.as_slice().to_string(), ());
+                                                        where T: AsRef<str> {
+        self._scopes.insert(scope.as_ref().to_string(), ());
         self
     }
 }
@@ -9843,8 +9843,8 @@ impl<'a, C, NC, A> AccountContainerTagGetCall<'a, C, NC, A> where NC: hyper::net
 ///
 /// ```test_harness,no_run
 /// # extern crate hyper;
-/// # extern crate "yup-oauth2" as oauth2;
-/// # extern crate "google-tagmanager1" as tagmanager1;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_tagmanager1 as tagmanager1;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -9908,7 +9908,7 @@ impl<'a, C, NC, A> AccountContainerVariableGetCall<'a, C, NC, A> where NC: hyper
 
         let mut url = "https://www.googleapis.com/tagmanager/v1/accounts/{accountId}/containers/{containerId}/variables/{variableId}".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Readonly.as_slice().to_string(), ());
+            self._scopes.insert(Scope::Readonly.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{accountId}", "accountId"), ("{containerId}", "containerId"), ("{variableId}", "variableId")].iter() {
@@ -9938,7 +9938,7 @@ impl<'a, C, NC, A> AccountContainerVariableGetCall<'a, C, NC, A> where NC: hyper
         
         if params.len() > 0 {
             url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
+            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_ref()))));
         }
 
 
@@ -9956,7 +9956,7 @@ impl<'a, C, NC, A> AccountContainerVariableGetCall<'a, C, NC, A> where NC: hyper
                                                              access_token: token.unwrap().access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_slice())
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_ref())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -9967,7 +9967,7 @@ impl<'a, C, NC, A> AccountContainerVariableGetCall<'a, C, NC, A> where NC: hyper
             match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
+                        sleep_ms(d.num_milliseconds() as u32);
                         continue;
                     }
                     dlg.finished(false);
@@ -9978,7 +9978,7 @@ impl<'a, C, NC, A> AccountContainerVariableGetCall<'a, C, NC, A> where NC: hyper
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
-                            sleep(d);
+                            sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
@@ -10063,8 +10063,8 @@ impl<'a, C, NC, A> AccountContainerVariableGetCall<'a, C, NC, A> where NC: hyper
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> AccountContainerVariableGetCall<'a, C, NC, A>
-                                                        where T: Str {
-        self._additional_params.insert(name.as_slice().to_string(), value.as_slice().to_string());
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
     }
 
@@ -10080,8 +10080,8 @@ impl<'a, C, NC, A> AccountContainerVariableGetCall<'a, C, NC, A> where NC: hyper
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T>(mut self, scope: T) -> AccountContainerVariableGetCall<'a, C, NC, A> 
-                                                        where T: Str {
-        self._scopes.insert(scope.as_slice().to_string(), ());
+                                                        where T: AsRef<str> {
+        self._scopes.insert(scope.as_ref().to_string(), ());
         self
     }
 }
@@ -10098,8 +10098,8 @@ impl<'a, C, NC, A> AccountContainerVariableGetCall<'a, C, NC, A> where NC: hyper
 ///
 /// ```test_harness,no_run
 /// # extern crate hyper;
-/// # extern crate "yup-oauth2" as oauth2;
-/// # extern crate "google-tagmanager1" as tagmanager1;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_tagmanager1 as tagmanager1;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -10162,7 +10162,7 @@ impl<'a, C, NC, A> AccountContainerTriggerDeleteCall<'a, C, NC, A> where NC: hyp
 
         let mut url = "https://www.googleapis.com/tagmanager/v1/accounts/{accountId}/containers/{containerId}/triggers/{triggerId}".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::DeleteContainer.as_slice().to_string(), ());
+            self._scopes.insert(Scope::DeleteContainer.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{accountId}", "accountId"), ("{containerId}", "containerId"), ("{triggerId}", "triggerId")].iter() {
@@ -10192,7 +10192,7 @@ impl<'a, C, NC, A> AccountContainerTriggerDeleteCall<'a, C, NC, A> where NC: hyp
         
         if params.len() > 0 {
             url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
+            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_ref()))));
         }
 
 
@@ -10210,7 +10210,7 @@ impl<'a, C, NC, A> AccountContainerTriggerDeleteCall<'a, C, NC, A> where NC: hyp
                                                              access_token: token.unwrap().access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Delete, url.as_slice())
+                let mut req = client.borrow_mut().request(hyper::method::Method::Delete, url.as_ref())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -10221,7 +10221,7 @@ impl<'a, C, NC, A> AccountContainerTriggerDeleteCall<'a, C, NC, A> where NC: hyp
             match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
+                        sleep_ms(d.num_milliseconds() as u32);
                         continue;
                     }
                     dlg.finished(false);
@@ -10232,7 +10232,7 @@ impl<'a, C, NC, A> AccountContainerTriggerDeleteCall<'a, C, NC, A> where NC: hyp
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
-                            sleep(d);
+                            sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
@@ -10307,8 +10307,8 @@ impl<'a, C, NC, A> AccountContainerTriggerDeleteCall<'a, C, NC, A> where NC: hyp
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> AccountContainerTriggerDeleteCall<'a, C, NC, A>
-                                                        where T: Str {
-        self._additional_params.insert(name.as_slice().to_string(), value.as_slice().to_string());
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
     }
 
@@ -10324,8 +10324,8 @@ impl<'a, C, NC, A> AccountContainerTriggerDeleteCall<'a, C, NC, A> where NC: hyp
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T>(mut self, scope: T) -> AccountContainerTriggerDeleteCall<'a, C, NC, A> 
-                                                        where T: Str {
-        self._scopes.insert(scope.as_slice().to_string(), ());
+                                                        where T: AsRef<str> {
+        self._scopes.insert(scope.as_ref().to_string(), ());
         self
     }
 }
@@ -10342,8 +10342,8 @@ impl<'a, C, NC, A> AccountContainerTriggerDeleteCall<'a, C, NC, A> where NC: hyp
 ///
 /// ```test_harness,no_run
 /// # extern crate hyper;
-/// # extern crate "yup-oauth2" as oauth2;
-/// # extern crate "google-tagmanager1" as tagmanager1;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_tagmanager1 as tagmanager1;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -10405,7 +10405,7 @@ impl<'a, C, NC, A> AccountContainerMacroListCall<'a, C, NC, A> where NC: hyper::
 
         let mut url = "https://www.googleapis.com/tagmanager/v1/accounts/{accountId}/containers/{containerId}/macros".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Readonly.as_slice().to_string(), ());
+            self._scopes.insert(Scope::Readonly.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{accountId}", "accountId"), ("{containerId}", "containerId")].iter() {
@@ -10435,7 +10435,7 @@ impl<'a, C, NC, A> AccountContainerMacroListCall<'a, C, NC, A> where NC: hyper::
         
         if params.len() > 0 {
             url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
+            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_ref()))));
         }
 
 
@@ -10453,7 +10453,7 @@ impl<'a, C, NC, A> AccountContainerMacroListCall<'a, C, NC, A> where NC: hyper::
                                                              access_token: token.unwrap().access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_slice())
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_ref())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -10464,7 +10464,7 @@ impl<'a, C, NC, A> AccountContainerMacroListCall<'a, C, NC, A> where NC: hyper::
             match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
+                        sleep_ms(d.num_milliseconds() as u32);
                         continue;
                     }
                     dlg.finished(false);
@@ -10475,7 +10475,7 @@ impl<'a, C, NC, A> AccountContainerMacroListCall<'a, C, NC, A> where NC: hyper::
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
-                            sleep(d);
+                            sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
@@ -10550,8 +10550,8 @@ impl<'a, C, NC, A> AccountContainerMacroListCall<'a, C, NC, A> where NC: hyper::
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> AccountContainerMacroListCall<'a, C, NC, A>
-                                                        where T: Str {
-        self._additional_params.insert(name.as_slice().to_string(), value.as_slice().to_string());
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
     }
 
@@ -10567,8 +10567,8 @@ impl<'a, C, NC, A> AccountContainerMacroListCall<'a, C, NC, A> where NC: hyper::
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T>(mut self, scope: T) -> AccountContainerMacroListCall<'a, C, NC, A> 
-                                                        where T: Str {
-        self._scopes.insert(scope.as_slice().to_string(), ());
+                                                        where T: AsRef<str> {
+        self._scopes.insert(scope.as_ref().to_string(), ());
         self
     }
 }
@@ -10585,8 +10585,8 @@ impl<'a, C, NC, A> AccountContainerMacroListCall<'a, C, NC, A> where NC: hyper::
 ///
 /// ```test_harness,no_run
 /// # extern crate hyper;
-/// # extern crate "yup-oauth2" as oauth2;
-/// # extern crate "google-tagmanager1" as tagmanager1;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_tagmanager1 as tagmanager1;
 /// use tagmanager1::Trigger;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
@@ -10655,7 +10655,7 @@ impl<'a, C, NC, A> AccountContainerTriggerCreateCall<'a, C, NC, A> where NC: hyp
 
         let mut url = "https://www.googleapis.com/tagmanager/v1/accounts/{accountId}/containers/{containerId}/triggers".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::DeleteContainer.as_slice().to_string(), ());
+            self._scopes.insert(Scope::DeleteContainer.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{accountId}", "accountId"), ("{containerId}", "containerId")].iter() {
@@ -10685,7 +10685,7 @@ impl<'a, C, NC, A> AccountContainerTriggerCreateCall<'a, C, NC, A> where NC: hyp
         
         if params.len() > 0 {
             url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
+            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_ref()))));
         }
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
@@ -10708,7 +10708,7 @@ impl<'a, C, NC, A> AccountContainerTriggerCreateCall<'a, C, NC, A> where NC: hyp
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.as_slice())
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.as_ref())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -10722,7 +10722,7 @@ impl<'a, C, NC, A> AccountContainerTriggerCreateCall<'a, C, NC, A> where NC: hyp
             match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
+                        sleep_ms(d.num_milliseconds() as u32);
                         continue;
                     }
                     dlg.finished(false);
@@ -10733,7 +10733,7 @@ impl<'a, C, NC, A> AccountContainerTriggerCreateCall<'a, C, NC, A> where NC: hyp
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
-                            sleep(d);
+                            sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
@@ -10817,8 +10817,8 @@ impl<'a, C, NC, A> AccountContainerTriggerCreateCall<'a, C, NC, A> where NC: hyp
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> AccountContainerTriggerCreateCall<'a, C, NC, A>
-                                                        where T: Str {
-        self._additional_params.insert(name.as_slice().to_string(), value.as_slice().to_string());
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
     }
 
@@ -10834,8 +10834,8 @@ impl<'a, C, NC, A> AccountContainerTriggerCreateCall<'a, C, NC, A> where NC: hyp
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T>(mut self, scope: T) -> AccountContainerTriggerCreateCall<'a, C, NC, A> 
-                                                        where T: Str {
-        self._scopes.insert(scope.as_slice().to_string(), ());
+                                                        where T: AsRef<str> {
+        self._scopes.insert(scope.as_ref().to_string(), ());
         self
     }
 }
@@ -10852,8 +10852,8 @@ impl<'a, C, NC, A> AccountContainerTriggerCreateCall<'a, C, NC, A> where NC: hyp
 ///
 /// ```test_harness,no_run
 /// # extern crate hyper;
-/// # extern crate "yup-oauth2" as oauth2;
-/// # extern crate "google-tagmanager1" as tagmanager1;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_tagmanager1 as tagmanager1;
 /// use tagmanager1::Macro;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
@@ -10929,7 +10929,7 @@ impl<'a, C, NC, A> AccountContainerMacroUpdateCall<'a, C, NC, A> where NC: hyper
 
         let mut url = "https://www.googleapis.com/tagmanager/v1/accounts/{accountId}/containers/{containerId}/macros/{macroId}".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::DeleteContainer.as_slice().to_string(), ());
+            self._scopes.insert(Scope::DeleteContainer.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{accountId}", "accountId"), ("{containerId}", "containerId"), ("{macroId}", "macroId")].iter() {
@@ -10959,7 +10959,7 @@ impl<'a, C, NC, A> AccountContainerMacroUpdateCall<'a, C, NC, A> where NC: hyper
         
         if params.len() > 0 {
             url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
+            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_ref()))));
         }
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
@@ -10982,7 +10982,7 @@ impl<'a, C, NC, A> AccountContainerMacroUpdateCall<'a, C, NC, A> where NC: hyper
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Put, url.as_slice())
+                let mut req = client.borrow_mut().request(hyper::method::Method::Put, url.as_ref())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -10996,7 +10996,7 @@ impl<'a, C, NC, A> AccountContainerMacroUpdateCall<'a, C, NC, A> where NC: hyper
             match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
+                        sleep_ms(d.num_milliseconds() as u32);
                         continue;
                     }
                     dlg.finished(false);
@@ -11007,7 +11007,7 @@ impl<'a, C, NC, A> AccountContainerMacroUpdateCall<'a, C, NC, A> where NC: hyper
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
-                            sleep(d);
+                            sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
@@ -11109,8 +11109,8 @@ impl<'a, C, NC, A> AccountContainerMacroUpdateCall<'a, C, NC, A> where NC: hyper
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> AccountContainerMacroUpdateCall<'a, C, NC, A>
-                                                        where T: Str {
-        self._additional_params.insert(name.as_slice().to_string(), value.as_slice().to_string());
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
     }
 
@@ -11126,8 +11126,8 @@ impl<'a, C, NC, A> AccountContainerMacroUpdateCall<'a, C, NC, A> where NC: hyper
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T>(mut self, scope: T) -> AccountContainerMacroUpdateCall<'a, C, NC, A> 
-                                                        where T: Str {
-        self._scopes.insert(scope.as_slice().to_string(), ());
+                                                        where T: AsRef<str> {
+        self._scopes.insert(scope.as_ref().to_string(), ());
         self
     }
 }
@@ -11144,8 +11144,8 @@ impl<'a, C, NC, A> AccountContainerMacroUpdateCall<'a, C, NC, A> where NC: hyper
 ///
 /// ```test_harness,no_run
 /// # extern crate hyper;
-/// # extern crate "yup-oauth2" as oauth2;
-/// # extern crate "google-tagmanager1" as tagmanager1;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_tagmanager1 as tagmanager1;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -11203,13 +11203,13 @@ impl<'a, C, NC, A> AccountListCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
 
         let mut url = "https://www.googleapis.com/tagmanager/v1/accounts".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Readonly.as_slice().to_string(), ());
+            self._scopes.insert(Scope::Readonly.as_ref().to_string(), ());
         }
 
         
         if params.len() > 0 {
             url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
+            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_ref()))));
         }
 
 
@@ -11227,7 +11227,7 @@ impl<'a, C, NC, A> AccountListCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
                                                              access_token: token.unwrap().access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_slice())
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_ref())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -11238,7 +11238,7 @@ impl<'a, C, NC, A> AccountListCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
             match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
+                        sleep_ms(d.num_milliseconds() as u32);
                         continue;
                     }
                     dlg.finished(false);
@@ -11249,7 +11249,7 @@ impl<'a, C, NC, A> AccountListCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
-                            sleep(d);
+                            sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
@@ -11304,8 +11304,8 @@ impl<'a, C, NC, A> AccountListCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> AccountListCall<'a, C, NC, A>
-                                                        where T: Str {
-        self._additional_params.insert(name.as_slice().to_string(), value.as_slice().to_string());
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
     }
 
@@ -11321,8 +11321,8 @@ impl<'a, C, NC, A> AccountListCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T>(mut self, scope: T) -> AccountListCall<'a, C, NC, A> 
-                                                        where T: Str {
-        self._scopes.insert(scope.as_slice().to_string(), ());
+                                                        where T: AsRef<str> {
+        self._scopes.insert(scope.as_ref().to_string(), ());
         self
     }
 }
@@ -11339,8 +11339,8 @@ impl<'a, C, NC, A> AccountListCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
 ///
 /// ```test_harness,no_run
 /// # extern crate hyper;
-/// # extern crate "yup-oauth2" as oauth2;
-/// # extern crate "google-tagmanager1" as tagmanager1;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_tagmanager1 as tagmanager1;
 /// use tagmanager1::UserAccess;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
@@ -11409,7 +11409,7 @@ impl<'a, C, NC, A> AccountPermissionUpdateCall<'a, C, NC, A> where NC: hyper::ne
 
         let mut url = "https://www.googleapis.com/tagmanager/v1/accounts/{accountId}/permissions/{permissionId}".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::DeleteContainer.as_slice().to_string(), ());
+            self._scopes.insert(Scope::DeleteContainer.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{accountId}", "accountId"), ("{permissionId}", "permissionId")].iter() {
@@ -11439,7 +11439,7 @@ impl<'a, C, NC, A> AccountPermissionUpdateCall<'a, C, NC, A> where NC: hyper::ne
         
         if params.len() > 0 {
             url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
+            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_ref()))));
         }
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
@@ -11462,7 +11462,7 @@ impl<'a, C, NC, A> AccountPermissionUpdateCall<'a, C, NC, A> where NC: hyper::ne
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Put, url.as_slice())
+                let mut req = client.borrow_mut().request(hyper::method::Method::Put, url.as_ref())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -11476,7 +11476,7 @@ impl<'a, C, NC, A> AccountPermissionUpdateCall<'a, C, NC, A> where NC: hyper::ne
             match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
+                        sleep_ms(d.num_milliseconds() as u32);
                         continue;
                     }
                     dlg.finished(false);
@@ -11487,7 +11487,7 @@ impl<'a, C, NC, A> AccountPermissionUpdateCall<'a, C, NC, A> where NC: hyper::ne
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
-                            sleep(d);
+                            sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
@@ -11571,8 +11571,8 @@ impl<'a, C, NC, A> AccountPermissionUpdateCall<'a, C, NC, A> where NC: hyper::ne
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> AccountPermissionUpdateCall<'a, C, NC, A>
-                                                        where T: Str {
-        self._additional_params.insert(name.as_slice().to_string(), value.as_slice().to_string());
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
     }
 
@@ -11588,8 +11588,8 @@ impl<'a, C, NC, A> AccountPermissionUpdateCall<'a, C, NC, A> where NC: hyper::ne
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T>(mut self, scope: T) -> AccountPermissionUpdateCall<'a, C, NC, A> 
-                                                        where T: Str {
-        self._scopes.insert(scope.as_slice().to_string(), ());
+                                                        where T: AsRef<str> {
+        self._scopes.insert(scope.as_ref().to_string(), ());
         self
     }
 }
@@ -11606,8 +11606,8 @@ impl<'a, C, NC, A> AccountPermissionUpdateCall<'a, C, NC, A> where NC: hyper::ne
 ///
 /// ```test_harness,no_run
 /// # extern crate hyper;
-/// # extern crate "yup-oauth2" as oauth2;
-/// # extern crate "google-tagmanager1" as tagmanager1;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_tagmanager1 as tagmanager1;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -11670,7 +11670,7 @@ impl<'a, C, NC, A> AccountContainerVariableDeleteCall<'a, C, NC, A> where NC: hy
 
         let mut url = "https://www.googleapis.com/tagmanager/v1/accounts/{accountId}/containers/{containerId}/variables/{variableId}".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::DeleteContainer.as_slice().to_string(), ());
+            self._scopes.insert(Scope::DeleteContainer.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{accountId}", "accountId"), ("{containerId}", "containerId"), ("{variableId}", "variableId")].iter() {
@@ -11700,7 +11700,7 @@ impl<'a, C, NC, A> AccountContainerVariableDeleteCall<'a, C, NC, A> where NC: hy
         
         if params.len() > 0 {
             url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
+            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_ref()))));
         }
 
 
@@ -11718,7 +11718,7 @@ impl<'a, C, NC, A> AccountContainerVariableDeleteCall<'a, C, NC, A> where NC: hy
                                                              access_token: token.unwrap().access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Delete, url.as_slice())
+                let mut req = client.borrow_mut().request(hyper::method::Method::Delete, url.as_ref())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -11729,7 +11729,7 @@ impl<'a, C, NC, A> AccountContainerVariableDeleteCall<'a, C, NC, A> where NC: hy
             match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
+                        sleep_ms(d.num_milliseconds() as u32);
                         continue;
                     }
                     dlg.finished(false);
@@ -11740,7 +11740,7 @@ impl<'a, C, NC, A> AccountContainerVariableDeleteCall<'a, C, NC, A> where NC: hy
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
-                            sleep(d);
+                            sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
@@ -11815,8 +11815,8 @@ impl<'a, C, NC, A> AccountContainerVariableDeleteCall<'a, C, NC, A> where NC: hy
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> AccountContainerVariableDeleteCall<'a, C, NC, A>
-                                                        where T: Str {
-        self._additional_params.insert(name.as_slice().to_string(), value.as_slice().to_string());
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
     }
 
@@ -11832,8 +11832,8 @@ impl<'a, C, NC, A> AccountContainerVariableDeleteCall<'a, C, NC, A> where NC: hy
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T>(mut self, scope: T) -> AccountContainerVariableDeleteCall<'a, C, NC, A> 
-                                                        where T: Str {
-        self._scopes.insert(scope.as_slice().to_string(), ());
+                                                        where T: AsRef<str> {
+        self._scopes.insert(scope.as_ref().to_string(), ());
         self
     }
 }
@@ -11850,8 +11850,8 @@ impl<'a, C, NC, A> AccountContainerVariableDeleteCall<'a, C, NC, A> where NC: hy
 ///
 /// ```test_harness,no_run
 /// # extern crate hyper;
-/// # extern crate "yup-oauth2" as oauth2;
-/// # extern crate "google-tagmanager1" as tagmanager1;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_tagmanager1 as tagmanager1;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -11911,7 +11911,7 @@ impl<'a, C, NC, A> AccountGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
 
         let mut url = "https://www.googleapis.com/tagmanager/v1/accounts/{accountId}".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Readonly.as_slice().to_string(), ());
+            self._scopes.insert(Scope::Readonly.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{accountId}", "accountId")].iter() {
@@ -11941,7 +11941,7 @@ impl<'a, C, NC, A> AccountGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
         
         if params.len() > 0 {
             url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
+            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_ref()))));
         }
 
 
@@ -11959,7 +11959,7 @@ impl<'a, C, NC, A> AccountGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
                                                              access_token: token.unwrap().access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_slice())
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_ref())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -11970,7 +11970,7 @@ impl<'a, C, NC, A> AccountGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
             match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
+                        sleep_ms(d.num_milliseconds() as u32);
                         continue;
                     }
                     dlg.finished(false);
@@ -11981,7 +11981,7 @@ impl<'a, C, NC, A> AccountGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
-                            sleep(d);
+                            sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
@@ -12046,8 +12046,8 @@ impl<'a, C, NC, A> AccountGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> AccountGetCall<'a, C, NC, A>
-                                                        where T: Str {
-        self._additional_params.insert(name.as_slice().to_string(), value.as_slice().to_string());
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
     }
 
@@ -12063,8 +12063,8 @@ impl<'a, C, NC, A> AccountGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T>(mut self, scope: T) -> AccountGetCall<'a, C, NC, A> 
-                                                        where T: Str {
-        self._scopes.insert(scope.as_slice().to_string(), ());
+                                                        where T: AsRef<str> {
+        self._scopes.insert(scope.as_ref().to_string(), ());
         self
     }
 }
@@ -12081,8 +12081,8 @@ impl<'a, C, NC, A> AccountGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
 ///
 /// ```test_harness,no_run
 /// # extern crate hyper;
-/// # extern crate "yup-oauth2" as oauth2;
-/// # extern crate "google-tagmanager1" as tagmanager1;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_tagmanager1 as tagmanager1;
 /// use tagmanager1::Container;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
@@ -12156,7 +12156,7 @@ impl<'a, C, NC, A> AccountContainerUpdateCall<'a, C, NC, A> where NC: hyper::net
 
         let mut url = "https://www.googleapis.com/tagmanager/v1/accounts/{accountId}/containers/{containerId}".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::DeleteContainer.as_slice().to_string(), ());
+            self._scopes.insert(Scope::DeleteContainer.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{accountId}", "accountId"), ("{containerId}", "containerId")].iter() {
@@ -12186,7 +12186,7 @@ impl<'a, C, NC, A> AccountContainerUpdateCall<'a, C, NC, A> where NC: hyper::net
         
         if params.len() > 0 {
             url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
+            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_ref()))));
         }
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
@@ -12209,7 +12209,7 @@ impl<'a, C, NC, A> AccountContainerUpdateCall<'a, C, NC, A> where NC: hyper::net
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Put, url.as_slice())
+                let mut req = client.borrow_mut().request(hyper::method::Method::Put, url.as_ref())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -12223,7 +12223,7 @@ impl<'a, C, NC, A> AccountContainerUpdateCall<'a, C, NC, A> where NC: hyper::net
             match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
+                        sleep_ms(d.num_milliseconds() as u32);
                         continue;
                     }
                     dlg.finished(false);
@@ -12234,7 +12234,7 @@ impl<'a, C, NC, A> AccountContainerUpdateCall<'a, C, NC, A> where NC: hyper::net
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
-                            sleep(d);
+                            sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
@@ -12326,8 +12326,8 @@ impl<'a, C, NC, A> AccountContainerUpdateCall<'a, C, NC, A> where NC: hyper::net
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> AccountContainerUpdateCall<'a, C, NC, A>
-                                                        where T: Str {
-        self._additional_params.insert(name.as_slice().to_string(), value.as_slice().to_string());
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
     }
 
@@ -12343,8 +12343,8 @@ impl<'a, C, NC, A> AccountContainerUpdateCall<'a, C, NC, A> where NC: hyper::net
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T>(mut self, scope: T) -> AccountContainerUpdateCall<'a, C, NC, A> 
-                                                        where T: Str {
-        self._scopes.insert(scope.as_slice().to_string(), ());
+                                                        where T: AsRef<str> {
+        self._scopes.insert(scope.as_ref().to_string(), ());
         self
     }
 }
@@ -12361,8 +12361,8 @@ impl<'a, C, NC, A> AccountContainerUpdateCall<'a, C, NC, A> where NC: hyper::net
 ///
 /// ```test_harness,no_run
 /// # extern crate hyper;
-/// # extern crate "yup-oauth2" as oauth2;
-/// # extern crate "google-tagmanager1" as tagmanager1;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_tagmanager1 as tagmanager1;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -12424,7 +12424,7 @@ impl<'a, C, NC, A> AccountContainerRuleListCall<'a, C, NC, A> where NC: hyper::n
 
         let mut url = "https://www.googleapis.com/tagmanager/v1/accounts/{accountId}/containers/{containerId}/rules".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Readonly.as_slice().to_string(), ());
+            self._scopes.insert(Scope::Readonly.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{accountId}", "accountId"), ("{containerId}", "containerId")].iter() {
@@ -12454,7 +12454,7 @@ impl<'a, C, NC, A> AccountContainerRuleListCall<'a, C, NC, A> where NC: hyper::n
         
         if params.len() > 0 {
             url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
+            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_ref()))));
         }
 
 
@@ -12472,7 +12472,7 @@ impl<'a, C, NC, A> AccountContainerRuleListCall<'a, C, NC, A> where NC: hyper::n
                                                              access_token: token.unwrap().access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_slice())
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_ref())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -12483,7 +12483,7 @@ impl<'a, C, NC, A> AccountContainerRuleListCall<'a, C, NC, A> where NC: hyper::n
             match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
+                        sleep_ms(d.num_milliseconds() as u32);
                         continue;
                     }
                     dlg.finished(false);
@@ -12494,7 +12494,7 @@ impl<'a, C, NC, A> AccountContainerRuleListCall<'a, C, NC, A> where NC: hyper::n
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
-                            sleep(d);
+                            sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
@@ -12569,8 +12569,8 @@ impl<'a, C, NC, A> AccountContainerRuleListCall<'a, C, NC, A> where NC: hyper::n
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> AccountContainerRuleListCall<'a, C, NC, A>
-                                                        where T: Str {
-        self._additional_params.insert(name.as_slice().to_string(), value.as_slice().to_string());
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
     }
 
@@ -12586,8 +12586,8 @@ impl<'a, C, NC, A> AccountContainerRuleListCall<'a, C, NC, A> where NC: hyper::n
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T>(mut self, scope: T) -> AccountContainerRuleListCall<'a, C, NC, A> 
-                                                        where T: Str {
-        self._scopes.insert(scope.as_slice().to_string(), ());
+                                                        where T: AsRef<str> {
+        self._scopes.insert(scope.as_ref().to_string(), ());
         self
     }
 }
@@ -12604,8 +12604,8 @@ impl<'a, C, NC, A> AccountContainerRuleListCall<'a, C, NC, A> where NC: hyper::n
 ///
 /// ```test_harness,no_run
 /// # extern crate hyper;
-/// # extern crate "yup-oauth2" as oauth2;
-/// # extern crate "google-tagmanager1" as tagmanager1;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_tagmanager1 as tagmanager1;
 /// use tagmanager1::Tag;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
@@ -12681,7 +12681,7 @@ impl<'a, C, NC, A> AccountContainerTagUpdateCall<'a, C, NC, A> where NC: hyper::
 
         let mut url = "https://www.googleapis.com/tagmanager/v1/accounts/{accountId}/containers/{containerId}/tags/{tagId}".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::DeleteContainer.as_slice().to_string(), ());
+            self._scopes.insert(Scope::DeleteContainer.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{accountId}", "accountId"), ("{containerId}", "containerId"), ("{tagId}", "tagId")].iter() {
@@ -12711,7 +12711,7 @@ impl<'a, C, NC, A> AccountContainerTagUpdateCall<'a, C, NC, A> where NC: hyper::
         
         if params.len() > 0 {
             url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
+            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_ref()))));
         }
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
@@ -12734,7 +12734,7 @@ impl<'a, C, NC, A> AccountContainerTagUpdateCall<'a, C, NC, A> where NC: hyper::
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Put, url.as_slice())
+                let mut req = client.borrow_mut().request(hyper::method::Method::Put, url.as_ref())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -12748,7 +12748,7 @@ impl<'a, C, NC, A> AccountContainerTagUpdateCall<'a, C, NC, A> where NC: hyper::
             match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
+                        sleep_ms(d.num_milliseconds() as u32);
                         continue;
                     }
                     dlg.finished(false);
@@ -12759,7 +12759,7 @@ impl<'a, C, NC, A> AccountContainerTagUpdateCall<'a, C, NC, A> where NC: hyper::
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
-                            sleep(d);
+                            sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
@@ -12861,8 +12861,8 @@ impl<'a, C, NC, A> AccountContainerTagUpdateCall<'a, C, NC, A> where NC: hyper::
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> AccountContainerTagUpdateCall<'a, C, NC, A>
-                                                        where T: Str {
-        self._additional_params.insert(name.as_slice().to_string(), value.as_slice().to_string());
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
     }
 
@@ -12878,8 +12878,8 @@ impl<'a, C, NC, A> AccountContainerTagUpdateCall<'a, C, NC, A> where NC: hyper::
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T>(mut self, scope: T) -> AccountContainerTagUpdateCall<'a, C, NC, A> 
-                                                        where T: Str {
-        self._scopes.insert(scope.as_slice().to_string(), ());
+                                                        where T: AsRef<str> {
+        self._scopes.insert(scope.as_ref().to_string(), ());
         self
     }
 }
@@ -12896,8 +12896,8 @@ impl<'a, C, NC, A> AccountContainerTagUpdateCall<'a, C, NC, A> where NC: hyper::
 ///
 /// ```test_harness,no_run
 /// # extern crate hyper;
-/// # extern crate "yup-oauth2" as oauth2;
-/// # extern crate "google-tagmanager1" as tagmanager1;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_tagmanager1 as tagmanager1;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -12961,7 +12961,7 @@ impl<'a, C, NC, A> AccountContainerMacroGetCall<'a, C, NC, A> where NC: hyper::n
 
         let mut url = "https://www.googleapis.com/tagmanager/v1/accounts/{accountId}/containers/{containerId}/macros/{macroId}".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Readonly.as_slice().to_string(), ());
+            self._scopes.insert(Scope::Readonly.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{accountId}", "accountId"), ("{containerId}", "containerId"), ("{macroId}", "macroId")].iter() {
@@ -12991,7 +12991,7 @@ impl<'a, C, NC, A> AccountContainerMacroGetCall<'a, C, NC, A> where NC: hyper::n
         
         if params.len() > 0 {
             url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
+            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_ref()))));
         }
 
 
@@ -13009,7 +13009,7 @@ impl<'a, C, NC, A> AccountContainerMacroGetCall<'a, C, NC, A> where NC: hyper::n
                                                              access_token: token.unwrap().access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_slice())
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_ref())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -13020,7 +13020,7 @@ impl<'a, C, NC, A> AccountContainerMacroGetCall<'a, C, NC, A> where NC: hyper::n
             match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
+                        sleep_ms(d.num_milliseconds() as u32);
                         continue;
                     }
                     dlg.finished(false);
@@ -13031,7 +13031,7 @@ impl<'a, C, NC, A> AccountContainerMacroGetCall<'a, C, NC, A> where NC: hyper::n
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
-                            sleep(d);
+                            sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
@@ -13116,8 +13116,8 @@ impl<'a, C, NC, A> AccountContainerMacroGetCall<'a, C, NC, A> where NC: hyper::n
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> AccountContainerMacroGetCall<'a, C, NC, A>
-                                                        where T: Str {
-        self._additional_params.insert(name.as_slice().to_string(), value.as_slice().to_string());
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
     }
 
@@ -13133,8 +13133,8 @@ impl<'a, C, NC, A> AccountContainerMacroGetCall<'a, C, NC, A> where NC: hyper::n
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T>(mut self, scope: T) -> AccountContainerMacroGetCall<'a, C, NC, A> 
-                                                        where T: Str {
-        self._scopes.insert(scope.as_slice().to_string(), ());
+                                                        where T: AsRef<str> {
+        self._scopes.insert(scope.as_ref().to_string(), ());
         self
     }
 }
@@ -13151,8 +13151,8 @@ impl<'a, C, NC, A> AccountContainerMacroGetCall<'a, C, NC, A> where NC: hyper::n
 ///
 /// ```test_harness,no_run
 /// # extern crate hyper;
-/// # extern crate "yup-oauth2" as oauth2;
-/// # extern crate "google-tagmanager1" as tagmanager1;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_tagmanager1 as tagmanager1;
 /// use tagmanager1::ContainerVersion;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
@@ -13228,7 +13228,7 @@ impl<'a, C, NC, A> AccountContainerVersionUpdateCall<'a, C, NC, A> where NC: hyp
 
         let mut url = "https://www.googleapis.com/tagmanager/v1/accounts/{accountId}/containers/{containerId}/versions/{containerVersionId}".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::DeleteContainer.as_slice().to_string(), ());
+            self._scopes.insert(Scope::DeleteContainer.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{accountId}", "accountId"), ("{containerId}", "containerId"), ("{containerVersionId}", "containerVersionId")].iter() {
@@ -13258,7 +13258,7 @@ impl<'a, C, NC, A> AccountContainerVersionUpdateCall<'a, C, NC, A> where NC: hyp
         
         if params.len() > 0 {
             url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
+            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_ref()))));
         }
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
@@ -13281,7 +13281,7 @@ impl<'a, C, NC, A> AccountContainerVersionUpdateCall<'a, C, NC, A> where NC: hyp
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Put, url.as_slice())
+                let mut req = client.borrow_mut().request(hyper::method::Method::Put, url.as_ref())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -13295,7 +13295,7 @@ impl<'a, C, NC, A> AccountContainerVersionUpdateCall<'a, C, NC, A> where NC: hyp
             match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
+                        sleep_ms(d.num_milliseconds() as u32);
                         continue;
                     }
                     dlg.finished(false);
@@ -13306,7 +13306,7 @@ impl<'a, C, NC, A> AccountContainerVersionUpdateCall<'a, C, NC, A> where NC: hyp
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
-                            sleep(d);
+                            sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
@@ -13408,8 +13408,8 @@ impl<'a, C, NC, A> AccountContainerVersionUpdateCall<'a, C, NC, A> where NC: hyp
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> AccountContainerVersionUpdateCall<'a, C, NC, A>
-                                                        where T: Str {
-        self._additional_params.insert(name.as_slice().to_string(), value.as_slice().to_string());
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
     }
 
@@ -13425,8 +13425,8 @@ impl<'a, C, NC, A> AccountContainerVersionUpdateCall<'a, C, NC, A> where NC: hyp
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T>(mut self, scope: T) -> AccountContainerVersionUpdateCall<'a, C, NC, A> 
-                                                        where T: Str {
-        self._scopes.insert(scope.as_slice().to_string(), ());
+                                                        where T: AsRef<str> {
+        self._scopes.insert(scope.as_ref().to_string(), ());
         self
     }
 }
@@ -13443,8 +13443,8 @@ impl<'a, C, NC, A> AccountContainerVersionUpdateCall<'a, C, NC, A> where NC: hyp
 ///
 /// ```test_harness,no_run
 /// # extern crate hyper;
-/// # extern crate "yup-oauth2" as oauth2;
-/// # extern crate "google-tagmanager1" as tagmanager1;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_tagmanager1 as tagmanager1;
 /// use tagmanager1::Variable;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
@@ -13520,7 +13520,7 @@ impl<'a, C, NC, A> AccountContainerVariableUpdateCall<'a, C, NC, A> where NC: hy
 
         let mut url = "https://www.googleapis.com/tagmanager/v1/accounts/{accountId}/containers/{containerId}/variables/{variableId}".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::DeleteContainer.as_slice().to_string(), ());
+            self._scopes.insert(Scope::DeleteContainer.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{accountId}", "accountId"), ("{containerId}", "containerId"), ("{variableId}", "variableId")].iter() {
@@ -13550,7 +13550,7 @@ impl<'a, C, NC, A> AccountContainerVariableUpdateCall<'a, C, NC, A> where NC: hy
         
         if params.len() > 0 {
             url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
+            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_ref()))));
         }
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
@@ -13573,7 +13573,7 @@ impl<'a, C, NC, A> AccountContainerVariableUpdateCall<'a, C, NC, A> where NC: hy
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Put, url.as_slice())
+                let mut req = client.borrow_mut().request(hyper::method::Method::Put, url.as_ref())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -13587,7 +13587,7 @@ impl<'a, C, NC, A> AccountContainerVariableUpdateCall<'a, C, NC, A> where NC: hy
             match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
+                        sleep_ms(d.num_milliseconds() as u32);
                         continue;
                     }
                     dlg.finished(false);
@@ -13598,7 +13598,7 @@ impl<'a, C, NC, A> AccountContainerVariableUpdateCall<'a, C, NC, A> where NC: hy
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
-                            sleep(d);
+                            sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
@@ -13700,8 +13700,8 @@ impl<'a, C, NC, A> AccountContainerVariableUpdateCall<'a, C, NC, A> where NC: hy
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> AccountContainerVariableUpdateCall<'a, C, NC, A>
-                                                        where T: Str {
-        self._additional_params.insert(name.as_slice().to_string(), value.as_slice().to_string());
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
     }
 
@@ -13717,8 +13717,8 @@ impl<'a, C, NC, A> AccountContainerVariableUpdateCall<'a, C, NC, A> where NC: hy
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T>(mut self, scope: T) -> AccountContainerVariableUpdateCall<'a, C, NC, A> 
-                                                        where T: Str {
-        self._scopes.insert(scope.as_slice().to_string(), ());
+                                                        where T: AsRef<str> {
+        self._scopes.insert(scope.as_ref().to_string(), ());
         self
     }
 }
@@ -13735,8 +13735,8 @@ impl<'a, C, NC, A> AccountContainerVariableUpdateCall<'a, C, NC, A> where NC: hy
 ///
 /// ```test_harness,no_run
 /// # extern crate hyper;
-/// # extern crate "yup-oauth2" as oauth2;
-/// # extern crate "google-tagmanager1" as tagmanager1;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_tagmanager1 as tagmanager1;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -13800,7 +13800,7 @@ impl<'a, C, NC, A> AccountContainerVersionGetCall<'a, C, NC, A> where NC: hyper:
 
         let mut url = "https://www.googleapis.com/tagmanager/v1/accounts/{accountId}/containers/{containerId}/versions/{containerVersionId}".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Readonly.as_slice().to_string(), ());
+            self._scopes.insert(Scope::Readonly.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{accountId}", "accountId"), ("{containerId}", "containerId"), ("{containerVersionId}", "containerVersionId")].iter() {
@@ -13830,7 +13830,7 @@ impl<'a, C, NC, A> AccountContainerVersionGetCall<'a, C, NC, A> where NC: hyper:
         
         if params.len() > 0 {
             url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
+            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_ref()))));
         }
 
 
@@ -13848,7 +13848,7 @@ impl<'a, C, NC, A> AccountContainerVersionGetCall<'a, C, NC, A> where NC: hyper:
                                                              access_token: token.unwrap().access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_slice())
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_ref())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -13859,7 +13859,7 @@ impl<'a, C, NC, A> AccountContainerVersionGetCall<'a, C, NC, A> where NC: hyper:
             match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
+                        sleep_ms(d.num_milliseconds() as u32);
                         continue;
                     }
                     dlg.finished(false);
@@ -13870,7 +13870,7 @@ impl<'a, C, NC, A> AccountContainerVersionGetCall<'a, C, NC, A> where NC: hyper:
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
-                            sleep(d);
+                            sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
@@ -13955,8 +13955,8 @@ impl<'a, C, NC, A> AccountContainerVersionGetCall<'a, C, NC, A> where NC: hyper:
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> AccountContainerVersionGetCall<'a, C, NC, A>
-                                                        where T: Str {
-        self._additional_params.insert(name.as_slice().to_string(), value.as_slice().to_string());
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
     }
 
@@ -13972,8 +13972,8 @@ impl<'a, C, NC, A> AccountContainerVersionGetCall<'a, C, NC, A> where NC: hyper:
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T>(mut self, scope: T) -> AccountContainerVersionGetCall<'a, C, NC, A> 
-                                                        where T: Str {
-        self._scopes.insert(scope.as_slice().to_string(), ());
+                                                        where T: AsRef<str> {
+        self._scopes.insert(scope.as_ref().to_string(), ());
         self
     }
 }

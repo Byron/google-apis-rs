@@ -108,8 +108,8 @@
 //! 
 //! ```test_harness,no_run
 //! extern crate hyper;
-//! extern crate "yup-oauth2" as oauth2;
-//! extern crate "google-mapsengine1" as mapsengine1;
+//! extern crate yup_oauth2 as oauth2;
+//! extern crate google_mapsengine1 as mapsengine1;
 //! use mapsengine1::{Result, Error};
 //! # #[test] fn egal() {
 //! use std::default::Default;
@@ -215,20 +215,20 @@
 //! [google-go-api]: https://github.com/google/google-api-go-client
 //! 
 //! 
-#![feature(core,io,thread_sleep)]
+#![feature(std_misc)]
 // Unused attributes happen thanks to defined, but unused structures
 // We don't warn about this, as depending on the API, some data structures or facilities are never used.
 // Instead of pre-determining this, we just disable the lint. It's manually tuned to not have any 
 // unused imports in fully featured APIs. Same with unused_mut ... .
 #![allow(unused_imports, unused_mut, dead_code)]
 // Required for serde annotations
-#![feature(custom_derive, custom_attribute, plugin)]
+#![feature(custom_derive, custom_attribute, plugin, slice_patterns)]
 #![plugin(serde_macros)]
 
 #[macro_use]
 extern crate hyper;
 extern crate serde;
-extern crate "yup-oauth2" as oauth2;
+extern crate yup_oauth2 as oauth2;
 extern crate mime;
 extern crate url;
 
@@ -243,7 +243,7 @@ use std::marker::PhantomData;
 use serde::json;
 use std::io;
 use std::fs;
-use std::thread::sleep;
+use std::thread::sleep_ms;
 
 pub use cmn::{MultiPartReader, ToParts, MethodInfo, Result, Error, CallBuilder, Hub, ReadSeek, Part, ResponseResult, RequestValue, NestedType, Delegate, DefaultDelegate, MethodsBuilder, Resource, JsonServerError};
 
@@ -264,8 +264,8 @@ pub enum Scope {
     Full,
 }
 
-impl Str for Scope {
-    fn as_slice(&self) -> &str {
+impl AsRef<str> for Scope {
+    fn as_ref(&self) -> &str {
         match *self {
             Scope::Readonly => "https://www.googleapis.com/auth/mapsengine.readonly",
             Scope::Full => "https://www.googleapis.com/auth/mapsengine",
@@ -293,8 +293,8 @@ impl Default for Scope {
 ///
 /// ```test_harness,no_run
 /// extern crate hyper;
-/// extern crate "yup-oauth2" as oauth2;
-/// extern crate "google-mapsengine1" as mapsengine1;
+/// extern crate yup_oauth2 as oauth2;
+/// extern crate google_mapsengine1 as mapsengine1;
 /// use mapsengine1::{Result, Error};
 /// # #[test] fn egal() {
 /// use std::default::Default;
@@ -2327,8 +2327,8 @@ impl Part for Datasource {}
 ///
 /// ```test_harness,no_run
 /// extern crate hyper;
-/// extern crate "yup-oauth2" as oauth2;
-/// extern crate "google-mapsengine1" as mapsengine1;
+/// extern crate yup_oauth2 as oauth2;
+/// extern crate google_mapsengine1 as mapsengine1;
 /// 
 /// # #[test] fn egal() {
 /// use std::default::Default;
@@ -2642,8 +2642,8 @@ impl<'a, C, NC, A> LayerMethods<'a, C, NC, A> {
 ///
 /// ```test_harness,no_run
 /// extern crate hyper;
-/// extern crate "yup-oauth2" as oauth2;
-/// extern crate "google-mapsengine1" as mapsengine1;
+/// extern crate yup_oauth2 as oauth2;
+/// extern crate google_mapsengine1 as mapsengine1;
 /// 
 /// # #[test] fn egal() {
 /// use std::default::Default;
@@ -2894,8 +2894,8 @@ impl<'a, C, NC, A> RasterMethods<'a, C, NC, A> {
 ///
 /// ```test_harness,no_run
 /// extern crate hyper;
-/// extern crate "yup-oauth2" as oauth2;
-/// extern crate "google-mapsengine1" as mapsengine1;
+/// extern crate yup_oauth2 as oauth2;
+/// extern crate google_mapsengine1 as mapsengine1;
 /// 
 /// # #[test] fn egal() {
 /// use std::default::Default;
@@ -3013,8 +3013,8 @@ impl<'a, C, NC, A> AssetMethods<'a, C, NC, A> {
 ///
 /// ```test_harness,no_run
 /// extern crate hyper;
-/// extern crate "yup-oauth2" as oauth2;
-/// extern crate "google-mapsengine1" as mapsengine1;
+/// extern crate yup_oauth2 as oauth2;
+/// extern crate google_mapsengine1 as mapsengine1;
 /// 
 /// # #[test] fn egal() {
 /// use std::default::Default;
@@ -3408,8 +3408,8 @@ impl<'a, C, NC, A> TableMethods<'a, C, NC, A> {
 ///
 /// ```test_harness,no_run
 /// extern crate hyper;
-/// extern crate "yup-oauth2" as oauth2;
-/// extern crate "google-mapsengine1" as mapsengine1;
+/// extern crate yup_oauth2 as oauth2;
+/// extern crate google_mapsengine1 as mapsengine1;
 /// 
 /// # #[test] fn egal() {
 /// use std::default::Default;
@@ -3669,8 +3669,8 @@ impl<'a, C, NC, A> MapMethods<'a, C, NC, A> {
 ///
 /// ```test_harness,no_run
 /// extern crate hyper;
-/// extern crate "yup-oauth2" as oauth2;
-/// extern crate "google-mapsengine1" as mapsengine1;
+/// extern crate yup_oauth2 as oauth2;
+/// extern crate google_mapsengine1 as mapsengine1;
 /// 
 /// # #[test] fn egal() {
 /// use std::default::Default;
@@ -3985,8 +3985,8 @@ impl<'a, C, NC, A> RasterCollectionMethods<'a, C, NC, A> {
 ///
 /// ```test_harness,no_run
 /// extern crate hyper;
-/// extern crate "yup-oauth2" as oauth2;
-/// extern crate "google-mapsengine1" as mapsengine1;
+/// extern crate yup_oauth2 as oauth2;
+/// extern crate google_mapsengine1 as mapsengine1;
 /// 
 /// # #[test] fn egal() {
 /// use std::default::Default;
@@ -4103,8 +4103,8 @@ impl<'a, C, NC, A> ProjectMethods<'a, C, NC, A> {
 ///
 /// ```test_harness,no_run
 /// # extern crate hyper;
-/// # extern crate "yup-oauth2" as oauth2;
-/// # extern crate "google-mapsengine1" as mapsengine1;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_mapsengine1 as mapsengine1;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -4164,7 +4164,7 @@ impl<'a, C, NC, A> LayerUnpublishCall<'a, C, NC, A> where NC: hyper::net::Networ
 
         let mut url = "https://www.googleapis.com/mapsengine/v1/layers/{id}/unpublish".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Full.as_slice().to_string(), ());
+            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{id}", "id")].iter() {
@@ -4194,7 +4194,7 @@ impl<'a, C, NC, A> LayerUnpublishCall<'a, C, NC, A> where NC: hyper::net::Networ
         
         if params.len() > 0 {
             url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
+            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_ref()))));
         }
 
 
@@ -4212,7 +4212,7 @@ impl<'a, C, NC, A> LayerUnpublishCall<'a, C, NC, A> where NC: hyper::net::Networ
                                                              access_token: token.unwrap().access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.as_slice())
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.as_ref())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -4223,7 +4223,7 @@ impl<'a, C, NC, A> LayerUnpublishCall<'a, C, NC, A> where NC: hyper::net::Networ
             match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
+                        sleep_ms(d.num_milliseconds() as u32);
                         continue;
                     }
                     dlg.finished(false);
@@ -4234,7 +4234,7 @@ impl<'a, C, NC, A> LayerUnpublishCall<'a, C, NC, A> where NC: hyper::net::Networ
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
-                            sleep(d);
+                            sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
@@ -4299,8 +4299,8 @@ impl<'a, C, NC, A> LayerUnpublishCall<'a, C, NC, A> where NC: hyper::net::Networ
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> LayerUnpublishCall<'a, C, NC, A>
-                                                        where T: Str {
-        self._additional_params.insert(name.as_slice().to_string(), value.as_slice().to_string());
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
     }
 
@@ -4316,8 +4316,8 @@ impl<'a, C, NC, A> LayerUnpublishCall<'a, C, NC, A> where NC: hyper::net::Networ
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T>(mut self, scope: T) -> LayerUnpublishCall<'a, C, NC, A> 
-                                                        where T: Str {
-        self._scopes.insert(scope.as_slice().to_string(), ());
+                                                        where T: AsRef<str> {
+        self._scopes.insert(scope.as_ref().to_string(), ());
         self
     }
 }
@@ -4334,8 +4334,8 @@ impl<'a, C, NC, A> LayerUnpublishCall<'a, C, NC, A> where NC: hyper::net::Networ
 ///
 /// ```test_harness,no_run
 /// # extern crate hyper;
-/// # extern crate "yup-oauth2" as oauth2;
-/// # extern crate "google-mapsengine1" as mapsengine1;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_mapsengine1 as mapsengine1;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -4400,7 +4400,7 @@ impl<'a, C, NC, A> LayerPublishCall<'a, C, NC, A> where NC: hyper::net::NetworkC
 
         let mut url = "https://www.googleapis.com/mapsengine/v1/layers/{id}/publish".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Full.as_slice().to_string(), ());
+            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{id}", "id")].iter() {
@@ -4430,7 +4430,7 @@ impl<'a, C, NC, A> LayerPublishCall<'a, C, NC, A> where NC: hyper::net::NetworkC
         
         if params.len() > 0 {
             url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
+            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_ref()))));
         }
 
 
@@ -4448,7 +4448,7 @@ impl<'a, C, NC, A> LayerPublishCall<'a, C, NC, A> where NC: hyper::net::NetworkC
                                                              access_token: token.unwrap().access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.as_slice())
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.as_ref())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -4459,7 +4459,7 @@ impl<'a, C, NC, A> LayerPublishCall<'a, C, NC, A> where NC: hyper::net::NetworkC
             match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
+                        sleep_ms(d.num_milliseconds() as u32);
                         continue;
                     }
                     dlg.finished(false);
@@ -4470,7 +4470,7 @@ impl<'a, C, NC, A> LayerPublishCall<'a, C, NC, A> where NC: hyper::net::NetworkC
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
-                            sleep(d);
+                            sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
@@ -4543,8 +4543,8 @@ impl<'a, C, NC, A> LayerPublishCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> LayerPublishCall<'a, C, NC, A>
-                                                        where T: Str {
-        self._additional_params.insert(name.as_slice().to_string(), value.as_slice().to_string());
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
     }
 
@@ -4560,8 +4560,8 @@ impl<'a, C, NC, A> LayerPublishCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T>(mut self, scope: T) -> LayerPublishCall<'a, C, NC, A> 
-                                                        where T: Str {
-        self._scopes.insert(scope.as_slice().to_string(), ());
+                                                        where T: AsRef<str> {
+        self._scopes.insert(scope.as_ref().to_string(), ());
         self
     }
 }
@@ -4578,8 +4578,8 @@ impl<'a, C, NC, A> LayerPublishCall<'a, C, NC, A> where NC: hyper::net::NetworkC
 ///
 /// ```test_harness,no_run
 /// # extern crate hyper;
-/// # extern crate "yup-oauth2" as oauth2;
-/// # extern crate "google-mapsengine1" as mapsengine1;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_mapsengine1 as mapsengine1;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -4652,13 +4652,13 @@ impl<'a, C, NC, A> LayerListPublishedCall<'a, C, NC, A> where NC: hyper::net::Ne
 
         let mut url = "https://www.googleapis.com/mapsengine/v1/layers/published".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Readonly.as_slice().to_string(), ());
+            self._scopes.insert(Scope::Readonly.as_ref().to_string(), ());
         }
 
         
         if params.len() > 0 {
             url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
+            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_ref()))));
         }
 
 
@@ -4676,7 +4676,7 @@ impl<'a, C, NC, A> LayerListPublishedCall<'a, C, NC, A> where NC: hyper::net::Ne
                                                              access_token: token.unwrap().access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_slice())
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_ref())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -4687,7 +4687,7 @@ impl<'a, C, NC, A> LayerListPublishedCall<'a, C, NC, A> where NC: hyper::net::Ne
             match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
+                        sleep_ms(d.num_milliseconds() as u32);
                         continue;
                     }
                     dlg.finished(false);
@@ -4698,7 +4698,7 @@ impl<'a, C, NC, A> LayerListPublishedCall<'a, C, NC, A> where NC: hyper::net::Ne
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
-                            sleep(d);
+                            sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
@@ -4777,8 +4777,8 @@ impl<'a, C, NC, A> LayerListPublishedCall<'a, C, NC, A> where NC: hyper::net::Ne
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> LayerListPublishedCall<'a, C, NC, A>
-                                                        where T: Str {
-        self._additional_params.insert(name.as_slice().to_string(), value.as_slice().to_string());
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
     }
 
@@ -4794,8 +4794,8 @@ impl<'a, C, NC, A> LayerListPublishedCall<'a, C, NC, A> where NC: hyper::net::Ne
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T>(mut self, scope: T) -> LayerListPublishedCall<'a, C, NC, A> 
-                                                        where T: Str {
-        self._scopes.insert(scope.as_slice().to_string(), ());
+                                                        where T: AsRef<str> {
+        self._scopes.insert(scope.as_ref().to_string(), ());
         self
     }
 }
@@ -4812,8 +4812,8 @@ impl<'a, C, NC, A> LayerListPublishedCall<'a, C, NC, A> where NC: hyper::net::Ne
 ///
 /// ```test_harness,no_run
 /// # extern crate hyper;
-/// # extern crate "yup-oauth2" as oauth2;
-/// # extern crate "google-mapsengine1" as mapsengine1;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_mapsengine1 as mapsengine1;
 /// use mapsengine1::Layer;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
@@ -4883,13 +4883,13 @@ impl<'a, C, NC, A> LayerCreateCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
 
         let mut url = "https://www.googleapis.com/mapsengine/v1/layers".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Full.as_slice().to_string(), ());
+            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
 
         
         if params.len() > 0 {
             url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
+            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_ref()))));
         }
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
@@ -4912,7 +4912,7 @@ impl<'a, C, NC, A> LayerCreateCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.as_slice())
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.as_ref())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -4926,7 +4926,7 @@ impl<'a, C, NC, A> LayerCreateCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
             match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
+                        sleep_ms(d.num_milliseconds() as u32);
                         continue;
                     }
                     dlg.finished(false);
@@ -4937,7 +4937,7 @@ impl<'a, C, NC, A> LayerCreateCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
-                            sleep(d);
+                            sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
@@ -5009,8 +5009,8 @@ impl<'a, C, NC, A> LayerCreateCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> LayerCreateCall<'a, C, NC, A>
-                                                        where T: Str {
-        self._additional_params.insert(name.as_slice().to_string(), value.as_slice().to_string());
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
     }
 
@@ -5026,8 +5026,8 @@ impl<'a, C, NC, A> LayerCreateCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T>(mut self, scope: T) -> LayerCreateCall<'a, C, NC, A> 
-                                                        where T: Str {
-        self._scopes.insert(scope.as_slice().to_string(), ());
+                                                        where T: AsRef<str> {
+        self._scopes.insert(scope.as_ref().to_string(), ());
         self
     }
 }
@@ -5044,8 +5044,8 @@ impl<'a, C, NC, A> LayerCreateCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
 ///
 /// ```test_harness,no_run
 /// # extern crate hyper;
-/// # extern crate "yup-oauth2" as oauth2;
-/// # extern crate "google-mapsengine1" as mapsengine1;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_mapsengine1 as mapsengine1;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -5105,7 +5105,7 @@ impl<'a, C, NC, A> LayerGetPublishedCall<'a, C, NC, A> where NC: hyper::net::Net
 
         let mut url = "https://www.googleapis.com/mapsengine/v1/layers/{id}/published".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Readonly.as_slice().to_string(), ());
+            self._scopes.insert(Scope::Readonly.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{id}", "id")].iter() {
@@ -5135,7 +5135,7 @@ impl<'a, C, NC, A> LayerGetPublishedCall<'a, C, NC, A> where NC: hyper::net::Net
         
         if params.len() > 0 {
             url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
+            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_ref()))));
         }
 
 
@@ -5153,7 +5153,7 @@ impl<'a, C, NC, A> LayerGetPublishedCall<'a, C, NC, A> where NC: hyper::net::Net
                                                              access_token: token.unwrap().access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_slice())
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_ref())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -5164,7 +5164,7 @@ impl<'a, C, NC, A> LayerGetPublishedCall<'a, C, NC, A> where NC: hyper::net::Net
             match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
+                        sleep_ms(d.num_milliseconds() as u32);
                         continue;
                     }
                     dlg.finished(false);
@@ -5175,7 +5175,7 @@ impl<'a, C, NC, A> LayerGetPublishedCall<'a, C, NC, A> where NC: hyper::net::Net
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
-                            sleep(d);
+                            sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
@@ -5240,8 +5240,8 @@ impl<'a, C, NC, A> LayerGetPublishedCall<'a, C, NC, A> where NC: hyper::net::Net
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> LayerGetPublishedCall<'a, C, NC, A>
-                                                        where T: Str {
-        self._additional_params.insert(name.as_slice().to_string(), value.as_slice().to_string());
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
     }
 
@@ -5257,8 +5257,8 @@ impl<'a, C, NC, A> LayerGetPublishedCall<'a, C, NC, A> where NC: hyper::net::Net
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T>(mut self, scope: T) -> LayerGetPublishedCall<'a, C, NC, A> 
-                                                        where T: Str {
-        self._scopes.insert(scope.as_slice().to_string(), ());
+                                                        where T: AsRef<str> {
+        self._scopes.insert(scope.as_ref().to_string(), ());
         self
     }
 }
@@ -5275,8 +5275,8 @@ impl<'a, C, NC, A> LayerGetPublishedCall<'a, C, NC, A> where NC: hyper::net::Net
 ///
 /// ```test_harness,no_run
 /// # extern crate hyper;
-/// # extern crate "yup-oauth2" as oauth2;
-/// # extern crate "google-mapsengine1" as mapsengine1;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_mapsengine1 as mapsengine1;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -5335,7 +5335,7 @@ impl<'a, C, NC, A> LayerDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
 
         let mut url = "https://www.googleapis.com/mapsengine/v1/layers/{id}".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Full.as_slice().to_string(), ());
+            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{id}", "id")].iter() {
@@ -5365,7 +5365,7 @@ impl<'a, C, NC, A> LayerDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
         
         if params.len() > 0 {
             url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
+            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_ref()))));
         }
 
 
@@ -5383,7 +5383,7 @@ impl<'a, C, NC, A> LayerDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
                                                              access_token: token.unwrap().access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Delete, url.as_slice())
+                let mut req = client.borrow_mut().request(hyper::method::Method::Delete, url.as_ref())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -5394,7 +5394,7 @@ impl<'a, C, NC, A> LayerDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
             match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
+                        sleep_ms(d.num_milliseconds() as u32);
                         continue;
                     }
                     dlg.finished(false);
@@ -5405,7 +5405,7 @@ impl<'a, C, NC, A> LayerDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
-                            sleep(d);
+                            sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
@@ -5460,8 +5460,8 @@ impl<'a, C, NC, A> LayerDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> LayerDeleteCall<'a, C, NC, A>
-                                                        where T: Str {
-        self._additional_params.insert(name.as_slice().to_string(), value.as_slice().to_string());
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
     }
 
@@ -5477,8 +5477,8 @@ impl<'a, C, NC, A> LayerDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T>(mut self, scope: T) -> LayerDeleteCall<'a, C, NC, A> 
-                                                        where T: Str {
-        self._scopes.insert(scope.as_slice().to_string(), ());
+                                                        where T: AsRef<str> {
+        self._scopes.insert(scope.as_ref().to_string(), ());
         self
     }
 }
@@ -5495,8 +5495,8 @@ impl<'a, C, NC, A> LayerDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
 ///
 /// ```test_harness,no_run
 /// # extern crate hyper;
-/// # extern crate "yup-oauth2" as oauth2;
-/// # extern crate "google-mapsengine1" as mapsengine1;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_mapsengine1 as mapsengine1;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -5561,7 +5561,7 @@ impl<'a, C, NC, A> LayerGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
 
         let mut url = "https://www.googleapis.com/mapsengine/v1/layers/{id}".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Readonly.as_slice().to_string(), ());
+            self._scopes.insert(Scope::Readonly.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{id}", "id")].iter() {
@@ -5591,7 +5591,7 @@ impl<'a, C, NC, A> LayerGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
         
         if params.len() > 0 {
             url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
+            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_ref()))));
         }
 
 
@@ -5609,7 +5609,7 @@ impl<'a, C, NC, A> LayerGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
                                                              access_token: token.unwrap().access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_slice())
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_ref())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -5620,7 +5620,7 @@ impl<'a, C, NC, A> LayerGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
             match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
+                        sleep_ms(d.num_milliseconds() as u32);
                         continue;
                     }
                     dlg.finished(false);
@@ -5631,7 +5631,7 @@ impl<'a, C, NC, A> LayerGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
-                            sleep(d);
+                            sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
@@ -5704,8 +5704,8 @@ impl<'a, C, NC, A> LayerGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> LayerGetCall<'a, C, NC, A>
-                                                        where T: Str {
-        self._additional_params.insert(name.as_slice().to_string(), value.as_slice().to_string());
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
     }
 
@@ -5721,8 +5721,8 @@ impl<'a, C, NC, A> LayerGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T>(mut self, scope: T) -> LayerGetCall<'a, C, NC, A> 
-                                                        where T: Str {
-        self._scopes.insert(scope.as_slice().to_string(), ());
+                                                        where T: AsRef<str> {
+        self._scopes.insert(scope.as_ref().to_string(), ());
         self
     }
 }
@@ -5739,8 +5739,8 @@ impl<'a, C, NC, A> LayerGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
 ///
 /// ```test_harness,no_run
 /// # extern crate hyper;
-/// # extern crate "yup-oauth2" as oauth2;
-/// # extern crate "google-mapsengine1" as mapsengine1;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_mapsengine1 as mapsengine1;
 /// use mapsengine1::PermissionsBatchDeleteRequest;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
@@ -5807,7 +5807,7 @@ impl<'a, C, NC, A> LayerPermissionBatchDeleteCall<'a, C, NC, A> where NC: hyper:
 
         let mut url = "https://www.googleapis.com/mapsengine/v1/layers/{id}/permissions/batchDelete".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Full.as_slice().to_string(), ());
+            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{id}", "id")].iter() {
@@ -5837,7 +5837,7 @@ impl<'a, C, NC, A> LayerPermissionBatchDeleteCall<'a, C, NC, A> where NC: hyper:
         
         if params.len() > 0 {
             url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
+            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_ref()))));
         }
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
@@ -5860,7 +5860,7 @@ impl<'a, C, NC, A> LayerPermissionBatchDeleteCall<'a, C, NC, A> where NC: hyper:
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.as_slice())
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.as_ref())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -5874,7 +5874,7 @@ impl<'a, C, NC, A> LayerPermissionBatchDeleteCall<'a, C, NC, A> where NC: hyper:
             match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
+                        sleep_ms(d.num_milliseconds() as u32);
                         continue;
                     }
                     dlg.finished(false);
@@ -5885,7 +5885,7 @@ impl<'a, C, NC, A> LayerPermissionBatchDeleteCall<'a, C, NC, A> where NC: hyper:
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
-                            sleep(d);
+                            sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
@@ -5959,8 +5959,8 @@ impl<'a, C, NC, A> LayerPermissionBatchDeleteCall<'a, C, NC, A> where NC: hyper:
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> LayerPermissionBatchDeleteCall<'a, C, NC, A>
-                                                        where T: Str {
-        self._additional_params.insert(name.as_slice().to_string(), value.as_slice().to_string());
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
     }
 
@@ -5976,8 +5976,8 @@ impl<'a, C, NC, A> LayerPermissionBatchDeleteCall<'a, C, NC, A> where NC: hyper:
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T>(mut self, scope: T) -> LayerPermissionBatchDeleteCall<'a, C, NC, A> 
-                                                        where T: Str {
-        self._scopes.insert(scope.as_slice().to_string(), ());
+                                                        where T: AsRef<str> {
+        self._scopes.insert(scope.as_ref().to_string(), ());
         self
     }
 }
@@ -5996,8 +5996,8 @@ impl<'a, C, NC, A> LayerPermissionBatchDeleteCall<'a, C, NC, A> where NC: hyper:
 ///
 /// ```test_harness,no_run
 /// # extern crate hyper;
-/// # extern crate "yup-oauth2" as oauth2;
-/// # extern crate "google-mapsengine1" as mapsengine1;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_mapsengine1 as mapsengine1;
 /// use mapsengine1::PermissionsBatchUpdateRequest;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
@@ -6064,7 +6064,7 @@ impl<'a, C, NC, A> LayerPermissionBatchUpdateCall<'a, C, NC, A> where NC: hyper:
 
         let mut url = "https://www.googleapis.com/mapsengine/v1/layers/{id}/permissions/batchUpdate".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Full.as_slice().to_string(), ());
+            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{id}", "id")].iter() {
@@ -6094,7 +6094,7 @@ impl<'a, C, NC, A> LayerPermissionBatchUpdateCall<'a, C, NC, A> where NC: hyper:
         
         if params.len() > 0 {
             url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
+            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_ref()))));
         }
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
@@ -6117,7 +6117,7 @@ impl<'a, C, NC, A> LayerPermissionBatchUpdateCall<'a, C, NC, A> where NC: hyper:
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.as_slice())
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.as_ref())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -6131,7 +6131,7 @@ impl<'a, C, NC, A> LayerPermissionBatchUpdateCall<'a, C, NC, A> where NC: hyper:
             match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
+                        sleep_ms(d.num_milliseconds() as u32);
                         continue;
                     }
                     dlg.finished(false);
@@ -6142,7 +6142,7 @@ impl<'a, C, NC, A> LayerPermissionBatchUpdateCall<'a, C, NC, A> where NC: hyper:
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
-                            sleep(d);
+                            sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
@@ -6216,8 +6216,8 @@ impl<'a, C, NC, A> LayerPermissionBatchUpdateCall<'a, C, NC, A> where NC: hyper:
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> LayerPermissionBatchUpdateCall<'a, C, NC, A>
-                                                        where T: Str {
-        self._additional_params.insert(name.as_slice().to_string(), value.as_slice().to_string());
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
     }
 
@@ -6233,8 +6233,8 @@ impl<'a, C, NC, A> LayerPermissionBatchUpdateCall<'a, C, NC, A> where NC: hyper:
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T>(mut self, scope: T) -> LayerPermissionBatchUpdateCall<'a, C, NC, A> 
-                                                        where T: Str {
-        self._scopes.insert(scope.as_slice().to_string(), ());
+                                                        where T: AsRef<str> {
+        self._scopes.insert(scope.as_ref().to_string(), ());
         self
     }
 }
@@ -6251,8 +6251,8 @@ impl<'a, C, NC, A> LayerPermissionBatchUpdateCall<'a, C, NC, A> where NC: hyper:
 ///
 /// ```test_harness,no_run
 /// # extern crate hyper;
-/// # extern crate "yup-oauth2" as oauth2;
-/// # extern crate "google-mapsengine1" as mapsengine1;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_mapsengine1 as mapsengine1;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -6375,13 +6375,13 @@ impl<'a, C, NC, A> LayerListCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
 
         let mut url = "https://www.googleapis.com/mapsengine/v1/layers".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Readonly.as_slice().to_string(), ());
+            self._scopes.insert(Scope::Readonly.as_ref().to_string(), ());
         }
 
         
         if params.len() > 0 {
             url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
+            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_ref()))));
         }
 
 
@@ -6399,7 +6399,7 @@ impl<'a, C, NC, A> LayerListCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
                                                              access_token: token.unwrap().access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_slice())
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_ref())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -6410,7 +6410,7 @@ impl<'a, C, NC, A> LayerListCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
             match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
+                        sleep_ms(d.num_milliseconds() as u32);
                         continue;
                     }
                     dlg.finished(false);
@@ -6421,7 +6421,7 @@ impl<'a, C, NC, A> LayerListCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
-                            sleep(d);
+                            sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
@@ -6579,8 +6579,8 @@ impl<'a, C, NC, A> LayerListCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> LayerListCall<'a, C, NC, A>
-                                                        where T: Str {
-        self._additional_params.insert(name.as_slice().to_string(), value.as_slice().to_string());
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
     }
 
@@ -6596,8 +6596,8 @@ impl<'a, C, NC, A> LayerListCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T>(mut self, scope: T) -> LayerListCall<'a, C, NC, A> 
-                                                        where T: Str {
-        self._scopes.insert(scope.as_slice().to_string(), ());
+                                                        where T: AsRef<str> {
+        self._scopes.insert(scope.as_ref().to_string(), ());
         self
     }
 }
@@ -6614,8 +6614,8 @@ impl<'a, C, NC, A> LayerListCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
 ///
 /// ```test_harness,no_run
 /// # extern crate hyper;
-/// # extern crate "yup-oauth2" as oauth2;
-/// # extern crate "google-mapsengine1" as mapsengine1;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_mapsengine1 as mapsengine1;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -6685,7 +6685,7 @@ impl<'a, C, NC, A> LayerParentListCall<'a, C, NC, A> where NC: hyper::net::Netwo
 
         let mut url = "https://www.googleapis.com/mapsengine/v1/layers/{id}/parents".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Readonly.as_slice().to_string(), ());
+            self._scopes.insert(Scope::Readonly.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{id}", "id")].iter() {
@@ -6715,7 +6715,7 @@ impl<'a, C, NC, A> LayerParentListCall<'a, C, NC, A> where NC: hyper::net::Netwo
         
         if params.len() > 0 {
             url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
+            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_ref()))));
         }
 
 
@@ -6733,7 +6733,7 @@ impl<'a, C, NC, A> LayerParentListCall<'a, C, NC, A> where NC: hyper::net::Netwo
                                                              access_token: token.unwrap().access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_slice())
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_ref())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -6744,7 +6744,7 @@ impl<'a, C, NC, A> LayerParentListCall<'a, C, NC, A> where NC: hyper::net::Netwo
             match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
+                        sleep_ms(d.num_milliseconds() as u32);
                         continue;
                     }
                     dlg.finished(false);
@@ -6755,7 +6755,7 @@ impl<'a, C, NC, A> LayerParentListCall<'a, C, NC, A> where NC: hyper::net::Netwo
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
-                            sleep(d);
+                            sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
@@ -6836,8 +6836,8 @@ impl<'a, C, NC, A> LayerParentListCall<'a, C, NC, A> where NC: hyper::net::Netwo
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> LayerParentListCall<'a, C, NC, A>
-                                                        where T: Str {
-        self._additional_params.insert(name.as_slice().to_string(), value.as_slice().to_string());
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
     }
 
@@ -6853,8 +6853,8 @@ impl<'a, C, NC, A> LayerParentListCall<'a, C, NC, A> where NC: hyper::net::Netwo
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T>(mut self, scope: T) -> LayerParentListCall<'a, C, NC, A> 
-                                                        where T: Str {
-        self._scopes.insert(scope.as_slice().to_string(), ());
+                                                        where T: AsRef<str> {
+        self._scopes.insert(scope.as_ref().to_string(), ());
         self
     }
 }
@@ -6871,8 +6871,8 @@ impl<'a, C, NC, A> LayerParentListCall<'a, C, NC, A> where NC: hyper::net::Netwo
 ///
 /// ```test_harness,no_run
 /// # extern crate hyper;
-/// # extern crate "yup-oauth2" as oauth2;
-/// # extern crate "google-mapsengine1" as mapsengine1;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_mapsengine1 as mapsengine1;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -6932,7 +6932,7 @@ impl<'a, C, NC, A> LayerCancelProcessingCall<'a, C, NC, A> where NC: hyper::net:
 
         let mut url = "https://www.googleapis.com/mapsengine/v1/layers/{id}/cancelProcessing".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Full.as_slice().to_string(), ());
+            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{id}", "id")].iter() {
@@ -6962,7 +6962,7 @@ impl<'a, C, NC, A> LayerCancelProcessingCall<'a, C, NC, A> where NC: hyper::net:
         
         if params.len() > 0 {
             url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
+            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_ref()))));
         }
 
 
@@ -6980,7 +6980,7 @@ impl<'a, C, NC, A> LayerCancelProcessingCall<'a, C, NC, A> where NC: hyper::net:
                                                              access_token: token.unwrap().access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.as_slice())
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.as_ref())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -6991,7 +6991,7 @@ impl<'a, C, NC, A> LayerCancelProcessingCall<'a, C, NC, A> where NC: hyper::net:
             match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
+                        sleep_ms(d.num_milliseconds() as u32);
                         continue;
                     }
                     dlg.finished(false);
@@ -7002,7 +7002,7 @@ impl<'a, C, NC, A> LayerCancelProcessingCall<'a, C, NC, A> where NC: hyper::net:
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
-                            sleep(d);
+                            sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
@@ -7067,8 +7067,8 @@ impl<'a, C, NC, A> LayerCancelProcessingCall<'a, C, NC, A> where NC: hyper::net:
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> LayerCancelProcessingCall<'a, C, NC, A>
-                                                        where T: Str {
-        self._additional_params.insert(name.as_slice().to_string(), value.as_slice().to_string());
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
     }
 
@@ -7084,8 +7084,8 @@ impl<'a, C, NC, A> LayerCancelProcessingCall<'a, C, NC, A> where NC: hyper::net:
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T>(mut self, scope: T) -> LayerCancelProcessingCall<'a, C, NC, A> 
-                                                        where T: Str {
-        self._scopes.insert(scope.as_slice().to_string(), ());
+                                                        where T: AsRef<str> {
+        self._scopes.insert(scope.as_ref().to_string(), ());
         self
     }
 }
@@ -7102,8 +7102,8 @@ impl<'a, C, NC, A> LayerCancelProcessingCall<'a, C, NC, A> where NC: hyper::net:
 ///
 /// ```test_harness,no_run
 /// # extern crate hyper;
-/// # extern crate "yup-oauth2" as oauth2;
-/// # extern crate "google-mapsengine1" as mapsengine1;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_mapsengine1 as mapsengine1;
 /// use mapsengine1::Layer;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
@@ -7169,7 +7169,7 @@ impl<'a, C, NC, A> LayerPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
 
         let mut url = "https://www.googleapis.com/mapsengine/v1/layers/{id}".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Full.as_slice().to_string(), ());
+            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{id}", "id")].iter() {
@@ -7199,7 +7199,7 @@ impl<'a, C, NC, A> LayerPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
         
         if params.len() > 0 {
             url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
+            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_ref()))));
         }
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
@@ -7222,7 +7222,7 @@ impl<'a, C, NC, A> LayerPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Patch, url.as_slice())
+                let mut req = client.borrow_mut().request(hyper::method::Method::Patch, url.as_ref())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -7236,7 +7236,7 @@ impl<'a, C, NC, A> LayerPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
             match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
+                        sleep_ms(d.num_milliseconds() as u32);
                         continue;
                     }
                     dlg.finished(false);
@@ -7247,7 +7247,7 @@ impl<'a, C, NC, A> LayerPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
-                            sleep(d);
+                            sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
@@ -7311,8 +7311,8 @@ impl<'a, C, NC, A> LayerPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> LayerPatchCall<'a, C, NC, A>
-                                                        where T: Str {
-        self._additional_params.insert(name.as_slice().to_string(), value.as_slice().to_string());
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
     }
 
@@ -7328,8 +7328,8 @@ impl<'a, C, NC, A> LayerPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T>(mut self, scope: T) -> LayerPatchCall<'a, C, NC, A> 
-                                                        where T: Str {
-        self._scopes.insert(scope.as_slice().to_string(), ());
+                                                        where T: AsRef<str> {
+        self._scopes.insert(scope.as_ref().to_string(), ());
         self
     }
 }
@@ -7346,8 +7346,8 @@ impl<'a, C, NC, A> LayerPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
 ///
 /// ```test_harness,no_run
 /// # extern crate hyper;
-/// # extern crate "yup-oauth2" as oauth2;
-/// # extern crate "google-mapsengine1" as mapsengine1;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_mapsengine1 as mapsengine1;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -7407,7 +7407,7 @@ impl<'a, C, NC, A> LayerPermissionListCall<'a, C, NC, A> where NC: hyper::net::N
 
         let mut url = "https://www.googleapis.com/mapsengine/v1/layers/{id}/permissions".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Readonly.as_slice().to_string(), ());
+            self._scopes.insert(Scope::Readonly.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{id}", "id")].iter() {
@@ -7437,7 +7437,7 @@ impl<'a, C, NC, A> LayerPermissionListCall<'a, C, NC, A> where NC: hyper::net::N
         
         if params.len() > 0 {
             url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
+            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_ref()))));
         }
 
 
@@ -7455,7 +7455,7 @@ impl<'a, C, NC, A> LayerPermissionListCall<'a, C, NC, A> where NC: hyper::net::N
                                                              access_token: token.unwrap().access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_slice())
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_ref())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -7466,7 +7466,7 @@ impl<'a, C, NC, A> LayerPermissionListCall<'a, C, NC, A> where NC: hyper::net::N
             match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
+                        sleep_ms(d.num_milliseconds() as u32);
                         continue;
                     }
                     dlg.finished(false);
@@ -7477,7 +7477,7 @@ impl<'a, C, NC, A> LayerPermissionListCall<'a, C, NC, A> where NC: hyper::net::N
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
-                            sleep(d);
+                            sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
@@ -7542,8 +7542,8 @@ impl<'a, C, NC, A> LayerPermissionListCall<'a, C, NC, A> where NC: hyper::net::N
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> LayerPermissionListCall<'a, C, NC, A>
-                                                        where T: Str {
-        self._additional_params.insert(name.as_slice().to_string(), value.as_slice().to_string());
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
     }
 
@@ -7559,8 +7559,8 @@ impl<'a, C, NC, A> LayerPermissionListCall<'a, C, NC, A> where NC: hyper::net::N
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T>(mut self, scope: T) -> LayerPermissionListCall<'a, C, NC, A> 
-                                                        where T: Str {
-        self._scopes.insert(scope.as_slice().to_string(), ());
+                                                        where T: AsRef<str> {
+        self._scopes.insert(scope.as_ref().to_string(), ());
         self
     }
 }
@@ -7577,8 +7577,8 @@ impl<'a, C, NC, A> LayerPermissionListCall<'a, C, NC, A> where NC: hyper::net::N
 ///
 /// ```test_harness,no_run
 /// # extern crate hyper;
-/// # extern crate "yup-oauth2" as oauth2;
-/// # extern crate "google-mapsengine1" as mapsengine1;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_mapsengine1 as mapsengine1;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -7638,7 +7638,7 @@ impl<'a, C, NC, A> LayerProcesCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
 
         let mut url = "https://www.googleapis.com/mapsengine/v1/layers/{id}/process".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Full.as_slice().to_string(), ());
+            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{id}", "id")].iter() {
@@ -7668,7 +7668,7 @@ impl<'a, C, NC, A> LayerProcesCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
         
         if params.len() > 0 {
             url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
+            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_ref()))));
         }
 
 
@@ -7686,7 +7686,7 @@ impl<'a, C, NC, A> LayerProcesCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
                                                              access_token: token.unwrap().access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.as_slice())
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.as_ref())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -7697,7 +7697,7 @@ impl<'a, C, NC, A> LayerProcesCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
             match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
+                        sleep_ms(d.num_milliseconds() as u32);
                         continue;
                     }
                     dlg.finished(false);
@@ -7708,7 +7708,7 @@ impl<'a, C, NC, A> LayerProcesCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
-                            sleep(d);
+                            sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
@@ -7773,8 +7773,8 @@ impl<'a, C, NC, A> LayerProcesCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> LayerProcesCall<'a, C, NC, A>
-                                                        where T: Str {
-        self._additional_params.insert(name.as_slice().to_string(), value.as_slice().to_string());
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
     }
 
@@ -7790,8 +7790,8 @@ impl<'a, C, NC, A> LayerProcesCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T>(mut self, scope: T) -> LayerProcesCall<'a, C, NC, A> 
-                                                        where T: Str {
-        self._scopes.insert(scope.as_slice().to_string(), ());
+                                                        where T: AsRef<str> {
+        self._scopes.insert(scope.as_ref().to_string(), ());
         self
     }
 }
@@ -7810,8 +7810,8 @@ impl<'a, C, NC, A> LayerProcesCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
 ///
 /// ```test_harness,no_run
 /// # extern crate hyper;
-/// # extern crate "yup-oauth2" as oauth2;
-/// # extern crate "google-mapsengine1" as mapsengine1;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_mapsengine1 as mapsengine1;
 /// use mapsengine1::PermissionsBatchUpdateRequest;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
@@ -7878,7 +7878,7 @@ impl<'a, C, NC, A> RasterPermissionBatchUpdateCall<'a, C, NC, A> where NC: hyper
 
         let mut url = "https://www.googleapis.com/mapsengine/v1/rasters/{id}/permissions/batchUpdate".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Full.as_slice().to_string(), ());
+            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{id}", "id")].iter() {
@@ -7908,7 +7908,7 @@ impl<'a, C, NC, A> RasterPermissionBatchUpdateCall<'a, C, NC, A> where NC: hyper
         
         if params.len() > 0 {
             url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
+            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_ref()))));
         }
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
@@ -7931,7 +7931,7 @@ impl<'a, C, NC, A> RasterPermissionBatchUpdateCall<'a, C, NC, A> where NC: hyper
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.as_slice())
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.as_ref())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -7945,7 +7945,7 @@ impl<'a, C, NC, A> RasterPermissionBatchUpdateCall<'a, C, NC, A> where NC: hyper
             match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
+                        sleep_ms(d.num_milliseconds() as u32);
                         continue;
                     }
                     dlg.finished(false);
@@ -7956,7 +7956,7 @@ impl<'a, C, NC, A> RasterPermissionBatchUpdateCall<'a, C, NC, A> where NC: hyper
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
-                            sleep(d);
+                            sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
@@ -8030,8 +8030,8 @@ impl<'a, C, NC, A> RasterPermissionBatchUpdateCall<'a, C, NC, A> where NC: hyper
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> RasterPermissionBatchUpdateCall<'a, C, NC, A>
-                                                        where T: Str {
-        self._additional_params.insert(name.as_slice().to_string(), value.as_slice().to_string());
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
     }
 
@@ -8047,8 +8047,8 @@ impl<'a, C, NC, A> RasterPermissionBatchUpdateCall<'a, C, NC, A> where NC: hyper
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T>(mut self, scope: T) -> RasterPermissionBatchUpdateCall<'a, C, NC, A> 
-                                                        where T: Str {
-        self._scopes.insert(scope.as_slice().to_string(), ());
+                                                        where T: AsRef<str> {
+        self._scopes.insert(scope.as_ref().to_string(), ());
         self
     }
 }
@@ -8065,8 +8065,8 @@ impl<'a, C, NC, A> RasterPermissionBatchUpdateCall<'a, C, NC, A> where NC: hyper
 ///
 /// ```test_harness,no_run
 /// # extern crate hyper;
-/// # extern crate "yup-oauth2" as oauth2;
-/// # extern crate "google-mapsengine1" as mapsengine1;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_mapsengine1 as mapsengine1;
 /// use mapsengine1::Raster;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
@@ -8132,7 +8132,7 @@ impl<'a, C, NC, A> RasterPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
 
         let mut url = "https://www.googleapis.com/mapsengine/v1/rasters/{id}".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Full.as_slice().to_string(), ());
+            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{id}", "id")].iter() {
@@ -8162,7 +8162,7 @@ impl<'a, C, NC, A> RasterPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
         
         if params.len() > 0 {
             url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
+            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_ref()))));
         }
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
@@ -8185,7 +8185,7 @@ impl<'a, C, NC, A> RasterPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Patch, url.as_slice())
+                let mut req = client.borrow_mut().request(hyper::method::Method::Patch, url.as_ref())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -8199,7 +8199,7 @@ impl<'a, C, NC, A> RasterPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
             match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
+                        sleep_ms(d.num_milliseconds() as u32);
                         continue;
                     }
                     dlg.finished(false);
@@ -8210,7 +8210,7 @@ impl<'a, C, NC, A> RasterPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
-                            sleep(d);
+                            sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
@@ -8274,8 +8274,8 @@ impl<'a, C, NC, A> RasterPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> RasterPatchCall<'a, C, NC, A>
-                                                        where T: Str {
-        self._additional_params.insert(name.as_slice().to_string(), value.as_slice().to_string());
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
     }
 
@@ -8291,8 +8291,8 @@ impl<'a, C, NC, A> RasterPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T>(mut self, scope: T) -> RasterPatchCall<'a, C, NC, A> 
-                                                        where T: Str {
-        self._scopes.insert(scope.as_slice().to_string(), ());
+                                                        where T: AsRef<str> {
+        self._scopes.insert(scope.as_ref().to_string(), ());
         self
     }
 }
@@ -8309,8 +8309,8 @@ impl<'a, C, NC, A> RasterPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
 ///
 /// ```test_harness,no_run
 /// # extern crate hyper;
-/// # extern crate "yup-oauth2" as oauth2;
-/// # extern crate "google-mapsengine1" as mapsengine1;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_mapsengine1 as mapsengine1;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -8370,7 +8370,7 @@ impl<'a, C, NC, A> RasterPermissionListCall<'a, C, NC, A> where NC: hyper::net::
 
         let mut url = "https://www.googleapis.com/mapsengine/v1/rasters/{id}/permissions".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Readonly.as_slice().to_string(), ());
+            self._scopes.insert(Scope::Readonly.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{id}", "id")].iter() {
@@ -8400,7 +8400,7 @@ impl<'a, C, NC, A> RasterPermissionListCall<'a, C, NC, A> where NC: hyper::net::
         
         if params.len() > 0 {
             url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
+            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_ref()))));
         }
 
 
@@ -8418,7 +8418,7 @@ impl<'a, C, NC, A> RasterPermissionListCall<'a, C, NC, A> where NC: hyper::net::
                                                              access_token: token.unwrap().access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_slice())
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_ref())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -8429,7 +8429,7 @@ impl<'a, C, NC, A> RasterPermissionListCall<'a, C, NC, A> where NC: hyper::net::
             match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
+                        sleep_ms(d.num_milliseconds() as u32);
                         continue;
                     }
                     dlg.finished(false);
@@ -8440,7 +8440,7 @@ impl<'a, C, NC, A> RasterPermissionListCall<'a, C, NC, A> where NC: hyper::net::
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
-                            sleep(d);
+                            sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
@@ -8505,8 +8505,8 @@ impl<'a, C, NC, A> RasterPermissionListCall<'a, C, NC, A> where NC: hyper::net::
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> RasterPermissionListCall<'a, C, NC, A>
-                                                        where T: Str {
-        self._additional_params.insert(name.as_slice().to_string(), value.as_slice().to_string());
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
     }
 
@@ -8522,8 +8522,8 @@ impl<'a, C, NC, A> RasterPermissionListCall<'a, C, NC, A> where NC: hyper::net::
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T>(mut self, scope: T) -> RasterPermissionListCall<'a, C, NC, A> 
-                                                        where T: Str {
-        self._scopes.insert(scope.as_slice().to_string(), ());
+                                                        where T: AsRef<str> {
+        self._scopes.insert(scope.as_ref().to_string(), ());
         self
     }
 }
@@ -8540,8 +8540,8 @@ impl<'a, C, NC, A> RasterPermissionListCall<'a, C, NC, A> where NC: hyper::net::
 ///
 /// ```test_harness,no_run
 /// # extern crate hyper;
-/// # extern crate "yup-oauth2" as oauth2;
-/// # extern crate "google-mapsengine1" as mapsengine1;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_mapsengine1 as mapsengine1;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -8600,7 +8600,7 @@ impl<'a, C, NC, A> RasterDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkC
 
         let mut url = "https://www.googleapis.com/mapsengine/v1/rasters/{id}".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Full.as_slice().to_string(), ());
+            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{id}", "id")].iter() {
@@ -8630,7 +8630,7 @@ impl<'a, C, NC, A> RasterDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkC
         
         if params.len() > 0 {
             url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
+            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_ref()))));
         }
 
 
@@ -8648,7 +8648,7 @@ impl<'a, C, NC, A> RasterDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkC
                                                              access_token: token.unwrap().access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Delete, url.as_slice())
+                let mut req = client.borrow_mut().request(hyper::method::Method::Delete, url.as_ref())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -8659,7 +8659,7 @@ impl<'a, C, NC, A> RasterDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkC
             match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
+                        sleep_ms(d.num_milliseconds() as u32);
                         continue;
                     }
                     dlg.finished(false);
@@ -8670,7 +8670,7 @@ impl<'a, C, NC, A> RasterDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkC
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
-                            sleep(d);
+                            sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
@@ -8725,8 +8725,8 @@ impl<'a, C, NC, A> RasterDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> RasterDeleteCall<'a, C, NC, A>
-                                                        where T: Str {
-        self._additional_params.insert(name.as_slice().to_string(), value.as_slice().to_string());
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
     }
 
@@ -8742,8 +8742,8 @@ impl<'a, C, NC, A> RasterDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T>(mut self, scope: T) -> RasterDeleteCall<'a, C, NC, A> 
-                                                        where T: Str {
-        self._scopes.insert(scope.as_slice().to_string(), ());
+                                                        where T: AsRef<str> {
+        self._scopes.insert(scope.as_ref().to_string(), ());
         self
     }
 }
@@ -8760,8 +8760,8 @@ impl<'a, C, NC, A> RasterDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkC
 ///
 /// ```test_harness,no_run
 /// # extern crate hyper;
-/// # extern crate "yup-oauth2" as oauth2;
-/// # extern crate "google-mapsengine1" as mapsengine1;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_mapsengine1 as mapsengine1;
 /// use mapsengine1::PermissionsBatchDeleteRequest;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
@@ -8828,7 +8828,7 @@ impl<'a, C, NC, A> RasterPermissionBatchDeleteCall<'a, C, NC, A> where NC: hyper
 
         let mut url = "https://www.googleapis.com/mapsengine/v1/rasters/{id}/permissions/batchDelete".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Full.as_slice().to_string(), ());
+            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{id}", "id")].iter() {
@@ -8858,7 +8858,7 @@ impl<'a, C, NC, A> RasterPermissionBatchDeleteCall<'a, C, NC, A> where NC: hyper
         
         if params.len() > 0 {
             url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
+            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_ref()))));
         }
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
@@ -8881,7 +8881,7 @@ impl<'a, C, NC, A> RasterPermissionBatchDeleteCall<'a, C, NC, A> where NC: hyper
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.as_slice())
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.as_ref())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -8895,7 +8895,7 @@ impl<'a, C, NC, A> RasterPermissionBatchDeleteCall<'a, C, NC, A> where NC: hyper
             match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
+                        sleep_ms(d.num_milliseconds() as u32);
                         continue;
                     }
                     dlg.finished(false);
@@ -8906,7 +8906,7 @@ impl<'a, C, NC, A> RasterPermissionBatchDeleteCall<'a, C, NC, A> where NC: hyper
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
-                            sleep(d);
+                            sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
@@ -8980,8 +8980,8 @@ impl<'a, C, NC, A> RasterPermissionBatchDeleteCall<'a, C, NC, A> where NC: hyper
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> RasterPermissionBatchDeleteCall<'a, C, NC, A>
-                                                        where T: Str {
-        self._additional_params.insert(name.as_slice().to_string(), value.as_slice().to_string());
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
     }
 
@@ -8997,8 +8997,8 @@ impl<'a, C, NC, A> RasterPermissionBatchDeleteCall<'a, C, NC, A> where NC: hyper
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T>(mut self, scope: T) -> RasterPermissionBatchDeleteCall<'a, C, NC, A> 
-                                                        where T: Str {
-        self._scopes.insert(scope.as_slice().to_string(), ());
+                                                        where T: AsRef<str> {
+        self._scopes.insert(scope.as_ref().to_string(), ());
         self
     }
 }
@@ -9015,8 +9015,8 @@ impl<'a, C, NC, A> RasterPermissionBatchDeleteCall<'a, C, NC, A> where NC: hyper
 ///
 /// ```test_harness,no_run
 /// # extern crate hyper;
-/// # extern crate "yup-oauth2" as oauth2;
-/// # extern crate "google-mapsengine1" as mapsengine1;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_mapsengine1 as mapsengine1;
 /// use std::fs;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
@@ -9086,7 +9086,7 @@ impl<'a, C, NC, A> RasterFileInsertCall<'a, C, NC, A> where NC: hyper::net::Netw
         };
         params.push(("uploadType", protocol.to_string()));
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Full.as_slice().to_string(), ());
+            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{id}", "id")].iter() {
@@ -9116,7 +9116,7 @@ impl<'a, C, NC, A> RasterFileInsertCall<'a, C, NC, A> where NC: hyper::net::Netw
         
         if params.len() > 0 {
             url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
+            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_ref()))));
         }
 
 
@@ -9150,7 +9150,7 @@ impl<'a, C, NC, A> RasterFileInsertCall<'a, C, NC, A> where NC: hyper::net::Netw
                     response
                 } else {
                     let mut client = &mut *self.hub.client.borrow_mut();
-                    let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.as_slice())
+                    let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.as_ref())
                         .header(UserAgent(self.hub._user_agent.clone()))
                         .header(auth_header.clone());
                     if protocol == "simple" {
@@ -9176,7 +9176,7 @@ impl<'a, C, NC, A> RasterFileInsertCall<'a, C, NC, A> where NC: hyper::net::Netw
             match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
+                        sleep_ms(d.num_milliseconds() as u32);
                         continue;
                     }
                     dlg.finished(false);
@@ -9187,7 +9187,7 @@ impl<'a, C, NC, A> RasterFileInsertCall<'a, C, NC, A> where NC: hyper::net::Netw
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
-                            sleep(d);
+                            sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
@@ -9322,8 +9322,8 @@ impl<'a, C, NC, A> RasterFileInsertCall<'a, C, NC, A> where NC: hyper::net::Netw
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> RasterFileInsertCall<'a, C, NC, A>
-                                                        where T: Str {
-        self._additional_params.insert(name.as_slice().to_string(), value.as_slice().to_string());
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
     }
 
@@ -9339,8 +9339,8 @@ impl<'a, C, NC, A> RasterFileInsertCall<'a, C, NC, A> where NC: hyper::net::Netw
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T>(mut self, scope: T) -> RasterFileInsertCall<'a, C, NC, A> 
-                                                        where T: Str {
-        self._scopes.insert(scope.as_slice().to_string(), ());
+                                                        where T: AsRef<str> {
+        self._scopes.insert(scope.as_ref().to_string(), ());
         self
     }
 }
@@ -9357,8 +9357,8 @@ impl<'a, C, NC, A> RasterFileInsertCall<'a, C, NC, A> where NC: hyper::net::Netw
 ///
 /// ```test_harness,no_run
 /// # extern crate hyper;
-/// # extern crate "yup-oauth2" as oauth2;
-/// # extern crate "google-mapsengine1" as mapsengine1;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_mapsengine1 as mapsengine1;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -9418,7 +9418,7 @@ impl<'a, C, NC, A> RasterProcesCall<'a, C, NC, A> where NC: hyper::net::NetworkC
 
         let mut url = "https://www.googleapis.com/mapsengine/v1/rasters/{id}/process".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Full.as_slice().to_string(), ());
+            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{id}", "id")].iter() {
@@ -9448,7 +9448,7 @@ impl<'a, C, NC, A> RasterProcesCall<'a, C, NC, A> where NC: hyper::net::NetworkC
         
         if params.len() > 0 {
             url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
+            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_ref()))));
         }
 
 
@@ -9466,7 +9466,7 @@ impl<'a, C, NC, A> RasterProcesCall<'a, C, NC, A> where NC: hyper::net::NetworkC
                                                              access_token: token.unwrap().access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.as_slice())
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.as_ref())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -9477,7 +9477,7 @@ impl<'a, C, NC, A> RasterProcesCall<'a, C, NC, A> where NC: hyper::net::NetworkC
             match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
+                        sleep_ms(d.num_milliseconds() as u32);
                         continue;
                     }
                     dlg.finished(false);
@@ -9488,7 +9488,7 @@ impl<'a, C, NC, A> RasterProcesCall<'a, C, NC, A> where NC: hyper::net::NetworkC
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
-                            sleep(d);
+                            sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
@@ -9553,8 +9553,8 @@ impl<'a, C, NC, A> RasterProcesCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> RasterProcesCall<'a, C, NC, A>
-                                                        where T: Str {
-        self._additional_params.insert(name.as_slice().to_string(), value.as_slice().to_string());
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
     }
 
@@ -9570,8 +9570,8 @@ impl<'a, C, NC, A> RasterProcesCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T>(mut self, scope: T) -> RasterProcesCall<'a, C, NC, A> 
-                                                        where T: Str {
-        self._scopes.insert(scope.as_slice().to_string(), ());
+                                                        where T: AsRef<str> {
+        self._scopes.insert(scope.as_ref().to_string(), ());
         self
     }
 }
@@ -9588,8 +9588,8 @@ impl<'a, C, NC, A> RasterProcesCall<'a, C, NC, A> where NC: hyper::net::NetworkC
 ///
 /// ```test_harness,no_run
 /// # extern crate hyper;
-/// # extern crate "yup-oauth2" as oauth2;
-/// # extern crate "google-mapsengine1" as mapsengine1;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_mapsengine1 as mapsengine1;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -9649,7 +9649,7 @@ impl<'a, C, NC, A> RasterGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
 
         let mut url = "https://www.googleapis.com/mapsengine/v1/rasters/{id}".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Readonly.as_slice().to_string(), ());
+            self._scopes.insert(Scope::Readonly.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{id}", "id")].iter() {
@@ -9679,7 +9679,7 @@ impl<'a, C, NC, A> RasterGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
         
         if params.len() > 0 {
             url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
+            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_ref()))));
         }
 
 
@@ -9697,7 +9697,7 @@ impl<'a, C, NC, A> RasterGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
                                                              access_token: token.unwrap().access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_slice())
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_ref())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -9708,7 +9708,7 @@ impl<'a, C, NC, A> RasterGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
             match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
+                        sleep_ms(d.num_milliseconds() as u32);
                         continue;
                     }
                     dlg.finished(false);
@@ -9719,7 +9719,7 @@ impl<'a, C, NC, A> RasterGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
-                            sleep(d);
+                            sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
@@ -9784,8 +9784,8 @@ impl<'a, C, NC, A> RasterGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> RasterGetCall<'a, C, NC, A>
-                                                        where T: Str {
-        self._additional_params.insert(name.as_slice().to_string(), value.as_slice().to_string());
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
     }
 
@@ -9801,8 +9801,8 @@ impl<'a, C, NC, A> RasterGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T>(mut self, scope: T) -> RasterGetCall<'a, C, NC, A> 
-                                                        where T: Str {
-        self._scopes.insert(scope.as_slice().to_string(), ());
+                                                        where T: AsRef<str> {
+        self._scopes.insert(scope.as_ref().to_string(), ());
         self
     }
 }
@@ -9819,8 +9819,8 @@ impl<'a, C, NC, A> RasterGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
 ///
 /// ```test_harness,no_run
 /// # extern crate hyper;
-/// # extern crate "yup-oauth2" as oauth2;
-/// # extern crate "google-mapsengine1" as mapsengine1;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_mapsengine1 as mapsengine1;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -9940,13 +9940,13 @@ impl<'a, C, NC, A> RasterListCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
 
         let mut url = "https://www.googleapis.com/mapsengine/v1/rasters".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Readonly.as_slice().to_string(), ());
+            self._scopes.insert(Scope::Readonly.as_ref().to_string(), ());
         }
 
         
         if params.len() > 0 {
             url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
+            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_ref()))));
         }
 
 
@@ -9964,7 +9964,7 @@ impl<'a, C, NC, A> RasterListCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
                                                              access_token: token.unwrap().access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_slice())
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_ref())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -9975,7 +9975,7 @@ impl<'a, C, NC, A> RasterListCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
             match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
+                        sleep_ms(d.num_milliseconds() as u32);
                         continue;
                     }
                     dlg.finished(false);
@@ -9986,7 +9986,7 @@ impl<'a, C, NC, A> RasterListCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
-                            sleep(d);
+                            sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
@@ -10146,8 +10146,8 @@ impl<'a, C, NC, A> RasterListCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> RasterListCall<'a, C, NC, A>
-                                                        where T: Str {
-        self._additional_params.insert(name.as_slice().to_string(), value.as_slice().to_string());
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
     }
 
@@ -10163,8 +10163,8 @@ impl<'a, C, NC, A> RasterListCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T>(mut self, scope: T) -> RasterListCall<'a, C, NC, A> 
-                                                        where T: Str {
-        self._scopes.insert(scope.as_slice().to_string(), ());
+                                                        where T: AsRef<str> {
+        self._scopes.insert(scope.as_ref().to_string(), ());
         self
     }
 }
@@ -10181,8 +10181,8 @@ impl<'a, C, NC, A> RasterListCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
 ///
 /// ```test_harness,no_run
 /// # extern crate hyper;
-/// # extern crate "yup-oauth2" as oauth2;
-/// # extern crate "google-mapsengine1" as mapsengine1;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_mapsengine1 as mapsengine1;
 /// use mapsengine1::Raster;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
@@ -10247,13 +10247,13 @@ impl<'a, C, NC, A> RasterUploadCall<'a, C, NC, A> where NC: hyper::net::NetworkC
 
         let mut url = "https://www.googleapis.com/mapsengine/v1/rasters/upload".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Full.as_slice().to_string(), ());
+            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
 
         
         if params.len() > 0 {
             url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
+            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_ref()))));
         }
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
@@ -10276,7 +10276,7 @@ impl<'a, C, NC, A> RasterUploadCall<'a, C, NC, A> where NC: hyper::net::NetworkC
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.as_slice())
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.as_ref())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -10290,7 +10290,7 @@ impl<'a, C, NC, A> RasterUploadCall<'a, C, NC, A> where NC: hyper::net::NetworkC
             match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
+                        sleep_ms(d.num_milliseconds() as u32);
                         continue;
                     }
                     dlg.finished(false);
@@ -10301,7 +10301,7 @@ impl<'a, C, NC, A> RasterUploadCall<'a, C, NC, A> where NC: hyper::net::NetworkC
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
-                            sleep(d);
+                            sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
@@ -10365,8 +10365,8 @@ impl<'a, C, NC, A> RasterUploadCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> RasterUploadCall<'a, C, NC, A>
-                                                        where T: Str {
-        self._additional_params.insert(name.as_slice().to_string(), value.as_slice().to_string());
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
     }
 
@@ -10382,8 +10382,8 @@ impl<'a, C, NC, A> RasterUploadCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T>(mut self, scope: T) -> RasterUploadCall<'a, C, NC, A> 
-                                                        where T: Str {
-        self._scopes.insert(scope.as_slice().to_string(), ());
+                                                        where T: AsRef<str> {
+        self._scopes.insert(scope.as_ref().to_string(), ());
         self
     }
 }
@@ -10400,8 +10400,8 @@ impl<'a, C, NC, A> RasterUploadCall<'a, C, NC, A> where NC: hyper::net::NetworkC
 ///
 /// ```test_harness,no_run
 /// # extern crate hyper;
-/// # extern crate "yup-oauth2" as oauth2;
-/// # extern crate "google-mapsengine1" as mapsengine1;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_mapsengine1 as mapsengine1;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -10471,7 +10471,7 @@ impl<'a, C, NC, A> RasterParentListCall<'a, C, NC, A> where NC: hyper::net::Netw
 
         let mut url = "https://www.googleapis.com/mapsengine/v1/rasters/{id}/parents".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Readonly.as_slice().to_string(), ());
+            self._scopes.insert(Scope::Readonly.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{id}", "id")].iter() {
@@ -10501,7 +10501,7 @@ impl<'a, C, NC, A> RasterParentListCall<'a, C, NC, A> where NC: hyper::net::Netw
         
         if params.len() > 0 {
             url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
+            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_ref()))));
         }
 
 
@@ -10519,7 +10519,7 @@ impl<'a, C, NC, A> RasterParentListCall<'a, C, NC, A> where NC: hyper::net::Netw
                                                              access_token: token.unwrap().access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_slice())
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_ref())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -10530,7 +10530,7 @@ impl<'a, C, NC, A> RasterParentListCall<'a, C, NC, A> where NC: hyper::net::Netw
             match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
+                        sleep_ms(d.num_milliseconds() as u32);
                         continue;
                     }
                     dlg.finished(false);
@@ -10541,7 +10541,7 @@ impl<'a, C, NC, A> RasterParentListCall<'a, C, NC, A> where NC: hyper::net::Netw
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
-                            sleep(d);
+                            sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
@@ -10622,8 +10622,8 @@ impl<'a, C, NC, A> RasterParentListCall<'a, C, NC, A> where NC: hyper::net::Netw
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> RasterParentListCall<'a, C, NC, A>
-                                                        where T: Str {
-        self._additional_params.insert(name.as_slice().to_string(), value.as_slice().to_string());
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
     }
 
@@ -10639,8 +10639,8 @@ impl<'a, C, NC, A> RasterParentListCall<'a, C, NC, A> where NC: hyper::net::Netw
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T>(mut self, scope: T) -> RasterParentListCall<'a, C, NC, A> 
-                                                        where T: Str {
-        self._scopes.insert(scope.as_slice().to_string(), ());
+                                                        where T: AsRef<str> {
+        self._scopes.insert(scope.as_ref().to_string(), ());
         self
     }
 }
@@ -10657,8 +10657,8 @@ impl<'a, C, NC, A> RasterParentListCall<'a, C, NC, A> where NC: hyper::net::Netw
 ///
 /// ```test_harness,no_run
 /// # extern crate hyper;
-/// # extern crate "yup-oauth2" as oauth2;
-/// # extern crate "google-mapsengine1" as mapsengine1;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_mapsengine1 as mapsengine1;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -10718,7 +10718,7 @@ impl<'a, C, NC, A> AssetPermissionListCall<'a, C, NC, A> where NC: hyper::net::N
 
         let mut url = "https://www.googleapis.com/mapsengine/v1/assets/{id}/permissions".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Readonly.as_slice().to_string(), ());
+            self._scopes.insert(Scope::Readonly.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{id}", "id")].iter() {
@@ -10748,7 +10748,7 @@ impl<'a, C, NC, A> AssetPermissionListCall<'a, C, NC, A> where NC: hyper::net::N
         
         if params.len() > 0 {
             url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
+            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_ref()))));
         }
 
 
@@ -10766,7 +10766,7 @@ impl<'a, C, NC, A> AssetPermissionListCall<'a, C, NC, A> where NC: hyper::net::N
                                                              access_token: token.unwrap().access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_slice())
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_ref())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -10777,7 +10777,7 @@ impl<'a, C, NC, A> AssetPermissionListCall<'a, C, NC, A> where NC: hyper::net::N
             match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
+                        sleep_ms(d.num_milliseconds() as u32);
                         continue;
                     }
                     dlg.finished(false);
@@ -10788,7 +10788,7 @@ impl<'a, C, NC, A> AssetPermissionListCall<'a, C, NC, A> where NC: hyper::net::N
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
-                            sleep(d);
+                            sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
@@ -10853,8 +10853,8 @@ impl<'a, C, NC, A> AssetPermissionListCall<'a, C, NC, A> where NC: hyper::net::N
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> AssetPermissionListCall<'a, C, NC, A>
-                                                        where T: Str {
-        self._additional_params.insert(name.as_slice().to_string(), value.as_slice().to_string());
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
     }
 
@@ -10870,8 +10870,8 @@ impl<'a, C, NC, A> AssetPermissionListCall<'a, C, NC, A> where NC: hyper::net::N
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T>(mut self, scope: T) -> AssetPermissionListCall<'a, C, NC, A> 
-                                                        where T: Str {
-        self._scopes.insert(scope.as_slice().to_string(), ());
+                                                        where T: AsRef<str> {
+        self._scopes.insert(scope.as_ref().to_string(), ());
         self
     }
 }
@@ -10888,8 +10888,8 @@ impl<'a, C, NC, A> AssetPermissionListCall<'a, C, NC, A> where NC: hyper::net::N
 ///
 /// ```test_harness,no_run
 /// # extern crate hyper;
-/// # extern crate "yup-oauth2" as oauth2;
-/// # extern crate "google-mapsengine1" as mapsengine1;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_mapsengine1 as mapsengine1;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -11012,13 +11012,13 @@ impl<'a, C, NC, A> AssetListCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
 
         let mut url = "https://www.googleapis.com/mapsengine/v1/assets".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Readonly.as_slice().to_string(), ());
+            self._scopes.insert(Scope::Readonly.as_ref().to_string(), ());
         }
 
         
         if params.len() > 0 {
             url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
+            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_ref()))));
         }
 
 
@@ -11036,7 +11036,7 @@ impl<'a, C, NC, A> AssetListCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
                                                              access_token: token.unwrap().access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_slice())
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_ref())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -11047,7 +11047,7 @@ impl<'a, C, NC, A> AssetListCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
             match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
+                        sleep_ms(d.num_milliseconds() as u32);
                         continue;
                     }
                     dlg.finished(false);
@@ -11058,7 +11058,7 @@ impl<'a, C, NC, A> AssetListCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
-                            sleep(d);
+                            sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
@@ -11217,8 +11217,8 @@ impl<'a, C, NC, A> AssetListCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> AssetListCall<'a, C, NC, A>
-                                                        where T: Str {
-        self._additional_params.insert(name.as_slice().to_string(), value.as_slice().to_string());
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
     }
 
@@ -11234,8 +11234,8 @@ impl<'a, C, NC, A> AssetListCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T>(mut self, scope: T) -> AssetListCall<'a, C, NC, A> 
-                                                        where T: Str {
-        self._scopes.insert(scope.as_slice().to_string(), ());
+                                                        where T: AsRef<str> {
+        self._scopes.insert(scope.as_ref().to_string(), ());
         self
     }
 }
@@ -11252,8 +11252,8 @@ impl<'a, C, NC, A> AssetListCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
 ///
 /// ```test_harness,no_run
 /// # extern crate hyper;
-/// # extern crate "yup-oauth2" as oauth2;
-/// # extern crate "google-mapsengine1" as mapsengine1;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_mapsengine1 as mapsengine1;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -11313,7 +11313,7 @@ impl<'a, C, NC, A> AssetGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
 
         let mut url = "https://www.googleapis.com/mapsengine/v1/assets/{id}".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Readonly.as_slice().to_string(), ());
+            self._scopes.insert(Scope::Readonly.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{id}", "id")].iter() {
@@ -11343,7 +11343,7 @@ impl<'a, C, NC, A> AssetGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
         
         if params.len() > 0 {
             url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
+            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_ref()))));
         }
 
 
@@ -11361,7 +11361,7 @@ impl<'a, C, NC, A> AssetGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
                                                              access_token: token.unwrap().access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_slice())
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_ref())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -11372,7 +11372,7 @@ impl<'a, C, NC, A> AssetGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
             match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
+                        sleep_ms(d.num_milliseconds() as u32);
                         continue;
                     }
                     dlg.finished(false);
@@ -11383,7 +11383,7 @@ impl<'a, C, NC, A> AssetGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
-                            sleep(d);
+                            sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
@@ -11448,8 +11448,8 @@ impl<'a, C, NC, A> AssetGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> AssetGetCall<'a, C, NC, A>
-                                                        where T: Str {
-        self._additional_params.insert(name.as_slice().to_string(), value.as_slice().to_string());
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
     }
 
@@ -11465,8 +11465,8 @@ impl<'a, C, NC, A> AssetGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T>(mut self, scope: T) -> AssetGetCall<'a, C, NC, A> 
-                                                        where T: Str {
-        self._scopes.insert(scope.as_slice().to_string(), ());
+                                                        where T: AsRef<str> {
+        self._scopes.insert(scope.as_ref().to_string(), ());
         self
     }
 }
@@ -11483,8 +11483,8 @@ impl<'a, C, NC, A> AssetGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
 ///
 /// ```test_harness,no_run
 /// # extern crate hyper;
-/// # extern crate "yup-oauth2" as oauth2;
-/// # extern crate "google-mapsengine1" as mapsengine1;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_mapsengine1 as mapsengine1;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -11554,7 +11554,7 @@ impl<'a, C, NC, A> AssetParentListCall<'a, C, NC, A> where NC: hyper::net::Netwo
 
         let mut url = "https://www.googleapis.com/mapsengine/v1/assets/{id}/parents".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Readonly.as_slice().to_string(), ());
+            self._scopes.insert(Scope::Readonly.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{id}", "id")].iter() {
@@ -11584,7 +11584,7 @@ impl<'a, C, NC, A> AssetParentListCall<'a, C, NC, A> where NC: hyper::net::Netwo
         
         if params.len() > 0 {
             url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
+            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_ref()))));
         }
 
 
@@ -11602,7 +11602,7 @@ impl<'a, C, NC, A> AssetParentListCall<'a, C, NC, A> where NC: hyper::net::Netwo
                                                              access_token: token.unwrap().access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_slice())
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_ref())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -11613,7 +11613,7 @@ impl<'a, C, NC, A> AssetParentListCall<'a, C, NC, A> where NC: hyper::net::Netwo
             match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
+                        sleep_ms(d.num_milliseconds() as u32);
                         continue;
                     }
                     dlg.finished(false);
@@ -11624,7 +11624,7 @@ impl<'a, C, NC, A> AssetParentListCall<'a, C, NC, A> where NC: hyper::net::Netwo
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
-                            sleep(d);
+                            sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
@@ -11705,8 +11705,8 @@ impl<'a, C, NC, A> AssetParentListCall<'a, C, NC, A> where NC: hyper::net::Netwo
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> AssetParentListCall<'a, C, NC, A>
-                                                        where T: Str {
-        self._additional_params.insert(name.as_slice().to_string(), value.as_slice().to_string());
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
     }
 
@@ -11722,8 +11722,8 @@ impl<'a, C, NC, A> AssetParentListCall<'a, C, NC, A> where NC: hyper::net::Netwo
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T>(mut self, scope: T) -> AssetParentListCall<'a, C, NC, A> 
-                                                        where T: Str {
-        self._scopes.insert(scope.as_slice().to_string(), ());
+                                                        where T: AsRef<str> {
+        self._scopes.insert(scope.as_ref().to_string(), ());
         self
     }
 }
@@ -11740,8 +11740,8 @@ impl<'a, C, NC, A> AssetParentListCall<'a, C, NC, A> where NC: hyper::net::Netwo
 ///
 /// ```test_harness,no_run
 /// # extern crate hyper;
-/// # extern crate "yup-oauth2" as oauth2;
-/// # extern crate "google-mapsengine1" as mapsengine1;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_mapsengine1 as mapsengine1;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -11800,7 +11800,7 @@ impl<'a, C, NC, A> TableDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
 
         let mut url = "https://www.googleapis.com/mapsengine/v1/tables/{id}".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Full.as_slice().to_string(), ());
+            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{id}", "id")].iter() {
@@ -11830,7 +11830,7 @@ impl<'a, C, NC, A> TableDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
         
         if params.len() > 0 {
             url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
+            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_ref()))));
         }
 
 
@@ -11848,7 +11848,7 @@ impl<'a, C, NC, A> TableDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
                                                              access_token: token.unwrap().access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Delete, url.as_slice())
+                let mut req = client.borrow_mut().request(hyper::method::Method::Delete, url.as_ref())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -11859,7 +11859,7 @@ impl<'a, C, NC, A> TableDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
             match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
+                        sleep_ms(d.num_milliseconds() as u32);
                         continue;
                     }
                     dlg.finished(false);
@@ -11870,7 +11870,7 @@ impl<'a, C, NC, A> TableDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
-                            sleep(d);
+                            sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
@@ -11925,8 +11925,8 @@ impl<'a, C, NC, A> TableDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> TableDeleteCall<'a, C, NC, A>
-                                                        where T: Str {
-        self._additional_params.insert(name.as_slice().to_string(), value.as_slice().to_string());
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
     }
 
@@ -11942,8 +11942,8 @@ impl<'a, C, NC, A> TableDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T>(mut self, scope: T) -> TableDeleteCall<'a, C, NC, A> 
-                                                        where T: Str {
-        self._scopes.insert(scope.as_slice().to_string(), ());
+                                                        where T: AsRef<str> {
+        self._scopes.insert(scope.as_ref().to_string(), ());
         self
     }
 }
@@ -11961,8 +11961,8 @@ impl<'a, C, NC, A> TableDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
 ///
 /// ```test_harness,no_run
 /// # extern crate hyper;
-/// # extern crate "yup-oauth2" as oauth2;
-/// # extern crate "google-mapsengine1" as mapsengine1;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_mapsengine1 as mapsengine1;
 /// use std::fs;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
@@ -12032,7 +12032,7 @@ impl<'a, C, NC, A> TableFileInsertCall<'a, C, NC, A> where NC: hyper::net::Netwo
         };
         params.push(("uploadType", protocol.to_string()));
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Full.as_slice().to_string(), ());
+            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{id}", "id")].iter() {
@@ -12062,7 +12062,7 @@ impl<'a, C, NC, A> TableFileInsertCall<'a, C, NC, A> where NC: hyper::net::Netwo
         
         if params.len() > 0 {
             url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
+            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_ref()))));
         }
 
 
@@ -12096,7 +12096,7 @@ impl<'a, C, NC, A> TableFileInsertCall<'a, C, NC, A> where NC: hyper::net::Netwo
                     response
                 } else {
                     let mut client = &mut *self.hub.client.borrow_mut();
-                    let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.as_slice())
+                    let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.as_ref())
                         .header(UserAgent(self.hub._user_agent.clone()))
                         .header(auth_header.clone());
                     if protocol == "simple" {
@@ -12122,7 +12122,7 @@ impl<'a, C, NC, A> TableFileInsertCall<'a, C, NC, A> where NC: hyper::net::Netwo
             match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
+                        sleep_ms(d.num_milliseconds() as u32);
                         continue;
                     }
                     dlg.finished(false);
@@ -12133,7 +12133,7 @@ impl<'a, C, NC, A> TableFileInsertCall<'a, C, NC, A> where NC: hyper::net::Netwo
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
-                            sleep(d);
+                            sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
@@ -12268,8 +12268,8 @@ impl<'a, C, NC, A> TableFileInsertCall<'a, C, NC, A> where NC: hyper::net::Netwo
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> TableFileInsertCall<'a, C, NC, A>
-                                                        where T: Str {
-        self._additional_params.insert(name.as_slice().to_string(), value.as_slice().to_string());
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
     }
 
@@ -12285,8 +12285,8 @@ impl<'a, C, NC, A> TableFileInsertCall<'a, C, NC, A> where NC: hyper::net::Netwo
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T>(mut self, scope: T) -> TableFileInsertCall<'a, C, NC, A> 
-                                                        where T: Str {
-        self._scopes.insert(scope.as_slice().to_string(), ());
+                                                        where T: AsRef<str> {
+        self._scopes.insert(scope.as_ref().to_string(), ());
         self
     }
 }
@@ -12311,8 +12311,8 @@ impl<'a, C, NC, A> TableFileInsertCall<'a, C, NC, A> where NC: hyper::net::Netwo
 ///
 /// ```test_harness,no_run
 /// # extern crate hyper;
-/// # extern crate "yup-oauth2" as oauth2;
-/// # extern crate "google-mapsengine1" as mapsengine1;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_mapsengine1 as mapsengine1;
 /// use mapsengine1::FeaturesBatchInsertRequest;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
@@ -12378,7 +12378,7 @@ impl<'a, C, NC, A> TableFeatureBatchInsertCall<'a, C, NC, A> where NC: hyper::ne
 
         let mut url = "https://www.googleapis.com/mapsengine/v1/tables/{id}/features/batchInsert".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Full.as_slice().to_string(), ());
+            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{id}", "id")].iter() {
@@ -12408,7 +12408,7 @@ impl<'a, C, NC, A> TableFeatureBatchInsertCall<'a, C, NC, A> where NC: hyper::ne
         
         if params.len() > 0 {
             url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
+            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_ref()))));
         }
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
@@ -12431,7 +12431,7 @@ impl<'a, C, NC, A> TableFeatureBatchInsertCall<'a, C, NC, A> where NC: hyper::ne
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.as_slice())
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.as_ref())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -12445,7 +12445,7 @@ impl<'a, C, NC, A> TableFeatureBatchInsertCall<'a, C, NC, A> where NC: hyper::ne
             match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
+                        sleep_ms(d.num_milliseconds() as u32);
                         continue;
                     }
                     dlg.finished(false);
@@ -12456,7 +12456,7 @@ impl<'a, C, NC, A> TableFeatureBatchInsertCall<'a, C, NC, A> where NC: hyper::ne
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
-                            sleep(d);
+                            sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
@@ -12520,8 +12520,8 @@ impl<'a, C, NC, A> TableFeatureBatchInsertCall<'a, C, NC, A> where NC: hyper::ne
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> TableFeatureBatchInsertCall<'a, C, NC, A>
-                                                        where T: Str {
-        self._additional_params.insert(name.as_slice().to_string(), value.as_slice().to_string());
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
     }
 
@@ -12537,8 +12537,8 @@ impl<'a, C, NC, A> TableFeatureBatchInsertCall<'a, C, NC, A> where NC: hyper::ne
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T>(mut self, scope: T) -> TableFeatureBatchInsertCall<'a, C, NC, A> 
-                                                        where T: Str {
-        self._scopes.insert(scope.as_slice().to_string(), ());
+                                                        where T: AsRef<str> {
+        self._scopes.insert(scope.as_ref().to_string(), ());
         self
     }
 }
@@ -12555,8 +12555,8 @@ impl<'a, C, NC, A> TableFeatureBatchInsertCall<'a, C, NC, A> where NC: hyper::ne
 ///
 /// ```test_harness,no_run
 /// # extern crate hyper;
-/// # extern crate "yup-oauth2" as oauth2;
-/// # extern crate "google-mapsengine1" as mapsengine1;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_mapsengine1 as mapsengine1;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -12679,13 +12679,13 @@ impl<'a, C, NC, A> TableListCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
 
         let mut url = "https://www.googleapis.com/mapsengine/v1/tables".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Readonly.as_slice().to_string(), ());
+            self._scopes.insert(Scope::Readonly.as_ref().to_string(), ());
         }
 
         
         if params.len() > 0 {
             url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
+            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_ref()))));
         }
 
 
@@ -12703,7 +12703,7 @@ impl<'a, C, NC, A> TableListCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
                                                              access_token: token.unwrap().access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_slice())
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_ref())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -12714,7 +12714,7 @@ impl<'a, C, NC, A> TableListCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
             match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
+                        sleep_ms(d.num_milliseconds() as u32);
                         continue;
                     }
                     dlg.finished(false);
@@ -12725,7 +12725,7 @@ impl<'a, C, NC, A> TableListCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
-                            sleep(d);
+                            sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
@@ -12883,8 +12883,8 @@ impl<'a, C, NC, A> TableListCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> TableListCall<'a, C, NC, A>
-                                                        where T: Str {
-        self._additional_params.insert(name.as_slice().to_string(), value.as_slice().to_string());
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
     }
 
@@ -12900,8 +12900,8 @@ impl<'a, C, NC, A> TableListCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T>(mut self, scope: T) -> TableListCall<'a, C, NC, A> 
-                                                        where T: Str {
-        self._scopes.insert(scope.as_slice().to_string(), ());
+                                                        where T: AsRef<str> {
+        self._scopes.insert(scope.as_ref().to_string(), ());
         self
     }
 }
@@ -12918,8 +12918,8 @@ impl<'a, C, NC, A> TableListCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
 ///
 /// ```test_harness,no_run
 /// # extern crate hyper;
-/// # extern crate "yup-oauth2" as oauth2;
-/// # extern crate "google-mapsengine1" as mapsengine1;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_mapsengine1 as mapsengine1;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -12984,7 +12984,7 @@ impl<'a, C, NC, A> TableGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
 
         let mut url = "https://www.googleapis.com/mapsengine/v1/tables/{id}".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Readonly.as_slice().to_string(), ());
+            self._scopes.insert(Scope::Readonly.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{id}", "id")].iter() {
@@ -13014,7 +13014,7 @@ impl<'a, C, NC, A> TableGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
         
         if params.len() > 0 {
             url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
+            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_ref()))));
         }
 
 
@@ -13032,7 +13032,7 @@ impl<'a, C, NC, A> TableGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
                                                              access_token: token.unwrap().access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_slice())
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_ref())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -13043,7 +13043,7 @@ impl<'a, C, NC, A> TableGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
             match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
+                        sleep_ms(d.num_milliseconds() as u32);
                         continue;
                     }
                     dlg.finished(false);
@@ -13054,7 +13054,7 @@ impl<'a, C, NC, A> TableGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
-                            sleep(d);
+                            sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
@@ -13126,8 +13126,8 @@ impl<'a, C, NC, A> TableGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> TableGetCall<'a, C, NC, A>
-                                                        where T: Str {
-        self._additional_params.insert(name.as_slice().to_string(), value.as_slice().to_string());
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
     }
 
@@ -13143,8 +13143,8 @@ impl<'a, C, NC, A> TableGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T>(mut self, scope: T) -> TableGetCall<'a, C, NC, A> 
-                                                        where T: Str {
-        self._scopes.insert(scope.as_slice().to_string(), ());
+                                                        where T: AsRef<str> {
+        self._scopes.insert(scope.as_ref().to_string(), ());
         self
     }
 }
@@ -13161,8 +13161,8 @@ impl<'a, C, NC, A> TableGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
 ///
 /// ```test_harness,no_run
 /// # extern crate hyper;
-/// # extern crate "yup-oauth2" as oauth2;
-/// # extern crate "google-mapsengine1" as mapsengine1;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_mapsengine1 as mapsengine1;
 /// use mapsengine1::FeaturesBatchDeleteRequest;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
@@ -13228,7 +13228,7 @@ impl<'a, C, NC, A> TableFeatureBatchDeleteCall<'a, C, NC, A> where NC: hyper::ne
 
         let mut url = "https://www.googleapis.com/mapsengine/v1/tables/{id}/features/batchDelete".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Full.as_slice().to_string(), ());
+            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{id}", "id")].iter() {
@@ -13258,7 +13258,7 @@ impl<'a, C, NC, A> TableFeatureBatchDeleteCall<'a, C, NC, A> where NC: hyper::ne
         
         if params.len() > 0 {
             url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
+            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_ref()))));
         }
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
@@ -13281,7 +13281,7 @@ impl<'a, C, NC, A> TableFeatureBatchDeleteCall<'a, C, NC, A> where NC: hyper::ne
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.as_slice())
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.as_ref())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -13295,7 +13295,7 @@ impl<'a, C, NC, A> TableFeatureBatchDeleteCall<'a, C, NC, A> where NC: hyper::ne
             match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
+                        sleep_ms(d.num_milliseconds() as u32);
                         continue;
                     }
                     dlg.finished(false);
@@ -13306,7 +13306,7 @@ impl<'a, C, NC, A> TableFeatureBatchDeleteCall<'a, C, NC, A> where NC: hyper::ne
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
-                            sleep(d);
+                            sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
@@ -13370,8 +13370,8 @@ impl<'a, C, NC, A> TableFeatureBatchDeleteCall<'a, C, NC, A> where NC: hyper::ne
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> TableFeatureBatchDeleteCall<'a, C, NC, A>
-                                                        where T: Str {
-        self._additional_params.insert(name.as_slice().to_string(), value.as_slice().to_string());
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
     }
 
@@ -13387,8 +13387,8 @@ impl<'a, C, NC, A> TableFeatureBatchDeleteCall<'a, C, NC, A> where NC: hyper::ne
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T>(mut self, scope: T) -> TableFeatureBatchDeleteCall<'a, C, NC, A> 
-                                                        where T: Str {
-        self._scopes.insert(scope.as_slice().to_string(), ());
+                                                        where T: AsRef<str> {
+        self._scopes.insert(scope.as_ref().to_string(), ());
         self
     }
 }
@@ -13405,8 +13405,8 @@ impl<'a, C, NC, A> TableFeatureBatchDeleteCall<'a, C, NC, A> where NC: hyper::ne
 ///
 /// ```test_harness,no_run
 /// # extern crate hyper;
-/// # extern crate "yup-oauth2" as oauth2;
-/// # extern crate "google-mapsengine1" as mapsengine1;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_mapsengine1 as mapsengine1;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -13511,7 +13511,7 @@ impl<'a, C, NC, A> TableFeatureListCall<'a, C, NC, A> where NC: hyper::net::Netw
 
         let mut url = "https://www.googleapis.com/mapsengine/v1/tables/{id}/features".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Readonly.as_slice().to_string(), ());
+            self._scopes.insert(Scope::Readonly.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{id}", "id")].iter() {
@@ -13541,7 +13541,7 @@ impl<'a, C, NC, A> TableFeatureListCall<'a, C, NC, A> where NC: hyper::net::Netw
         
         if params.len() > 0 {
             url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
+            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_ref()))));
         }
 
 
@@ -13559,7 +13559,7 @@ impl<'a, C, NC, A> TableFeatureListCall<'a, C, NC, A> where NC: hyper::net::Netw
                                                              access_token: token.unwrap().access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_slice())
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_ref())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -13570,7 +13570,7 @@ impl<'a, C, NC, A> TableFeatureListCall<'a, C, NC, A> where NC: hyper::net::Netw
             match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
+                        sleep_ms(d.num_milliseconds() as u32);
                         continue;
                     }
                     dlg.finished(false);
@@ -13581,7 +13581,7 @@ impl<'a, C, NC, A> TableFeatureListCall<'a, C, NC, A> where NC: hyper::net::Netw
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
-                            sleep(d);
+                            sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
@@ -13718,8 +13718,8 @@ impl<'a, C, NC, A> TableFeatureListCall<'a, C, NC, A> where NC: hyper::net::Netw
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> TableFeatureListCall<'a, C, NC, A>
-                                                        where T: Str {
-        self._additional_params.insert(name.as_slice().to_string(), value.as_slice().to_string());
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
     }
 
@@ -13735,8 +13735,8 @@ impl<'a, C, NC, A> TableFeatureListCall<'a, C, NC, A> where NC: hyper::net::Netw
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T>(mut self, scope: T) -> TableFeatureListCall<'a, C, NC, A> 
-                                                        where T: Str {
-        self._scopes.insert(scope.as_slice().to_string(), ());
+                                                        where T: AsRef<str> {
+        self._scopes.insert(scope.as_ref().to_string(), ());
         self
     }
 }
@@ -13753,8 +13753,8 @@ impl<'a, C, NC, A> TableFeatureListCall<'a, C, NC, A> where NC: hyper::net::Netw
 ///
 /// ```test_harness,no_run
 /// # extern crate hyper;
-/// # extern crate "yup-oauth2" as oauth2;
-/// # extern crate "google-mapsengine1" as mapsengine1;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_mapsengine1 as mapsengine1;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -13814,7 +13814,7 @@ impl<'a, C, NC, A> TableProcesCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
 
         let mut url = "https://www.googleapis.com/mapsengine/v1/tables/{id}/process".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Full.as_slice().to_string(), ());
+            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{id}", "id")].iter() {
@@ -13844,7 +13844,7 @@ impl<'a, C, NC, A> TableProcesCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
         
         if params.len() > 0 {
             url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
+            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_ref()))));
         }
 
 
@@ -13862,7 +13862,7 @@ impl<'a, C, NC, A> TableProcesCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
                                                              access_token: token.unwrap().access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.as_slice())
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.as_ref())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -13873,7 +13873,7 @@ impl<'a, C, NC, A> TableProcesCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
             match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
+                        sleep_ms(d.num_milliseconds() as u32);
                         continue;
                     }
                     dlg.finished(false);
@@ -13884,7 +13884,7 @@ impl<'a, C, NC, A> TableProcesCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
-                            sleep(d);
+                            sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
@@ -13949,8 +13949,8 @@ impl<'a, C, NC, A> TableProcesCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> TableProcesCall<'a, C, NC, A>
-                                                        where T: Str {
-        self._additional_params.insert(name.as_slice().to_string(), value.as_slice().to_string());
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
     }
 
@@ -13966,8 +13966,8 @@ impl<'a, C, NC, A> TableProcesCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T>(mut self, scope: T) -> TableProcesCall<'a, C, NC, A> 
-                                                        where T: Str {
-        self._scopes.insert(scope.as_slice().to_string(), ());
+                                                        where T: AsRef<str> {
+        self._scopes.insert(scope.as_ref().to_string(), ());
         self
     }
 }
@@ -13984,8 +13984,8 @@ impl<'a, C, NC, A> TableProcesCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
 ///
 /// ```test_harness,no_run
 /// # extern crate hyper;
-/// # extern crate "yup-oauth2" as oauth2;
-/// # extern crate "google-mapsengine1" as mapsengine1;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_mapsengine1 as mapsengine1;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -14055,7 +14055,7 @@ impl<'a, C, NC, A> TableParentListCall<'a, C, NC, A> where NC: hyper::net::Netwo
 
         let mut url = "https://www.googleapis.com/mapsengine/v1/tables/{id}/parents".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Readonly.as_slice().to_string(), ());
+            self._scopes.insert(Scope::Readonly.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{id}", "id")].iter() {
@@ -14085,7 +14085,7 @@ impl<'a, C, NC, A> TableParentListCall<'a, C, NC, A> where NC: hyper::net::Netwo
         
         if params.len() > 0 {
             url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
+            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_ref()))));
         }
 
 
@@ -14103,7 +14103,7 @@ impl<'a, C, NC, A> TableParentListCall<'a, C, NC, A> where NC: hyper::net::Netwo
                                                              access_token: token.unwrap().access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_slice())
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_ref())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -14114,7 +14114,7 @@ impl<'a, C, NC, A> TableParentListCall<'a, C, NC, A> where NC: hyper::net::Netwo
             match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
+                        sleep_ms(d.num_milliseconds() as u32);
                         continue;
                     }
                     dlg.finished(false);
@@ -14125,7 +14125,7 @@ impl<'a, C, NC, A> TableParentListCall<'a, C, NC, A> where NC: hyper::net::Netwo
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
-                            sleep(d);
+                            sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
@@ -14206,8 +14206,8 @@ impl<'a, C, NC, A> TableParentListCall<'a, C, NC, A> where NC: hyper::net::Netwo
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> TableParentListCall<'a, C, NC, A>
-                                                        where T: Str {
-        self._additional_params.insert(name.as_slice().to_string(), value.as_slice().to_string());
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
     }
 
@@ -14223,8 +14223,8 @@ impl<'a, C, NC, A> TableParentListCall<'a, C, NC, A> where NC: hyper::net::Netwo
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T>(mut self, scope: T) -> TableParentListCall<'a, C, NC, A> 
-                                                        where T: Str {
-        self._scopes.insert(scope.as_slice().to_string(), ());
+                                                        where T: AsRef<str> {
+        self._scopes.insert(scope.as_ref().to_string(), ());
         self
     }
 }
@@ -14243,8 +14243,8 @@ impl<'a, C, NC, A> TableParentListCall<'a, C, NC, A> where NC: hyper::net::Netwo
 ///
 /// ```test_harness,no_run
 /// # extern crate hyper;
-/// # extern crate "yup-oauth2" as oauth2;
-/// # extern crate "google-mapsengine1" as mapsengine1;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_mapsengine1 as mapsengine1;
 /// use mapsengine1::PermissionsBatchUpdateRequest;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
@@ -14311,7 +14311,7 @@ impl<'a, C, NC, A> TablePermissionBatchUpdateCall<'a, C, NC, A> where NC: hyper:
 
         let mut url = "https://www.googleapis.com/mapsengine/v1/tables/{id}/permissions/batchUpdate".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Full.as_slice().to_string(), ());
+            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{id}", "id")].iter() {
@@ -14341,7 +14341,7 @@ impl<'a, C, NC, A> TablePermissionBatchUpdateCall<'a, C, NC, A> where NC: hyper:
         
         if params.len() > 0 {
             url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
+            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_ref()))));
         }
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
@@ -14364,7 +14364,7 @@ impl<'a, C, NC, A> TablePermissionBatchUpdateCall<'a, C, NC, A> where NC: hyper:
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.as_slice())
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.as_ref())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -14378,7 +14378,7 @@ impl<'a, C, NC, A> TablePermissionBatchUpdateCall<'a, C, NC, A> where NC: hyper:
             match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
+                        sleep_ms(d.num_milliseconds() as u32);
                         continue;
                     }
                     dlg.finished(false);
@@ -14389,7 +14389,7 @@ impl<'a, C, NC, A> TablePermissionBatchUpdateCall<'a, C, NC, A> where NC: hyper:
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
-                            sleep(d);
+                            sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
@@ -14463,8 +14463,8 @@ impl<'a, C, NC, A> TablePermissionBatchUpdateCall<'a, C, NC, A> where NC: hyper:
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> TablePermissionBatchUpdateCall<'a, C, NC, A>
-                                                        where T: Str {
-        self._additional_params.insert(name.as_slice().to_string(), value.as_slice().to_string());
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
     }
 
@@ -14480,8 +14480,8 @@ impl<'a, C, NC, A> TablePermissionBatchUpdateCall<'a, C, NC, A> where NC: hyper:
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T>(mut self, scope: T) -> TablePermissionBatchUpdateCall<'a, C, NC, A> 
-                                                        where T: Str {
-        self._scopes.insert(scope.as_slice().to_string(), ());
+                                                        where T: AsRef<str> {
+        self._scopes.insert(scope.as_ref().to_string(), ());
         self
     }
 }
@@ -14500,8 +14500,8 @@ impl<'a, C, NC, A> TablePermissionBatchUpdateCall<'a, C, NC, A> where NC: hyper:
 ///
 /// ```test_harness,no_run
 /// # extern crate hyper;
-/// # extern crate "yup-oauth2" as oauth2;
-/// # extern crate "google-mapsengine1" as mapsengine1;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_mapsengine1 as mapsengine1;
 /// use mapsengine1::Table;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
@@ -14566,13 +14566,13 @@ impl<'a, C, NC, A> TableUploadCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
 
         let mut url = "https://www.googleapis.com/mapsengine/v1/tables/upload".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Full.as_slice().to_string(), ());
+            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
 
         
         if params.len() > 0 {
             url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
+            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_ref()))));
         }
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
@@ -14595,7 +14595,7 @@ impl<'a, C, NC, A> TableUploadCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.as_slice())
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.as_ref())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -14609,7 +14609,7 @@ impl<'a, C, NC, A> TableUploadCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
             match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
+                        sleep_ms(d.num_milliseconds() as u32);
                         continue;
                     }
                     dlg.finished(false);
@@ -14620,7 +14620,7 @@ impl<'a, C, NC, A> TableUploadCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
-                            sleep(d);
+                            sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
@@ -14684,8 +14684,8 @@ impl<'a, C, NC, A> TableUploadCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> TableUploadCall<'a, C, NC, A>
-                                                        where T: Str {
-        self._additional_params.insert(name.as_slice().to_string(), value.as_slice().to_string());
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
     }
 
@@ -14701,8 +14701,8 @@ impl<'a, C, NC, A> TableUploadCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T>(mut self, scope: T) -> TableUploadCall<'a, C, NC, A> 
-                                                        where T: Str {
-        self._scopes.insert(scope.as_slice().to_string(), ());
+                                                        where T: AsRef<str> {
+        self._scopes.insert(scope.as_ref().to_string(), ());
         self
     }
 }
@@ -14733,8 +14733,8 @@ impl<'a, C, NC, A> TableUploadCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
 ///
 /// ```test_harness,no_run
 /// # extern crate hyper;
-/// # extern crate "yup-oauth2" as oauth2;
-/// # extern crate "google-mapsengine1" as mapsengine1;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_mapsengine1 as mapsengine1;
 /// use mapsengine1::FeaturesBatchPatchRequest;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
@@ -14800,7 +14800,7 @@ impl<'a, C, NC, A> TableFeatureBatchPatchCall<'a, C, NC, A> where NC: hyper::net
 
         let mut url = "https://www.googleapis.com/mapsengine/v1/tables/{id}/features/batchPatch".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Full.as_slice().to_string(), ());
+            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{id}", "id")].iter() {
@@ -14830,7 +14830,7 @@ impl<'a, C, NC, A> TableFeatureBatchPatchCall<'a, C, NC, A> where NC: hyper::net
         
         if params.len() > 0 {
             url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
+            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_ref()))));
         }
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
@@ -14853,7 +14853,7 @@ impl<'a, C, NC, A> TableFeatureBatchPatchCall<'a, C, NC, A> where NC: hyper::net
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.as_slice())
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.as_ref())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -14867,7 +14867,7 @@ impl<'a, C, NC, A> TableFeatureBatchPatchCall<'a, C, NC, A> where NC: hyper::net
             match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
+                        sleep_ms(d.num_milliseconds() as u32);
                         continue;
                     }
                     dlg.finished(false);
@@ -14878,7 +14878,7 @@ impl<'a, C, NC, A> TableFeatureBatchPatchCall<'a, C, NC, A> where NC: hyper::net
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
-                            sleep(d);
+                            sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
@@ -14942,8 +14942,8 @@ impl<'a, C, NC, A> TableFeatureBatchPatchCall<'a, C, NC, A> where NC: hyper::net
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> TableFeatureBatchPatchCall<'a, C, NC, A>
-                                                        where T: Str {
-        self._additional_params.insert(name.as_slice().to_string(), value.as_slice().to_string());
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
     }
 
@@ -14959,8 +14959,8 @@ impl<'a, C, NC, A> TableFeatureBatchPatchCall<'a, C, NC, A> where NC: hyper::net
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T>(mut self, scope: T) -> TableFeatureBatchPatchCall<'a, C, NC, A> 
-                                                        where T: Str {
-        self._scopes.insert(scope.as_slice().to_string(), ());
+                                                        where T: AsRef<str> {
+        self._scopes.insert(scope.as_ref().to_string(), ());
         self
     }
 }
@@ -14977,8 +14977,8 @@ impl<'a, C, NC, A> TableFeatureBatchPatchCall<'a, C, NC, A> where NC: hyper::net
 ///
 /// ```test_harness,no_run
 /// # extern crate hyper;
-/// # extern crate "yup-oauth2" as oauth2;
-/// # extern crate "google-mapsengine1" as mapsengine1;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_mapsengine1 as mapsengine1;
 /// use mapsengine1::Table;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
@@ -15044,7 +15044,7 @@ impl<'a, C, NC, A> TablePatchCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
 
         let mut url = "https://www.googleapis.com/mapsengine/v1/tables/{id}".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Full.as_slice().to_string(), ());
+            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{id}", "id")].iter() {
@@ -15074,7 +15074,7 @@ impl<'a, C, NC, A> TablePatchCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
         
         if params.len() > 0 {
             url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
+            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_ref()))));
         }
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
@@ -15097,7 +15097,7 @@ impl<'a, C, NC, A> TablePatchCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Patch, url.as_slice())
+                let mut req = client.borrow_mut().request(hyper::method::Method::Patch, url.as_ref())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -15111,7 +15111,7 @@ impl<'a, C, NC, A> TablePatchCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
             match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
+                        sleep_ms(d.num_milliseconds() as u32);
                         continue;
                     }
                     dlg.finished(false);
@@ -15122,7 +15122,7 @@ impl<'a, C, NC, A> TablePatchCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
-                            sleep(d);
+                            sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
@@ -15186,8 +15186,8 @@ impl<'a, C, NC, A> TablePatchCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> TablePatchCall<'a, C, NC, A>
-                                                        where T: Str {
-        self._additional_params.insert(name.as_slice().to_string(), value.as_slice().to_string());
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
     }
 
@@ -15203,8 +15203,8 @@ impl<'a, C, NC, A> TablePatchCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T>(mut self, scope: T) -> TablePatchCall<'a, C, NC, A> 
-                                                        where T: Str {
-        self._scopes.insert(scope.as_slice().to_string(), ());
+                                                        where T: AsRef<str> {
+        self._scopes.insert(scope.as_ref().to_string(), ());
         self
     }
 }
@@ -15221,8 +15221,8 @@ impl<'a, C, NC, A> TablePatchCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
 ///
 /// ```test_harness,no_run
 /// # extern crate hyper;
-/// # extern crate "yup-oauth2" as oauth2;
-/// # extern crate "google-mapsengine1" as mapsengine1;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_mapsengine1 as mapsengine1;
 /// use mapsengine1::PermissionsBatchDeleteRequest;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
@@ -15289,7 +15289,7 @@ impl<'a, C, NC, A> TablePermissionBatchDeleteCall<'a, C, NC, A> where NC: hyper:
 
         let mut url = "https://www.googleapis.com/mapsengine/v1/tables/{id}/permissions/batchDelete".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Full.as_slice().to_string(), ());
+            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{id}", "id")].iter() {
@@ -15319,7 +15319,7 @@ impl<'a, C, NC, A> TablePermissionBatchDeleteCall<'a, C, NC, A> where NC: hyper:
         
         if params.len() > 0 {
             url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
+            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_ref()))));
         }
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
@@ -15342,7 +15342,7 @@ impl<'a, C, NC, A> TablePermissionBatchDeleteCall<'a, C, NC, A> where NC: hyper:
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.as_slice())
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.as_ref())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -15356,7 +15356,7 @@ impl<'a, C, NC, A> TablePermissionBatchDeleteCall<'a, C, NC, A> where NC: hyper:
             match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
+                        sleep_ms(d.num_milliseconds() as u32);
                         continue;
                     }
                     dlg.finished(false);
@@ -15367,7 +15367,7 @@ impl<'a, C, NC, A> TablePermissionBatchDeleteCall<'a, C, NC, A> where NC: hyper:
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
-                            sleep(d);
+                            sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
@@ -15441,8 +15441,8 @@ impl<'a, C, NC, A> TablePermissionBatchDeleteCall<'a, C, NC, A> where NC: hyper:
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> TablePermissionBatchDeleteCall<'a, C, NC, A>
-                                                        where T: Str {
-        self._additional_params.insert(name.as_slice().to_string(), value.as_slice().to_string());
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
     }
 
@@ -15458,8 +15458,8 @@ impl<'a, C, NC, A> TablePermissionBatchDeleteCall<'a, C, NC, A> where NC: hyper:
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T>(mut self, scope: T) -> TablePermissionBatchDeleteCall<'a, C, NC, A> 
-                                                        where T: Str {
-        self._scopes.insert(scope.as_slice().to_string(), ());
+                                                        where T: AsRef<str> {
+        self._scopes.insert(scope.as_ref().to_string(), ());
         self
     }
 }
@@ -15476,8 +15476,8 @@ impl<'a, C, NC, A> TablePermissionBatchDeleteCall<'a, C, NC, A> where NC: hyper:
 ///
 /// ```test_harness,no_run
 /// # extern crate hyper;
-/// # extern crate "yup-oauth2" as oauth2;
-/// # extern crate "google-mapsengine1" as mapsengine1;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_mapsengine1 as mapsengine1;
 /// use mapsengine1::Table;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
@@ -15542,13 +15542,13 @@ impl<'a, C, NC, A> TableCreateCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
 
         let mut url = "https://www.googleapis.com/mapsengine/v1/tables".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Full.as_slice().to_string(), ());
+            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
 
         
         if params.len() > 0 {
             url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
+            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_ref()))));
         }
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
@@ -15571,7 +15571,7 @@ impl<'a, C, NC, A> TableCreateCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.as_slice())
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.as_ref())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -15585,7 +15585,7 @@ impl<'a, C, NC, A> TableCreateCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
             match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
+                        sleep_ms(d.num_milliseconds() as u32);
                         continue;
                     }
                     dlg.finished(false);
@@ -15596,7 +15596,7 @@ impl<'a, C, NC, A> TableCreateCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
-                            sleep(d);
+                            sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
@@ -15660,8 +15660,8 @@ impl<'a, C, NC, A> TableCreateCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> TableCreateCall<'a, C, NC, A>
-                                                        where T: Str {
-        self._additional_params.insert(name.as_slice().to_string(), value.as_slice().to_string());
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
     }
 
@@ -15677,8 +15677,8 @@ impl<'a, C, NC, A> TableCreateCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T>(mut self, scope: T) -> TableCreateCall<'a, C, NC, A> 
-                                                        where T: Str {
-        self._scopes.insert(scope.as_slice().to_string(), ());
+                                                        where T: AsRef<str> {
+        self._scopes.insert(scope.as_ref().to_string(), ());
         self
     }
 }
@@ -15695,8 +15695,8 @@ impl<'a, C, NC, A> TableCreateCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
 ///
 /// ```test_harness,no_run
 /// # extern crate hyper;
-/// # extern crate "yup-oauth2" as oauth2;
-/// # extern crate "google-mapsengine1" as mapsengine1;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_mapsengine1 as mapsengine1;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -15756,7 +15756,7 @@ impl<'a, C, NC, A> TablePermissionListCall<'a, C, NC, A> where NC: hyper::net::N
 
         let mut url = "https://www.googleapis.com/mapsengine/v1/tables/{id}/permissions".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Readonly.as_slice().to_string(), ());
+            self._scopes.insert(Scope::Readonly.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{id}", "id")].iter() {
@@ -15786,7 +15786,7 @@ impl<'a, C, NC, A> TablePermissionListCall<'a, C, NC, A> where NC: hyper::net::N
         
         if params.len() > 0 {
             url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
+            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_ref()))));
         }
 
 
@@ -15804,7 +15804,7 @@ impl<'a, C, NC, A> TablePermissionListCall<'a, C, NC, A> where NC: hyper::net::N
                                                              access_token: token.unwrap().access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_slice())
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_ref())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -15815,7 +15815,7 @@ impl<'a, C, NC, A> TablePermissionListCall<'a, C, NC, A> where NC: hyper::net::N
             match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
+                        sleep_ms(d.num_milliseconds() as u32);
                         continue;
                     }
                     dlg.finished(false);
@@ -15826,7 +15826,7 @@ impl<'a, C, NC, A> TablePermissionListCall<'a, C, NC, A> where NC: hyper::net::N
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
-                            sleep(d);
+                            sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
@@ -15891,8 +15891,8 @@ impl<'a, C, NC, A> TablePermissionListCall<'a, C, NC, A> where NC: hyper::net::N
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> TablePermissionListCall<'a, C, NC, A>
-                                                        where T: Str {
-        self._additional_params.insert(name.as_slice().to_string(), value.as_slice().to_string());
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
     }
 
@@ -15908,8 +15908,8 @@ impl<'a, C, NC, A> TablePermissionListCall<'a, C, NC, A> where NC: hyper::net::N
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T>(mut self, scope: T) -> TablePermissionListCall<'a, C, NC, A> 
-                                                        where T: Str {
-        self._scopes.insert(scope.as_slice().to_string(), ());
+                                                        where T: AsRef<str> {
+        self._scopes.insert(scope.as_ref().to_string(), ());
         self
     }
 }
@@ -15926,8 +15926,8 @@ impl<'a, C, NC, A> TablePermissionListCall<'a, C, NC, A> where NC: hyper::net::N
 ///
 /// ```test_harness,no_run
 /// # extern crate hyper;
-/// # extern crate "yup-oauth2" as oauth2;
-/// # extern crate "google-mapsengine1" as mapsengine1;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_mapsengine1 as mapsengine1;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -15999,7 +15999,7 @@ impl<'a, C, NC, A> TableFeatureGetCall<'a, C, NC, A> where NC: hyper::net::Netwo
 
         let mut url = "https://www.googleapis.com/mapsengine/v1/tables/{tableId}/features/{id}".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Readonly.as_slice().to_string(), ());
+            self._scopes.insert(Scope::Readonly.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{tableId}", "tableId"), ("{id}", "id")].iter() {
@@ -16029,7 +16029,7 @@ impl<'a, C, NC, A> TableFeatureGetCall<'a, C, NC, A> where NC: hyper::net::Netwo
         
         if params.len() > 0 {
             url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
+            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_ref()))));
         }
 
 
@@ -16047,7 +16047,7 @@ impl<'a, C, NC, A> TableFeatureGetCall<'a, C, NC, A> where NC: hyper::net::Netwo
                                                              access_token: token.unwrap().access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_slice())
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_ref())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -16058,7 +16058,7 @@ impl<'a, C, NC, A> TableFeatureGetCall<'a, C, NC, A> where NC: hyper::net::Netwo
             match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
+                        sleep_ms(d.num_milliseconds() as u32);
                         continue;
                     }
                     dlg.finished(false);
@@ -16069,7 +16069,7 @@ impl<'a, C, NC, A> TableFeatureGetCall<'a, C, NC, A> where NC: hyper::net::Netwo
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
-                            sleep(d);
+                            sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
@@ -16160,8 +16160,8 @@ impl<'a, C, NC, A> TableFeatureGetCall<'a, C, NC, A> where NC: hyper::net::Netwo
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> TableFeatureGetCall<'a, C, NC, A>
-                                                        where T: Str {
-        self._additional_params.insert(name.as_slice().to_string(), value.as_slice().to_string());
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
     }
 
@@ -16177,8 +16177,8 @@ impl<'a, C, NC, A> TableFeatureGetCall<'a, C, NC, A> where NC: hyper::net::Netwo
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T>(mut self, scope: T) -> TableFeatureGetCall<'a, C, NC, A> 
-                                                        where T: Str {
-        self._scopes.insert(scope.as_slice().to_string(), ());
+                                                        where T: AsRef<str> {
+        self._scopes.insert(scope.as_ref().to_string(), ());
         self
     }
 }
@@ -16195,8 +16195,8 @@ impl<'a, C, NC, A> TableFeatureGetCall<'a, C, NC, A> where NC: hyper::net::Netwo
 ///
 /// ```test_harness,no_run
 /// # extern crate hyper;
-/// # extern crate "yup-oauth2" as oauth2;
-/// # extern crate "google-mapsengine1" as mapsengine1;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_mapsengine1 as mapsengine1;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -16319,13 +16319,13 @@ impl<'a, C, NC, A> MapListCall<'a, C, NC, A> where NC: hyper::net::NetworkConnec
 
         let mut url = "https://www.googleapis.com/mapsengine/v1/maps".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Readonly.as_slice().to_string(), ());
+            self._scopes.insert(Scope::Readonly.as_ref().to_string(), ());
         }
 
         
         if params.len() > 0 {
             url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
+            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_ref()))));
         }
 
 
@@ -16343,7 +16343,7 @@ impl<'a, C, NC, A> MapListCall<'a, C, NC, A> where NC: hyper::net::NetworkConnec
                                                              access_token: token.unwrap().access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_slice())
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_ref())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -16354,7 +16354,7 @@ impl<'a, C, NC, A> MapListCall<'a, C, NC, A> where NC: hyper::net::NetworkConnec
             match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
+                        sleep_ms(d.num_milliseconds() as u32);
                         continue;
                     }
                     dlg.finished(false);
@@ -16365,7 +16365,7 @@ impl<'a, C, NC, A> MapListCall<'a, C, NC, A> where NC: hyper::net::NetworkConnec
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
-                            sleep(d);
+                            sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
@@ -16523,8 +16523,8 @@ impl<'a, C, NC, A> MapListCall<'a, C, NC, A> where NC: hyper::net::NetworkConnec
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> MapListCall<'a, C, NC, A>
-                                                        where T: Str {
-        self._additional_params.insert(name.as_slice().to_string(), value.as_slice().to_string());
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
     }
 
@@ -16540,8 +16540,8 @@ impl<'a, C, NC, A> MapListCall<'a, C, NC, A> where NC: hyper::net::NetworkConnec
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T>(mut self, scope: T) -> MapListCall<'a, C, NC, A> 
-                                                        where T: Str {
-        self._scopes.insert(scope.as_slice().to_string(), ());
+                                                        where T: AsRef<str> {
+        self._scopes.insert(scope.as_ref().to_string(), ());
         self
     }
 }
@@ -16558,8 +16558,8 @@ impl<'a, C, NC, A> MapListCall<'a, C, NC, A> where NC: hyper::net::NetworkConnec
 ///
 /// ```test_harness,no_run
 /// # extern crate hyper;
-/// # extern crate "yup-oauth2" as oauth2;
-/// # extern crate "google-mapsengine1" as mapsengine1;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_mapsengine1 as mapsengine1;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -16632,13 +16632,13 @@ impl<'a, C, NC, A> MapListPublishedCall<'a, C, NC, A> where NC: hyper::net::Netw
 
         let mut url = "https://www.googleapis.com/mapsengine/v1/maps/published".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Readonly.as_slice().to_string(), ());
+            self._scopes.insert(Scope::Readonly.as_ref().to_string(), ());
         }
 
         
         if params.len() > 0 {
             url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
+            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_ref()))));
         }
 
 
@@ -16656,7 +16656,7 @@ impl<'a, C, NC, A> MapListPublishedCall<'a, C, NC, A> where NC: hyper::net::Netw
                                                              access_token: token.unwrap().access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_slice())
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_ref())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -16667,7 +16667,7 @@ impl<'a, C, NC, A> MapListPublishedCall<'a, C, NC, A> where NC: hyper::net::Netw
             match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
+                        sleep_ms(d.num_milliseconds() as u32);
                         continue;
                     }
                     dlg.finished(false);
@@ -16678,7 +16678,7 @@ impl<'a, C, NC, A> MapListPublishedCall<'a, C, NC, A> where NC: hyper::net::Netw
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
-                            sleep(d);
+                            sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
@@ -16757,8 +16757,8 @@ impl<'a, C, NC, A> MapListPublishedCall<'a, C, NC, A> where NC: hyper::net::Netw
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> MapListPublishedCall<'a, C, NC, A>
-                                                        where T: Str {
-        self._additional_params.insert(name.as_slice().to_string(), value.as_slice().to_string());
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
     }
 
@@ -16774,8 +16774,8 @@ impl<'a, C, NC, A> MapListPublishedCall<'a, C, NC, A> where NC: hyper::net::Netw
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T>(mut self, scope: T) -> MapListPublishedCall<'a, C, NC, A> 
-                                                        where T: Str {
-        self._scopes.insert(scope.as_slice().to_string(), ());
+                                                        where T: AsRef<str> {
+        self._scopes.insert(scope.as_ref().to_string(), ());
         self
     }
 }
@@ -16792,8 +16792,8 @@ impl<'a, C, NC, A> MapListPublishedCall<'a, C, NC, A> where NC: hyper::net::Netw
 ///
 /// ```test_harness,no_run
 /// # extern crate hyper;
-/// # extern crate "yup-oauth2" as oauth2;
-/// # extern crate "google-mapsengine1" as mapsengine1;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_mapsengine1 as mapsengine1;
 /// use mapsengine1::Map;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
@@ -16859,7 +16859,7 @@ impl<'a, C, NC, A> MapPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
 
         let mut url = "https://www.googleapis.com/mapsengine/v1/maps/{id}".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Full.as_slice().to_string(), ());
+            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{id}", "id")].iter() {
@@ -16889,7 +16889,7 @@ impl<'a, C, NC, A> MapPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
         
         if params.len() > 0 {
             url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
+            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_ref()))));
         }
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
@@ -16912,7 +16912,7 @@ impl<'a, C, NC, A> MapPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Patch, url.as_slice())
+                let mut req = client.borrow_mut().request(hyper::method::Method::Patch, url.as_ref())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -16926,7 +16926,7 @@ impl<'a, C, NC, A> MapPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
             match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
+                        sleep_ms(d.num_milliseconds() as u32);
                         continue;
                     }
                     dlg.finished(false);
@@ -16937,7 +16937,7 @@ impl<'a, C, NC, A> MapPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
-                            sleep(d);
+                            sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
@@ -17001,8 +17001,8 @@ impl<'a, C, NC, A> MapPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> MapPatchCall<'a, C, NC, A>
-                                                        where T: Str {
-        self._additional_params.insert(name.as_slice().to_string(), value.as_slice().to_string());
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
     }
 
@@ -17018,8 +17018,8 @@ impl<'a, C, NC, A> MapPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T>(mut self, scope: T) -> MapPatchCall<'a, C, NC, A> 
-                                                        where T: Str {
-        self._scopes.insert(scope.as_slice().to_string(), ());
+                                                        where T: AsRef<str> {
+        self._scopes.insert(scope.as_ref().to_string(), ());
         self
     }
 }
@@ -17038,8 +17038,8 @@ impl<'a, C, NC, A> MapPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
 ///
 /// ```test_harness,no_run
 /// # extern crate hyper;
-/// # extern crate "yup-oauth2" as oauth2;
-/// # extern crate "google-mapsengine1" as mapsengine1;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_mapsengine1 as mapsengine1;
 /// use mapsengine1::PermissionsBatchUpdateRequest;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
@@ -17106,7 +17106,7 @@ impl<'a, C, NC, A> MapPermissionBatchUpdateCall<'a, C, NC, A> where NC: hyper::n
 
         let mut url = "https://www.googleapis.com/mapsengine/v1/maps/{id}/permissions/batchUpdate".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Full.as_slice().to_string(), ());
+            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{id}", "id")].iter() {
@@ -17136,7 +17136,7 @@ impl<'a, C, NC, A> MapPermissionBatchUpdateCall<'a, C, NC, A> where NC: hyper::n
         
         if params.len() > 0 {
             url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
+            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_ref()))));
         }
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
@@ -17159,7 +17159,7 @@ impl<'a, C, NC, A> MapPermissionBatchUpdateCall<'a, C, NC, A> where NC: hyper::n
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.as_slice())
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.as_ref())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -17173,7 +17173,7 @@ impl<'a, C, NC, A> MapPermissionBatchUpdateCall<'a, C, NC, A> where NC: hyper::n
             match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
+                        sleep_ms(d.num_milliseconds() as u32);
                         continue;
                     }
                     dlg.finished(false);
@@ -17184,7 +17184,7 @@ impl<'a, C, NC, A> MapPermissionBatchUpdateCall<'a, C, NC, A> where NC: hyper::n
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
-                            sleep(d);
+                            sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
@@ -17258,8 +17258,8 @@ impl<'a, C, NC, A> MapPermissionBatchUpdateCall<'a, C, NC, A> where NC: hyper::n
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> MapPermissionBatchUpdateCall<'a, C, NC, A>
-                                                        where T: Str {
-        self._additional_params.insert(name.as_slice().to_string(), value.as_slice().to_string());
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
     }
 
@@ -17275,8 +17275,8 @@ impl<'a, C, NC, A> MapPermissionBatchUpdateCall<'a, C, NC, A> where NC: hyper::n
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T>(mut self, scope: T) -> MapPermissionBatchUpdateCall<'a, C, NC, A> 
-                                                        where T: Str {
-        self._scopes.insert(scope.as_slice().to_string(), ());
+                                                        where T: AsRef<str> {
+        self._scopes.insert(scope.as_ref().to_string(), ());
         self
     }
 }
@@ -17293,8 +17293,8 @@ impl<'a, C, NC, A> MapPermissionBatchUpdateCall<'a, C, NC, A> where NC: hyper::n
 ///
 /// ```test_harness,no_run
 /// # extern crate hyper;
-/// # extern crate "yup-oauth2" as oauth2;
-/// # extern crate "google-mapsengine1" as mapsengine1;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_mapsengine1 as mapsengine1;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -17353,7 +17353,7 @@ impl<'a, C, NC, A> MapDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
 
         let mut url = "https://www.googleapis.com/mapsengine/v1/maps/{id}".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Full.as_slice().to_string(), ());
+            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{id}", "id")].iter() {
@@ -17383,7 +17383,7 @@ impl<'a, C, NC, A> MapDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
         
         if params.len() > 0 {
             url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
+            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_ref()))));
         }
 
 
@@ -17401,7 +17401,7 @@ impl<'a, C, NC, A> MapDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
                                                              access_token: token.unwrap().access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Delete, url.as_slice())
+                let mut req = client.borrow_mut().request(hyper::method::Method::Delete, url.as_ref())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -17412,7 +17412,7 @@ impl<'a, C, NC, A> MapDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
             match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
+                        sleep_ms(d.num_milliseconds() as u32);
                         continue;
                     }
                     dlg.finished(false);
@@ -17423,7 +17423,7 @@ impl<'a, C, NC, A> MapDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
-                            sleep(d);
+                            sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
@@ -17478,8 +17478,8 @@ impl<'a, C, NC, A> MapDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> MapDeleteCall<'a, C, NC, A>
-                                                        where T: Str {
-        self._additional_params.insert(name.as_slice().to_string(), value.as_slice().to_string());
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
     }
 
@@ -17495,8 +17495,8 @@ impl<'a, C, NC, A> MapDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T>(mut self, scope: T) -> MapDeleteCall<'a, C, NC, A> 
-                                                        where T: Str {
-        self._scopes.insert(scope.as_slice().to_string(), ());
+                                                        where T: AsRef<str> {
+        self._scopes.insert(scope.as_ref().to_string(), ());
         self
     }
 }
@@ -17513,8 +17513,8 @@ impl<'a, C, NC, A> MapDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
 ///
 /// ```test_harness,no_run
 /// # extern crate hyper;
-/// # extern crate "yup-oauth2" as oauth2;
-/// # extern crate "google-mapsengine1" as mapsengine1;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_mapsengine1 as mapsengine1;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -17574,7 +17574,7 @@ impl<'a, C, NC, A> MapUnpublishCall<'a, C, NC, A> where NC: hyper::net::NetworkC
 
         let mut url = "https://www.googleapis.com/mapsengine/v1/maps/{id}/unpublish".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Full.as_slice().to_string(), ());
+            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{id}", "id")].iter() {
@@ -17604,7 +17604,7 @@ impl<'a, C, NC, A> MapUnpublishCall<'a, C, NC, A> where NC: hyper::net::NetworkC
         
         if params.len() > 0 {
             url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
+            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_ref()))));
         }
 
 
@@ -17622,7 +17622,7 @@ impl<'a, C, NC, A> MapUnpublishCall<'a, C, NC, A> where NC: hyper::net::NetworkC
                                                              access_token: token.unwrap().access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.as_slice())
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.as_ref())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -17633,7 +17633,7 @@ impl<'a, C, NC, A> MapUnpublishCall<'a, C, NC, A> where NC: hyper::net::NetworkC
             match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
+                        sleep_ms(d.num_milliseconds() as u32);
                         continue;
                     }
                     dlg.finished(false);
@@ -17644,7 +17644,7 @@ impl<'a, C, NC, A> MapUnpublishCall<'a, C, NC, A> where NC: hyper::net::NetworkC
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
-                            sleep(d);
+                            sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
@@ -17709,8 +17709,8 @@ impl<'a, C, NC, A> MapUnpublishCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> MapUnpublishCall<'a, C, NC, A>
-                                                        where T: Str {
-        self._additional_params.insert(name.as_slice().to_string(), value.as_slice().to_string());
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
     }
 
@@ -17726,8 +17726,8 @@ impl<'a, C, NC, A> MapUnpublishCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T>(mut self, scope: T) -> MapUnpublishCall<'a, C, NC, A> 
-                                                        where T: Str {
-        self._scopes.insert(scope.as_slice().to_string(), ());
+                                                        where T: AsRef<str> {
+        self._scopes.insert(scope.as_ref().to_string(), ());
         self
     }
 }
@@ -17744,8 +17744,8 @@ impl<'a, C, NC, A> MapUnpublishCall<'a, C, NC, A> where NC: hyper::net::NetworkC
 ///
 /// ```test_harness,no_run
 /// # extern crate hyper;
-/// # extern crate "yup-oauth2" as oauth2;
-/// # extern crate "google-mapsengine1" as mapsengine1;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_mapsengine1 as mapsengine1;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -17810,7 +17810,7 @@ impl<'a, C, NC, A> MapPublishCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
 
         let mut url = "https://www.googleapis.com/mapsengine/v1/maps/{id}/publish".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Full.as_slice().to_string(), ());
+            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{id}", "id")].iter() {
@@ -17840,7 +17840,7 @@ impl<'a, C, NC, A> MapPublishCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
         
         if params.len() > 0 {
             url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
+            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_ref()))));
         }
 
 
@@ -17858,7 +17858,7 @@ impl<'a, C, NC, A> MapPublishCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
                                                              access_token: token.unwrap().access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.as_slice())
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.as_ref())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -17869,7 +17869,7 @@ impl<'a, C, NC, A> MapPublishCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
             match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
+                        sleep_ms(d.num_milliseconds() as u32);
                         continue;
                     }
                     dlg.finished(false);
@@ -17880,7 +17880,7 @@ impl<'a, C, NC, A> MapPublishCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
-                            sleep(d);
+                            sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
@@ -17953,8 +17953,8 @@ impl<'a, C, NC, A> MapPublishCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> MapPublishCall<'a, C, NC, A>
-                                                        where T: Str {
-        self._additional_params.insert(name.as_slice().to_string(), value.as_slice().to_string());
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
     }
 
@@ -17970,8 +17970,8 @@ impl<'a, C, NC, A> MapPublishCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T>(mut self, scope: T) -> MapPublishCall<'a, C, NC, A> 
-                                                        where T: Str {
-        self._scopes.insert(scope.as_slice().to_string(), ());
+                                                        where T: AsRef<str> {
+        self._scopes.insert(scope.as_ref().to_string(), ());
         self
     }
 }
@@ -17988,8 +17988,8 @@ impl<'a, C, NC, A> MapPublishCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
 ///
 /// ```test_harness,no_run
 /// # extern crate hyper;
-/// # extern crate "yup-oauth2" as oauth2;
-/// # extern crate "google-mapsengine1" as mapsengine1;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_mapsengine1 as mapsengine1;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -18049,7 +18049,7 @@ impl<'a, C, NC, A> MapPermissionListCall<'a, C, NC, A> where NC: hyper::net::Net
 
         let mut url = "https://www.googleapis.com/mapsengine/v1/maps/{id}/permissions".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Readonly.as_slice().to_string(), ());
+            self._scopes.insert(Scope::Readonly.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{id}", "id")].iter() {
@@ -18079,7 +18079,7 @@ impl<'a, C, NC, A> MapPermissionListCall<'a, C, NC, A> where NC: hyper::net::Net
         
         if params.len() > 0 {
             url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
+            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_ref()))));
         }
 
 
@@ -18097,7 +18097,7 @@ impl<'a, C, NC, A> MapPermissionListCall<'a, C, NC, A> where NC: hyper::net::Net
                                                              access_token: token.unwrap().access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_slice())
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_ref())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -18108,7 +18108,7 @@ impl<'a, C, NC, A> MapPermissionListCall<'a, C, NC, A> where NC: hyper::net::Net
             match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
+                        sleep_ms(d.num_milliseconds() as u32);
                         continue;
                     }
                     dlg.finished(false);
@@ -18119,7 +18119,7 @@ impl<'a, C, NC, A> MapPermissionListCall<'a, C, NC, A> where NC: hyper::net::Net
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
-                            sleep(d);
+                            sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
@@ -18184,8 +18184,8 @@ impl<'a, C, NC, A> MapPermissionListCall<'a, C, NC, A> where NC: hyper::net::Net
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> MapPermissionListCall<'a, C, NC, A>
-                                                        where T: Str {
-        self._additional_params.insert(name.as_slice().to_string(), value.as_slice().to_string());
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
     }
 
@@ -18201,8 +18201,8 @@ impl<'a, C, NC, A> MapPermissionListCall<'a, C, NC, A> where NC: hyper::net::Net
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T>(mut self, scope: T) -> MapPermissionListCall<'a, C, NC, A> 
-                                                        where T: Str {
-        self._scopes.insert(scope.as_slice().to_string(), ());
+                                                        where T: AsRef<str> {
+        self._scopes.insert(scope.as_ref().to_string(), ());
         self
     }
 }
@@ -18219,8 +18219,8 @@ impl<'a, C, NC, A> MapPermissionListCall<'a, C, NC, A> where NC: hyper::net::Net
 ///
 /// ```test_harness,no_run
 /// # extern crate hyper;
-/// # extern crate "yup-oauth2" as oauth2;
-/// # extern crate "google-mapsengine1" as mapsengine1;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_mapsengine1 as mapsengine1;
 /// use mapsengine1::Map;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
@@ -18285,13 +18285,13 @@ impl<'a, C, NC, A> MapCreateCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
 
         let mut url = "https://www.googleapis.com/mapsengine/v1/maps".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Full.as_slice().to_string(), ());
+            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
 
         
         if params.len() > 0 {
             url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
+            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_ref()))));
         }
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
@@ -18314,7 +18314,7 @@ impl<'a, C, NC, A> MapCreateCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.as_slice())
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.as_ref())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -18328,7 +18328,7 @@ impl<'a, C, NC, A> MapCreateCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
             match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
+                        sleep_ms(d.num_milliseconds() as u32);
                         continue;
                     }
                     dlg.finished(false);
@@ -18339,7 +18339,7 @@ impl<'a, C, NC, A> MapCreateCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
-                            sleep(d);
+                            sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
@@ -18403,8 +18403,8 @@ impl<'a, C, NC, A> MapCreateCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> MapCreateCall<'a, C, NC, A>
-                                                        where T: Str {
-        self._additional_params.insert(name.as_slice().to_string(), value.as_slice().to_string());
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
     }
 
@@ -18420,8 +18420,8 @@ impl<'a, C, NC, A> MapCreateCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T>(mut self, scope: T) -> MapCreateCall<'a, C, NC, A> 
-                                                        where T: Str {
-        self._scopes.insert(scope.as_slice().to_string(), ());
+                                                        where T: AsRef<str> {
+        self._scopes.insert(scope.as_ref().to_string(), ());
         self
     }
 }
@@ -18438,8 +18438,8 @@ impl<'a, C, NC, A> MapCreateCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
 ///
 /// ```test_harness,no_run
 /// # extern crate hyper;
-/// # extern crate "yup-oauth2" as oauth2;
-/// # extern crate "google-mapsengine1" as mapsengine1;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_mapsengine1 as mapsengine1;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -18499,7 +18499,7 @@ impl<'a, C, NC, A> MapGetPublishedCall<'a, C, NC, A> where NC: hyper::net::Netwo
 
         let mut url = "https://www.googleapis.com/mapsengine/v1/maps/{id}/published".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Readonly.as_slice().to_string(), ());
+            self._scopes.insert(Scope::Readonly.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{id}", "id")].iter() {
@@ -18529,7 +18529,7 @@ impl<'a, C, NC, A> MapGetPublishedCall<'a, C, NC, A> where NC: hyper::net::Netwo
         
         if params.len() > 0 {
             url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
+            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_ref()))));
         }
 
 
@@ -18547,7 +18547,7 @@ impl<'a, C, NC, A> MapGetPublishedCall<'a, C, NC, A> where NC: hyper::net::Netwo
                                                              access_token: token.unwrap().access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_slice())
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_ref())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -18558,7 +18558,7 @@ impl<'a, C, NC, A> MapGetPublishedCall<'a, C, NC, A> where NC: hyper::net::Netwo
             match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
+                        sleep_ms(d.num_milliseconds() as u32);
                         continue;
                     }
                     dlg.finished(false);
@@ -18569,7 +18569,7 @@ impl<'a, C, NC, A> MapGetPublishedCall<'a, C, NC, A> where NC: hyper::net::Netwo
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
-                            sleep(d);
+                            sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
@@ -18634,8 +18634,8 @@ impl<'a, C, NC, A> MapGetPublishedCall<'a, C, NC, A> where NC: hyper::net::Netwo
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> MapGetPublishedCall<'a, C, NC, A>
-                                                        where T: Str {
-        self._additional_params.insert(name.as_slice().to_string(), value.as_slice().to_string());
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
     }
 
@@ -18651,8 +18651,8 @@ impl<'a, C, NC, A> MapGetPublishedCall<'a, C, NC, A> where NC: hyper::net::Netwo
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T>(mut self, scope: T) -> MapGetPublishedCall<'a, C, NC, A> 
-                                                        where T: Str {
-        self._scopes.insert(scope.as_slice().to_string(), ());
+                                                        where T: AsRef<str> {
+        self._scopes.insert(scope.as_ref().to_string(), ());
         self
     }
 }
@@ -18669,8 +18669,8 @@ impl<'a, C, NC, A> MapGetPublishedCall<'a, C, NC, A> where NC: hyper::net::Netwo
 ///
 /// ```test_harness,no_run
 /// # extern crate hyper;
-/// # extern crate "yup-oauth2" as oauth2;
-/// # extern crate "google-mapsengine1" as mapsengine1;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_mapsengine1 as mapsengine1;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -18735,7 +18735,7 @@ impl<'a, C, NC, A> MapGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnect
 
         let mut url = "https://www.googleapis.com/mapsengine/v1/maps/{id}".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Readonly.as_slice().to_string(), ());
+            self._scopes.insert(Scope::Readonly.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{id}", "id")].iter() {
@@ -18765,7 +18765,7 @@ impl<'a, C, NC, A> MapGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnect
         
         if params.len() > 0 {
             url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
+            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_ref()))));
         }
 
 
@@ -18783,7 +18783,7 @@ impl<'a, C, NC, A> MapGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnect
                                                              access_token: token.unwrap().access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_slice())
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_ref())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -18794,7 +18794,7 @@ impl<'a, C, NC, A> MapGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnect
             match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
+                        sleep_ms(d.num_milliseconds() as u32);
                         continue;
                     }
                     dlg.finished(false);
@@ -18805,7 +18805,7 @@ impl<'a, C, NC, A> MapGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnect
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
-                            sleep(d);
+                            sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
@@ -18878,8 +18878,8 @@ impl<'a, C, NC, A> MapGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnect
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> MapGetCall<'a, C, NC, A>
-                                                        where T: Str {
-        self._additional_params.insert(name.as_slice().to_string(), value.as_slice().to_string());
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
     }
 
@@ -18895,8 +18895,8 @@ impl<'a, C, NC, A> MapGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnect
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T>(mut self, scope: T) -> MapGetCall<'a, C, NC, A> 
-                                                        where T: Str {
-        self._scopes.insert(scope.as_slice().to_string(), ());
+                                                        where T: AsRef<str> {
+        self._scopes.insert(scope.as_ref().to_string(), ());
         self
     }
 }
@@ -18913,8 +18913,8 @@ impl<'a, C, NC, A> MapGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnect
 ///
 /// ```test_harness,no_run
 /// # extern crate hyper;
-/// # extern crate "yup-oauth2" as oauth2;
-/// # extern crate "google-mapsengine1" as mapsengine1;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_mapsengine1 as mapsengine1;
 /// use mapsengine1::PermissionsBatchDeleteRequest;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
@@ -18981,7 +18981,7 @@ impl<'a, C, NC, A> MapPermissionBatchDeleteCall<'a, C, NC, A> where NC: hyper::n
 
         let mut url = "https://www.googleapis.com/mapsengine/v1/maps/{id}/permissions/batchDelete".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Full.as_slice().to_string(), ());
+            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{id}", "id")].iter() {
@@ -19011,7 +19011,7 @@ impl<'a, C, NC, A> MapPermissionBatchDeleteCall<'a, C, NC, A> where NC: hyper::n
         
         if params.len() > 0 {
             url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
+            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_ref()))));
         }
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
@@ -19034,7 +19034,7 @@ impl<'a, C, NC, A> MapPermissionBatchDeleteCall<'a, C, NC, A> where NC: hyper::n
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.as_slice())
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.as_ref())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -19048,7 +19048,7 @@ impl<'a, C, NC, A> MapPermissionBatchDeleteCall<'a, C, NC, A> where NC: hyper::n
             match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
+                        sleep_ms(d.num_milliseconds() as u32);
                         continue;
                     }
                     dlg.finished(false);
@@ -19059,7 +19059,7 @@ impl<'a, C, NC, A> MapPermissionBatchDeleteCall<'a, C, NC, A> where NC: hyper::n
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
-                            sleep(d);
+                            sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
@@ -19133,8 +19133,8 @@ impl<'a, C, NC, A> MapPermissionBatchDeleteCall<'a, C, NC, A> where NC: hyper::n
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> MapPermissionBatchDeleteCall<'a, C, NC, A>
-                                                        where T: Str {
-        self._additional_params.insert(name.as_slice().to_string(), value.as_slice().to_string());
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
     }
 
@@ -19150,8 +19150,8 @@ impl<'a, C, NC, A> MapPermissionBatchDeleteCall<'a, C, NC, A> where NC: hyper::n
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T>(mut self, scope: T) -> MapPermissionBatchDeleteCall<'a, C, NC, A> 
-                                                        where T: Str {
-        self._scopes.insert(scope.as_slice().to_string(), ());
+                                                        where T: AsRef<str> {
+        self._scopes.insert(scope.as_ref().to_string(), ());
         self
     }
 }
@@ -19168,8 +19168,8 @@ impl<'a, C, NC, A> MapPermissionBatchDeleteCall<'a, C, NC, A> where NC: hyper::n
 ///
 /// ```test_harness,no_run
 /// # extern crate hyper;
-/// # extern crate "yup-oauth2" as oauth2;
-/// # extern crate "google-mapsengine1" as mapsengine1;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_mapsengine1 as mapsengine1;
 /// use mapsengine1::RasterCollection;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
@@ -19234,13 +19234,13 @@ impl<'a, C, NC, A> RasterCollectionCreateCall<'a, C, NC, A> where NC: hyper::net
 
         let mut url = "https://www.googleapis.com/mapsengine/v1/rasterCollections".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Full.as_slice().to_string(), ());
+            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
 
         
         if params.len() > 0 {
             url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
+            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_ref()))));
         }
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
@@ -19263,7 +19263,7 @@ impl<'a, C, NC, A> RasterCollectionCreateCall<'a, C, NC, A> where NC: hyper::net
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.as_slice())
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.as_ref())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -19277,7 +19277,7 @@ impl<'a, C, NC, A> RasterCollectionCreateCall<'a, C, NC, A> where NC: hyper::net
             match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
+                        sleep_ms(d.num_milliseconds() as u32);
                         continue;
                     }
                     dlg.finished(false);
@@ -19288,7 +19288,7 @@ impl<'a, C, NC, A> RasterCollectionCreateCall<'a, C, NC, A> where NC: hyper::net
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
-                            sleep(d);
+                            sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
@@ -19352,8 +19352,8 @@ impl<'a, C, NC, A> RasterCollectionCreateCall<'a, C, NC, A> where NC: hyper::net
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> RasterCollectionCreateCall<'a, C, NC, A>
-                                                        where T: Str {
-        self._additional_params.insert(name.as_slice().to_string(), value.as_slice().to_string());
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
     }
 
@@ -19369,8 +19369,8 @@ impl<'a, C, NC, A> RasterCollectionCreateCall<'a, C, NC, A> where NC: hyper::net
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T>(mut self, scope: T) -> RasterCollectionCreateCall<'a, C, NC, A> 
-                                                        where T: Str {
-        self._scopes.insert(scope.as_slice().to_string(), ());
+                                                        where T: AsRef<str> {
+        self._scopes.insert(scope.as_ref().to_string(), ());
         self
     }
 }
@@ -19387,8 +19387,8 @@ impl<'a, C, NC, A> RasterCollectionCreateCall<'a, C, NC, A> where NC: hyper::net
 ///
 /// ```test_harness,no_run
 /// # extern crate hyper;
-/// # extern crate "yup-oauth2" as oauth2;
-/// # extern crate "google-mapsengine1" as mapsengine1;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_mapsengine1 as mapsengine1;
 /// use mapsengine1::PermissionsBatchDeleteRequest;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
@@ -19455,7 +19455,7 @@ impl<'a, C, NC, A> RasterCollectionPermissionBatchDeleteCall<'a, C, NC, A> where
 
         let mut url = "https://www.googleapis.com/mapsengine/v1/rasterCollections/{id}/permissions/batchDelete".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Full.as_slice().to_string(), ());
+            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{id}", "id")].iter() {
@@ -19485,7 +19485,7 @@ impl<'a, C, NC, A> RasterCollectionPermissionBatchDeleteCall<'a, C, NC, A> where
         
         if params.len() > 0 {
             url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
+            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_ref()))));
         }
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
@@ -19508,7 +19508,7 @@ impl<'a, C, NC, A> RasterCollectionPermissionBatchDeleteCall<'a, C, NC, A> where
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.as_slice())
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.as_ref())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -19522,7 +19522,7 @@ impl<'a, C, NC, A> RasterCollectionPermissionBatchDeleteCall<'a, C, NC, A> where
             match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
+                        sleep_ms(d.num_milliseconds() as u32);
                         continue;
                     }
                     dlg.finished(false);
@@ -19533,7 +19533,7 @@ impl<'a, C, NC, A> RasterCollectionPermissionBatchDeleteCall<'a, C, NC, A> where
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
-                            sleep(d);
+                            sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
@@ -19607,8 +19607,8 @@ impl<'a, C, NC, A> RasterCollectionPermissionBatchDeleteCall<'a, C, NC, A> where
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> RasterCollectionPermissionBatchDeleteCall<'a, C, NC, A>
-                                                        where T: Str {
-        self._additional_params.insert(name.as_slice().to_string(), value.as_slice().to_string());
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
     }
 
@@ -19624,8 +19624,8 @@ impl<'a, C, NC, A> RasterCollectionPermissionBatchDeleteCall<'a, C, NC, A> where
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T>(mut self, scope: T) -> RasterCollectionPermissionBatchDeleteCall<'a, C, NC, A> 
-                                                        where T: Str {
-        self._scopes.insert(scope.as_slice().to_string(), ());
+                                                        where T: AsRef<str> {
+        self._scopes.insert(scope.as_ref().to_string(), ());
         self
     }
 }
@@ -19642,8 +19642,8 @@ impl<'a, C, NC, A> RasterCollectionPermissionBatchDeleteCall<'a, C, NC, A> where
 ///
 /// ```test_harness,no_run
 /// # extern crate hyper;
-/// # extern crate "yup-oauth2" as oauth2;
-/// # extern crate "google-mapsengine1" as mapsengine1;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_mapsengine1 as mapsengine1;
 /// use mapsengine1::RasterCollection;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
@@ -19709,7 +19709,7 @@ impl<'a, C, NC, A> RasterCollectionPatchCall<'a, C, NC, A> where NC: hyper::net:
 
         let mut url = "https://www.googleapis.com/mapsengine/v1/rasterCollections/{id}".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Full.as_slice().to_string(), ());
+            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{id}", "id")].iter() {
@@ -19739,7 +19739,7 @@ impl<'a, C, NC, A> RasterCollectionPatchCall<'a, C, NC, A> where NC: hyper::net:
         
         if params.len() > 0 {
             url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
+            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_ref()))));
         }
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
@@ -19762,7 +19762,7 @@ impl<'a, C, NC, A> RasterCollectionPatchCall<'a, C, NC, A> where NC: hyper::net:
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Patch, url.as_slice())
+                let mut req = client.borrow_mut().request(hyper::method::Method::Patch, url.as_ref())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -19776,7 +19776,7 @@ impl<'a, C, NC, A> RasterCollectionPatchCall<'a, C, NC, A> where NC: hyper::net:
             match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
+                        sleep_ms(d.num_milliseconds() as u32);
                         continue;
                     }
                     dlg.finished(false);
@@ -19787,7 +19787,7 @@ impl<'a, C, NC, A> RasterCollectionPatchCall<'a, C, NC, A> where NC: hyper::net:
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
-                            sleep(d);
+                            sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
@@ -19851,8 +19851,8 @@ impl<'a, C, NC, A> RasterCollectionPatchCall<'a, C, NC, A> where NC: hyper::net:
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> RasterCollectionPatchCall<'a, C, NC, A>
-                                                        where T: Str {
-        self._additional_params.insert(name.as_slice().to_string(), value.as_slice().to_string());
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
     }
 
@@ -19868,8 +19868,8 @@ impl<'a, C, NC, A> RasterCollectionPatchCall<'a, C, NC, A> where NC: hyper::net:
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T>(mut self, scope: T) -> RasterCollectionPatchCall<'a, C, NC, A> 
-                                                        where T: Str {
-        self._scopes.insert(scope.as_slice().to_string(), ());
+                                                        where T: AsRef<str> {
+        self._scopes.insert(scope.as_ref().to_string(), ());
         self
     }
 }
@@ -19886,8 +19886,8 @@ impl<'a, C, NC, A> RasterCollectionPatchCall<'a, C, NC, A> where NC: hyper::net:
 ///
 /// ```test_harness,no_run
 /// # extern crate hyper;
-/// # extern crate "yup-oauth2" as oauth2;
-/// # extern crate "google-mapsengine1" as mapsengine1;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_mapsengine1 as mapsengine1;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -19947,7 +19947,7 @@ impl<'a, C, NC, A> RasterCollectionCancelProcessingCall<'a, C, NC, A> where NC: 
 
         let mut url = "https://www.googleapis.com/mapsengine/v1/rasterCollections/{id}/cancelProcessing".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Full.as_slice().to_string(), ());
+            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{id}", "id")].iter() {
@@ -19977,7 +19977,7 @@ impl<'a, C, NC, A> RasterCollectionCancelProcessingCall<'a, C, NC, A> where NC: 
         
         if params.len() > 0 {
             url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
+            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_ref()))));
         }
 
 
@@ -19995,7 +19995,7 @@ impl<'a, C, NC, A> RasterCollectionCancelProcessingCall<'a, C, NC, A> where NC: 
                                                              access_token: token.unwrap().access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.as_slice())
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.as_ref())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -20006,7 +20006,7 @@ impl<'a, C, NC, A> RasterCollectionCancelProcessingCall<'a, C, NC, A> where NC: 
             match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
+                        sleep_ms(d.num_milliseconds() as u32);
                         continue;
                     }
                     dlg.finished(false);
@@ -20017,7 +20017,7 @@ impl<'a, C, NC, A> RasterCollectionCancelProcessingCall<'a, C, NC, A> where NC: 
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
-                            sleep(d);
+                            sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
@@ -20082,8 +20082,8 @@ impl<'a, C, NC, A> RasterCollectionCancelProcessingCall<'a, C, NC, A> where NC: 
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> RasterCollectionCancelProcessingCall<'a, C, NC, A>
-                                                        where T: Str {
-        self._additional_params.insert(name.as_slice().to_string(), value.as_slice().to_string());
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
     }
 
@@ -20099,8 +20099,8 @@ impl<'a, C, NC, A> RasterCollectionCancelProcessingCall<'a, C, NC, A> where NC: 
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T>(mut self, scope: T) -> RasterCollectionCancelProcessingCall<'a, C, NC, A> 
-                                                        where T: Str {
-        self._scopes.insert(scope.as_slice().to_string(), ());
+                                                        where T: AsRef<str> {
+        self._scopes.insert(scope.as_ref().to_string(), ());
         self
     }
 }
@@ -20117,8 +20117,8 @@ impl<'a, C, NC, A> RasterCollectionCancelProcessingCall<'a, C, NC, A> where NC: 
 ///
 /// ```test_harness,no_run
 /// # extern crate hyper;
-/// # extern crate "yup-oauth2" as oauth2;
-/// # extern crate "google-mapsengine1" as mapsengine1;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_mapsengine1 as mapsengine1;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -20178,7 +20178,7 @@ impl<'a, C, NC, A> RasterCollectionProcesCall<'a, C, NC, A> where NC: hyper::net
 
         let mut url = "https://www.googleapis.com/mapsengine/v1/rasterCollections/{id}/process".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Full.as_slice().to_string(), ());
+            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{id}", "id")].iter() {
@@ -20208,7 +20208,7 @@ impl<'a, C, NC, A> RasterCollectionProcesCall<'a, C, NC, A> where NC: hyper::net
         
         if params.len() > 0 {
             url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
+            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_ref()))));
         }
 
 
@@ -20226,7 +20226,7 @@ impl<'a, C, NC, A> RasterCollectionProcesCall<'a, C, NC, A> where NC: hyper::net
                                                              access_token: token.unwrap().access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.as_slice())
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.as_ref())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -20237,7 +20237,7 @@ impl<'a, C, NC, A> RasterCollectionProcesCall<'a, C, NC, A> where NC: hyper::net
             match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
+                        sleep_ms(d.num_milliseconds() as u32);
                         continue;
                     }
                     dlg.finished(false);
@@ -20248,7 +20248,7 @@ impl<'a, C, NC, A> RasterCollectionProcesCall<'a, C, NC, A> where NC: hyper::net
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
-                            sleep(d);
+                            sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
@@ -20313,8 +20313,8 @@ impl<'a, C, NC, A> RasterCollectionProcesCall<'a, C, NC, A> where NC: hyper::net
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> RasterCollectionProcesCall<'a, C, NC, A>
-                                                        where T: Str {
-        self._additional_params.insert(name.as_slice().to_string(), value.as_slice().to_string());
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
     }
 
@@ -20330,8 +20330,8 @@ impl<'a, C, NC, A> RasterCollectionProcesCall<'a, C, NC, A> where NC: hyper::net
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T>(mut self, scope: T) -> RasterCollectionProcesCall<'a, C, NC, A> 
-                                                        where T: Str {
-        self._scopes.insert(scope.as_slice().to_string(), ());
+                                                        where T: AsRef<str> {
+        self._scopes.insert(scope.as_ref().to_string(), ());
         self
     }
 }
@@ -20350,8 +20350,8 @@ impl<'a, C, NC, A> RasterCollectionProcesCall<'a, C, NC, A> where NC: hyper::net
 ///
 /// ```test_harness,no_run
 /// # extern crate hyper;
-/// # extern crate "yup-oauth2" as oauth2;
-/// # extern crate "google-mapsengine1" as mapsengine1;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_mapsengine1 as mapsengine1;
 /// use mapsengine1::PermissionsBatchUpdateRequest;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
@@ -20418,7 +20418,7 @@ impl<'a, C, NC, A> RasterCollectionPermissionBatchUpdateCall<'a, C, NC, A> where
 
         let mut url = "https://www.googleapis.com/mapsengine/v1/rasterCollections/{id}/permissions/batchUpdate".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Full.as_slice().to_string(), ());
+            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{id}", "id")].iter() {
@@ -20448,7 +20448,7 @@ impl<'a, C, NC, A> RasterCollectionPermissionBatchUpdateCall<'a, C, NC, A> where
         
         if params.len() > 0 {
             url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
+            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_ref()))));
         }
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
@@ -20471,7 +20471,7 @@ impl<'a, C, NC, A> RasterCollectionPermissionBatchUpdateCall<'a, C, NC, A> where
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.as_slice())
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.as_ref())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -20485,7 +20485,7 @@ impl<'a, C, NC, A> RasterCollectionPermissionBatchUpdateCall<'a, C, NC, A> where
             match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
+                        sleep_ms(d.num_milliseconds() as u32);
                         continue;
                     }
                     dlg.finished(false);
@@ -20496,7 +20496,7 @@ impl<'a, C, NC, A> RasterCollectionPermissionBatchUpdateCall<'a, C, NC, A> where
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
-                            sleep(d);
+                            sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
@@ -20570,8 +20570,8 @@ impl<'a, C, NC, A> RasterCollectionPermissionBatchUpdateCall<'a, C, NC, A> where
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> RasterCollectionPermissionBatchUpdateCall<'a, C, NC, A>
-                                                        where T: Str {
-        self._additional_params.insert(name.as_slice().to_string(), value.as_slice().to_string());
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
     }
 
@@ -20587,8 +20587,8 @@ impl<'a, C, NC, A> RasterCollectionPermissionBatchUpdateCall<'a, C, NC, A> where
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T>(mut self, scope: T) -> RasterCollectionPermissionBatchUpdateCall<'a, C, NC, A> 
-                                                        where T: Str {
-        self._scopes.insert(scope.as_slice().to_string(), ());
+                                                        where T: AsRef<str> {
+        self._scopes.insert(scope.as_ref().to_string(), ());
         self
     }
 }
@@ -20605,8 +20605,8 @@ impl<'a, C, NC, A> RasterCollectionPermissionBatchUpdateCall<'a, C, NC, A> where
 ///
 /// ```test_harness,no_run
 /// # extern crate hyper;
-/// # extern crate "yup-oauth2" as oauth2;
-/// # extern crate "google-mapsengine1" as mapsengine1;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_mapsengine1 as mapsengine1;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -20665,7 +20665,7 @@ impl<'a, C, NC, A> RasterCollectionDeleteCall<'a, C, NC, A> where NC: hyper::net
 
         let mut url = "https://www.googleapis.com/mapsengine/v1/rasterCollections/{id}".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Full.as_slice().to_string(), ());
+            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{id}", "id")].iter() {
@@ -20695,7 +20695,7 @@ impl<'a, C, NC, A> RasterCollectionDeleteCall<'a, C, NC, A> where NC: hyper::net
         
         if params.len() > 0 {
             url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
+            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_ref()))));
         }
 
 
@@ -20713,7 +20713,7 @@ impl<'a, C, NC, A> RasterCollectionDeleteCall<'a, C, NC, A> where NC: hyper::net
                                                              access_token: token.unwrap().access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Delete, url.as_slice())
+                let mut req = client.borrow_mut().request(hyper::method::Method::Delete, url.as_ref())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -20724,7 +20724,7 @@ impl<'a, C, NC, A> RasterCollectionDeleteCall<'a, C, NC, A> where NC: hyper::net
             match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
+                        sleep_ms(d.num_milliseconds() as u32);
                         continue;
                     }
                     dlg.finished(false);
@@ -20735,7 +20735,7 @@ impl<'a, C, NC, A> RasterCollectionDeleteCall<'a, C, NC, A> where NC: hyper::net
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
-                            sleep(d);
+                            sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
@@ -20790,8 +20790,8 @@ impl<'a, C, NC, A> RasterCollectionDeleteCall<'a, C, NC, A> where NC: hyper::net
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> RasterCollectionDeleteCall<'a, C, NC, A>
-                                                        where T: Str {
-        self._additional_params.insert(name.as_slice().to_string(), value.as_slice().to_string());
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
     }
 
@@ -20807,8 +20807,8 @@ impl<'a, C, NC, A> RasterCollectionDeleteCall<'a, C, NC, A> where NC: hyper::net
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T>(mut self, scope: T) -> RasterCollectionDeleteCall<'a, C, NC, A> 
-                                                        where T: Str {
-        self._scopes.insert(scope.as_slice().to_string(), ());
+                                                        where T: AsRef<str> {
+        self._scopes.insert(scope.as_ref().to_string(), ());
         self
     }
 }
@@ -20825,8 +20825,8 @@ impl<'a, C, NC, A> RasterCollectionDeleteCall<'a, C, NC, A> where NC: hyper::net
 ///
 /// ```test_harness,no_run
 /// # extern crate hyper;
-/// # extern crate "yup-oauth2" as oauth2;
-/// # extern crate "google-mapsengine1" as mapsengine1;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_mapsengine1 as mapsengine1;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -20896,7 +20896,7 @@ impl<'a, C, NC, A> RasterCollectionParentListCall<'a, C, NC, A> where NC: hyper:
 
         let mut url = "https://www.googleapis.com/mapsengine/v1/rasterCollections/{id}/parents".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Readonly.as_slice().to_string(), ());
+            self._scopes.insert(Scope::Readonly.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{id}", "id")].iter() {
@@ -20926,7 +20926,7 @@ impl<'a, C, NC, A> RasterCollectionParentListCall<'a, C, NC, A> where NC: hyper:
         
         if params.len() > 0 {
             url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
+            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_ref()))));
         }
 
 
@@ -20944,7 +20944,7 @@ impl<'a, C, NC, A> RasterCollectionParentListCall<'a, C, NC, A> where NC: hyper:
                                                              access_token: token.unwrap().access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_slice())
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_ref())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -20955,7 +20955,7 @@ impl<'a, C, NC, A> RasterCollectionParentListCall<'a, C, NC, A> where NC: hyper:
             match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
+                        sleep_ms(d.num_milliseconds() as u32);
                         continue;
                     }
                     dlg.finished(false);
@@ -20966,7 +20966,7 @@ impl<'a, C, NC, A> RasterCollectionParentListCall<'a, C, NC, A> where NC: hyper:
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
-                            sleep(d);
+                            sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
@@ -21047,8 +21047,8 @@ impl<'a, C, NC, A> RasterCollectionParentListCall<'a, C, NC, A> where NC: hyper:
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> RasterCollectionParentListCall<'a, C, NC, A>
-                                                        where T: Str {
-        self._additional_params.insert(name.as_slice().to_string(), value.as_slice().to_string());
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
     }
 
@@ -21064,8 +21064,8 @@ impl<'a, C, NC, A> RasterCollectionParentListCall<'a, C, NC, A> where NC: hyper:
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T>(mut self, scope: T) -> RasterCollectionParentListCall<'a, C, NC, A> 
-                                                        where T: Str {
-        self._scopes.insert(scope.as_slice().to_string(), ());
+                                                        where T: AsRef<str> {
+        self._scopes.insert(scope.as_ref().to_string(), ());
         self
     }
 }
@@ -21082,8 +21082,8 @@ impl<'a, C, NC, A> RasterCollectionParentListCall<'a, C, NC, A> where NC: hyper:
 ///
 /// ```test_harness,no_run
 /// # extern crate hyper;
-/// # extern crate "yup-oauth2" as oauth2;
-/// # extern crate "google-mapsengine1" as mapsengine1;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_mapsengine1 as mapsengine1;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -21206,13 +21206,13 @@ impl<'a, C, NC, A> RasterCollectionListCall<'a, C, NC, A> where NC: hyper::net::
 
         let mut url = "https://www.googleapis.com/mapsengine/v1/rasterCollections".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Readonly.as_slice().to_string(), ());
+            self._scopes.insert(Scope::Readonly.as_ref().to_string(), ());
         }
 
         
         if params.len() > 0 {
             url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
+            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_ref()))));
         }
 
 
@@ -21230,7 +21230,7 @@ impl<'a, C, NC, A> RasterCollectionListCall<'a, C, NC, A> where NC: hyper::net::
                                                              access_token: token.unwrap().access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_slice())
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_ref())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -21241,7 +21241,7 @@ impl<'a, C, NC, A> RasterCollectionListCall<'a, C, NC, A> where NC: hyper::net::
             match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
+                        sleep_ms(d.num_milliseconds() as u32);
                         continue;
                     }
                     dlg.finished(false);
@@ -21252,7 +21252,7 @@ impl<'a, C, NC, A> RasterCollectionListCall<'a, C, NC, A> where NC: hyper::net::
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
-                            sleep(d);
+                            sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
@@ -21410,8 +21410,8 @@ impl<'a, C, NC, A> RasterCollectionListCall<'a, C, NC, A> where NC: hyper::net::
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> RasterCollectionListCall<'a, C, NC, A>
-                                                        where T: Str {
-        self._additional_params.insert(name.as_slice().to_string(), value.as_slice().to_string());
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
     }
 
@@ -21427,8 +21427,8 @@ impl<'a, C, NC, A> RasterCollectionListCall<'a, C, NC, A> where NC: hyper::net::
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T>(mut self, scope: T) -> RasterCollectionListCall<'a, C, NC, A> 
-                                                        where T: Str {
-        self._scopes.insert(scope.as_slice().to_string(), ());
+                                                        where T: AsRef<str> {
+        self._scopes.insert(scope.as_ref().to_string(), ());
         self
     }
 }
@@ -21447,8 +21447,8 @@ impl<'a, C, NC, A> RasterCollectionListCall<'a, C, NC, A> where NC: hyper::net::
 ///
 /// ```test_harness,no_run
 /// # extern crate hyper;
-/// # extern crate "yup-oauth2" as oauth2;
-/// # extern crate "google-mapsengine1" as mapsengine1;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_mapsengine1 as mapsengine1;
 /// use mapsengine1::RasterCollectionsRastersBatchInsertRequest;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
@@ -21515,7 +21515,7 @@ impl<'a, C, NC, A> RasterCollectionRasterBatchInsertCall<'a, C, NC, A> where NC:
 
         let mut url = "https://www.googleapis.com/mapsengine/v1/rasterCollections/{id}/rasters/batchInsert".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Full.as_slice().to_string(), ());
+            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{id}", "id")].iter() {
@@ -21545,7 +21545,7 @@ impl<'a, C, NC, A> RasterCollectionRasterBatchInsertCall<'a, C, NC, A> where NC:
         
         if params.len() > 0 {
             url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
+            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_ref()))));
         }
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
@@ -21568,7 +21568,7 @@ impl<'a, C, NC, A> RasterCollectionRasterBatchInsertCall<'a, C, NC, A> where NC:
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.as_slice())
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.as_ref())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -21582,7 +21582,7 @@ impl<'a, C, NC, A> RasterCollectionRasterBatchInsertCall<'a, C, NC, A> where NC:
             match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
+                        sleep_ms(d.num_milliseconds() as u32);
                         continue;
                     }
                     dlg.finished(false);
@@ -21593,7 +21593,7 @@ impl<'a, C, NC, A> RasterCollectionRasterBatchInsertCall<'a, C, NC, A> where NC:
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
-                            sleep(d);
+                            sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
@@ -21667,8 +21667,8 @@ impl<'a, C, NC, A> RasterCollectionRasterBatchInsertCall<'a, C, NC, A> where NC:
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> RasterCollectionRasterBatchInsertCall<'a, C, NC, A>
-                                                        where T: Str {
-        self._additional_params.insert(name.as_slice().to_string(), value.as_slice().to_string());
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
     }
 
@@ -21684,8 +21684,8 @@ impl<'a, C, NC, A> RasterCollectionRasterBatchInsertCall<'a, C, NC, A> where NC:
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T>(mut self, scope: T) -> RasterCollectionRasterBatchInsertCall<'a, C, NC, A> 
-                                                        where T: Str {
-        self._scopes.insert(scope.as_slice().to_string(), ());
+                                                        where T: AsRef<str> {
+        self._scopes.insert(scope.as_ref().to_string(), ());
         self
     }
 }
@@ -21704,8 +21704,8 @@ impl<'a, C, NC, A> RasterCollectionRasterBatchInsertCall<'a, C, NC, A> where NC:
 ///
 /// ```test_harness,no_run
 /// # extern crate hyper;
-/// # extern crate "yup-oauth2" as oauth2;
-/// # extern crate "google-mapsengine1" as mapsengine1;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_mapsengine1 as mapsengine1;
 /// use mapsengine1::RasterCollectionsRasterBatchDeleteRequest;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
@@ -21772,7 +21772,7 @@ impl<'a, C, NC, A> RasterCollectionRasterBatchDeleteCall<'a, C, NC, A> where NC:
 
         let mut url = "https://www.googleapis.com/mapsengine/v1/rasterCollections/{id}/rasters/batchDelete".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Full.as_slice().to_string(), ());
+            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{id}", "id")].iter() {
@@ -21802,7 +21802,7 @@ impl<'a, C, NC, A> RasterCollectionRasterBatchDeleteCall<'a, C, NC, A> where NC:
         
         if params.len() > 0 {
             url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
+            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_ref()))));
         }
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
@@ -21825,7 +21825,7 @@ impl<'a, C, NC, A> RasterCollectionRasterBatchDeleteCall<'a, C, NC, A> where NC:
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.as_slice())
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.as_ref())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -21839,7 +21839,7 @@ impl<'a, C, NC, A> RasterCollectionRasterBatchDeleteCall<'a, C, NC, A> where NC:
             match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
+                        sleep_ms(d.num_milliseconds() as u32);
                         continue;
                     }
                     dlg.finished(false);
@@ -21850,7 +21850,7 @@ impl<'a, C, NC, A> RasterCollectionRasterBatchDeleteCall<'a, C, NC, A> where NC:
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
-                            sleep(d);
+                            sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
@@ -21924,8 +21924,8 @@ impl<'a, C, NC, A> RasterCollectionRasterBatchDeleteCall<'a, C, NC, A> where NC:
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> RasterCollectionRasterBatchDeleteCall<'a, C, NC, A>
-                                                        where T: Str {
-        self._additional_params.insert(name.as_slice().to_string(), value.as_slice().to_string());
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
     }
 
@@ -21941,8 +21941,8 @@ impl<'a, C, NC, A> RasterCollectionRasterBatchDeleteCall<'a, C, NC, A> where NC:
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T>(mut self, scope: T) -> RasterCollectionRasterBatchDeleteCall<'a, C, NC, A> 
-                                                        where T: Str {
-        self._scopes.insert(scope.as_slice().to_string(), ());
+                                                        where T: AsRef<str> {
+        self._scopes.insert(scope.as_ref().to_string(), ());
         self
     }
 }
@@ -21959,8 +21959,8 @@ impl<'a, C, NC, A> RasterCollectionRasterBatchDeleteCall<'a, C, NC, A> where NC:
 ///
 /// ```test_harness,no_run
 /// # extern crate hyper;
-/// # extern crate "yup-oauth2" as oauth2;
-/// # extern crate "google-mapsengine1" as mapsengine1;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_mapsengine1 as mapsengine1;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -22020,7 +22020,7 @@ impl<'a, C, NC, A> RasterCollectionPermissionListCall<'a, C, NC, A> where NC: hy
 
         let mut url = "https://www.googleapis.com/mapsengine/v1/rasterCollections/{id}/permissions".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Readonly.as_slice().to_string(), ());
+            self._scopes.insert(Scope::Readonly.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{id}", "id")].iter() {
@@ -22050,7 +22050,7 @@ impl<'a, C, NC, A> RasterCollectionPermissionListCall<'a, C, NC, A> where NC: hy
         
         if params.len() > 0 {
             url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
+            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_ref()))));
         }
 
 
@@ -22068,7 +22068,7 @@ impl<'a, C, NC, A> RasterCollectionPermissionListCall<'a, C, NC, A> where NC: hy
                                                              access_token: token.unwrap().access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_slice())
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_ref())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -22079,7 +22079,7 @@ impl<'a, C, NC, A> RasterCollectionPermissionListCall<'a, C, NC, A> where NC: hy
             match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
+                        sleep_ms(d.num_milliseconds() as u32);
                         continue;
                     }
                     dlg.finished(false);
@@ -22090,7 +22090,7 @@ impl<'a, C, NC, A> RasterCollectionPermissionListCall<'a, C, NC, A> where NC: hy
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
-                            sleep(d);
+                            sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
@@ -22155,8 +22155,8 @@ impl<'a, C, NC, A> RasterCollectionPermissionListCall<'a, C, NC, A> where NC: hy
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> RasterCollectionPermissionListCall<'a, C, NC, A>
-                                                        where T: Str {
-        self._additional_params.insert(name.as_slice().to_string(), value.as_slice().to_string());
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
     }
 
@@ -22172,8 +22172,8 @@ impl<'a, C, NC, A> RasterCollectionPermissionListCall<'a, C, NC, A> where NC: hy
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T>(mut self, scope: T) -> RasterCollectionPermissionListCall<'a, C, NC, A> 
-                                                        where T: Str {
-        self._scopes.insert(scope.as_slice().to_string(), ());
+                                                        where T: AsRef<str> {
+        self._scopes.insert(scope.as_ref().to_string(), ());
         self
     }
 }
@@ -22190,8 +22190,8 @@ impl<'a, C, NC, A> RasterCollectionPermissionListCall<'a, C, NC, A> where NC: hy
 ///
 /// ```test_harness,no_run
 /// # extern crate hyper;
-/// # extern crate "yup-oauth2" as oauth2;
-/// # extern crate "google-mapsengine1" as mapsengine1;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_mapsengine1 as mapsengine1;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -22251,7 +22251,7 @@ impl<'a, C, NC, A> RasterCollectionGetCall<'a, C, NC, A> where NC: hyper::net::N
 
         let mut url = "https://www.googleapis.com/mapsengine/v1/rasterCollections/{id}".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Readonly.as_slice().to_string(), ());
+            self._scopes.insert(Scope::Readonly.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{id}", "id")].iter() {
@@ -22281,7 +22281,7 @@ impl<'a, C, NC, A> RasterCollectionGetCall<'a, C, NC, A> where NC: hyper::net::N
         
         if params.len() > 0 {
             url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
+            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_ref()))));
         }
 
 
@@ -22299,7 +22299,7 @@ impl<'a, C, NC, A> RasterCollectionGetCall<'a, C, NC, A> where NC: hyper::net::N
                                                              access_token: token.unwrap().access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_slice())
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_ref())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -22310,7 +22310,7 @@ impl<'a, C, NC, A> RasterCollectionGetCall<'a, C, NC, A> where NC: hyper::net::N
             match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
+                        sleep_ms(d.num_milliseconds() as u32);
                         continue;
                     }
                     dlg.finished(false);
@@ -22321,7 +22321,7 @@ impl<'a, C, NC, A> RasterCollectionGetCall<'a, C, NC, A> where NC: hyper::net::N
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
-                            sleep(d);
+                            sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
@@ -22386,8 +22386,8 @@ impl<'a, C, NC, A> RasterCollectionGetCall<'a, C, NC, A> where NC: hyper::net::N
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> RasterCollectionGetCall<'a, C, NC, A>
-                                                        where T: Str {
-        self._additional_params.insert(name.as_slice().to_string(), value.as_slice().to_string());
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
     }
 
@@ -22403,8 +22403,8 @@ impl<'a, C, NC, A> RasterCollectionGetCall<'a, C, NC, A> where NC: hyper::net::N
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T>(mut self, scope: T) -> RasterCollectionGetCall<'a, C, NC, A> 
-                                                        where T: Str {
-        self._scopes.insert(scope.as_slice().to_string(), ());
+                                                        where T: AsRef<str> {
+        self._scopes.insert(scope.as_ref().to_string(), ());
         self
     }
 }
@@ -22421,8 +22421,8 @@ impl<'a, C, NC, A> RasterCollectionGetCall<'a, C, NC, A> where NC: hyper::net::N
 ///
 /// ```test_harness,no_run
 /// # extern crate hyper;
-/// # extern crate "yup-oauth2" as oauth2;
-/// # extern crate "google-mapsengine1" as mapsengine1;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_mapsengine1 as mapsengine1;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -22537,7 +22537,7 @@ impl<'a, C, NC, A> RasterCollectionRasterListCall<'a, C, NC, A> where NC: hyper:
 
         let mut url = "https://www.googleapis.com/mapsengine/v1/rasterCollections/{id}/rasters".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Readonly.as_slice().to_string(), ());
+            self._scopes.insert(Scope::Readonly.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{id}", "id")].iter() {
@@ -22567,7 +22567,7 @@ impl<'a, C, NC, A> RasterCollectionRasterListCall<'a, C, NC, A> where NC: hyper:
         
         if params.len() > 0 {
             url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
+            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_ref()))));
         }
 
 
@@ -22585,7 +22585,7 @@ impl<'a, C, NC, A> RasterCollectionRasterListCall<'a, C, NC, A> where NC: hyper:
                                                              access_token: token.unwrap().access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_slice())
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_ref())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -22596,7 +22596,7 @@ impl<'a, C, NC, A> RasterCollectionRasterListCall<'a, C, NC, A> where NC: hyper:
             match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
+                        sleep_ms(d.num_milliseconds() as u32);
                         continue;
                     }
                     dlg.finished(false);
@@ -22607,7 +22607,7 @@ impl<'a, C, NC, A> RasterCollectionRasterListCall<'a, C, NC, A> where NC: hyper:
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
-                            sleep(d);
+                            sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
@@ -22760,8 +22760,8 @@ impl<'a, C, NC, A> RasterCollectionRasterListCall<'a, C, NC, A> where NC: hyper:
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> RasterCollectionRasterListCall<'a, C, NC, A>
-                                                        where T: Str {
-        self._additional_params.insert(name.as_slice().to_string(), value.as_slice().to_string());
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
     }
 
@@ -22777,8 +22777,8 @@ impl<'a, C, NC, A> RasterCollectionRasterListCall<'a, C, NC, A> where NC: hyper:
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T>(mut self, scope: T) -> RasterCollectionRasterListCall<'a, C, NC, A> 
-                                                        where T: Str {
-        self._scopes.insert(scope.as_slice().to_string(), ());
+                                                        where T: AsRef<str> {
+        self._scopes.insert(scope.as_ref().to_string(), ());
         self
     }
 }
@@ -22800,8 +22800,8 @@ impl<'a, C, NC, A> RasterCollectionRasterListCall<'a, C, NC, A> where NC: hyper:
 ///
 /// ```test_harness,no_run
 /// # extern crate hyper;
-/// # extern crate "yup-oauth2" as oauth2;
-/// # extern crate "google-mapsengine1" as mapsengine1;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_mapsengine1 as mapsengine1;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -22865,7 +22865,7 @@ impl<'a, C, NC, A> ProjectIconGetCall<'a, C, NC, A> where NC: hyper::net::Networ
             for &(name, ref value) in params.iter() {
                 if name == "alt" {
                     field_present = false;
-                    if value.as_slice() != "json" {
+                    if <String as AsRef<str>>::as_ref(&value) != "json" {
                         enable = false;
                     }
                     break;
@@ -22879,7 +22879,7 @@ impl<'a, C, NC, A> ProjectIconGetCall<'a, C, NC, A> where NC: hyper::net::Networ
 
         let mut url = "https://www.googleapis.com/mapsengine/v1/projects/{projectId}/icons/{id}".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Readonly.as_slice().to_string(), ());
+            self._scopes.insert(Scope::Readonly.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{projectId}", "projectId"), ("{id}", "id")].iter() {
@@ -22909,7 +22909,7 @@ impl<'a, C, NC, A> ProjectIconGetCall<'a, C, NC, A> where NC: hyper::net::Networ
         
         if params.len() > 0 {
             url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
+            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_ref()))));
         }
 
 
@@ -22927,7 +22927,7 @@ impl<'a, C, NC, A> ProjectIconGetCall<'a, C, NC, A> where NC: hyper::net::Networ
                                                              access_token: token.unwrap().access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_slice())
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_ref())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -22938,7 +22938,7 @@ impl<'a, C, NC, A> ProjectIconGetCall<'a, C, NC, A> where NC: hyper::net::Networ
             match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
+                        sleep_ms(d.num_milliseconds() as u32);
                         continue;
                     }
                     dlg.finished(false);
@@ -22949,7 +22949,7 @@ impl<'a, C, NC, A> ProjectIconGetCall<'a, C, NC, A> where NC: hyper::net::Networ
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
-                            sleep(d);
+                            sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
@@ -23024,8 +23024,8 @@ impl<'a, C, NC, A> ProjectIconGetCall<'a, C, NC, A> where NC: hyper::net::Networ
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> ProjectIconGetCall<'a, C, NC, A>
-                                                        where T: Str {
-        self._additional_params.insert(name.as_slice().to_string(), value.as_slice().to_string());
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
     }
 
@@ -23041,8 +23041,8 @@ impl<'a, C, NC, A> ProjectIconGetCall<'a, C, NC, A> where NC: hyper::net::Networ
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T>(mut self, scope: T) -> ProjectIconGetCall<'a, C, NC, A> 
-                                                        where T: Str {
-        self._scopes.insert(scope.as_slice().to_string(), ());
+                                                        where T: AsRef<str> {
+        self._scopes.insert(scope.as_ref().to_string(), ());
         self
     }
 }
@@ -23059,8 +23059,8 @@ impl<'a, C, NC, A> ProjectIconGetCall<'a, C, NC, A> where NC: hyper::net::Networ
 ///
 /// ```test_harness,no_run
 /// # extern crate hyper;
-/// # extern crate "yup-oauth2" as oauth2;
-/// # extern crate "google-mapsengine1" as mapsengine1;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_mapsengine1 as mapsengine1;
 /// use mapsengine1::Icon;
 /// use std::fs;
 /// # #[test] fn egal() {
@@ -23136,7 +23136,7 @@ impl<'a, C, NC, A> ProjectIconCreateCall<'a, C, NC, A> where NC: hyper::net::Net
         };
         params.push(("uploadType", protocol.to_string()));
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Full.as_slice().to_string(), ());
+            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{projectId}", "projectId")].iter() {
@@ -23166,7 +23166,7 @@ impl<'a, C, NC, A> ProjectIconCreateCall<'a, C, NC, A> where NC: hyper::net::Net
         
         if params.len() > 0 {
             url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
+            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_ref()))));
         }
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
@@ -23221,7 +23221,7 @@ impl<'a, C, NC, A> ProjectIconCreateCall<'a, C, NC, A> where NC: hyper::net::Net
                         _ => (&mut request_value_reader as &mut io::Read, ContentType(json_mime_type.clone())),
                     };
                     let mut client = &mut *self.hub.client.borrow_mut();
-                    let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.as_slice())
+                    let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.as_ref())
                         .header(UserAgent(self.hub._user_agent.clone()))
                         .header(auth_header.clone())
                         .header(content_type)
@@ -23239,7 +23239,7 @@ impl<'a, C, NC, A> ProjectIconCreateCall<'a, C, NC, A> where NC: hyper::net::Net
             match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
+                        sleep_ms(d.num_milliseconds() as u32);
                         continue;
                     }
                     dlg.finished(false);
@@ -23250,7 +23250,7 @@ impl<'a, C, NC, A> ProjectIconCreateCall<'a, C, NC, A> where NC: hyper::net::Net
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
-                            sleep(d);
+                            sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
@@ -23394,8 +23394,8 @@ impl<'a, C, NC, A> ProjectIconCreateCall<'a, C, NC, A> where NC: hyper::net::Net
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> ProjectIconCreateCall<'a, C, NC, A>
-                                                        where T: Str {
-        self._additional_params.insert(name.as_slice().to_string(), value.as_slice().to_string());
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
     }
 
@@ -23411,8 +23411,8 @@ impl<'a, C, NC, A> ProjectIconCreateCall<'a, C, NC, A> where NC: hyper::net::Net
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T>(mut self, scope: T) -> ProjectIconCreateCall<'a, C, NC, A> 
-                                                        where T: Str {
-        self._scopes.insert(scope.as_slice().to_string(), ());
+                                                        where T: AsRef<str> {
+        self._scopes.insert(scope.as_ref().to_string(), ());
         self
     }
 }
@@ -23429,8 +23429,8 @@ impl<'a, C, NC, A> ProjectIconCreateCall<'a, C, NC, A> where NC: hyper::net::Net
 ///
 /// ```test_harness,no_run
 /// # extern crate hyper;
-/// # extern crate "yup-oauth2" as oauth2;
-/// # extern crate "google-mapsengine1" as mapsengine1;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_mapsengine1 as mapsengine1;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -23488,13 +23488,13 @@ impl<'a, C, NC, A> ProjectListCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
 
         let mut url = "https://www.googleapis.com/mapsengine/v1/projects".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Readonly.as_slice().to_string(), ());
+            self._scopes.insert(Scope::Readonly.as_ref().to_string(), ());
         }
 
         
         if params.len() > 0 {
             url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
+            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_ref()))));
         }
 
 
@@ -23512,7 +23512,7 @@ impl<'a, C, NC, A> ProjectListCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
                                                              access_token: token.unwrap().access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_slice())
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_ref())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -23523,7 +23523,7 @@ impl<'a, C, NC, A> ProjectListCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
             match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
+                        sleep_ms(d.num_milliseconds() as u32);
                         continue;
                     }
                     dlg.finished(false);
@@ -23534,7 +23534,7 @@ impl<'a, C, NC, A> ProjectListCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
-                            sleep(d);
+                            sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
@@ -23589,8 +23589,8 @@ impl<'a, C, NC, A> ProjectListCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> ProjectListCall<'a, C, NC, A>
-                                                        where T: Str {
-        self._additional_params.insert(name.as_slice().to_string(), value.as_slice().to_string());
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
     }
 
@@ -23606,8 +23606,8 @@ impl<'a, C, NC, A> ProjectListCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T>(mut self, scope: T) -> ProjectListCall<'a, C, NC, A> 
-                                                        where T: Str {
-        self._scopes.insert(scope.as_slice().to_string(), ());
+                                                        where T: AsRef<str> {
+        self._scopes.insert(scope.as_ref().to_string(), ());
         self
     }
 }
@@ -23624,8 +23624,8 @@ impl<'a, C, NC, A> ProjectListCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
 ///
 /// ```test_harness,no_run
 /// # extern crate hyper;
-/// # extern crate "yup-oauth2" as oauth2;
-/// # extern crate "google-mapsengine1" as mapsengine1;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_mapsengine1 as mapsengine1;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -23695,7 +23695,7 @@ impl<'a, C, NC, A> ProjectIconListCall<'a, C, NC, A> where NC: hyper::net::Netwo
 
         let mut url = "https://www.googleapis.com/mapsengine/v1/projects/{projectId}/icons".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Readonly.as_slice().to_string(), ());
+            self._scopes.insert(Scope::Readonly.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{projectId}", "projectId")].iter() {
@@ -23725,7 +23725,7 @@ impl<'a, C, NC, A> ProjectIconListCall<'a, C, NC, A> where NC: hyper::net::Netwo
         
         if params.len() > 0 {
             url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
+            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_ref()))));
         }
 
 
@@ -23743,7 +23743,7 @@ impl<'a, C, NC, A> ProjectIconListCall<'a, C, NC, A> where NC: hyper::net::Netwo
                                                              access_token: token.unwrap().access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_slice())
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_ref())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -23754,7 +23754,7 @@ impl<'a, C, NC, A> ProjectIconListCall<'a, C, NC, A> where NC: hyper::net::Netwo
             match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
+                        sleep_ms(d.num_milliseconds() as u32);
                         continue;
                     }
                     dlg.finished(false);
@@ -23765,7 +23765,7 @@ impl<'a, C, NC, A> ProjectIconListCall<'a, C, NC, A> where NC: hyper::net::Netwo
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
-                            sleep(d);
+                            sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
@@ -23846,8 +23846,8 @@ impl<'a, C, NC, A> ProjectIconListCall<'a, C, NC, A> where NC: hyper::net::Netwo
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> ProjectIconListCall<'a, C, NC, A>
-                                                        where T: Str {
-        self._additional_params.insert(name.as_slice().to_string(), value.as_slice().to_string());
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
     }
 
@@ -23863,8 +23863,8 @@ impl<'a, C, NC, A> ProjectIconListCall<'a, C, NC, A> where NC: hyper::net::Netwo
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T>(mut self, scope: T) -> ProjectIconListCall<'a, C, NC, A> 
-                                                        where T: Str {
-        self._scopes.insert(scope.as_slice().to_string(), ());
+                                                        where T: AsRef<str> {
+        self._scopes.insert(scope.as_ref().to_string(), ());
         self
     }
 }

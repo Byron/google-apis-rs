@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *pubsub* crate version *0.1.2+20150213*, where *20150213* is the exact revision of the *pubsub:v1beta2* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.2*.
+//! This documentation was generated from *pubsub* crate version *0.1.2+20150326*, where *20150326* is the exact revision of the *pubsub:v1beta2* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.2*.
 //! The original source code is [on github](https://github.com/Byron/google-apis-rs/tree/master/gen/pubsub1_beta2).
 //! # Features
 //! 
@@ -71,8 +71,8 @@
 //! 
 //! ```test_harness,no_run
 //! extern crate hyper;
-//! extern crate "yup-oauth2" as oauth2;
-//! extern crate "google-pubsub1_beta2" as pubsub1_beta2;
+//! extern crate yup_oauth2 as oauth2;
+//! extern crate google_pubsub1_beta2 as pubsub1_beta2;
 //! use pubsub1_beta2::AcknowledgeRequest;
 //! use pubsub1_beta2::{Result, Error};
 //! # #[test] fn egal() {
@@ -171,20 +171,20 @@
 //! [google-go-api]: https://github.com/google/google-api-go-client
 //! 
 //! 
-#![feature(core,io,thread_sleep)]
+#![feature(std_misc)]
 // Unused attributes happen thanks to defined, but unused structures
 // We don't warn about this, as depending on the API, some data structures or facilities are never used.
 // Instead of pre-determining this, we just disable the lint. It's manually tuned to not have any 
 // unused imports in fully featured APIs. Same with unused_mut ... .
 #![allow(unused_imports, unused_mut, dead_code)]
 // Required for serde annotations
-#![feature(custom_derive, custom_attribute, plugin)]
+#![feature(custom_derive, custom_attribute, plugin, slice_patterns)]
 #![plugin(serde_macros)]
 
 #[macro_use]
 extern crate hyper;
 extern crate serde;
-extern crate "yup-oauth2" as oauth2;
+extern crate yup_oauth2 as oauth2;
 extern crate mime;
 extern crate url;
 
@@ -199,7 +199,7 @@ use std::marker::PhantomData;
 use serde::json;
 use std::io;
 use std::fs;
-use std::thread::sleep;
+use std::thread::sleep_ms;
 
 pub use cmn::{MultiPartReader, ToParts, MethodInfo, Result, Error, CallBuilder, Hub, ReadSeek, Part, ResponseResult, RequestValue, NestedType, Delegate, DefaultDelegate, MethodsBuilder, Resource, JsonServerError};
 
@@ -220,8 +220,8 @@ pub enum Scope {
     Full,
 }
 
-impl Str for Scope {
-    fn as_slice(&self) -> &str {
+impl AsRef<str> for Scope {
+    fn as_ref(&self) -> &str {
         match *self {
             Scope::CloudPlatform => "https://www.googleapis.com/auth/cloud-platform",
             Scope::Full => "https://www.googleapis.com/auth/pubsub",
@@ -249,8 +249,8 @@ impl Default for Scope {
 ///
 /// ```test_harness,no_run
 /// extern crate hyper;
-/// extern crate "yup-oauth2" as oauth2;
-/// extern crate "google-pubsub1_beta2" as pubsub1_beta2;
+/// extern crate yup_oauth2 as oauth2;
+/// extern crate google_pubsub1_beta2 as pubsub1_beta2;
 /// use pubsub1_beta2::AcknowledgeRequest;
 /// use pubsub1_beta2::{Result, Error};
 /// # #[test] fn egal() {
@@ -669,8 +669,8 @@ impl ResponseResult for Subscription {}
 ///
 /// ```test_harness,no_run
 /// extern crate hyper;
-/// extern crate "yup-oauth2" as oauth2;
-/// extern crate "google-pubsub1_beta2" as pubsub1_beta2;
+/// extern crate yup_oauth2 as oauth2;
+/// extern crate google_pubsub1_beta2 as pubsub1_beta2;
 /// 
 /// # #[test] fn egal() {
 /// use std::default::Default;
@@ -757,7 +757,7 @@ impl<'a, C, NC, A> ProjectMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Deletes the topic with the given name. All subscriptions to this topic are detached from the topic. Returns NOT_FOUND if the topic does not exist. After a topic is deleted, a new topic may be created with the same name; this is an entirely new topic with none of the old configuration or subscriptions.
+    /// Deletes the topic with the given name. Returns NOT_FOUND if the topic does not exist. After a topic is deleted, a new topic may be created with the same name; this is an entirely new topic with none of the old configuration or subscriptions. Existing subscriptions to this topic are not deleted.
     /// 
     /// # Arguments
     ///
@@ -976,8 +976,8 @@ impl<'a, C, NC, A> ProjectMethods<'a, C, NC, A> {
 ///
 /// ```test_harness,no_run
 /// # extern crate hyper;
-/// # extern crate "yup-oauth2" as oauth2;
-/// # extern crate "google-pubsub1_beta2" as pubsub1_beta2;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_pubsub1_beta2 as pubsub1_beta2;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -1048,7 +1048,7 @@ impl<'a, C, NC, A> ProjectTopicListCall<'a, C, NC, A> where NC: hyper::net::Netw
 
         let mut url = "https://pubsub.googleapis.com/v1beta2/{+project}/topics".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::CloudPlatform.as_slice().to_string(), ());
+            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{+project}", "project")].iter() {
@@ -1081,7 +1081,7 @@ impl<'a, C, NC, A> ProjectTopicListCall<'a, C, NC, A> where NC: hyper::net::Netw
         
         if params.len() > 0 {
             url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
+            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_ref()))));
         }
 
 
@@ -1099,7 +1099,7 @@ impl<'a, C, NC, A> ProjectTopicListCall<'a, C, NC, A> where NC: hyper::net::Netw
                                                              access_token: token.unwrap().access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_slice())
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_ref())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -1110,7 +1110,7 @@ impl<'a, C, NC, A> ProjectTopicListCall<'a, C, NC, A> where NC: hyper::net::Netw
             match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
+                        sleep_ms(d.num_milliseconds() as u32);
                         continue;
                     }
                     dlg.finished(false);
@@ -1121,7 +1121,7 @@ impl<'a, C, NC, A> ProjectTopicListCall<'a, C, NC, A> where NC: hyper::net::Netw
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
-                            sleep(d);
+                            sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
@@ -1199,8 +1199,8 @@ impl<'a, C, NC, A> ProjectTopicListCall<'a, C, NC, A> where NC: hyper::net::Netw
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> ProjectTopicListCall<'a, C, NC, A>
-                                                        where T: Str {
-        self._additional_params.insert(name.as_slice().to_string(), value.as_slice().to_string());
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
     }
 
@@ -1216,8 +1216,8 @@ impl<'a, C, NC, A> ProjectTopicListCall<'a, C, NC, A> where NC: hyper::net::Netw
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T>(mut self, scope: T) -> ProjectTopicListCall<'a, C, NC, A> 
-                                                        where T: Str {
-        self._scopes.insert(scope.as_slice().to_string(), ());
+                                                        where T: AsRef<str> {
+        self._scopes.insert(scope.as_ref().to_string(), ());
         self
     }
 }
@@ -1234,8 +1234,8 @@ impl<'a, C, NC, A> ProjectTopicListCall<'a, C, NC, A> where NC: hyper::net::Netw
 ///
 /// ```test_harness,no_run
 /// # extern crate hyper;
-/// # extern crate "yup-oauth2" as oauth2;
-/// # extern crate "google-pubsub1_beta2" as pubsub1_beta2;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_pubsub1_beta2 as pubsub1_beta2;
 /// use pubsub1_beta2::PullRequest;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
@@ -1303,7 +1303,7 @@ impl<'a, C, NC, A> ProjectSubscriptionPullCall<'a, C, NC, A> where NC: hyper::ne
 
         let mut url = "https://pubsub.googleapis.com/v1beta2/{+subscription}:pull".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::CloudPlatform.as_slice().to_string(), ());
+            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{+subscription}", "subscription")].iter() {
@@ -1336,7 +1336,7 @@ impl<'a, C, NC, A> ProjectSubscriptionPullCall<'a, C, NC, A> where NC: hyper::ne
         
         if params.len() > 0 {
             url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
+            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_ref()))));
         }
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
@@ -1359,7 +1359,7 @@ impl<'a, C, NC, A> ProjectSubscriptionPullCall<'a, C, NC, A> where NC: hyper::ne
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.as_slice())
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.as_ref())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -1373,7 +1373,7 @@ impl<'a, C, NC, A> ProjectSubscriptionPullCall<'a, C, NC, A> where NC: hyper::ne
             match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
+                        sleep_ms(d.num_milliseconds() as u32);
                         continue;
                     }
                     dlg.finished(false);
@@ -1384,7 +1384,7 @@ impl<'a, C, NC, A> ProjectSubscriptionPullCall<'a, C, NC, A> where NC: hyper::ne
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
-                            sleep(d);
+                            sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
@@ -1457,8 +1457,8 @@ impl<'a, C, NC, A> ProjectSubscriptionPullCall<'a, C, NC, A> where NC: hyper::ne
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> ProjectSubscriptionPullCall<'a, C, NC, A>
-                                                        where T: Str {
-        self._additional_params.insert(name.as_slice().to_string(), value.as_slice().to_string());
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
     }
 
@@ -1474,8 +1474,8 @@ impl<'a, C, NC, A> ProjectSubscriptionPullCall<'a, C, NC, A> where NC: hyper::ne
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T>(mut self, scope: T) -> ProjectSubscriptionPullCall<'a, C, NC, A> 
-                                                        where T: Str {
-        self._scopes.insert(scope.as_slice().to_string(), ());
+                                                        where T: AsRef<str> {
+        self._scopes.insert(scope.as_ref().to_string(), ());
         self
     }
 }
@@ -1492,8 +1492,8 @@ impl<'a, C, NC, A> ProjectSubscriptionPullCall<'a, C, NC, A> where NC: hyper::ne
 ///
 /// ```test_harness,no_run
 /// # extern crate hyper;
-/// # extern crate "yup-oauth2" as oauth2;
-/// # extern crate "google-pubsub1_beta2" as pubsub1_beta2;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_pubsub1_beta2 as pubsub1_beta2;
 /// use pubsub1_beta2::Topic;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
@@ -1561,7 +1561,7 @@ impl<'a, C, NC, A> ProjectTopicCreateCall<'a, C, NC, A> where NC: hyper::net::Ne
 
         let mut url = "https://pubsub.googleapis.com/v1beta2/{+name}".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::CloudPlatform.as_slice().to_string(), ());
+            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{+name}", "name")].iter() {
@@ -1594,7 +1594,7 @@ impl<'a, C, NC, A> ProjectTopicCreateCall<'a, C, NC, A> where NC: hyper::net::Ne
         
         if params.len() > 0 {
             url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
+            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_ref()))));
         }
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
@@ -1617,7 +1617,7 @@ impl<'a, C, NC, A> ProjectTopicCreateCall<'a, C, NC, A> where NC: hyper::net::Ne
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Put, url.as_slice())
+                let mut req = client.borrow_mut().request(hyper::method::Method::Put, url.as_ref())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -1631,7 +1631,7 @@ impl<'a, C, NC, A> ProjectTopicCreateCall<'a, C, NC, A> where NC: hyper::net::Ne
             match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
+                        sleep_ms(d.num_milliseconds() as u32);
                         continue;
                     }
                     dlg.finished(false);
@@ -1642,7 +1642,7 @@ impl<'a, C, NC, A> ProjectTopicCreateCall<'a, C, NC, A> where NC: hyper::net::Ne
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
-                            sleep(d);
+                            sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
@@ -1715,8 +1715,8 @@ impl<'a, C, NC, A> ProjectTopicCreateCall<'a, C, NC, A> where NC: hyper::net::Ne
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> ProjectTopicCreateCall<'a, C, NC, A>
-                                                        where T: Str {
-        self._additional_params.insert(name.as_slice().to_string(), value.as_slice().to_string());
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
     }
 
@@ -1732,14 +1732,14 @@ impl<'a, C, NC, A> ProjectTopicCreateCall<'a, C, NC, A> where NC: hyper::net::Ne
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T>(mut self, scope: T) -> ProjectTopicCreateCall<'a, C, NC, A> 
-                                                        where T: Str {
-        self._scopes.insert(scope.as_slice().to_string(), ());
+                                                        where T: AsRef<str> {
+        self._scopes.insert(scope.as_ref().to_string(), ());
         self
     }
 }
 
 
-/// Deletes the topic with the given name. All subscriptions to this topic are detached from the topic. Returns NOT_FOUND if the topic does not exist. After a topic is deleted, a new topic may be created with the same name; this is an entirely new topic with none of the old configuration or subscriptions.
+/// Deletes the topic with the given name. Returns NOT_FOUND if the topic does not exist. After a topic is deleted, a new topic may be created with the same name; this is an entirely new topic with none of the old configuration or subscriptions. Existing subscriptions to this topic are not deleted.
 ///
 /// A builder for the *topics.delete* method supported by a *project* resource.
 /// It is not used directly, but through a `ProjectMethods` instance.
@@ -1750,8 +1750,8 @@ impl<'a, C, NC, A> ProjectTopicCreateCall<'a, C, NC, A> where NC: hyper::net::Ne
 ///
 /// ```test_harness,no_run
 /// # extern crate hyper;
-/// # extern crate "yup-oauth2" as oauth2;
-/// # extern crate "google-pubsub1_beta2" as pubsub1_beta2;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_pubsub1_beta2 as pubsub1_beta2;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -1812,7 +1812,7 @@ impl<'a, C, NC, A> ProjectTopicDeleteCall<'a, C, NC, A> where NC: hyper::net::Ne
 
         let mut url = "https://pubsub.googleapis.com/v1beta2/{+topic}".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::CloudPlatform.as_slice().to_string(), ());
+            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{+topic}", "topic")].iter() {
@@ -1845,7 +1845,7 @@ impl<'a, C, NC, A> ProjectTopicDeleteCall<'a, C, NC, A> where NC: hyper::net::Ne
         
         if params.len() > 0 {
             url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
+            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_ref()))));
         }
 
 
@@ -1863,7 +1863,7 @@ impl<'a, C, NC, A> ProjectTopicDeleteCall<'a, C, NC, A> where NC: hyper::net::Ne
                                                              access_token: token.unwrap().access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Delete, url.as_slice())
+                let mut req = client.borrow_mut().request(hyper::method::Method::Delete, url.as_ref())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -1874,7 +1874,7 @@ impl<'a, C, NC, A> ProjectTopicDeleteCall<'a, C, NC, A> where NC: hyper::net::Ne
             match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
+                        sleep_ms(d.num_milliseconds() as u32);
                         continue;
                     }
                     dlg.finished(false);
@@ -1885,7 +1885,7 @@ impl<'a, C, NC, A> ProjectTopicDeleteCall<'a, C, NC, A> where NC: hyper::net::Ne
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
-                            sleep(d);
+                            sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
@@ -1949,8 +1949,8 @@ impl<'a, C, NC, A> ProjectTopicDeleteCall<'a, C, NC, A> where NC: hyper::net::Ne
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> ProjectTopicDeleteCall<'a, C, NC, A>
-                                                        where T: Str {
-        self._additional_params.insert(name.as_slice().to_string(), value.as_slice().to_string());
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
     }
 
@@ -1966,8 +1966,8 @@ impl<'a, C, NC, A> ProjectTopicDeleteCall<'a, C, NC, A> where NC: hyper::net::Ne
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T>(mut self, scope: T) -> ProjectTopicDeleteCall<'a, C, NC, A> 
-                                                        where T: Str {
-        self._scopes.insert(scope.as_slice().to_string(), ());
+                                                        where T: AsRef<str> {
+        self._scopes.insert(scope.as_ref().to_string(), ());
         self
     }
 }
@@ -1984,8 +1984,8 @@ impl<'a, C, NC, A> ProjectTopicDeleteCall<'a, C, NC, A> where NC: hyper::net::Ne
 ///
 /// ```test_harness,no_run
 /// # extern crate hyper;
-/// # extern crate "yup-oauth2" as oauth2;
-/// # extern crate "google-pubsub1_beta2" as pubsub1_beta2;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_pubsub1_beta2 as pubsub1_beta2;
 /// use pubsub1_beta2::ModifyPushConfigRequest;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
@@ -2053,7 +2053,7 @@ impl<'a, C, NC, A> ProjectSubscriptionModifyPushConfigCall<'a, C, NC, A> where N
 
         let mut url = "https://pubsub.googleapis.com/v1beta2/{+subscription}:modifyPushConfig".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::CloudPlatform.as_slice().to_string(), ());
+            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{+subscription}", "subscription")].iter() {
@@ -2086,7 +2086,7 @@ impl<'a, C, NC, A> ProjectSubscriptionModifyPushConfigCall<'a, C, NC, A> where N
         
         if params.len() > 0 {
             url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
+            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_ref()))));
         }
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
@@ -2109,7 +2109,7 @@ impl<'a, C, NC, A> ProjectSubscriptionModifyPushConfigCall<'a, C, NC, A> where N
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.as_slice())
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.as_ref())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -2123,7 +2123,7 @@ impl<'a, C, NC, A> ProjectSubscriptionModifyPushConfigCall<'a, C, NC, A> where N
             match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
+                        sleep_ms(d.num_milliseconds() as u32);
                         continue;
                     }
                     dlg.finished(false);
@@ -2134,7 +2134,7 @@ impl<'a, C, NC, A> ProjectSubscriptionModifyPushConfigCall<'a, C, NC, A> where N
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
-                            sleep(d);
+                            sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
@@ -2207,8 +2207,8 @@ impl<'a, C, NC, A> ProjectSubscriptionModifyPushConfigCall<'a, C, NC, A> where N
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> ProjectSubscriptionModifyPushConfigCall<'a, C, NC, A>
-                                                        where T: Str {
-        self._additional_params.insert(name.as_slice().to_string(), value.as_slice().to_string());
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
     }
 
@@ -2224,8 +2224,8 @@ impl<'a, C, NC, A> ProjectSubscriptionModifyPushConfigCall<'a, C, NC, A> where N
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T>(mut self, scope: T) -> ProjectSubscriptionModifyPushConfigCall<'a, C, NC, A> 
-                                                        where T: Str {
-        self._scopes.insert(scope.as_slice().to_string(), ());
+                                                        where T: AsRef<str> {
+        self._scopes.insert(scope.as_ref().to_string(), ());
         self
     }
 }
@@ -2242,8 +2242,8 @@ impl<'a, C, NC, A> ProjectSubscriptionModifyPushConfigCall<'a, C, NC, A> where N
 ///
 /// ```test_harness,no_run
 /// # extern crate hyper;
-/// # extern crate "yup-oauth2" as oauth2;
-/// # extern crate "google-pubsub1_beta2" as pubsub1_beta2;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_pubsub1_beta2 as pubsub1_beta2;
 /// use pubsub1_beta2::PublishRequest;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
@@ -2311,7 +2311,7 @@ impl<'a, C, NC, A> ProjectTopicPublishCall<'a, C, NC, A> where NC: hyper::net::N
 
         let mut url = "https://pubsub.googleapis.com/v1beta2/{+topic}:publish".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::CloudPlatform.as_slice().to_string(), ());
+            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{+topic}", "topic")].iter() {
@@ -2344,7 +2344,7 @@ impl<'a, C, NC, A> ProjectTopicPublishCall<'a, C, NC, A> where NC: hyper::net::N
         
         if params.len() > 0 {
             url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
+            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_ref()))));
         }
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
@@ -2367,7 +2367,7 @@ impl<'a, C, NC, A> ProjectTopicPublishCall<'a, C, NC, A> where NC: hyper::net::N
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.as_slice())
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.as_ref())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -2381,7 +2381,7 @@ impl<'a, C, NC, A> ProjectTopicPublishCall<'a, C, NC, A> where NC: hyper::net::N
             match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
+                        sleep_ms(d.num_milliseconds() as u32);
                         continue;
                     }
                     dlg.finished(false);
@@ -2392,7 +2392,7 @@ impl<'a, C, NC, A> ProjectTopicPublishCall<'a, C, NC, A> where NC: hyper::net::N
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
-                            sleep(d);
+                            sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
@@ -2465,8 +2465,8 @@ impl<'a, C, NC, A> ProjectTopicPublishCall<'a, C, NC, A> where NC: hyper::net::N
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> ProjectTopicPublishCall<'a, C, NC, A>
-                                                        where T: Str {
-        self._additional_params.insert(name.as_slice().to_string(), value.as_slice().to_string());
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
     }
 
@@ -2482,8 +2482,8 @@ impl<'a, C, NC, A> ProjectTopicPublishCall<'a, C, NC, A> where NC: hyper::net::N
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T>(mut self, scope: T) -> ProjectTopicPublishCall<'a, C, NC, A> 
-                                                        where T: Str {
-        self._scopes.insert(scope.as_slice().to_string(), ());
+                                                        where T: AsRef<str> {
+        self._scopes.insert(scope.as_ref().to_string(), ());
         self
     }
 }
@@ -2500,8 +2500,8 @@ impl<'a, C, NC, A> ProjectTopicPublishCall<'a, C, NC, A> where NC: hyper::net::N
 ///
 /// ```test_harness,no_run
 /// # extern crate hyper;
-/// # extern crate "yup-oauth2" as oauth2;
-/// # extern crate "google-pubsub1_beta2" as pubsub1_beta2;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_pubsub1_beta2 as pubsub1_beta2;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -2562,7 +2562,7 @@ impl<'a, C, NC, A> ProjectTopicGetCall<'a, C, NC, A> where NC: hyper::net::Netwo
 
         let mut url = "https://pubsub.googleapis.com/v1beta2/{+topic}".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::CloudPlatform.as_slice().to_string(), ());
+            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{+topic}", "topic")].iter() {
@@ -2595,7 +2595,7 @@ impl<'a, C, NC, A> ProjectTopicGetCall<'a, C, NC, A> where NC: hyper::net::Netwo
         
         if params.len() > 0 {
             url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
+            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_ref()))));
         }
 
 
@@ -2613,7 +2613,7 @@ impl<'a, C, NC, A> ProjectTopicGetCall<'a, C, NC, A> where NC: hyper::net::Netwo
                                                              access_token: token.unwrap().access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_slice())
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_ref())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -2624,7 +2624,7 @@ impl<'a, C, NC, A> ProjectTopicGetCall<'a, C, NC, A> where NC: hyper::net::Netwo
             match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
+                        sleep_ms(d.num_milliseconds() as u32);
                         continue;
                     }
                     dlg.finished(false);
@@ -2635,7 +2635,7 @@ impl<'a, C, NC, A> ProjectTopicGetCall<'a, C, NC, A> where NC: hyper::net::Netwo
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
-                            sleep(d);
+                            sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
@@ -2699,8 +2699,8 @@ impl<'a, C, NC, A> ProjectTopicGetCall<'a, C, NC, A> where NC: hyper::net::Netwo
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> ProjectTopicGetCall<'a, C, NC, A>
-                                                        where T: Str {
-        self._additional_params.insert(name.as_slice().to_string(), value.as_slice().to_string());
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
     }
 
@@ -2716,8 +2716,8 @@ impl<'a, C, NC, A> ProjectTopicGetCall<'a, C, NC, A> where NC: hyper::net::Netwo
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T>(mut self, scope: T) -> ProjectTopicGetCall<'a, C, NC, A> 
-                                                        where T: Str {
-        self._scopes.insert(scope.as_slice().to_string(), ());
+                                                        where T: AsRef<str> {
+        self._scopes.insert(scope.as_ref().to_string(), ());
         self
     }
 }
@@ -2734,8 +2734,8 @@ impl<'a, C, NC, A> ProjectTopicGetCall<'a, C, NC, A> where NC: hyper::net::Netwo
 ///
 /// ```test_harness,no_run
 /// # extern crate hyper;
-/// # extern crate "yup-oauth2" as oauth2;
-/// # extern crate "google-pubsub1_beta2" as pubsub1_beta2;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_pubsub1_beta2 as pubsub1_beta2;
 /// use pubsub1_beta2::ModifyAckDeadlineRequest;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
@@ -2803,7 +2803,7 @@ impl<'a, C, NC, A> ProjectSubscriptionModifyAckDeadlineCall<'a, C, NC, A> where 
 
         let mut url = "https://pubsub.googleapis.com/v1beta2/{+subscription}:modifyAckDeadline".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::CloudPlatform.as_slice().to_string(), ());
+            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{+subscription}", "subscription")].iter() {
@@ -2836,7 +2836,7 @@ impl<'a, C, NC, A> ProjectSubscriptionModifyAckDeadlineCall<'a, C, NC, A> where 
         
         if params.len() > 0 {
             url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
+            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_ref()))));
         }
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
@@ -2859,7 +2859,7 @@ impl<'a, C, NC, A> ProjectSubscriptionModifyAckDeadlineCall<'a, C, NC, A> where 
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.as_slice())
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.as_ref())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -2873,7 +2873,7 @@ impl<'a, C, NC, A> ProjectSubscriptionModifyAckDeadlineCall<'a, C, NC, A> where 
             match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
+                        sleep_ms(d.num_milliseconds() as u32);
                         continue;
                     }
                     dlg.finished(false);
@@ -2884,7 +2884,7 @@ impl<'a, C, NC, A> ProjectSubscriptionModifyAckDeadlineCall<'a, C, NC, A> where 
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
-                            sleep(d);
+                            sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
@@ -2957,8 +2957,8 @@ impl<'a, C, NC, A> ProjectSubscriptionModifyAckDeadlineCall<'a, C, NC, A> where 
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> ProjectSubscriptionModifyAckDeadlineCall<'a, C, NC, A>
-                                                        where T: Str {
-        self._additional_params.insert(name.as_slice().to_string(), value.as_slice().to_string());
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
     }
 
@@ -2974,8 +2974,8 @@ impl<'a, C, NC, A> ProjectSubscriptionModifyAckDeadlineCall<'a, C, NC, A> where 
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T>(mut self, scope: T) -> ProjectSubscriptionModifyAckDeadlineCall<'a, C, NC, A> 
-                                                        where T: Str {
-        self._scopes.insert(scope.as_slice().to_string(), ());
+                                                        where T: AsRef<str> {
+        self._scopes.insert(scope.as_ref().to_string(), ());
         self
     }
 }
@@ -2992,8 +2992,8 @@ impl<'a, C, NC, A> ProjectSubscriptionModifyAckDeadlineCall<'a, C, NC, A> where 
 ///
 /// ```test_harness,no_run
 /// # extern crate hyper;
-/// # extern crate "yup-oauth2" as oauth2;
-/// # extern crate "google-pubsub1_beta2" as pubsub1_beta2;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_pubsub1_beta2 as pubsub1_beta2;
 /// use pubsub1_beta2::AcknowledgeRequest;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
@@ -3061,7 +3061,7 @@ impl<'a, C, NC, A> ProjectSubscriptionAcknowledgeCall<'a, C, NC, A> where NC: hy
 
         let mut url = "https://pubsub.googleapis.com/v1beta2/{+subscription}:acknowledge".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::CloudPlatform.as_slice().to_string(), ());
+            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{+subscription}", "subscription")].iter() {
@@ -3094,7 +3094,7 @@ impl<'a, C, NC, A> ProjectSubscriptionAcknowledgeCall<'a, C, NC, A> where NC: hy
         
         if params.len() > 0 {
             url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
+            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_ref()))));
         }
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
@@ -3117,7 +3117,7 @@ impl<'a, C, NC, A> ProjectSubscriptionAcknowledgeCall<'a, C, NC, A> where NC: hy
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.as_slice())
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.as_ref())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -3131,7 +3131,7 @@ impl<'a, C, NC, A> ProjectSubscriptionAcknowledgeCall<'a, C, NC, A> where NC: hy
             match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
+                        sleep_ms(d.num_milliseconds() as u32);
                         continue;
                     }
                     dlg.finished(false);
@@ -3142,7 +3142,7 @@ impl<'a, C, NC, A> ProjectSubscriptionAcknowledgeCall<'a, C, NC, A> where NC: hy
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
-                            sleep(d);
+                            sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
@@ -3215,8 +3215,8 @@ impl<'a, C, NC, A> ProjectSubscriptionAcknowledgeCall<'a, C, NC, A> where NC: hy
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> ProjectSubscriptionAcknowledgeCall<'a, C, NC, A>
-                                                        where T: Str {
-        self._additional_params.insert(name.as_slice().to_string(), value.as_slice().to_string());
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
     }
 
@@ -3232,8 +3232,8 @@ impl<'a, C, NC, A> ProjectSubscriptionAcknowledgeCall<'a, C, NC, A> where NC: hy
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T>(mut self, scope: T) -> ProjectSubscriptionAcknowledgeCall<'a, C, NC, A> 
-                                                        where T: Str {
-        self._scopes.insert(scope.as_slice().to_string(), ());
+                                                        where T: AsRef<str> {
+        self._scopes.insert(scope.as_ref().to_string(), ());
         self
     }
 }
@@ -3250,8 +3250,8 @@ impl<'a, C, NC, A> ProjectSubscriptionAcknowledgeCall<'a, C, NC, A> where NC: hy
 ///
 /// ```test_harness,no_run
 /// # extern crate hyper;
-/// # extern crate "yup-oauth2" as oauth2;
-/// # extern crate "google-pubsub1_beta2" as pubsub1_beta2;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_pubsub1_beta2 as pubsub1_beta2;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -3312,7 +3312,7 @@ impl<'a, C, NC, A> ProjectSubscriptionDeleteCall<'a, C, NC, A> where NC: hyper::
 
         let mut url = "https://pubsub.googleapis.com/v1beta2/{+subscription}".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::CloudPlatform.as_slice().to_string(), ());
+            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{+subscription}", "subscription")].iter() {
@@ -3345,7 +3345,7 @@ impl<'a, C, NC, A> ProjectSubscriptionDeleteCall<'a, C, NC, A> where NC: hyper::
         
         if params.len() > 0 {
             url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
+            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_ref()))));
         }
 
 
@@ -3363,7 +3363,7 @@ impl<'a, C, NC, A> ProjectSubscriptionDeleteCall<'a, C, NC, A> where NC: hyper::
                                                              access_token: token.unwrap().access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Delete, url.as_slice())
+                let mut req = client.borrow_mut().request(hyper::method::Method::Delete, url.as_ref())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -3374,7 +3374,7 @@ impl<'a, C, NC, A> ProjectSubscriptionDeleteCall<'a, C, NC, A> where NC: hyper::
             match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
+                        sleep_ms(d.num_milliseconds() as u32);
                         continue;
                     }
                     dlg.finished(false);
@@ -3385,7 +3385,7 @@ impl<'a, C, NC, A> ProjectSubscriptionDeleteCall<'a, C, NC, A> where NC: hyper::
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
-                            sleep(d);
+                            sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
@@ -3449,8 +3449,8 @@ impl<'a, C, NC, A> ProjectSubscriptionDeleteCall<'a, C, NC, A> where NC: hyper::
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> ProjectSubscriptionDeleteCall<'a, C, NC, A>
-                                                        where T: Str {
-        self._additional_params.insert(name.as_slice().to_string(), value.as_slice().to_string());
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
     }
 
@@ -3466,8 +3466,8 @@ impl<'a, C, NC, A> ProjectSubscriptionDeleteCall<'a, C, NC, A> where NC: hyper::
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T>(mut self, scope: T) -> ProjectSubscriptionDeleteCall<'a, C, NC, A> 
-                                                        where T: Str {
-        self._scopes.insert(scope.as_slice().to_string(), ());
+                                                        where T: AsRef<str> {
+        self._scopes.insert(scope.as_ref().to_string(), ());
         self
     }
 }
@@ -3484,8 +3484,8 @@ impl<'a, C, NC, A> ProjectSubscriptionDeleteCall<'a, C, NC, A> where NC: hyper::
 ///
 /// ```test_harness,no_run
 /// # extern crate hyper;
-/// # extern crate "yup-oauth2" as oauth2;
-/// # extern crate "google-pubsub1_beta2" as pubsub1_beta2;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_pubsub1_beta2 as pubsub1_beta2;
 /// use pubsub1_beta2::Subscription;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
@@ -3553,7 +3553,7 @@ impl<'a, C, NC, A> ProjectSubscriptionCreateCall<'a, C, NC, A> where NC: hyper::
 
         let mut url = "https://pubsub.googleapis.com/v1beta2/{+name}".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::CloudPlatform.as_slice().to_string(), ());
+            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{+name}", "name")].iter() {
@@ -3586,7 +3586,7 @@ impl<'a, C, NC, A> ProjectSubscriptionCreateCall<'a, C, NC, A> where NC: hyper::
         
         if params.len() > 0 {
             url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
+            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_ref()))));
         }
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
@@ -3609,7 +3609,7 @@ impl<'a, C, NC, A> ProjectSubscriptionCreateCall<'a, C, NC, A> where NC: hyper::
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Put, url.as_slice())
+                let mut req = client.borrow_mut().request(hyper::method::Method::Put, url.as_ref())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -3623,7 +3623,7 @@ impl<'a, C, NC, A> ProjectSubscriptionCreateCall<'a, C, NC, A> where NC: hyper::
             match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
+                        sleep_ms(d.num_milliseconds() as u32);
                         continue;
                     }
                     dlg.finished(false);
@@ -3634,7 +3634,7 @@ impl<'a, C, NC, A> ProjectSubscriptionCreateCall<'a, C, NC, A> where NC: hyper::
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
-                            sleep(d);
+                            sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
@@ -3707,8 +3707,8 @@ impl<'a, C, NC, A> ProjectSubscriptionCreateCall<'a, C, NC, A> where NC: hyper::
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> ProjectSubscriptionCreateCall<'a, C, NC, A>
-                                                        where T: Str {
-        self._additional_params.insert(name.as_slice().to_string(), value.as_slice().to_string());
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
     }
 
@@ -3724,8 +3724,8 @@ impl<'a, C, NC, A> ProjectSubscriptionCreateCall<'a, C, NC, A> where NC: hyper::
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T>(mut self, scope: T) -> ProjectSubscriptionCreateCall<'a, C, NC, A> 
-                                                        where T: Str {
-        self._scopes.insert(scope.as_slice().to_string(), ());
+                                                        where T: AsRef<str> {
+        self._scopes.insert(scope.as_ref().to_string(), ());
         self
     }
 }
@@ -3742,8 +3742,8 @@ impl<'a, C, NC, A> ProjectSubscriptionCreateCall<'a, C, NC, A> where NC: hyper::
 ///
 /// ```test_harness,no_run
 /// # extern crate hyper;
-/// # extern crate "yup-oauth2" as oauth2;
-/// # extern crate "google-pubsub1_beta2" as pubsub1_beta2;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_pubsub1_beta2 as pubsub1_beta2;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -3804,7 +3804,7 @@ impl<'a, C, NC, A> ProjectSubscriptionGetCall<'a, C, NC, A> where NC: hyper::net
 
         let mut url = "https://pubsub.googleapis.com/v1beta2/{+subscription}".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::CloudPlatform.as_slice().to_string(), ());
+            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{+subscription}", "subscription")].iter() {
@@ -3837,7 +3837,7 @@ impl<'a, C, NC, A> ProjectSubscriptionGetCall<'a, C, NC, A> where NC: hyper::net
         
         if params.len() > 0 {
             url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
+            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_ref()))));
         }
 
 
@@ -3855,7 +3855,7 @@ impl<'a, C, NC, A> ProjectSubscriptionGetCall<'a, C, NC, A> where NC: hyper::net
                                                              access_token: token.unwrap().access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_slice())
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_ref())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -3866,7 +3866,7 @@ impl<'a, C, NC, A> ProjectSubscriptionGetCall<'a, C, NC, A> where NC: hyper::net
             match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
+                        sleep_ms(d.num_milliseconds() as u32);
                         continue;
                     }
                     dlg.finished(false);
@@ -3877,7 +3877,7 @@ impl<'a, C, NC, A> ProjectSubscriptionGetCall<'a, C, NC, A> where NC: hyper::net
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
-                            sleep(d);
+                            sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
@@ -3941,8 +3941,8 @@ impl<'a, C, NC, A> ProjectSubscriptionGetCall<'a, C, NC, A> where NC: hyper::net
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> ProjectSubscriptionGetCall<'a, C, NC, A>
-                                                        where T: Str {
-        self._additional_params.insert(name.as_slice().to_string(), value.as_slice().to_string());
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
     }
 
@@ -3958,8 +3958,8 @@ impl<'a, C, NC, A> ProjectSubscriptionGetCall<'a, C, NC, A> where NC: hyper::net
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T>(mut self, scope: T) -> ProjectSubscriptionGetCall<'a, C, NC, A> 
-                                                        where T: Str {
-        self._scopes.insert(scope.as_slice().to_string(), ());
+                                                        where T: AsRef<str> {
+        self._scopes.insert(scope.as_ref().to_string(), ());
         self
     }
 }
@@ -3976,8 +3976,8 @@ impl<'a, C, NC, A> ProjectSubscriptionGetCall<'a, C, NC, A> where NC: hyper::net
 ///
 /// ```test_harness,no_run
 /// # extern crate hyper;
-/// # extern crate "yup-oauth2" as oauth2;
-/// # extern crate "google-pubsub1_beta2" as pubsub1_beta2;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_pubsub1_beta2 as pubsub1_beta2;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -4048,7 +4048,7 @@ impl<'a, C, NC, A> ProjectTopicSubscriptionListCall<'a, C, NC, A> where NC: hype
 
         let mut url = "https://pubsub.googleapis.com/v1beta2/{+topic}/subscriptions".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::CloudPlatform.as_slice().to_string(), ());
+            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{+topic}", "topic")].iter() {
@@ -4081,7 +4081,7 @@ impl<'a, C, NC, A> ProjectTopicSubscriptionListCall<'a, C, NC, A> where NC: hype
         
         if params.len() > 0 {
             url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
+            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_ref()))));
         }
 
 
@@ -4099,7 +4099,7 @@ impl<'a, C, NC, A> ProjectTopicSubscriptionListCall<'a, C, NC, A> where NC: hype
                                                              access_token: token.unwrap().access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_slice())
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_ref())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -4110,7 +4110,7 @@ impl<'a, C, NC, A> ProjectTopicSubscriptionListCall<'a, C, NC, A> where NC: hype
             match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
+                        sleep_ms(d.num_milliseconds() as u32);
                         continue;
                     }
                     dlg.finished(false);
@@ -4121,7 +4121,7 @@ impl<'a, C, NC, A> ProjectTopicSubscriptionListCall<'a, C, NC, A> where NC: hype
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
-                            sleep(d);
+                            sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
@@ -4199,8 +4199,8 @@ impl<'a, C, NC, A> ProjectTopicSubscriptionListCall<'a, C, NC, A> where NC: hype
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> ProjectTopicSubscriptionListCall<'a, C, NC, A>
-                                                        where T: Str {
-        self._additional_params.insert(name.as_slice().to_string(), value.as_slice().to_string());
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
     }
 
@@ -4216,8 +4216,8 @@ impl<'a, C, NC, A> ProjectTopicSubscriptionListCall<'a, C, NC, A> where NC: hype
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T>(mut self, scope: T) -> ProjectTopicSubscriptionListCall<'a, C, NC, A> 
-                                                        where T: Str {
-        self._scopes.insert(scope.as_slice().to_string(), ());
+                                                        where T: AsRef<str> {
+        self._scopes.insert(scope.as_ref().to_string(), ());
         self
     }
 }
@@ -4234,8 +4234,8 @@ impl<'a, C, NC, A> ProjectTopicSubscriptionListCall<'a, C, NC, A> where NC: hype
 ///
 /// ```test_harness,no_run
 /// # extern crate hyper;
-/// # extern crate "yup-oauth2" as oauth2;
-/// # extern crate "google-pubsub1_beta2" as pubsub1_beta2;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_pubsub1_beta2 as pubsub1_beta2;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -4306,7 +4306,7 @@ impl<'a, C, NC, A> ProjectSubscriptionListCall<'a, C, NC, A> where NC: hyper::ne
 
         let mut url = "https://pubsub.googleapis.com/v1beta2/{+project}/subscriptions".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::CloudPlatform.as_slice().to_string(), ());
+            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{+project}", "project")].iter() {
@@ -4339,7 +4339,7 @@ impl<'a, C, NC, A> ProjectSubscriptionListCall<'a, C, NC, A> where NC: hyper::ne
         
         if params.len() > 0 {
             url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
+            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_ref()))));
         }
 
 
@@ -4357,7 +4357,7 @@ impl<'a, C, NC, A> ProjectSubscriptionListCall<'a, C, NC, A> where NC: hyper::ne
                                                              access_token: token.unwrap().access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_slice())
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_ref())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -4368,7 +4368,7 @@ impl<'a, C, NC, A> ProjectSubscriptionListCall<'a, C, NC, A> where NC: hyper::ne
             match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
+                        sleep_ms(d.num_milliseconds() as u32);
                         continue;
                     }
                     dlg.finished(false);
@@ -4379,7 +4379,7 @@ impl<'a, C, NC, A> ProjectSubscriptionListCall<'a, C, NC, A> where NC: hyper::ne
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
-                            sleep(d);
+                            sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
@@ -4457,8 +4457,8 @@ impl<'a, C, NC, A> ProjectSubscriptionListCall<'a, C, NC, A> where NC: hyper::ne
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> ProjectSubscriptionListCall<'a, C, NC, A>
-                                                        where T: Str {
-        self._additional_params.insert(name.as_slice().to_string(), value.as_slice().to_string());
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
     }
 
@@ -4474,8 +4474,8 @@ impl<'a, C, NC, A> ProjectSubscriptionListCall<'a, C, NC, A> where NC: hyper::ne
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T>(mut self, scope: T) -> ProjectSubscriptionListCall<'a, C, NC, A> 
-                                                        where T: Str {
-        self._scopes.insert(scope.as_slice().to_string(), ());
+                                                        where T: AsRef<str> {
+        self._scopes.insert(scope.as_ref().to_string(), ());
         self
     }
 }

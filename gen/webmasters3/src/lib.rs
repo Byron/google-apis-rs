@@ -76,8 +76,8 @@
 //! 
 //! ```test_harness,no_run
 //! extern crate hyper;
-//! extern crate "yup-oauth2" as oauth2;
-//! extern crate "google-webmasters3" as webmasters3;
+//! extern crate yup_oauth2 as oauth2;
+//! extern crate google_webmasters3 as webmasters3;
 //! use webmasters3::{Result, Error};
 //! # #[test] fn egal() {
 //! use std::default::Default;
@@ -170,20 +170,20 @@
 //! [google-go-api]: https://github.com/google/google-api-go-client
 //! 
 //! 
-#![feature(core,io,thread_sleep)]
+#![feature(std_misc)]
 // Unused attributes happen thanks to defined, but unused structures
 // We don't warn about this, as depending on the API, some data structures or facilities are never used.
 // Instead of pre-determining this, we just disable the lint. It's manually tuned to not have any 
 // unused imports in fully featured APIs. Same with unused_mut ... .
 #![allow(unused_imports, unused_mut, dead_code)]
 // Required for serde annotations
-#![feature(custom_derive, custom_attribute, plugin)]
+#![feature(custom_derive, custom_attribute, plugin, slice_patterns)]
 #![plugin(serde_macros)]
 
 #[macro_use]
 extern crate hyper;
 extern crate serde;
-extern crate "yup-oauth2" as oauth2;
+extern crate yup_oauth2 as oauth2;
 extern crate mime;
 extern crate url;
 
@@ -198,7 +198,7 @@ use std::marker::PhantomData;
 use serde::json;
 use std::io;
 use std::fs;
-use std::thread::sleep;
+use std::thread::sleep_ms;
 
 pub use cmn::{MultiPartReader, ToParts, MethodInfo, Result, Error, CallBuilder, Hub, ReadSeek, Part, ResponseResult, RequestValue, NestedType, Delegate, DefaultDelegate, MethodsBuilder, Resource, JsonServerError};
 
@@ -219,8 +219,8 @@ pub enum Scope {
     Full,
 }
 
-impl Str for Scope {
-    fn as_slice(&self) -> &str {
+impl AsRef<str> for Scope {
+    fn as_ref(&self) -> &str {
         match *self {
             Scope::Readonly => "https://www.googleapis.com/auth/webmasters.readonly",
             Scope::Full => "https://www.googleapis.com/auth/webmasters",
@@ -248,8 +248,8 @@ impl Default for Scope {
 ///
 /// ```test_harness,no_run
 /// extern crate hyper;
-/// extern crate "yup-oauth2" as oauth2;
-/// extern crate "google-webmasters3" as webmasters3;
+/// extern crate yup_oauth2 as oauth2;
+/// extern crate google_webmasters3 as webmasters3;
 /// use webmasters3::{Result, Error};
 /// # #[test] fn egal() {
 /// use std::default::Default;
@@ -586,8 +586,8 @@ impl ResponseResult for UrlCrawlErrorsSamplesListResponse {}
 ///
 /// ```test_harness,no_run
 /// extern crate hyper;
-/// extern crate "yup-oauth2" as oauth2;
-/// extern crate "google-webmasters3" as webmasters3;
+/// extern crate yup_oauth2 as oauth2;
+/// extern crate google_webmasters3 as webmasters3;
 /// 
 /// # #[test] fn egal() {
 /// use std::default::Default;
@@ -702,8 +702,8 @@ impl<'a, C, NC, A> SitemapMethods<'a, C, NC, A> {
 ///
 /// ```test_harness,no_run
 /// extern crate hyper;
-/// extern crate "yup-oauth2" as oauth2;
-/// extern crate "google-webmasters3" as webmasters3;
+/// extern crate yup_oauth2 as oauth2;
+/// extern crate google_webmasters3 as webmasters3;
 /// 
 /// # #[test] fn egal() {
 /// use std::default::Default;
@@ -806,8 +806,8 @@ impl<'a, C, NC, A> SiteMethods<'a, C, NC, A> {
 ///
 /// ```test_harness,no_run
 /// extern crate hyper;
-/// extern crate "yup-oauth2" as oauth2;
-/// extern crate "google-webmasters3" as webmasters3;
+/// extern crate yup_oauth2 as oauth2;
+/// extern crate google_webmasters3 as webmasters3;
 /// 
 /// # #[test] fn egal() {
 /// use std::default::Default;
@@ -867,8 +867,8 @@ impl<'a, C, NC, A> UrlcrawlerrorscountMethods<'a, C, NC, A> {
 ///
 /// ```test_harness,no_run
 /// extern crate hyper;
-/// extern crate "yup-oauth2" as oauth2;
-/// extern crate "google-webmasters3" as webmasters3;
+/// extern crate yup_oauth2 as oauth2;
+/// extern crate google_webmasters3 as webmasters3;
 /// 
 /// # #[test] fn egal() {
 /// use std::default::Default;
@@ -983,8 +983,8 @@ impl<'a, C, NC, A> UrlcrawlerrorssampleMethods<'a, C, NC, A> {
 ///
 /// ```test_harness,no_run
 /// # extern crate hyper;
-/// # extern crate "yup-oauth2" as oauth2;
-/// # extern crate "google-webmasters3" as webmasters3;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_webmasters3 as webmasters3;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -1045,7 +1045,7 @@ impl<'a, C, NC, A> SitemapDeleteCall<'a, C, NC, A> where NC: hyper::net::Network
 
         let mut url = "https://www.googleapis.com/webmasters/v3/sites/{siteUrl}/sitemaps/{feedpath}".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Full.as_slice().to_string(), ());
+            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{siteUrl}", "siteUrl"), ("{feedpath}", "feedpath")].iter() {
@@ -1075,7 +1075,7 @@ impl<'a, C, NC, A> SitemapDeleteCall<'a, C, NC, A> where NC: hyper::net::Network
         
         if params.len() > 0 {
             url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
+            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_ref()))));
         }
 
 
@@ -1093,7 +1093,7 @@ impl<'a, C, NC, A> SitemapDeleteCall<'a, C, NC, A> where NC: hyper::net::Network
                                                              access_token: token.unwrap().access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Delete, url.as_slice())
+                let mut req = client.borrow_mut().request(hyper::method::Method::Delete, url.as_ref())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -1104,7 +1104,7 @@ impl<'a, C, NC, A> SitemapDeleteCall<'a, C, NC, A> where NC: hyper::net::Network
             match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
+                        sleep_ms(d.num_milliseconds() as u32);
                         continue;
                     }
                     dlg.finished(false);
@@ -1115,7 +1115,7 @@ impl<'a, C, NC, A> SitemapDeleteCall<'a, C, NC, A> where NC: hyper::net::Network
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
-                            sleep(d);
+                            sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
@@ -1180,8 +1180,8 @@ impl<'a, C, NC, A> SitemapDeleteCall<'a, C, NC, A> where NC: hyper::net::Network
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> SitemapDeleteCall<'a, C, NC, A>
-                                                        where T: Str {
-        self._additional_params.insert(name.as_slice().to_string(), value.as_slice().to_string());
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
     }
 
@@ -1197,8 +1197,8 @@ impl<'a, C, NC, A> SitemapDeleteCall<'a, C, NC, A> where NC: hyper::net::Network
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T>(mut self, scope: T) -> SitemapDeleteCall<'a, C, NC, A> 
-                                                        where T: Str {
-        self._scopes.insert(scope.as_slice().to_string(), ());
+                                                        where T: AsRef<str> {
+        self._scopes.insert(scope.as_ref().to_string(), ());
         self
     }
 }
@@ -1215,8 +1215,8 @@ impl<'a, C, NC, A> SitemapDeleteCall<'a, C, NC, A> where NC: hyper::net::Network
 ///
 /// ```test_harness,no_run
 /// # extern crate hyper;
-/// # extern crate "yup-oauth2" as oauth2;
-/// # extern crate "google-webmasters3" as webmasters3;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_webmasters3 as webmasters3;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -1277,7 +1277,7 @@ impl<'a, C, NC, A> SitemapSubmitCall<'a, C, NC, A> where NC: hyper::net::Network
 
         let mut url = "https://www.googleapis.com/webmasters/v3/sites/{siteUrl}/sitemaps/{feedpath}".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Full.as_slice().to_string(), ());
+            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{siteUrl}", "siteUrl"), ("{feedpath}", "feedpath")].iter() {
@@ -1307,7 +1307,7 @@ impl<'a, C, NC, A> SitemapSubmitCall<'a, C, NC, A> where NC: hyper::net::Network
         
         if params.len() > 0 {
             url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
+            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_ref()))));
         }
 
 
@@ -1325,7 +1325,7 @@ impl<'a, C, NC, A> SitemapSubmitCall<'a, C, NC, A> where NC: hyper::net::Network
                                                              access_token: token.unwrap().access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Put, url.as_slice())
+                let mut req = client.borrow_mut().request(hyper::method::Method::Put, url.as_ref())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -1336,7 +1336,7 @@ impl<'a, C, NC, A> SitemapSubmitCall<'a, C, NC, A> where NC: hyper::net::Network
             match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
+                        sleep_ms(d.num_milliseconds() as u32);
                         continue;
                     }
                     dlg.finished(false);
@@ -1347,7 +1347,7 @@ impl<'a, C, NC, A> SitemapSubmitCall<'a, C, NC, A> where NC: hyper::net::Network
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
-                            sleep(d);
+                            sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
@@ -1412,8 +1412,8 @@ impl<'a, C, NC, A> SitemapSubmitCall<'a, C, NC, A> where NC: hyper::net::Network
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> SitemapSubmitCall<'a, C, NC, A>
-                                                        where T: Str {
-        self._additional_params.insert(name.as_slice().to_string(), value.as_slice().to_string());
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
     }
 
@@ -1429,8 +1429,8 @@ impl<'a, C, NC, A> SitemapSubmitCall<'a, C, NC, A> where NC: hyper::net::Network
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T>(mut self, scope: T) -> SitemapSubmitCall<'a, C, NC, A> 
-                                                        where T: Str {
-        self._scopes.insert(scope.as_slice().to_string(), ());
+                                                        where T: AsRef<str> {
+        self._scopes.insert(scope.as_ref().to_string(), ());
         self
     }
 }
@@ -1447,8 +1447,8 @@ impl<'a, C, NC, A> SitemapSubmitCall<'a, C, NC, A> where NC: hyper::net::Network
 ///
 /// ```test_harness,no_run
 /// # extern crate hyper;
-/// # extern crate "yup-oauth2" as oauth2;
-/// # extern crate "google-webmasters3" as webmasters3;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_webmasters3 as webmasters3;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -1510,7 +1510,7 @@ impl<'a, C, NC, A> SitemapGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
 
         let mut url = "https://www.googleapis.com/webmasters/v3/sites/{siteUrl}/sitemaps/{feedpath}".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Readonly.as_slice().to_string(), ());
+            self._scopes.insert(Scope::Readonly.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{siteUrl}", "siteUrl"), ("{feedpath}", "feedpath")].iter() {
@@ -1540,7 +1540,7 @@ impl<'a, C, NC, A> SitemapGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
         
         if params.len() > 0 {
             url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
+            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_ref()))));
         }
 
 
@@ -1558,7 +1558,7 @@ impl<'a, C, NC, A> SitemapGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
                                                              access_token: token.unwrap().access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_slice())
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_ref())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -1569,7 +1569,7 @@ impl<'a, C, NC, A> SitemapGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
             match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
+                        sleep_ms(d.num_milliseconds() as u32);
                         continue;
                     }
                     dlg.finished(false);
@@ -1580,7 +1580,7 @@ impl<'a, C, NC, A> SitemapGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
-                            sleep(d);
+                            sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
@@ -1655,8 +1655,8 @@ impl<'a, C, NC, A> SitemapGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> SitemapGetCall<'a, C, NC, A>
-                                                        where T: Str {
-        self._additional_params.insert(name.as_slice().to_string(), value.as_slice().to_string());
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
     }
 
@@ -1672,8 +1672,8 @@ impl<'a, C, NC, A> SitemapGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T>(mut self, scope: T) -> SitemapGetCall<'a, C, NC, A> 
-                                                        where T: Str {
-        self._scopes.insert(scope.as_slice().to_string(), ());
+                                                        where T: AsRef<str> {
+        self._scopes.insert(scope.as_ref().to_string(), ());
         self
     }
 }
@@ -1690,8 +1690,8 @@ impl<'a, C, NC, A> SitemapGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
 ///
 /// ```test_harness,no_run
 /// # extern crate hyper;
-/// # extern crate "yup-oauth2" as oauth2;
-/// # extern crate "google-webmasters3" as webmasters3;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_webmasters3 as webmasters3;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -1756,7 +1756,7 @@ impl<'a, C, NC, A> SitemapListCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
 
         let mut url = "https://www.googleapis.com/webmasters/v3/sites/{siteUrl}/sitemaps".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Readonly.as_slice().to_string(), ());
+            self._scopes.insert(Scope::Readonly.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{siteUrl}", "siteUrl")].iter() {
@@ -1786,7 +1786,7 @@ impl<'a, C, NC, A> SitemapListCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
         
         if params.len() > 0 {
             url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
+            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_ref()))));
         }
 
 
@@ -1804,7 +1804,7 @@ impl<'a, C, NC, A> SitemapListCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
                                                              access_token: token.unwrap().access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_slice())
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_ref())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -1815,7 +1815,7 @@ impl<'a, C, NC, A> SitemapListCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
             match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
+                        sleep_ms(d.num_milliseconds() as u32);
                         continue;
                     }
                     dlg.finished(false);
@@ -1826,7 +1826,7 @@ impl<'a, C, NC, A> SitemapListCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
-                            sleep(d);
+                            sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
@@ -1899,8 +1899,8 @@ impl<'a, C, NC, A> SitemapListCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> SitemapListCall<'a, C, NC, A>
-                                                        where T: Str {
-        self._additional_params.insert(name.as_slice().to_string(), value.as_slice().to_string());
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
     }
 
@@ -1916,8 +1916,8 @@ impl<'a, C, NC, A> SitemapListCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T>(mut self, scope: T) -> SitemapListCall<'a, C, NC, A> 
-                                                        where T: Str {
-        self._scopes.insert(scope.as_slice().to_string(), ());
+                                                        where T: AsRef<str> {
+        self._scopes.insert(scope.as_ref().to_string(), ());
         self
     }
 }
@@ -1934,8 +1934,8 @@ impl<'a, C, NC, A> SitemapListCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
 ///
 /// ```test_harness,no_run
 /// # extern crate hyper;
-/// # extern crate "yup-oauth2" as oauth2;
-/// # extern crate "google-webmasters3" as webmasters3;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_webmasters3 as webmasters3;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -1995,7 +1995,7 @@ impl<'a, C, NC, A> SiteGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnec
 
         let mut url = "https://www.googleapis.com/webmasters/v3/sites/{siteUrl}".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Readonly.as_slice().to_string(), ());
+            self._scopes.insert(Scope::Readonly.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{siteUrl}", "siteUrl")].iter() {
@@ -2025,7 +2025,7 @@ impl<'a, C, NC, A> SiteGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnec
         
         if params.len() > 0 {
             url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
+            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_ref()))));
         }
 
 
@@ -2043,7 +2043,7 @@ impl<'a, C, NC, A> SiteGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnec
                                                              access_token: token.unwrap().access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_slice())
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_ref())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -2054,7 +2054,7 @@ impl<'a, C, NC, A> SiteGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnec
             match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
+                        sleep_ms(d.num_milliseconds() as u32);
                         continue;
                     }
                     dlg.finished(false);
@@ -2065,7 +2065,7 @@ impl<'a, C, NC, A> SiteGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnec
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
-                            sleep(d);
+                            sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
@@ -2130,8 +2130,8 @@ impl<'a, C, NC, A> SiteGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnec
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> SiteGetCall<'a, C, NC, A>
-                                                        where T: Str {
-        self._additional_params.insert(name.as_slice().to_string(), value.as_slice().to_string());
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
     }
 
@@ -2147,8 +2147,8 @@ impl<'a, C, NC, A> SiteGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnec
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T>(mut self, scope: T) -> SiteGetCall<'a, C, NC, A> 
-                                                        where T: Str {
-        self._scopes.insert(scope.as_slice().to_string(), ());
+                                                        where T: AsRef<str> {
+        self._scopes.insert(scope.as_ref().to_string(), ());
         self
     }
 }
@@ -2165,8 +2165,8 @@ impl<'a, C, NC, A> SiteGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnec
 ///
 /// ```test_harness,no_run
 /// # extern crate hyper;
-/// # extern crate "yup-oauth2" as oauth2;
-/// # extern crate "google-webmasters3" as webmasters3;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_webmasters3 as webmasters3;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -2225,7 +2225,7 @@ impl<'a, C, NC, A> SiteAddCall<'a, C, NC, A> where NC: hyper::net::NetworkConnec
 
         let mut url = "https://www.googleapis.com/webmasters/v3/sites/{siteUrl}".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Full.as_slice().to_string(), ());
+            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{siteUrl}", "siteUrl")].iter() {
@@ -2255,7 +2255,7 @@ impl<'a, C, NC, A> SiteAddCall<'a, C, NC, A> where NC: hyper::net::NetworkConnec
         
         if params.len() > 0 {
             url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
+            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_ref()))));
         }
 
 
@@ -2273,7 +2273,7 @@ impl<'a, C, NC, A> SiteAddCall<'a, C, NC, A> where NC: hyper::net::NetworkConnec
                                                              access_token: token.unwrap().access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Put, url.as_slice())
+                let mut req = client.borrow_mut().request(hyper::method::Method::Put, url.as_ref())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -2284,7 +2284,7 @@ impl<'a, C, NC, A> SiteAddCall<'a, C, NC, A> where NC: hyper::net::NetworkConnec
             match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
+                        sleep_ms(d.num_milliseconds() as u32);
                         continue;
                     }
                     dlg.finished(false);
@@ -2295,7 +2295,7 @@ impl<'a, C, NC, A> SiteAddCall<'a, C, NC, A> where NC: hyper::net::NetworkConnec
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
-                            sleep(d);
+                            sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
@@ -2350,8 +2350,8 @@ impl<'a, C, NC, A> SiteAddCall<'a, C, NC, A> where NC: hyper::net::NetworkConnec
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> SiteAddCall<'a, C, NC, A>
-                                                        where T: Str {
-        self._additional_params.insert(name.as_slice().to_string(), value.as_slice().to_string());
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
     }
 
@@ -2367,8 +2367,8 @@ impl<'a, C, NC, A> SiteAddCall<'a, C, NC, A> where NC: hyper::net::NetworkConnec
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T>(mut self, scope: T) -> SiteAddCall<'a, C, NC, A> 
-                                                        where T: Str {
-        self._scopes.insert(scope.as_slice().to_string(), ());
+                                                        where T: AsRef<str> {
+        self._scopes.insert(scope.as_ref().to_string(), ());
         self
     }
 }
@@ -2385,8 +2385,8 @@ impl<'a, C, NC, A> SiteAddCall<'a, C, NC, A> where NC: hyper::net::NetworkConnec
 ///
 /// ```test_harness,no_run
 /// # extern crate hyper;
-/// # extern crate "yup-oauth2" as oauth2;
-/// # extern crate "google-webmasters3" as webmasters3;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_webmasters3 as webmasters3;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -2444,13 +2444,13 @@ impl<'a, C, NC, A> SiteListCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
 
         let mut url = "https://www.googleapis.com/webmasters/v3/sites".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Readonly.as_slice().to_string(), ());
+            self._scopes.insert(Scope::Readonly.as_ref().to_string(), ());
         }
 
         
         if params.len() > 0 {
             url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
+            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_ref()))));
         }
 
 
@@ -2468,7 +2468,7 @@ impl<'a, C, NC, A> SiteListCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
                                                              access_token: token.unwrap().access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_slice())
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_ref())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -2479,7 +2479,7 @@ impl<'a, C, NC, A> SiteListCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
             match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
+                        sleep_ms(d.num_milliseconds() as u32);
                         continue;
                     }
                     dlg.finished(false);
@@ -2490,7 +2490,7 @@ impl<'a, C, NC, A> SiteListCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
-                            sleep(d);
+                            sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
@@ -2545,8 +2545,8 @@ impl<'a, C, NC, A> SiteListCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> SiteListCall<'a, C, NC, A>
-                                                        where T: Str {
-        self._additional_params.insert(name.as_slice().to_string(), value.as_slice().to_string());
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
     }
 
@@ -2562,8 +2562,8 @@ impl<'a, C, NC, A> SiteListCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T>(mut self, scope: T) -> SiteListCall<'a, C, NC, A> 
-                                                        where T: Str {
-        self._scopes.insert(scope.as_slice().to_string(), ());
+                                                        where T: AsRef<str> {
+        self._scopes.insert(scope.as_ref().to_string(), ());
         self
     }
 }
@@ -2580,8 +2580,8 @@ impl<'a, C, NC, A> SiteListCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
 ///
 /// ```test_harness,no_run
 /// # extern crate hyper;
-/// # extern crate "yup-oauth2" as oauth2;
-/// # extern crate "google-webmasters3" as webmasters3;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_webmasters3 as webmasters3;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -2640,7 +2640,7 @@ impl<'a, C, NC, A> SiteDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
 
         let mut url = "https://www.googleapis.com/webmasters/v3/sites/{siteUrl}".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Full.as_slice().to_string(), ());
+            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{siteUrl}", "siteUrl")].iter() {
@@ -2670,7 +2670,7 @@ impl<'a, C, NC, A> SiteDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
         
         if params.len() > 0 {
             url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
+            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_ref()))));
         }
 
 
@@ -2688,7 +2688,7 @@ impl<'a, C, NC, A> SiteDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
                                                              access_token: token.unwrap().access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Delete, url.as_slice())
+                let mut req = client.borrow_mut().request(hyper::method::Method::Delete, url.as_ref())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -2699,7 +2699,7 @@ impl<'a, C, NC, A> SiteDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
             match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
+                        sleep_ms(d.num_milliseconds() as u32);
                         continue;
                     }
                     dlg.finished(false);
@@ -2710,7 +2710,7 @@ impl<'a, C, NC, A> SiteDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
-                            sleep(d);
+                            sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
@@ -2765,8 +2765,8 @@ impl<'a, C, NC, A> SiteDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> SiteDeleteCall<'a, C, NC, A>
-                                                        where T: Str {
-        self._additional_params.insert(name.as_slice().to_string(), value.as_slice().to_string());
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
     }
 
@@ -2782,8 +2782,8 @@ impl<'a, C, NC, A> SiteDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T>(mut self, scope: T) -> SiteDeleteCall<'a, C, NC, A> 
-                                                        where T: Str {
-        self._scopes.insert(scope.as_slice().to_string(), ());
+                                                        where T: AsRef<str> {
+        self._scopes.insert(scope.as_ref().to_string(), ());
         self
     }
 }
@@ -2800,8 +2800,8 @@ impl<'a, C, NC, A> SiteDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
 ///
 /// ```test_harness,no_run
 /// # extern crate hyper;
-/// # extern crate "yup-oauth2" as oauth2;
-/// # extern crate "google-webmasters3" as webmasters3;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_webmasters3 as webmasters3;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -2876,7 +2876,7 @@ impl<'a, C, NC, A> UrlcrawlerrorscountQueryCall<'a, C, NC, A> where NC: hyper::n
 
         let mut url = "https://www.googleapis.com/webmasters/v3/sites/{siteUrl}/urlCrawlErrorsCounts/query".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Readonly.as_slice().to_string(), ());
+            self._scopes.insert(Scope::Readonly.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{siteUrl}", "siteUrl")].iter() {
@@ -2906,7 +2906,7 @@ impl<'a, C, NC, A> UrlcrawlerrorscountQueryCall<'a, C, NC, A> where NC: hyper::n
         
         if params.len() > 0 {
             url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
+            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_ref()))));
         }
 
 
@@ -2924,7 +2924,7 @@ impl<'a, C, NC, A> UrlcrawlerrorscountQueryCall<'a, C, NC, A> where NC: hyper::n
                                                              access_token: token.unwrap().access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_slice())
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_ref())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -2935,7 +2935,7 @@ impl<'a, C, NC, A> UrlcrawlerrorscountQueryCall<'a, C, NC, A> where NC: hyper::n
             match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
+                        sleep_ms(d.num_milliseconds() as u32);
                         continue;
                     }
                     dlg.finished(false);
@@ -2946,7 +2946,7 @@ impl<'a, C, NC, A> UrlcrawlerrorscountQueryCall<'a, C, NC, A> where NC: hyper::n
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
-                            sleep(d);
+                            sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
@@ -3035,8 +3035,8 @@ impl<'a, C, NC, A> UrlcrawlerrorscountQueryCall<'a, C, NC, A> where NC: hyper::n
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> UrlcrawlerrorscountQueryCall<'a, C, NC, A>
-                                                        where T: Str {
-        self._additional_params.insert(name.as_slice().to_string(), value.as_slice().to_string());
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
     }
 
@@ -3052,8 +3052,8 @@ impl<'a, C, NC, A> UrlcrawlerrorscountQueryCall<'a, C, NC, A> where NC: hyper::n
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T>(mut self, scope: T) -> UrlcrawlerrorscountQueryCall<'a, C, NC, A> 
-                                                        where T: Str {
-        self._scopes.insert(scope.as_slice().to_string(), ());
+                                                        where T: AsRef<str> {
+        self._scopes.insert(scope.as_ref().to_string(), ());
         self
     }
 }
@@ -3070,8 +3070,8 @@ impl<'a, C, NC, A> UrlcrawlerrorscountQueryCall<'a, C, NC, A> where NC: hyper::n
 ///
 /// ```test_harness,no_run
 /// # extern crate hyper;
-/// # extern crate "yup-oauth2" as oauth2;
-/// # extern crate "google-webmasters3" as webmasters3;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_webmasters3 as webmasters3;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -3137,7 +3137,7 @@ impl<'a, C, NC, A> UrlcrawlerrorssampleGetCall<'a, C, NC, A> where NC: hyper::ne
 
         let mut url = "https://www.googleapis.com/webmasters/v3/sites/{siteUrl}/urlCrawlErrorsSamples/{url}".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Readonly.as_slice().to_string(), ());
+            self._scopes.insert(Scope::Readonly.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{siteUrl}", "siteUrl"), ("{url}", "url")].iter() {
@@ -3167,7 +3167,7 @@ impl<'a, C, NC, A> UrlcrawlerrorssampleGetCall<'a, C, NC, A> where NC: hyper::ne
         
         if params.len() > 0 {
             url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
+            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_ref()))));
         }
 
 
@@ -3185,7 +3185,7 @@ impl<'a, C, NC, A> UrlcrawlerrorssampleGetCall<'a, C, NC, A> where NC: hyper::ne
                                                              access_token: token.unwrap().access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_slice())
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_ref())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -3196,7 +3196,7 @@ impl<'a, C, NC, A> UrlcrawlerrorssampleGetCall<'a, C, NC, A> where NC: hyper::ne
             match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
+                        sleep_ms(d.num_milliseconds() as u32);
                         continue;
                     }
                     dlg.finished(false);
@@ -3207,7 +3207,7 @@ impl<'a, C, NC, A> UrlcrawlerrorssampleGetCall<'a, C, NC, A> where NC: hyper::ne
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
-                            sleep(d);
+                            sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
@@ -3302,8 +3302,8 @@ impl<'a, C, NC, A> UrlcrawlerrorssampleGetCall<'a, C, NC, A> where NC: hyper::ne
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> UrlcrawlerrorssampleGetCall<'a, C, NC, A>
-                                                        where T: Str {
-        self._additional_params.insert(name.as_slice().to_string(), value.as_slice().to_string());
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
     }
 
@@ -3319,8 +3319,8 @@ impl<'a, C, NC, A> UrlcrawlerrorssampleGetCall<'a, C, NC, A> where NC: hyper::ne
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T>(mut self, scope: T) -> UrlcrawlerrorssampleGetCall<'a, C, NC, A> 
-                                                        where T: Str {
-        self._scopes.insert(scope.as_slice().to_string(), ());
+                                                        where T: AsRef<str> {
+        self._scopes.insert(scope.as_ref().to_string(), ());
         self
     }
 }
@@ -3337,8 +3337,8 @@ impl<'a, C, NC, A> UrlcrawlerrorssampleGetCall<'a, C, NC, A> where NC: hyper::ne
 ///
 /// ```test_harness,no_run
 /// # extern crate hyper;
-/// # extern crate "yup-oauth2" as oauth2;
-/// # extern crate "google-webmasters3" as webmasters3;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_webmasters3 as webmasters3;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -3402,7 +3402,7 @@ impl<'a, C, NC, A> UrlcrawlerrorssampleListCall<'a, C, NC, A> where NC: hyper::n
 
         let mut url = "https://www.googleapis.com/webmasters/v3/sites/{siteUrl}/urlCrawlErrorsSamples".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Readonly.as_slice().to_string(), ());
+            self._scopes.insert(Scope::Readonly.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{siteUrl}", "siteUrl")].iter() {
@@ -3432,7 +3432,7 @@ impl<'a, C, NC, A> UrlcrawlerrorssampleListCall<'a, C, NC, A> where NC: hyper::n
         
         if params.len() > 0 {
             url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
+            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_ref()))));
         }
 
 
@@ -3450,7 +3450,7 @@ impl<'a, C, NC, A> UrlcrawlerrorssampleListCall<'a, C, NC, A> where NC: hyper::n
                                                              access_token: token.unwrap().access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_slice())
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_ref())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -3461,7 +3461,7 @@ impl<'a, C, NC, A> UrlcrawlerrorssampleListCall<'a, C, NC, A> where NC: hyper::n
             match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
+                        sleep_ms(d.num_milliseconds() as u32);
                         continue;
                     }
                     dlg.finished(false);
@@ -3472,7 +3472,7 @@ impl<'a, C, NC, A> UrlcrawlerrorssampleListCall<'a, C, NC, A> where NC: hyper::n
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
-                            sleep(d);
+                            sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
@@ -3557,8 +3557,8 @@ impl<'a, C, NC, A> UrlcrawlerrorssampleListCall<'a, C, NC, A> where NC: hyper::n
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> UrlcrawlerrorssampleListCall<'a, C, NC, A>
-                                                        where T: Str {
-        self._additional_params.insert(name.as_slice().to_string(), value.as_slice().to_string());
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
     }
 
@@ -3574,8 +3574,8 @@ impl<'a, C, NC, A> UrlcrawlerrorssampleListCall<'a, C, NC, A> where NC: hyper::n
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T>(mut self, scope: T) -> UrlcrawlerrorssampleListCall<'a, C, NC, A> 
-                                                        where T: Str {
-        self._scopes.insert(scope.as_slice().to_string(), ());
+                                                        where T: AsRef<str> {
+        self._scopes.insert(scope.as_ref().to_string(), ());
         self
     }
 }
@@ -3592,8 +3592,8 @@ impl<'a, C, NC, A> UrlcrawlerrorssampleListCall<'a, C, NC, A> where NC: hyper::n
 ///
 /// ```test_harness,no_run
 /// # extern crate hyper;
-/// # extern crate "yup-oauth2" as oauth2;
-/// # extern crate "google-webmasters3" as webmasters3;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_webmasters3 as webmasters3;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -3658,7 +3658,7 @@ impl<'a, C, NC, A> UrlcrawlerrorssampleMarkAsFixedCall<'a, C, NC, A> where NC: h
 
         let mut url = "https://www.googleapis.com/webmasters/v3/sites/{siteUrl}/urlCrawlErrorsSamples/{url}".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Full.as_slice().to_string(), ());
+            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{siteUrl}", "siteUrl"), ("{url}", "url")].iter() {
@@ -3688,7 +3688,7 @@ impl<'a, C, NC, A> UrlcrawlerrorssampleMarkAsFixedCall<'a, C, NC, A> where NC: h
         
         if params.len() > 0 {
             url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
+            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_ref()))));
         }
 
 
@@ -3706,7 +3706,7 @@ impl<'a, C, NC, A> UrlcrawlerrorssampleMarkAsFixedCall<'a, C, NC, A> where NC: h
                                                              access_token: token.unwrap().access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Delete, url.as_slice())
+                let mut req = client.borrow_mut().request(hyper::method::Method::Delete, url.as_ref())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -3717,7 +3717,7 @@ impl<'a, C, NC, A> UrlcrawlerrorssampleMarkAsFixedCall<'a, C, NC, A> where NC: h
             match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
+                        sleep_ms(d.num_milliseconds() as u32);
                         continue;
                     }
                     dlg.finished(false);
@@ -3728,7 +3728,7 @@ impl<'a, C, NC, A> UrlcrawlerrorssampleMarkAsFixedCall<'a, C, NC, A> where NC: h
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
-                            sleep(d);
+                            sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
@@ -3813,8 +3813,8 @@ impl<'a, C, NC, A> UrlcrawlerrorssampleMarkAsFixedCall<'a, C, NC, A> where NC: h
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> UrlcrawlerrorssampleMarkAsFixedCall<'a, C, NC, A>
-                                                        where T: Str {
-        self._additional_params.insert(name.as_slice().to_string(), value.as_slice().to_string());
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
     }
 
@@ -3830,8 +3830,8 @@ impl<'a, C, NC, A> UrlcrawlerrorssampleMarkAsFixedCall<'a, C, NC, A> where NC: h
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T>(mut self, scope: T) -> UrlcrawlerrorssampleMarkAsFixedCall<'a, C, NC, A> 
-                                                        where T: Str {
-        self._scopes.insert(scope.as_slice().to_string(), ());
+                                                        where T: AsRef<str> {
+        self._scopes.insert(scope.as_ref().to_string(), ());
         self
     }
 }

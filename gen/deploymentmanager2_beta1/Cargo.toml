@@ -4,7 +4,7 @@
 [package]
 
 name = "google-deploymentmanager2_beta1"
-version = "0.1.2+20141215"
+version = "0.1.2+20150303"
 authors = ["Sebastian Thiel <byronimo@gmail>"]
 description = "A complete library to interact with deploymentmanager (protocol v2beta1)"
 repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/deploymentmanager2_beta1"

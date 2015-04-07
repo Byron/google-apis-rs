@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *directory* crate version *0.1.2+20150123*, where *20150123* is the exact revision of the *admin:directory_v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.2*.
+//! This documentation was generated from *directory* crate version *0.1.2+20150309*, where *20150309* is the exact revision of the *admin:directory_v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.2*.
 //! 
 //! Everything else about the *directory* *v1_directory* API can be found at the
 //! [official documentation site](https://developers.google.com/admin-sdk/directory/).
@@ -116,8 +116,8 @@
 //! 
 //! ```test_harness,no_run
 //! extern crate hyper;
-//! extern crate "yup-oauth2" as oauth2;
-//! extern crate "google-admin1_directory" as admin1_directory;
+//! extern crate yup_oauth2 as oauth2;
+//! extern crate google_admin1_directory as admin1_directory;
 //! use admin1_directory::Channel;
 //! use admin1_directory::{Result, Error};
 //! # #[test] fn egal() {
@@ -228,20 +228,20 @@
 //! [google-go-api]: https://github.com/google/google-api-go-client
 //! 
 //! 
-#![feature(core,io,thread_sleep)]
+#![feature(std_misc)]
 // Unused attributes happen thanks to defined, but unused structures
 // We don't warn about this, as depending on the API, some data structures or facilities are never used.
 // Instead of pre-determining this, we just disable the lint. It's manually tuned to not have any 
 // unused imports in fully featured APIs. Same with unused_mut ... .
 #![allow(unused_imports, unused_mut, dead_code)]
 // Required for serde annotations
-#![feature(custom_derive, custom_attribute, plugin)]
+#![feature(custom_derive, custom_attribute, plugin, slice_patterns)]
 #![plugin(serde_macros)]
 
 #[macro_use]
 extern crate hyper;
 extern crate serde;
-extern crate "yup-oauth2" as oauth2;
+extern crate yup_oauth2 as oauth2;
 extern crate mime;
 extern crate url;
 
@@ -256,7 +256,7 @@ use std::marker::PhantomData;
 use serde::json;
 use std::io;
 use std::fs;
-use std::thread::sleep;
+use std::thread::sleep_ms;
 
 pub use cmn::{MultiPartReader, ToParts, MethodInfo, Result, Error, CallBuilder, Hub, ReadSeek, Part, ResponseResult, RequestValue, NestedType, Delegate, DefaultDelegate, MethodsBuilder, Resource, JsonServerError};
 
@@ -328,8 +328,8 @@ pub enum Scope {
     DirectoryOrgunit,
 }
 
-impl Str for Scope {
-    fn as_slice(&self) -> &str {
+impl AsRef<str> for Scope {
+    fn as_ref(&self) -> &str {
         match *self {
             Scope::DirectoryUserAlia => "https://www.googleapis.com/auth/admin.directory.user.alias",
             Scope::DirectoryDeviceMobileReadonly => "https://www.googleapis.com/auth/admin.directory.device.mobile.readonly",
@@ -374,8 +374,8 @@ impl Default for Scope {
 ///
 /// ```test_harness,no_run
 /// extern crate hyper;
-/// extern crate "yup-oauth2" as oauth2;
-/// extern crate "google-admin1_directory" as admin1_directory;
+/// extern crate yup_oauth2 as oauth2;
+/// extern crate google_admin1_directory as admin1_directory;
 /// use admin1_directory::Channel;
 /// use admin1_directory::{Result, Error};
 /// # #[test] fn egal() {
@@ -1587,13 +1587,19 @@ impl ResponseResult for ChromeOsDevices {}
 pub struct OrgUnit {
     /// Kind of resource this is.
     pub kind: Option<String>,
-    /// ETag of the resource.
-    pub etag: Option<String>,
     /// Path of parent OrgUnit
     #[serde(alias="parentOrgUnitPath")]
     pub parent_org_unit_path: Option<String>,
     /// Name of OrgUnit
     pub name: Option<String>,
+    /// ETag of the resource.
+    pub etag: Option<String>,
+    /// Id of OrgUnit
+    #[serde(alias="orgUnitId")]
+    pub org_unit_id: Option<String>,
+    /// Id of parent OrgUnit
+    #[serde(alias="parentOrgUnitId")]
+    pub parent_org_unit_id: Option<String>,
     /// Should block inheritance
     #[serde(alias="blockInheritance")]
     pub block_inheritance: Option<bool>,
@@ -1714,8 +1720,8 @@ impl ResponseResult for Aliases {}
 ///
 /// ```test_harness,no_run
 /// extern crate hyper;
-/// extern crate "yup-oauth2" as oauth2;
-/// extern crate "google-admin1_directory" as admin1_directory;
+/// extern crate yup_oauth2 as oauth2;
+/// extern crate google_admin1_directory as admin1_directory;
 /// 
 /// # #[test] fn egal() {
 /// use std::default::Default;
@@ -1810,8 +1816,8 @@ impl<'a, C, NC, A> TokenMethods<'a, C, NC, A> {
 ///
 /// ```test_harness,no_run
 /// extern crate hyper;
-/// extern crate "yup-oauth2" as oauth2;
-/// extern crate "google-admin1_directory" as admin1_directory;
+/// extern crate yup_oauth2 as oauth2;
+/// extern crate google_admin1_directory as admin1_directory;
 /// 
 /// # #[test] fn egal() {
 /// use std::default::Default;
@@ -1868,8 +1874,8 @@ impl<'a, C, NC, A> ChannelMethods<'a, C, NC, A> {
 ///
 /// ```test_harness,no_run
 /// extern crate hyper;
-/// extern crate "yup-oauth2" as oauth2;
-/// extern crate "google-admin1_directory" as admin1_directory;
+/// extern crate yup_oauth2 as oauth2;
+/// extern crate google_admin1_directory as admin1_directory;
 /// 
 /// # #[test] fn egal() {
 /// use std::default::Default;
@@ -1942,7 +1948,7 @@ impl<'a, C, NC, A> OrgunitMethods<'a, C, NC, A> {
     /// # Arguments
     ///
     /// * `customerId` - Immutable id of the Google Apps account
-    /// * `orgUnitPath` - Full path of the organization unit
+    /// * `orgUnitPath` - Full path of the organization unit or its Id
     pub fn get(&self, customer_id: &str, org_unit_path: &Vec<String>) -> OrgunitGetCall<'a, C, NC, A> {
         OrgunitGetCall {
             hub: self.hub,
@@ -1962,7 +1968,7 @@ impl<'a, C, NC, A> OrgunitMethods<'a, C, NC, A> {
     ///
     /// * `request` - No description provided.
     /// * `customerId` - Immutable id of the Google Apps account
-    /// * `orgUnitPath` - Full path of the organization unit
+    /// * `orgUnitPath` - Full path of the organization unit or its Id
     pub fn update(&self, request: &OrgUnit, customer_id: &str, org_unit_path: &Vec<String>) -> OrgunitUpdateCall<'a, C, NC, A> {
         OrgunitUpdateCall {
             hub: self.hub,
@@ -1982,7 +1988,7 @@ impl<'a, C, NC, A> OrgunitMethods<'a, C, NC, A> {
     /// # Arguments
     ///
     /// * `customerId` - Immutable id of the Google Apps account
-    /// * `orgUnitPath` - Full path of the organization unit
+    /// * `orgUnitPath` - Full path of the organization unit or its Id
     pub fn delete(&self, customer_id: &str, org_unit_path: &Vec<String>) -> OrgunitDeleteCall<'a, C, NC, A> {
         OrgunitDeleteCall {
             hub: self.hub,
@@ -2002,7 +2008,7 @@ impl<'a, C, NC, A> OrgunitMethods<'a, C, NC, A> {
     ///
     /// * `request` - No description provided.
     /// * `customerId` - Immutable id of the Google Apps account
-    /// * `orgUnitPath` - Full path of the organization unit
+    /// * `orgUnitPath` - Full path of the organization unit or its Id
     pub fn patch(&self, request: &OrgUnit, customer_id: &str, org_unit_path: &Vec<String>) -> OrgunitPatchCall<'a, C, NC, A> {
         OrgunitPatchCall {
             hub: self.hub,
@@ -2027,8 +2033,8 @@ impl<'a, C, NC, A> OrgunitMethods<'a, C, NC, A> {
 ///
 /// ```test_harness,no_run
 /// extern crate hyper;
-/// extern crate "yup-oauth2" as oauth2;
-/// extern crate "google-admin1_directory" as admin1_directory;
+/// extern crate yup_oauth2 as oauth2;
+/// extern crate google_admin1_directory as admin1_directory;
 /// 
 /// # #[test] fn egal() {
 /// use std::default::Default;
@@ -2399,8 +2405,8 @@ impl<'a, C, NC, A> UserMethods<'a, C, NC, A> {
 ///
 /// ```test_harness,no_run
 /// extern crate hyper;
-/// extern crate "yup-oauth2" as oauth2;
-/// extern crate "google-admin1_directory" as admin1_directory;
+/// extern crate yup_oauth2 as oauth2;
+/// extern crate google_admin1_directory as admin1_directory;
 /// 
 /// # #[test] fn egal() {
 /// use std::default::Default;
@@ -2523,8 +2529,8 @@ impl<'a, C, NC, A> MobiledeviceMethods<'a, C, NC, A> {
 ///
 /// ```test_harness,no_run
 /// extern crate hyper;
-/// extern crate "yup-oauth2" as oauth2;
-/// extern crate "google-admin1_directory" as admin1_directory;
+/// extern crate yup_oauth2 as oauth2;
+/// extern crate google_admin1_directory as admin1_directory;
 /// 
 /// # #[test] fn egal() {
 /// use std::default::Default;
@@ -2683,8 +2689,8 @@ impl<'a, C, NC, A> MemberMethods<'a, C, NC, A> {
 ///
 /// ```test_harness,no_run
 /// extern crate hyper;
-/// extern crate "yup-oauth2" as oauth2;
-/// extern crate "google-admin1_directory" as admin1_directory;
+/// extern crate yup_oauth2 as oauth2;
+/// extern crate google_admin1_directory as admin1_directory;
 /// 
 /// # #[test] fn egal() {
 /// use std::default::Default;
@@ -2824,8 +2830,8 @@ impl<'a, C, NC, A> NotificationMethods<'a, C, NC, A> {
 ///
 /// ```test_harness,no_run
 /// extern crate hyper;
-/// extern crate "yup-oauth2" as oauth2;
-/// extern crate "google-admin1_directory" as admin1_directory;
+/// extern crate yup_oauth2 as oauth2;
+/// extern crate google_admin1_directory as admin1_directory;
 /// 
 /// # #[test] fn egal() {
 /// use std::default::Default;
@@ -2952,8 +2958,8 @@ impl<'a, C, NC, A> ChromeosdeviceMethods<'a, C, NC, A> {
 ///
 /// ```test_harness,no_run
 /// extern crate hyper;
-/// extern crate "yup-oauth2" as oauth2;
-/// extern crate "google-admin1_directory" as admin1_directory;
+/// extern crate yup_oauth2 as oauth2;
+/// extern crate google_admin1_directory as admin1_directory;
 /// 
 /// # #[test] fn egal() {
 /// use std::default::Default;
@@ -3044,8 +3050,8 @@ impl<'a, C, NC, A> VerificationCodeMethods<'a, C, NC, A> {
 ///
 /// ```test_harness,no_run
 /// extern crate hyper;
-/// extern crate "yup-oauth2" as oauth2;
-/// extern crate "google-admin1_directory" as admin1_directory;
+/// extern crate yup_oauth2 as oauth2;
+/// extern crate google_admin1_directory as admin1_directory;
 /// 
 /// # #[test] fn egal() {
 /// use std::default::Default;
@@ -3246,8 +3252,8 @@ impl<'a, C, NC, A> GroupMethods<'a, C, NC, A> {
 ///
 /// ```test_harness,no_run
 /// extern crate hyper;
-/// extern crate "yup-oauth2" as oauth2;
-/// extern crate "google-admin1_directory" as admin1_directory;
+/// extern crate yup_oauth2 as oauth2;
+/// extern crate google_admin1_directory as admin1_directory;
 /// 
 /// # #[test] fn egal() {
 /// use std::default::Default;
@@ -3342,8 +3348,8 @@ impl<'a, C, NC, A> AspMethods<'a, C, NC, A> {
 ///
 /// ```test_harness,no_run
 /// extern crate hyper;
-/// extern crate "yup-oauth2" as oauth2;
-/// extern crate "google-admin1_directory" as admin1_directory;
+/// extern crate yup_oauth2 as oauth2;
+/// extern crate google_admin1_directory as admin1_directory;
 /// 
 /// # #[test] fn egal() {
 /// use std::default::Default;
@@ -3507,8 +3513,8 @@ impl<'a, C, NC, A> SchemaMethods<'a, C, NC, A> {
 ///
 /// ```test_harness,no_run
 /// # extern crate hyper;
-/// # extern crate "yup-oauth2" as oauth2;
-/// # extern crate "google-admin1_directory" as admin1_directory;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_admin1_directory as admin1_directory;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -3570,7 +3576,7 @@ impl<'a, C, NC, A> TokenGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
 
         let mut url = "https://www.googleapis.com/admin/directory/v1/users/{userKey}/tokens/{clientId}".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::DirectoryDeviceChromeoReadonly.as_slice().to_string(), ());
+            self._scopes.insert(Scope::DirectoryDeviceChromeoReadonly.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{userKey}", "userKey"), ("{clientId}", "clientId")].iter() {
@@ -3600,7 +3606,7 @@ impl<'a, C, NC, A> TokenGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
         
         if params.len() > 0 {
             url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
+            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_ref()))));
         }
 
 
@@ -3618,7 +3624,7 @@ impl<'a, C, NC, A> TokenGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
                                                              access_token: token.unwrap().access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_slice())
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_ref())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -3629,7 +3635,7 @@ impl<'a, C, NC, A> TokenGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
             match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
+                        sleep_ms(d.num_milliseconds() as u32);
                         continue;
                     }
                     dlg.finished(false);
@@ -3640,7 +3646,7 @@ impl<'a, C, NC, A> TokenGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
-                            sleep(d);
+                            sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
@@ -3715,8 +3721,8 @@ impl<'a, C, NC, A> TokenGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> TokenGetCall<'a, C, NC, A>
-                                                        where T: Str {
-        self._additional_params.insert(name.as_slice().to_string(), value.as_slice().to_string());
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
     }
 
@@ -3732,8 +3738,8 @@ impl<'a, C, NC, A> TokenGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T>(mut self, scope: T) -> TokenGetCall<'a, C, NC, A> 
-                                                        where T: Str {
-        self._scopes.insert(scope.as_slice().to_string(), ());
+                                                        where T: AsRef<str> {
+        self._scopes.insert(scope.as_ref().to_string(), ());
         self
     }
 }
@@ -3750,8 +3756,8 @@ impl<'a, C, NC, A> TokenGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
 ///
 /// ```test_harness,no_run
 /// # extern crate hyper;
-/// # extern crate "yup-oauth2" as oauth2;
-/// # extern crate "google-admin1_directory" as admin1_directory;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_admin1_directory as admin1_directory;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -3811,7 +3817,7 @@ impl<'a, C, NC, A> TokenListCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
 
         let mut url = "https://www.googleapis.com/admin/directory/v1/users/{userKey}/tokens".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::DirectoryDeviceChromeoReadonly.as_slice().to_string(), ());
+            self._scopes.insert(Scope::DirectoryDeviceChromeoReadonly.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{userKey}", "userKey")].iter() {
@@ -3841,7 +3847,7 @@ impl<'a, C, NC, A> TokenListCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
         
         if params.len() > 0 {
             url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
+            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_ref()))));
         }
 
 
@@ -3859,7 +3865,7 @@ impl<'a, C, NC, A> TokenListCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
                                                              access_token: token.unwrap().access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_slice())
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_ref())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -3870,7 +3876,7 @@ impl<'a, C, NC, A> TokenListCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
             match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
+                        sleep_ms(d.num_milliseconds() as u32);
                         continue;
                     }
                     dlg.finished(false);
@@ -3881,7 +3887,7 @@ impl<'a, C, NC, A> TokenListCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
-                            sleep(d);
+                            sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
@@ -3946,8 +3952,8 @@ impl<'a, C, NC, A> TokenListCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> TokenListCall<'a, C, NC, A>
-                                                        where T: Str {
-        self._additional_params.insert(name.as_slice().to_string(), value.as_slice().to_string());
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
     }
 
@@ -3963,8 +3969,8 @@ impl<'a, C, NC, A> TokenListCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T>(mut self, scope: T) -> TokenListCall<'a, C, NC, A> 
-                                                        where T: Str {
-        self._scopes.insert(scope.as_slice().to_string(), ());
+                                                        where T: AsRef<str> {
+        self._scopes.insert(scope.as_ref().to_string(), ());
         self
     }
 }
@@ -3981,8 +3987,8 @@ impl<'a, C, NC, A> TokenListCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
 ///
 /// ```test_harness,no_run
 /// # extern crate hyper;
-/// # extern crate "yup-oauth2" as oauth2;
-/// # extern crate "google-admin1_directory" as admin1_directory;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_admin1_directory as admin1_directory;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -4043,7 +4049,7 @@ impl<'a, C, NC, A> TokenDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
 
         let mut url = "https://www.googleapis.com/admin/directory/v1/users/{userKey}/tokens/{clientId}".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::DirectoryDeviceChromeo.as_slice().to_string(), ());
+            self._scopes.insert(Scope::DirectoryDeviceChromeo.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{userKey}", "userKey"), ("{clientId}", "clientId")].iter() {
@@ -4073,7 +4079,7 @@ impl<'a, C, NC, A> TokenDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
         
         if params.len() > 0 {
             url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
+            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_ref()))));
         }
 
 
@@ -4091,7 +4097,7 @@ impl<'a, C, NC, A> TokenDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
                                                              access_token: token.unwrap().access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Delete, url.as_slice())
+                let mut req = client.borrow_mut().request(hyper::method::Method::Delete, url.as_ref())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -4102,7 +4108,7 @@ impl<'a, C, NC, A> TokenDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
             match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
+                        sleep_ms(d.num_milliseconds() as u32);
                         continue;
                     }
                     dlg.finished(false);
@@ -4113,7 +4119,7 @@ impl<'a, C, NC, A> TokenDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
-                            sleep(d);
+                            sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
@@ -4178,8 +4184,8 @@ impl<'a, C, NC, A> TokenDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> TokenDeleteCall<'a, C, NC, A>
-                                                        where T: Str {
-        self._additional_params.insert(name.as_slice().to_string(), value.as_slice().to_string());
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
     }
 
@@ -4195,8 +4201,8 @@ impl<'a, C, NC, A> TokenDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T>(mut self, scope: T) -> TokenDeleteCall<'a, C, NC, A> 
-                                                        where T: Str {
-        self._scopes.insert(scope.as_slice().to_string(), ());
+                                                        where T: AsRef<str> {
+        self._scopes.insert(scope.as_ref().to_string(), ());
         self
     }
 }
@@ -4213,8 +4219,8 @@ impl<'a, C, NC, A> TokenDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
 ///
 /// ```test_harness,no_run
 /// # extern crate hyper;
-/// # extern crate "yup-oauth2" as oauth2;
-/// # extern crate "google-admin1_directory" as admin1_directory;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_admin1_directory as admin1_directory;
 /// use admin1_directory::Channel;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
@@ -4278,13 +4284,13 @@ impl<'a, C, NC, A> ChannelStopCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
 
         let mut url = "https://www.googleapis.com/admin/directory/v1//admin/directory_v1/channels/stop".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::DirectoryDeviceChromeo.as_slice().to_string(), ());
+            self._scopes.insert(Scope::DirectoryDeviceChromeo.as_ref().to_string(), ());
         }
 
         
         if params.len() > 0 {
             url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
+            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_ref()))));
         }
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
@@ -4307,7 +4313,7 @@ impl<'a, C, NC, A> ChannelStopCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.as_slice())
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.as_ref())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -4321,7 +4327,7 @@ impl<'a, C, NC, A> ChannelStopCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
             match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
+                        sleep_ms(d.num_milliseconds() as u32);
                         continue;
                     }
                     dlg.finished(false);
@@ -4332,7 +4338,7 @@ impl<'a, C, NC, A> ChannelStopCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
-                            sleep(d);
+                            sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
@@ -4386,8 +4392,8 @@ impl<'a, C, NC, A> ChannelStopCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> ChannelStopCall<'a, C, NC, A>
-                                                        where T: Str {
-        self._additional_params.insert(name.as_slice().to_string(), value.as_slice().to_string());
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
     }
 
@@ -4403,8 +4409,8 @@ impl<'a, C, NC, A> ChannelStopCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T>(mut self, scope: T) -> ChannelStopCall<'a, C, NC, A> 
-                                                        where T: Str {
-        self._scopes.insert(scope.as_slice().to_string(), ());
+                                                        where T: AsRef<str> {
+        self._scopes.insert(scope.as_ref().to_string(), ());
         self
     }
 }
@@ -4421,8 +4427,8 @@ impl<'a, C, NC, A> ChannelStopCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
 ///
 /// ```test_harness,no_run
 /// # extern crate hyper;
-/// # extern crate "yup-oauth2" as oauth2;
-/// # extern crate "google-admin1_directory" as admin1_directory;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_admin1_directory as admin1_directory;
 /// use admin1_directory::OrgUnit;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
@@ -4489,7 +4495,7 @@ impl<'a, C, NC, A> OrgunitInsertCall<'a, C, NC, A> where NC: hyper::net::Network
 
         let mut url = "https://www.googleapis.com/admin/directory/v1/customer/{customerId}/orgunits".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::DirectoryDeviceChromeo.as_slice().to_string(), ());
+            self._scopes.insert(Scope::DirectoryDeviceChromeo.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{customerId}", "customerId")].iter() {
@@ -4519,7 +4525,7 @@ impl<'a, C, NC, A> OrgunitInsertCall<'a, C, NC, A> where NC: hyper::net::Network
         
         if params.len() > 0 {
             url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
+            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_ref()))));
         }
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
@@ -4542,7 +4548,7 @@ impl<'a, C, NC, A> OrgunitInsertCall<'a, C, NC, A> where NC: hyper::net::Network
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.as_slice())
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.as_ref())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -4556,7 +4562,7 @@ impl<'a, C, NC, A> OrgunitInsertCall<'a, C, NC, A> where NC: hyper::net::Network
             match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
+                        sleep_ms(d.num_milliseconds() as u32);
                         continue;
                     }
                     dlg.finished(false);
@@ -4567,7 +4573,7 @@ impl<'a, C, NC, A> OrgunitInsertCall<'a, C, NC, A> where NC: hyper::net::Network
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
-                            sleep(d);
+                            sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
@@ -4641,8 +4647,8 @@ impl<'a, C, NC, A> OrgunitInsertCall<'a, C, NC, A> where NC: hyper::net::Network
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> OrgunitInsertCall<'a, C, NC, A>
-                                                        where T: Str {
-        self._additional_params.insert(name.as_slice().to_string(), value.as_slice().to_string());
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
     }
 
@@ -4658,8 +4664,8 @@ impl<'a, C, NC, A> OrgunitInsertCall<'a, C, NC, A> where NC: hyper::net::Network
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T>(mut self, scope: T) -> OrgunitInsertCall<'a, C, NC, A> 
-                                                        where T: Str {
-        self._scopes.insert(scope.as_slice().to_string(), ());
+                                                        where T: AsRef<str> {
+        self._scopes.insert(scope.as_ref().to_string(), ());
         self
     }
 }
@@ -4676,8 +4682,8 @@ impl<'a, C, NC, A> OrgunitInsertCall<'a, C, NC, A> where NC: hyper::net::Network
 ///
 /// ```test_harness,no_run
 /// # extern crate hyper;
-/// # extern crate "yup-oauth2" as oauth2;
-/// # extern crate "google-admin1_directory" as admin1_directory;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_admin1_directory as admin1_directory;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -4747,7 +4753,7 @@ impl<'a, C, NC, A> OrgunitListCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
 
         let mut url = "https://www.googleapis.com/admin/directory/v1/customer/{customerId}/orgunits".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::DirectoryDeviceChromeoReadonly.as_slice().to_string(), ());
+            self._scopes.insert(Scope::DirectoryDeviceChromeoReadonly.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{customerId}", "customerId")].iter() {
@@ -4777,7 +4783,7 @@ impl<'a, C, NC, A> OrgunitListCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
         
         if params.len() > 0 {
             url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
+            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_ref()))));
         }
 
 
@@ -4795,7 +4801,7 @@ impl<'a, C, NC, A> OrgunitListCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
                                                              access_token: token.unwrap().access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_slice())
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_ref())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -4806,7 +4812,7 @@ impl<'a, C, NC, A> OrgunitListCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
             match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
+                        sleep_ms(d.num_milliseconds() as u32);
                         continue;
                     }
                     dlg.finished(false);
@@ -4817,7 +4823,7 @@ impl<'a, C, NC, A> OrgunitListCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
-                            sleep(d);
+                            sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
@@ -4864,7 +4870,7 @@ impl<'a, C, NC, A> OrgunitListCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// Sets the *org unit path* query property to the given value.
     ///
     /// 
-    /// the URL-encoded organization unit
+    /// the URL-encoded organization unit's path or its Id
     pub fn org_unit_path(mut self, new_value: &str) -> OrgunitListCall<'a, C, NC, A> {
         self._org_unit_path = Some(new_value.to_string());
         self
@@ -4898,8 +4904,8 @@ impl<'a, C, NC, A> OrgunitListCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> OrgunitListCall<'a, C, NC, A>
-                                                        where T: Str {
-        self._additional_params.insert(name.as_slice().to_string(), value.as_slice().to_string());
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
     }
 
@@ -4915,8 +4921,8 @@ impl<'a, C, NC, A> OrgunitListCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T>(mut self, scope: T) -> OrgunitListCall<'a, C, NC, A> 
-                                                        where T: Str {
-        self._scopes.insert(scope.as_slice().to_string(), ());
+                                                        where T: AsRef<str> {
+        self._scopes.insert(scope.as_ref().to_string(), ());
         self
     }
 }
@@ -4933,8 +4939,8 @@ impl<'a, C, NC, A> OrgunitListCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
 ///
 /// ```test_harness,no_run
 /// # extern crate hyper;
-/// # extern crate "yup-oauth2" as oauth2;
-/// # extern crate "google-admin1_directory" as admin1_directory;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_admin1_directory as admin1_directory;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -5002,7 +5008,7 @@ impl<'a, C, NC, A> OrgunitGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
 
         let mut url = "https://www.googleapis.com/admin/directory/v1/customer/{customerId}/orgunits{/orgUnitPath*}".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::DirectoryDeviceChromeoReadonly.as_slice().to_string(), ());
+            self._scopes.insert(Scope::DirectoryDeviceChromeoReadonly.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{customerId}", "customerId"), ("{/orgUnitPath*}", "orgUnitPath")].iter() {
@@ -5032,7 +5038,7 @@ impl<'a, C, NC, A> OrgunitGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
         
         if params.len() > 0 {
             url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
+            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_ref()))));
         }
 
 
@@ -5050,7 +5056,7 @@ impl<'a, C, NC, A> OrgunitGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
                                                              access_token: token.unwrap().access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_slice())
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_ref())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -5061,7 +5067,7 @@ impl<'a, C, NC, A> OrgunitGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
             match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
+                        sleep_ms(d.num_milliseconds() as u32);
                         continue;
                     }
                     dlg.finished(false);
@@ -5072,7 +5078,7 @@ impl<'a, C, NC, A> OrgunitGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
-                            sleep(d);
+                            sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
@@ -5114,7 +5120,7 @@ impl<'a, C, NC, A> OrgunitGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Full path of the organization unit
+    /// Full path of the organization unit or its Id
     pub fn add_org_unit_path(mut self, new_value: &str) -> OrgunitGetCall<'a, C, NC, A> {
         self._org_unit_path.push(new_value.to_string());
         self
@@ -5148,8 +5154,8 @@ impl<'a, C, NC, A> OrgunitGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> OrgunitGetCall<'a, C, NC, A>
-                                                        where T: Str {
-        self._additional_params.insert(name.as_slice().to_string(), value.as_slice().to_string());
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
     }
 
@@ -5165,8 +5171,8 @@ impl<'a, C, NC, A> OrgunitGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T>(mut self, scope: T) -> OrgunitGetCall<'a, C, NC, A> 
-                                                        where T: Str {
-        self._scopes.insert(scope.as_slice().to_string(), ());
+                                                        where T: AsRef<str> {
+        self._scopes.insert(scope.as_ref().to_string(), ());
         self
     }
 }
@@ -5183,8 +5189,8 @@ impl<'a, C, NC, A> OrgunitGetCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
 ///
 /// ```test_harness,no_run
 /// # extern crate hyper;
-/// # extern crate "yup-oauth2" as oauth2;
-/// # extern crate "google-admin1_directory" as admin1_directory;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_admin1_directory as admin1_directory;
 /// use admin1_directory::OrgUnit;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
@@ -5259,7 +5265,7 @@ impl<'a, C, NC, A> OrgunitUpdateCall<'a, C, NC, A> where NC: hyper::net::Network
 
         let mut url = "https://www.googleapis.com/admin/directory/v1/customer/{customerId}/orgunits{/orgUnitPath*}".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::DirectoryDeviceChromeo.as_slice().to_string(), ());
+            self._scopes.insert(Scope::DirectoryDeviceChromeo.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{customerId}", "customerId"), ("{/orgUnitPath*}", "orgUnitPath")].iter() {
@@ -5289,7 +5295,7 @@ impl<'a, C, NC, A> OrgunitUpdateCall<'a, C, NC, A> where NC: hyper::net::Network
         
         if params.len() > 0 {
             url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
+            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_ref()))));
         }
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
@@ -5312,7 +5318,7 @@ impl<'a, C, NC, A> OrgunitUpdateCall<'a, C, NC, A> where NC: hyper::net::Network
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Put, url.as_slice())
+                let mut req = client.borrow_mut().request(hyper::method::Method::Put, url.as_ref())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -5326,7 +5332,7 @@ impl<'a, C, NC, A> OrgunitUpdateCall<'a, C, NC, A> where NC: hyper::net::Network
             match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
+                        sleep_ms(d.num_milliseconds() as u32);
                         continue;
                     }
                     dlg.finished(false);
@@ -5337,7 +5343,7 @@ impl<'a, C, NC, A> OrgunitUpdateCall<'a, C, NC, A> where NC: hyper::net::Network
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
-                            sleep(d);
+                            sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
@@ -5388,7 +5394,7 @@ impl<'a, C, NC, A> OrgunitUpdateCall<'a, C, NC, A> where NC: hyper::net::Network
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Full path of the organization unit
+    /// Full path of the organization unit or its Id
     pub fn add_org_unit_path(mut self, new_value: &str) -> OrgunitUpdateCall<'a, C, NC, A> {
         self._org_unit_path.push(new_value.to_string());
         self
@@ -5422,8 +5428,8 @@ impl<'a, C, NC, A> OrgunitUpdateCall<'a, C, NC, A> where NC: hyper::net::Network
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> OrgunitUpdateCall<'a, C, NC, A>
-                                                        where T: Str {
-        self._additional_params.insert(name.as_slice().to_string(), value.as_slice().to_string());
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
     }
 
@@ -5439,8 +5445,8 @@ impl<'a, C, NC, A> OrgunitUpdateCall<'a, C, NC, A> where NC: hyper::net::Network
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T>(mut self, scope: T) -> OrgunitUpdateCall<'a, C, NC, A> 
-                                                        where T: Str {
-        self._scopes.insert(scope.as_slice().to_string(), ());
+                                                        where T: AsRef<str> {
+        self._scopes.insert(scope.as_ref().to_string(), ());
         self
     }
 }
@@ -5457,8 +5463,8 @@ impl<'a, C, NC, A> OrgunitUpdateCall<'a, C, NC, A> where NC: hyper::net::Network
 ///
 /// ```test_harness,no_run
 /// # extern crate hyper;
-/// # extern crate "yup-oauth2" as oauth2;
-/// # extern crate "google-admin1_directory" as admin1_directory;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_admin1_directory as admin1_directory;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -5525,7 +5531,7 @@ impl<'a, C, NC, A> OrgunitDeleteCall<'a, C, NC, A> where NC: hyper::net::Network
 
         let mut url = "https://www.googleapis.com/admin/directory/v1/customer/{customerId}/orgunits{/orgUnitPath*}".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::DirectoryDeviceChromeo.as_slice().to_string(), ());
+            self._scopes.insert(Scope::DirectoryDeviceChromeo.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{customerId}", "customerId"), ("{/orgUnitPath*}", "orgUnitPath")].iter() {
@@ -5555,7 +5561,7 @@ impl<'a, C, NC, A> OrgunitDeleteCall<'a, C, NC, A> where NC: hyper::net::Network
         
         if params.len() > 0 {
             url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
+            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_ref()))));
         }
 
 
@@ -5573,7 +5579,7 @@ impl<'a, C, NC, A> OrgunitDeleteCall<'a, C, NC, A> where NC: hyper::net::Network
                                                              access_token: token.unwrap().access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Delete, url.as_slice())
+                let mut req = client.borrow_mut().request(hyper::method::Method::Delete, url.as_ref())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -5584,7 +5590,7 @@ impl<'a, C, NC, A> OrgunitDeleteCall<'a, C, NC, A> where NC: hyper::net::Network
             match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
+                        sleep_ms(d.num_milliseconds() as u32);
                         continue;
                     }
                     dlg.finished(false);
@@ -5595,7 +5601,7 @@ impl<'a, C, NC, A> OrgunitDeleteCall<'a, C, NC, A> where NC: hyper::net::Network
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
-                            sleep(d);
+                            sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
@@ -5627,7 +5633,7 @@ impl<'a, C, NC, A> OrgunitDeleteCall<'a, C, NC, A> where NC: hyper::net::Network
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Full path of the organization unit
+    /// Full path of the organization unit or its Id
     pub fn add_org_unit_path(mut self, new_value: &str) -> OrgunitDeleteCall<'a, C, NC, A> {
         self._org_unit_path.push(new_value.to_string());
         self
@@ -5661,8 +5667,8 @@ impl<'a, C, NC, A> OrgunitDeleteCall<'a, C, NC, A> where NC: hyper::net::Network
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> OrgunitDeleteCall<'a, C, NC, A>
-                                                        where T: Str {
-        self._additional_params.insert(name.as_slice().to_string(), value.as_slice().to_string());
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
     }
 
@@ -5678,8 +5684,8 @@ impl<'a, C, NC, A> OrgunitDeleteCall<'a, C, NC, A> where NC: hyper::net::Network
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T>(mut self, scope: T) -> OrgunitDeleteCall<'a, C, NC, A> 
-                                                        where T: Str {
-        self._scopes.insert(scope.as_slice().to_string(), ());
+                                                        where T: AsRef<str> {
+        self._scopes.insert(scope.as_ref().to_string(), ());
         self
     }
 }
@@ -5696,8 +5702,8 @@ impl<'a, C, NC, A> OrgunitDeleteCall<'a, C, NC, A> where NC: hyper::net::Network
 ///
 /// ```test_harness,no_run
 /// # extern crate hyper;
-/// # extern crate "yup-oauth2" as oauth2;
-/// # extern crate "google-admin1_directory" as admin1_directory;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_admin1_directory as admin1_directory;
 /// use admin1_directory::OrgUnit;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
@@ -5772,7 +5778,7 @@ impl<'a, C, NC, A> OrgunitPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkC
 
         let mut url = "https://www.googleapis.com/admin/directory/v1/customer/{customerId}/orgunits{/orgUnitPath*}".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::DirectoryDeviceChromeo.as_slice().to_string(), ());
+            self._scopes.insert(Scope::DirectoryDeviceChromeo.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{customerId}", "customerId"), ("{/orgUnitPath*}", "orgUnitPath")].iter() {
@@ -5802,7 +5808,7 @@ impl<'a, C, NC, A> OrgunitPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkC
         
         if params.len() > 0 {
             url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
+            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_ref()))));
         }
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
@@ -5825,7 +5831,7 @@ impl<'a, C, NC, A> OrgunitPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkC
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Patch, url.as_slice())
+                let mut req = client.borrow_mut().request(hyper::method::Method::Patch, url.as_ref())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -5839,7 +5845,7 @@ impl<'a, C, NC, A> OrgunitPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkC
             match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
+                        sleep_ms(d.num_milliseconds() as u32);
                         continue;
                     }
                     dlg.finished(false);
@@ -5850,7 +5856,7 @@ impl<'a, C, NC, A> OrgunitPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkC
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
-                            sleep(d);
+                            sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
@@ -5901,7 +5907,7 @@ impl<'a, C, NC, A> OrgunitPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
     /// 
-    /// Full path of the organization unit
+    /// Full path of the organization unit or its Id
     pub fn add_org_unit_path(mut self, new_value: &str) -> OrgunitPatchCall<'a, C, NC, A> {
         self._org_unit_path.push(new_value.to_string());
         self
@@ -5935,8 +5941,8 @@ impl<'a, C, NC, A> OrgunitPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> OrgunitPatchCall<'a, C, NC, A>
-                                                        where T: Str {
-        self._additional_params.insert(name.as_slice().to_string(), value.as_slice().to_string());
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
     }
 
@@ -5952,8 +5958,8 @@ impl<'a, C, NC, A> OrgunitPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T>(mut self, scope: T) -> OrgunitPatchCall<'a, C, NC, A> 
-                                                        where T: Str {
-        self._scopes.insert(scope.as_slice().to_string(), ());
+                                                        where T: AsRef<str> {
+        self._scopes.insert(scope.as_ref().to_string(), ());
         self
     }
 }
@@ -5970,8 +5976,8 @@ impl<'a, C, NC, A> OrgunitPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkC
 ///
 /// ```test_harness,no_run
 /// # extern crate hyper;
-/// # extern crate "yup-oauth2" as oauth2;
-/// # extern crate "google-admin1_directory" as admin1_directory;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_admin1_directory as admin1_directory;
 /// use admin1_directory::User;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
@@ -6036,13 +6042,13 @@ impl<'a, C, NC, A> UserInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
 
         let mut url = "https://www.googleapis.com/admin/directory/v1/users".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::DirectoryDeviceChromeo.as_slice().to_string(), ());
+            self._scopes.insert(Scope::DirectoryDeviceChromeo.as_ref().to_string(), ());
         }
 
         
         if params.len() > 0 {
             url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
+            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_ref()))));
         }
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
@@ -6065,7 +6071,7 @@ impl<'a, C, NC, A> UserInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.as_slice())
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.as_ref())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -6079,7 +6085,7 @@ impl<'a, C, NC, A> UserInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
             match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
+                        sleep_ms(d.num_milliseconds() as u32);
                         continue;
                     }
                     dlg.finished(false);
@@ -6090,7 +6096,7 @@ impl<'a, C, NC, A> UserInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
-                            sleep(d);
+                            sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
@@ -6154,8 +6160,8 @@ impl<'a, C, NC, A> UserInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> UserInsertCall<'a, C, NC, A>
-                                                        where T: Str {
-        self._additional_params.insert(name.as_slice().to_string(), value.as_slice().to_string());
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
     }
 
@@ -6171,8 +6177,8 @@ impl<'a, C, NC, A> UserInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T>(mut self, scope: T) -> UserInsertCall<'a, C, NC, A> 
-                                                        where T: Str {
-        self._scopes.insert(scope.as_slice().to_string(), ());
+                                                        where T: AsRef<str> {
+        self._scopes.insert(scope.as_ref().to_string(), ());
         self
     }
 }
@@ -6189,8 +6195,8 @@ impl<'a, C, NC, A> UserInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
 ///
 /// ```test_harness,no_run
 /// # extern crate hyper;
-/// # extern crate "yup-oauth2" as oauth2;
-/// # extern crate "google-admin1_directory" as admin1_directory;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_admin1_directory as admin1_directory;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -6249,7 +6255,7 @@ impl<'a, C, NC, A> UserPhotoDeleteCall<'a, C, NC, A> where NC: hyper::net::Netwo
 
         let mut url = "https://www.googleapis.com/admin/directory/v1/users/{userKey}/photos/thumbnail".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::DirectoryDeviceChromeo.as_slice().to_string(), ());
+            self._scopes.insert(Scope::DirectoryDeviceChromeo.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{userKey}", "userKey")].iter() {
@@ -6279,7 +6285,7 @@ impl<'a, C, NC, A> UserPhotoDeleteCall<'a, C, NC, A> where NC: hyper::net::Netwo
         
         if params.len() > 0 {
             url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
+            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_ref()))));
         }
 
 
@@ -6297,7 +6303,7 @@ impl<'a, C, NC, A> UserPhotoDeleteCall<'a, C, NC, A> where NC: hyper::net::Netwo
                                                              access_token: token.unwrap().access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Delete, url.as_slice())
+                let mut req = client.borrow_mut().request(hyper::method::Method::Delete, url.as_ref())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -6308,7 +6314,7 @@ impl<'a, C, NC, A> UserPhotoDeleteCall<'a, C, NC, A> where NC: hyper::net::Netwo
             match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
+                        sleep_ms(d.num_milliseconds() as u32);
                         continue;
                     }
                     dlg.finished(false);
@@ -6319,7 +6325,7 @@ impl<'a, C, NC, A> UserPhotoDeleteCall<'a, C, NC, A> where NC: hyper::net::Netwo
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
-                            sleep(d);
+                            sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
@@ -6374,8 +6380,8 @@ impl<'a, C, NC, A> UserPhotoDeleteCall<'a, C, NC, A> where NC: hyper::net::Netwo
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> UserPhotoDeleteCall<'a, C, NC, A>
-                                                        where T: Str {
-        self._additional_params.insert(name.as_slice().to_string(), value.as_slice().to_string());
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
     }
 
@@ -6391,8 +6397,8 @@ impl<'a, C, NC, A> UserPhotoDeleteCall<'a, C, NC, A> where NC: hyper::net::Netwo
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T>(mut self, scope: T) -> UserPhotoDeleteCall<'a, C, NC, A> 
-                                                        where T: Str {
-        self._scopes.insert(scope.as_slice().to_string(), ());
+                                                        where T: AsRef<str> {
+        self._scopes.insert(scope.as_ref().to_string(), ());
         self
     }
 }
@@ -6409,8 +6415,8 @@ impl<'a, C, NC, A> UserPhotoDeleteCall<'a, C, NC, A> where NC: hyper::net::Netwo
 ///
 /// ```test_harness,no_run
 /// # extern crate hyper;
-/// # extern crate "yup-oauth2" as oauth2;
-/// # extern crate "google-admin1_directory" as admin1_directory;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_admin1_directory as admin1_directory;
 /// use admin1_directory::UserUndelete;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
@@ -6476,7 +6482,7 @@ impl<'a, C, NC, A> UserUndeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkC
 
         let mut url = "https://www.googleapis.com/admin/directory/v1/users/{userKey}/undelete".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::DirectoryDeviceChromeo.as_slice().to_string(), ());
+            self._scopes.insert(Scope::DirectoryDeviceChromeo.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{userKey}", "userKey")].iter() {
@@ -6506,7 +6512,7 @@ impl<'a, C, NC, A> UserUndeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkC
         
         if params.len() > 0 {
             url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
+            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_ref()))));
         }
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
@@ -6529,7 +6535,7 @@ impl<'a, C, NC, A> UserUndeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkC
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.as_slice())
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.as_ref())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -6543,7 +6549,7 @@ impl<'a, C, NC, A> UserUndeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkC
             match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
+                        sleep_ms(d.num_milliseconds() as u32);
                         continue;
                     }
                     dlg.finished(false);
@@ -6554,7 +6560,7 @@ impl<'a, C, NC, A> UserUndeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkC
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
-                            sleep(d);
+                            sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
@@ -6618,8 +6624,8 @@ impl<'a, C, NC, A> UserUndeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> UserUndeleteCall<'a, C, NC, A>
-                                                        where T: Str {
-        self._additional_params.insert(name.as_slice().to_string(), value.as_slice().to_string());
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
     }
 
@@ -6635,8 +6641,8 @@ impl<'a, C, NC, A> UserUndeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T>(mut self, scope: T) -> UserUndeleteCall<'a, C, NC, A> 
-                                                        where T: Str {
-        self._scopes.insert(scope.as_slice().to_string(), ());
+                                                        where T: AsRef<str> {
+        self._scopes.insert(scope.as_ref().to_string(), ());
         self
     }
 }
@@ -6653,8 +6659,8 @@ impl<'a, C, NC, A> UserUndeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkC
 ///
 /// ```test_harness,no_run
 /// # extern crate hyper;
-/// # extern crate "yup-oauth2" as oauth2;
-/// # extern crate "google-admin1_directory" as admin1_directory;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_admin1_directory as admin1_directory;
 /// use admin1_directory::UserMakeAdmin;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
@@ -6720,7 +6726,7 @@ impl<'a, C, NC, A> UserMakeAdminCall<'a, C, NC, A> where NC: hyper::net::Network
 
         let mut url = "https://www.googleapis.com/admin/directory/v1/users/{userKey}/makeAdmin".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::DirectoryDeviceChromeo.as_slice().to_string(), ());
+            self._scopes.insert(Scope::DirectoryDeviceChromeo.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{userKey}", "userKey")].iter() {
@@ -6750,7 +6756,7 @@ impl<'a, C, NC, A> UserMakeAdminCall<'a, C, NC, A> where NC: hyper::net::Network
         
         if params.len() > 0 {
             url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
+            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_ref()))));
         }
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
@@ -6773,7 +6779,7 @@ impl<'a, C, NC, A> UserMakeAdminCall<'a, C, NC, A> where NC: hyper::net::Network
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.as_slice())
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.as_ref())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -6787,7 +6793,7 @@ impl<'a, C, NC, A> UserMakeAdminCall<'a, C, NC, A> where NC: hyper::net::Network
             match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
+                        sleep_ms(d.num_milliseconds() as u32);
                         continue;
                     }
                     dlg.finished(false);
@@ -6798,7 +6804,7 @@ impl<'a, C, NC, A> UserMakeAdminCall<'a, C, NC, A> where NC: hyper::net::Network
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
-                            sleep(d);
+                            sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
@@ -6862,8 +6868,8 @@ impl<'a, C, NC, A> UserMakeAdminCall<'a, C, NC, A> where NC: hyper::net::Network
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> UserMakeAdminCall<'a, C, NC, A>
-                                                        where T: Str {
-        self._additional_params.insert(name.as_slice().to_string(), value.as_slice().to_string());
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
     }
 
@@ -6879,8 +6885,8 @@ impl<'a, C, NC, A> UserMakeAdminCall<'a, C, NC, A> where NC: hyper::net::Network
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T>(mut self, scope: T) -> UserMakeAdminCall<'a, C, NC, A> 
-                                                        where T: Str {
-        self._scopes.insert(scope.as_slice().to_string(), ());
+                                                        where T: AsRef<str> {
+        self._scopes.insert(scope.as_ref().to_string(), ());
         self
     }
 }
@@ -6897,8 +6903,8 @@ impl<'a, C, NC, A> UserMakeAdminCall<'a, C, NC, A> where NC: hyper::net::Network
 ///
 /// ```test_harness,no_run
 /// # extern crate hyper;
-/// # extern crate "yup-oauth2" as oauth2;
-/// # extern crate "google-admin1_directory" as admin1_directory;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_admin1_directory as admin1_directory;
 /// use admin1_directory::User;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
@@ -6965,7 +6971,7 @@ impl<'a, C, NC, A> UserPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
 
         let mut url = "https://www.googleapis.com/admin/directory/v1/users/{userKey}".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::DirectoryDeviceChromeo.as_slice().to_string(), ());
+            self._scopes.insert(Scope::DirectoryDeviceChromeo.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{userKey}", "userKey")].iter() {
@@ -6995,7 +7001,7 @@ impl<'a, C, NC, A> UserPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
         
         if params.len() > 0 {
             url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
+            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_ref()))));
         }
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
@@ -7018,7 +7024,7 @@ impl<'a, C, NC, A> UserPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Patch, url.as_slice())
+                let mut req = client.borrow_mut().request(hyper::method::Method::Patch, url.as_ref())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -7032,7 +7038,7 @@ impl<'a, C, NC, A> UserPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
             match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
+                        sleep_ms(d.num_milliseconds() as u32);
                         continue;
                     }
                     dlg.finished(false);
@@ -7043,7 +7049,7 @@ impl<'a, C, NC, A> UserPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
-                            sleep(d);
+                            sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
@@ -7117,8 +7123,8 @@ impl<'a, C, NC, A> UserPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> UserPatchCall<'a, C, NC, A>
-                                                        where T: Str {
-        self._additional_params.insert(name.as_slice().to_string(), value.as_slice().to_string());
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
     }
 
@@ -7134,8 +7140,8 @@ impl<'a, C, NC, A> UserPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T>(mut self, scope: T) -> UserPatchCall<'a, C, NC, A> 
-                                                        where T: Str {
-        self._scopes.insert(scope.as_slice().to_string(), ());
+                                                        where T: AsRef<str> {
+        self._scopes.insert(scope.as_ref().to_string(), ());
         self
     }
 }
@@ -7152,8 +7158,8 @@ impl<'a, C, NC, A> UserPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
 ///
 /// ```test_harness,no_run
 /// # extern crate hyper;
-/// # extern crate "yup-oauth2" as oauth2;
-/// # extern crate "google-admin1_directory" as admin1_directory;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_admin1_directory as admin1_directory;
 /// use admin1_directory::Channel;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
@@ -7278,13 +7284,13 @@ impl<'a, C, NC, A> UserWatchCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
 
         let mut url = "https://www.googleapis.com/admin/directory/v1/users/watch".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::DirectoryDeviceChromeo.as_slice().to_string(), ());
+            self._scopes.insert(Scope::DirectoryDeviceChromeo.as_ref().to_string(), ());
         }
 
         
         if params.len() > 0 {
             url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
+            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_ref()))));
         }
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
@@ -7307,7 +7313,7 @@ impl<'a, C, NC, A> UserWatchCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.as_slice())
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.as_ref())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -7321,7 +7327,7 @@ impl<'a, C, NC, A> UserWatchCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
             match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
+                        sleep_ms(d.num_milliseconds() as u32);
                         continue;
                     }
                     dlg.finished(false);
@@ -7332,7 +7338,7 @@ impl<'a, C, NC, A> UserWatchCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
-                            sleep(d);
+                            sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
@@ -7492,8 +7498,8 @@ impl<'a, C, NC, A> UserWatchCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> UserWatchCall<'a, C, NC, A>
-                                                        where T: Str {
-        self._additional_params.insert(name.as_slice().to_string(), value.as_slice().to_string());
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
     }
 
@@ -7509,8 +7515,8 @@ impl<'a, C, NC, A> UserWatchCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T>(mut self, scope: T) -> UserWatchCall<'a, C, NC, A> 
-                                                        where T: Str {
-        self._scopes.insert(scope.as_slice().to_string(), ());
+                                                        where T: AsRef<str> {
+        self._scopes.insert(scope.as_ref().to_string(), ());
         self
     }
 }
@@ -7527,8 +7533,8 @@ impl<'a, C, NC, A> UserWatchCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
 ///
 /// ```test_harness,no_run
 /// # extern crate hyper;
-/// # extern crate "yup-oauth2" as oauth2;
-/// # extern crate "google-admin1_directory" as admin1_directory;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_admin1_directory as admin1_directory;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -7587,7 +7593,7 @@ impl<'a, C, NC, A> UserDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
 
         let mut url = "https://www.googleapis.com/admin/directory/v1/users/{userKey}".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::DirectoryDeviceChromeo.as_slice().to_string(), ());
+            self._scopes.insert(Scope::DirectoryDeviceChromeo.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{userKey}", "userKey")].iter() {
@@ -7617,7 +7623,7 @@ impl<'a, C, NC, A> UserDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
         
         if params.len() > 0 {
             url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
+            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_ref()))));
         }
 
 
@@ -7635,7 +7641,7 @@ impl<'a, C, NC, A> UserDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
                                                              access_token: token.unwrap().access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Delete, url.as_slice())
+                let mut req = client.borrow_mut().request(hyper::method::Method::Delete, url.as_ref())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -7646,7 +7652,7 @@ impl<'a, C, NC, A> UserDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
             match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
+                        sleep_ms(d.num_milliseconds() as u32);
                         continue;
                     }
                     dlg.finished(false);
@@ -7657,7 +7663,7 @@ impl<'a, C, NC, A> UserDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
-                            sleep(d);
+                            sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
@@ -7712,8 +7718,8 @@ impl<'a, C, NC, A> UserDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> UserDeleteCall<'a, C, NC, A>
-                                                        where T: Str {
-        self._additional_params.insert(name.as_slice().to_string(), value.as_slice().to_string());
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
     }
 
@@ -7729,8 +7735,8 @@ impl<'a, C, NC, A> UserDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T>(mut self, scope: T) -> UserDeleteCall<'a, C, NC, A> 
-                                                        where T: Str {
-        self._scopes.insert(scope.as_slice().to_string(), ());
+                                                        where T: AsRef<str> {
+        self._scopes.insert(scope.as_ref().to_string(), ());
         self
     }
 }
@@ -7747,8 +7753,8 @@ impl<'a, C, NC, A> UserDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
 ///
 /// ```test_harness,no_run
 /// # extern crate hyper;
-/// # extern crate "yup-oauth2" as oauth2;
-/// # extern crate "google-admin1_directory" as admin1_directory;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_admin1_directory as admin1_directory;
 /// use admin1_directory::UserPhoto;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
@@ -7815,7 +7821,7 @@ impl<'a, C, NC, A> UserPhotoUpdateCall<'a, C, NC, A> where NC: hyper::net::Netwo
 
         let mut url = "https://www.googleapis.com/admin/directory/v1/users/{userKey}/photos/thumbnail".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::DirectoryDeviceChromeo.as_slice().to_string(), ());
+            self._scopes.insert(Scope::DirectoryDeviceChromeo.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{userKey}", "userKey")].iter() {
@@ -7845,7 +7851,7 @@ impl<'a, C, NC, A> UserPhotoUpdateCall<'a, C, NC, A> where NC: hyper::net::Netwo
         
         if params.len() > 0 {
             url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
+            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_ref()))));
         }
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
@@ -7868,7 +7874,7 @@ impl<'a, C, NC, A> UserPhotoUpdateCall<'a, C, NC, A> where NC: hyper::net::Netwo
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Put, url.as_slice())
+                let mut req = client.borrow_mut().request(hyper::method::Method::Put, url.as_ref())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -7882,7 +7888,7 @@ impl<'a, C, NC, A> UserPhotoUpdateCall<'a, C, NC, A> where NC: hyper::net::Netwo
             match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
+                        sleep_ms(d.num_milliseconds() as u32);
                         continue;
                     }
                     dlg.finished(false);
@@ -7893,7 +7899,7 @@ impl<'a, C, NC, A> UserPhotoUpdateCall<'a, C, NC, A> where NC: hyper::net::Netwo
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
-                            sleep(d);
+                            sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
@@ -7967,8 +7973,8 @@ impl<'a, C, NC, A> UserPhotoUpdateCall<'a, C, NC, A> where NC: hyper::net::Netwo
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> UserPhotoUpdateCall<'a, C, NC, A>
-                                                        where T: Str {
-        self._additional_params.insert(name.as_slice().to_string(), value.as_slice().to_string());
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
     }
 
@@ -7984,8 +7990,8 @@ impl<'a, C, NC, A> UserPhotoUpdateCall<'a, C, NC, A> where NC: hyper::net::Netwo
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T>(mut self, scope: T) -> UserPhotoUpdateCall<'a, C, NC, A> 
-                                                        where T: Str {
-        self._scopes.insert(scope.as_slice().to_string(), ());
+                                                        where T: AsRef<str> {
+        self._scopes.insert(scope.as_ref().to_string(), ());
         self
     }
 }
@@ -8002,8 +8008,8 @@ impl<'a, C, NC, A> UserPhotoUpdateCall<'a, C, NC, A> where NC: hyper::net::Netwo
 ///
 /// ```test_harness,no_run
 /// # extern crate hyper;
-/// # extern crate "yup-oauth2" as oauth2;
-/// # extern crate "google-admin1_directory" as admin1_directory;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_admin1_directory as admin1_directory;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -8078,7 +8084,7 @@ impl<'a, C, NC, A> UserGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnec
 
         let mut url = "https://www.googleapis.com/admin/directory/v1/users/{userKey}".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::DirectoryDeviceChromeoReadonly.as_slice().to_string(), ());
+            self._scopes.insert(Scope::DirectoryDeviceChromeoReadonly.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{userKey}", "userKey")].iter() {
@@ -8108,7 +8114,7 @@ impl<'a, C, NC, A> UserGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnec
         
         if params.len() > 0 {
             url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
+            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_ref()))));
         }
 
 
@@ -8126,7 +8132,7 @@ impl<'a, C, NC, A> UserGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnec
                                                              access_token: token.unwrap().access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_slice())
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_ref())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -8137,7 +8143,7 @@ impl<'a, C, NC, A> UserGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnec
             match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
+                        sleep_ms(d.num_milliseconds() as u32);
                         continue;
                     }
                     dlg.finished(false);
@@ -8148,7 +8154,7 @@ impl<'a, C, NC, A> UserGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnec
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
-                            sleep(d);
+                            sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
@@ -8237,8 +8243,8 @@ impl<'a, C, NC, A> UserGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnec
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> UserGetCall<'a, C, NC, A>
-                                                        where T: Str {
-        self._additional_params.insert(name.as_slice().to_string(), value.as_slice().to_string());
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
     }
 
@@ -8254,8 +8260,8 @@ impl<'a, C, NC, A> UserGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnec
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T>(mut self, scope: T) -> UserGetCall<'a, C, NC, A> 
-                                                        where T: Str {
-        self._scopes.insert(scope.as_slice().to_string(), ());
+                                                        where T: AsRef<str> {
+        self._scopes.insert(scope.as_ref().to_string(), ());
         self
     }
 }
@@ -8272,8 +8278,8 @@ impl<'a, C, NC, A> UserGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnec
 ///
 /// ```test_harness,no_run
 /// # extern crate hyper;
-/// # extern crate "yup-oauth2" as oauth2;
-/// # extern crate "google-admin1_directory" as admin1_directory;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_admin1_directory as admin1_directory;
 /// use admin1_directory::Alias;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
@@ -8340,7 +8346,7 @@ impl<'a, C, NC, A> UserAliaseInsertCall<'a, C, NC, A> where NC: hyper::net::Netw
 
         let mut url = "https://www.googleapis.com/admin/directory/v1/users/{userKey}/aliases".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::DirectoryDeviceChromeo.as_slice().to_string(), ());
+            self._scopes.insert(Scope::DirectoryDeviceChromeo.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{userKey}", "userKey")].iter() {
@@ -8370,7 +8376,7 @@ impl<'a, C, NC, A> UserAliaseInsertCall<'a, C, NC, A> where NC: hyper::net::Netw
         
         if params.len() > 0 {
             url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
+            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_ref()))));
         }
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
@@ -8393,7 +8399,7 @@ impl<'a, C, NC, A> UserAliaseInsertCall<'a, C, NC, A> where NC: hyper::net::Netw
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.as_slice())
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.as_ref())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -8407,7 +8413,7 @@ impl<'a, C, NC, A> UserAliaseInsertCall<'a, C, NC, A> where NC: hyper::net::Netw
             match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
+                        sleep_ms(d.num_milliseconds() as u32);
                         continue;
                     }
                     dlg.finished(false);
@@ -8418,7 +8424,7 @@ impl<'a, C, NC, A> UserAliaseInsertCall<'a, C, NC, A> where NC: hyper::net::Netw
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
-                            sleep(d);
+                            sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
@@ -8492,8 +8498,8 @@ impl<'a, C, NC, A> UserAliaseInsertCall<'a, C, NC, A> where NC: hyper::net::Netw
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> UserAliaseInsertCall<'a, C, NC, A>
-                                                        where T: Str {
-        self._additional_params.insert(name.as_slice().to_string(), value.as_slice().to_string());
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
     }
 
@@ -8509,8 +8515,8 @@ impl<'a, C, NC, A> UserAliaseInsertCall<'a, C, NC, A> where NC: hyper::net::Netw
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T>(mut self, scope: T) -> UserAliaseInsertCall<'a, C, NC, A> 
-                                                        where T: Str {
-        self._scopes.insert(scope.as_slice().to_string(), ());
+                                                        where T: AsRef<str> {
+        self._scopes.insert(scope.as_ref().to_string(), ());
         self
     }
 }
@@ -8527,8 +8533,8 @@ impl<'a, C, NC, A> UserAliaseInsertCall<'a, C, NC, A> where NC: hyper::net::Netw
 ///
 /// ```test_harness,no_run
 /// # extern crate hyper;
-/// # extern crate "yup-oauth2" as oauth2;
-/// # extern crate "google-admin1_directory" as admin1_directory;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_admin1_directory as admin1_directory;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -8646,13 +8652,13 @@ impl<'a, C, NC, A> UserListCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
 
         let mut url = "https://www.googleapis.com/admin/directory/v1/users".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::DirectoryDeviceChromeoReadonly.as_slice().to_string(), ());
+            self._scopes.insert(Scope::DirectoryDeviceChromeoReadonly.as_ref().to_string(), ());
         }
 
         
         if params.len() > 0 {
             url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
+            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_ref()))));
         }
 
 
@@ -8670,7 +8676,7 @@ impl<'a, C, NC, A> UserListCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
                                                              access_token: token.unwrap().access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_slice())
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_ref())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -8681,7 +8687,7 @@ impl<'a, C, NC, A> UserListCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
             match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
+                        sleep_ms(d.num_milliseconds() as u32);
                         continue;
                     }
                     dlg.finished(false);
@@ -8692,7 +8698,7 @@ impl<'a, C, NC, A> UserListCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
-                            sleep(d);
+                            sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
@@ -8843,8 +8849,8 @@ impl<'a, C, NC, A> UserListCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> UserListCall<'a, C, NC, A>
-                                                        where T: Str {
-        self._additional_params.insert(name.as_slice().to_string(), value.as_slice().to_string());
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
     }
 
@@ -8860,8 +8866,8 @@ impl<'a, C, NC, A> UserListCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T>(mut self, scope: T) -> UserListCall<'a, C, NC, A> 
-                                                        where T: Str {
-        self._scopes.insert(scope.as_slice().to_string(), ());
+                                                        where T: AsRef<str> {
+        self._scopes.insert(scope.as_ref().to_string(), ());
         self
     }
 }
@@ -8878,8 +8884,8 @@ impl<'a, C, NC, A> UserListCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
 ///
 /// ```test_harness,no_run
 /// # extern crate hyper;
-/// # extern crate "yup-oauth2" as oauth2;
-/// # extern crate "google-admin1_directory" as admin1_directory;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_admin1_directory as admin1_directory;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -8940,7 +8946,7 @@ impl<'a, C, NC, A> UserAliaseDeleteCall<'a, C, NC, A> where NC: hyper::net::Netw
 
         let mut url = "https://www.googleapis.com/admin/directory/v1/users/{userKey}/aliases/{alias}".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::DirectoryDeviceChromeo.as_slice().to_string(), ());
+            self._scopes.insert(Scope::DirectoryDeviceChromeo.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{userKey}", "userKey"), ("{alias}", "alias")].iter() {
@@ -8970,7 +8976,7 @@ impl<'a, C, NC, A> UserAliaseDeleteCall<'a, C, NC, A> where NC: hyper::net::Netw
         
         if params.len() > 0 {
             url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
+            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_ref()))));
         }
 
 
@@ -8988,7 +8994,7 @@ impl<'a, C, NC, A> UserAliaseDeleteCall<'a, C, NC, A> where NC: hyper::net::Netw
                                                              access_token: token.unwrap().access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Delete, url.as_slice())
+                let mut req = client.borrow_mut().request(hyper::method::Method::Delete, url.as_ref())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -8999,7 +9005,7 @@ impl<'a, C, NC, A> UserAliaseDeleteCall<'a, C, NC, A> where NC: hyper::net::Netw
             match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
+                        sleep_ms(d.num_milliseconds() as u32);
                         continue;
                     }
                     dlg.finished(false);
@@ -9010,7 +9016,7 @@ impl<'a, C, NC, A> UserAliaseDeleteCall<'a, C, NC, A> where NC: hyper::net::Netw
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
-                            sleep(d);
+                            sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
@@ -9075,8 +9081,8 @@ impl<'a, C, NC, A> UserAliaseDeleteCall<'a, C, NC, A> where NC: hyper::net::Netw
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> UserAliaseDeleteCall<'a, C, NC, A>
-                                                        where T: Str {
-        self._additional_params.insert(name.as_slice().to_string(), value.as_slice().to_string());
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
     }
 
@@ -9092,8 +9098,8 @@ impl<'a, C, NC, A> UserAliaseDeleteCall<'a, C, NC, A> where NC: hyper::net::Netw
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T>(mut self, scope: T) -> UserAliaseDeleteCall<'a, C, NC, A> 
-                                                        where T: Str {
-        self._scopes.insert(scope.as_slice().to_string(), ());
+                                                        where T: AsRef<str> {
+        self._scopes.insert(scope.as_ref().to_string(), ());
         self
     }
 }
@@ -9110,8 +9116,8 @@ impl<'a, C, NC, A> UserAliaseDeleteCall<'a, C, NC, A> where NC: hyper::net::Netw
 ///
 /// ```test_harness,no_run
 /// # extern crate hyper;
-/// # extern crate "yup-oauth2" as oauth2;
-/// # extern crate "google-admin1_directory" as admin1_directory;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_admin1_directory as admin1_directory;
 /// use admin1_directory::User;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
@@ -9178,7 +9184,7 @@ impl<'a, C, NC, A> UserUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
 
         let mut url = "https://www.googleapis.com/admin/directory/v1/users/{userKey}".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::DirectoryDeviceChromeo.as_slice().to_string(), ());
+            self._scopes.insert(Scope::DirectoryDeviceChromeo.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{userKey}", "userKey")].iter() {
@@ -9208,7 +9214,7 @@ impl<'a, C, NC, A> UserUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
         
         if params.len() > 0 {
             url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
+            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_ref()))));
         }
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
@@ -9231,7 +9237,7 @@ impl<'a, C, NC, A> UserUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Put, url.as_slice())
+                let mut req = client.borrow_mut().request(hyper::method::Method::Put, url.as_ref())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -9245,7 +9251,7 @@ impl<'a, C, NC, A> UserUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
             match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
+                        sleep_ms(d.num_milliseconds() as u32);
                         continue;
                     }
                     dlg.finished(false);
@@ -9256,7 +9262,7 @@ impl<'a, C, NC, A> UserUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
-                            sleep(d);
+                            sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
@@ -9330,8 +9336,8 @@ impl<'a, C, NC, A> UserUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> UserUpdateCall<'a, C, NC, A>
-                                                        where T: Str {
-        self._additional_params.insert(name.as_slice().to_string(), value.as_slice().to_string());
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
     }
 
@@ -9347,8 +9353,8 @@ impl<'a, C, NC, A> UserUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T>(mut self, scope: T) -> UserUpdateCall<'a, C, NC, A> 
-                                                        where T: Str {
-        self._scopes.insert(scope.as_slice().to_string(), ());
+                                                        where T: AsRef<str> {
+        self._scopes.insert(scope.as_ref().to_string(), ());
         self
     }
 }
@@ -9365,8 +9371,8 @@ impl<'a, C, NC, A> UserUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
 ///
 /// ```test_harness,no_run
 /// # extern crate hyper;
-/// # extern crate "yup-oauth2" as oauth2;
-/// # extern crate "google-admin1_directory" as admin1_directory;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_admin1_directory as admin1_directory;
 /// use admin1_directory::Channel;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
@@ -9438,7 +9444,7 @@ impl<'a, C, NC, A> UserAliaseWatchCall<'a, C, NC, A> where NC: hyper::net::Netwo
 
         let mut url = "https://www.googleapis.com/admin/directory/v1/users/{userKey}/aliases/watch".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::DirectoryDeviceChromeo.as_slice().to_string(), ());
+            self._scopes.insert(Scope::DirectoryDeviceChromeo.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{userKey}", "userKey")].iter() {
@@ -9468,7 +9474,7 @@ impl<'a, C, NC, A> UserAliaseWatchCall<'a, C, NC, A> where NC: hyper::net::Netwo
         
         if params.len() > 0 {
             url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
+            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_ref()))));
         }
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
@@ -9491,7 +9497,7 @@ impl<'a, C, NC, A> UserAliaseWatchCall<'a, C, NC, A> where NC: hyper::net::Netwo
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.as_slice())
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.as_ref())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -9505,7 +9511,7 @@ impl<'a, C, NC, A> UserAliaseWatchCall<'a, C, NC, A> where NC: hyper::net::Netwo
             match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
+                        sleep_ms(d.num_milliseconds() as u32);
                         continue;
                     }
                     dlg.finished(false);
@@ -9516,7 +9522,7 @@ impl<'a, C, NC, A> UserAliaseWatchCall<'a, C, NC, A> where NC: hyper::net::Netwo
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
-                            sleep(d);
+                            sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
@@ -9598,8 +9604,8 @@ impl<'a, C, NC, A> UserAliaseWatchCall<'a, C, NC, A> where NC: hyper::net::Netwo
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> UserAliaseWatchCall<'a, C, NC, A>
-                                                        where T: Str {
-        self._additional_params.insert(name.as_slice().to_string(), value.as_slice().to_string());
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
     }
 
@@ -9615,8 +9621,8 @@ impl<'a, C, NC, A> UserAliaseWatchCall<'a, C, NC, A> where NC: hyper::net::Netwo
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T>(mut self, scope: T) -> UserAliaseWatchCall<'a, C, NC, A> 
-                                                        where T: Str {
-        self._scopes.insert(scope.as_slice().to_string(), ());
+                                                        where T: AsRef<str> {
+        self._scopes.insert(scope.as_ref().to_string(), ());
         self
     }
 }
@@ -9633,8 +9639,8 @@ impl<'a, C, NC, A> UserAliaseWatchCall<'a, C, NC, A> where NC: hyper::net::Netwo
 ///
 /// ```test_harness,no_run
 /// # extern crate hyper;
-/// # extern crate "yup-oauth2" as oauth2;
-/// # extern crate "google-admin1_directory" as admin1_directory;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_admin1_directory as admin1_directory;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -9699,7 +9705,7 @@ impl<'a, C, NC, A> UserAliaseListCall<'a, C, NC, A> where NC: hyper::net::Networ
 
         let mut url = "https://www.googleapis.com/admin/directory/v1/users/{userKey}/aliases".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::DirectoryDeviceChromeoReadonly.as_slice().to_string(), ());
+            self._scopes.insert(Scope::DirectoryDeviceChromeoReadonly.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{userKey}", "userKey")].iter() {
@@ -9729,7 +9735,7 @@ impl<'a, C, NC, A> UserAliaseListCall<'a, C, NC, A> where NC: hyper::net::Networ
         
         if params.len() > 0 {
             url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
+            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_ref()))));
         }
 
 
@@ -9747,7 +9753,7 @@ impl<'a, C, NC, A> UserAliaseListCall<'a, C, NC, A> where NC: hyper::net::Networ
                                                              access_token: token.unwrap().access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_slice())
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_ref())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -9758,7 +9764,7 @@ impl<'a, C, NC, A> UserAliaseListCall<'a, C, NC, A> where NC: hyper::net::Networ
             match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
+                        sleep_ms(d.num_milliseconds() as u32);
                         continue;
                     }
                     dlg.finished(false);
@@ -9769,7 +9775,7 @@ impl<'a, C, NC, A> UserAliaseListCall<'a, C, NC, A> where NC: hyper::net::Networ
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
-                            sleep(d);
+                            sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
@@ -9842,8 +9848,8 @@ impl<'a, C, NC, A> UserAliaseListCall<'a, C, NC, A> where NC: hyper::net::Networ
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> UserAliaseListCall<'a, C, NC, A>
-                                                        where T: Str {
-        self._additional_params.insert(name.as_slice().to_string(), value.as_slice().to_string());
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
     }
 
@@ -9859,8 +9865,8 @@ impl<'a, C, NC, A> UserAliaseListCall<'a, C, NC, A> where NC: hyper::net::Networ
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T>(mut self, scope: T) -> UserAliaseListCall<'a, C, NC, A> 
-                                                        where T: Str {
-        self._scopes.insert(scope.as_slice().to_string(), ());
+                                                        where T: AsRef<str> {
+        self._scopes.insert(scope.as_ref().to_string(), ());
         self
     }
 }
@@ -9877,8 +9883,8 @@ impl<'a, C, NC, A> UserAliaseListCall<'a, C, NC, A> where NC: hyper::net::Networ
 ///
 /// ```test_harness,no_run
 /// # extern crate hyper;
-/// # extern crate "yup-oauth2" as oauth2;
-/// # extern crate "google-admin1_directory" as admin1_directory;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_admin1_directory as admin1_directory;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -9938,7 +9944,7 @@ impl<'a, C, NC, A> UserPhotoGetCall<'a, C, NC, A> where NC: hyper::net::NetworkC
 
         let mut url = "https://www.googleapis.com/admin/directory/v1/users/{userKey}/photos/thumbnail".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::DirectoryDeviceChromeoReadonly.as_slice().to_string(), ());
+            self._scopes.insert(Scope::DirectoryDeviceChromeoReadonly.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{userKey}", "userKey")].iter() {
@@ -9968,7 +9974,7 @@ impl<'a, C, NC, A> UserPhotoGetCall<'a, C, NC, A> where NC: hyper::net::NetworkC
         
         if params.len() > 0 {
             url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
+            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_ref()))));
         }
 
 
@@ -9986,7 +9992,7 @@ impl<'a, C, NC, A> UserPhotoGetCall<'a, C, NC, A> where NC: hyper::net::NetworkC
                                                              access_token: token.unwrap().access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_slice())
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_ref())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -9997,7 +10003,7 @@ impl<'a, C, NC, A> UserPhotoGetCall<'a, C, NC, A> where NC: hyper::net::NetworkC
             match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
+                        sleep_ms(d.num_milliseconds() as u32);
                         continue;
                     }
                     dlg.finished(false);
@@ -10008,7 +10014,7 @@ impl<'a, C, NC, A> UserPhotoGetCall<'a, C, NC, A> where NC: hyper::net::NetworkC
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
-                            sleep(d);
+                            sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
@@ -10073,8 +10079,8 @@ impl<'a, C, NC, A> UserPhotoGetCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> UserPhotoGetCall<'a, C, NC, A>
-                                                        where T: Str {
-        self._additional_params.insert(name.as_slice().to_string(), value.as_slice().to_string());
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
     }
 
@@ -10090,8 +10096,8 @@ impl<'a, C, NC, A> UserPhotoGetCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T>(mut self, scope: T) -> UserPhotoGetCall<'a, C, NC, A> 
-                                                        where T: Str {
-        self._scopes.insert(scope.as_slice().to_string(), ());
+                                                        where T: AsRef<str> {
+        self._scopes.insert(scope.as_ref().to_string(), ());
         self
     }
 }
@@ -10108,8 +10114,8 @@ impl<'a, C, NC, A> UserPhotoGetCall<'a, C, NC, A> where NC: hyper::net::NetworkC
 ///
 /// ```test_harness,no_run
 /// # extern crate hyper;
-/// # extern crate "yup-oauth2" as oauth2;
-/// # extern crate "google-admin1_directory" as admin1_directory;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_admin1_directory as admin1_directory;
 /// use admin1_directory::UserPhoto;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
@@ -10176,7 +10182,7 @@ impl<'a, C, NC, A> UserPhotoPatchCall<'a, C, NC, A> where NC: hyper::net::Networ
 
         let mut url = "https://www.googleapis.com/admin/directory/v1/users/{userKey}/photos/thumbnail".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::DirectoryDeviceChromeo.as_slice().to_string(), ());
+            self._scopes.insert(Scope::DirectoryDeviceChromeo.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{userKey}", "userKey")].iter() {
@@ -10206,7 +10212,7 @@ impl<'a, C, NC, A> UserPhotoPatchCall<'a, C, NC, A> where NC: hyper::net::Networ
         
         if params.len() > 0 {
             url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
+            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_ref()))));
         }
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
@@ -10229,7 +10235,7 @@ impl<'a, C, NC, A> UserPhotoPatchCall<'a, C, NC, A> where NC: hyper::net::Networ
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Patch, url.as_slice())
+                let mut req = client.borrow_mut().request(hyper::method::Method::Patch, url.as_ref())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -10243,7 +10249,7 @@ impl<'a, C, NC, A> UserPhotoPatchCall<'a, C, NC, A> where NC: hyper::net::Networ
             match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
+                        sleep_ms(d.num_milliseconds() as u32);
                         continue;
                     }
                     dlg.finished(false);
@@ -10254,7 +10260,7 @@ impl<'a, C, NC, A> UserPhotoPatchCall<'a, C, NC, A> where NC: hyper::net::Networ
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
-                            sleep(d);
+                            sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
@@ -10328,8 +10334,8 @@ impl<'a, C, NC, A> UserPhotoPatchCall<'a, C, NC, A> where NC: hyper::net::Networ
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> UserPhotoPatchCall<'a, C, NC, A>
-                                                        where T: Str {
-        self._additional_params.insert(name.as_slice().to_string(), value.as_slice().to_string());
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
     }
 
@@ -10345,8 +10351,8 @@ impl<'a, C, NC, A> UserPhotoPatchCall<'a, C, NC, A> where NC: hyper::net::Networ
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T>(mut self, scope: T) -> UserPhotoPatchCall<'a, C, NC, A> 
-                                                        where T: Str {
-        self._scopes.insert(scope.as_slice().to_string(), ());
+                                                        where T: AsRef<str> {
+        self._scopes.insert(scope.as_ref().to_string(), ());
         self
     }
 }
@@ -10363,8 +10369,8 @@ impl<'a, C, NC, A> UserPhotoPatchCall<'a, C, NC, A> where NC: hyper::net::Networ
 ///
 /// ```test_harness,no_run
 /// # extern crate hyper;
-/// # extern crate "yup-oauth2" as oauth2;
-/// # extern crate "google-admin1_directory" as admin1_directory;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_admin1_directory as admin1_directory;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -10425,7 +10431,7 @@ impl<'a, C, NC, A> MobiledeviceDeleteCall<'a, C, NC, A> where NC: hyper::net::Ne
 
         let mut url = "https://www.googleapis.com/admin/directory/v1/customer/{customerId}/devices/mobile/{resourceId}".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::DirectoryDeviceChromeo.as_slice().to_string(), ());
+            self._scopes.insert(Scope::DirectoryDeviceChromeo.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{customerId}", "customerId"), ("{resourceId}", "resourceId")].iter() {
@@ -10455,7 +10461,7 @@ impl<'a, C, NC, A> MobiledeviceDeleteCall<'a, C, NC, A> where NC: hyper::net::Ne
         
         if params.len() > 0 {
             url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
+            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_ref()))));
         }
 
 
@@ -10473,7 +10479,7 @@ impl<'a, C, NC, A> MobiledeviceDeleteCall<'a, C, NC, A> where NC: hyper::net::Ne
                                                              access_token: token.unwrap().access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Delete, url.as_slice())
+                let mut req = client.borrow_mut().request(hyper::method::Method::Delete, url.as_ref())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -10484,7 +10490,7 @@ impl<'a, C, NC, A> MobiledeviceDeleteCall<'a, C, NC, A> where NC: hyper::net::Ne
             match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
+                        sleep_ms(d.num_milliseconds() as u32);
                         continue;
                     }
                     dlg.finished(false);
@@ -10495,7 +10501,7 @@ impl<'a, C, NC, A> MobiledeviceDeleteCall<'a, C, NC, A> where NC: hyper::net::Ne
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
-                            sleep(d);
+                            sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
@@ -10560,8 +10566,8 @@ impl<'a, C, NC, A> MobiledeviceDeleteCall<'a, C, NC, A> where NC: hyper::net::Ne
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> MobiledeviceDeleteCall<'a, C, NC, A>
-                                                        where T: Str {
-        self._additional_params.insert(name.as_slice().to_string(), value.as_slice().to_string());
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
     }
 
@@ -10577,8 +10583,8 @@ impl<'a, C, NC, A> MobiledeviceDeleteCall<'a, C, NC, A> where NC: hyper::net::Ne
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T>(mut self, scope: T) -> MobiledeviceDeleteCall<'a, C, NC, A> 
-                                                        where T: Str {
-        self._scopes.insert(scope.as_slice().to_string(), ());
+                                                        where T: AsRef<str> {
+        self._scopes.insert(scope.as_ref().to_string(), ());
         self
     }
 }
@@ -10595,8 +10601,8 @@ impl<'a, C, NC, A> MobiledeviceDeleteCall<'a, C, NC, A> where NC: hyper::net::Ne
 ///
 /// ```test_harness,no_run
 /// # extern crate hyper;
-/// # extern crate "yup-oauth2" as oauth2;
-/// # extern crate "google-admin1_directory" as admin1_directory;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_admin1_directory as admin1_directory;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -10663,7 +10669,7 @@ impl<'a, C, NC, A> MobiledeviceGetCall<'a, C, NC, A> where NC: hyper::net::Netwo
 
         let mut url = "https://www.googleapis.com/admin/directory/v1/customer/{customerId}/devices/mobile/{resourceId}".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::DirectoryDeviceChromeoReadonly.as_slice().to_string(), ());
+            self._scopes.insert(Scope::DirectoryDeviceChromeoReadonly.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{customerId}", "customerId"), ("{resourceId}", "resourceId")].iter() {
@@ -10693,7 +10699,7 @@ impl<'a, C, NC, A> MobiledeviceGetCall<'a, C, NC, A> where NC: hyper::net::Netwo
         
         if params.len() > 0 {
             url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
+            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_ref()))));
         }
 
 
@@ -10711,7 +10717,7 @@ impl<'a, C, NC, A> MobiledeviceGetCall<'a, C, NC, A> where NC: hyper::net::Netwo
                                                              access_token: token.unwrap().access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_slice())
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_ref())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -10722,7 +10728,7 @@ impl<'a, C, NC, A> MobiledeviceGetCall<'a, C, NC, A> where NC: hyper::net::Netwo
             match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
+                        sleep_ms(d.num_milliseconds() as u32);
                         continue;
                     }
                     dlg.finished(false);
@@ -10733,7 +10739,7 @@ impl<'a, C, NC, A> MobiledeviceGetCall<'a, C, NC, A> where NC: hyper::net::Netwo
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
-                            sleep(d);
+                            sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
@@ -10816,8 +10822,8 @@ impl<'a, C, NC, A> MobiledeviceGetCall<'a, C, NC, A> where NC: hyper::net::Netwo
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> MobiledeviceGetCall<'a, C, NC, A>
-                                                        where T: Str {
-        self._additional_params.insert(name.as_slice().to_string(), value.as_slice().to_string());
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
     }
 
@@ -10833,8 +10839,8 @@ impl<'a, C, NC, A> MobiledeviceGetCall<'a, C, NC, A> where NC: hyper::net::Netwo
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T>(mut self, scope: T) -> MobiledeviceGetCall<'a, C, NC, A> 
-                                                        where T: Str {
-        self._scopes.insert(scope.as_slice().to_string(), ());
+                                                        where T: AsRef<str> {
+        self._scopes.insert(scope.as_ref().to_string(), ());
         self
     }
 }
@@ -10851,8 +10857,8 @@ impl<'a, C, NC, A> MobiledeviceGetCall<'a, C, NC, A> where NC: hyper::net::Netwo
 ///
 /// ```test_harness,no_run
 /// # extern crate hyper;
-/// # extern crate "yup-oauth2" as oauth2;
-/// # extern crate "google-admin1_directory" as admin1_directory;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_admin1_directory as admin1_directory;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -10942,7 +10948,7 @@ impl<'a, C, NC, A> MobiledeviceListCall<'a, C, NC, A> where NC: hyper::net::Netw
 
         let mut url = "https://www.googleapis.com/admin/directory/v1/customer/{customerId}/devices/mobile".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::DirectoryDeviceChromeoReadonly.as_slice().to_string(), ());
+            self._scopes.insert(Scope::DirectoryDeviceChromeoReadonly.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{customerId}", "customerId")].iter() {
@@ -10972,7 +10978,7 @@ impl<'a, C, NC, A> MobiledeviceListCall<'a, C, NC, A> where NC: hyper::net::Netw
         
         if params.len() > 0 {
             url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
+            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_ref()))));
         }
 
 
@@ -10990,7 +10996,7 @@ impl<'a, C, NC, A> MobiledeviceListCall<'a, C, NC, A> where NC: hyper::net::Netw
                                                              access_token: token.unwrap().access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_slice())
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_ref())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -11001,7 +11007,7 @@ impl<'a, C, NC, A> MobiledeviceListCall<'a, C, NC, A> where NC: hyper::net::Netw
             match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
+                        sleep_ms(d.num_milliseconds() as u32);
                         continue;
                     }
                     dlg.finished(false);
@@ -11012,7 +11018,7 @@ impl<'a, C, NC, A> MobiledeviceListCall<'a, C, NC, A> where NC: hyper::net::Netw
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
-                            sleep(d);
+                            sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
@@ -11125,8 +11131,8 @@ impl<'a, C, NC, A> MobiledeviceListCall<'a, C, NC, A> where NC: hyper::net::Netw
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> MobiledeviceListCall<'a, C, NC, A>
-                                                        where T: Str {
-        self._additional_params.insert(name.as_slice().to_string(), value.as_slice().to_string());
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
     }
 
@@ -11142,8 +11148,8 @@ impl<'a, C, NC, A> MobiledeviceListCall<'a, C, NC, A> where NC: hyper::net::Netw
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T>(mut self, scope: T) -> MobiledeviceListCall<'a, C, NC, A> 
-                                                        where T: Str {
-        self._scopes.insert(scope.as_slice().to_string(), ());
+                                                        where T: AsRef<str> {
+        self._scopes.insert(scope.as_ref().to_string(), ());
         self
     }
 }
@@ -11160,8 +11166,8 @@ impl<'a, C, NC, A> MobiledeviceListCall<'a, C, NC, A> where NC: hyper::net::Netw
 ///
 /// ```test_harness,no_run
 /// # extern crate hyper;
-/// # extern crate "yup-oauth2" as oauth2;
-/// # extern crate "google-admin1_directory" as admin1_directory;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_admin1_directory as admin1_directory;
 /// use admin1_directory::MobileDeviceAction;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
@@ -11229,7 +11235,7 @@ impl<'a, C, NC, A> MobiledeviceActionCall<'a, C, NC, A> where NC: hyper::net::Ne
 
         let mut url = "https://www.googleapis.com/admin/directory/v1/customer/{customerId}/devices/mobile/{resourceId}/action".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::DirectoryDeviceChromeo.as_slice().to_string(), ());
+            self._scopes.insert(Scope::DirectoryDeviceChromeo.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{customerId}", "customerId"), ("{resourceId}", "resourceId")].iter() {
@@ -11259,7 +11265,7 @@ impl<'a, C, NC, A> MobiledeviceActionCall<'a, C, NC, A> where NC: hyper::net::Ne
         
         if params.len() > 0 {
             url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
+            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_ref()))));
         }
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
@@ -11282,7 +11288,7 @@ impl<'a, C, NC, A> MobiledeviceActionCall<'a, C, NC, A> where NC: hyper::net::Ne
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.as_slice())
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.as_ref())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -11296,7 +11302,7 @@ impl<'a, C, NC, A> MobiledeviceActionCall<'a, C, NC, A> where NC: hyper::net::Ne
             match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
+                        sleep_ms(d.num_milliseconds() as u32);
                         continue;
                     }
                     dlg.finished(false);
@@ -11307,7 +11313,7 @@ impl<'a, C, NC, A> MobiledeviceActionCall<'a, C, NC, A> where NC: hyper::net::Ne
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
-                            sleep(d);
+                            sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
@@ -11381,8 +11387,8 @@ impl<'a, C, NC, A> MobiledeviceActionCall<'a, C, NC, A> where NC: hyper::net::Ne
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> MobiledeviceActionCall<'a, C, NC, A>
-                                                        where T: Str {
-        self._additional_params.insert(name.as_slice().to_string(), value.as_slice().to_string());
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
     }
 
@@ -11398,8 +11404,8 @@ impl<'a, C, NC, A> MobiledeviceActionCall<'a, C, NC, A> where NC: hyper::net::Ne
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T>(mut self, scope: T) -> MobiledeviceActionCall<'a, C, NC, A> 
-                                                        where T: Str {
-        self._scopes.insert(scope.as_slice().to_string(), ());
+                                                        where T: AsRef<str> {
+        self._scopes.insert(scope.as_ref().to_string(), ());
         self
     }
 }
@@ -11416,8 +11422,8 @@ impl<'a, C, NC, A> MobiledeviceActionCall<'a, C, NC, A> where NC: hyper::net::Ne
 ///
 /// ```test_harness,no_run
 /// # extern crate hyper;
-/// # extern crate "yup-oauth2" as oauth2;
-/// # extern crate "google-admin1_directory" as admin1_directory;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_admin1_directory as admin1_directory;
 /// use admin1_directory::Member;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
@@ -11486,7 +11492,7 @@ impl<'a, C, NC, A> MemberUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkC
 
         let mut url = "https://www.googleapis.com/admin/directory/v1/groups/{groupKey}/members/{memberKey}".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::DirectoryDeviceChromeo.as_slice().to_string(), ());
+            self._scopes.insert(Scope::DirectoryDeviceChromeo.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{groupKey}", "groupKey"), ("{memberKey}", "memberKey")].iter() {
@@ -11516,7 +11522,7 @@ impl<'a, C, NC, A> MemberUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkC
         
         if params.len() > 0 {
             url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
+            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_ref()))));
         }
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
@@ -11539,7 +11545,7 @@ impl<'a, C, NC, A> MemberUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkC
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Put, url.as_slice())
+                let mut req = client.borrow_mut().request(hyper::method::Method::Put, url.as_ref())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -11553,7 +11559,7 @@ impl<'a, C, NC, A> MemberUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkC
             match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
+                        sleep_ms(d.num_milliseconds() as u32);
                         continue;
                     }
                     dlg.finished(false);
@@ -11564,7 +11570,7 @@ impl<'a, C, NC, A> MemberUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkC
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
-                            sleep(d);
+                            sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
@@ -11648,8 +11654,8 @@ impl<'a, C, NC, A> MemberUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> MemberUpdateCall<'a, C, NC, A>
-                                                        where T: Str {
-        self._additional_params.insert(name.as_slice().to_string(), value.as_slice().to_string());
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
     }
 
@@ -11665,8 +11671,8 @@ impl<'a, C, NC, A> MemberUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T>(mut self, scope: T) -> MemberUpdateCall<'a, C, NC, A> 
-                                                        where T: Str {
-        self._scopes.insert(scope.as_slice().to_string(), ());
+                                                        where T: AsRef<str> {
+        self._scopes.insert(scope.as_ref().to_string(), ());
         self
     }
 }
@@ -11683,8 +11689,8 @@ impl<'a, C, NC, A> MemberUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkC
 ///
 /// ```test_harness,no_run
 /// # extern crate hyper;
-/// # extern crate "yup-oauth2" as oauth2;
-/// # extern crate "google-admin1_directory" as admin1_directory;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_admin1_directory as admin1_directory;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -11746,7 +11752,7 @@ impl<'a, C, NC, A> MemberGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
 
         let mut url = "https://www.googleapis.com/admin/directory/v1/groups/{groupKey}/members/{memberKey}".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::DirectoryDeviceChromeoReadonly.as_slice().to_string(), ());
+            self._scopes.insert(Scope::DirectoryDeviceChromeoReadonly.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{groupKey}", "groupKey"), ("{memberKey}", "memberKey")].iter() {
@@ -11776,7 +11782,7 @@ impl<'a, C, NC, A> MemberGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
         
         if params.len() > 0 {
             url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
+            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_ref()))));
         }
 
 
@@ -11794,7 +11800,7 @@ impl<'a, C, NC, A> MemberGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
                                                              access_token: token.unwrap().access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_slice())
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_ref())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -11805,7 +11811,7 @@ impl<'a, C, NC, A> MemberGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
             match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
+                        sleep_ms(d.num_milliseconds() as u32);
                         continue;
                     }
                     dlg.finished(false);
@@ -11816,7 +11822,7 @@ impl<'a, C, NC, A> MemberGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
-                            sleep(d);
+                            sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
@@ -11891,8 +11897,8 @@ impl<'a, C, NC, A> MemberGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> MemberGetCall<'a, C, NC, A>
-                                                        where T: Str {
-        self._additional_params.insert(name.as_slice().to_string(), value.as_slice().to_string());
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
     }
 
@@ -11908,8 +11914,8 @@ impl<'a, C, NC, A> MemberGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T>(mut self, scope: T) -> MemberGetCall<'a, C, NC, A> 
-                                                        where T: Str {
-        self._scopes.insert(scope.as_slice().to_string(), ());
+                                                        where T: AsRef<str> {
+        self._scopes.insert(scope.as_ref().to_string(), ());
         self
     }
 }
@@ -11926,8 +11932,8 @@ impl<'a, C, NC, A> MemberGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
 ///
 /// ```test_harness,no_run
 /// # extern crate hyper;
-/// # extern crate "yup-oauth2" as oauth2;
-/// # extern crate "google-admin1_directory" as admin1_directory;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_admin1_directory as admin1_directory;
 /// use admin1_directory::Member;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
@@ -11994,7 +12000,7 @@ impl<'a, C, NC, A> MemberInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkC
 
         let mut url = "https://www.googleapis.com/admin/directory/v1/groups/{groupKey}/members".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::DirectoryDeviceChromeo.as_slice().to_string(), ());
+            self._scopes.insert(Scope::DirectoryDeviceChromeo.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{groupKey}", "groupKey")].iter() {
@@ -12024,7 +12030,7 @@ impl<'a, C, NC, A> MemberInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkC
         
         if params.len() > 0 {
             url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
+            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_ref()))));
         }
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
@@ -12047,7 +12053,7 @@ impl<'a, C, NC, A> MemberInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkC
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.as_slice())
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.as_ref())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -12061,7 +12067,7 @@ impl<'a, C, NC, A> MemberInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkC
             match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
+                        sleep_ms(d.num_milliseconds() as u32);
                         continue;
                     }
                     dlg.finished(false);
@@ -12072,7 +12078,7 @@ impl<'a, C, NC, A> MemberInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkC
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
-                            sleep(d);
+                            sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
@@ -12146,8 +12152,8 @@ impl<'a, C, NC, A> MemberInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> MemberInsertCall<'a, C, NC, A>
-                                                        where T: Str {
-        self._additional_params.insert(name.as_slice().to_string(), value.as_slice().to_string());
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
     }
 
@@ -12163,8 +12169,8 @@ impl<'a, C, NC, A> MemberInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T>(mut self, scope: T) -> MemberInsertCall<'a, C, NC, A> 
-                                                        where T: Str {
-        self._scopes.insert(scope.as_slice().to_string(), ());
+                                                        where T: AsRef<str> {
+        self._scopes.insert(scope.as_ref().to_string(), ());
         self
     }
 }
@@ -12181,8 +12187,8 @@ impl<'a, C, NC, A> MemberInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkC
 ///
 /// ```test_harness,no_run
 /// # extern crate hyper;
-/// # extern crate "yup-oauth2" as oauth2;
-/// # extern crate "google-admin1_directory" as admin1_directory;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_admin1_directory as admin1_directory;
 /// use admin1_directory::Member;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
@@ -12251,7 +12257,7 @@ impl<'a, C, NC, A> MemberPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
 
         let mut url = "https://www.googleapis.com/admin/directory/v1/groups/{groupKey}/members/{memberKey}".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::DirectoryDeviceChromeo.as_slice().to_string(), ());
+            self._scopes.insert(Scope::DirectoryDeviceChromeo.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{groupKey}", "groupKey"), ("{memberKey}", "memberKey")].iter() {
@@ -12281,7 +12287,7 @@ impl<'a, C, NC, A> MemberPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
         
         if params.len() > 0 {
             url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
+            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_ref()))));
         }
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
@@ -12304,7 +12310,7 @@ impl<'a, C, NC, A> MemberPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Patch, url.as_slice())
+                let mut req = client.borrow_mut().request(hyper::method::Method::Patch, url.as_ref())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -12318,7 +12324,7 @@ impl<'a, C, NC, A> MemberPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
             match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
+                        sleep_ms(d.num_milliseconds() as u32);
                         continue;
                     }
                     dlg.finished(false);
@@ -12329,7 +12335,7 @@ impl<'a, C, NC, A> MemberPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
-                            sleep(d);
+                            sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
@@ -12413,8 +12419,8 @@ impl<'a, C, NC, A> MemberPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> MemberPatchCall<'a, C, NC, A>
-                                                        where T: Str {
-        self._additional_params.insert(name.as_slice().to_string(), value.as_slice().to_string());
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
     }
 
@@ -12430,8 +12436,8 @@ impl<'a, C, NC, A> MemberPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T>(mut self, scope: T) -> MemberPatchCall<'a, C, NC, A> 
-                                                        where T: Str {
-        self._scopes.insert(scope.as_slice().to_string(), ());
+                                                        where T: AsRef<str> {
+        self._scopes.insert(scope.as_ref().to_string(), ());
         self
     }
 }
@@ -12448,8 +12454,8 @@ impl<'a, C, NC, A> MemberPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
 ///
 /// ```test_harness,no_run
 /// # extern crate hyper;
-/// # extern crate "yup-oauth2" as oauth2;
-/// # extern crate "google-admin1_directory" as admin1_directory;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_admin1_directory as admin1_directory;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -12510,7 +12516,7 @@ impl<'a, C, NC, A> MemberDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkC
 
         let mut url = "https://www.googleapis.com/admin/directory/v1/groups/{groupKey}/members/{memberKey}".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::DirectoryDeviceChromeo.as_slice().to_string(), ());
+            self._scopes.insert(Scope::DirectoryDeviceChromeo.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{groupKey}", "groupKey"), ("{memberKey}", "memberKey")].iter() {
@@ -12540,7 +12546,7 @@ impl<'a, C, NC, A> MemberDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkC
         
         if params.len() > 0 {
             url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
+            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_ref()))));
         }
 
 
@@ -12558,7 +12564,7 @@ impl<'a, C, NC, A> MemberDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkC
                                                              access_token: token.unwrap().access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Delete, url.as_slice())
+                let mut req = client.borrow_mut().request(hyper::method::Method::Delete, url.as_ref())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -12569,7 +12575,7 @@ impl<'a, C, NC, A> MemberDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkC
             match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
+                        sleep_ms(d.num_milliseconds() as u32);
                         continue;
                     }
                     dlg.finished(false);
@@ -12580,7 +12586,7 @@ impl<'a, C, NC, A> MemberDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkC
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
-                            sleep(d);
+                            sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
@@ -12645,8 +12651,8 @@ impl<'a, C, NC, A> MemberDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> MemberDeleteCall<'a, C, NC, A>
-                                                        where T: Str {
-        self._additional_params.insert(name.as_slice().to_string(), value.as_slice().to_string());
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
     }
 
@@ -12662,8 +12668,8 @@ impl<'a, C, NC, A> MemberDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T>(mut self, scope: T) -> MemberDeleteCall<'a, C, NC, A> 
-                                                        where T: Str {
-        self._scopes.insert(scope.as_slice().to_string(), ());
+                                                        where T: AsRef<str> {
+        self._scopes.insert(scope.as_ref().to_string(), ());
         self
     }
 }
@@ -12680,8 +12686,8 @@ impl<'a, C, NC, A> MemberDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkC
 ///
 /// ```test_harness,no_run
 /// # extern crate hyper;
-/// # extern crate "yup-oauth2" as oauth2;
-/// # extern crate "google-admin1_directory" as admin1_directory;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_admin1_directory as admin1_directory;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -12756,7 +12762,7 @@ impl<'a, C, NC, A> MemberListCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
 
         let mut url = "https://www.googleapis.com/admin/directory/v1/groups/{groupKey}/members".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::DirectoryDeviceChromeoReadonly.as_slice().to_string(), ());
+            self._scopes.insert(Scope::DirectoryDeviceChromeoReadonly.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{groupKey}", "groupKey")].iter() {
@@ -12786,7 +12792,7 @@ impl<'a, C, NC, A> MemberListCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
         
         if params.len() > 0 {
             url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
+            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_ref()))));
         }
 
 
@@ -12804,7 +12810,7 @@ impl<'a, C, NC, A> MemberListCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
                                                              access_token: token.unwrap().access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_slice())
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_ref())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -12815,7 +12821,7 @@ impl<'a, C, NC, A> MemberListCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
             match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
+                        sleep_ms(d.num_milliseconds() as u32);
                         continue;
                     }
                     dlg.finished(false);
@@ -12826,7 +12832,7 @@ impl<'a, C, NC, A> MemberListCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
-                            sleep(d);
+                            sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
@@ -12915,8 +12921,8 @@ impl<'a, C, NC, A> MemberListCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> MemberListCall<'a, C, NC, A>
-                                                        where T: Str {
-        self._additional_params.insert(name.as_slice().to_string(), value.as_slice().to_string());
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
     }
 
@@ -12932,8 +12938,8 @@ impl<'a, C, NC, A> MemberListCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T>(mut self, scope: T) -> MemberListCall<'a, C, NC, A> 
-                                                        where T: Str {
-        self._scopes.insert(scope.as_slice().to_string(), ());
+                                                        where T: AsRef<str> {
+        self._scopes.insert(scope.as_ref().to_string(), ());
         self
     }
 }
@@ -12950,8 +12956,8 @@ impl<'a, C, NC, A> MemberListCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
 ///
 /// ```test_harness,no_run
 /// # extern crate hyper;
-/// # extern crate "yup-oauth2" as oauth2;
-/// # extern crate "google-admin1_directory" as admin1_directory;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_admin1_directory as admin1_directory;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -13026,7 +13032,7 @@ impl<'a, C, NC, A> NotificationListCall<'a, C, NC, A> where NC: hyper::net::Netw
 
         let mut url = "https://www.googleapis.com/admin/directory/v1/customer/{customer}/notifications".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::DirectoryDeviceChromeoReadonly.as_slice().to_string(), ());
+            self._scopes.insert(Scope::DirectoryDeviceChromeoReadonly.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{customer}", "customer")].iter() {
@@ -13056,7 +13062,7 @@ impl<'a, C, NC, A> NotificationListCall<'a, C, NC, A> where NC: hyper::net::Netw
         
         if params.len() > 0 {
             url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
+            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_ref()))));
         }
 
 
@@ -13074,7 +13080,7 @@ impl<'a, C, NC, A> NotificationListCall<'a, C, NC, A> where NC: hyper::net::Netw
                                                              access_token: token.unwrap().access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_slice())
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_ref())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -13085,7 +13091,7 @@ impl<'a, C, NC, A> NotificationListCall<'a, C, NC, A> where NC: hyper::net::Netw
             match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
+                        sleep_ms(d.num_milliseconds() as u32);
                         continue;
                     }
                     dlg.finished(false);
@@ -13096,7 +13102,7 @@ impl<'a, C, NC, A> NotificationListCall<'a, C, NC, A> where NC: hyper::net::Netw
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
-                            sleep(d);
+                            sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
@@ -13185,8 +13191,8 @@ impl<'a, C, NC, A> NotificationListCall<'a, C, NC, A> where NC: hyper::net::Netw
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> NotificationListCall<'a, C, NC, A>
-                                                        where T: Str {
-        self._additional_params.insert(name.as_slice().to_string(), value.as_slice().to_string());
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
     }
 
@@ -13202,8 +13208,8 @@ impl<'a, C, NC, A> NotificationListCall<'a, C, NC, A> where NC: hyper::net::Netw
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T>(mut self, scope: T) -> NotificationListCall<'a, C, NC, A> 
-                                                        where T: Str {
-        self._scopes.insert(scope.as_slice().to_string(), ());
+                                                        where T: AsRef<str> {
+        self._scopes.insert(scope.as_ref().to_string(), ());
         self
     }
 }
@@ -13220,8 +13226,8 @@ impl<'a, C, NC, A> NotificationListCall<'a, C, NC, A> where NC: hyper::net::Netw
 ///
 /// ```test_harness,no_run
 /// # extern crate hyper;
-/// # extern crate "yup-oauth2" as oauth2;
-/// # extern crate "google-admin1_directory" as admin1_directory;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_admin1_directory as admin1_directory;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -13282,7 +13288,7 @@ impl<'a, C, NC, A> NotificationDeleteCall<'a, C, NC, A> where NC: hyper::net::Ne
 
         let mut url = "https://www.googleapis.com/admin/directory/v1/customer/{customer}/notifications/{notificationId}".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::DirectoryDeviceChromeo.as_slice().to_string(), ());
+            self._scopes.insert(Scope::DirectoryDeviceChromeo.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{customer}", "customer"), ("{notificationId}", "notificationId")].iter() {
@@ -13312,7 +13318,7 @@ impl<'a, C, NC, A> NotificationDeleteCall<'a, C, NC, A> where NC: hyper::net::Ne
         
         if params.len() > 0 {
             url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
+            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_ref()))));
         }
 
 
@@ -13330,7 +13336,7 @@ impl<'a, C, NC, A> NotificationDeleteCall<'a, C, NC, A> where NC: hyper::net::Ne
                                                              access_token: token.unwrap().access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Delete, url.as_slice())
+                let mut req = client.borrow_mut().request(hyper::method::Method::Delete, url.as_ref())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -13341,7 +13347,7 @@ impl<'a, C, NC, A> NotificationDeleteCall<'a, C, NC, A> where NC: hyper::net::Ne
             match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
+                        sleep_ms(d.num_milliseconds() as u32);
                         continue;
                     }
                     dlg.finished(false);
@@ -13352,7 +13358,7 @@ impl<'a, C, NC, A> NotificationDeleteCall<'a, C, NC, A> where NC: hyper::net::Ne
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
-                            sleep(d);
+                            sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
@@ -13417,8 +13423,8 @@ impl<'a, C, NC, A> NotificationDeleteCall<'a, C, NC, A> where NC: hyper::net::Ne
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> NotificationDeleteCall<'a, C, NC, A>
-                                                        where T: Str {
-        self._additional_params.insert(name.as_slice().to_string(), value.as_slice().to_string());
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
     }
 
@@ -13434,8 +13440,8 @@ impl<'a, C, NC, A> NotificationDeleteCall<'a, C, NC, A> where NC: hyper::net::Ne
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T>(mut self, scope: T) -> NotificationDeleteCall<'a, C, NC, A> 
-                                                        where T: Str {
-        self._scopes.insert(scope.as_slice().to_string(), ());
+                                                        where T: AsRef<str> {
+        self._scopes.insert(scope.as_ref().to_string(), ());
         self
     }
 }
@@ -13452,8 +13458,8 @@ impl<'a, C, NC, A> NotificationDeleteCall<'a, C, NC, A> where NC: hyper::net::Ne
 ///
 /// ```test_harness,no_run
 /// # extern crate hyper;
-/// # extern crate "yup-oauth2" as oauth2;
-/// # extern crate "google-admin1_directory" as admin1_directory;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_admin1_directory as admin1_directory;
 /// use admin1_directory::Notification;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
@@ -13522,7 +13528,7 @@ impl<'a, C, NC, A> NotificationPatchCall<'a, C, NC, A> where NC: hyper::net::Net
 
         let mut url = "https://www.googleapis.com/admin/directory/v1/customer/{customer}/notifications/{notificationId}".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::DirectoryDeviceChromeo.as_slice().to_string(), ());
+            self._scopes.insert(Scope::DirectoryDeviceChromeo.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{customer}", "customer"), ("{notificationId}", "notificationId")].iter() {
@@ -13552,7 +13558,7 @@ impl<'a, C, NC, A> NotificationPatchCall<'a, C, NC, A> where NC: hyper::net::Net
         
         if params.len() > 0 {
             url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
+            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_ref()))));
         }
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
@@ -13575,7 +13581,7 @@ impl<'a, C, NC, A> NotificationPatchCall<'a, C, NC, A> where NC: hyper::net::Net
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Patch, url.as_slice())
+                let mut req = client.borrow_mut().request(hyper::method::Method::Patch, url.as_ref())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -13589,7 +13595,7 @@ impl<'a, C, NC, A> NotificationPatchCall<'a, C, NC, A> where NC: hyper::net::Net
             match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
+                        sleep_ms(d.num_milliseconds() as u32);
                         continue;
                     }
                     dlg.finished(false);
@@ -13600,7 +13606,7 @@ impl<'a, C, NC, A> NotificationPatchCall<'a, C, NC, A> where NC: hyper::net::Net
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
-                            sleep(d);
+                            sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
@@ -13684,8 +13690,8 @@ impl<'a, C, NC, A> NotificationPatchCall<'a, C, NC, A> where NC: hyper::net::Net
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> NotificationPatchCall<'a, C, NC, A>
-                                                        where T: Str {
-        self._additional_params.insert(name.as_slice().to_string(), value.as_slice().to_string());
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
     }
 
@@ -13701,8 +13707,8 @@ impl<'a, C, NC, A> NotificationPatchCall<'a, C, NC, A> where NC: hyper::net::Net
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T>(mut self, scope: T) -> NotificationPatchCall<'a, C, NC, A> 
-                                                        where T: Str {
-        self._scopes.insert(scope.as_slice().to_string(), ());
+                                                        where T: AsRef<str> {
+        self._scopes.insert(scope.as_ref().to_string(), ());
         self
     }
 }
@@ -13719,8 +13725,8 @@ impl<'a, C, NC, A> NotificationPatchCall<'a, C, NC, A> where NC: hyper::net::Net
 ///
 /// ```test_harness,no_run
 /// # extern crate hyper;
-/// # extern crate "yup-oauth2" as oauth2;
-/// # extern crate "google-admin1_directory" as admin1_directory;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_admin1_directory as admin1_directory;
 /// use admin1_directory::Notification;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
@@ -13789,7 +13795,7 @@ impl<'a, C, NC, A> NotificationUpdateCall<'a, C, NC, A> where NC: hyper::net::Ne
 
         let mut url = "https://www.googleapis.com/admin/directory/v1/customer/{customer}/notifications/{notificationId}".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::DirectoryDeviceChromeo.as_slice().to_string(), ());
+            self._scopes.insert(Scope::DirectoryDeviceChromeo.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{customer}", "customer"), ("{notificationId}", "notificationId")].iter() {
@@ -13819,7 +13825,7 @@ impl<'a, C, NC, A> NotificationUpdateCall<'a, C, NC, A> where NC: hyper::net::Ne
         
         if params.len() > 0 {
             url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
+            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_ref()))));
         }
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
@@ -13842,7 +13848,7 @@ impl<'a, C, NC, A> NotificationUpdateCall<'a, C, NC, A> where NC: hyper::net::Ne
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Put, url.as_slice())
+                let mut req = client.borrow_mut().request(hyper::method::Method::Put, url.as_ref())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -13856,7 +13862,7 @@ impl<'a, C, NC, A> NotificationUpdateCall<'a, C, NC, A> where NC: hyper::net::Ne
             match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
+                        sleep_ms(d.num_milliseconds() as u32);
                         continue;
                     }
                     dlg.finished(false);
@@ -13867,7 +13873,7 @@ impl<'a, C, NC, A> NotificationUpdateCall<'a, C, NC, A> where NC: hyper::net::Ne
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
-                            sleep(d);
+                            sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
@@ -13951,8 +13957,8 @@ impl<'a, C, NC, A> NotificationUpdateCall<'a, C, NC, A> where NC: hyper::net::Ne
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> NotificationUpdateCall<'a, C, NC, A>
-                                                        where T: Str {
-        self._additional_params.insert(name.as_slice().to_string(), value.as_slice().to_string());
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
     }
 
@@ -13968,8 +13974,8 @@ impl<'a, C, NC, A> NotificationUpdateCall<'a, C, NC, A> where NC: hyper::net::Ne
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T>(mut self, scope: T) -> NotificationUpdateCall<'a, C, NC, A> 
-                                                        where T: Str {
-        self._scopes.insert(scope.as_slice().to_string(), ());
+                                                        where T: AsRef<str> {
+        self._scopes.insert(scope.as_ref().to_string(), ());
         self
     }
 }
@@ -13986,8 +13992,8 @@ impl<'a, C, NC, A> NotificationUpdateCall<'a, C, NC, A> where NC: hyper::net::Ne
 ///
 /// ```test_harness,no_run
 /// # extern crate hyper;
-/// # extern crate "yup-oauth2" as oauth2;
-/// # extern crate "google-admin1_directory" as admin1_directory;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_admin1_directory as admin1_directory;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -14049,7 +14055,7 @@ impl<'a, C, NC, A> NotificationGetCall<'a, C, NC, A> where NC: hyper::net::Netwo
 
         let mut url = "https://www.googleapis.com/admin/directory/v1/customer/{customer}/notifications/{notificationId}".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::DirectoryDeviceChromeoReadonly.as_slice().to_string(), ());
+            self._scopes.insert(Scope::DirectoryDeviceChromeoReadonly.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{customer}", "customer"), ("{notificationId}", "notificationId")].iter() {
@@ -14079,7 +14085,7 @@ impl<'a, C, NC, A> NotificationGetCall<'a, C, NC, A> where NC: hyper::net::Netwo
         
         if params.len() > 0 {
             url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
+            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_ref()))));
         }
 
 
@@ -14097,7 +14103,7 @@ impl<'a, C, NC, A> NotificationGetCall<'a, C, NC, A> where NC: hyper::net::Netwo
                                                              access_token: token.unwrap().access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_slice())
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_ref())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -14108,7 +14114,7 @@ impl<'a, C, NC, A> NotificationGetCall<'a, C, NC, A> where NC: hyper::net::Netwo
             match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
+                        sleep_ms(d.num_milliseconds() as u32);
                         continue;
                     }
                     dlg.finished(false);
@@ -14119,7 +14125,7 @@ impl<'a, C, NC, A> NotificationGetCall<'a, C, NC, A> where NC: hyper::net::Netwo
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
-                            sleep(d);
+                            sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
@@ -14194,8 +14200,8 @@ impl<'a, C, NC, A> NotificationGetCall<'a, C, NC, A> where NC: hyper::net::Netwo
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> NotificationGetCall<'a, C, NC, A>
-                                                        where T: Str {
-        self._additional_params.insert(name.as_slice().to_string(), value.as_slice().to_string());
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
     }
 
@@ -14211,8 +14217,8 @@ impl<'a, C, NC, A> NotificationGetCall<'a, C, NC, A> where NC: hyper::net::Netwo
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T>(mut self, scope: T) -> NotificationGetCall<'a, C, NC, A> 
-                                                        where T: Str {
-        self._scopes.insert(scope.as_slice().to_string(), ());
+                                                        where T: AsRef<str> {
+        self._scopes.insert(scope.as_ref().to_string(), ());
         self
     }
 }
@@ -14229,8 +14235,8 @@ impl<'a, C, NC, A> NotificationGetCall<'a, C, NC, A> where NC: hyper::net::Netwo
 ///
 /// ```test_harness,no_run
 /// # extern crate hyper;
-/// # extern crate "yup-oauth2" as oauth2;
-/// # extern crate "google-admin1_directory" as admin1_directory;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_admin1_directory as admin1_directory;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -14320,7 +14326,7 @@ impl<'a, C, NC, A> ChromeosdeviceListCall<'a, C, NC, A> where NC: hyper::net::Ne
 
         let mut url = "https://www.googleapis.com/admin/directory/v1/customer/{customerId}/devices/chromeos".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::DirectoryDeviceChromeoReadonly.as_slice().to_string(), ());
+            self._scopes.insert(Scope::DirectoryDeviceChromeoReadonly.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{customerId}", "customerId")].iter() {
@@ -14350,7 +14356,7 @@ impl<'a, C, NC, A> ChromeosdeviceListCall<'a, C, NC, A> where NC: hyper::net::Ne
         
         if params.len() > 0 {
             url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
+            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_ref()))));
         }
 
 
@@ -14368,7 +14374,7 @@ impl<'a, C, NC, A> ChromeosdeviceListCall<'a, C, NC, A> where NC: hyper::net::Ne
                                                              access_token: token.unwrap().access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_slice())
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_ref())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -14379,7 +14385,7 @@ impl<'a, C, NC, A> ChromeosdeviceListCall<'a, C, NC, A> where NC: hyper::net::Ne
             match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
+                        sleep_ms(d.num_milliseconds() as u32);
                         continue;
                     }
                     dlg.finished(false);
@@ -14390,7 +14396,7 @@ impl<'a, C, NC, A> ChromeosdeviceListCall<'a, C, NC, A> where NC: hyper::net::Ne
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
-                            sleep(d);
+                            sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
@@ -14503,8 +14509,8 @@ impl<'a, C, NC, A> ChromeosdeviceListCall<'a, C, NC, A> where NC: hyper::net::Ne
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> ChromeosdeviceListCall<'a, C, NC, A>
-                                                        where T: Str {
-        self._additional_params.insert(name.as_slice().to_string(), value.as_slice().to_string());
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
     }
 
@@ -14520,8 +14526,8 @@ impl<'a, C, NC, A> ChromeosdeviceListCall<'a, C, NC, A> where NC: hyper::net::Ne
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T>(mut self, scope: T) -> ChromeosdeviceListCall<'a, C, NC, A> 
-                                                        where T: Str {
-        self._scopes.insert(scope.as_slice().to_string(), ());
+                                                        where T: AsRef<str> {
+        self._scopes.insert(scope.as_ref().to_string(), ());
         self
     }
 }
@@ -14538,8 +14544,8 @@ impl<'a, C, NC, A> ChromeosdeviceListCall<'a, C, NC, A> where NC: hyper::net::Ne
 ///
 /// ```test_harness,no_run
 /// # extern crate hyper;
-/// # extern crate "yup-oauth2" as oauth2;
-/// # extern crate "google-admin1_directory" as admin1_directory;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_admin1_directory as admin1_directory;
 /// use admin1_directory::ChromeOsDevice;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
@@ -14613,7 +14619,7 @@ impl<'a, C, NC, A> ChromeosdevicePatchCall<'a, C, NC, A> where NC: hyper::net::N
 
         let mut url = "https://www.googleapis.com/admin/directory/v1/customer/{customerId}/devices/chromeos/{deviceId}".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::DirectoryDeviceChromeo.as_slice().to_string(), ());
+            self._scopes.insert(Scope::DirectoryDeviceChromeo.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{customerId}", "customerId"), ("{deviceId}", "deviceId")].iter() {
@@ -14643,7 +14649,7 @@ impl<'a, C, NC, A> ChromeosdevicePatchCall<'a, C, NC, A> where NC: hyper::net::N
         
         if params.len() > 0 {
             url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
+            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_ref()))));
         }
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
@@ -14666,7 +14672,7 @@ impl<'a, C, NC, A> ChromeosdevicePatchCall<'a, C, NC, A> where NC: hyper::net::N
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Patch, url.as_slice())
+                let mut req = client.borrow_mut().request(hyper::method::Method::Patch, url.as_ref())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -14680,7 +14686,7 @@ impl<'a, C, NC, A> ChromeosdevicePatchCall<'a, C, NC, A> where NC: hyper::net::N
             match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
+                        sleep_ms(d.num_milliseconds() as u32);
                         continue;
                     }
                     dlg.finished(false);
@@ -14691,7 +14697,7 @@ impl<'a, C, NC, A> ChromeosdevicePatchCall<'a, C, NC, A> where NC: hyper::net::N
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
-                            sleep(d);
+                            sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
@@ -14783,8 +14789,8 @@ impl<'a, C, NC, A> ChromeosdevicePatchCall<'a, C, NC, A> where NC: hyper::net::N
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> ChromeosdevicePatchCall<'a, C, NC, A>
-                                                        where T: Str {
-        self._additional_params.insert(name.as_slice().to_string(), value.as_slice().to_string());
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
     }
 
@@ -14800,8 +14806,8 @@ impl<'a, C, NC, A> ChromeosdevicePatchCall<'a, C, NC, A> where NC: hyper::net::N
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T>(mut self, scope: T) -> ChromeosdevicePatchCall<'a, C, NC, A> 
-                                                        where T: Str {
-        self._scopes.insert(scope.as_slice().to_string(), ());
+                                                        where T: AsRef<str> {
+        self._scopes.insert(scope.as_ref().to_string(), ());
         self
     }
 }
@@ -14818,8 +14824,8 @@ impl<'a, C, NC, A> ChromeosdevicePatchCall<'a, C, NC, A> where NC: hyper::net::N
 ///
 /// ```test_harness,no_run
 /// # extern crate hyper;
-/// # extern crate "yup-oauth2" as oauth2;
-/// # extern crate "google-admin1_directory" as admin1_directory;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_admin1_directory as admin1_directory;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -14886,7 +14892,7 @@ impl<'a, C, NC, A> ChromeosdeviceGetCall<'a, C, NC, A> where NC: hyper::net::Net
 
         let mut url = "https://www.googleapis.com/admin/directory/v1/customer/{customerId}/devices/chromeos/{deviceId}".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::DirectoryDeviceChromeoReadonly.as_slice().to_string(), ());
+            self._scopes.insert(Scope::DirectoryDeviceChromeoReadonly.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{customerId}", "customerId"), ("{deviceId}", "deviceId")].iter() {
@@ -14916,7 +14922,7 @@ impl<'a, C, NC, A> ChromeosdeviceGetCall<'a, C, NC, A> where NC: hyper::net::Net
         
         if params.len() > 0 {
             url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
+            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_ref()))));
         }
 
 
@@ -14934,7 +14940,7 @@ impl<'a, C, NC, A> ChromeosdeviceGetCall<'a, C, NC, A> where NC: hyper::net::Net
                                                              access_token: token.unwrap().access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_slice())
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_ref())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -14945,7 +14951,7 @@ impl<'a, C, NC, A> ChromeosdeviceGetCall<'a, C, NC, A> where NC: hyper::net::Net
             match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
+                        sleep_ms(d.num_milliseconds() as u32);
                         continue;
                     }
                     dlg.finished(false);
@@ -14956,7 +14962,7 @@ impl<'a, C, NC, A> ChromeosdeviceGetCall<'a, C, NC, A> where NC: hyper::net::Net
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
-                            sleep(d);
+                            sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
@@ -15039,8 +15045,8 @@ impl<'a, C, NC, A> ChromeosdeviceGetCall<'a, C, NC, A> where NC: hyper::net::Net
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> ChromeosdeviceGetCall<'a, C, NC, A>
-                                                        where T: Str {
-        self._additional_params.insert(name.as_slice().to_string(), value.as_slice().to_string());
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
     }
 
@@ -15056,8 +15062,8 @@ impl<'a, C, NC, A> ChromeosdeviceGetCall<'a, C, NC, A> where NC: hyper::net::Net
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T>(mut self, scope: T) -> ChromeosdeviceGetCall<'a, C, NC, A> 
-                                                        where T: Str {
-        self._scopes.insert(scope.as_slice().to_string(), ());
+                                                        where T: AsRef<str> {
+        self._scopes.insert(scope.as_ref().to_string(), ());
         self
     }
 }
@@ -15074,8 +15080,8 @@ impl<'a, C, NC, A> ChromeosdeviceGetCall<'a, C, NC, A> where NC: hyper::net::Net
 ///
 /// ```test_harness,no_run
 /// # extern crate hyper;
-/// # extern crate "yup-oauth2" as oauth2;
-/// # extern crate "google-admin1_directory" as admin1_directory;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_admin1_directory as admin1_directory;
 /// use admin1_directory::ChromeOsDevice;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
@@ -15149,7 +15155,7 @@ impl<'a, C, NC, A> ChromeosdeviceUpdateCall<'a, C, NC, A> where NC: hyper::net::
 
         let mut url = "https://www.googleapis.com/admin/directory/v1/customer/{customerId}/devices/chromeos/{deviceId}".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::DirectoryDeviceChromeo.as_slice().to_string(), ());
+            self._scopes.insert(Scope::DirectoryDeviceChromeo.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{customerId}", "customerId"), ("{deviceId}", "deviceId")].iter() {
@@ -15179,7 +15185,7 @@ impl<'a, C, NC, A> ChromeosdeviceUpdateCall<'a, C, NC, A> where NC: hyper::net::
         
         if params.len() > 0 {
             url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
+            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_ref()))));
         }
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
@@ -15202,7 +15208,7 @@ impl<'a, C, NC, A> ChromeosdeviceUpdateCall<'a, C, NC, A> where NC: hyper::net::
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Put, url.as_slice())
+                let mut req = client.borrow_mut().request(hyper::method::Method::Put, url.as_ref())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -15216,7 +15222,7 @@ impl<'a, C, NC, A> ChromeosdeviceUpdateCall<'a, C, NC, A> where NC: hyper::net::
             match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
+                        sleep_ms(d.num_milliseconds() as u32);
                         continue;
                     }
                     dlg.finished(false);
@@ -15227,7 +15233,7 @@ impl<'a, C, NC, A> ChromeosdeviceUpdateCall<'a, C, NC, A> where NC: hyper::net::
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
-                            sleep(d);
+                            sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
@@ -15319,8 +15325,8 @@ impl<'a, C, NC, A> ChromeosdeviceUpdateCall<'a, C, NC, A> where NC: hyper::net::
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> ChromeosdeviceUpdateCall<'a, C, NC, A>
-                                                        where T: Str {
-        self._additional_params.insert(name.as_slice().to_string(), value.as_slice().to_string());
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
     }
 
@@ -15336,8 +15342,8 @@ impl<'a, C, NC, A> ChromeosdeviceUpdateCall<'a, C, NC, A> where NC: hyper::net::
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T>(mut self, scope: T) -> ChromeosdeviceUpdateCall<'a, C, NC, A> 
-                                                        where T: Str {
-        self._scopes.insert(scope.as_slice().to_string(), ());
+                                                        where T: AsRef<str> {
+        self._scopes.insert(scope.as_ref().to_string(), ());
         self
     }
 }
@@ -15354,8 +15360,8 @@ impl<'a, C, NC, A> ChromeosdeviceUpdateCall<'a, C, NC, A> where NC: hyper::net::
 ///
 /// ```test_harness,no_run
 /// # extern crate hyper;
-/// # extern crate "yup-oauth2" as oauth2;
-/// # extern crate "google-admin1_directory" as admin1_directory;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_admin1_directory as admin1_directory;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -15414,7 +15420,7 @@ impl<'a, C, NC, A> VerificationCodeGenerateCall<'a, C, NC, A> where NC: hyper::n
 
         let mut url = "https://www.googleapis.com/admin/directory/v1/users/{userKey}/verificationCodes/generate".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::DirectoryDeviceChromeo.as_slice().to_string(), ());
+            self._scopes.insert(Scope::DirectoryDeviceChromeo.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{userKey}", "userKey")].iter() {
@@ -15444,7 +15450,7 @@ impl<'a, C, NC, A> VerificationCodeGenerateCall<'a, C, NC, A> where NC: hyper::n
         
         if params.len() > 0 {
             url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
+            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_ref()))));
         }
 
 
@@ -15462,7 +15468,7 @@ impl<'a, C, NC, A> VerificationCodeGenerateCall<'a, C, NC, A> where NC: hyper::n
                                                              access_token: token.unwrap().access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.as_slice())
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.as_ref())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -15473,7 +15479,7 @@ impl<'a, C, NC, A> VerificationCodeGenerateCall<'a, C, NC, A> where NC: hyper::n
             match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
+                        sleep_ms(d.num_milliseconds() as u32);
                         continue;
                     }
                     dlg.finished(false);
@@ -15484,7 +15490,7 @@ impl<'a, C, NC, A> VerificationCodeGenerateCall<'a, C, NC, A> where NC: hyper::n
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
-                            sleep(d);
+                            sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
@@ -15539,8 +15545,8 @@ impl<'a, C, NC, A> VerificationCodeGenerateCall<'a, C, NC, A> where NC: hyper::n
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> VerificationCodeGenerateCall<'a, C, NC, A>
-                                                        where T: Str {
-        self._additional_params.insert(name.as_slice().to_string(), value.as_slice().to_string());
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
     }
 
@@ -15556,8 +15562,8 @@ impl<'a, C, NC, A> VerificationCodeGenerateCall<'a, C, NC, A> where NC: hyper::n
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T>(mut self, scope: T) -> VerificationCodeGenerateCall<'a, C, NC, A> 
-                                                        where T: Str {
-        self._scopes.insert(scope.as_slice().to_string(), ());
+                                                        where T: AsRef<str> {
+        self._scopes.insert(scope.as_ref().to_string(), ());
         self
     }
 }
@@ -15574,8 +15580,8 @@ impl<'a, C, NC, A> VerificationCodeGenerateCall<'a, C, NC, A> where NC: hyper::n
 ///
 /// ```test_harness,no_run
 /// # extern crate hyper;
-/// # extern crate "yup-oauth2" as oauth2;
-/// # extern crate "google-admin1_directory" as admin1_directory;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_admin1_directory as admin1_directory;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -15634,7 +15640,7 @@ impl<'a, C, NC, A> VerificationCodeInvalidateCall<'a, C, NC, A> where NC: hyper:
 
         let mut url = "https://www.googleapis.com/admin/directory/v1/users/{userKey}/verificationCodes/invalidate".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::DirectoryDeviceChromeo.as_slice().to_string(), ());
+            self._scopes.insert(Scope::DirectoryDeviceChromeo.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{userKey}", "userKey")].iter() {
@@ -15664,7 +15670,7 @@ impl<'a, C, NC, A> VerificationCodeInvalidateCall<'a, C, NC, A> where NC: hyper:
         
         if params.len() > 0 {
             url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
+            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_ref()))));
         }
 
 
@@ -15682,7 +15688,7 @@ impl<'a, C, NC, A> VerificationCodeInvalidateCall<'a, C, NC, A> where NC: hyper:
                                                              access_token: token.unwrap().access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.as_slice())
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.as_ref())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -15693,7 +15699,7 @@ impl<'a, C, NC, A> VerificationCodeInvalidateCall<'a, C, NC, A> where NC: hyper:
             match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
+                        sleep_ms(d.num_milliseconds() as u32);
                         continue;
                     }
                     dlg.finished(false);
@@ -15704,7 +15710,7 @@ impl<'a, C, NC, A> VerificationCodeInvalidateCall<'a, C, NC, A> where NC: hyper:
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
-                            sleep(d);
+                            sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
@@ -15759,8 +15765,8 @@ impl<'a, C, NC, A> VerificationCodeInvalidateCall<'a, C, NC, A> where NC: hyper:
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> VerificationCodeInvalidateCall<'a, C, NC, A>
-                                                        where T: Str {
-        self._additional_params.insert(name.as_slice().to_string(), value.as_slice().to_string());
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
     }
 
@@ -15776,8 +15782,8 @@ impl<'a, C, NC, A> VerificationCodeInvalidateCall<'a, C, NC, A> where NC: hyper:
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T>(mut self, scope: T) -> VerificationCodeInvalidateCall<'a, C, NC, A> 
-                                                        where T: Str {
-        self._scopes.insert(scope.as_slice().to_string(), ());
+                                                        where T: AsRef<str> {
+        self._scopes.insert(scope.as_ref().to_string(), ());
         self
     }
 }
@@ -15794,8 +15800,8 @@ impl<'a, C, NC, A> VerificationCodeInvalidateCall<'a, C, NC, A> where NC: hyper:
 ///
 /// ```test_harness,no_run
 /// # extern crate hyper;
-/// # extern crate "yup-oauth2" as oauth2;
-/// # extern crate "google-admin1_directory" as admin1_directory;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_admin1_directory as admin1_directory;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -15855,7 +15861,7 @@ impl<'a, C, NC, A> VerificationCodeListCall<'a, C, NC, A> where NC: hyper::net::
 
         let mut url = "https://www.googleapis.com/admin/directory/v1/users/{userKey}/verificationCodes".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::DirectoryDeviceChromeoReadonly.as_slice().to_string(), ());
+            self._scopes.insert(Scope::DirectoryDeviceChromeoReadonly.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{userKey}", "userKey")].iter() {
@@ -15885,7 +15891,7 @@ impl<'a, C, NC, A> VerificationCodeListCall<'a, C, NC, A> where NC: hyper::net::
         
         if params.len() > 0 {
             url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
+            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_ref()))));
         }
 
 
@@ -15903,7 +15909,7 @@ impl<'a, C, NC, A> VerificationCodeListCall<'a, C, NC, A> where NC: hyper::net::
                                                              access_token: token.unwrap().access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_slice())
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_ref())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -15914,7 +15920,7 @@ impl<'a, C, NC, A> VerificationCodeListCall<'a, C, NC, A> where NC: hyper::net::
             match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
+                        sleep_ms(d.num_milliseconds() as u32);
                         continue;
                     }
                     dlg.finished(false);
@@ -15925,7 +15931,7 @@ impl<'a, C, NC, A> VerificationCodeListCall<'a, C, NC, A> where NC: hyper::net::
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
-                            sleep(d);
+                            sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
@@ -15990,8 +15996,8 @@ impl<'a, C, NC, A> VerificationCodeListCall<'a, C, NC, A> where NC: hyper::net::
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> VerificationCodeListCall<'a, C, NC, A>
-                                                        where T: Str {
-        self._additional_params.insert(name.as_slice().to_string(), value.as_slice().to_string());
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
     }
 
@@ -16007,8 +16013,8 @@ impl<'a, C, NC, A> VerificationCodeListCall<'a, C, NC, A> where NC: hyper::net::
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T>(mut self, scope: T) -> VerificationCodeListCall<'a, C, NC, A> 
-                                                        where T: Str {
-        self._scopes.insert(scope.as_slice().to_string(), ());
+                                                        where T: AsRef<str> {
+        self._scopes.insert(scope.as_ref().to_string(), ());
         self
     }
 }
@@ -16025,8 +16031,8 @@ impl<'a, C, NC, A> VerificationCodeListCall<'a, C, NC, A> where NC: hyper::net::
 ///
 /// ```test_harness,no_run
 /// # extern crate hyper;
-/// # extern crate "yup-oauth2" as oauth2;
-/// # extern crate "google-admin1_directory" as admin1_directory;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_admin1_directory as admin1_directory;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -16086,7 +16092,7 @@ impl<'a, C, NC, A> GroupGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
 
         let mut url = "https://www.googleapis.com/admin/directory/v1/groups/{groupKey}".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::DirectoryDeviceChromeoReadonly.as_slice().to_string(), ());
+            self._scopes.insert(Scope::DirectoryDeviceChromeoReadonly.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{groupKey}", "groupKey")].iter() {
@@ -16116,7 +16122,7 @@ impl<'a, C, NC, A> GroupGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
         
         if params.len() > 0 {
             url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
+            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_ref()))));
         }
 
 
@@ -16134,7 +16140,7 @@ impl<'a, C, NC, A> GroupGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
                                                              access_token: token.unwrap().access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_slice())
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_ref())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -16145,7 +16151,7 @@ impl<'a, C, NC, A> GroupGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
             match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
+                        sleep_ms(d.num_milliseconds() as u32);
                         continue;
                     }
                     dlg.finished(false);
@@ -16156,7 +16162,7 @@ impl<'a, C, NC, A> GroupGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
-                            sleep(d);
+                            sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
@@ -16221,8 +16227,8 @@ impl<'a, C, NC, A> GroupGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> GroupGetCall<'a, C, NC, A>
-                                                        where T: Str {
-        self._additional_params.insert(name.as_slice().to_string(), value.as_slice().to_string());
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
     }
 
@@ -16238,8 +16244,8 @@ impl<'a, C, NC, A> GroupGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T>(mut self, scope: T) -> GroupGetCall<'a, C, NC, A> 
-                                                        where T: Str {
-        self._scopes.insert(scope.as_slice().to_string(), ());
+                                                        where T: AsRef<str> {
+        self._scopes.insert(scope.as_ref().to_string(), ());
         self
     }
 }
@@ -16256,8 +16262,8 @@ impl<'a, C, NC, A> GroupGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConne
 ///
 /// ```test_harness,no_run
 /// # extern crate hyper;
-/// # extern crate "yup-oauth2" as oauth2;
-/// # extern crate "google-admin1_directory" as admin1_directory;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_admin1_directory as admin1_directory;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -16340,13 +16346,13 @@ impl<'a, C, NC, A> GroupListCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
 
         let mut url = "https://www.googleapis.com/admin/directory/v1/groups".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::DirectoryDeviceChromeoReadonly.as_slice().to_string(), ());
+            self._scopes.insert(Scope::DirectoryDeviceChromeoReadonly.as_ref().to_string(), ());
         }
 
         
         if params.len() > 0 {
             url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
+            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_ref()))));
         }
 
 
@@ -16364,7 +16370,7 @@ impl<'a, C, NC, A> GroupListCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
                                                              access_token: token.unwrap().access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_slice())
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_ref())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -16375,7 +16381,7 @@ impl<'a, C, NC, A> GroupListCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
             match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
+                        sleep_ms(d.num_milliseconds() as u32);
                         continue;
                     }
                     dlg.finished(false);
@@ -16386,7 +16392,7 @@ impl<'a, C, NC, A> GroupListCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
-                            sleep(d);
+                            sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
@@ -16481,8 +16487,8 @@ impl<'a, C, NC, A> GroupListCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> GroupListCall<'a, C, NC, A>
-                                                        where T: Str {
-        self._additional_params.insert(name.as_slice().to_string(), value.as_slice().to_string());
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
     }
 
@@ -16498,8 +16504,8 @@ impl<'a, C, NC, A> GroupListCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T>(mut self, scope: T) -> GroupListCall<'a, C, NC, A> 
-                                                        where T: Str {
-        self._scopes.insert(scope.as_slice().to_string(), ());
+                                                        where T: AsRef<str> {
+        self._scopes.insert(scope.as_ref().to_string(), ());
         self
     }
 }
@@ -16516,8 +16522,8 @@ impl<'a, C, NC, A> GroupListCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
 ///
 /// ```test_harness,no_run
 /// # extern crate hyper;
-/// # extern crate "yup-oauth2" as oauth2;
-/// # extern crate "google-admin1_directory" as admin1_directory;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_admin1_directory as admin1_directory;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -16577,7 +16583,7 @@ impl<'a, C, NC, A> GroupAliaseListCall<'a, C, NC, A> where NC: hyper::net::Netwo
 
         let mut url = "https://www.googleapis.com/admin/directory/v1/groups/{groupKey}/aliases".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::DirectoryDeviceChromeoReadonly.as_slice().to_string(), ());
+            self._scopes.insert(Scope::DirectoryDeviceChromeoReadonly.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{groupKey}", "groupKey")].iter() {
@@ -16607,7 +16613,7 @@ impl<'a, C, NC, A> GroupAliaseListCall<'a, C, NC, A> where NC: hyper::net::Netwo
         
         if params.len() > 0 {
             url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
+            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_ref()))));
         }
 
 
@@ -16625,7 +16631,7 @@ impl<'a, C, NC, A> GroupAliaseListCall<'a, C, NC, A> where NC: hyper::net::Netwo
                                                              access_token: token.unwrap().access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_slice())
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_ref())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -16636,7 +16642,7 @@ impl<'a, C, NC, A> GroupAliaseListCall<'a, C, NC, A> where NC: hyper::net::Netwo
             match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
+                        sleep_ms(d.num_milliseconds() as u32);
                         continue;
                     }
                     dlg.finished(false);
@@ -16647,7 +16653,7 @@ impl<'a, C, NC, A> GroupAliaseListCall<'a, C, NC, A> where NC: hyper::net::Netwo
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
-                            sleep(d);
+                            sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
@@ -16712,8 +16718,8 @@ impl<'a, C, NC, A> GroupAliaseListCall<'a, C, NC, A> where NC: hyper::net::Netwo
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> GroupAliaseListCall<'a, C, NC, A>
-                                                        where T: Str {
-        self._additional_params.insert(name.as_slice().to_string(), value.as_slice().to_string());
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
     }
 
@@ -16729,8 +16735,8 @@ impl<'a, C, NC, A> GroupAliaseListCall<'a, C, NC, A> where NC: hyper::net::Netwo
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T>(mut self, scope: T) -> GroupAliaseListCall<'a, C, NC, A> 
-                                                        where T: Str {
-        self._scopes.insert(scope.as_slice().to_string(), ());
+                                                        where T: AsRef<str> {
+        self._scopes.insert(scope.as_ref().to_string(), ());
         self
     }
 }
@@ -16747,8 +16753,8 @@ impl<'a, C, NC, A> GroupAliaseListCall<'a, C, NC, A> where NC: hyper::net::Netwo
 ///
 /// ```test_harness,no_run
 /// # extern crate hyper;
-/// # extern crate "yup-oauth2" as oauth2;
-/// # extern crate "google-admin1_directory" as admin1_directory;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_admin1_directory as admin1_directory;
 /// use admin1_directory::Group;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
@@ -16815,7 +16821,7 @@ impl<'a, C, NC, A> GroupPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
 
         let mut url = "https://www.googleapis.com/admin/directory/v1/groups/{groupKey}".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::DirectoryDeviceChromeo.as_slice().to_string(), ());
+            self._scopes.insert(Scope::DirectoryDeviceChromeo.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{groupKey}", "groupKey")].iter() {
@@ -16845,7 +16851,7 @@ impl<'a, C, NC, A> GroupPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
         
         if params.len() > 0 {
             url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
+            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_ref()))));
         }
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
@@ -16868,7 +16874,7 @@ impl<'a, C, NC, A> GroupPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Patch, url.as_slice())
+                let mut req = client.borrow_mut().request(hyper::method::Method::Patch, url.as_ref())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -16882,7 +16888,7 @@ impl<'a, C, NC, A> GroupPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
             match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
+                        sleep_ms(d.num_milliseconds() as u32);
                         continue;
                     }
                     dlg.finished(false);
@@ -16893,7 +16899,7 @@ impl<'a, C, NC, A> GroupPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
-                            sleep(d);
+                            sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
@@ -16967,8 +16973,8 @@ impl<'a, C, NC, A> GroupPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> GroupPatchCall<'a, C, NC, A>
-                                                        where T: Str {
-        self._additional_params.insert(name.as_slice().to_string(), value.as_slice().to_string());
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
     }
 
@@ -16984,8 +16990,8 @@ impl<'a, C, NC, A> GroupPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T>(mut self, scope: T) -> GroupPatchCall<'a, C, NC, A> 
-                                                        where T: Str {
-        self._scopes.insert(scope.as_slice().to_string(), ());
+                                                        where T: AsRef<str> {
+        self._scopes.insert(scope.as_ref().to_string(), ());
         self
     }
 }
@@ -17002,8 +17008,8 @@ impl<'a, C, NC, A> GroupPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
 ///
 /// ```test_harness,no_run
 /// # extern crate hyper;
-/// # extern crate "yup-oauth2" as oauth2;
-/// # extern crate "google-admin1_directory" as admin1_directory;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_admin1_directory as admin1_directory;
 /// use admin1_directory::Group;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
@@ -17070,7 +17076,7 @@ impl<'a, C, NC, A> GroupUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
 
         let mut url = "https://www.googleapis.com/admin/directory/v1/groups/{groupKey}".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::DirectoryDeviceChromeo.as_slice().to_string(), ());
+            self._scopes.insert(Scope::DirectoryDeviceChromeo.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{groupKey}", "groupKey")].iter() {
@@ -17100,7 +17106,7 @@ impl<'a, C, NC, A> GroupUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
         
         if params.len() > 0 {
             url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
+            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_ref()))));
         }
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
@@ -17123,7 +17129,7 @@ impl<'a, C, NC, A> GroupUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Put, url.as_slice())
+                let mut req = client.borrow_mut().request(hyper::method::Method::Put, url.as_ref())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -17137,7 +17143,7 @@ impl<'a, C, NC, A> GroupUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
             match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
+                        sleep_ms(d.num_milliseconds() as u32);
                         continue;
                     }
                     dlg.finished(false);
@@ -17148,7 +17154,7 @@ impl<'a, C, NC, A> GroupUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
-                            sleep(d);
+                            sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
@@ -17222,8 +17228,8 @@ impl<'a, C, NC, A> GroupUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> GroupUpdateCall<'a, C, NC, A>
-                                                        where T: Str {
-        self._additional_params.insert(name.as_slice().to_string(), value.as_slice().to_string());
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
     }
 
@@ -17239,8 +17245,8 @@ impl<'a, C, NC, A> GroupUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T>(mut self, scope: T) -> GroupUpdateCall<'a, C, NC, A> 
-                                                        where T: Str {
-        self._scopes.insert(scope.as_slice().to_string(), ());
+                                                        where T: AsRef<str> {
+        self._scopes.insert(scope.as_ref().to_string(), ());
         self
     }
 }
@@ -17257,8 +17263,8 @@ impl<'a, C, NC, A> GroupUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
 ///
 /// ```test_harness,no_run
 /// # extern crate hyper;
-/// # extern crate "yup-oauth2" as oauth2;
-/// # extern crate "google-admin1_directory" as admin1_directory;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_admin1_directory as admin1_directory;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -17317,7 +17323,7 @@ impl<'a, C, NC, A> GroupDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
 
         let mut url = "https://www.googleapis.com/admin/directory/v1/groups/{groupKey}".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::DirectoryDeviceChromeo.as_slice().to_string(), ());
+            self._scopes.insert(Scope::DirectoryDeviceChromeo.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{groupKey}", "groupKey")].iter() {
@@ -17347,7 +17353,7 @@ impl<'a, C, NC, A> GroupDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
         
         if params.len() > 0 {
             url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
+            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_ref()))));
         }
 
 
@@ -17365,7 +17371,7 @@ impl<'a, C, NC, A> GroupDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
                                                              access_token: token.unwrap().access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Delete, url.as_slice())
+                let mut req = client.borrow_mut().request(hyper::method::Method::Delete, url.as_ref())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -17376,7 +17382,7 @@ impl<'a, C, NC, A> GroupDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
             match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
+                        sleep_ms(d.num_milliseconds() as u32);
                         continue;
                     }
                     dlg.finished(false);
@@ -17387,7 +17393,7 @@ impl<'a, C, NC, A> GroupDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
-                            sleep(d);
+                            sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
@@ -17442,8 +17448,8 @@ impl<'a, C, NC, A> GroupDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> GroupDeleteCall<'a, C, NC, A>
-                                                        where T: Str {
-        self._additional_params.insert(name.as_slice().to_string(), value.as_slice().to_string());
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
     }
 
@@ -17459,8 +17465,8 @@ impl<'a, C, NC, A> GroupDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T>(mut self, scope: T) -> GroupDeleteCall<'a, C, NC, A> 
-                                                        where T: Str {
-        self._scopes.insert(scope.as_slice().to_string(), ());
+                                                        where T: AsRef<str> {
+        self._scopes.insert(scope.as_ref().to_string(), ());
         self
     }
 }
@@ -17477,8 +17483,8 @@ impl<'a, C, NC, A> GroupDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
 ///
 /// ```test_harness,no_run
 /// # extern crate hyper;
-/// # extern crate "yup-oauth2" as oauth2;
-/// # extern crate "google-admin1_directory" as admin1_directory;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_admin1_directory as admin1_directory;
 /// use admin1_directory::Alias;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
@@ -17545,7 +17551,7 @@ impl<'a, C, NC, A> GroupAliaseInsertCall<'a, C, NC, A> where NC: hyper::net::Net
 
         let mut url = "https://www.googleapis.com/admin/directory/v1/groups/{groupKey}/aliases".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::DirectoryDeviceChromeo.as_slice().to_string(), ());
+            self._scopes.insert(Scope::DirectoryDeviceChromeo.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{groupKey}", "groupKey")].iter() {
@@ -17575,7 +17581,7 @@ impl<'a, C, NC, A> GroupAliaseInsertCall<'a, C, NC, A> where NC: hyper::net::Net
         
         if params.len() > 0 {
             url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
+            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_ref()))));
         }
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
@@ -17598,7 +17604,7 @@ impl<'a, C, NC, A> GroupAliaseInsertCall<'a, C, NC, A> where NC: hyper::net::Net
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.as_slice())
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.as_ref())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -17612,7 +17618,7 @@ impl<'a, C, NC, A> GroupAliaseInsertCall<'a, C, NC, A> where NC: hyper::net::Net
             match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
+                        sleep_ms(d.num_milliseconds() as u32);
                         continue;
                     }
                     dlg.finished(false);
@@ -17623,7 +17629,7 @@ impl<'a, C, NC, A> GroupAliaseInsertCall<'a, C, NC, A> where NC: hyper::net::Net
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
-                            sleep(d);
+                            sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
@@ -17697,8 +17703,8 @@ impl<'a, C, NC, A> GroupAliaseInsertCall<'a, C, NC, A> where NC: hyper::net::Net
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> GroupAliaseInsertCall<'a, C, NC, A>
-                                                        where T: Str {
-        self._additional_params.insert(name.as_slice().to_string(), value.as_slice().to_string());
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
     }
 
@@ -17714,8 +17720,8 @@ impl<'a, C, NC, A> GroupAliaseInsertCall<'a, C, NC, A> where NC: hyper::net::Net
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T>(mut self, scope: T) -> GroupAliaseInsertCall<'a, C, NC, A> 
-                                                        where T: Str {
-        self._scopes.insert(scope.as_slice().to_string(), ());
+                                                        where T: AsRef<str> {
+        self._scopes.insert(scope.as_ref().to_string(), ());
         self
     }
 }
@@ -17732,8 +17738,8 @@ impl<'a, C, NC, A> GroupAliaseInsertCall<'a, C, NC, A> where NC: hyper::net::Net
 ///
 /// ```test_harness,no_run
 /// # extern crate hyper;
-/// # extern crate "yup-oauth2" as oauth2;
-/// # extern crate "google-admin1_directory" as admin1_directory;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_admin1_directory as admin1_directory;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -17794,7 +17800,7 @@ impl<'a, C, NC, A> GroupAliaseDeleteCall<'a, C, NC, A> where NC: hyper::net::Net
 
         let mut url = "https://www.googleapis.com/admin/directory/v1/groups/{groupKey}/aliases/{alias}".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::DirectoryDeviceChromeo.as_slice().to_string(), ());
+            self._scopes.insert(Scope::DirectoryDeviceChromeo.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{groupKey}", "groupKey"), ("{alias}", "alias")].iter() {
@@ -17824,7 +17830,7 @@ impl<'a, C, NC, A> GroupAliaseDeleteCall<'a, C, NC, A> where NC: hyper::net::Net
         
         if params.len() > 0 {
             url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
+            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_ref()))));
         }
 
 
@@ -17842,7 +17848,7 @@ impl<'a, C, NC, A> GroupAliaseDeleteCall<'a, C, NC, A> where NC: hyper::net::Net
                                                              access_token: token.unwrap().access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Delete, url.as_slice())
+                let mut req = client.borrow_mut().request(hyper::method::Method::Delete, url.as_ref())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -17853,7 +17859,7 @@ impl<'a, C, NC, A> GroupAliaseDeleteCall<'a, C, NC, A> where NC: hyper::net::Net
             match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
+                        sleep_ms(d.num_milliseconds() as u32);
                         continue;
                     }
                     dlg.finished(false);
@@ -17864,7 +17870,7 @@ impl<'a, C, NC, A> GroupAliaseDeleteCall<'a, C, NC, A> where NC: hyper::net::Net
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
-                            sleep(d);
+                            sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
@@ -17929,8 +17935,8 @@ impl<'a, C, NC, A> GroupAliaseDeleteCall<'a, C, NC, A> where NC: hyper::net::Net
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> GroupAliaseDeleteCall<'a, C, NC, A>
-                                                        where T: Str {
-        self._additional_params.insert(name.as_slice().to_string(), value.as_slice().to_string());
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
     }
 
@@ -17946,8 +17952,8 @@ impl<'a, C, NC, A> GroupAliaseDeleteCall<'a, C, NC, A> where NC: hyper::net::Net
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T>(mut self, scope: T) -> GroupAliaseDeleteCall<'a, C, NC, A> 
-                                                        where T: Str {
-        self._scopes.insert(scope.as_slice().to_string(), ());
+                                                        where T: AsRef<str> {
+        self._scopes.insert(scope.as_ref().to_string(), ());
         self
     }
 }
@@ -17964,8 +17970,8 @@ impl<'a, C, NC, A> GroupAliaseDeleteCall<'a, C, NC, A> where NC: hyper::net::Net
 ///
 /// ```test_harness,no_run
 /// # extern crate hyper;
-/// # extern crate "yup-oauth2" as oauth2;
-/// # extern crate "google-admin1_directory" as admin1_directory;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_admin1_directory as admin1_directory;
 /// use admin1_directory::Group;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
@@ -18030,13 +18036,13 @@ impl<'a, C, NC, A> GroupInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
 
         let mut url = "https://www.googleapis.com/admin/directory/v1/groups".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::DirectoryDeviceChromeo.as_slice().to_string(), ());
+            self._scopes.insert(Scope::DirectoryDeviceChromeo.as_ref().to_string(), ());
         }
 
         
         if params.len() > 0 {
             url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
+            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_ref()))));
         }
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
@@ -18059,7 +18065,7 @@ impl<'a, C, NC, A> GroupInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.as_slice())
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.as_ref())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -18073,7 +18079,7 @@ impl<'a, C, NC, A> GroupInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
             match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
+                        sleep_ms(d.num_milliseconds() as u32);
                         continue;
                     }
                     dlg.finished(false);
@@ -18084,7 +18090,7 @@ impl<'a, C, NC, A> GroupInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
-                            sleep(d);
+                            sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
@@ -18148,8 +18154,8 @@ impl<'a, C, NC, A> GroupInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> GroupInsertCall<'a, C, NC, A>
-                                                        where T: Str {
-        self._additional_params.insert(name.as_slice().to_string(), value.as_slice().to_string());
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
     }
 
@@ -18165,8 +18171,8 @@ impl<'a, C, NC, A> GroupInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T>(mut self, scope: T) -> GroupInsertCall<'a, C, NC, A> 
-                                                        where T: Str {
-        self._scopes.insert(scope.as_slice().to_string(), ());
+                                                        where T: AsRef<str> {
+        self._scopes.insert(scope.as_ref().to_string(), ());
         self
     }
 }
@@ -18183,8 +18189,8 @@ impl<'a, C, NC, A> GroupInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
 ///
 /// ```test_harness,no_run
 /// # extern crate hyper;
-/// # extern crate "yup-oauth2" as oauth2;
-/// # extern crate "google-admin1_directory" as admin1_directory;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_admin1_directory as admin1_directory;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -18245,7 +18251,7 @@ impl<'a, C, NC, A> AspDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
 
         let mut url = "https://www.googleapis.com/admin/directory/v1/users/{userKey}/asps/{codeId}".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::DirectoryDeviceChromeo.as_slice().to_string(), ());
+            self._scopes.insert(Scope::DirectoryDeviceChromeo.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{userKey}", "userKey"), ("{codeId}", "codeId")].iter() {
@@ -18275,7 +18281,7 @@ impl<'a, C, NC, A> AspDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
         
         if params.len() > 0 {
             url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
+            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_ref()))));
         }
 
 
@@ -18293,7 +18299,7 @@ impl<'a, C, NC, A> AspDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
                                                              access_token: token.unwrap().access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Delete, url.as_slice())
+                let mut req = client.borrow_mut().request(hyper::method::Method::Delete, url.as_ref())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -18304,7 +18310,7 @@ impl<'a, C, NC, A> AspDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
             match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
+                        sleep_ms(d.num_milliseconds() as u32);
                         continue;
                     }
                     dlg.finished(false);
@@ -18315,7 +18321,7 @@ impl<'a, C, NC, A> AspDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
-                            sleep(d);
+                            sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
@@ -18380,8 +18386,8 @@ impl<'a, C, NC, A> AspDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> AspDeleteCall<'a, C, NC, A>
-                                                        where T: Str {
-        self._additional_params.insert(name.as_slice().to_string(), value.as_slice().to_string());
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
     }
 
@@ -18397,8 +18403,8 @@ impl<'a, C, NC, A> AspDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T>(mut self, scope: T) -> AspDeleteCall<'a, C, NC, A> 
-                                                        where T: Str {
-        self._scopes.insert(scope.as_slice().to_string(), ());
+                                                        where T: AsRef<str> {
+        self._scopes.insert(scope.as_ref().to_string(), ());
         self
     }
 }
@@ -18415,8 +18421,8 @@ impl<'a, C, NC, A> AspDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
 ///
 /// ```test_harness,no_run
 /// # extern crate hyper;
-/// # extern crate "yup-oauth2" as oauth2;
-/// # extern crate "google-admin1_directory" as admin1_directory;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_admin1_directory as admin1_directory;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -18476,7 +18482,7 @@ impl<'a, C, NC, A> AspListCall<'a, C, NC, A> where NC: hyper::net::NetworkConnec
 
         let mut url = "https://www.googleapis.com/admin/directory/v1/users/{userKey}/asps".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::DirectoryDeviceChromeoReadonly.as_slice().to_string(), ());
+            self._scopes.insert(Scope::DirectoryDeviceChromeoReadonly.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{userKey}", "userKey")].iter() {
@@ -18506,7 +18512,7 @@ impl<'a, C, NC, A> AspListCall<'a, C, NC, A> where NC: hyper::net::NetworkConnec
         
         if params.len() > 0 {
             url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
+            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_ref()))));
         }
 
 
@@ -18524,7 +18530,7 @@ impl<'a, C, NC, A> AspListCall<'a, C, NC, A> where NC: hyper::net::NetworkConnec
                                                              access_token: token.unwrap().access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_slice())
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_ref())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -18535,7 +18541,7 @@ impl<'a, C, NC, A> AspListCall<'a, C, NC, A> where NC: hyper::net::NetworkConnec
             match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
+                        sleep_ms(d.num_milliseconds() as u32);
                         continue;
                     }
                     dlg.finished(false);
@@ -18546,7 +18552,7 @@ impl<'a, C, NC, A> AspListCall<'a, C, NC, A> where NC: hyper::net::NetworkConnec
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
-                            sleep(d);
+                            sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
@@ -18611,8 +18617,8 @@ impl<'a, C, NC, A> AspListCall<'a, C, NC, A> where NC: hyper::net::NetworkConnec
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> AspListCall<'a, C, NC, A>
-                                                        where T: Str {
-        self._additional_params.insert(name.as_slice().to_string(), value.as_slice().to_string());
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
     }
 
@@ -18628,8 +18634,8 @@ impl<'a, C, NC, A> AspListCall<'a, C, NC, A> where NC: hyper::net::NetworkConnec
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T>(mut self, scope: T) -> AspListCall<'a, C, NC, A> 
-                                                        where T: Str {
-        self._scopes.insert(scope.as_slice().to_string(), ());
+                                                        where T: AsRef<str> {
+        self._scopes.insert(scope.as_ref().to_string(), ());
         self
     }
 }
@@ -18646,8 +18652,8 @@ impl<'a, C, NC, A> AspListCall<'a, C, NC, A> where NC: hyper::net::NetworkConnec
 ///
 /// ```test_harness,no_run
 /// # extern crate hyper;
-/// # extern crate "yup-oauth2" as oauth2;
-/// # extern crate "google-admin1_directory" as admin1_directory;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_admin1_directory as admin1_directory;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -18709,7 +18715,7 @@ impl<'a, C, NC, A> AspGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnect
 
         let mut url = "https://www.googleapis.com/admin/directory/v1/users/{userKey}/asps/{codeId}".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::DirectoryDeviceChromeoReadonly.as_slice().to_string(), ());
+            self._scopes.insert(Scope::DirectoryDeviceChromeoReadonly.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{userKey}", "userKey"), ("{codeId}", "codeId")].iter() {
@@ -18739,7 +18745,7 @@ impl<'a, C, NC, A> AspGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnect
         
         if params.len() > 0 {
             url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
+            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_ref()))));
         }
 
 
@@ -18757,7 +18763,7 @@ impl<'a, C, NC, A> AspGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnect
                                                              access_token: token.unwrap().access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_slice())
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_ref())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -18768,7 +18774,7 @@ impl<'a, C, NC, A> AspGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnect
             match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
+                        sleep_ms(d.num_milliseconds() as u32);
                         continue;
                     }
                     dlg.finished(false);
@@ -18779,7 +18785,7 @@ impl<'a, C, NC, A> AspGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnect
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
-                            sleep(d);
+                            sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
@@ -18854,8 +18860,8 @@ impl<'a, C, NC, A> AspGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnect
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> AspGetCall<'a, C, NC, A>
-                                                        where T: Str {
-        self._additional_params.insert(name.as_slice().to_string(), value.as_slice().to_string());
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
     }
 
@@ -18871,8 +18877,8 @@ impl<'a, C, NC, A> AspGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnect
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T>(mut self, scope: T) -> AspGetCall<'a, C, NC, A> 
-                                                        where T: Str {
-        self._scopes.insert(scope.as_slice().to_string(), ());
+                                                        where T: AsRef<str> {
+        self._scopes.insert(scope.as_ref().to_string(), ());
         self
     }
 }
@@ -18889,8 +18895,8 @@ impl<'a, C, NC, A> AspGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConnect
 ///
 /// ```test_harness,no_run
 /// # extern crate hyper;
-/// # extern crate "yup-oauth2" as oauth2;
-/// # extern crate "google-admin1_directory" as admin1_directory;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_admin1_directory as admin1_directory;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -18950,7 +18956,7 @@ impl<'a, C, NC, A> SchemaListCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
 
         let mut url = "https://www.googleapis.com/admin/directory/v1/customer/{customerId}/schemas".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::DirectoryDeviceChromeoReadonly.as_slice().to_string(), ());
+            self._scopes.insert(Scope::DirectoryDeviceChromeoReadonly.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{customerId}", "customerId")].iter() {
@@ -18980,7 +18986,7 @@ impl<'a, C, NC, A> SchemaListCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
         
         if params.len() > 0 {
             url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
+            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_ref()))));
         }
 
 
@@ -18998,7 +19004,7 @@ impl<'a, C, NC, A> SchemaListCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
                                                              access_token: token.unwrap().access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_slice())
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_ref())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -19009,7 +19015,7 @@ impl<'a, C, NC, A> SchemaListCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
             match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
+                        sleep_ms(d.num_milliseconds() as u32);
                         continue;
                     }
                     dlg.finished(false);
@@ -19020,7 +19026,7 @@ impl<'a, C, NC, A> SchemaListCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
-                            sleep(d);
+                            sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
@@ -19085,8 +19091,8 @@ impl<'a, C, NC, A> SchemaListCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> SchemaListCall<'a, C, NC, A>
-                                                        where T: Str {
-        self._additional_params.insert(name.as_slice().to_string(), value.as_slice().to_string());
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
     }
 
@@ -19102,8 +19108,8 @@ impl<'a, C, NC, A> SchemaListCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T>(mut self, scope: T) -> SchemaListCall<'a, C, NC, A> 
-                                                        where T: Str {
-        self._scopes.insert(scope.as_slice().to_string(), ());
+                                                        where T: AsRef<str> {
+        self._scopes.insert(scope.as_ref().to_string(), ());
         self
     }
 }
@@ -19120,8 +19126,8 @@ impl<'a, C, NC, A> SchemaListCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
 ///
 /// ```test_harness,no_run
 /// # extern crate hyper;
-/// # extern crate "yup-oauth2" as oauth2;
-/// # extern crate "google-admin1_directory" as admin1_directory;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_admin1_directory as admin1_directory;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -19183,7 +19189,7 @@ impl<'a, C, NC, A> SchemaGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
 
         let mut url = "https://www.googleapis.com/admin/directory/v1/customer/{customerId}/schemas/{schemaKey}".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::DirectoryDeviceChromeoReadonly.as_slice().to_string(), ());
+            self._scopes.insert(Scope::DirectoryDeviceChromeoReadonly.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{customerId}", "customerId"), ("{schemaKey}", "schemaKey")].iter() {
@@ -19213,7 +19219,7 @@ impl<'a, C, NC, A> SchemaGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
         
         if params.len() > 0 {
             url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
+            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_ref()))));
         }
 
 
@@ -19231,7 +19237,7 @@ impl<'a, C, NC, A> SchemaGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
                                                              access_token: token.unwrap().access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_slice())
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_ref())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -19242,7 +19248,7 @@ impl<'a, C, NC, A> SchemaGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
             match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
+                        sleep_ms(d.num_milliseconds() as u32);
                         continue;
                     }
                     dlg.finished(false);
@@ -19253,7 +19259,7 @@ impl<'a, C, NC, A> SchemaGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
-                            sleep(d);
+                            sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
@@ -19328,8 +19334,8 @@ impl<'a, C, NC, A> SchemaGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> SchemaGetCall<'a, C, NC, A>
-                                                        where T: Str {
-        self._additional_params.insert(name.as_slice().to_string(), value.as_slice().to_string());
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
     }
 
@@ -19345,8 +19351,8 @@ impl<'a, C, NC, A> SchemaGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T>(mut self, scope: T) -> SchemaGetCall<'a, C, NC, A> 
-                                                        where T: Str {
-        self._scopes.insert(scope.as_slice().to_string(), ());
+                                                        where T: AsRef<str> {
+        self._scopes.insert(scope.as_ref().to_string(), ());
         self
     }
 }
@@ -19363,8 +19369,8 @@ impl<'a, C, NC, A> SchemaGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
 ///
 /// ```test_harness,no_run
 /// # extern crate hyper;
-/// # extern crate "yup-oauth2" as oauth2;
-/// # extern crate "google-admin1_directory" as admin1_directory;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_admin1_directory as admin1_directory;
 /// use admin1_directory::Schema;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
@@ -19433,7 +19439,7 @@ impl<'a, C, NC, A> SchemaPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
 
         let mut url = "https://www.googleapis.com/admin/directory/v1/customer/{customerId}/schemas/{schemaKey}".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::DirectoryDeviceChromeo.as_slice().to_string(), ());
+            self._scopes.insert(Scope::DirectoryDeviceChromeo.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{customerId}", "customerId"), ("{schemaKey}", "schemaKey")].iter() {
@@ -19463,7 +19469,7 @@ impl<'a, C, NC, A> SchemaPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
         
         if params.len() > 0 {
             url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
+            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_ref()))));
         }
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
@@ -19486,7 +19492,7 @@ impl<'a, C, NC, A> SchemaPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Patch, url.as_slice())
+                let mut req = client.borrow_mut().request(hyper::method::Method::Patch, url.as_ref())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -19500,7 +19506,7 @@ impl<'a, C, NC, A> SchemaPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
             match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
+                        sleep_ms(d.num_milliseconds() as u32);
                         continue;
                     }
                     dlg.finished(false);
@@ -19511,7 +19517,7 @@ impl<'a, C, NC, A> SchemaPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
-                            sleep(d);
+                            sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
@@ -19595,8 +19601,8 @@ impl<'a, C, NC, A> SchemaPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> SchemaPatchCall<'a, C, NC, A>
-                                                        where T: Str {
-        self._additional_params.insert(name.as_slice().to_string(), value.as_slice().to_string());
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
     }
 
@@ -19612,8 +19618,8 @@ impl<'a, C, NC, A> SchemaPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T>(mut self, scope: T) -> SchemaPatchCall<'a, C, NC, A> 
-                                                        where T: Str {
-        self._scopes.insert(scope.as_slice().to_string(), ());
+                                                        where T: AsRef<str> {
+        self._scopes.insert(scope.as_ref().to_string(), ());
         self
     }
 }
@@ -19630,8 +19636,8 @@ impl<'a, C, NC, A> SchemaPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
 ///
 /// ```test_harness,no_run
 /// # extern crate hyper;
-/// # extern crate "yup-oauth2" as oauth2;
-/// # extern crate "google-admin1_directory" as admin1_directory;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_admin1_directory as admin1_directory;
 /// use admin1_directory::Schema;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
@@ -19698,7 +19704,7 @@ impl<'a, C, NC, A> SchemaInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkC
 
         let mut url = "https://www.googleapis.com/admin/directory/v1/customer/{customerId}/schemas".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::DirectoryDeviceChromeo.as_slice().to_string(), ());
+            self._scopes.insert(Scope::DirectoryDeviceChromeo.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{customerId}", "customerId")].iter() {
@@ -19728,7 +19734,7 @@ impl<'a, C, NC, A> SchemaInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkC
         
         if params.len() > 0 {
             url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
+            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_ref()))));
         }
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
@@ -19751,7 +19757,7 @@ impl<'a, C, NC, A> SchemaInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkC
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.as_slice())
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.as_ref())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -19765,7 +19771,7 @@ impl<'a, C, NC, A> SchemaInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkC
             match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
+                        sleep_ms(d.num_milliseconds() as u32);
                         continue;
                     }
                     dlg.finished(false);
@@ -19776,7 +19782,7 @@ impl<'a, C, NC, A> SchemaInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkC
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
-                            sleep(d);
+                            sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
@@ -19850,8 +19856,8 @@ impl<'a, C, NC, A> SchemaInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> SchemaInsertCall<'a, C, NC, A>
-                                                        where T: Str {
-        self._additional_params.insert(name.as_slice().to_string(), value.as_slice().to_string());
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
     }
 
@@ -19867,8 +19873,8 @@ impl<'a, C, NC, A> SchemaInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T>(mut self, scope: T) -> SchemaInsertCall<'a, C, NC, A> 
-                                                        where T: Str {
-        self._scopes.insert(scope.as_slice().to_string(), ());
+                                                        where T: AsRef<str> {
+        self._scopes.insert(scope.as_ref().to_string(), ());
         self
     }
 }
@@ -19885,8 +19891,8 @@ impl<'a, C, NC, A> SchemaInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkC
 ///
 /// ```test_harness,no_run
 /// # extern crate hyper;
-/// # extern crate "yup-oauth2" as oauth2;
-/// # extern crate "google-admin1_directory" as admin1_directory;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_admin1_directory as admin1_directory;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -19947,7 +19953,7 @@ impl<'a, C, NC, A> SchemaDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkC
 
         let mut url = "https://www.googleapis.com/admin/directory/v1/customer/{customerId}/schemas/{schemaKey}".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::DirectoryDeviceChromeo.as_slice().to_string(), ());
+            self._scopes.insert(Scope::DirectoryDeviceChromeo.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{customerId}", "customerId"), ("{schemaKey}", "schemaKey")].iter() {
@@ -19977,7 +19983,7 @@ impl<'a, C, NC, A> SchemaDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkC
         
         if params.len() > 0 {
             url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
+            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_ref()))));
         }
 
 
@@ -19995,7 +20001,7 @@ impl<'a, C, NC, A> SchemaDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkC
                                                              access_token: token.unwrap().access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Delete, url.as_slice())
+                let mut req = client.borrow_mut().request(hyper::method::Method::Delete, url.as_ref())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -20006,7 +20012,7 @@ impl<'a, C, NC, A> SchemaDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkC
             match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
+                        sleep_ms(d.num_milliseconds() as u32);
                         continue;
                     }
                     dlg.finished(false);
@@ -20017,7 +20023,7 @@ impl<'a, C, NC, A> SchemaDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkC
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
-                            sleep(d);
+                            sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
@@ -20082,8 +20088,8 @@ impl<'a, C, NC, A> SchemaDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> SchemaDeleteCall<'a, C, NC, A>
-                                                        where T: Str {
-        self._additional_params.insert(name.as_slice().to_string(), value.as_slice().to_string());
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
     }
 
@@ -20099,8 +20105,8 @@ impl<'a, C, NC, A> SchemaDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T>(mut self, scope: T) -> SchemaDeleteCall<'a, C, NC, A> 
-                                                        where T: Str {
-        self._scopes.insert(scope.as_slice().to_string(), ());
+                                                        where T: AsRef<str> {
+        self._scopes.insert(scope.as_ref().to_string(), ());
         self
     }
 }
@@ -20117,8 +20123,8 @@ impl<'a, C, NC, A> SchemaDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkC
 ///
 /// ```test_harness,no_run
 /// # extern crate hyper;
-/// # extern crate "yup-oauth2" as oauth2;
-/// # extern crate "google-admin1_directory" as admin1_directory;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_admin1_directory as admin1_directory;
 /// use admin1_directory::Schema;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
@@ -20187,7 +20193,7 @@ impl<'a, C, NC, A> SchemaUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkC
 
         let mut url = "https://www.googleapis.com/admin/directory/v1/customer/{customerId}/schemas/{schemaKey}".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::DirectoryDeviceChromeo.as_slice().to_string(), ());
+            self._scopes.insert(Scope::DirectoryDeviceChromeo.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{customerId}", "customerId"), ("{schemaKey}", "schemaKey")].iter() {
@@ -20217,7 +20223,7 @@ impl<'a, C, NC, A> SchemaUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkC
         
         if params.len() > 0 {
             url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
+            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_ref()))));
         }
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
@@ -20240,7 +20246,7 @@ impl<'a, C, NC, A> SchemaUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkC
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Put, url.as_slice())
+                let mut req = client.borrow_mut().request(hyper::method::Method::Put, url.as_ref())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -20254,7 +20260,7 @@ impl<'a, C, NC, A> SchemaUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkC
             match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
+                        sleep_ms(d.num_milliseconds() as u32);
                         continue;
                     }
                     dlg.finished(false);
@@ -20265,7 +20271,7 @@ impl<'a, C, NC, A> SchemaUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkC
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
-                            sleep(d);
+                            sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
@@ -20349,8 +20355,8 @@ impl<'a, C, NC, A> SchemaUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> SchemaUpdateCall<'a, C, NC, A>
-                                                        where T: Str {
-        self._additional_params.insert(name.as_slice().to_string(), value.as_slice().to_string());
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
     }
 
@@ -20366,8 +20372,8 @@ impl<'a, C, NC, A> SchemaUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T>(mut self, scope: T) -> SchemaUpdateCall<'a, C, NC, A> 
-                                                        where T: Str {
-        self._scopes.insert(scope.as_slice().to_string(), ());
+                                                        where T: AsRef<str> {
+        self._scopes.insert(scope.as_ref().to_string(), ());
         self
     }
 }

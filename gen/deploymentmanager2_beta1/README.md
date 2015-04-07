@@ -5,7 +5,7 @@ DO NOT EDIT !
 -->
 The `google-deploymentmanager2_beta1` library allows access to all features of the *Google deploymentmanager* service.
 
-This documentation was generated from *deploymentmanager* crate version *0.1.2+20141215*, where *20141215* is the exact revision of the *deploymentmanager:v2beta1* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.2*.
+This documentation was generated from *deploymentmanager* crate version *0.1.2+20150303*, where *20150303* is the exact revision of the *deploymentmanager:v2beta1* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.2*.
 
 Everything else about the *deploymentmanager* *v2_beta1* API can be found at the
 [official documentation site](https://developers.google.com/deployment-manager/).
@@ -81,8 +81,8 @@ google-deploymentmanager2_beta1 = "*"
 
 ```Rust
 extern crate hyper;
-extern crate "yup-oauth2" as oauth2;
-extern crate "google-deploymentmanager2_beta1" as deploymentmanager2_beta1;
+extern crate yup_oauth2 as oauth2;
+extern crate google_deploymentmanager2_beta1 as deploymentmanager2_beta1;
 use deploymentmanager2_beta1::{Result, Error};
 use std::default::Default;
 use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};

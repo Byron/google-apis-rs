@@ -5,7 +5,7 @@ DO NOT EDIT !
 -->
 The `google-gamesmanagement1_management` library allows access to all features of the *Google Games Management* service.
 
-This documentation was generated from *Games Management* crate version *0.1.2+20150316*, where *20150316* is the exact revision of the *gamesManagement:v1management* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.2*.
+This documentation was generated from *Games Management* crate version *0.1.2+20150325*, where *20150325* is the exact revision of the *gamesManagement:v1management* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.2*.
 
 Everything else about the *Games Management* *v1_management* API can be found at the
 [official documentation site](https://developers.google.com/games/services).
@@ -85,8 +85,8 @@ google-gamesmanagement1_management = "*"
 
 ```Rust
 extern crate hyper;
-extern crate "yup-oauth2" as oauth2;
-extern crate "google-gamesmanagement1_management" as gamesmanagement1_management;
+extern crate yup_oauth2 as oauth2;
+extern crate google_gamesmanagement1_management as gamesmanagement1_management;
 use gamesmanagement1_management::{Result, Error};
 use std::default::Default;
 use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};

@@ -79,8 +79,8 @@ google-autoscaler1_beta2 = "*"
 
 ```Rust
 extern crate hyper;
-extern crate "yup-oauth2" as oauth2;
-extern crate "google-autoscaler1_beta2" as autoscaler1_beta2;
+extern crate yup_oauth2 as oauth2;
+extern crate google_autoscaler1_beta2 as autoscaler1_beta2;
 use autoscaler1_beta2::{Result, Error};
 use std::default::Default;
 use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};

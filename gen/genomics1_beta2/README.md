@@ -5,7 +5,7 @@ DO NOT EDIT !
 -->
 The `google-genomics1_beta2` library allows access to all features of the *Google genomics* service.
 
-This documentation was generated from *genomics* crate version *0.1.2+20150317*, where *20150317* is the exact revision of the *genomics:v1beta2* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.2*.
+This documentation was generated from *genomics* crate version *0.1.2+20150326*, where *20150326* is the exact revision of the *genomics:v1beta2* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.2*.
 
 Everything else about the *genomics* *v1_beta2* API can be found at the
 [official documentation site](https://developers.google.com/genomics/v1beta2/reference).
@@ -33,6 +33,8 @@ Handle the following *Resources* with ease from the central [hub](http://byron.g
  * [*bases list*](http://byron.github.io/google-apis-rs/google-genomics1_beta2/struct.ReferenceBaseListCall.html), [*get*](http://byron.github.io/google-apis-rs/google-genomics1_beta2/struct.ReferenceGetCall.html) and [*search*](http://byron.github.io/google-apis-rs/google-genomics1_beta2/struct.ReferenceSearchCall.html)
 * referencesets
  * [*get*](http://byron.github.io/google-apis-rs/google-genomics1_beta2/struct.ReferencesetGetCall.html) and [*search*](http://byron.github.io/google-apis-rs/google-genomics1_beta2/struct.ReferencesetSearchCall.html)
+* streaming variant store
+ * [*streamvariants*](http://byron.github.io/google-apis-rs/google-genomics1_beta2/struct.StreamingVariantStoreStreamvariantCall.html)
 * [variants](http://byron.github.io/google-apis-rs/google-genomics1_beta2/struct.Variant.html)
  * [*create*](http://byron.github.io/google-apis-rs/google-genomics1_beta2/struct.VariantCreateCall.html), [*delete*](http://byron.github.io/google-apis-rs/google-genomics1_beta2/struct.VariantDeleteCall.html), [*get*](http://byron.github.io/google-apis-rs/google-genomics1_beta2/struct.VariantGetCall.html), [*search*](http://byron.github.io/google-apis-rs/google-genomics1_beta2/struct.VariantSearchCall.html) and [*update*](http://byron.github.io/google-apis-rs/google-genomics1_beta2/struct.VariantUpdateCall.html)
 * variantsets
@@ -98,8 +100,8 @@ google-genomics1_beta2 = "*"
 
 ```Rust
 extern crate hyper;
-extern crate "yup-oauth2" as oauth2;
-extern crate "google-genomics1_beta2" as genomics1_beta2;
+extern crate yup_oauth2 as oauth2;
+extern crate google_genomics1_beta2 as genomics1_beta2;
 use genomics1_beta2::Annotation;
 use genomics1_beta2::{Result, Error};
 use std::default::Default;

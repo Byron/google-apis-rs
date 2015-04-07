@@ -72,8 +72,8 @@ google-groupssettings1 = "*"
 
 ```Rust
 extern crate hyper;
-extern crate "yup-oauth2" as oauth2;
-extern crate "google-groupssettings1" as groupssettings1;
+extern crate yup_oauth2 as oauth2;
+extern crate google_groupssettings1 as groupssettings1;
 use groupssettings1::Groups;
 use groupssettings1::{Result, Error};
 use std::default::Default;

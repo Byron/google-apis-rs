@@ -79,8 +79,8 @@ google-replicapoolupdater1_beta1 = "*"
 
 ```Rust
 extern crate hyper;
-extern crate "yup-oauth2" as oauth2;
-extern crate "google-replicapoolupdater1_beta1" as replicapoolupdater1_beta1;
+extern crate yup_oauth2 as oauth2;
+extern crate google_replicapoolupdater1_beta1 as replicapoolupdater1_beta1;
 use replicapoolupdater1_beta1::{Result, Error};
 use std::default::Default;
 use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};

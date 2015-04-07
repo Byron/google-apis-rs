@@ -79,8 +79,8 @@
 //! 
 //! ```test_harness,no_run
 //! extern crate hyper;
-//! extern crate "yup-oauth2" as oauth2;
-//! extern crate "google-replicapoolupdater1_beta1" as replicapoolupdater1_beta1;
+//! extern crate yup_oauth2 as oauth2;
+//! extern crate google_replicapoolupdater1_beta1 as replicapoolupdater1_beta1;
 //! use replicapoolupdater1_beta1::{Result, Error};
 //! # #[test] fn egal() {
 //! use std::default::Default;
@@ -177,20 +177,20 @@
 //! [google-go-api]: https://github.com/google/google-api-go-client
 //! 
 //! 
-#![feature(core,io,thread_sleep)]
+#![feature(std_misc)]
 // Unused attributes happen thanks to defined, but unused structures
 // We don't warn about this, as depending on the API, some data structures or facilities are never used.
 // Instead of pre-determining this, we just disable the lint. It's manually tuned to not have any 
 // unused imports in fully featured APIs. Same with unused_mut ... .
 #![allow(unused_imports, unused_mut, dead_code)]
 // Required for serde annotations
-#![feature(custom_derive, custom_attribute, plugin)]
+#![feature(custom_derive, custom_attribute, plugin, slice_patterns)]
 #![plugin(serde_macros)]
 
 #[macro_use]
 extern crate hyper;
 extern crate serde;
-extern crate "yup-oauth2" as oauth2;
+extern crate yup_oauth2 as oauth2;
 extern crate mime;
 extern crate url;
 
@@ -205,7 +205,7 @@ use std::marker::PhantomData;
 use serde::json;
 use std::io;
 use std::fs;
-use std::thread::sleep;
+use std::thread::sleep_ms;
 
 pub use cmn::{MultiPartReader, ToParts, MethodInfo, Result, Error, CallBuilder, Hub, ReadSeek, Part, ResponseResult, RequestValue, NestedType, Delegate, DefaultDelegate, MethodsBuilder, Resource, JsonServerError};
 
@@ -229,8 +229,8 @@ pub enum Scope {
     ReplicapoolReadonly,
 }
 
-impl Str for Scope {
-    fn as_slice(&self) -> &str {
+impl AsRef<str> for Scope {
+    fn as_ref(&self) -> &str {
         match *self {
             Scope::CloudPlatform => "https://www.googleapis.com/auth/cloud-platform",
             Scope::Replicapool => "https://www.googleapis.com/auth/replicapool",
@@ -259,8 +259,8 @@ impl Default for Scope {
 ///
 /// ```test_harness,no_run
 /// extern crate hyper;
-/// extern crate "yup-oauth2" as oauth2;
-/// extern crate "google-replicapoolupdater1_beta1" as replicapoolupdater1_beta1;
+/// extern crate yup_oauth2 as oauth2;
+/// extern crate google_replicapoolupdater1_beta1 as replicapoolupdater1_beta1;
 /// use replicapoolupdater1_beta1::{Result, Error};
 /// # #[test] fn egal() {
 /// use std::default::Default;
@@ -745,8 +745,8 @@ impl ResponseResult for RollingUpdateList {}
 ///
 /// ```test_harness,no_run
 /// extern crate hyper;
-/// extern crate "yup-oauth2" as oauth2;
-/// extern crate "google-replicapoolupdater1_beta1" as replicapoolupdater1_beta1;
+/// extern crate yup_oauth2 as oauth2;
+/// extern crate google_replicapoolupdater1_beta1 as replicapoolupdater1_beta1;
 /// 
 /// # #[test] fn egal() {
 /// use std::default::Default;
@@ -959,8 +959,8 @@ impl<'a, C, NC, A> RollingUpdateMethods<'a, C, NC, A> {
 ///
 /// ```test_harness,no_run
 /// extern crate hyper;
-/// extern crate "yup-oauth2" as oauth2;
-/// extern crate "google-replicapoolupdater1_beta1" as replicapoolupdater1_beta1;
+/// extern crate yup_oauth2 as oauth2;
+/// extern crate google_replicapoolupdater1_beta1 as replicapoolupdater1_beta1;
 /// 
 /// # #[test] fn egal() {
 /// use std::default::Default;
@@ -1029,8 +1029,8 @@ impl<'a, C, NC, A> ZoneOperationMethods<'a, C, NC, A> {
 ///
 /// ```test_harness,no_run
 /// # extern crate hyper;
-/// # extern crate "yup-oauth2" as oauth2;
-/// # extern crate "google-replicapoolupdater1_beta1" as replicapoolupdater1_beta1;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_replicapoolupdater1_beta1 as replicapoolupdater1_beta1;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -1094,7 +1094,7 @@ impl<'a, C, NC, A> RollingUpdatePauseCall<'a, C, NC, A> where NC: hyper::net::Ne
 
         let mut url = "https://www.googleapis.com/replicapoolupdater/v1beta1/projects/{project}/zones/{zone}/rollingUpdates/{rollingUpdate}/pause".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::CloudPlatform.as_slice().to_string(), ());
+            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{project}", "project"), ("{zone}", "zone"), ("{rollingUpdate}", "rollingUpdate")].iter() {
@@ -1124,7 +1124,7 @@ impl<'a, C, NC, A> RollingUpdatePauseCall<'a, C, NC, A> where NC: hyper::net::Ne
         
         if params.len() > 0 {
             url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
+            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_ref()))));
         }
 
 
@@ -1142,7 +1142,7 @@ impl<'a, C, NC, A> RollingUpdatePauseCall<'a, C, NC, A> where NC: hyper::net::Ne
                                                              access_token: token.unwrap().access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.as_slice())
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.as_ref())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -1153,7 +1153,7 @@ impl<'a, C, NC, A> RollingUpdatePauseCall<'a, C, NC, A> where NC: hyper::net::Ne
             match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
+                        sleep_ms(d.num_milliseconds() as u32);
                         continue;
                     }
                     dlg.finished(false);
@@ -1164,7 +1164,7 @@ impl<'a, C, NC, A> RollingUpdatePauseCall<'a, C, NC, A> where NC: hyper::net::Ne
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
-                            sleep(d);
+                            sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
@@ -1249,8 +1249,8 @@ impl<'a, C, NC, A> RollingUpdatePauseCall<'a, C, NC, A> where NC: hyper::net::Ne
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> RollingUpdatePauseCall<'a, C, NC, A>
-                                                        where T: Str {
-        self._additional_params.insert(name.as_slice().to_string(), value.as_slice().to_string());
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
     }
 
@@ -1266,8 +1266,8 @@ impl<'a, C, NC, A> RollingUpdatePauseCall<'a, C, NC, A> where NC: hyper::net::Ne
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T>(mut self, scope: T) -> RollingUpdatePauseCall<'a, C, NC, A> 
-                                                        where T: Str {
-        self._scopes.insert(scope.as_slice().to_string(), ());
+                                                        where T: AsRef<str> {
+        self._scopes.insert(scope.as_ref().to_string(), ());
         self
     }
 }
@@ -1284,8 +1284,8 @@ impl<'a, C, NC, A> RollingUpdatePauseCall<'a, C, NC, A> where NC: hyper::net::Ne
 ///
 /// ```test_harness,no_run
 /// # extern crate hyper;
-/// # extern crate "yup-oauth2" as oauth2;
-/// # extern crate "google-replicapoolupdater1_beta1" as replicapoolupdater1_beta1;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_replicapoolupdater1_beta1 as replicapoolupdater1_beta1;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -1349,7 +1349,7 @@ impl<'a, C, NC, A> RollingUpdateRollbackCall<'a, C, NC, A> where NC: hyper::net:
 
         let mut url = "https://www.googleapis.com/replicapoolupdater/v1beta1/projects/{project}/zones/{zone}/rollingUpdates/{rollingUpdate}/rollback".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::CloudPlatform.as_slice().to_string(), ());
+            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{project}", "project"), ("{zone}", "zone"), ("{rollingUpdate}", "rollingUpdate")].iter() {
@@ -1379,7 +1379,7 @@ impl<'a, C, NC, A> RollingUpdateRollbackCall<'a, C, NC, A> where NC: hyper::net:
         
         if params.len() > 0 {
             url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
+            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_ref()))));
         }
 
 
@@ -1397,7 +1397,7 @@ impl<'a, C, NC, A> RollingUpdateRollbackCall<'a, C, NC, A> where NC: hyper::net:
                                                              access_token: token.unwrap().access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.as_slice())
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.as_ref())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -1408,7 +1408,7 @@ impl<'a, C, NC, A> RollingUpdateRollbackCall<'a, C, NC, A> where NC: hyper::net:
             match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
+                        sleep_ms(d.num_milliseconds() as u32);
                         continue;
                     }
                     dlg.finished(false);
@@ -1419,7 +1419,7 @@ impl<'a, C, NC, A> RollingUpdateRollbackCall<'a, C, NC, A> where NC: hyper::net:
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
-                            sleep(d);
+                            sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
@@ -1504,8 +1504,8 @@ impl<'a, C, NC, A> RollingUpdateRollbackCall<'a, C, NC, A> where NC: hyper::net:
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> RollingUpdateRollbackCall<'a, C, NC, A>
-                                                        where T: Str {
-        self._additional_params.insert(name.as_slice().to_string(), value.as_slice().to_string());
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
     }
 
@@ -1521,8 +1521,8 @@ impl<'a, C, NC, A> RollingUpdateRollbackCall<'a, C, NC, A> where NC: hyper::net:
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T>(mut self, scope: T) -> RollingUpdateRollbackCall<'a, C, NC, A> 
-                                                        where T: Str {
-        self._scopes.insert(scope.as_slice().to_string(), ());
+                                                        where T: AsRef<str> {
+        self._scopes.insert(scope.as_ref().to_string(), ());
         self
     }
 }
@@ -1539,8 +1539,8 @@ impl<'a, C, NC, A> RollingUpdateRollbackCall<'a, C, NC, A> where NC: hyper::net:
 ///
 /// ```test_harness,no_run
 /// # extern crate hyper;
-/// # extern crate "yup-oauth2" as oauth2;
-/// # extern crate "google-replicapoolupdater1_beta1" as replicapoolupdater1_beta1;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_replicapoolupdater1_beta1 as replicapoolupdater1_beta1;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -1604,7 +1604,7 @@ impl<'a, C, NC, A> RollingUpdateGetCall<'a, C, NC, A> where NC: hyper::net::Netw
 
         let mut url = "https://www.googleapis.com/replicapoolupdater/v1beta1/projects/{project}/zones/{zone}/rollingUpdates/{rollingUpdate}".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::ReplicapoolReadonly.as_slice().to_string(), ());
+            self._scopes.insert(Scope::ReplicapoolReadonly.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{project}", "project"), ("{zone}", "zone"), ("{rollingUpdate}", "rollingUpdate")].iter() {
@@ -1634,7 +1634,7 @@ impl<'a, C, NC, A> RollingUpdateGetCall<'a, C, NC, A> where NC: hyper::net::Netw
         
         if params.len() > 0 {
             url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
+            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_ref()))));
         }
 
 
@@ -1652,7 +1652,7 @@ impl<'a, C, NC, A> RollingUpdateGetCall<'a, C, NC, A> where NC: hyper::net::Netw
                                                              access_token: token.unwrap().access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_slice())
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_ref())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -1663,7 +1663,7 @@ impl<'a, C, NC, A> RollingUpdateGetCall<'a, C, NC, A> where NC: hyper::net::Netw
             match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
+                        sleep_ms(d.num_milliseconds() as u32);
                         continue;
                     }
                     dlg.finished(false);
@@ -1674,7 +1674,7 @@ impl<'a, C, NC, A> RollingUpdateGetCall<'a, C, NC, A> where NC: hyper::net::Netw
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
-                            sleep(d);
+                            sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
@@ -1759,8 +1759,8 @@ impl<'a, C, NC, A> RollingUpdateGetCall<'a, C, NC, A> where NC: hyper::net::Netw
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> RollingUpdateGetCall<'a, C, NC, A>
-                                                        where T: Str {
-        self._additional_params.insert(name.as_slice().to_string(), value.as_slice().to_string());
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
     }
 
@@ -1776,8 +1776,8 @@ impl<'a, C, NC, A> RollingUpdateGetCall<'a, C, NC, A> where NC: hyper::net::Netw
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T>(mut self, scope: T) -> RollingUpdateGetCall<'a, C, NC, A> 
-                                                        where T: Str {
-        self._scopes.insert(scope.as_slice().to_string(), ());
+                                                        where T: AsRef<str> {
+        self._scopes.insert(scope.as_ref().to_string(), ());
         self
     }
 }
@@ -1794,8 +1794,8 @@ impl<'a, C, NC, A> RollingUpdateGetCall<'a, C, NC, A> where NC: hyper::net::Netw
 ///
 /// ```test_harness,no_run
 /// # extern crate hyper;
-/// # extern crate "yup-oauth2" as oauth2;
-/// # extern crate "google-replicapoolupdater1_beta1" as replicapoolupdater1_beta1;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_replicapoolupdater1_beta1 as replicapoolupdater1_beta1;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -1859,7 +1859,7 @@ impl<'a, C, NC, A> RollingUpdateResumeCall<'a, C, NC, A> where NC: hyper::net::N
 
         let mut url = "https://www.googleapis.com/replicapoolupdater/v1beta1/projects/{project}/zones/{zone}/rollingUpdates/{rollingUpdate}/resume".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::CloudPlatform.as_slice().to_string(), ());
+            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{project}", "project"), ("{zone}", "zone"), ("{rollingUpdate}", "rollingUpdate")].iter() {
@@ -1889,7 +1889,7 @@ impl<'a, C, NC, A> RollingUpdateResumeCall<'a, C, NC, A> where NC: hyper::net::N
         
         if params.len() > 0 {
             url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
+            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_ref()))));
         }
 
 
@@ -1907,7 +1907,7 @@ impl<'a, C, NC, A> RollingUpdateResumeCall<'a, C, NC, A> where NC: hyper::net::N
                                                              access_token: token.unwrap().access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.as_slice())
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.as_ref())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -1918,7 +1918,7 @@ impl<'a, C, NC, A> RollingUpdateResumeCall<'a, C, NC, A> where NC: hyper::net::N
             match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
+                        sleep_ms(d.num_milliseconds() as u32);
                         continue;
                     }
                     dlg.finished(false);
@@ -1929,7 +1929,7 @@ impl<'a, C, NC, A> RollingUpdateResumeCall<'a, C, NC, A> where NC: hyper::net::N
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
-                            sleep(d);
+                            sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
@@ -2014,8 +2014,8 @@ impl<'a, C, NC, A> RollingUpdateResumeCall<'a, C, NC, A> where NC: hyper::net::N
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> RollingUpdateResumeCall<'a, C, NC, A>
-                                                        where T: Str {
-        self._additional_params.insert(name.as_slice().to_string(), value.as_slice().to_string());
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
     }
 
@@ -2031,8 +2031,8 @@ impl<'a, C, NC, A> RollingUpdateResumeCall<'a, C, NC, A> where NC: hyper::net::N
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T>(mut self, scope: T) -> RollingUpdateResumeCall<'a, C, NC, A> 
-                                                        where T: Str {
-        self._scopes.insert(scope.as_slice().to_string(), ());
+                                                        where T: AsRef<str> {
+        self._scopes.insert(scope.as_ref().to_string(), ());
         self
     }
 }
@@ -2049,8 +2049,8 @@ impl<'a, C, NC, A> RollingUpdateResumeCall<'a, C, NC, A> where NC: hyper::net::N
 ///
 /// ```test_harness,no_run
 /// # extern crate hyper;
-/// # extern crate "yup-oauth2" as oauth2;
-/// # extern crate "google-replicapoolupdater1_beta1" as replicapoolupdater1_beta1;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_replicapoolupdater1_beta1 as replicapoolupdater1_beta1;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -2132,7 +2132,7 @@ impl<'a, C, NC, A> RollingUpdateListCall<'a, C, NC, A> where NC: hyper::net::Net
 
         let mut url = "https://www.googleapis.com/replicapoolupdater/v1beta1/projects/{project}/zones/{zone}/rollingUpdates".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::ReplicapoolReadonly.as_slice().to_string(), ());
+            self._scopes.insert(Scope::ReplicapoolReadonly.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{project}", "project"), ("{zone}", "zone")].iter() {
@@ -2162,7 +2162,7 @@ impl<'a, C, NC, A> RollingUpdateListCall<'a, C, NC, A> where NC: hyper::net::Net
         
         if params.len() > 0 {
             url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
+            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_ref()))));
         }
 
 
@@ -2180,7 +2180,7 @@ impl<'a, C, NC, A> RollingUpdateListCall<'a, C, NC, A> where NC: hyper::net::Net
                                                              access_token: token.unwrap().access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_slice())
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_ref())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -2191,7 +2191,7 @@ impl<'a, C, NC, A> RollingUpdateListCall<'a, C, NC, A> where NC: hyper::net::Net
             match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
+                        sleep_ms(d.num_milliseconds() as u32);
                         continue;
                     }
                     dlg.finished(false);
@@ -2202,7 +2202,7 @@ impl<'a, C, NC, A> RollingUpdateListCall<'a, C, NC, A> where NC: hyper::net::Net
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
-                            sleep(d);
+                            sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
@@ -2309,8 +2309,8 @@ impl<'a, C, NC, A> RollingUpdateListCall<'a, C, NC, A> where NC: hyper::net::Net
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> RollingUpdateListCall<'a, C, NC, A>
-                                                        where T: Str {
-        self._additional_params.insert(name.as_slice().to_string(), value.as_slice().to_string());
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
     }
 
@@ -2326,8 +2326,8 @@ impl<'a, C, NC, A> RollingUpdateListCall<'a, C, NC, A> where NC: hyper::net::Net
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T>(mut self, scope: T) -> RollingUpdateListCall<'a, C, NC, A> 
-                                                        where T: Str {
-        self._scopes.insert(scope.as_slice().to_string(), ());
+                                                        where T: AsRef<str> {
+        self._scopes.insert(scope.as_ref().to_string(), ());
         self
     }
 }
@@ -2344,8 +2344,8 @@ impl<'a, C, NC, A> RollingUpdateListCall<'a, C, NC, A> where NC: hyper::net::Net
 ///
 /// ```test_harness,no_run
 /// # extern crate hyper;
-/// # extern crate "yup-oauth2" as oauth2;
-/// # extern crate "google-replicapoolupdater1_beta1" as replicapoolupdater1_beta1;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_replicapoolupdater1_beta1 as replicapoolupdater1_beta1;
 /// use replicapoolupdater1_beta1::RollingUpdate;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
@@ -2414,7 +2414,7 @@ impl<'a, C, NC, A> RollingUpdateInsertCall<'a, C, NC, A> where NC: hyper::net::N
 
         let mut url = "https://www.googleapis.com/replicapoolupdater/v1beta1/projects/{project}/zones/{zone}/rollingUpdates".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::CloudPlatform.as_slice().to_string(), ());
+            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{project}", "project"), ("{zone}", "zone")].iter() {
@@ -2444,7 +2444,7 @@ impl<'a, C, NC, A> RollingUpdateInsertCall<'a, C, NC, A> where NC: hyper::net::N
         
         if params.len() > 0 {
             url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
+            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_ref()))));
         }
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
@@ -2467,7 +2467,7 @@ impl<'a, C, NC, A> RollingUpdateInsertCall<'a, C, NC, A> where NC: hyper::net::N
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.as_slice())
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.as_ref())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -2481,7 +2481,7 @@ impl<'a, C, NC, A> RollingUpdateInsertCall<'a, C, NC, A> where NC: hyper::net::N
             match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
+                        sleep_ms(d.num_milliseconds() as u32);
                         continue;
                     }
                     dlg.finished(false);
@@ -2492,7 +2492,7 @@ impl<'a, C, NC, A> RollingUpdateInsertCall<'a, C, NC, A> where NC: hyper::net::N
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
-                            sleep(d);
+                            sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
@@ -2576,8 +2576,8 @@ impl<'a, C, NC, A> RollingUpdateInsertCall<'a, C, NC, A> where NC: hyper::net::N
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> RollingUpdateInsertCall<'a, C, NC, A>
-                                                        where T: Str {
-        self._additional_params.insert(name.as_slice().to_string(), value.as_slice().to_string());
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
     }
 
@@ -2593,8 +2593,8 @@ impl<'a, C, NC, A> RollingUpdateInsertCall<'a, C, NC, A> where NC: hyper::net::N
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T>(mut self, scope: T) -> RollingUpdateInsertCall<'a, C, NC, A> 
-                                                        where T: Str {
-        self._scopes.insert(scope.as_slice().to_string(), ());
+                                                        where T: AsRef<str> {
+        self._scopes.insert(scope.as_ref().to_string(), ());
         self
     }
 }
@@ -2611,8 +2611,8 @@ impl<'a, C, NC, A> RollingUpdateInsertCall<'a, C, NC, A> where NC: hyper::net::N
 ///
 /// ```test_harness,no_run
 /// # extern crate hyper;
-/// # extern crate "yup-oauth2" as oauth2;
-/// # extern crate "google-replicapoolupdater1_beta1" as replicapoolupdater1_beta1;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_replicapoolupdater1_beta1 as replicapoolupdater1_beta1;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -2691,7 +2691,7 @@ impl<'a, C, NC, A> RollingUpdateListInstanceUpdateCall<'a, C, NC, A> where NC: h
 
         let mut url = "https://www.googleapis.com/replicapoolupdater/v1beta1/projects/{project}/zones/{zone}/rollingUpdates/{rollingUpdate}/instanceUpdates".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::ReplicapoolReadonly.as_slice().to_string(), ());
+            self._scopes.insert(Scope::ReplicapoolReadonly.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{project}", "project"), ("{zone}", "zone"), ("{rollingUpdate}", "rollingUpdate")].iter() {
@@ -2721,7 +2721,7 @@ impl<'a, C, NC, A> RollingUpdateListInstanceUpdateCall<'a, C, NC, A> where NC: h
         
         if params.len() > 0 {
             url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
+            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_ref()))));
         }
 
 
@@ -2739,7 +2739,7 @@ impl<'a, C, NC, A> RollingUpdateListInstanceUpdateCall<'a, C, NC, A> where NC: h
                                                              access_token: token.unwrap().access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_slice())
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_ref())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -2750,7 +2750,7 @@ impl<'a, C, NC, A> RollingUpdateListInstanceUpdateCall<'a, C, NC, A> where NC: h
             match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
+                        sleep_ms(d.num_milliseconds() as u32);
                         continue;
                     }
                     dlg.finished(false);
@@ -2761,7 +2761,7 @@ impl<'a, C, NC, A> RollingUpdateListInstanceUpdateCall<'a, C, NC, A> where NC: h
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
-                            sleep(d);
+                            sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
@@ -2870,8 +2870,8 @@ impl<'a, C, NC, A> RollingUpdateListInstanceUpdateCall<'a, C, NC, A> where NC: h
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> RollingUpdateListInstanceUpdateCall<'a, C, NC, A>
-                                                        where T: Str {
-        self._additional_params.insert(name.as_slice().to_string(), value.as_slice().to_string());
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
     }
 
@@ -2887,8 +2887,8 @@ impl<'a, C, NC, A> RollingUpdateListInstanceUpdateCall<'a, C, NC, A> where NC: h
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T>(mut self, scope: T) -> RollingUpdateListInstanceUpdateCall<'a, C, NC, A> 
-                                                        where T: Str {
-        self._scopes.insert(scope.as_slice().to_string(), ());
+                                                        where T: AsRef<str> {
+        self._scopes.insert(scope.as_ref().to_string(), ());
         self
     }
 }
@@ -2905,8 +2905,8 @@ impl<'a, C, NC, A> RollingUpdateListInstanceUpdateCall<'a, C, NC, A> where NC: h
 ///
 /// ```test_harness,no_run
 /// # extern crate hyper;
-/// # extern crate "yup-oauth2" as oauth2;
-/// # extern crate "google-replicapoolupdater1_beta1" as replicapoolupdater1_beta1;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_replicapoolupdater1_beta1 as replicapoolupdater1_beta1;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -2970,7 +2970,7 @@ impl<'a, C, NC, A> RollingUpdateCancelCall<'a, C, NC, A> where NC: hyper::net::N
 
         let mut url = "https://www.googleapis.com/replicapoolupdater/v1beta1/projects/{project}/zones/{zone}/rollingUpdates/{rollingUpdate}/cancel".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::CloudPlatform.as_slice().to_string(), ());
+            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{project}", "project"), ("{zone}", "zone"), ("{rollingUpdate}", "rollingUpdate")].iter() {
@@ -3000,7 +3000,7 @@ impl<'a, C, NC, A> RollingUpdateCancelCall<'a, C, NC, A> where NC: hyper::net::N
         
         if params.len() > 0 {
             url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
+            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_ref()))));
         }
 
 
@@ -3018,7 +3018,7 @@ impl<'a, C, NC, A> RollingUpdateCancelCall<'a, C, NC, A> where NC: hyper::net::N
                                                              access_token: token.unwrap().access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.as_slice())
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.as_ref())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -3029,7 +3029,7 @@ impl<'a, C, NC, A> RollingUpdateCancelCall<'a, C, NC, A> where NC: hyper::net::N
             match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
+                        sleep_ms(d.num_milliseconds() as u32);
                         continue;
                     }
                     dlg.finished(false);
@@ -3040,7 +3040,7 @@ impl<'a, C, NC, A> RollingUpdateCancelCall<'a, C, NC, A> where NC: hyper::net::N
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
-                            sleep(d);
+                            sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
@@ -3125,8 +3125,8 @@ impl<'a, C, NC, A> RollingUpdateCancelCall<'a, C, NC, A> where NC: hyper::net::N
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> RollingUpdateCancelCall<'a, C, NC, A>
-                                                        where T: Str {
-        self._additional_params.insert(name.as_slice().to_string(), value.as_slice().to_string());
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
     }
 
@@ -3142,8 +3142,8 @@ impl<'a, C, NC, A> RollingUpdateCancelCall<'a, C, NC, A> where NC: hyper::net::N
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T>(mut self, scope: T) -> RollingUpdateCancelCall<'a, C, NC, A> 
-                                                        where T: Str {
-        self._scopes.insert(scope.as_slice().to_string(), ());
+                                                        where T: AsRef<str> {
+        self._scopes.insert(scope.as_ref().to_string(), ());
         self
     }
 }
@@ -3160,8 +3160,8 @@ impl<'a, C, NC, A> RollingUpdateCancelCall<'a, C, NC, A> where NC: hyper::net::N
 ///
 /// ```test_harness,no_run
 /// # extern crate hyper;
-/// # extern crate "yup-oauth2" as oauth2;
-/// # extern crate "google-replicapoolupdater1_beta1" as replicapoolupdater1_beta1;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_replicapoolupdater1_beta1 as replicapoolupdater1_beta1;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -3225,7 +3225,7 @@ impl<'a, C, NC, A> ZoneOperationGetCall<'a, C, NC, A> where NC: hyper::net::Netw
 
         let mut url = "https://www.googleapis.com/replicapoolupdater/v1beta1/projects/{project}/zones/{zone}/operations/{operation}".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::ReplicapoolReadonly.as_slice().to_string(), ());
+            self._scopes.insert(Scope::ReplicapoolReadonly.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{project}", "project"), ("{zone}", "zone"), ("{operation}", "operation")].iter() {
@@ -3255,7 +3255,7 @@ impl<'a, C, NC, A> ZoneOperationGetCall<'a, C, NC, A> where NC: hyper::net::Netw
         
         if params.len() > 0 {
             url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
+            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_ref()))));
         }
 
 
@@ -3273,7 +3273,7 @@ impl<'a, C, NC, A> ZoneOperationGetCall<'a, C, NC, A> where NC: hyper::net::Netw
                                                              access_token: token.unwrap().access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_slice())
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_ref())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -3284,7 +3284,7 @@ impl<'a, C, NC, A> ZoneOperationGetCall<'a, C, NC, A> where NC: hyper::net::Netw
             match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
+                        sleep_ms(d.num_milliseconds() as u32);
                         continue;
                     }
                     dlg.finished(false);
@@ -3295,7 +3295,7 @@ impl<'a, C, NC, A> ZoneOperationGetCall<'a, C, NC, A> where NC: hyper::net::Netw
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
-                            sleep(d);
+                            sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
@@ -3380,8 +3380,8 @@ impl<'a, C, NC, A> ZoneOperationGetCall<'a, C, NC, A> where NC: hyper::net::Netw
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> ZoneOperationGetCall<'a, C, NC, A>
-                                                        where T: Str {
-        self._additional_params.insert(name.as_slice().to_string(), value.as_slice().to_string());
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
     }
 
@@ -3397,8 +3397,8 @@ impl<'a, C, NC, A> ZoneOperationGetCall<'a, C, NC, A> where NC: hyper::net::Netw
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T>(mut self, scope: T) -> ZoneOperationGetCall<'a, C, NC, A> 
-                                                        where T: Str {
-        self._scopes.insert(scope.as_slice().to_string(), ());
+                                                        where T: AsRef<str> {
+        self._scopes.insert(scope.as_ref().to_string(), ());
         self
     }
 }

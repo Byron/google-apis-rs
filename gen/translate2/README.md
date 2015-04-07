@@ -74,8 +74,8 @@ google-translate2 = "*"
 
 ```Rust
 extern crate hyper;
-extern crate "yup-oauth2" as oauth2;
-extern crate "google-translate2" as translate2;
+extern crate yup_oauth2 as oauth2;
+extern crate google_translate2 as translate2;
 use translate2::{Result, Error};
 use std::default::Default;
 use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};

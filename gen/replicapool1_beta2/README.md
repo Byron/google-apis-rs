@@ -5,7 +5,7 @@ DO NOT EDIT !
 -->
 The `google-replicapool1_beta2` library allows access to all features of the *Google replicapool* service.
 
-This documentation was generated from *replicapool* crate version *0.1.2+20141002*, where *20141002* is the exact revision of the *replicapool:v1beta2* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.2*.
+This documentation was generated from *replicapool* crate version *0.1.2+20150223*, where *20150223* is the exact revision of the *replicapool:v1beta2* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.2*.
 
 Everything else about the *replicapool* *v1_beta2* API can be found at the
 [official documentation site](https://developers.google.com/compute/docs/instance-groups/manager/v1beta2).
@@ -81,8 +81,8 @@ google-replicapool1_beta2 = "*"
 
 ```Rust
 extern crate hyper;
-extern crate "yup-oauth2" as oauth2;
-extern crate "google-replicapool1_beta2" as replicapool1_beta2;
+extern crate yup_oauth2 as oauth2;
+extern crate google_replicapool1_beta2 as replicapool1_beta2;
 use replicapool1_beta2::{Result, Error};
 use std::default::Default;
 use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};

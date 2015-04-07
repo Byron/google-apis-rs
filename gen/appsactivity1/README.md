@@ -70,8 +70,8 @@ google-appsactivity1 = "*"
 
 ```Rust
 extern crate hyper;
-extern crate "yup-oauth2" as oauth2;
-extern crate "google-appsactivity1" as appsactivity1;
+extern crate yup_oauth2 as oauth2;
+extern crate google_appsactivity1 as appsactivity1;
 use appsactivity1::{Result, Error};
 use std::default::Default;
 use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};

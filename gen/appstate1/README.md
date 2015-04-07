@@ -5,7 +5,7 @@ DO NOT EDIT !
 -->
 The `google-appstate1` library allows access to all features of the *Google App State* service.
 
-This documentation was generated from *App State* crate version *0.1.2+20150316*, where *20150316* is the exact revision of the *appstate:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.2*.
+This documentation was generated from *App State* crate version *0.1.2+20150326*, where *20150326* is the exact revision of the *appstate:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.2*.
 
 Everything else about the *App State* *v1* API can be found at the
 [official documentation site](https://developers.google.com/games/services/web/api/states).
@@ -71,8 +71,8 @@ google-appstate1 = "*"
 
 ```Rust
 extern crate hyper;
-extern crate "yup-oauth2" as oauth2;
-extern crate "google-appstate1" as appstate1;
+extern crate yup_oauth2 as oauth2;
+extern crate google_appstate1 as appstate1;
 use appstate1::UpdateRequest;
 use appstate1::{Result, Error};
 use std::default::Default;

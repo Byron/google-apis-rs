@@ -4,7 +4,7 @@
 [package]
 
 name = "google-adexchangeseller2"
-version = "0.1.2+20150309"
+version = "0.1.2+20150326"
 authors = ["Sebastian Thiel <byronimo@gmail>"]
 description = "A complete library to interact with Ad Exchange Seller (protocol v2.0)"
 repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/adexchangeseller2"

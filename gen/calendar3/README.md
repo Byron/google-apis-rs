@@ -106,8 +106,8 @@ google-calendar3 = "*"
 
 ```Rust
 extern crate hyper;
-extern crate "yup-oauth2" as oauth2;
-extern crate "google-calendar3" as calendar3;
+extern crate yup_oauth2 as oauth2;
+extern crate google_calendar3 as calendar3;
 use calendar3::Channel;
 use calendar3::{Result, Error};
 use std::default::Default;

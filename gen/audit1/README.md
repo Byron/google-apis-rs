@@ -70,8 +70,8 @@ google-audit1 = "*"
 
 ```Rust
 extern crate hyper;
-extern crate "yup-oauth2" as oauth2;
-extern crate "google-audit1" as audit1;
+extern crate yup_oauth2 as oauth2;
+extern crate google_audit1 as audit1;
 use audit1::{Result, Error};
 use std::default::Default;
 use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};

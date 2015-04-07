@@ -37,10 +37,14 @@ api:
     - v1
     calendar:
     - v3
+    civicinfo:
+    - v2
     cloudlatencytest:
     - v2
     cloudmonitoring:
     - v2beta2
+    cloudsearch:
+    - v1
     compute:
     - v1
     container:
@@ -59,6 +63,8 @@ api:
     - v2beta1
     dfareporting:
     - v2.0
+    discovery:
+    - v1
     dns:
     - v1beta1
     doubleclickbidmanager:
@@ -71,6 +77,7 @@ api:
     - v1
     freebase:
     - v1
+    - v1sandbox
     fusiontables:
     - v2
     games:
@@ -79,6 +86,8 @@ api:
     - v1configuration
     gamesmanagement:
     - v1management
+    gan:
+    - v1beta1
     genomics:
     - v1beta2
     gmail:
@@ -91,6 +100,8 @@ api:
     - v3
     licensing:
     - v1
+    logging:
+    - v1beta3
     manager:
     - v1beta2
     mapsengine:
@@ -101,6 +112,8 @@ api:
     - v2
     pagespeedonline:
     - v2
+    plus:
+    - v1
     plusdomains:
     - v1
     prediction:

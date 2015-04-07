@@ -1,11 +1,10 @@
 // COPY OF 'src/rust/api/cmn.rs'
 // DO NOT EDIT
-use std::marker::MarkerTrait;
 use std::io::{self, Read, Seek, Cursor, Write, SeekFrom};
 use std;
 use std::fmt::{self, Display};
 use std::str::FromStr;
-use std::thread::sleep;
+use std::thread::sleep_ms;
 
 use mime::{Mime, TopLevel, SubLevel, Attr, Value};
 use oauth2::{TokenType, Retry, self};
@@ -21,35 +20,35 @@ use serde;
 /// Identifies the Hub. There is only one per library, this trait is supposed
 /// to make intended use more explicit.
 /// The hub allows to access all resource methods more easily.
-pub trait Hub: MarkerTrait {}
+pub trait Hub {}
 
 /// Identifies types for building methods of a particular resource type
-pub trait MethodsBuilder: MarkerTrait {}
+pub trait MethodsBuilder {}
 
 /// Identifies types which represent builders for a particular resource method
-pub trait CallBuilder: MarkerTrait {}
+pub trait CallBuilder {}
 
 /// Identifies types which can be inserted and deleted.
 /// Types with this trait are most commonly used by clients of this API.
-pub trait Resource: MarkerTrait {}
+pub trait Resource {}
 
 /// Identifies types which are used in API responses.
-pub trait ResponseResult: MarkerTrait {}
+pub trait ResponseResult {}
 
 /// Identifies types which are used in API requests.
-pub trait RequestValue: MarkerTrait {}
+pub trait RequestValue {}
 
 /// Identifies types which are not actually used by the API
 /// This might be a bug within the google API schema.
-pub trait UnusedType: MarkerTrait {}
+pub trait UnusedType {}
 
 /// Identifies types which are only used as part of other types, which 
 /// usually are carrying the `Resource` trait.
-pub trait Part: MarkerTrait {}
+pub trait Part {}
 
 /// Identifies types which are only used by other types internally.
 /// They have no special meaning, this trait just marks them for completeness.
-pub trait NestedType: MarkerTrait {}
+pub trait NestedType {}
 
 /// A utility to specify reader types which provide seeking capabilities too
 pub trait ReadSeek: Seek + Read {}
@@ -380,14 +379,10 @@ impl<'a> Read for MultiPartReader<'a> {
     }
 }
 
-
-/// The `X-Upload-Content-Type` header.
-#[derive(Clone, PartialEq, Debug)]
-pub struct XUploadContentType(pub Mime);
-
-impl_header!(XUploadContentType,
-             "X-Upload-Content-Type",
-             Mime);
+header!{
+    #[doc="The `X-Upload-Content-Type` header."]
+    (XUploadContentType, "X-Upload-Content-Type") => [Mime]
+}
 
 #[derive(Clone, PartialEq, Debug)]
 pub struct Chunk {
@@ -519,7 +514,7 @@ impl<'a, NC, A> ResumableUploadHelper<'a, NC, A>
                         Some(hh) if r.status == StatusCode::PermanentRedirect => hh,
                         None|Some(_) => {
                             if let Retry::After(d) = self.delegate.http_failure(&r, None) {
-                                sleep(d);
+                                sleep_ms(d.num_milliseconds() as u32);
                                 continue;
                             }
                             return Err(Ok(r))
@@ -529,7 +524,7 @@ impl<'a, NC, A> ResumableUploadHelper<'a, NC, A>
                 }
                 Err(err) => {
                     if let Retry::After(d) = self.delegate.http_error(&err) {
-                        sleep(d);
+                        sleep_ms(d.num_milliseconds() as u32);
                         continue;
                     }
                     return Err(Err(err))
@@ -586,7 +581,7 @@ impl<'a, NC, A> ResumableUploadHelper<'a, NC, A>
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
                         if let Retry::After(d) = self.delegate.http_failure(&res, serde::json::from_str(&json_err).ok()) {
-                            sleep(d);
+                            sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                     }
@@ -594,7 +589,7 @@ impl<'a, NC, A> ResumableUploadHelper<'a, NC, A>
                 },
                 Err(err) => {
                     if let Retry::After(d) = self.delegate.http_error(&err) {
-                        sleep(d);
+                        sleep_ms(d.num_milliseconds() as u32);
                         continue;
                     }
                     return Some(Err(err))

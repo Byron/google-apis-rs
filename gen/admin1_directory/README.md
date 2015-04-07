@@ -5,7 +5,7 @@ DO NOT EDIT !
 -->
 The `google-admin1_directory` library allows access to all features of the *Google directory* service.
 
-This documentation was generated from *directory* crate version *0.1.2+20150123*, where *20150123* is the exact revision of the *admin:directory_v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.2*.
+This documentation was generated from *directory* crate version *0.1.2+20150309*, where *20150309* is the exact revision of the *admin:directory_v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.2*.
 
 Everything else about the *directory* *v1_directory* API can be found at the
 [official documentation site](https://developers.google.com/admin-sdk/directory/).
@@ -116,8 +116,8 @@ google-admin1_directory = "*"
 
 ```Rust
 extern crate hyper;
-extern crate "yup-oauth2" as oauth2;
-extern crate "google-admin1_directory" as admin1_directory;
+extern crate yup_oauth2 as oauth2;
+extern crate google_admin1_directory as admin1_directory;
 use admin1_directory::Channel;
 use admin1_directory::{Result, Error};
 use std::default::Default;

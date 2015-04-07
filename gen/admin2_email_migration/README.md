@@ -74,8 +74,8 @@ google-admin2_email_migration = "*"
 
 ```Rust
 extern crate hyper;
-extern crate "yup-oauth2" as oauth2;
-extern crate "google-admin2_email_migration" as admin2_email_migration;
+extern crate yup_oauth2 as oauth2;
+extern crate google_admin2_email_migration as admin2_email_migration;
 use admin2_email_migration::MailItem;
 use admin2_email_migration::{Result, Error};
 use std::fs;

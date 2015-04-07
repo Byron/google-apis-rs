@@ -82,8 +82,8 @@ google-admin1_reports = "*"
 
 ```Rust
 extern crate hyper;
-extern crate "yup-oauth2" as oauth2;
-extern crate "google-admin1_reports" as admin1_reports;
+extern crate yup_oauth2 as oauth2;
+extern crate google_admin1_reports as admin1_reports;
 use admin1_reports::Channel;
 use admin1_reports::{Result, Error};
 use std::default::Default;

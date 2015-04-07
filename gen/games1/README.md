@@ -5,7 +5,7 @@ DO NOT EDIT !
 -->
 The `google-games1` library allows access to all features of the *Google Games* service.
 
-This documentation was generated from *Games* crate version *0.1.2+20150316*, where *20150316* is the exact revision of the *games:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.2*.
+This documentation was generated from *Games* crate version *0.1.2+20150325*, where *20150325* is the exact revision of the *games:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.2*.
 
 Everything else about the *Games* *v1* API can be found at the
 [official documentation site](https://developers.google.com/games/services/).
@@ -105,8 +105,8 @@ google-games1 = "*"
 
 ```Rust
 extern crate hyper;
-extern crate "yup-oauth2" as oauth2;
-extern crate "google-games1" as games1;
+extern crate yup_oauth2 as oauth2;
+extern crate google_games1 as games1;
 use games1::{Result, Error};
 use std::default::Default;
 use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};

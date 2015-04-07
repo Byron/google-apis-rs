@@ -5,7 +5,7 @@ DO NOT EDIT !
 -->
 The `google-adexchangebuyer1d3` library allows access to all features of the *Google Ad Exchange Buyer* service.
 
-This documentation was generated from *Ad Exchange Buyer* crate version *0.1.2+20150218*, where *20150218* is the exact revision of the *adexchangebuyer:v1.3* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.2*.
+This documentation was generated from *Ad Exchange Buyer* crate version *0.1.2+20150323*, where *20150323* is the exact revision of the *adexchangebuyer:v1.3* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.2*.
 
 Everything else about the *Ad Exchange Buyer* *v1d3* API can be found at the
 [official documentation site](https://developers.google.com/ad-exchange/buyer-rest).
@@ -85,8 +85,8 @@ google-adexchangebuyer1d3 = "*"
 
 ```Rust
 extern crate hyper;
-extern crate "yup-oauth2" as oauth2;
-extern crate "google-adexchangebuyer1d3" as adexchangebuyer1d3;
+extern crate yup_oauth2 as oauth2;
+extern crate google_adexchangebuyer1d3 as adexchangebuyer1d3;
 use adexchangebuyer1d3::PretargetingConfig;
 use adexchangebuyer1d3::{Result, Error};
 use std::default::Default;

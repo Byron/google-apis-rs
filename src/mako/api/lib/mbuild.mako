@@ -151,8 +151,8 @@ ${self._setter_fn(resource, method, m, p, part_prop, ThisType, c)}\
     % endfor
     % endif
     pub fn ${ADD_PARAM_FN}<T>(mut self, name: T, value: T) -> ${ThisType}
-                                                        where T: Str {
-        self.${api.properties.params}.insert(name.as_slice().to_string(), value.as_slice().to_string());
+                                                        where T: AsRef<str> {
+        self.${api.properties.params}.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
     }
 
@@ -169,8 +169,8 @@ ${self._setter_fn(resource, method, m, p, part_prop, ThisType, c)}\
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T>(mut self, scope: T) -> ${ThisType} 
-                                                        where T: Str {
-        self.${api.properties.scopes}.insert(scope.as_slice().to_string(), ());
+                                                        where T: AsRef<str> {
+        self.${api.properties.scopes}.insert(scope.as_ref().to_string(), ());
         self
     }
     % endif
@@ -544,7 +544,7 @@ match result {
             for &(name, ref value) in params.iter() {
                 if name == "alt" {
                     field_present = false;
-                    if value.as_slice() != "json" {
+                    if <String as AsRef<str>>::as_ref(&value) != "json" {
                         enable = false;
                     }
                     break;
@@ -596,7 +596,7 @@ else {
         }
         % else:
         if self.${api.properties.scopes}.len() == 0 {
-            self.${api.properties.scopes}.insert(${scope_url_to_variant(name, default_scope, fully_qualified=True)}.as_slice().to_string(), ());
+            self.${api.properties.scopes}.insert(${scope_url_to_variant(name, default_scope, fully_qualified=True)}.as_ref().to_string(), ());
         }
         % endif
 
@@ -646,7 +646,7 @@ else {
         
         if params.len() > 0 {
             url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
+            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_ref()))));
         }
 
         % if request_value:
@@ -710,7 +710,7 @@ else {
                 };
             % endif
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(${method_name_to_variant(m.httpMethod)}, url.as_slice())
+                let mut req = client.borrow_mut().request(${method_name_to_variant(m.httpMethod)}, url.as_ref())
                     .header(UserAgent(self.hub._user_agent.clone()))\
                     % if supports_scopes(auth):
 
@@ -755,7 +755,7 @@ else {
             match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
+                        sleep_ms(d.num_milliseconds() as u32);
                         continue;
                     }
                     ${delegate_finish}(false);
@@ -766,7 +766,7 @@ else {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
-                            sleep(d);
+                            sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         ${delegate_finish}(false);

@@ -79,8 +79,8 @@ google-tasks1 = "*"
 
 ```Rust
 extern crate hyper;
-extern crate "yup-oauth2" as oauth2;
-extern crate "google-tasks1" as tasks1;
+extern crate yup_oauth2 as oauth2;
+extern crate google_tasks1 as tasks1;
 use tasks1::{Result, Error};
 use std::default::Default;
 use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};

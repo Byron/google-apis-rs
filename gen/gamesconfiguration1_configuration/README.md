@@ -5,7 +5,7 @@ DO NOT EDIT !
 -->
 The `google-gamesconfiguration1_configuration` library allows access to all features of the *Google Games Configuration* service.
 
-This documentation was generated from *Games Configuration* crate version *0.1.2+20150316*, where *20150316* is the exact revision of the *gamesConfiguration:v1configuration* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.2*.
+This documentation was generated from *Games Configuration* crate version *0.1.2+20150325*, where *20150325* is the exact revision of the *gamesConfiguration:v1configuration* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.2*.
 
 Everything else about the *Games Configuration* *v1_configuration* API can be found at the
 [official documentation site](https://developers.google.com/games/services).
@@ -83,8 +83,8 @@ google-gamesconfiguration1_configuration = "*"
 
 ```Rust
 extern crate hyper;
-extern crate "yup-oauth2" as oauth2;
-extern crate "google-gamesconfiguration1_configuration" as gamesconfiguration1_configuration;
+extern crate yup_oauth2 as oauth2;
+extern crate google_gamesconfiguration1_configuration as gamesconfiguration1_configuration;
 use gamesconfiguration1_configuration::{Result, Error};
 use std::default::Default;
 use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};

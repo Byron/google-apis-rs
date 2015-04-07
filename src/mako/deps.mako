@@ -15,10 +15,10 @@
 		if make.documentation_engine == 'mkdocs':
 			return gen_root + '/' + mkdocs.site_dir
 		else:
-			return gen_root + '/target/doc/' + crate_name
+			return gen_root + '/target/doc/' + util.to_extern_crate_name(crate_name)
 	# end utility
 
-	central_api_index = lambda crate_name: doc_root + '/' + crate_name + '/index.html'
+	central_api_index = lambda crate_name: doc_root + '/' + util.to_extern_crate_name(crate_name) + '/index.html'
 
 	discovery_url = 'https://www.googleapis.com/discovery/v1/'
 	apis = json.loads(urllib2.urlopen(discovery_url + "apis").read())
@@ -27,6 +27,12 @@
 	suffix = make.target_suffix
 	agsuffix = make.aggregated_target_suffix
 	global_targets = make.get('global_targets', False)
+
+	try:
+		root = directories.mako_src + '/' + make.id + '/lib'
+		lib_files = [os.path.join(root, file_name) for file_name in os.listdir(root)]
+	except OSError:
+		lib_files = list()
 %>\
 % for an, versions in api.list.iteritems():
 % if an in api.get('blacklist', list()):
@@ -60,7 +66,7 @@
 	api_json = directories.api_base + '/' + an + '/' + version + '/' + an + '-api.json'
 	api_meta_dir = os.path.dirname(api_json)
 	api_crate_publish_file = api_meta_dir + '/crates/' + util.crate_version(cargo.build_version + make.aggregated_target_suffix,
-																		 	json.load(open(api_json, 'r'))['revision'])
+																		 	json.load(open(api_json, 'r')).get('revision', '00000000'))
 	api_json_overrides = api_meta_dir + '/' + an + '-api_overrides.json'
 	type_specific_json = '$(API_DIR)/type-' + make.id + '.yaml'
 	api_json_inputs = api_json + ' $(API_SHARED_INFO) ' + type_specific_json
@@ -75,7 +81,7 @@ ${api_common}: $(RUST_SRC)/${make.id}/cmn.rs $(lastword $(MAKEFILE_LIST)) ${gen_
 	@ echo "// DO NOT EDIT"  >> $@
 	@cat $< >> $@
 
-${gen_root_stamp}: ${' '.join(i[0] for i in sds)} ${api_json_inputs} $(MAKO_STANDARD_DEPENDENCIES) ${depends_on_target}
+${gen_root_stamp}: ${' '.join(i[0] for i in sds)} ${' '.join(lib_files)} ${api_json_inputs} $(MAKO_STANDARD_DEPENDENCIES) ${depends_on_target}
 	@echo Generating ${api_target}
 	@$(MAKO) -io ${' '.join("%s=%s" % (s, d) for s, d in sds)} --data-files ${api_json_inputs}
 	@touch $@

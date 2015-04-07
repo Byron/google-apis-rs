@@ -70,8 +70,8 @@
 //! 
 //! ```test_harness,no_run
 //! extern crate hyper;
-//! extern crate "yup-oauth2" as oauth2;
-//! extern crate "google-identitytoolkit3" as identitytoolkit3;
+//! extern crate yup_oauth2 as oauth2;
+//! extern crate google_identitytoolkit3 as identitytoolkit3;
 //! use identitytoolkit3::IdentitytoolkitRelyingpartyVerifyAssertionRequest;
 //! use identitytoolkit3::{Result, Error};
 //! # #[test] fn egal() {
@@ -170,20 +170,20 @@
 //! [google-go-api]: https://github.com/google/google-api-go-client
 //! 
 //! 
-#![feature(core,io,thread_sleep)]
+#![feature(std_misc)]
 // Unused attributes happen thanks to defined, but unused structures
 // We don't warn about this, as depending on the API, some data structures or facilities are never used.
 // Instead of pre-determining this, we just disable the lint. It's manually tuned to not have any 
 // unused imports in fully featured APIs. Same with unused_mut ... .
 #![allow(unused_imports, unused_mut, dead_code)]
 // Required for serde annotations
-#![feature(custom_derive, custom_attribute, plugin)]
+#![feature(custom_derive, custom_attribute, plugin, slice_patterns)]
 #![plugin(serde_macros)]
 
 #[macro_use]
 extern crate hyper;
 extern crate serde;
-extern crate "yup-oauth2" as oauth2;
+extern crate yup_oauth2 as oauth2;
 extern crate mime;
 extern crate url;
 
@@ -198,7 +198,7 @@ use std::marker::PhantomData;
 use serde::json;
 use std::io;
 use std::fs;
-use std::thread::sleep;
+use std::thread::sleep_ms;
 
 pub use cmn::{MultiPartReader, ToParts, MethodInfo, Result, Error, CallBuilder, Hub, ReadSeek, Part, ResponseResult, RequestValue, NestedType, Delegate, DefaultDelegate, MethodsBuilder, Resource, JsonServerError};
 
@@ -222,8 +222,8 @@ pub use cmn::{MultiPartReader, ToParts, MethodInfo, Result, Error, CallBuilder, 
 ///
 /// ```test_harness,no_run
 /// extern crate hyper;
-/// extern crate "yup-oauth2" as oauth2;
-/// extern crate "google-identitytoolkit3" as identitytoolkit3;
+/// extern crate yup_oauth2 as oauth2;
+/// extern crate google_identitytoolkit3 as identitytoolkit3;
 /// use identitytoolkit3::IdentitytoolkitRelyingpartyVerifyAssertionRequest;
 /// use identitytoolkit3::{Result, Error};
 /// # #[test] fn egal() {
@@ -1046,8 +1046,8 @@ impl Part for UserInfo {}
 ///
 /// ```test_harness,no_run
 /// extern crate hyper;
-/// extern crate "yup-oauth2" as oauth2;
-/// extern crate "google-identitytoolkit3" as identitytoolkit3;
+/// extern crate yup_oauth2 as oauth2;
+/// extern crate google_identitytoolkit3 as identitytoolkit3;
 /// 
 /// # #[test] fn egal() {
 /// use std::default::Default;
@@ -1266,8 +1266,8 @@ impl<'a, C, NC, A> RelyingpartyMethods<'a, C, NC, A> {
 ///
 /// ```test_harness,no_run
 /// # extern crate hyper;
-/// # extern crate "yup-oauth2" as oauth2;
-/// # extern crate "google-identitytoolkit3" as identitytoolkit3;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_identitytoolkit3 as identitytoolkit3;
 /// use identitytoolkit3::Relyingparty;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
@@ -1346,7 +1346,7 @@ impl<'a, C, NC, A> RelyingpartyGetOobConfirmationCodeCall<'a, C, NC, A> where NC
         
         if params.len() > 0 {
             url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
+            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_ref()))));
         }
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
@@ -1359,7 +1359,7 @@ impl<'a, C, NC, A> RelyingpartyGetOobConfirmationCodeCall<'a, C, NC, A> where NC
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.as_slice())
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.as_ref())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(ContentType(json_mime_type.clone()))
                     .header(ContentLength(request_size as u64))
@@ -1372,7 +1372,7 @@ impl<'a, C, NC, A> RelyingpartyGetOobConfirmationCodeCall<'a, C, NC, A> where NC
             match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
+                        sleep_ms(d.num_milliseconds() as u32);
                         continue;
                     }
                     dlg.finished(false);
@@ -1383,7 +1383,7 @@ impl<'a, C, NC, A> RelyingpartyGetOobConfirmationCodeCall<'a, C, NC, A> where NC
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
-                            sleep(d);
+                            sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
@@ -1447,8 +1447,8 @@ impl<'a, C, NC, A> RelyingpartyGetOobConfirmationCodeCall<'a, C, NC, A> where NC
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> RelyingpartyGetOobConfirmationCodeCall<'a, C, NC, A>
-                                                        where T: Str {
-        self._additional_params.insert(name.as_slice().to_string(), value.as_slice().to_string());
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
     }
 
@@ -1466,8 +1466,8 @@ impl<'a, C, NC, A> RelyingpartyGetOobConfirmationCodeCall<'a, C, NC, A> where NC
 ///
 /// ```test_harness,no_run
 /// # extern crate hyper;
-/// # extern crate "yup-oauth2" as oauth2;
-/// # extern crate "google-identitytoolkit3" as identitytoolkit3;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_identitytoolkit3 as identitytoolkit3;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -1539,7 +1539,7 @@ impl<'a, C, NC, A> RelyingpartyGetPublicKeyCall<'a, C, NC, A> where NC: hyper::n
         
         if params.len() > 0 {
             url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
+            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_ref()))));
         }
 
 
@@ -1547,7 +1547,7 @@ impl<'a, C, NC, A> RelyingpartyGetPublicKeyCall<'a, C, NC, A> where NC: hyper::n
         loop {
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_slice())
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_ref())
                     .header(UserAgent(self.hub._user_agent.clone()));
 
                 dlg.pre_request();
@@ -1557,7 +1557,7 @@ impl<'a, C, NC, A> RelyingpartyGetPublicKeyCall<'a, C, NC, A> where NC: hyper::n
             match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
+                        sleep_ms(d.num_milliseconds() as u32);
                         continue;
                     }
                     dlg.finished(false);
@@ -1568,7 +1568,7 @@ impl<'a, C, NC, A> RelyingpartyGetPublicKeyCall<'a, C, NC, A> where NC: hyper::n
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
-                            sleep(d);
+                            sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
@@ -1623,8 +1623,8 @@ impl<'a, C, NC, A> RelyingpartyGetPublicKeyCall<'a, C, NC, A> where NC: hyper::n
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> RelyingpartyGetPublicKeyCall<'a, C, NC, A>
-                                                        where T: Str {
-        self._additional_params.insert(name.as_slice().to_string(), value.as_slice().to_string());
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
     }
 
@@ -1642,8 +1642,8 @@ impl<'a, C, NC, A> RelyingpartyGetPublicKeyCall<'a, C, NC, A> where NC: hyper::n
 ///
 /// ```test_harness,no_run
 /// # extern crate hyper;
-/// # extern crate "yup-oauth2" as oauth2;
-/// # extern crate "google-identitytoolkit3" as identitytoolkit3;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_identitytoolkit3 as identitytoolkit3;
 /// use identitytoolkit3::IdentitytoolkitRelyingpartyCreateAuthUriRequest;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
@@ -1722,7 +1722,7 @@ impl<'a, C, NC, A> RelyingpartyCreateAuthUriCall<'a, C, NC, A> where NC: hyper::
         
         if params.len() > 0 {
             url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
+            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_ref()))));
         }
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
@@ -1735,7 +1735,7 @@ impl<'a, C, NC, A> RelyingpartyCreateAuthUriCall<'a, C, NC, A> where NC: hyper::
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.as_slice())
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.as_ref())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(ContentType(json_mime_type.clone()))
                     .header(ContentLength(request_size as u64))
@@ -1748,7 +1748,7 @@ impl<'a, C, NC, A> RelyingpartyCreateAuthUriCall<'a, C, NC, A> where NC: hyper::
             match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
+                        sleep_ms(d.num_milliseconds() as u32);
                         continue;
                     }
                     dlg.finished(false);
@@ -1759,7 +1759,7 @@ impl<'a, C, NC, A> RelyingpartyCreateAuthUriCall<'a, C, NC, A> where NC: hyper::
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
-                            sleep(d);
+                            sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
@@ -1823,8 +1823,8 @@ impl<'a, C, NC, A> RelyingpartyCreateAuthUriCall<'a, C, NC, A> where NC: hyper::
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> RelyingpartyCreateAuthUriCall<'a, C, NC, A>
-                                                        where T: Str {
-        self._additional_params.insert(name.as_slice().to_string(), value.as_slice().to_string());
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
     }
 
@@ -1842,8 +1842,8 @@ impl<'a, C, NC, A> RelyingpartyCreateAuthUriCall<'a, C, NC, A> where NC: hyper::
 ///
 /// ```test_harness,no_run
 /// # extern crate hyper;
-/// # extern crate "yup-oauth2" as oauth2;
-/// # extern crate "google-identitytoolkit3" as identitytoolkit3;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_identitytoolkit3 as identitytoolkit3;
 /// use identitytoolkit3::IdentitytoolkitRelyingpartyVerifyAssertionRequest;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
@@ -1922,7 +1922,7 @@ impl<'a, C, NC, A> RelyingpartyVerifyAssertionCall<'a, C, NC, A> where NC: hyper
         
         if params.len() > 0 {
             url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
+            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_ref()))));
         }
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
@@ -1935,7 +1935,7 @@ impl<'a, C, NC, A> RelyingpartyVerifyAssertionCall<'a, C, NC, A> where NC: hyper
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.as_slice())
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.as_ref())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(ContentType(json_mime_type.clone()))
                     .header(ContentLength(request_size as u64))
@@ -1948,7 +1948,7 @@ impl<'a, C, NC, A> RelyingpartyVerifyAssertionCall<'a, C, NC, A> where NC: hyper
             match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
+                        sleep_ms(d.num_milliseconds() as u32);
                         continue;
                     }
                     dlg.finished(false);
@@ -1959,7 +1959,7 @@ impl<'a, C, NC, A> RelyingpartyVerifyAssertionCall<'a, C, NC, A> where NC: hyper
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
-                            sleep(d);
+                            sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
@@ -2023,8 +2023,8 @@ impl<'a, C, NC, A> RelyingpartyVerifyAssertionCall<'a, C, NC, A> where NC: hyper
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> RelyingpartyVerifyAssertionCall<'a, C, NC, A>
-                                                        where T: Str {
-        self._additional_params.insert(name.as_slice().to_string(), value.as_slice().to_string());
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
     }
 
@@ -2042,8 +2042,8 @@ impl<'a, C, NC, A> RelyingpartyVerifyAssertionCall<'a, C, NC, A> where NC: hyper
 ///
 /// ```test_harness,no_run
 /// # extern crate hyper;
-/// # extern crate "yup-oauth2" as oauth2;
-/// # extern crate "google-identitytoolkit3" as identitytoolkit3;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_identitytoolkit3 as identitytoolkit3;
 /// use identitytoolkit3::IdentitytoolkitRelyingpartyUploadAccountRequest;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
@@ -2122,7 +2122,7 @@ impl<'a, C, NC, A> RelyingpartyUploadAccountCall<'a, C, NC, A> where NC: hyper::
         
         if params.len() > 0 {
             url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
+            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_ref()))));
         }
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
@@ -2135,7 +2135,7 @@ impl<'a, C, NC, A> RelyingpartyUploadAccountCall<'a, C, NC, A> where NC: hyper::
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.as_slice())
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.as_ref())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(ContentType(json_mime_type.clone()))
                     .header(ContentLength(request_size as u64))
@@ -2148,7 +2148,7 @@ impl<'a, C, NC, A> RelyingpartyUploadAccountCall<'a, C, NC, A> where NC: hyper::
             match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
+                        sleep_ms(d.num_milliseconds() as u32);
                         continue;
                     }
                     dlg.finished(false);
@@ -2159,7 +2159,7 @@ impl<'a, C, NC, A> RelyingpartyUploadAccountCall<'a, C, NC, A> where NC: hyper::
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
-                            sleep(d);
+                            sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
@@ -2223,8 +2223,8 @@ impl<'a, C, NC, A> RelyingpartyUploadAccountCall<'a, C, NC, A> where NC: hyper::
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> RelyingpartyUploadAccountCall<'a, C, NC, A>
-                                                        where T: Str {
-        self._additional_params.insert(name.as_slice().to_string(), value.as_slice().to_string());
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
     }
 
@@ -2242,8 +2242,8 @@ impl<'a, C, NC, A> RelyingpartyUploadAccountCall<'a, C, NC, A> where NC: hyper::
 ///
 /// ```test_harness,no_run
 /// # extern crate hyper;
-/// # extern crate "yup-oauth2" as oauth2;
-/// # extern crate "google-identitytoolkit3" as identitytoolkit3;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_identitytoolkit3 as identitytoolkit3;
 /// use identitytoolkit3::IdentitytoolkitRelyingpartyGetAccountInfoRequest;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
@@ -2322,7 +2322,7 @@ impl<'a, C, NC, A> RelyingpartyGetAccountInfoCall<'a, C, NC, A> where NC: hyper:
         
         if params.len() > 0 {
             url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
+            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_ref()))));
         }
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
@@ -2335,7 +2335,7 @@ impl<'a, C, NC, A> RelyingpartyGetAccountInfoCall<'a, C, NC, A> where NC: hyper:
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.as_slice())
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.as_ref())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(ContentType(json_mime_type.clone()))
                     .header(ContentLength(request_size as u64))
@@ -2348,7 +2348,7 @@ impl<'a, C, NC, A> RelyingpartyGetAccountInfoCall<'a, C, NC, A> where NC: hyper:
             match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
+                        sleep_ms(d.num_milliseconds() as u32);
                         continue;
                     }
                     dlg.finished(false);
@@ -2359,7 +2359,7 @@ impl<'a, C, NC, A> RelyingpartyGetAccountInfoCall<'a, C, NC, A> where NC: hyper:
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
-                            sleep(d);
+                            sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
@@ -2423,8 +2423,8 @@ impl<'a, C, NC, A> RelyingpartyGetAccountInfoCall<'a, C, NC, A> where NC: hyper:
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> RelyingpartyGetAccountInfoCall<'a, C, NC, A>
-                                                        where T: Str {
-        self._additional_params.insert(name.as_slice().to_string(), value.as_slice().to_string());
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
     }
 
@@ -2442,8 +2442,8 @@ impl<'a, C, NC, A> RelyingpartyGetAccountInfoCall<'a, C, NC, A> where NC: hyper:
 ///
 /// ```test_harness,no_run
 /// # extern crate hyper;
-/// # extern crate "yup-oauth2" as oauth2;
-/// # extern crate "google-identitytoolkit3" as identitytoolkit3;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_identitytoolkit3 as identitytoolkit3;
 /// use identitytoolkit3::IdentitytoolkitRelyingpartyResetPasswordRequest;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
@@ -2522,7 +2522,7 @@ impl<'a, C, NC, A> RelyingpartyResetPasswordCall<'a, C, NC, A> where NC: hyper::
         
         if params.len() > 0 {
             url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
+            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_ref()))));
         }
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
@@ -2535,7 +2535,7 @@ impl<'a, C, NC, A> RelyingpartyResetPasswordCall<'a, C, NC, A> where NC: hyper::
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.as_slice())
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.as_ref())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(ContentType(json_mime_type.clone()))
                     .header(ContentLength(request_size as u64))
@@ -2548,7 +2548,7 @@ impl<'a, C, NC, A> RelyingpartyResetPasswordCall<'a, C, NC, A> where NC: hyper::
             match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
+                        sleep_ms(d.num_milliseconds() as u32);
                         continue;
                     }
                     dlg.finished(false);
@@ -2559,7 +2559,7 @@ impl<'a, C, NC, A> RelyingpartyResetPasswordCall<'a, C, NC, A> where NC: hyper::
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
-                            sleep(d);
+                            sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
@@ -2623,8 +2623,8 @@ impl<'a, C, NC, A> RelyingpartyResetPasswordCall<'a, C, NC, A> where NC: hyper::
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> RelyingpartyResetPasswordCall<'a, C, NC, A>
-                                                        where T: Str {
-        self._additional_params.insert(name.as_slice().to_string(), value.as_slice().to_string());
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
     }
 
@@ -2642,8 +2642,8 @@ impl<'a, C, NC, A> RelyingpartyResetPasswordCall<'a, C, NC, A> where NC: hyper::
 ///
 /// ```test_harness,no_run
 /// # extern crate hyper;
-/// # extern crate "yup-oauth2" as oauth2;
-/// # extern crate "google-identitytoolkit3" as identitytoolkit3;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_identitytoolkit3 as identitytoolkit3;
 /// use identitytoolkit3::IdentitytoolkitRelyingpartyDownloadAccountRequest;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
@@ -2722,7 +2722,7 @@ impl<'a, C, NC, A> RelyingpartyDownloadAccountCall<'a, C, NC, A> where NC: hyper
         
         if params.len() > 0 {
             url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
+            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_ref()))));
         }
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
@@ -2735,7 +2735,7 @@ impl<'a, C, NC, A> RelyingpartyDownloadAccountCall<'a, C, NC, A> where NC: hyper
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.as_slice())
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.as_ref())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(ContentType(json_mime_type.clone()))
                     .header(ContentLength(request_size as u64))
@@ -2748,7 +2748,7 @@ impl<'a, C, NC, A> RelyingpartyDownloadAccountCall<'a, C, NC, A> where NC: hyper
             match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
+                        sleep_ms(d.num_milliseconds() as u32);
                         continue;
                     }
                     dlg.finished(false);
@@ -2759,7 +2759,7 @@ impl<'a, C, NC, A> RelyingpartyDownloadAccountCall<'a, C, NC, A> where NC: hyper
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
-                            sleep(d);
+                            sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
@@ -2823,8 +2823,8 @@ impl<'a, C, NC, A> RelyingpartyDownloadAccountCall<'a, C, NC, A> where NC: hyper
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> RelyingpartyDownloadAccountCall<'a, C, NC, A>
-                                                        where T: Str {
-        self._additional_params.insert(name.as_slice().to_string(), value.as_slice().to_string());
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
     }
 
@@ -2842,8 +2842,8 @@ impl<'a, C, NC, A> RelyingpartyDownloadAccountCall<'a, C, NC, A> where NC: hyper
 ///
 /// ```test_harness,no_run
 /// # extern crate hyper;
-/// # extern crate "yup-oauth2" as oauth2;
-/// # extern crate "google-identitytoolkit3" as identitytoolkit3;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_identitytoolkit3 as identitytoolkit3;
 /// use identitytoolkit3::IdentitytoolkitRelyingpartySetAccountInfoRequest;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
@@ -2922,7 +2922,7 @@ impl<'a, C, NC, A> RelyingpartySetAccountInfoCall<'a, C, NC, A> where NC: hyper:
         
         if params.len() > 0 {
             url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
+            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_ref()))));
         }
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
@@ -2935,7 +2935,7 @@ impl<'a, C, NC, A> RelyingpartySetAccountInfoCall<'a, C, NC, A> where NC: hyper:
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.as_slice())
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.as_ref())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(ContentType(json_mime_type.clone()))
                     .header(ContentLength(request_size as u64))
@@ -2948,7 +2948,7 @@ impl<'a, C, NC, A> RelyingpartySetAccountInfoCall<'a, C, NC, A> where NC: hyper:
             match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
+                        sleep_ms(d.num_milliseconds() as u32);
                         continue;
                     }
                     dlg.finished(false);
@@ -2959,7 +2959,7 @@ impl<'a, C, NC, A> RelyingpartySetAccountInfoCall<'a, C, NC, A> where NC: hyper:
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
-                            sleep(d);
+                            sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
@@ -3023,8 +3023,8 @@ impl<'a, C, NC, A> RelyingpartySetAccountInfoCall<'a, C, NC, A> where NC: hyper:
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> RelyingpartySetAccountInfoCall<'a, C, NC, A>
-                                                        where T: Str {
-        self._additional_params.insert(name.as_slice().to_string(), value.as_slice().to_string());
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
     }
 
@@ -3042,8 +3042,8 @@ impl<'a, C, NC, A> RelyingpartySetAccountInfoCall<'a, C, NC, A> where NC: hyper:
 ///
 /// ```test_harness,no_run
 /// # extern crate hyper;
-/// # extern crate "yup-oauth2" as oauth2;
-/// # extern crate "google-identitytoolkit3" as identitytoolkit3;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_identitytoolkit3 as identitytoolkit3;
 /// use identitytoolkit3::IdentitytoolkitRelyingpartyDeleteAccountRequest;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
@@ -3122,7 +3122,7 @@ impl<'a, C, NC, A> RelyingpartyDeleteAccountCall<'a, C, NC, A> where NC: hyper::
         
         if params.len() > 0 {
             url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
+            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_ref()))));
         }
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
@@ -3135,7 +3135,7 @@ impl<'a, C, NC, A> RelyingpartyDeleteAccountCall<'a, C, NC, A> where NC: hyper::
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.as_slice())
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.as_ref())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(ContentType(json_mime_type.clone()))
                     .header(ContentLength(request_size as u64))
@@ -3148,7 +3148,7 @@ impl<'a, C, NC, A> RelyingpartyDeleteAccountCall<'a, C, NC, A> where NC: hyper::
             match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
+                        sleep_ms(d.num_milliseconds() as u32);
                         continue;
                     }
                     dlg.finished(false);
@@ -3159,7 +3159,7 @@ impl<'a, C, NC, A> RelyingpartyDeleteAccountCall<'a, C, NC, A> where NC: hyper::
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
-                            sleep(d);
+                            sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
@@ -3223,8 +3223,8 @@ impl<'a, C, NC, A> RelyingpartyDeleteAccountCall<'a, C, NC, A> where NC: hyper::
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> RelyingpartyDeleteAccountCall<'a, C, NC, A>
-                                                        where T: Str {
-        self._additional_params.insert(name.as_slice().to_string(), value.as_slice().to_string());
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
     }
 
@@ -3242,8 +3242,8 @@ impl<'a, C, NC, A> RelyingpartyDeleteAccountCall<'a, C, NC, A> where NC: hyper::
 ///
 /// ```test_harness,no_run
 /// # extern crate hyper;
-/// # extern crate "yup-oauth2" as oauth2;
-/// # extern crate "google-identitytoolkit3" as identitytoolkit3;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_identitytoolkit3 as identitytoolkit3;
 /// use identitytoolkit3::IdentitytoolkitRelyingpartyVerifyPasswordRequest;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
@@ -3322,7 +3322,7 @@ impl<'a, C, NC, A> RelyingpartyVerifyPasswordCall<'a, C, NC, A> where NC: hyper:
         
         if params.len() > 0 {
             url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
+            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_ref()))));
         }
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
@@ -3335,7 +3335,7 @@ impl<'a, C, NC, A> RelyingpartyVerifyPasswordCall<'a, C, NC, A> where NC: hyper:
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.as_slice())
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.as_ref())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(ContentType(json_mime_type.clone()))
                     .header(ContentLength(request_size as u64))
@@ -3348,7 +3348,7 @@ impl<'a, C, NC, A> RelyingpartyVerifyPasswordCall<'a, C, NC, A> where NC: hyper:
             match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
+                        sleep_ms(d.num_milliseconds() as u32);
                         continue;
                     }
                     dlg.finished(false);
@@ -3359,7 +3359,7 @@ impl<'a, C, NC, A> RelyingpartyVerifyPasswordCall<'a, C, NC, A> where NC: hyper:
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
-                            sleep(d);
+                            sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
@@ -3423,8 +3423,8 @@ impl<'a, C, NC, A> RelyingpartyVerifyPasswordCall<'a, C, NC, A> where NC: hyper:
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> RelyingpartyVerifyPasswordCall<'a, C, NC, A>
-                                                        where T: Str {
-        self._additional_params.insert(name.as_slice().to_string(), value.as_slice().to_string());
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
     }
 

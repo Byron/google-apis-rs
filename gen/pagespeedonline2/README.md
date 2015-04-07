@@ -70,8 +70,8 @@ google-pagespeedonline2 = "*"
 
 ```Rust
 extern crate hyper;
-extern crate "yup-oauth2" as oauth2;
-extern crate "google-pagespeedonline2" as pagespeedonline2;
+extern crate yup_oauth2 as oauth2;
+extern crate google_pagespeedonline2 as pagespeedonline2;
 use pagespeedonline2::{Result, Error};
 use std::default::Default;
 use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};

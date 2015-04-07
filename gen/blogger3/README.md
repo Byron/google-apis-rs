@@ -93,8 +93,8 @@ google-blogger3 = "*"
 
 ```Rust
 extern crate hyper;
-extern crate "yup-oauth2" as oauth2;
-extern crate "google-blogger3" as blogger3;
+extern crate yup_oauth2 as oauth2;
+extern crate google_blogger3 as blogger3;
 use blogger3::{Result, Error};
 use std::default::Default;
 use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};

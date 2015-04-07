@@ -28,15 +28,15 @@ ${util.library_to_crate_name(util.library_name(name, version), make.target_suffi
 </%def>
 
 <%def name="crate_version()" buffered="True">\
-${util.crate_version(cargo.build_version, revision)}\
+${util.crate_version(cargo.build_version, revision is UNDEFINED and '00000000' or revision)}\
 </%def>
 
 ## All crates and standard `use` declaration, required for all examples
 ## Must be outside of a test function
 <%def name="test_prelude()">\
 extern crate hyper;
-extern crate "yup-oauth2" as oauth2;
-extern crate "${self.crate_name()}" as ${self.library_name()};
+extern crate yup_oauth2 as oauth2;
+extern crate ${util.to_extern_crate_name(self.crate_name())} as ${self.library_name()};
 </%def>
 
 ## Define the canonical name, if present, or name otherwise

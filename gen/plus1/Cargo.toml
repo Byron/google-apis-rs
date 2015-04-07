@@ -1,0 +1,22 @@
+# DO NOT EDIT !
+# This file was generated automatically from 'src/mako/Cargo.toml.mako'
+# DO NOT EDIT !
+[package]
+
+name = "google-plus1"
+version = "0.1.2+20150326"
+authors = ["Sebastian Thiel <byronimo@gmail>"]
+description = "A complete library to interact with plus (protocol v1)"
+repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/plus1"
+homepage = "https://developers.google.com/+/api/"
+documentation = "http://byron.github.io/google-apis-rs/google-plus1"
+license = "MIT"
+keywords = ["plus", "google", "protocol", "web", "api"]
+
+[dependencies]
+hyper = "*"
+mime = "*"
+yup-oauth2 = "*"
+url = "*"
+serde = "*"
+serde_macros = "*"

@@ -1,0 +1,22 @@
+# DO NOT EDIT !
+# This file was generated automatically from 'src/mako/Cargo.toml.mako'
+# DO NOT EDIT !
+[package]
+
+name = "google-gan1_beta1"
+version = "0.1.2+20130205"
+authors = ["Sebastian Thiel <byronimo@gmail>"]
+description = "A complete library to interact with gan (protocol v1beta1)"
+repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/gan1_beta1"
+homepage = "https://developers.google.com/affiliate-network/"
+documentation = "http://byron.github.io/google-apis-rs/google-gan1_beta1"
+license = "MIT"
+keywords = ["gan", "google", "protocol", "web", "api"]
+
+[dependencies]
+hyper = "*"
+mime = "*"
+yup-oauth2 = "*"
+url = "*"
+serde = "*"
+serde_macros = "*"

@@ -5,7 +5,7 @@ DO NOT EDIT !
 -->
 The `google-gmail1` library allows access to all features of the *Google gmail* service.
 
-This documentation was generated from *gmail* crate version *0.1.2+20150313*, where *20150313* is the exact revision of the *gmail:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.2*.
+This documentation was generated from *gmail* crate version *0.1.2+20150303*, where *20150303* is the exact revision of the *gmail:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.2*.
 
 Everything else about the *gmail* *v1* API can be found at the
 [official documentation site](https://developers.google.com/gmail/api/).
@@ -86,8 +86,8 @@ google-gmail1 = "*"
 
 ```Rust
 extern crate hyper;
-extern crate "yup-oauth2" as oauth2;
-extern crate "google-gmail1" as gmail1;
+extern crate yup_oauth2 as oauth2;
+extern crate google_gmail1 as gmail1;
 use gmail1::Message;
 use gmail1::{Result, Error};
 use std::fs;

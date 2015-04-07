@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *replicapool* crate version *0.1.2+20141002*, where *20141002* is the exact revision of the *replicapool:v1beta2* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.2*.
+//! This documentation was generated from *replicapool* crate version *0.1.2+20150223*, where *20150223* is the exact revision of the *replicapool:v1beta2* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.2*.
 //! 
 //! Everything else about the *replicapool* *v1_beta2* API can be found at the
 //! [official documentation site](https://developers.google.com/compute/docs/instance-groups/manager/v1beta2).
@@ -81,8 +81,8 @@
 //! 
 //! ```test_harness,no_run
 //! extern crate hyper;
-//! extern crate "yup-oauth2" as oauth2;
-//! extern crate "google-replicapool1_beta2" as replicapool1_beta2;
+//! extern crate yup_oauth2 as oauth2;
+//! extern crate google_replicapool1_beta2 as replicapool1_beta2;
 //! use replicapool1_beta2::{Result, Error};
 //! # #[test] fn egal() {
 //! use std::default::Default;
@@ -178,20 +178,20 @@
 //! [google-go-api]: https://github.com/google/google-api-go-client
 //! 
 //! 
-#![feature(core,io,thread_sleep)]
+#![feature(std_misc)]
 // Unused attributes happen thanks to defined, but unused structures
 // We don't warn about this, as depending on the API, some data structures or facilities are never used.
 // Instead of pre-determining this, we just disable the lint. It's manually tuned to not have any 
 // unused imports in fully featured APIs. Same with unused_mut ... .
 #![allow(unused_imports, unused_mut, dead_code)]
 // Required for serde annotations
-#![feature(custom_derive, custom_attribute, plugin)]
+#![feature(custom_derive, custom_attribute, plugin, slice_patterns)]
 #![plugin(serde_macros)]
 
 #[macro_use]
 extern crate hyper;
 extern crate serde;
-extern crate "yup-oauth2" as oauth2;
+extern crate yup_oauth2 as oauth2;
 extern crate mime;
 extern crate url;
 
@@ -206,7 +206,7 @@ use std::marker::PhantomData;
 use serde::json;
 use std::io;
 use std::fs;
-use std::thread::sleep;
+use std::thread::sleep_ms;
 
 pub use cmn::{MultiPartReader, ToParts, MethodInfo, Result, Error, CallBuilder, Hub, ReadSeek, Part, ResponseResult, RequestValue, NestedType, Delegate, DefaultDelegate, MethodsBuilder, Resource, JsonServerError};
 
@@ -230,8 +230,8 @@ pub enum Scope {
     ComputeReadonly,
 }
 
-impl Str for Scope {
-    fn as_slice(&self) -> &str {
+impl AsRef<str> for Scope {
+    fn as_ref(&self) -> &str {
         match *self {
             Scope::Compute => "https://www.googleapis.com/auth/compute",
             Scope::CloudPlatform => "https://www.googleapis.com/auth/cloud-platform",
@@ -260,8 +260,8 @@ impl Default for Scope {
 ///
 /// ```test_harness,no_run
 /// extern crate hyper;
-/// extern crate "yup-oauth2" as oauth2;
-/// extern crate "google-replicapool1_beta2" as replicapool1_beta2;
+/// extern crate yup_oauth2 as oauth2;
+/// extern crate google_replicapool1_beta2 as replicapool1_beta2;
 /// use replicapool1_beta2::{Result, Error};
 /// # #[test] fn egal() {
 /// use std::default::Default;
@@ -722,8 +722,8 @@ impl ResponseResult for Operation {}
 ///
 /// ```test_harness,no_run
 /// extern crate hyper;
-/// extern crate "yup-oauth2" as oauth2;
-/// extern crate "google-replicapool1_beta2" as replicapool1_beta2;
+/// extern crate yup_oauth2 as oauth2;
+/// extern crate google_replicapool1_beta2 as replicapool1_beta2;
 /// 
 /// # #[test] fn egal() {
 /// use std::default::Default;
@@ -806,8 +806,8 @@ impl<'a, C, NC, A> ZoneOperationMethods<'a, C, NC, A> {
 ///
 /// ```test_harness,no_run
 /// extern crate hyper;
-/// extern crate "yup-oauth2" as oauth2;
-/// extern crate "google-replicapool1_beta2" as replicapool1_beta2;
+/// extern crate yup_oauth2 as oauth2;
+/// extern crate google_replicapool1_beta2 as replicapool1_beta2;
 /// 
 /// # #[test] fn egal() {
 /// use std::default::Default;
@@ -1039,7 +1039,7 @@ impl<'a, C, NC, A> InstanceGroupManagerMethods<'a, C, NC, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Deletes the specified instances. The instances are removed from the instance group and any target pools of which they are a member, then deleted. The targetSize of the instance group manager is reduced by the number of instances deleted.
+    /// Deletes the specified instances. The instances are deleted, then removed from the instance group and any target pools of which they were a member. The targetSize of the instance group manager is reduced by the number of instances deleted.
     /// 
     /// # Arguments
     ///
@@ -1080,8 +1080,8 @@ impl<'a, C, NC, A> InstanceGroupManagerMethods<'a, C, NC, A> {
 ///
 /// ```test_harness,no_run
 /// # extern crate hyper;
-/// # extern crate "yup-oauth2" as oauth2;
-/// # extern crate "google-replicapool1_beta2" as replicapool1_beta2;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_replicapool1_beta2 as replicapool1_beta2;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -1158,7 +1158,7 @@ impl<'a, C, NC, A> ZoneOperationListCall<'a, C, NC, A> where NC: hyper::net::Net
 
         let mut url = "https://www.googleapis.com/replicapool/v1beta2/projects/{project}/zones/{zone}/operations".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::ComputeReadonly.as_slice().to_string(), ());
+            self._scopes.insert(Scope::ComputeReadonly.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{project}", "project"), ("{zone}", "zone")].iter() {
@@ -1188,7 +1188,7 @@ impl<'a, C, NC, A> ZoneOperationListCall<'a, C, NC, A> where NC: hyper::net::Net
         
         if params.len() > 0 {
             url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
+            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_ref()))));
         }
 
 
@@ -1206,7 +1206,7 @@ impl<'a, C, NC, A> ZoneOperationListCall<'a, C, NC, A> where NC: hyper::net::Net
                                                              access_token: token.unwrap().access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_slice())
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_ref())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -1217,7 +1217,7 @@ impl<'a, C, NC, A> ZoneOperationListCall<'a, C, NC, A> where NC: hyper::net::Net
             match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
+                        sleep_ms(d.num_milliseconds() as u32);
                         continue;
                     }
                     dlg.finished(false);
@@ -1228,7 +1228,7 @@ impl<'a, C, NC, A> ZoneOperationListCall<'a, C, NC, A> where NC: hyper::net::Net
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
-                            sleep(d);
+                            sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
@@ -1327,8 +1327,8 @@ impl<'a, C, NC, A> ZoneOperationListCall<'a, C, NC, A> where NC: hyper::net::Net
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> ZoneOperationListCall<'a, C, NC, A>
-                                                        where T: Str {
-        self._additional_params.insert(name.as_slice().to_string(), value.as_slice().to_string());
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
     }
 
@@ -1344,8 +1344,8 @@ impl<'a, C, NC, A> ZoneOperationListCall<'a, C, NC, A> where NC: hyper::net::Net
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T>(mut self, scope: T) -> ZoneOperationListCall<'a, C, NC, A> 
-                                                        where T: Str {
-        self._scopes.insert(scope.as_slice().to_string(), ());
+                                                        where T: AsRef<str> {
+        self._scopes.insert(scope.as_ref().to_string(), ());
         self
     }
 }
@@ -1362,8 +1362,8 @@ impl<'a, C, NC, A> ZoneOperationListCall<'a, C, NC, A> where NC: hyper::net::Net
 ///
 /// ```test_harness,no_run
 /// # extern crate hyper;
-/// # extern crate "yup-oauth2" as oauth2;
-/// # extern crate "google-replicapool1_beta2" as replicapool1_beta2;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_replicapool1_beta2 as replicapool1_beta2;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -1427,7 +1427,7 @@ impl<'a, C, NC, A> ZoneOperationGetCall<'a, C, NC, A> where NC: hyper::net::Netw
 
         let mut url = "https://www.googleapis.com/replicapool/v1beta2/projects/{project}/zones/{zone}/operations/{operation}".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::ComputeReadonly.as_slice().to_string(), ());
+            self._scopes.insert(Scope::ComputeReadonly.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{project}", "project"), ("{zone}", "zone"), ("{operation}", "operation")].iter() {
@@ -1457,7 +1457,7 @@ impl<'a, C, NC, A> ZoneOperationGetCall<'a, C, NC, A> where NC: hyper::net::Netw
         
         if params.len() > 0 {
             url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
+            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_ref()))));
         }
 
 
@@ -1475,7 +1475,7 @@ impl<'a, C, NC, A> ZoneOperationGetCall<'a, C, NC, A> where NC: hyper::net::Netw
                                                              access_token: token.unwrap().access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_slice())
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_ref())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -1486,7 +1486,7 @@ impl<'a, C, NC, A> ZoneOperationGetCall<'a, C, NC, A> where NC: hyper::net::Netw
             match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
+                        sleep_ms(d.num_milliseconds() as u32);
                         continue;
                     }
                     dlg.finished(false);
@@ -1497,7 +1497,7 @@ impl<'a, C, NC, A> ZoneOperationGetCall<'a, C, NC, A> where NC: hyper::net::Netw
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
-                            sleep(d);
+                            sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
@@ -1582,8 +1582,8 @@ impl<'a, C, NC, A> ZoneOperationGetCall<'a, C, NC, A> where NC: hyper::net::Netw
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> ZoneOperationGetCall<'a, C, NC, A>
-                                                        where T: Str {
-        self._additional_params.insert(name.as_slice().to_string(), value.as_slice().to_string());
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
     }
 
@@ -1599,8 +1599,8 @@ impl<'a, C, NC, A> ZoneOperationGetCall<'a, C, NC, A> where NC: hyper::net::Netw
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T>(mut self, scope: T) -> ZoneOperationGetCall<'a, C, NC, A> 
-                                                        where T: Str {
-        self._scopes.insert(scope.as_slice().to_string(), ());
+                                                        where T: AsRef<str> {
+        self._scopes.insert(scope.as_ref().to_string(), ());
         self
     }
 }
@@ -1617,8 +1617,8 @@ impl<'a, C, NC, A> ZoneOperationGetCall<'a, C, NC, A> where NC: hyper::net::Netw
 ///
 /// ```test_harness,no_run
 /// # extern crate hyper;
-/// # extern crate "yup-oauth2" as oauth2;
-/// # extern crate "google-replicapool1_beta2" as replicapool1_beta2;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_replicapool1_beta2 as replicapool1_beta2;
 /// use replicapool1_beta2::InstanceGroupManagersSetTargetPoolsRequest;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
@@ -1689,7 +1689,7 @@ impl<'a, C, NC, A> InstanceGroupManagerSetTargetPoolCall<'a, C, NC, A> where NC:
 
         let mut url = "https://www.googleapis.com/replicapool/v1beta2/projects/{project}/zones/{zone}/instanceGroupManagers/{instanceGroupManager}/setTargetPools".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::CloudPlatform.as_slice().to_string(), ());
+            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{project}", "project"), ("{zone}", "zone"), ("{instanceGroupManager}", "instanceGroupManager")].iter() {
@@ -1719,7 +1719,7 @@ impl<'a, C, NC, A> InstanceGroupManagerSetTargetPoolCall<'a, C, NC, A> where NC:
         
         if params.len() > 0 {
             url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
+            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_ref()))));
         }
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
@@ -1742,7 +1742,7 @@ impl<'a, C, NC, A> InstanceGroupManagerSetTargetPoolCall<'a, C, NC, A> where NC:
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.as_slice())
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.as_ref())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -1756,7 +1756,7 @@ impl<'a, C, NC, A> InstanceGroupManagerSetTargetPoolCall<'a, C, NC, A> where NC:
             match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
+                        sleep_ms(d.num_milliseconds() as u32);
                         continue;
                     }
                     dlg.finished(false);
@@ -1767,7 +1767,7 @@ impl<'a, C, NC, A> InstanceGroupManagerSetTargetPoolCall<'a, C, NC, A> where NC:
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
-                            sleep(d);
+                            sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
@@ -1861,8 +1861,8 @@ impl<'a, C, NC, A> InstanceGroupManagerSetTargetPoolCall<'a, C, NC, A> where NC:
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> InstanceGroupManagerSetTargetPoolCall<'a, C, NC, A>
-                                                        where T: Str {
-        self._additional_params.insert(name.as_slice().to_string(), value.as_slice().to_string());
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
     }
 
@@ -1878,8 +1878,8 @@ impl<'a, C, NC, A> InstanceGroupManagerSetTargetPoolCall<'a, C, NC, A> where NC:
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T>(mut self, scope: T) -> InstanceGroupManagerSetTargetPoolCall<'a, C, NC, A> 
-                                                        where T: Str {
-        self._scopes.insert(scope.as_slice().to_string(), ());
+                                                        where T: AsRef<str> {
+        self._scopes.insert(scope.as_ref().to_string(), ());
         self
     }
 }
@@ -1896,8 +1896,8 @@ impl<'a, C, NC, A> InstanceGroupManagerSetTargetPoolCall<'a, C, NC, A> where NC:
 ///
 /// ```test_harness,no_run
 /// # extern crate hyper;
-/// # extern crate "yup-oauth2" as oauth2;
-/// # extern crate "google-replicapool1_beta2" as replicapool1_beta2;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_replicapool1_beta2 as replicapool1_beta2;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -1974,7 +1974,7 @@ impl<'a, C, NC, A> InstanceGroupManagerListCall<'a, C, NC, A> where NC: hyper::n
 
         let mut url = "https://www.googleapis.com/replicapool/v1beta2/projects/{project}/zones/{zone}/instanceGroupManagers".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::ComputeReadonly.as_slice().to_string(), ());
+            self._scopes.insert(Scope::ComputeReadonly.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{project}", "project"), ("{zone}", "zone")].iter() {
@@ -2004,7 +2004,7 @@ impl<'a, C, NC, A> InstanceGroupManagerListCall<'a, C, NC, A> where NC: hyper::n
         
         if params.len() > 0 {
             url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
+            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_ref()))));
         }
 
 
@@ -2022,7 +2022,7 @@ impl<'a, C, NC, A> InstanceGroupManagerListCall<'a, C, NC, A> where NC: hyper::n
                                                              access_token: token.unwrap().access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_slice())
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_ref())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -2033,7 +2033,7 @@ impl<'a, C, NC, A> InstanceGroupManagerListCall<'a, C, NC, A> where NC: hyper::n
             match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
+                        sleep_ms(d.num_milliseconds() as u32);
                         continue;
                     }
                     dlg.finished(false);
@@ -2044,7 +2044,7 @@ impl<'a, C, NC, A> InstanceGroupManagerListCall<'a, C, NC, A> where NC: hyper::n
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
-                            sleep(d);
+                            sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
@@ -2143,8 +2143,8 @@ impl<'a, C, NC, A> InstanceGroupManagerListCall<'a, C, NC, A> where NC: hyper::n
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> InstanceGroupManagerListCall<'a, C, NC, A>
-                                                        where T: Str {
-        self._additional_params.insert(name.as_slice().to_string(), value.as_slice().to_string());
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
     }
 
@@ -2160,8 +2160,8 @@ impl<'a, C, NC, A> InstanceGroupManagerListCall<'a, C, NC, A> where NC: hyper::n
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T>(mut self, scope: T) -> InstanceGroupManagerListCall<'a, C, NC, A> 
-                                                        where T: Str {
-        self._scopes.insert(scope.as_slice().to_string(), ());
+                                                        where T: AsRef<str> {
+        self._scopes.insert(scope.as_ref().to_string(), ());
         self
     }
 }
@@ -2178,8 +2178,8 @@ impl<'a, C, NC, A> InstanceGroupManagerListCall<'a, C, NC, A> where NC: hyper::n
 ///
 /// ```test_harness,no_run
 /// # extern crate hyper;
-/// # extern crate "yup-oauth2" as oauth2;
-/// # extern crate "google-replicapool1_beta2" as replicapool1_beta2;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_replicapool1_beta2 as replicapool1_beta2;
 /// use replicapool1_beta2::InstanceGroupManager;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
@@ -2250,7 +2250,7 @@ impl<'a, C, NC, A> InstanceGroupManagerInsertCall<'a, C, NC, A> where NC: hyper:
 
         let mut url = "https://www.googleapis.com/replicapool/v1beta2/projects/{project}/zones/{zone}/instanceGroupManagers".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::CloudPlatform.as_slice().to_string(), ());
+            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{project}", "project"), ("{zone}", "zone")].iter() {
@@ -2280,7 +2280,7 @@ impl<'a, C, NC, A> InstanceGroupManagerInsertCall<'a, C, NC, A> where NC: hyper:
         
         if params.len() > 0 {
             url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
+            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_ref()))));
         }
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
@@ -2303,7 +2303,7 @@ impl<'a, C, NC, A> InstanceGroupManagerInsertCall<'a, C, NC, A> where NC: hyper:
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.as_slice())
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.as_ref())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -2317,7 +2317,7 @@ impl<'a, C, NC, A> InstanceGroupManagerInsertCall<'a, C, NC, A> where NC: hyper:
             match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
+                        sleep_ms(d.num_milliseconds() as u32);
                         continue;
                     }
                     dlg.finished(false);
@@ -2328,7 +2328,7 @@ impl<'a, C, NC, A> InstanceGroupManagerInsertCall<'a, C, NC, A> where NC: hyper:
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
-                            sleep(d);
+                            sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
@@ -2422,8 +2422,8 @@ impl<'a, C, NC, A> InstanceGroupManagerInsertCall<'a, C, NC, A> where NC: hyper:
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> InstanceGroupManagerInsertCall<'a, C, NC, A>
-                                                        where T: Str {
-        self._additional_params.insert(name.as_slice().to_string(), value.as_slice().to_string());
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
     }
 
@@ -2439,8 +2439,8 @@ impl<'a, C, NC, A> InstanceGroupManagerInsertCall<'a, C, NC, A> where NC: hyper:
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T>(mut self, scope: T) -> InstanceGroupManagerInsertCall<'a, C, NC, A> 
-                                                        where T: Str {
-        self._scopes.insert(scope.as_slice().to_string(), ());
+                                                        where T: AsRef<str> {
+        self._scopes.insert(scope.as_ref().to_string(), ());
         self
     }
 }
@@ -2457,8 +2457,8 @@ impl<'a, C, NC, A> InstanceGroupManagerInsertCall<'a, C, NC, A> where NC: hyper:
 ///
 /// ```test_harness,no_run
 /// # extern crate hyper;
-/// # extern crate "yup-oauth2" as oauth2;
-/// # extern crate "google-replicapool1_beta2" as replicapool1_beta2;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_replicapool1_beta2 as replicapool1_beta2;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -2522,7 +2522,7 @@ impl<'a, C, NC, A> InstanceGroupManagerGetCall<'a, C, NC, A> where NC: hyper::ne
 
         let mut url = "https://www.googleapis.com/replicapool/v1beta2/projects/{project}/zones/{zone}/instanceGroupManagers/{instanceGroupManager}".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::ComputeReadonly.as_slice().to_string(), ());
+            self._scopes.insert(Scope::ComputeReadonly.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{project}", "project"), ("{zone}", "zone"), ("{instanceGroupManager}", "instanceGroupManager")].iter() {
@@ -2552,7 +2552,7 @@ impl<'a, C, NC, A> InstanceGroupManagerGetCall<'a, C, NC, A> where NC: hyper::ne
         
         if params.len() > 0 {
             url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
+            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_ref()))));
         }
 
 
@@ -2570,7 +2570,7 @@ impl<'a, C, NC, A> InstanceGroupManagerGetCall<'a, C, NC, A> where NC: hyper::ne
                                                              access_token: token.unwrap().access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_slice())
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_ref())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -2581,7 +2581,7 @@ impl<'a, C, NC, A> InstanceGroupManagerGetCall<'a, C, NC, A> where NC: hyper::ne
             match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
+                        sleep_ms(d.num_milliseconds() as u32);
                         continue;
                     }
                     dlg.finished(false);
@@ -2592,7 +2592,7 @@ impl<'a, C, NC, A> InstanceGroupManagerGetCall<'a, C, NC, A> where NC: hyper::ne
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
-                            sleep(d);
+                            sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
@@ -2677,8 +2677,8 @@ impl<'a, C, NC, A> InstanceGroupManagerGetCall<'a, C, NC, A> where NC: hyper::ne
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> InstanceGroupManagerGetCall<'a, C, NC, A>
-                                                        where T: Str {
-        self._additional_params.insert(name.as_slice().to_string(), value.as_slice().to_string());
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
     }
 
@@ -2694,8 +2694,8 @@ impl<'a, C, NC, A> InstanceGroupManagerGetCall<'a, C, NC, A> where NC: hyper::ne
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T>(mut self, scope: T) -> InstanceGroupManagerGetCall<'a, C, NC, A> 
-                                                        where T: Str {
-        self._scopes.insert(scope.as_slice().to_string(), ());
+                                                        where T: AsRef<str> {
+        self._scopes.insert(scope.as_ref().to_string(), ());
         self
     }
 }
@@ -2712,8 +2712,8 @@ impl<'a, C, NC, A> InstanceGroupManagerGetCall<'a, C, NC, A> where NC: hyper::ne
 ///
 /// ```test_harness,no_run
 /// # extern crate hyper;
-/// # extern crate "yup-oauth2" as oauth2;
-/// # extern crate "google-replicapool1_beta2" as replicapool1_beta2;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_replicapool1_beta2 as replicapool1_beta2;
 /// use replicapool1_beta2::InstanceGroupManagersAbandonInstancesRequest;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
@@ -2784,7 +2784,7 @@ impl<'a, C, NC, A> InstanceGroupManagerAbandonInstanceCall<'a, C, NC, A> where N
 
         let mut url = "https://www.googleapis.com/replicapool/v1beta2/projects/{project}/zones/{zone}/instanceGroupManagers/{instanceGroupManager}/abandonInstances".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::CloudPlatform.as_slice().to_string(), ());
+            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{project}", "project"), ("{zone}", "zone"), ("{instanceGroupManager}", "instanceGroupManager")].iter() {
@@ -2814,7 +2814,7 @@ impl<'a, C, NC, A> InstanceGroupManagerAbandonInstanceCall<'a, C, NC, A> where N
         
         if params.len() > 0 {
             url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
+            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_ref()))));
         }
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
@@ -2837,7 +2837,7 @@ impl<'a, C, NC, A> InstanceGroupManagerAbandonInstanceCall<'a, C, NC, A> where N
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.as_slice())
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.as_ref())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -2851,7 +2851,7 @@ impl<'a, C, NC, A> InstanceGroupManagerAbandonInstanceCall<'a, C, NC, A> where N
             match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
+                        sleep_ms(d.num_milliseconds() as u32);
                         continue;
                     }
                     dlg.finished(false);
@@ -2862,7 +2862,7 @@ impl<'a, C, NC, A> InstanceGroupManagerAbandonInstanceCall<'a, C, NC, A> where N
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
-                            sleep(d);
+                            sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
@@ -2956,8 +2956,8 @@ impl<'a, C, NC, A> InstanceGroupManagerAbandonInstanceCall<'a, C, NC, A> where N
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> InstanceGroupManagerAbandonInstanceCall<'a, C, NC, A>
-                                                        where T: Str {
-        self._additional_params.insert(name.as_slice().to_string(), value.as_slice().to_string());
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
     }
 
@@ -2973,8 +2973,8 @@ impl<'a, C, NC, A> InstanceGroupManagerAbandonInstanceCall<'a, C, NC, A> where N
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T>(mut self, scope: T) -> InstanceGroupManagerAbandonInstanceCall<'a, C, NC, A> 
-                                                        where T: Str {
-        self._scopes.insert(scope.as_slice().to_string(), ());
+                                                        where T: AsRef<str> {
+        self._scopes.insert(scope.as_ref().to_string(), ());
         self
     }
 }
@@ -2991,8 +2991,8 @@ impl<'a, C, NC, A> InstanceGroupManagerAbandonInstanceCall<'a, C, NC, A> where N
 ///
 /// ```test_harness,no_run
 /// # extern crate hyper;
-/// # extern crate "yup-oauth2" as oauth2;
-/// # extern crate "google-replicapool1_beta2" as replicapool1_beta2;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_replicapool1_beta2 as replicapool1_beta2;
 /// use replicapool1_beta2::InstanceGroupManagersRecreateInstancesRequest;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
@@ -3063,7 +3063,7 @@ impl<'a, C, NC, A> InstanceGroupManagerRecreateInstanceCall<'a, C, NC, A> where 
 
         let mut url = "https://www.googleapis.com/replicapool/v1beta2/projects/{project}/zones/{zone}/instanceGroupManagers/{instanceGroupManager}/recreateInstances".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::CloudPlatform.as_slice().to_string(), ());
+            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{project}", "project"), ("{zone}", "zone"), ("{instanceGroupManager}", "instanceGroupManager")].iter() {
@@ -3093,7 +3093,7 @@ impl<'a, C, NC, A> InstanceGroupManagerRecreateInstanceCall<'a, C, NC, A> where 
         
         if params.len() > 0 {
             url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
+            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_ref()))));
         }
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
@@ -3116,7 +3116,7 @@ impl<'a, C, NC, A> InstanceGroupManagerRecreateInstanceCall<'a, C, NC, A> where 
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.as_slice())
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.as_ref())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -3130,7 +3130,7 @@ impl<'a, C, NC, A> InstanceGroupManagerRecreateInstanceCall<'a, C, NC, A> where 
             match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
+                        sleep_ms(d.num_milliseconds() as u32);
                         continue;
                     }
                     dlg.finished(false);
@@ -3141,7 +3141,7 @@ impl<'a, C, NC, A> InstanceGroupManagerRecreateInstanceCall<'a, C, NC, A> where 
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
-                            sleep(d);
+                            sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
@@ -3235,8 +3235,8 @@ impl<'a, C, NC, A> InstanceGroupManagerRecreateInstanceCall<'a, C, NC, A> where 
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> InstanceGroupManagerRecreateInstanceCall<'a, C, NC, A>
-                                                        where T: Str {
-        self._additional_params.insert(name.as_slice().to_string(), value.as_slice().to_string());
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
     }
 
@@ -3252,8 +3252,8 @@ impl<'a, C, NC, A> InstanceGroupManagerRecreateInstanceCall<'a, C, NC, A> where 
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T>(mut self, scope: T) -> InstanceGroupManagerRecreateInstanceCall<'a, C, NC, A> 
-                                                        where T: Str {
-        self._scopes.insert(scope.as_slice().to_string(), ());
+                                                        where T: AsRef<str> {
+        self._scopes.insert(scope.as_ref().to_string(), ());
         self
     }
 }
@@ -3270,8 +3270,8 @@ impl<'a, C, NC, A> InstanceGroupManagerRecreateInstanceCall<'a, C, NC, A> where 
 ///
 /// ```test_harness,no_run
 /// # extern crate hyper;
-/// # extern crate "yup-oauth2" as oauth2;
-/// # extern crate "google-replicapool1_beta2" as replicapool1_beta2;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_replicapool1_beta2 as replicapool1_beta2;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -3335,7 +3335,7 @@ impl<'a, C, NC, A> InstanceGroupManagerDeleteCall<'a, C, NC, A> where NC: hyper:
 
         let mut url = "https://www.googleapis.com/replicapool/v1beta2/projects/{project}/zones/{zone}/instanceGroupManagers/{instanceGroupManager}".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::CloudPlatform.as_slice().to_string(), ());
+            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{project}", "project"), ("{zone}", "zone"), ("{instanceGroupManager}", "instanceGroupManager")].iter() {
@@ -3365,7 +3365,7 @@ impl<'a, C, NC, A> InstanceGroupManagerDeleteCall<'a, C, NC, A> where NC: hyper:
         
         if params.len() > 0 {
             url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
+            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_ref()))));
         }
 
 
@@ -3383,7 +3383,7 @@ impl<'a, C, NC, A> InstanceGroupManagerDeleteCall<'a, C, NC, A> where NC: hyper:
                                                              access_token: token.unwrap().access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Delete, url.as_slice())
+                let mut req = client.borrow_mut().request(hyper::method::Method::Delete, url.as_ref())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -3394,7 +3394,7 @@ impl<'a, C, NC, A> InstanceGroupManagerDeleteCall<'a, C, NC, A> where NC: hyper:
             match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
+                        sleep_ms(d.num_milliseconds() as u32);
                         continue;
                     }
                     dlg.finished(false);
@@ -3405,7 +3405,7 @@ impl<'a, C, NC, A> InstanceGroupManagerDeleteCall<'a, C, NC, A> where NC: hyper:
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
-                            sleep(d);
+                            sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
@@ -3490,8 +3490,8 @@ impl<'a, C, NC, A> InstanceGroupManagerDeleteCall<'a, C, NC, A> where NC: hyper:
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> InstanceGroupManagerDeleteCall<'a, C, NC, A>
-                                                        where T: Str {
-        self._additional_params.insert(name.as_slice().to_string(), value.as_slice().to_string());
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
     }
 
@@ -3507,8 +3507,8 @@ impl<'a, C, NC, A> InstanceGroupManagerDeleteCall<'a, C, NC, A> where NC: hyper:
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T>(mut self, scope: T) -> InstanceGroupManagerDeleteCall<'a, C, NC, A> 
-                                                        where T: Str {
-        self._scopes.insert(scope.as_slice().to_string(), ());
+                                                        where T: AsRef<str> {
+        self._scopes.insert(scope.as_ref().to_string(), ());
         self
     }
 }
@@ -3525,8 +3525,8 @@ impl<'a, C, NC, A> InstanceGroupManagerDeleteCall<'a, C, NC, A> where NC: hyper:
 ///
 /// ```test_harness,no_run
 /// # extern crate hyper;
-/// # extern crate "yup-oauth2" as oauth2;
-/// # extern crate "google-replicapool1_beta2" as replicapool1_beta2;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_replicapool1_beta2 as replicapool1_beta2;
 /// use replicapool1_beta2::InstanceGroupManagersSetInstanceTemplateRequest;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
@@ -3597,7 +3597,7 @@ impl<'a, C, NC, A> InstanceGroupManagerSetInstanceTemplateCall<'a, C, NC, A> whe
 
         let mut url = "https://www.googleapis.com/replicapool/v1beta2/projects/{project}/zones/{zone}/instanceGroupManagers/{instanceGroupManager}/setInstanceTemplate".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::CloudPlatform.as_slice().to_string(), ());
+            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{project}", "project"), ("{zone}", "zone"), ("{instanceGroupManager}", "instanceGroupManager")].iter() {
@@ -3627,7 +3627,7 @@ impl<'a, C, NC, A> InstanceGroupManagerSetInstanceTemplateCall<'a, C, NC, A> whe
         
         if params.len() > 0 {
             url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
+            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_ref()))));
         }
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
@@ -3650,7 +3650,7 @@ impl<'a, C, NC, A> InstanceGroupManagerSetInstanceTemplateCall<'a, C, NC, A> whe
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.as_slice())
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.as_ref())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -3664,7 +3664,7 @@ impl<'a, C, NC, A> InstanceGroupManagerSetInstanceTemplateCall<'a, C, NC, A> whe
             match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
+                        sleep_ms(d.num_milliseconds() as u32);
                         continue;
                     }
                     dlg.finished(false);
@@ -3675,7 +3675,7 @@ impl<'a, C, NC, A> InstanceGroupManagerSetInstanceTemplateCall<'a, C, NC, A> whe
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
-                            sleep(d);
+                            sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
@@ -3769,8 +3769,8 @@ impl<'a, C, NC, A> InstanceGroupManagerSetInstanceTemplateCall<'a, C, NC, A> whe
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> InstanceGroupManagerSetInstanceTemplateCall<'a, C, NC, A>
-                                                        where T: Str {
-        self._additional_params.insert(name.as_slice().to_string(), value.as_slice().to_string());
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
     }
 
@@ -3786,8 +3786,8 @@ impl<'a, C, NC, A> InstanceGroupManagerSetInstanceTemplateCall<'a, C, NC, A> whe
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T>(mut self, scope: T) -> InstanceGroupManagerSetInstanceTemplateCall<'a, C, NC, A> 
-                                                        where T: Str {
-        self._scopes.insert(scope.as_slice().to_string(), ());
+                                                        where T: AsRef<str> {
+        self._scopes.insert(scope.as_ref().to_string(), ());
         self
     }
 }
@@ -3804,8 +3804,8 @@ impl<'a, C, NC, A> InstanceGroupManagerSetInstanceTemplateCall<'a, C, NC, A> whe
 ///
 /// ```test_harness,no_run
 /// # extern crate hyper;
-/// # extern crate "yup-oauth2" as oauth2;
-/// # extern crate "google-replicapool1_beta2" as replicapool1_beta2;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_replicapool1_beta2 as replicapool1_beta2;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -3871,7 +3871,7 @@ impl<'a, C, NC, A> InstanceGroupManagerResizeCall<'a, C, NC, A> where NC: hyper:
 
         let mut url = "https://www.googleapis.com/replicapool/v1beta2/projects/{project}/zones/{zone}/instanceGroupManagers/{instanceGroupManager}/resize".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::CloudPlatform.as_slice().to_string(), ());
+            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{project}", "project"), ("{zone}", "zone"), ("{instanceGroupManager}", "instanceGroupManager")].iter() {
@@ -3901,7 +3901,7 @@ impl<'a, C, NC, A> InstanceGroupManagerResizeCall<'a, C, NC, A> where NC: hyper:
         
         if params.len() > 0 {
             url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
+            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_ref()))));
         }
 
 
@@ -3919,7 +3919,7 @@ impl<'a, C, NC, A> InstanceGroupManagerResizeCall<'a, C, NC, A> where NC: hyper:
                                                              access_token: token.unwrap().access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.as_slice())
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.as_ref())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -3930,7 +3930,7 @@ impl<'a, C, NC, A> InstanceGroupManagerResizeCall<'a, C, NC, A> where NC: hyper:
             match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
+                        sleep_ms(d.num_milliseconds() as u32);
                         continue;
                     }
                     dlg.finished(false);
@@ -3941,7 +3941,7 @@ impl<'a, C, NC, A> InstanceGroupManagerResizeCall<'a, C, NC, A> where NC: hyper:
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
-                            sleep(d);
+                            sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
@@ -4036,8 +4036,8 @@ impl<'a, C, NC, A> InstanceGroupManagerResizeCall<'a, C, NC, A> where NC: hyper:
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> InstanceGroupManagerResizeCall<'a, C, NC, A>
-                                                        where T: Str {
-        self._additional_params.insert(name.as_slice().to_string(), value.as_slice().to_string());
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
     }
 
@@ -4053,14 +4053,14 @@ impl<'a, C, NC, A> InstanceGroupManagerResizeCall<'a, C, NC, A> where NC: hyper:
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T>(mut self, scope: T) -> InstanceGroupManagerResizeCall<'a, C, NC, A> 
-                                                        where T: Str {
-        self._scopes.insert(scope.as_slice().to_string(), ());
+                                                        where T: AsRef<str> {
+        self._scopes.insert(scope.as_ref().to_string(), ());
         self
     }
 }
 
 
-/// Deletes the specified instances. The instances are removed from the instance group and any target pools of which they are a member, then deleted. The targetSize of the instance group manager is reduced by the number of instances deleted.
+/// Deletes the specified instances. The instances are deleted, then removed from the instance group and any target pools of which they were a member. The targetSize of the instance group manager is reduced by the number of instances deleted.
 ///
 /// A builder for the *deleteInstances* method supported by a *instanceGroupManager* resource.
 /// It is not used directly, but through a `InstanceGroupManagerMethods` instance.
@@ -4071,8 +4071,8 @@ impl<'a, C, NC, A> InstanceGroupManagerResizeCall<'a, C, NC, A> where NC: hyper:
 ///
 /// ```test_harness,no_run
 /// # extern crate hyper;
-/// # extern crate "yup-oauth2" as oauth2;
-/// # extern crate "google-replicapool1_beta2" as replicapool1_beta2;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_replicapool1_beta2 as replicapool1_beta2;
 /// use replicapool1_beta2::InstanceGroupManagersDeleteInstancesRequest;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
@@ -4143,7 +4143,7 @@ impl<'a, C, NC, A> InstanceGroupManagerDeleteInstanceCall<'a, C, NC, A> where NC
 
         let mut url = "https://www.googleapis.com/replicapool/v1beta2/projects/{project}/zones/{zone}/instanceGroupManagers/{instanceGroupManager}/deleteInstances".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::CloudPlatform.as_slice().to_string(), ());
+            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{project}", "project"), ("{zone}", "zone"), ("{instanceGroupManager}", "instanceGroupManager")].iter() {
@@ -4173,7 +4173,7 @@ impl<'a, C, NC, A> InstanceGroupManagerDeleteInstanceCall<'a, C, NC, A> where NC
         
         if params.len() > 0 {
             url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
+            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_ref()))));
         }
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
@@ -4196,7 +4196,7 @@ impl<'a, C, NC, A> InstanceGroupManagerDeleteInstanceCall<'a, C, NC, A> where NC
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.as_slice())
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.as_ref())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -4210,7 +4210,7 @@ impl<'a, C, NC, A> InstanceGroupManagerDeleteInstanceCall<'a, C, NC, A> where NC
             match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
+                        sleep_ms(d.num_milliseconds() as u32);
                         continue;
                     }
                     dlg.finished(false);
@@ -4221,7 +4221,7 @@ impl<'a, C, NC, A> InstanceGroupManagerDeleteInstanceCall<'a, C, NC, A> where NC
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
-                            sleep(d);
+                            sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
@@ -4315,8 +4315,8 @@ impl<'a, C, NC, A> InstanceGroupManagerDeleteInstanceCall<'a, C, NC, A> where NC
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> InstanceGroupManagerDeleteInstanceCall<'a, C, NC, A>
-                                                        where T: Str {
-        self._additional_params.insert(name.as_slice().to_string(), value.as_slice().to_string());
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
     }
 
@@ -4332,8 +4332,8 @@ impl<'a, C, NC, A> InstanceGroupManagerDeleteInstanceCall<'a, C, NC, A> where NC
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T>(mut self, scope: T) -> InstanceGroupManagerDeleteInstanceCall<'a, C, NC, A> 
-                                                        where T: Str {
-        self._scopes.insert(scope.as_slice().to_string(), ());
+                                                        where T: AsRef<str> {
+        self._scopes.insert(scope.as_ref().to_string(), ());
         self
     }
 }

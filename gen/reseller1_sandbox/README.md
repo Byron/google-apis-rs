@@ -81,8 +81,8 @@ google-reseller1_sandbox = "*"
 
 ```Rust
 extern crate hyper;
-extern crate "yup-oauth2" as oauth2;
-extern crate "google-reseller1_sandbox" as reseller1_sandbox;
+extern crate yup_oauth2 as oauth2;
+extern crate google_reseller1_sandbox as reseller1_sandbox;
 use reseller1_sandbox::{Result, Error};
 use std::default::Default;
 use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};

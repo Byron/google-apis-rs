@@ -810,6 +810,10 @@ def library_to_crate_name(name, suffix=''):
 def crate_version(build_version, revision):
     return '%s+%s' % (build_version, revision)
 
+# return a crate name for us in extern crate statements
+def to_extern_crate_name(crate_name):
+    return crate_name.replace('-', '_')
+
 # return type name of a resource method builder, from a resource name
 def rb_type(r):
     return "%sMethods" % singular(canonical_type_name(r))

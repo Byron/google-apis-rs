@@ -4,7 +4,7 @@
 [package]
 
 name = "google-freebase1"
-version = "0.1.2+20150313"
+version = "0.1.2+20150330"
 authors = ["Sebastian Thiel <byronimo@gmail>"]
 description = "A complete library to interact with freebase (protocol v1)"
 repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/freebase1"

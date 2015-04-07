@@ -5,7 +5,7 @@ DO NOT EDIT !
 -->
 The `google-bigquery2` library allows access to all features of the *Google bigquery* service.
 
-This documentation was generated from *bigquery* crate version *0.1.2+20150303*, where *20150303* is the exact revision of the *bigquery:v2* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.2*.
+This documentation was generated from *bigquery* crate version *0.1.2+20150326*, where *20150326* is the exact revision of the *bigquery:v2* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.2*.
 
 Everything else about the *bigquery* *v2* API can be found at the
 [official documentation site](https://developers.google.com/bigquery/docs/overview).
@@ -87,8 +87,8 @@ google-bigquery2 = "*"
 
 ```Rust
 extern crate hyper;
-extern crate "yup-oauth2" as oauth2;
-extern crate "google-bigquery2" as bigquery2;
+extern crate yup_oauth2 as oauth2;
+extern crate google_bigquery2 as bigquery2;
 use bigquery2::Table;
 use bigquery2::{Result, Error};
 use std::default::Default;

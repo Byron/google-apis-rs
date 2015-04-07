@@ -85,8 +85,8 @@ google-analytics3 = "*"
 
 ```Rust
 extern crate hyper;
-extern crate "yup-oauth2" as oauth2;
-extern crate "google-analytics3" as analytics3;
+extern crate yup_oauth2 as oauth2;
+extern crate google_analytics3 as analytics3;
 use analytics3::EntityUserLink;
 use analytics3::{Result, Error};
 use std::default::Default;

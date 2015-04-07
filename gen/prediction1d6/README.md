@@ -74,8 +74,8 @@ google-prediction1d6 = "*"
 
 ```Rust
 extern crate hyper;
-extern crate "yup-oauth2" as oauth2;
-extern crate "google-prediction1d6" as prediction1d6;
+extern crate yup_oauth2 as oauth2;
+extern crate google_prediction1d6 as prediction1d6;
 use prediction1d6::Update;
 use prediction1d6::{Result, Error};
 use std::default::Default;

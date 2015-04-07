@@ -95,8 +95,8 @@ google-mirror1 = "*"
 
 ```Rust
 extern crate hyper;
-extern crate "yup-oauth2" as oauth2;
-extern crate "google-mirror1" as mirror1;
+extern crate yup_oauth2 as oauth2;
+extern crate google_mirror1 as mirror1;
 use mirror1::Contact;
 use mirror1::{Result, Error};
 use std::default::Default;

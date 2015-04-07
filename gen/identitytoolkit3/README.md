@@ -70,8 +70,8 @@ google-identitytoolkit3 = "*"
 
 ```Rust
 extern crate hyper;
-extern crate "yup-oauth2" as oauth2;
-extern crate "google-identitytoolkit3" as identitytoolkit3;
+extern crate yup_oauth2 as oauth2;
+extern crate google_identitytoolkit3 as identitytoolkit3;
 use identitytoolkit3::IdentitytoolkitRelyingpartyVerifyAssertionRequest;
 use identitytoolkit3::{Result, Error};
 use std::default::Default;

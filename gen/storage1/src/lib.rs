@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *storage* crate version *0.1.2+20150213*, where *20150213* is the exact revision of the *storage:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.2*.
+//! This documentation was generated from *storage* crate version *0.1.2+20150326*, where *20150326* is the exact revision of the *storage:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.2*.
 //! 
 //! Everything else about the *storage* *v1* API can be found at the
 //! [official documentation site](https://developers.google.com/storage/docs/json_api/).
@@ -106,8 +106,8 @@
 //! 
 //! ```test_harness,no_run
 //! extern crate hyper;
-//! extern crate "yup-oauth2" as oauth2;
-//! extern crate "google-storage1" as storage1;
+//! extern crate yup_oauth2 as oauth2;
+//! extern crate google_storage1 as storage1;
 //! use storage1::ObjectAccessControl;
 //! use storage1::{Result, Error};
 //! # #[test] fn egal() {
@@ -207,20 +207,20 @@
 //! [google-go-api]: https://github.com/google/google-api-go-client
 //! 
 //! 
-#![feature(core,io,thread_sleep)]
+#![feature(std_misc)]
 // Unused attributes happen thanks to defined, but unused structures
 // We don't warn about this, as depending on the API, some data structures or facilities are never used.
 // Instead of pre-determining this, we just disable the lint. It's manually tuned to not have any 
 // unused imports in fully featured APIs. Same with unused_mut ... .
 #![allow(unused_imports, unused_mut, dead_code)]
 // Required for serde annotations
-#![feature(custom_derive, custom_attribute, plugin)]
+#![feature(custom_derive, custom_attribute, plugin, slice_patterns)]
 #![plugin(serde_macros)]
 
 #[macro_use]
 extern crate hyper;
 extern crate serde;
-extern crate "yup-oauth2" as oauth2;
+extern crate yup_oauth2 as oauth2;
 extern crate mime;
 extern crate url;
 
@@ -235,7 +235,7 @@ use std::marker::PhantomData;
 use serde::json;
 use std::io;
 use std::fs;
-use std::thread::sleep;
+use std::thread::sleep_ms;
 
 pub use cmn::{MultiPartReader, ToParts, MethodInfo, Result, Error, CallBuilder, Hub, ReadSeek, Part, ResponseResult, RequestValue, NestedType, Delegate, DefaultDelegate, MethodsBuilder, Resource, JsonServerError};
 
@@ -262,8 +262,8 @@ pub enum Scope {
     DevstorageFullControl,
 }
 
-impl Str for Scope {
-    fn as_slice(&self) -> &str {
+impl AsRef<str> for Scope {
+    fn as_ref(&self) -> &str {
         match *self {
             Scope::DevstorageReadOnly => "https://www.googleapis.com/auth/devstorage.read_only",
             Scope::DevstorageReadWrite => "https://www.googleapis.com/auth/devstorage.read_write",
@@ -293,8 +293,8 @@ impl Default for Scope {
 ///
 /// ```test_harness,no_run
 /// extern crate hyper;
-/// extern crate "yup-oauth2" as oauth2;
-/// extern crate "google-storage1" as storage1;
+/// extern crate yup_oauth2 as oauth2;
+/// extern crate google_storage1 as storage1;
 /// use storage1::ObjectAccessControl;
 /// use storage1::{Result, Error};
 /// # #[test] fn egal() {
@@ -830,7 +830,7 @@ pub struct Bucket {
     pub project_number: Option<String>,
     /// HTTP 1.1 Entity tag for the bucket.
     pub etag: Option<String>,
-    /// The bucket's storage class. This defines how objects in the bucket are stored and determines the SLA and the cost of storage. Typical values are STANDARD and DURABLE_REDUCED_AVAILABILITY. Defaults to STANDARD. See the developer's guide for the authoritative list.
+    /// The bucket's storage class. This defines how objects in the bucket are stored and determines the SLA and the cost of storage. Values include STANDARD, NEARLINE and DURABLE_REDUCED_AVAILABILITY. Defaults to STANDARD. For more information, see storage classes.
     #[serde(alias="storageClass")]
     pub storage_class: Option<String>,
     /// The bucket's lifecycle configuration. See lifecycle management for more information.
@@ -1082,8 +1082,8 @@ impl ResponseResult for Buckets {}
 ///
 /// ```test_harness,no_run
 /// extern crate hyper;
-/// extern crate "yup-oauth2" as oauth2;
-/// extern crate "google-storage1" as storage1;
+/// extern crate yup_oauth2 as oauth2;
+/// extern crate google_storage1 as storage1;
 /// 
 /// # #[test] fn egal() {
 /// use std::default::Default;
@@ -1241,8 +1241,8 @@ impl<'a, C, NC, A> DefaultObjectAccessControlMethods<'a, C, NC, A> {
 ///
 /// ```test_harness,no_run
 /// extern crate hyper;
-/// extern crate "yup-oauth2" as oauth2;
-/// extern crate "google-storage1" as storage1;
+/// extern crate yup_oauth2 as oauth2;
+/// extern crate google_storage1 as storage1;
 /// 
 /// # #[test] fn egal() {
 /// use std::default::Default;
@@ -1398,8 +1398,8 @@ impl<'a, C, NC, A> BucketAccessControlMethods<'a, C, NC, A> {
 ///
 /// ```test_harness,no_run
 /// extern crate hyper;
-/// extern crate "yup-oauth2" as oauth2;
-/// extern crate "google-storage1" as storage1;
+/// extern crate yup_oauth2 as oauth2;
+/// extern crate google_storage1 as storage1;
 /// 
 /// # #[test] fn egal() {
 /// use std::default::Default;
@@ -1456,8 +1456,8 @@ impl<'a, C, NC, A> ChannelMethods<'a, C, NC, A> {
 ///
 /// ```test_harness,no_run
 /// extern crate hyper;
-/// extern crate "yup-oauth2" as oauth2;
-/// extern crate "google-storage1" as storage1;
+/// extern crate yup_oauth2 as oauth2;
+/// extern crate google_storage1 as storage1;
 /// 
 /// # #[test] fn egal() {
 /// use std::default::Default;
@@ -1504,6 +1504,9 @@ impl<'a, C, NC, A> ObjectMethods<'a, C, NC, A> {
             _if_generation_not_match: Default::default(),
             _if_generation_match: Default::default(),
             _generation: Default::default(),
+            _encryption_key_hash: Default::default(),
+            _encryption_key: Default::default(),
+            _encryption_algorithm: Default::default(),
             _delegate: Default::default(),
             _scopes: Default::default(),
             _additional_params: Default::default(),
@@ -1557,6 +1560,9 @@ impl<'a, C, NC, A> ObjectMethods<'a, C, NC, A> {
             _if_generation_not_match: Default::default(),
             _if_generation_match: Default::default(),
             _generation: Default::default(),
+            _encryption_key_hash: Default::default(),
+            _encryption_key: Default::default(),
+            _encryption_algorithm: Default::default(),
             _delegate: Default::default(),
             _scopes: Default::default(),
             _additional_params: Default::default(),
@@ -1583,6 +1589,9 @@ impl<'a, C, NC, A> ObjectMethods<'a, C, NC, A> {
             _if_metageneration_match: Default::default(),
             _if_generation_not_match: Default::default(),
             _if_generation_match: Default::default(),
+            _encryption_key_hash: Default::default(),
+            _encryption_key: Default::default(),
+            _encryption_algorithm: Default::default(),
             _content_encoding: Default::default(),
             _delegate: Default::default(),
             _scopes: Default::default(),
@@ -1607,6 +1616,9 @@ impl<'a, C, NC, A> ObjectMethods<'a, C, NC, A> {
             _destination_object: destination_object.to_string(),
             _if_metageneration_match: Default::default(),
             _if_generation_match: Default::default(),
+            _encryption_key_hash: Default::default(),
+            _encryption_key: Default::default(),
+            _encryption_algorithm: Default::default(),
             _destination_predefined_acl: Default::default(),
             _delegate: Default::default(),
             _scopes: Default::default(),
@@ -1690,6 +1702,9 @@ impl<'a, C, NC, A> ObjectMethods<'a, C, NC, A> {
             _if_metageneration_match: Default::default(),
             _if_generation_not_match: Default::default(),
             _if_generation_match: Default::default(),
+            _encryption_key_hash: Default::default(),
+            _encryption_key: Default::default(),
+            _encryption_algorithm: Default::default(),
             _destination_predefined_acl: Default::default(),
             _delegate: Default::default(),
             _scopes: Default::default(),
@@ -1719,6 +1734,9 @@ impl<'a, C, NC, A> ObjectMethods<'a, C, NC, A> {
             _if_generation_not_match: Default::default(),
             _if_generation_match: Default::default(),
             _generation: Default::default(),
+            _encryption_key_hash: Default::default(),
+            _encryption_key: Default::default(),
+            _encryption_algorithm: Default::default(),
             _delegate: Default::default(),
             _scopes: Default::default(),
             _additional_params: Default::default(),
@@ -1737,8 +1755,8 @@ impl<'a, C, NC, A> ObjectMethods<'a, C, NC, A> {
 ///
 /// ```test_harness,no_run
 /// extern crate hyper;
-/// extern crate "yup-oauth2" as oauth2;
-/// extern crate "google-storage1" as storage1;
+/// extern crate yup_oauth2 as oauth2;
+/// extern crate google_storage1 as storage1;
 /// 
 /// # #[test] fn egal() {
 /// use std::default::Default;
@@ -1912,8 +1930,8 @@ impl<'a, C, NC, A> ObjectAccessControlMethods<'a, C, NC, A> {
 ///
 /// ```test_harness,no_run
 /// extern crate hyper;
-/// extern crate "yup-oauth2" as oauth2;
-/// extern crate "google-storage1" as storage1;
+/// extern crate yup_oauth2 as oauth2;
+/// extern crate google_storage1 as storage1;
 /// 
 /// # #[test] fn egal() {
 /// use std::default::Default;
@@ -2091,8 +2109,8 @@ impl<'a, C, NC, A> BucketMethods<'a, C, NC, A> {
 ///
 /// ```test_harness,no_run
 /// # extern crate hyper;
-/// # extern crate "yup-oauth2" as oauth2;
-/// # extern crate "google-storage1" as storage1;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_storage1 as storage1;
 /// use storage1::ObjectAccessControl;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
@@ -2159,7 +2177,7 @@ impl<'a, C, NC, A> DefaultObjectAccessControlInsertCall<'a, C, NC, A> where NC: 
 
         let mut url = "https://www.googleapis.com/storage/v1/b/{bucket}/defaultObjectAcl".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::CloudPlatform.as_slice().to_string(), ());
+            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{bucket}", "bucket")].iter() {
@@ -2189,7 +2207,7 @@ impl<'a, C, NC, A> DefaultObjectAccessControlInsertCall<'a, C, NC, A> where NC: 
         
         if params.len() > 0 {
             url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
+            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_ref()))));
         }
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
@@ -2212,7 +2230,7 @@ impl<'a, C, NC, A> DefaultObjectAccessControlInsertCall<'a, C, NC, A> where NC: 
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.as_slice())
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.as_ref())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -2226,7 +2244,7 @@ impl<'a, C, NC, A> DefaultObjectAccessControlInsertCall<'a, C, NC, A> where NC: 
             match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
+                        sleep_ms(d.num_milliseconds() as u32);
                         continue;
                     }
                     dlg.finished(false);
@@ -2237,7 +2255,7 @@ impl<'a, C, NC, A> DefaultObjectAccessControlInsertCall<'a, C, NC, A> where NC: 
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
-                            sleep(d);
+                            sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
@@ -2311,8 +2329,8 @@ impl<'a, C, NC, A> DefaultObjectAccessControlInsertCall<'a, C, NC, A> where NC: 
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> DefaultObjectAccessControlInsertCall<'a, C, NC, A>
-                                                        where T: Str {
-        self._additional_params.insert(name.as_slice().to_string(), value.as_slice().to_string());
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
     }
 
@@ -2328,8 +2346,8 @@ impl<'a, C, NC, A> DefaultObjectAccessControlInsertCall<'a, C, NC, A> where NC: 
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T>(mut self, scope: T) -> DefaultObjectAccessControlInsertCall<'a, C, NC, A> 
-                                                        where T: Str {
-        self._scopes.insert(scope.as_slice().to_string(), ());
+                                                        where T: AsRef<str> {
+        self._scopes.insert(scope.as_ref().to_string(), ());
         self
     }
 }
@@ -2346,8 +2364,8 @@ impl<'a, C, NC, A> DefaultObjectAccessControlInsertCall<'a, C, NC, A> where NC: 
 ///
 /// ```test_harness,no_run
 /// # extern crate hyper;
-/// # extern crate "yup-oauth2" as oauth2;
-/// # extern crate "google-storage1" as storage1;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_storage1 as storage1;
 /// use storage1::ObjectAccessControl;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
@@ -2416,7 +2434,7 @@ impl<'a, C, NC, A> DefaultObjectAccessControlUpdateCall<'a, C, NC, A> where NC: 
 
         let mut url = "https://www.googleapis.com/storage/v1/b/{bucket}/defaultObjectAcl/{entity}".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::CloudPlatform.as_slice().to_string(), ());
+            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{bucket}", "bucket"), ("{entity}", "entity")].iter() {
@@ -2446,7 +2464,7 @@ impl<'a, C, NC, A> DefaultObjectAccessControlUpdateCall<'a, C, NC, A> where NC: 
         
         if params.len() > 0 {
             url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
+            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_ref()))));
         }
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
@@ -2469,7 +2487,7 @@ impl<'a, C, NC, A> DefaultObjectAccessControlUpdateCall<'a, C, NC, A> where NC: 
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Put, url.as_slice())
+                let mut req = client.borrow_mut().request(hyper::method::Method::Put, url.as_ref())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -2483,7 +2501,7 @@ impl<'a, C, NC, A> DefaultObjectAccessControlUpdateCall<'a, C, NC, A> where NC: 
             match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
+                        sleep_ms(d.num_milliseconds() as u32);
                         continue;
                     }
                     dlg.finished(false);
@@ -2494,7 +2512,7 @@ impl<'a, C, NC, A> DefaultObjectAccessControlUpdateCall<'a, C, NC, A> where NC: 
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
-                            sleep(d);
+                            sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
@@ -2578,8 +2596,8 @@ impl<'a, C, NC, A> DefaultObjectAccessControlUpdateCall<'a, C, NC, A> where NC: 
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> DefaultObjectAccessControlUpdateCall<'a, C, NC, A>
-                                                        where T: Str {
-        self._additional_params.insert(name.as_slice().to_string(), value.as_slice().to_string());
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
     }
 
@@ -2595,8 +2613,8 @@ impl<'a, C, NC, A> DefaultObjectAccessControlUpdateCall<'a, C, NC, A> where NC: 
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T>(mut self, scope: T) -> DefaultObjectAccessControlUpdateCall<'a, C, NC, A> 
-                                                        where T: Str {
-        self._scopes.insert(scope.as_slice().to_string(), ());
+                                                        where T: AsRef<str> {
+        self._scopes.insert(scope.as_ref().to_string(), ());
         self
     }
 }
@@ -2613,8 +2631,8 @@ impl<'a, C, NC, A> DefaultObjectAccessControlUpdateCall<'a, C, NC, A> where NC: 
 ///
 /// ```test_harness,no_run
 /// # extern crate hyper;
-/// # extern crate "yup-oauth2" as oauth2;
-/// # extern crate "google-storage1" as storage1;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_storage1 as storage1;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -2684,7 +2702,7 @@ impl<'a, C, NC, A> DefaultObjectAccessControlListCall<'a, C, NC, A> where NC: hy
 
         let mut url = "https://www.googleapis.com/storage/v1/b/{bucket}/defaultObjectAcl".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::CloudPlatform.as_slice().to_string(), ());
+            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{bucket}", "bucket")].iter() {
@@ -2714,7 +2732,7 @@ impl<'a, C, NC, A> DefaultObjectAccessControlListCall<'a, C, NC, A> where NC: hy
         
         if params.len() > 0 {
             url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
+            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_ref()))));
         }
 
 
@@ -2732,7 +2750,7 @@ impl<'a, C, NC, A> DefaultObjectAccessControlListCall<'a, C, NC, A> where NC: hy
                                                              access_token: token.unwrap().access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_slice())
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_ref())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -2743,7 +2761,7 @@ impl<'a, C, NC, A> DefaultObjectAccessControlListCall<'a, C, NC, A> where NC: hy
             match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
+                        sleep_ms(d.num_milliseconds() as u32);
                         continue;
                     }
                     dlg.finished(false);
@@ -2754,7 +2772,7 @@ impl<'a, C, NC, A> DefaultObjectAccessControlListCall<'a, C, NC, A> where NC: hy
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
-                            sleep(d);
+                            sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
@@ -2835,8 +2853,8 @@ impl<'a, C, NC, A> DefaultObjectAccessControlListCall<'a, C, NC, A> where NC: hy
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> DefaultObjectAccessControlListCall<'a, C, NC, A>
-                                                        where T: Str {
-        self._additional_params.insert(name.as_slice().to_string(), value.as_slice().to_string());
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
     }
 
@@ -2852,8 +2870,8 @@ impl<'a, C, NC, A> DefaultObjectAccessControlListCall<'a, C, NC, A> where NC: hy
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T>(mut self, scope: T) -> DefaultObjectAccessControlListCall<'a, C, NC, A> 
-                                                        where T: Str {
-        self._scopes.insert(scope.as_slice().to_string(), ());
+                                                        where T: AsRef<str> {
+        self._scopes.insert(scope.as_ref().to_string(), ());
         self
     }
 }
@@ -2870,8 +2888,8 @@ impl<'a, C, NC, A> DefaultObjectAccessControlListCall<'a, C, NC, A> where NC: hy
 ///
 /// ```test_harness,no_run
 /// # extern crate hyper;
-/// # extern crate "yup-oauth2" as oauth2;
-/// # extern crate "google-storage1" as storage1;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_storage1 as storage1;
 /// use storage1::ObjectAccessControl;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
@@ -2940,7 +2958,7 @@ impl<'a, C, NC, A> DefaultObjectAccessControlPatchCall<'a, C, NC, A> where NC: h
 
         let mut url = "https://www.googleapis.com/storage/v1/b/{bucket}/defaultObjectAcl/{entity}".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::CloudPlatform.as_slice().to_string(), ());
+            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{bucket}", "bucket"), ("{entity}", "entity")].iter() {
@@ -2970,7 +2988,7 @@ impl<'a, C, NC, A> DefaultObjectAccessControlPatchCall<'a, C, NC, A> where NC: h
         
         if params.len() > 0 {
             url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
+            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_ref()))));
         }
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
@@ -2993,7 +3011,7 @@ impl<'a, C, NC, A> DefaultObjectAccessControlPatchCall<'a, C, NC, A> where NC: h
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Patch, url.as_slice())
+                let mut req = client.borrow_mut().request(hyper::method::Method::Patch, url.as_ref())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -3007,7 +3025,7 @@ impl<'a, C, NC, A> DefaultObjectAccessControlPatchCall<'a, C, NC, A> where NC: h
             match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
+                        sleep_ms(d.num_milliseconds() as u32);
                         continue;
                     }
                     dlg.finished(false);
@@ -3018,7 +3036,7 @@ impl<'a, C, NC, A> DefaultObjectAccessControlPatchCall<'a, C, NC, A> where NC: h
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
-                            sleep(d);
+                            sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
@@ -3102,8 +3120,8 @@ impl<'a, C, NC, A> DefaultObjectAccessControlPatchCall<'a, C, NC, A> where NC: h
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> DefaultObjectAccessControlPatchCall<'a, C, NC, A>
-                                                        where T: Str {
-        self._additional_params.insert(name.as_slice().to_string(), value.as_slice().to_string());
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
     }
 
@@ -3119,8 +3137,8 @@ impl<'a, C, NC, A> DefaultObjectAccessControlPatchCall<'a, C, NC, A> where NC: h
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T>(mut self, scope: T) -> DefaultObjectAccessControlPatchCall<'a, C, NC, A> 
-                                                        where T: Str {
-        self._scopes.insert(scope.as_slice().to_string(), ());
+                                                        where T: AsRef<str> {
+        self._scopes.insert(scope.as_ref().to_string(), ());
         self
     }
 }
@@ -3137,8 +3155,8 @@ impl<'a, C, NC, A> DefaultObjectAccessControlPatchCall<'a, C, NC, A> where NC: h
 ///
 /// ```test_harness,no_run
 /// # extern crate hyper;
-/// # extern crate "yup-oauth2" as oauth2;
-/// # extern crate "google-storage1" as storage1;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_storage1 as storage1;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -3199,7 +3217,7 @@ impl<'a, C, NC, A> DefaultObjectAccessControlDeleteCall<'a, C, NC, A> where NC: 
 
         let mut url = "https://www.googleapis.com/storage/v1/b/{bucket}/defaultObjectAcl/{entity}".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::CloudPlatform.as_slice().to_string(), ());
+            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{bucket}", "bucket"), ("{entity}", "entity")].iter() {
@@ -3229,7 +3247,7 @@ impl<'a, C, NC, A> DefaultObjectAccessControlDeleteCall<'a, C, NC, A> where NC: 
         
         if params.len() > 0 {
             url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
+            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_ref()))));
         }
 
 
@@ -3247,7 +3265,7 @@ impl<'a, C, NC, A> DefaultObjectAccessControlDeleteCall<'a, C, NC, A> where NC: 
                                                              access_token: token.unwrap().access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Delete, url.as_slice())
+                let mut req = client.borrow_mut().request(hyper::method::Method::Delete, url.as_ref())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -3258,7 +3276,7 @@ impl<'a, C, NC, A> DefaultObjectAccessControlDeleteCall<'a, C, NC, A> where NC: 
             match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
+                        sleep_ms(d.num_milliseconds() as u32);
                         continue;
                     }
                     dlg.finished(false);
@@ -3269,7 +3287,7 @@ impl<'a, C, NC, A> DefaultObjectAccessControlDeleteCall<'a, C, NC, A> where NC: 
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
-                            sleep(d);
+                            sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
@@ -3334,8 +3352,8 @@ impl<'a, C, NC, A> DefaultObjectAccessControlDeleteCall<'a, C, NC, A> where NC: 
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> DefaultObjectAccessControlDeleteCall<'a, C, NC, A>
-                                                        where T: Str {
-        self._additional_params.insert(name.as_slice().to_string(), value.as_slice().to_string());
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
     }
 
@@ -3351,8 +3369,8 @@ impl<'a, C, NC, A> DefaultObjectAccessControlDeleteCall<'a, C, NC, A> where NC: 
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T>(mut self, scope: T) -> DefaultObjectAccessControlDeleteCall<'a, C, NC, A> 
-                                                        where T: Str {
-        self._scopes.insert(scope.as_slice().to_string(), ());
+                                                        where T: AsRef<str> {
+        self._scopes.insert(scope.as_ref().to_string(), ());
         self
     }
 }
@@ -3369,8 +3387,8 @@ impl<'a, C, NC, A> DefaultObjectAccessControlDeleteCall<'a, C, NC, A> where NC: 
 ///
 /// ```test_harness,no_run
 /// # extern crate hyper;
-/// # extern crate "yup-oauth2" as oauth2;
-/// # extern crate "google-storage1" as storage1;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_storage1 as storage1;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -3432,7 +3450,7 @@ impl<'a, C, NC, A> DefaultObjectAccessControlGetCall<'a, C, NC, A> where NC: hyp
 
         let mut url = "https://www.googleapis.com/storage/v1/b/{bucket}/defaultObjectAcl/{entity}".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::CloudPlatform.as_slice().to_string(), ());
+            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{bucket}", "bucket"), ("{entity}", "entity")].iter() {
@@ -3462,7 +3480,7 @@ impl<'a, C, NC, A> DefaultObjectAccessControlGetCall<'a, C, NC, A> where NC: hyp
         
         if params.len() > 0 {
             url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
+            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_ref()))));
         }
 
 
@@ -3480,7 +3498,7 @@ impl<'a, C, NC, A> DefaultObjectAccessControlGetCall<'a, C, NC, A> where NC: hyp
                                                              access_token: token.unwrap().access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_slice())
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_ref())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -3491,7 +3509,7 @@ impl<'a, C, NC, A> DefaultObjectAccessControlGetCall<'a, C, NC, A> where NC: hyp
             match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
+                        sleep_ms(d.num_milliseconds() as u32);
                         continue;
                     }
                     dlg.finished(false);
@@ -3502,7 +3520,7 @@ impl<'a, C, NC, A> DefaultObjectAccessControlGetCall<'a, C, NC, A> where NC: hyp
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
-                            sleep(d);
+                            sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
@@ -3577,8 +3595,8 @@ impl<'a, C, NC, A> DefaultObjectAccessControlGetCall<'a, C, NC, A> where NC: hyp
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> DefaultObjectAccessControlGetCall<'a, C, NC, A>
-                                                        where T: Str {
-        self._additional_params.insert(name.as_slice().to_string(), value.as_slice().to_string());
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
     }
 
@@ -3594,8 +3612,8 @@ impl<'a, C, NC, A> DefaultObjectAccessControlGetCall<'a, C, NC, A> where NC: hyp
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T>(mut self, scope: T) -> DefaultObjectAccessControlGetCall<'a, C, NC, A> 
-                                                        where T: Str {
-        self._scopes.insert(scope.as_slice().to_string(), ());
+                                                        where T: AsRef<str> {
+        self._scopes.insert(scope.as_ref().to_string(), ());
         self
     }
 }
@@ -3612,8 +3630,8 @@ impl<'a, C, NC, A> DefaultObjectAccessControlGetCall<'a, C, NC, A> where NC: hyp
 ///
 /// ```test_harness,no_run
 /// # extern crate hyper;
-/// # extern crate "yup-oauth2" as oauth2;
-/// # extern crate "google-storage1" as storage1;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_storage1 as storage1;
 /// use storage1::BucketAccessControl;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
@@ -3682,7 +3700,7 @@ impl<'a, C, NC, A> BucketAccessControlPatchCall<'a, C, NC, A> where NC: hyper::n
 
         let mut url = "https://www.googleapis.com/storage/v1/b/{bucket}/acl/{entity}".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::CloudPlatform.as_slice().to_string(), ());
+            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{bucket}", "bucket"), ("{entity}", "entity")].iter() {
@@ -3712,7 +3730,7 @@ impl<'a, C, NC, A> BucketAccessControlPatchCall<'a, C, NC, A> where NC: hyper::n
         
         if params.len() > 0 {
             url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
+            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_ref()))));
         }
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
@@ -3735,7 +3753,7 @@ impl<'a, C, NC, A> BucketAccessControlPatchCall<'a, C, NC, A> where NC: hyper::n
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Patch, url.as_slice())
+                let mut req = client.borrow_mut().request(hyper::method::Method::Patch, url.as_ref())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -3749,7 +3767,7 @@ impl<'a, C, NC, A> BucketAccessControlPatchCall<'a, C, NC, A> where NC: hyper::n
             match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
+                        sleep_ms(d.num_milliseconds() as u32);
                         continue;
                     }
                     dlg.finished(false);
@@ -3760,7 +3778,7 @@ impl<'a, C, NC, A> BucketAccessControlPatchCall<'a, C, NC, A> where NC: hyper::n
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
-                            sleep(d);
+                            sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
@@ -3844,8 +3862,8 @@ impl<'a, C, NC, A> BucketAccessControlPatchCall<'a, C, NC, A> where NC: hyper::n
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> BucketAccessControlPatchCall<'a, C, NC, A>
-                                                        where T: Str {
-        self._additional_params.insert(name.as_slice().to_string(), value.as_slice().to_string());
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
     }
 
@@ -3861,8 +3879,8 @@ impl<'a, C, NC, A> BucketAccessControlPatchCall<'a, C, NC, A> where NC: hyper::n
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T>(mut self, scope: T) -> BucketAccessControlPatchCall<'a, C, NC, A> 
-                                                        where T: Str {
-        self._scopes.insert(scope.as_slice().to_string(), ());
+                                                        where T: AsRef<str> {
+        self._scopes.insert(scope.as_ref().to_string(), ());
         self
     }
 }
@@ -3879,8 +3897,8 @@ impl<'a, C, NC, A> BucketAccessControlPatchCall<'a, C, NC, A> where NC: hyper::n
 ///
 /// ```test_harness,no_run
 /// # extern crate hyper;
-/// # extern crate "yup-oauth2" as oauth2;
-/// # extern crate "google-storage1" as storage1;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_storage1 as storage1;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -3941,7 +3959,7 @@ impl<'a, C, NC, A> BucketAccessControlDeleteCall<'a, C, NC, A> where NC: hyper::
 
         let mut url = "https://www.googleapis.com/storage/v1/b/{bucket}/acl/{entity}".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::CloudPlatform.as_slice().to_string(), ());
+            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{bucket}", "bucket"), ("{entity}", "entity")].iter() {
@@ -3971,7 +3989,7 @@ impl<'a, C, NC, A> BucketAccessControlDeleteCall<'a, C, NC, A> where NC: hyper::
         
         if params.len() > 0 {
             url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
+            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_ref()))));
         }
 
 
@@ -3989,7 +4007,7 @@ impl<'a, C, NC, A> BucketAccessControlDeleteCall<'a, C, NC, A> where NC: hyper::
                                                              access_token: token.unwrap().access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Delete, url.as_slice())
+                let mut req = client.borrow_mut().request(hyper::method::Method::Delete, url.as_ref())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -4000,7 +4018,7 @@ impl<'a, C, NC, A> BucketAccessControlDeleteCall<'a, C, NC, A> where NC: hyper::
             match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
+                        sleep_ms(d.num_milliseconds() as u32);
                         continue;
                     }
                     dlg.finished(false);
@@ -4011,7 +4029,7 @@ impl<'a, C, NC, A> BucketAccessControlDeleteCall<'a, C, NC, A> where NC: hyper::
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
-                            sleep(d);
+                            sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
@@ -4076,8 +4094,8 @@ impl<'a, C, NC, A> BucketAccessControlDeleteCall<'a, C, NC, A> where NC: hyper::
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> BucketAccessControlDeleteCall<'a, C, NC, A>
-                                                        where T: Str {
-        self._additional_params.insert(name.as_slice().to_string(), value.as_slice().to_string());
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
     }
 
@@ -4093,8 +4111,8 @@ impl<'a, C, NC, A> BucketAccessControlDeleteCall<'a, C, NC, A> where NC: hyper::
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T>(mut self, scope: T) -> BucketAccessControlDeleteCall<'a, C, NC, A> 
-                                                        where T: Str {
-        self._scopes.insert(scope.as_slice().to_string(), ());
+                                                        where T: AsRef<str> {
+        self._scopes.insert(scope.as_ref().to_string(), ());
         self
     }
 }
@@ -4111,8 +4129,8 @@ impl<'a, C, NC, A> BucketAccessControlDeleteCall<'a, C, NC, A> where NC: hyper::
 ///
 /// ```test_harness,no_run
 /// # extern crate hyper;
-/// # extern crate "yup-oauth2" as oauth2;
-/// # extern crate "google-storage1" as storage1;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_storage1 as storage1;
 /// use storage1::BucketAccessControl;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
@@ -4179,7 +4197,7 @@ impl<'a, C, NC, A> BucketAccessControlInsertCall<'a, C, NC, A> where NC: hyper::
 
         let mut url = "https://www.googleapis.com/storage/v1/b/{bucket}/acl".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::CloudPlatform.as_slice().to_string(), ());
+            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{bucket}", "bucket")].iter() {
@@ -4209,7 +4227,7 @@ impl<'a, C, NC, A> BucketAccessControlInsertCall<'a, C, NC, A> where NC: hyper::
         
         if params.len() > 0 {
             url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
+            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_ref()))));
         }
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
@@ -4232,7 +4250,7 @@ impl<'a, C, NC, A> BucketAccessControlInsertCall<'a, C, NC, A> where NC: hyper::
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.as_slice())
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.as_ref())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -4246,7 +4264,7 @@ impl<'a, C, NC, A> BucketAccessControlInsertCall<'a, C, NC, A> where NC: hyper::
             match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
+                        sleep_ms(d.num_milliseconds() as u32);
                         continue;
                     }
                     dlg.finished(false);
@@ -4257,7 +4275,7 @@ impl<'a, C, NC, A> BucketAccessControlInsertCall<'a, C, NC, A> where NC: hyper::
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
-                            sleep(d);
+                            sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
@@ -4331,8 +4349,8 @@ impl<'a, C, NC, A> BucketAccessControlInsertCall<'a, C, NC, A> where NC: hyper::
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> BucketAccessControlInsertCall<'a, C, NC, A>
-                                                        where T: Str {
-        self._additional_params.insert(name.as_slice().to_string(), value.as_slice().to_string());
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
     }
 
@@ -4348,8 +4366,8 @@ impl<'a, C, NC, A> BucketAccessControlInsertCall<'a, C, NC, A> where NC: hyper::
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T>(mut self, scope: T) -> BucketAccessControlInsertCall<'a, C, NC, A> 
-                                                        where T: Str {
-        self._scopes.insert(scope.as_slice().to_string(), ());
+                                                        where T: AsRef<str> {
+        self._scopes.insert(scope.as_ref().to_string(), ());
         self
     }
 }
@@ -4366,8 +4384,8 @@ impl<'a, C, NC, A> BucketAccessControlInsertCall<'a, C, NC, A> where NC: hyper::
 ///
 /// ```test_harness,no_run
 /// # extern crate hyper;
-/// # extern crate "yup-oauth2" as oauth2;
-/// # extern crate "google-storage1" as storage1;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_storage1 as storage1;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -4429,7 +4447,7 @@ impl<'a, C, NC, A> BucketAccessControlGetCall<'a, C, NC, A> where NC: hyper::net
 
         let mut url = "https://www.googleapis.com/storage/v1/b/{bucket}/acl/{entity}".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::CloudPlatform.as_slice().to_string(), ());
+            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{bucket}", "bucket"), ("{entity}", "entity")].iter() {
@@ -4459,7 +4477,7 @@ impl<'a, C, NC, A> BucketAccessControlGetCall<'a, C, NC, A> where NC: hyper::net
         
         if params.len() > 0 {
             url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
+            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_ref()))));
         }
 
 
@@ -4477,7 +4495,7 @@ impl<'a, C, NC, A> BucketAccessControlGetCall<'a, C, NC, A> where NC: hyper::net
                                                              access_token: token.unwrap().access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_slice())
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_ref())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -4488,7 +4506,7 @@ impl<'a, C, NC, A> BucketAccessControlGetCall<'a, C, NC, A> where NC: hyper::net
             match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
+                        sleep_ms(d.num_milliseconds() as u32);
                         continue;
                     }
                     dlg.finished(false);
@@ -4499,7 +4517,7 @@ impl<'a, C, NC, A> BucketAccessControlGetCall<'a, C, NC, A> where NC: hyper::net
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
-                            sleep(d);
+                            sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
@@ -4574,8 +4592,8 @@ impl<'a, C, NC, A> BucketAccessControlGetCall<'a, C, NC, A> where NC: hyper::net
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> BucketAccessControlGetCall<'a, C, NC, A>
-                                                        where T: Str {
-        self._additional_params.insert(name.as_slice().to_string(), value.as_slice().to_string());
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
     }
 
@@ -4591,8 +4609,8 @@ impl<'a, C, NC, A> BucketAccessControlGetCall<'a, C, NC, A> where NC: hyper::net
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T>(mut self, scope: T) -> BucketAccessControlGetCall<'a, C, NC, A> 
-                                                        where T: Str {
-        self._scopes.insert(scope.as_slice().to_string(), ());
+                                                        where T: AsRef<str> {
+        self._scopes.insert(scope.as_ref().to_string(), ());
         self
     }
 }
@@ -4609,8 +4627,8 @@ impl<'a, C, NC, A> BucketAccessControlGetCall<'a, C, NC, A> where NC: hyper::net
 ///
 /// ```test_harness,no_run
 /// # extern crate hyper;
-/// # extern crate "yup-oauth2" as oauth2;
-/// # extern crate "google-storage1" as storage1;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_storage1 as storage1;
 /// use storage1::BucketAccessControl;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
@@ -4679,7 +4697,7 @@ impl<'a, C, NC, A> BucketAccessControlUpdateCall<'a, C, NC, A> where NC: hyper::
 
         let mut url = "https://www.googleapis.com/storage/v1/b/{bucket}/acl/{entity}".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::CloudPlatform.as_slice().to_string(), ());
+            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{bucket}", "bucket"), ("{entity}", "entity")].iter() {
@@ -4709,7 +4727,7 @@ impl<'a, C, NC, A> BucketAccessControlUpdateCall<'a, C, NC, A> where NC: hyper::
         
         if params.len() > 0 {
             url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
+            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_ref()))));
         }
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
@@ -4732,7 +4750,7 @@ impl<'a, C, NC, A> BucketAccessControlUpdateCall<'a, C, NC, A> where NC: hyper::
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Put, url.as_slice())
+                let mut req = client.borrow_mut().request(hyper::method::Method::Put, url.as_ref())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -4746,7 +4764,7 @@ impl<'a, C, NC, A> BucketAccessControlUpdateCall<'a, C, NC, A> where NC: hyper::
             match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
+                        sleep_ms(d.num_milliseconds() as u32);
                         continue;
                     }
                     dlg.finished(false);
@@ -4757,7 +4775,7 @@ impl<'a, C, NC, A> BucketAccessControlUpdateCall<'a, C, NC, A> where NC: hyper::
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
-                            sleep(d);
+                            sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
@@ -4841,8 +4859,8 @@ impl<'a, C, NC, A> BucketAccessControlUpdateCall<'a, C, NC, A> where NC: hyper::
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> BucketAccessControlUpdateCall<'a, C, NC, A>
-                                                        where T: Str {
-        self._additional_params.insert(name.as_slice().to_string(), value.as_slice().to_string());
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
     }
 
@@ -4858,8 +4876,8 @@ impl<'a, C, NC, A> BucketAccessControlUpdateCall<'a, C, NC, A> where NC: hyper::
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T>(mut self, scope: T) -> BucketAccessControlUpdateCall<'a, C, NC, A> 
-                                                        where T: Str {
-        self._scopes.insert(scope.as_slice().to_string(), ());
+                                                        where T: AsRef<str> {
+        self._scopes.insert(scope.as_ref().to_string(), ());
         self
     }
 }
@@ -4876,8 +4894,8 @@ impl<'a, C, NC, A> BucketAccessControlUpdateCall<'a, C, NC, A> where NC: hyper::
 ///
 /// ```test_harness,no_run
 /// # extern crate hyper;
-/// # extern crate "yup-oauth2" as oauth2;
-/// # extern crate "google-storage1" as storage1;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_storage1 as storage1;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -4937,7 +4955,7 @@ impl<'a, C, NC, A> BucketAccessControlListCall<'a, C, NC, A> where NC: hyper::ne
 
         let mut url = "https://www.googleapis.com/storage/v1/b/{bucket}/acl".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::CloudPlatform.as_slice().to_string(), ());
+            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{bucket}", "bucket")].iter() {
@@ -4967,7 +4985,7 @@ impl<'a, C, NC, A> BucketAccessControlListCall<'a, C, NC, A> where NC: hyper::ne
         
         if params.len() > 0 {
             url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
+            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_ref()))));
         }
 
 
@@ -4985,7 +5003,7 @@ impl<'a, C, NC, A> BucketAccessControlListCall<'a, C, NC, A> where NC: hyper::ne
                                                              access_token: token.unwrap().access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_slice())
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_ref())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -4996,7 +5014,7 @@ impl<'a, C, NC, A> BucketAccessControlListCall<'a, C, NC, A> where NC: hyper::ne
             match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
+                        sleep_ms(d.num_milliseconds() as u32);
                         continue;
                     }
                     dlg.finished(false);
@@ -5007,7 +5025,7 @@ impl<'a, C, NC, A> BucketAccessControlListCall<'a, C, NC, A> where NC: hyper::ne
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
-                            sleep(d);
+                            sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
@@ -5072,8 +5090,8 @@ impl<'a, C, NC, A> BucketAccessControlListCall<'a, C, NC, A> where NC: hyper::ne
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> BucketAccessControlListCall<'a, C, NC, A>
-                                                        where T: Str {
-        self._additional_params.insert(name.as_slice().to_string(), value.as_slice().to_string());
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
     }
 
@@ -5089,8 +5107,8 @@ impl<'a, C, NC, A> BucketAccessControlListCall<'a, C, NC, A> where NC: hyper::ne
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T>(mut self, scope: T) -> BucketAccessControlListCall<'a, C, NC, A> 
-                                                        where T: Str {
-        self._scopes.insert(scope.as_slice().to_string(), ());
+                                                        where T: AsRef<str> {
+        self._scopes.insert(scope.as_ref().to_string(), ());
         self
     }
 }
@@ -5107,8 +5125,8 @@ impl<'a, C, NC, A> BucketAccessControlListCall<'a, C, NC, A> where NC: hyper::ne
 ///
 /// ```test_harness,no_run
 /// # extern crate hyper;
-/// # extern crate "yup-oauth2" as oauth2;
-/// # extern crate "google-storage1" as storage1;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_storage1 as storage1;
 /// use storage1::Channel;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
@@ -5172,13 +5190,13 @@ impl<'a, C, NC, A> ChannelStopCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
 
         let mut url = "https://www.googleapis.com/storage/v1/channels/stop".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::CloudPlatform.as_slice().to_string(), ());
+            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
 
         
         if params.len() > 0 {
             url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
+            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_ref()))));
         }
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
@@ -5201,7 +5219,7 @@ impl<'a, C, NC, A> ChannelStopCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.as_slice())
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.as_ref())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -5215,7 +5233,7 @@ impl<'a, C, NC, A> ChannelStopCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
             match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
+                        sleep_ms(d.num_milliseconds() as u32);
                         continue;
                     }
                     dlg.finished(false);
@@ -5226,7 +5244,7 @@ impl<'a, C, NC, A> ChannelStopCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
-                            sleep(d);
+                            sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
@@ -5280,8 +5298,8 @@ impl<'a, C, NC, A> ChannelStopCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> ChannelStopCall<'a, C, NC, A>
-                                                        where T: Str {
-        self._additional_params.insert(name.as_slice().to_string(), value.as_slice().to_string());
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
     }
 
@@ -5297,8 +5315,8 @@ impl<'a, C, NC, A> ChannelStopCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T>(mut self, scope: T) -> ChannelStopCall<'a, C, NC, A> 
-                                                        where T: Str {
-        self._scopes.insert(scope.as_slice().to_string(), ());
+                                                        where T: AsRef<str> {
+        self._scopes.insert(scope.as_ref().to_string(), ());
         self
     }
 }
@@ -5320,8 +5338,8 @@ impl<'a, C, NC, A> ChannelStopCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
 ///
 /// ```test_harness,no_run
 /// # extern crate hyper;
-/// # extern crate "yup-oauth2" as oauth2;
-/// # extern crate "google-storage1" as storage1;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_storage1 as storage1;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -5342,6 +5360,9 @@ impl<'a, C, NC, A> ChannelStopCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
 ///              .if_generation_not_match("amet")
 ///              .if_generation_match("no")
 ///              .generation("labore")
+///              .encryption_key_hash("eirmod")
+///              .encryption_key("dolore")
+///              .encryption_algorithm("invidunt")
 ///              .doit();
 /// # }
 /// ```
@@ -5357,6 +5378,9 @@ pub struct ObjectGetCall<'a, C, NC, A>
     _if_generation_not_match: Option<String>,
     _if_generation_match: Option<String>,
     _generation: Option<String>,
+    _encryption_key_hash: Option<String>,
+    _encryption_key: Option<String>,
+    _encryption_algorithm: Option<String>,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
@@ -5378,7 +5402,7 @@ impl<'a, C, NC, A> ObjectGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
         };
         dlg.begin(MethodInfo { id: "storage.objects.get", 
                                http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((9 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity((12 + self._additional_params.len()));
         params.push(("bucket", self._bucket.to_string()));
         params.push(("object", self._object.to_string()));
         if let Some(value) = self._projection {
@@ -5399,7 +5423,16 @@ impl<'a, C, NC, A> ObjectGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
         if let Some(value) = self._generation {
             params.push(("generation", value.to_string()));
         }
-        for &field in ["bucket", "object", "projection", "ifMetagenerationNotMatch", "ifMetagenerationMatch", "ifGenerationNotMatch", "ifGenerationMatch", "generation"].iter() {
+        if let Some(value) = self._encryption_key_hash {
+            params.push(("encryptionKeyHash", value.to_string()));
+        }
+        if let Some(value) = self._encryption_key {
+            params.push(("encryptionKey", value.to_string()));
+        }
+        if let Some(value) = self._encryption_algorithm {
+            params.push(("encryptionAlgorithm", value.to_string()));
+        }
+        for &field in ["bucket", "object", "projection", "ifMetagenerationNotMatch", "ifMetagenerationMatch", "ifGenerationNotMatch", "ifGenerationMatch", "generation", "encryptionKeyHash", "encryptionKey", "encryptionAlgorithm"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(Error::FieldClash(field));
@@ -5415,7 +5448,7 @@ impl<'a, C, NC, A> ObjectGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
             for &(name, ref value) in params.iter() {
                 if name == "alt" {
                     field_present = false;
-                    if value.as_slice() != "json" {
+                    if <String as AsRef<str>>::as_ref(&value) != "json" {
                         enable = false;
                     }
                     break;
@@ -5429,7 +5462,7 @@ impl<'a, C, NC, A> ObjectGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
 
         let mut url = "https://www.googleapis.com/storage/v1/b/{bucket}/o/{object}".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::CloudPlatform.as_slice().to_string(), ());
+            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{bucket}", "bucket"), ("{object}", "object")].iter() {
@@ -5459,7 +5492,7 @@ impl<'a, C, NC, A> ObjectGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
         
         if params.len() > 0 {
             url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
+            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_ref()))));
         }
 
 
@@ -5477,7 +5510,7 @@ impl<'a, C, NC, A> ObjectGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
                                                              access_token: token.unwrap().access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_slice())
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_ref())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -5488,7 +5521,7 @@ impl<'a, C, NC, A> ObjectGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
             match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
+                        sleep_ms(d.num_milliseconds() as u32);
                         continue;
                     }
                     dlg.finished(false);
@@ -5499,7 +5532,7 @@ impl<'a, C, NC, A> ObjectGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
-                            sleep(d);
+                            sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
@@ -5593,6 +5626,30 @@ impl<'a, C, NC, A> ObjectGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
         self._generation = Some(new_value.to_string());
         self
     }
+    /// Sets the *encryption key hash* query property to the given value.
+    ///
+    /// 
+    /// Provides the digest of the key for error-checking transmission. A digest is in the format of '='. Algorithm, key, and key hash must be supplied together.
+    pub fn encryption_key_hash(mut self, new_value: &str) -> ObjectGetCall<'a, C, NC, A> {
+        self._encryption_key_hash = Some(new_value.to_string());
+        self
+    }
+    /// Sets the *encryption key* query property to the given value.
+    ///
+    /// 
+    /// Provides a base64-encoded 256-bit key to decrypt the object. Algorithm, key, and key hash must be supplied together.
+    pub fn encryption_key(mut self, new_value: &str) -> ObjectGetCall<'a, C, NC, A> {
+        self._encryption_key = Some(new_value.to_string());
+        self
+    }
+    /// Sets the *encryption algorithm* query property to the given value.
+    ///
+    /// 
+    /// Specifies the encryption algorithm that would be used to decrypt the object. Only 'AES256' is supported currently. Algorithm, key, and key hash must be supplied together.
+    pub fn encryption_algorithm(mut self, new_value: &str) -> ObjectGetCall<'a, C, NC, A> {
+        self._encryption_algorithm = Some(new_value.to_string());
+        self
+    }
     /// Sets the *delegate* property to the given value.
     ///
     /// 
@@ -5622,8 +5679,8 @@ impl<'a, C, NC, A> ObjectGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> ObjectGetCall<'a, C, NC, A>
-                                                        where T: Str {
-        self._additional_params.insert(name.as_slice().to_string(), value.as_slice().to_string());
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
     }
 
@@ -5639,8 +5696,8 @@ impl<'a, C, NC, A> ObjectGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T>(mut self, scope: T) -> ObjectGetCall<'a, C, NC, A> 
-                                                        where T: Str {
-        self._scopes.insert(scope.as_slice().to_string(), ());
+                                                        where T: AsRef<str> {
+        self._scopes.insert(scope.as_ref().to_string(), ());
         self
     }
 }
@@ -5657,8 +5714,8 @@ impl<'a, C, NC, A> ObjectGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
 ///
 /// ```test_harness,no_run
 /// # extern crate hyper;
-/// # extern crate "yup-oauth2" as oauth2;
-/// # extern crate "google-storage1" as storage1;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_storage1 as storage1;
 /// use storage1::Channel;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
@@ -5679,12 +5736,12 @@ impl<'a, C, NC, A> ObjectGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.objects().watch_all(&req, "bucket")
-///              .versions(true)
-///              .projection("invidunt")
-///              .prefix("aliquyam")
-///              .page_token("accusam")
-///              .max_results(45)
-///              .delimiter("sea")
+///              .versions(false)
+///              .projection("Lorem")
+///              .prefix("sea")
+///              .page_token("et")
+///              .max_results(31)
+///              .delimiter("et")
 ///              .doit();
 /// # }
 /// ```
@@ -5755,7 +5812,7 @@ impl<'a, C, NC, A> ObjectWatchAllCall<'a, C, NC, A> where NC: hyper::net::Networ
 
         let mut url = "https://www.googleapis.com/storage/v1/b/{bucket}/o/watch".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::CloudPlatform.as_slice().to_string(), ());
+            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{bucket}", "bucket")].iter() {
@@ -5785,7 +5842,7 @@ impl<'a, C, NC, A> ObjectWatchAllCall<'a, C, NC, A> where NC: hyper::net::Networ
         
         if params.len() > 0 {
             url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
+            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_ref()))));
         }
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
@@ -5808,7 +5865,7 @@ impl<'a, C, NC, A> ObjectWatchAllCall<'a, C, NC, A> where NC: hyper::net::Networ
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.as_slice())
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.as_ref())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -5822,7 +5879,7 @@ impl<'a, C, NC, A> ObjectWatchAllCall<'a, C, NC, A> where NC: hyper::net::Networ
             match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
+                        sleep_ms(d.num_milliseconds() as u32);
                         continue;
                     }
                     dlg.finished(false);
@@ -5833,7 +5890,7 @@ impl<'a, C, NC, A> ObjectWatchAllCall<'a, C, NC, A> where NC: hyper::net::Networ
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
-                            sleep(d);
+                            sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
@@ -5955,8 +6012,8 @@ impl<'a, C, NC, A> ObjectWatchAllCall<'a, C, NC, A> where NC: hyper::net::Networ
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> ObjectWatchAllCall<'a, C, NC, A>
-                                                        where T: Str {
-        self._additional_params.insert(name.as_slice().to_string(), value.as_slice().to_string());
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
     }
 
@@ -5972,8 +6029,8 @@ impl<'a, C, NC, A> ObjectWatchAllCall<'a, C, NC, A> where NC: hyper::net::Networ
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T>(mut self, scope: T) -> ObjectWatchAllCall<'a, C, NC, A> 
-                                                        where T: Str {
-        self._scopes.insert(scope.as_slice().to_string(), ());
+                                                        where T: AsRef<str> {
+        self._scopes.insert(scope.as_ref().to_string(), ());
         self
     }
 }
@@ -5995,8 +6052,8 @@ impl<'a, C, NC, A> ObjectWatchAllCall<'a, C, NC, A> where NC: hyper::net::Networ
 ///
 /// ```test_harness,no_run
 /// # extern crate hyper;
-/// # extern crate "yup-oauth2" as oauth2;
-/// # extern crate "google-storage1" as storage1;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_storage1 as storage1;
 /// use storage1::Object;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
@@ -6018,12 +6075,15 @@ impl<'a, C, NC, A> ObjectWatchAllCall<'a, C, NC, A> where NC: hyper::net::Networ
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.objects().update(&req, "bucket", "object")
 ///              .projection("et")
-///              .predefined_acl("eirmod")
-///              .if_metageneration_not_match("sanctus")
-///              .if_metageneration_match("et")
-///              .if_generation_not_match("amet")
-///              .if_generation_match("et")
-///              .generation("consetetur")
+///              .predefined_acl("amet")
+///              .if_metageneration_not_match("et")
+///              .if_metageneration_match("consetetur")
+///              .if_generation_not_match("ut")
+///              .if_generation_match("ea")
+///              .generation("sed")
+///              .encryption_key_hash("dolor")
+///              .encryption_key("dolor")
+///              .encryption_algorithm("dolor")
 ///              .doit();
 /// # }
 /// ```
@@ -6041,6 +6101,9 @@ pub struct ObjectUpdateCall<'a, C, NC, A>
     _if_generation_not_match: Option<String>,
     _if_generation_match: Option<String>,
     _generation: Option<String>,
+    _encryption_key_hash: Option<String>,
+    _encryption_key: Option<String>,
+    _encryption_algorithm: Option<String>,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
@@ -6062,7 +6125,7 @@ impl<'a, C, NC, A> ObjectUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkC
         };
         dlg.begin(MethodInfo { id: "storage.objects.update", 
                                http_method: hyper::method::Method::Put });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((11 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity((14 + self._additional_params.len()));
         params.push(("bucket", self._bucket.to_string()));
         params.push(("object", self._object.to_string()));
         if let Some(value) = self._projection {
@@ -6086,7 +6149,16 @@ impl<'a, C, NC, A> ObjectUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkC
         if let Some(value) = self._generation {
             params.push(("generation", value.to_string()));
         }
-        for &field in ["bucket", "object", "projection", "predefinedAcl", "ifMetagenerationNotMatch", "ifMetagenerationMatch", "ifGenerationNotMatch", "ifGenerationMatch", "generation"].iter() {
+        if let Some(value) = self._encryption_key_hash {
+            params.push(("encryptionKeyHash", value.to_string()));
+        }
+        if let Some(value) = self._encryption_key {
+            params.push(("encryptionKey", value.to_string()));
+        }
+        if let Some(value) = self._encryption_algorithm {
+            params.push(("encryptionAlgorithm", value.to_string()));
+        }
+        for &field in ["bucket", "object", "projection", "predefinedAcl", "ifMetagenerationNotMatch", "ifMetagenerationMatch", "ifGenerationNotMatch", "ifGenerationMatch", "generation", "encryptionKeyHash", "encryptionKey", "encryptionAlgorithm"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(Error::FieldClash(field));
@@ -6102,7 +6174,7 @@ impl<'a, C, NC, A> ObjectUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkC
             for &(name, ref value) in params.iter() {
                 if name == "alt" {
                     field_present = false;
-                    if value.as_slice() != "json" {
+                    if <String as AsRef<str>>::as_ref(&value) != "json" {
                         enable = false;
                     }
                     break;
@@ -6116,7 +6188,7 @@ impl<'a, C, NC, A> ObjectUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkC
 
         let mut url = "https://www.googleapis.com/storage/v1/b/{bucket}/o/{object}".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::CloudPlatform.as_slice().to_string(), ());
+            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{bucket}", "bucket"), ("{object}", "object")].iter() {
@@ -6146,7 +6218,7 @@ impl<'a, C, NC, A> ObjectUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkC
         
         if params.len() > 0 {
             url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
+            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_ref()))));
         }
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
@@ -6169,7 +6241,7 @@ impl<'a, C, NC, A> ObjectUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkC
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Put, url.as_slice())
+                let mut req = client.borrow_mut().request(hyper::method::Method::Put, url.as_ref())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -6183,7 +6255,7 @@ impl<'a, C, NC, A> ObjectUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkC
             match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
+                        sleep_ms(d.num_milliseconds() as u32);
                         continue;
                     }
                     dlg.finished(false);
@@ -6194,7 +6266,7 @@ impl<'a, C, NC, A> ObjectUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkC
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
-                            sleep(d);
+                            sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
@@ -6305,6 +6377,30 @@ impl<'a, C, NC, A> ObjectUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkC
         self._generation = Some(new_value.to_string());
         self
     }
+    /// Sets the *encryption key hash* query property to the given value.
+    ///
+    /// 
+    /// For downloading encrypted objects, provides the digest of the key for error-checking transmission. A digest is in the format of '='. Algorithm, key, and key hash must be supplied together.
+    pub fn encryption_key_hash(mut self, new_value: &str) -> ObjectUpdateCall<'a, C, NC, A> {
+        self._encryption_key_hash = Some(new_value.to_string());
+        self
+    }
+    /// Sets the *encryption key* query property to the given value.
+    ///
+    /// 
+    /// For downloading encrypted objects, provides a base64-encoded 256-bit key to decrypt the object. Algorithm, key, and key hash must be supplied together.
+    pub fn encryption_key(mut self, new_value: &str) -> ObjectUpdateCall<'a, C, NC, A> {
+        self._encryption_key = Some(new_value.to_string());
+        self
+    }
+    /// Sets the *encryption algorithm* query property to the given value.
+    ///
+    /// 
+    /// For downloading encrypted objects, specifies the encryption algorithm that would be used to decrypt the object. Only 'AES256' is supported currently. Algorithm, key, and key hash must be supplied together.
+    pub fn encryption_algorithm(mut self, new_value: &str) -> ObjectUpdateCall<'a, C, NC, A> {
+        self._encryption_algorithm = Some(new_value.to_string());
+        self
+    }
     /// Sets the *delegate* property to the given value.
     ///
     /// 
@@ -6334,8 +6430,8 @@ impl<'a, C, NC, A> ObjectUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> ObjectUpdateCall<'a, C, NC, A>
-                                                        where T: Str {
-        self._additional_params.insert(name.as_slice().to_string(), value.as_slice().to_string());
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
     }
 
@@ -6351,8 +6447,8 @@ impl<'a, C, NC, A> ObjectUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T>(mut self, scope: T) -> ObjectUpdateCall<'a, C, NC, A> 
-                                                        where T: Str {
-        self._scopes.insert(scope.as_slice().to_string(), ());
+                                                        where T: AsRef<str> {
+        self._scopes.insert(scope.as_ref().to_string(), ());
         self
     }
 }
@@ -6374,8 +6470,8 @@ impl<'a, C, NC, A> ObjectUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkC
 ///
 /// ```test_harness,no_run
 /// # extern crate hyper;
-/// # extern crate "yup-oauth2" as oauth2;
-/// # extern crate "google-storage1" as storage1;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_storage1 as storage1;
 /// use storage1::Object;
 /// use std::fs;
 /// # #[test] fn egal() {
@@ -6397,14 +6493,17 @@ impl<'a, C, NC, A> ObjectUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkC
 /// // execute the final call using `upload(...)`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.objects().insert(&req, "bucket")
-///              .projection("ea")
-///              .predefined_acl("sed")
-///              .name("dolor")
-///              .if_metageneration_not_match("dolor")
-///              .if_metageneration_match("dolor")
-///              .if_generation_not_match("et")
-///              .if_generation_match("consetetur")
-///              .content_encoding("amet.")
+///              .projection("consetetur")
+///              .predefined_acl("amet.")
+///              .name("voluptua.")
+///              .if_metageneration_not_match("Lorem")
+///              .if_metageneration_match("gubergren")
+///              .if_generation_not_match("justo")
+///              .if_generation_match("sit")
+///              .encryption_key_hash("vero")
+///              .encryption_key("diam")
+///              .encryption_algorithm("rebum.")
+///              .content_encoding("consetetur")
 ///              .upload(fs::File::open("file.ext").unwrap(), "application/octet-stream".parse().unwrap());
 /// # }
 /// ```
@@ -6421,6 +6520,9 @@ pub struct ObjectInsertCall<'a, C, NC, A>
     _if_metageneration_match: Option<String>,
     _if_generation_not_match: Option<String>,
     _if_generation_match: Option<String>,
+    _encryption_key_hash: Option<String>,
+    _encryption_key: Option<String>,
+    _encryption_algorithm: Option<String>,
     _content_encoding: Option<String>,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
@@ -6444,7 +6546,7 @@ impl<'a, C, NC, A> ObjectInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkC
         };
         dlg.begin(MethodInfo { id: "storage.objects.insert", 
                                http_method: hyper::method::Method::Post });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((11 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity((14 + self._additional_params.len()));
         params.push(("bucket", self._bucket.to_string()));
         if let Some(value) = self._projection {
             params.push(("projection", value.to_string()));
@@ -6467,10 +6569,19 @@ impl<'a, C, NC, A> ObjectInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkC
         if let Some(value) = self._if_generation_match {
             params.push(("ifGenerationMatch", value.to_string()));
         }
+        if let Some(value) = self._encryption_key_hash {
+            params.push(("encryptionKeyHash", value.to_string()));
+        }
+        if let Some(value) = self._encryption_key {
+            params.push(("encryptionKey", value.to_string()));
+        }
+        if let Some(value) = self._encryption_algorithm {
+            params.push(("encryptionAlgorithm", value.to_string()));
+        }
         if let Some(value) = self._content_encoding {
             params.push(("contentEncoding", value.to_string()));
         }
-        for &field in ["bucket", "projection", "predefinedAcl", "name", "ifMetagenerationNotMatch", "ifMetagenerationMatch", "ifGenerationNotMatch", "ifGenerationMatch", "contentEncoding"].iter() {
+        for &field in ["bucket", "projection", "predefinedAcl", "name", "ifMetagenerationNotMatch", "ifMetagenerationMatch", "ifGenerationNotMatch", "ifGenerationMatch", "encryptionKeyHash", "encryptionKey", "encryptionAlgorithm", "contentEncoding"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(Error::FieldClash(field));
@@ -6486,7 +6597,7 @@ impl<'a, C, NC, A> ObjectInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkC
             for &(name, ref value) in params.iter() {
                 if name == "alt" {
                     field_present = false;
-                    if value.as_slice() != "json" {
+                    if <String as AsRef<str>>::as_ref(&value) != "json" {
                         enable = false;
                     }
                     break;
@@ -6507,7 +6618,7 @@ impl<'a, C, NC, A> ObjectInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkC
         };
         params.push(("uploadType", protocol.to_string()));
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::CloudPlatform.as_slice().to_string(), ());
+            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{bucket}", "bucket")].iter() {
@@ -6537,7 +6648,7 @@ impl<'a, C, NC, A> ObjectInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkC
         
         if params.len() > 0 {
             url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
+            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_ref()))));
         }
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
@@ -6590,7 +6701,7 @@ impl<'a, C, NC, A> ObjectInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkC
                         _ => (&mut request_value_reader as &mut io::Read, ContentType(json_mime_type.clone())),
                     };
                     let mut client = &mut *self.hub.client.borrow_mut();
-                    let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.as_slice())
+                    let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.as_ref())
                         .header(UserAgent(self.hub._user_agent.clone()))
                         .header(auth_header.clone())
                         .header(content_type)
@@ -6608,7 +6719,7 @@ impl<'a, C, NC, A> ObjectInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkC
             match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
+                        sleep_ms(d.num_milliseconds() as u32);
                         continue;
                     }
                     dlg.finished(false);
@@ -6619,7 +6730,7 @@ impl<'a, C, NC, A> ObjectInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkC
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
-                            sleep(d);
+                            sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
@@ -6788,6 +6899,30 @@ impl<'a, C, NC, A> ObjectInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkC
         self._if_generation_match = Some(new_value.to_string());
         self
     }
+    /// Sets the *encryption key hash* query property to the given value.
+    ///
+    /// 
+    /// Provides the digest of the key for error-checking transmission. A digest is in the format of '='. Algorithm, key, and key hash must be supplied together.
+    pub fn encryption_key_hash(mut self, new_value: &str) -> ObjectInsertCall<'a, C, NC, A> {
+        self._encryption_key_hash = Some(new_value.to_string());
+        self
+    }
+    /// Sets the *encryption key* query property to the given value.
+    ///
+    /// 
+    /// Provides a base64-encoded 256-bit key to encrypt the object. Algorithm, key, and key hash must be supplied together.
+    pub fn encryption_key(mut self, new_value: &str) -> ObjectInsertCall<'a, C, NC, A> {
+        self._encryption_key = Some(new_value.to_string());
+        self
+    }
+    /// Sets the *encryption algorithm* query property to the given value.
+    ///
+    /// 
+    /// Specifies the encryption algorithm that would be used to encrypt the object. Only 'AES256' is supported currently. Algorithm, key, and key hash must be supplied together.
+    pub fn encryption_algorithm(mut self, new_value: &str) -> ObjectInsertCall<'a, C, NC, A> {
+        self._encryption_algorithm = Some(new_value.to_string());
+        self
+    }
     /// Sets the *content encoding* query property to the given value.
     ///
     /// 
@@ -6825,8 +6960,8 @@ impl<'a, C, NC, A> ObjectInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> ObjectInsertCall<'a, C, NC, A>
-                                                        where T: Str {
-        self._additional_params.insert(name.as_slice().to_string(), value.as_slice().to_string());
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
     }
 
@@ -6842,8 +6977,8 @@ impl<'a, C, NC, A> ObjectInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T>(mut self, scope: T) -> ObjectInsertCall<'a, C, NC, A> 
-                                                        where T: Str {
-        self._scopes.insert(scope.as_slice().to_string(), ());
+                                                        where T: AsRef<str> {
+        self._scopes.insert(scope.as_ref().to_string(), ());
         self
     }
 }
@@ -6865,8 +7000,8 @@ impl<'a, C, NC, A> ObjectInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkC
 ///
 /// ```test_harness,no_run
 /// # extern crate hyper;
-/// # extern crate "yup-oauth2" as oauth2;
-/// # extern crate "google-storage1" as storage1;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_storage1 as storage1;
 /// use storage1::ComposeRequest;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
@@ -6887,9 +7022,12 @@ impl<'a, C, NC, A> ObjectInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkC
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.objects().compose(&req, "destinationBucket", "destinationObject")
-///              .if_metageneration_match("gubergren")
-///              .if_generation_match("justo")
-///              .destination_predefined_acl("sit")
+///              .if_metageneration_match("sadipscing")
+///              .if_generation_match("invidunt")
+///              .encryption_key_hash("consetetur")
+///              .encryption_key("dolore")
+///              .encryption_algorithm("duo")
+///              .destination_predefined_acl("aliquyam")
 ///              .doit();
 /// # }
 /// ```
@@ -6902,6 +7040,9 @@ pub struct ObjectComposeCall<'a, C, NC, A>
     _destination_object: String,
     _if_metageneration_match: Option<String>,
     _if_generation_match: Option<String>,
+    _encryption_key_hash: Option<String>,
+    _encryption_key: Option<String>,
+    _encryption_algorithm: Option<String>,
     _destination_predefined_acl: Option<String>,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
@@ -6924,7 +7065,7 @@ impl<'a, C, NC, A> ObjectComposeCall<'a, C, NC, A> where NC: hyper::net::Network
         };
         dlg.begin(MethodInfo { id: "storage.objects.compose", 
                                http_method: hyper::method::Method::Post });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((7 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity((10 + self._additional_params.len()));
         params.push(("destinationBucket", self._destination_bucket.to_string()));
         params.push(("destinationObject", self._destination_object.to_string()));
         if let Some(value) = self._if_metageneration_match {
@@ -6933,10 +7074,19 @@ impl<'a, C, NC, A> ObjectComposeCall<'a, C, NC, A> where NC: hyper::net::Network
         if let Some(value) = self._if_generation_match {
             params.push(("ifGenerationMatch", value.to_string()));
         }
+        if let Some(value) = self._encryption_key_hash {
+            params.push(("encryptionKeyHash", value.to_string()));
+        }
+        if let Some(value) = self._encryption_key {
+            params.push(("encryptionKey", value.to_string()));
+        }
+        if let Some(value) = self._encryption_algorithm {
+            params.push(("encryptionAlgorithm", value.to_string()));
+        }
         if let Some(value) = self._destination_predefined_acl {
             params.push(("destinationPredefinedAcl", value.to_string()));
         }
-        for &field in ["destinationBucket", "destinationObject", "ifMetagenerationMatch", "ifGenerationMatch", "destinationPredefinedAcl"].iter() {
+        for &field in ["destinationBucket", "destinationObject", "ifMetagenerationMatch", "ifGenerationMatch", "encryptionKeyHash", "encryptionKey", "encryptionAlgorithm", "destinationPredefinedAcl"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(Error::FieldClash(field));
@@ -6952,7 +7102,7 @@ impl<'a, C, NC, A> ObjectComposeCall<'a, C, NC, A> where NC: hyper::net::Network
             for &(name, ref value) in params.iter() {
                 if name == "alt" {
                     field_present = false;
-                    if value.as_slice() != "json" {
+                    if <String as AsRef<str>>::as_ref(&value) != "json" {
                         enable = false;
                     }
                     break;
@@ -6966,7 +7116,7 @@ impl<'a, C, NC, A> ObjectComposeCall<'a, C, NC, A> where NC: hyper::net::Network
 
         let mut url = "https://www.googleapis.com/storage/v1/b/{destinationBucket}/o/{destinationObject}/compose".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::CloudPlatform.as_slice().to_string(), ());
+            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{destinationBucket}", "destinationBucket"), ("{destinationObject}", "destinationObject")].iter() {
@@ -6996,7 +7146,7 @@ impl<'a, C, NC, A> ObjectComposeCall<'a, C, NC, A> where NC: hyper::net::Network
         
         if params.len() > 0 {
             url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
+            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_ref()))));
         }
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
@@ -7019,7 +7169,7 @@ impl<'a, C, NC, A> ObjectComposeCall<'a, C, NC, A> where NC: hyper::net::Network
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.as_slice())
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.as_ref())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -7033,7 +7183,7 @@ impl<'a, C, NC, A> ObjectComposeCall<'a, C, NC, A> where NC: hyper::net::Network
             match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
+                        sleep_ms(d.num_milliseconds() as u32);
                         continue;
                     }
                     dlg.finished(false);
@@ -7044,7 +7194,7 @@ impl<'a, C, NC, A> ObjectComposeCall<'a, C, NC, A> where NC: hyper::net::Network
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
-                            sleep(d);
+                            sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
@@ -7115,6 +7265,30 @@ impl<'a, C, NC, A> ObjectComposeCall<'a, C, NC, A> where NC: hyper::net::Network
         self._if_generation_match = Some(new_value.to_string());
         self
     }
+    /// Sets the *encryption key hash* query property to the given value.
+    ///
+    /// 
+    /// Provides the digest of the key for error-checking transmission. A digest is in the format of '='. Algorithm, key, and key hash must be supplied together.
+    pub fn encryption_key_hash(mut self, new_value: &str) -> ObjectComposeCall<'a, C, NC, A> {
+        self._encryption_key_hash = Some(new_value.to_string());
+        self
+    }
+    /// Sets the *encryption key* query property to the given value.
+    ///
+    /// 
+    /// Provides a base64-encoded 256-bit key that was used to encrypt the object, if any. Algorithm, key, and key hash must be supplied together.
+    pub fn encryption_key(mut self, new_value: &str) -> ObjectComposeCall<'a, C, NC, A> {
+        self._encryption_key = Some(new_value.to_string());
+        self
+    }
+    /// Sets the *encryption algorithm* query property to the given value.
+    ///
+    /// 
+    /// Specifies the encryption algorithm that was used to encrypt the object, if any. Only 'AES256' is supported currently. Algorithm, key, and key hash must be supplied together.
+    pub fn encryption_algorithm(mut self, new_value: &str) -> ObjectComposeCall<'a, C, NC, A> {
+        self._encryption_algorithm = Some(new_value.to_string());
+        self
+    }
     /// Sets the *destination predefined acl* query property to the given value.
     ///
     /// 
@@ -7152,8 +7326,8 @@ impl<'a, C, NC, A> ObjectComposeCall<'a, C, NC, A> where NC: hyper::net::Network
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> ObjectComposeCall<'a, C, NC, A>
-                                                        where T: Str {
-        self._additional_params.insert(name.as_slice().to_string(), value.as_slice().to_string());
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
     }
 
@@ -7169,8 +7343,8 @@ impl<'a, C, NC, A> ObjectComposeCall<'a, C, NC, A> where NC: hyper::net::Network
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T>(mut self, scope: T) -> ObjectComposeCall<'a, C, NC, A> 
-                                                        where T: Str {
-        self._scopes.insert(scope.as_slice().to_string(), ());
+                                                        where T: AsRef<str> {
+        self._scopes.insert(scope.as_ref().to_string(), ());
         self
     }
 }
@@ -7187,8 +7361,8 @@ impl<'a, C, NC, A> ObjectComposeCall<'a, C, NC, A> where NC: hyper::net::Network
 ///
 /// ```test_harness,no_run
 /// # extern crate hyper;
-/// # extern crate "yup-oauth2" as oauth2;
-/// # extern crate "google-storage1" as storage1;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_storage1 as storage1;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -7203,11 +7377,11 @@ impl<'a, C, NC, A> ObjectComposeCall<'a, C, NC, A> where NC: hyper::net::Network
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.objects().delete("bucket", "object")
-///              .if_metageneration_not_match("rebum.")
+///              .if_metageneration_not_match("clita")
 ///              .if_metageneration_match("consetetur")
-///              .if_generation_not_match("sadipscing")
-///              .if_generation_match("vero")
-///              .generation("sadipscing")
+///              .if_generation_not_match("takimata")
+///              .if_generation_match("nonumy")
+///              .generation("kasd")
 ///              .doit();
 /// # }
 /// ```
@@ -7274,7 +7448,7 @@ impl<'a, C, NC, A> ObjectDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkC
 
         let mut url = "https://www.googleapis.com/storage/v1/b/{bucket}/o/{object}".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::CloudPlatform.as_slice().to_string(), ());
+            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{bucket}", "bucket"), ("{object}", "object")].iter() {
@@ -7304,7 +7478,7 @@ impl<'a, C, NC, A> ObjectDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkC
         
         if params.len() > 0 {
             url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
+            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_ref()))));
         }
 
 
@@ -7322,7 +7496,7 @@ impl<'a, C, NC, A> ObjectDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkC
                                                              access_token: token.unwrap().access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Delete, url.as_slice())
+                let mut req = client.borrow_mut().request(hyper::method::Method::Delete, url.as_ref())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -7333,7 +7507,7 @@ impl<'a, C, NC, A> ObjectDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkC
             match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
+                        sleep_ms(d.num_milliseconds() as u32);
                         continue;
                     }
                     dlg.finished(false);
@@ -7344,7 +7518,7 @@ impl<'a, C, NC, A> ObjectDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkC
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
-                            sleep(d);
+                            sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
@@ -7449,8 +7623,8 @@ impl<'a, C, NC, A> ObjectDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> ObjectDeleteCall<'a, C, NC, A>
-                                                        where T: Str {
-        self._additional_params.insert(name.as_slice().to_string(), value.as_slice().to_string());
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
     }
 
@@ -7466,8 +7640,8 @@ impl<'a, C, NC, A> ObjectDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T>(mut self, scope: T) -> ObjectDeleteCall<'a, C, NC, A> 
-                                                        where T: Str {
-        self._scopes.insert(scope.as_slice().to_string(), ());
+                                                        where T: AsRef<str> {
+        self._scopes.insert(scope.as_ref().to_string(), ());
         self
     }
 }
@@ -7484,8 +7658,8 @@ impl<'a, C, NC, A> ObjectDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkC
 ///
 /// ```test_harness,no_run
 /// # extern crate hyper;
-/// # extern crate "yup-oauth2" as oauth2;
-/// # extern crate "google-storage1" as storage1;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_storage1 as storage1;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -7501,11 +7675,11 @@ impl<'a, C, NC, A> ObjectDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkC
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.objects().list("bucket")
 ///              .versions(false)
-///              .projection("dolore")
-///              .prefix("duo")
-///              .page_token("aliquyam")
-///              .max_results(96)
-///              .delimiter("et")
+///              .projection("At")
+///              .prefix("labore")
+///              .page_token("invidunt")
+///              .max_results(35)
+///              .delimiter("sadipscing")
 ///              .doit();
 /// # }
 /// ```
@@ -7575,7 +7749,7 @@ impl<'a, C, NC, A> ObjectListCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
 
         let mut url = "https://www.googleapis.com/storage/v1/b/{bucket}/o".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::CloudPlatform.as_slice().to_string(), ());
+            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{bucket}", "bucket")].iter() {
@@ -7605,7 +7779,7 @@ impl<'a, C, NC, A> ObjectListCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
         
         if params.len() > 0 {
             url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
+            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_ref()))));
         }
 
 
@@ -7623,7 +7797,7 @@ impl<'a, C, NC, A> ObjectListCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
                                                              access_token: token.unwrap().access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_slice())
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_ref())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -7634,7 +7808,7 @@ impl<'a, C, NC, A> ObjectListCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
             match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
+                        sleep_ms(d.num_milliseconds() as u32);
                         continue;
                     }
                     dlg.finished(false);
@@ -7645,7 +7819,7 @@ impl<'a, C, NC, A> ObjectListCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
-                            sleep(d);
+                            sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
@@ -7758,8 +7932,8 @@ impl<'a, C, NC, A> ObjectListCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> ObjectListCall<'a, C, NC, A>
-                                                        where T: Str {
-        self._additional_params.insert(name.as_slice().to_string(), value.as_slice().to_string());
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
     }
 
@@ -7775,8 +7949,8 @@ impl<'a, C, NC, A> ObjectListCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T>(mut self, scope: T) -> ObjectListCall<'a, C, NC, A> 
-                                                        where T: Str {
-        self._scopes.insert(scope.as_slice().to_string(), ());
+                                                        where T: AsRef<str> {
+        self._scopes.insert(scope.as_ref().to_string(), ());
         self
     }
 }
@@ -7798,8 +7972,8 @@ impl<'a, C, NC, A> ObjectListCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
 ///
 /// ```test_harness,no_run
 /// # extern crate hyper;
-/// # extern crate "yup-oauth2" as oauth2;
-/// # extern crate "google-storage1" as storage1;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_storage1 as storage1;
 /// use storage1::Object;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
@@ -7820,17 +7994,20 @@ impl<'a, C, NC, A> ObjectListCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.objects().copy(&req, "sourceBucket", "sourceObject", "destinationBucket", "destinationObject")
-///              .source_generation("kasd")
-///              .projection("sanctus")
-///              .if_source_metageneration_not_match("takimata")
-///              .if_source_metageneration_match("At")
+///              .source_generation("aliquyam")
+///              .projection("sit")
+///              .if_source_metageneration_not_match("eirmod")
+///              .if_source_metageneration_match("consetetur")
 ///              .if_source_generation_not_match("labore")
-///              .if_source_generation_match("invidunt")
+///              .if_source_generation_match("sed")
 ///              .if_metageneration_not_match("ea")
-///              .if_metageneration_match("sadipscing")
-///              .if_generation_not_match("rebum.")
-///              .if_generation_match("dolore")
-///              .destination_predefined_acl("nonumy")
+///              .if_metageneration_match("gubergren")
+///              .if_generation_not_match("aliquyam")
+///              .if_generation_match("eos")
+///              .encryption_key_hash("tempor")
+///              .encryption_key("sea")
+///              .encryption_algorithm("labore")
+///              .destination_predefined_acl("ipsum")
 ///              .doit();
 /// # }
 /// ```
@@ -7853,6 +8030,9 @@ pub struct ObjectCopyCall<'a, C, NC, A>
     _if_metageneration_match: Option<String>,
     _if_generation_not_match: Option<String>,
     _if_generation_match: Option<String>,
+    _encryption_key_hash: Option<String>,
+    _encryption_key: Option<String>,
+    _encryption_algorithm: Option<String>,
     _destination_predefined_acl: Option<String>,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
@@ -7875,7 +8055,7 @@ impl<'a, C, NC, A> ObjectCopyCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
         };
         dlg.begin(MethodInfo { id: "storage.objects.copy", 
                                http_method: hyper::method::Method::Post });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((17 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity((20 + self._additional_params.len()));
         params.push(("sourceBucket", self._source_bucket.to_string()));
         params.push(("sourceObject", self._source_object.to_string()));
         params.push(("destinationBucket", self._destination_bucket.to_string()));
@@ -7910,10 +8090,19 @@ impl<'a, C, NC, A> ObjectCopyCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
         if let Some(value) = self._if_generation_match {
             params.push(("ifGenerationMatch", value.to_string()));
         }
+        if let Some(value) = self._encryption_key_hash {
+            params.push(("encryptionKeyHash", value.to_string()));
+        }
+        if let Some(value) = self._encryption_key {
+            params.push(("encryptionKey", value.to_string()));
+        }
+        if let Some(value) = self._encryption_algorithm {
+            params.push(("encryptionAlgorithm", value.to_string()));
+        }
         if let Some(value) = self._destination_predefined_acl {
             params.push(("destinationPredefinedAcl", value.to_string()));
         }
-        for &field in ["sourceBucket", "sourceObject", "destinationBucket", "destinationObject", "sourceGeneration", "projection", "ifSourceMetagenerationNotMatch", "ifSourceMetagenerationMatch", "ifSourceGenerationNotMatch", "ifSourceGenerationMatch", "ifMetagenerationNotMatch", "ifMetagenerationMatch", "ifGenerationNotMatch", "ifGenerationMatch", "destinationPredefinedAcl"].iter() {
+        for &field in ["sourceBucket", "sourceObject", "destinationBucket", "destinationObject", "sourceGeneration", "projection", "ifSourceMetagenerationNotMatch", "ifSourceMetagenerationMatch", "ifSourceGenerationNotMatch", "ifSourceGenerationMatch", "ifMetagenerationNotMatch", "ifMetagenerationMatch", "ifGenerationNotMatch", "ifGenerationMatch", "encryptionKeyHash", "encryptionKey", "encryptionAlgorithm", "destinationPredefinedAcl"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(Error::FieldClash(field));
@@ -7929,7 +8118,7 @@ impl<'a, C, NC, A> ObjectCopyCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
             for &(name, ref value) in params.iter() {
                 if name == "alt" {
                     field_present = false;
-                    if value.as_slice() != "json" {
+                    if <String as AsRef<str>>::as_ref(&value) != "json" {
                         enable = false;
                     }
                     break;
@@ -7943,7 +8132,7 @@ impl<'a, C, NC, A> ObjectCopyCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
 
         let mut url = "https://www.googleapis.com/storage/v1/b/{sourceBucket}/o/{sourceObject}/copyTo/b/{destinationBucket}/o/{destinationObject}".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::CloudPlatform.as_slice().to_string(), ());
+            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{sourceBucket}", "sourceBucket"), ("{sourceObject}", "sourceObject"), ("{destinationBucket}", "destinationBucket"), ("{destinationObject}", "destinationObject")].iter() {
@@ -7973,7 +8162,7 @@ impl<'a, C, NC, A> ObjectCopyCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
         
         if params.len() > 0 {
             url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
+            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_ref()))));
         }
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
@@ -7996,7 +8185,7 @@ impl<'a, C, NC, A> ObjectCopyCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.as_slice())
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.as_ref())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -8010,7 +8199,7 @@ impl<'a, C, NC, A> ObjectCopyCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
             match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
+                        sleep_ms(d.num_milliseconds() as u32);
                         continue;
                     }
                     dlg.finished(false);
@@ -8021,7 +8210,7 @@ impl<'a, C, NC, A> ObjectCopyCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
-                            sleep(d);
+                            sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
@@ -8176,6 +8365,30 @@ impl<'a, C, NC, A> ObjectCopyCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
         self._if_generation_match = Some(new_value.to_string());
         self
     }
+    /// Sets the *encryption key hash* query property to the given value.
+    ///
+    /// 
+    /// Provides the digest of the key for error-checking transmission. A digest is in the format of '='. Algorithm, key, and key hash must be supplied together.
+    pub fn encryption_key_hash(mut self, new_value: &str) -> ObjectCopyCall<'a, C, NC, A> {
+        self._encryption_key_hash = Some(new_value.to_string());
+        self
+    }
+    /// Sets the *encryption key* query property to the given value.
+    ///
+    /// 
+    /// Provides a base64-encoded 256-bit key that was used to encrypt the object, if any. Algorithm, key, and key hash must be supplied together.
+    pub fn encryption_key(mut self, new_value: &str) -> ObjectCopyCall<'a, C, NC, A> {
+        self._encryption_key = Some(new_value.to_string());
+        self
+    }
+    /// Sets the *encryption algorithm* query property to the given value.
+    ///
+    /// 
+    /// Specifies the encryption algorithm that was used to encrypt the object, if any. Only 'AES256' is supported currently. Algorithm, key, and key hash must be supplied together.
+    pub fn encryption_algorithm(mut self, new_value: &str) -> ObjectCopyCall<'a, C, NC, A> {
+        self._encryption_algorithm = Some(new_value.to_string());
+        self
+    }
     /// Sets the *destination predefined acl* query property to the given value.
     ///
     /// 
@@ -8213,8 +8426,8 @@ impl<'a, C, NC, A> ObjectCopyCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> ObjectCopyCall<'a, C, NC, A>
-                                                        where T: Str {
-        self._additional_params.insert(name.as_slice().to_string(), value.as_slice().to_string());
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
     }
 
@@ -8230,8 +8443,8 @@ impl<'a, C, NC, A> ObjectCopyCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T>(mut self, scope: T) -> ObjectCopyCall<'a, C, NC, A> 
-                                                        where T: Str {
-        self._scopes.insert(scope.as_slice().to_string(), ());
+                                                        where T: AsRef<str> {
+        self._scopes.insert(scope.as_ref().to_string(), ());
         self
     }
 }
@@ -8248,8 +8461,8 @@ impl<'a, C, NC, A> ObjectCopyCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
 ///
 /// ```test_harness,no_run
 /// # extern crate hyper;
-/// # extern crate "yup-oauth2" as oauth2;
-/// # extern crate "google-storage1" as storage1;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_storage1 as storage1;
 /// use storage1::Object;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
@@ -8271,12 +8484,15 @@ impl<'a, C, NC, A> ObjectCopyCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.objects().patch(&req, "bucket", "object")
 ///              .projection("sit")
-///              .predefined_acl("eirmod")
-///              .if_metageneration_not_match("consetetur")
-///              .if_metageneration_match("labore")
-///              .if_generation_not_match("sed")
-///              .if_generation_match("ea")
-///              .generation("gubergren")
+///              .predefined_acl("diam")
+///              .if_metageneration_not_match("ut")
+///              .if_metageneration_match("justo")
+///              .if_generation_not_match("est")
+///              .if_generation_match("amet")
+///              .generation("accusam")
+///              .encryption_key_hash("clita")
+///              .encryption_key("diam")
+///              .encryption_algorithm("justo")
 ///              .doit();
 /// # }
 /// ```
@@ -8294,6 +8510,9 @@ pub struct ObjectPatchCall<'a, C, NC, A>
     _if_generation_not_match: Option<String>,
     _if_generation_match: Option<String>,
     _generation: Option<String>,
+    _encryption_key_hash: Option<String>,
+    _encryption_key: Option<String>,
+    _encryption_algorithm: Option<String>,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
@@ -8315,7 +8534,7 @@ impl<'a, C, NC, A> ObjectPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
         };
         dlg.begin(MethodInfo { id: "storage.objects.patch", 
                                http_method: hyper::method::Method::Patch });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((12 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity((15 + self._additional_params.len()));
         params.push(("bucket", self._bucket.to_string()));
         params.push(("object", self._object.to_string()));
         if let Some(value) = self._projection {
@@ -8339,7 +8558,16 @@ impl<'a, C, NC, A> ObjectPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
         if let Some(value) = self._generation {
             params.push(("generation", value.to_string()));
         }
-        for &field in ["alt", "bucket", "object", "projection", "predefinedAcl", "ifMetagenerationNotMatch", "ifMetagenerationMatch", "ifGenerationNotMatch", "ifGenerationMatch", "generation"].iter() {
+        if let Some(value) = self._encryption_key_hash {
+            params.push(("encryptionKeyHash", value.to_string()));
+        }
+        if let Some(value) = self._encryption_key {
+            params.push(("encryptionKey", value.to_string()));
+        }
+        if let Some(value) = self._encryption_algorithm {
+            params.push(("encryptionAlgorithm", value.to_string()));
+        }
+        for &field in ["alt", "bucket", "object", "projection", "predefinedAcl", "ifMetagenerationNotMatch", "ifMetagenerationMatch", "ifGenerationNotMatch", "ifGenerationMatch", "generation", "encryptionKeyHash", "encryptionKey", "encryptionAlgorithm"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(Error::FieldClash(field));
@@ -8353,7 +8581,7 @@ impl<'a, C, NC, A> ObjectPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
 
         let mut url = "https://www.googleapis.com/storage/v1/b/{bucket}/o/{object}".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::CloudPlatform.as_slice().to_string(), ());
+            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{bucket}", "bucket"), ("{object}", "object")].iter() {
@@ -8383,7 +8611,7 @@ impl<'a, C, NC, A> ObjectPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
         
         if params.len() > 0 {
             url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
+            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_ref()))));
         }
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
@@ -8406,7 +8634,7 @@ impl<'a, C, NC, A> ObjectPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Patch, url.as_slice())
+                let mut req = client.borrow_mut().request(hyper::method::Method::Patch, url.as_ref())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -8420,7 +8648,7 @@ impl<'a, C, NC, A> ObjectPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
             match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
+                        sleep_ms(d.num_milliseconds() as u32);
                         continue;
                     }
                     dlg.finished(false);
@@ -8431,7 +8659,7 @@ impl<'a, C, NC, A> ObjectPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
-                            sleep(d);
+                            sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
@@ -8542,6 +8770,30 @@ impl<'a, C, NC, A> ObjectPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
         self._generation = Some(new_value.to_string());
         self
     }
+    /// Sets the *encryption key hash* query property to the given value.
+    ///
+    /// 
+    /// For downloading encrypted objects, provides the digest of the key for error-checking transmission. A digest is in the format of '='. Algorithm, key, and key hash must be supplied together.
+    pub fn encryption_key_hash(mut self, new_value: &str) -> ObjectPatchCall<'a, C, NC, A> {
+        self._encryption_key_hash = Some(new_value.to_string());
+        self
+    }
+    /// Sets the *encryption key* query property to the given value.
+    ///
+    /// 
+    /// For downloading encrypted objects, provides a base64-encoded 256-bit key to decrypt the object. Algorithm, key, and key hash must be supplied together.
+    pub fn encryption_key(mut self, new_value: &str) -> ObjectPatchCall<'a, C, NC, A> {
+        self._encryption_key = Some(new_value.to_string());
+        self
+    }
+    /// Sets the *encryption algorithm* query property to the given value.
+    ///
+    /// 
+    /// For downloading encrypted objects, specifies the encryption algorithm that would be used to decrypt the object. Only 'AES256' is supported currently. Algorithm, key, and key hash must be supplied together.
+    pub fn encryption_algorithm(mut self, new_value: &str) -> ObjectPatchCall<'a, C, NC, A> {
+        self._encryption_algorithm = Some(new_value.to_string());
+        self
+    }
     /// Sets the *delegate* property to the given value.
     ///
     /// 
@@ -8571,8 +8823,8 @@ impl<'a, C, NC, A> ObjectPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> ObjectPatchCall<'a, C, NC, A>
-                                                        where T: Str {
-        self._additional_params.insert(name.as_slice().to_string(), value.as_slice().to_string());
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
     }
 
@@ -8588,8 +8840,8 @@ impl<'a, C, NC, A> ObjectPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T>(mut self, scope: T) -> ObjectPatchCall<'a, C, NC, A> 
-                                                        where T: Str {
-        self._scopes.insert(scope.as_slice().to_string(), ());
+                                                        where T: AsRef<str> {
+        self._scopes.insert(scope.as_ref().to_string(), ());
         self
     }
 }
@@ -8606,8 +8858,8 @@ impl<'a, C, NC, A> ObjectPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
 ///
 /// ```test_harness,no_run
 /// # extern crate hyper;
-/// # extern crate "yup-oauth2" as oauth2;
-/// # extern crate "google-storage1" as storage1;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_storage1 as storage1;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -8622,7 +8874,7 @@ impl<'a, C, NC, A> ObjectPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.object_access_controls().get("bucket", "object", "entity")
-///              .generation("sea")
+///              .generation("ut")
 ///              .doit();
 /// # }
 /// ```
@@ -8676,7 +8928,7 @@ impl<'a, C, NC, A> ObjectAccessControlGetCall<'a, C, NC, A> where NC: hyper::net
 
         let mut url = "https://www.googleapis.com/storage/v1/b/{bucket}/o/{object}/acl/{entity}".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::CloudPlatform.as_slice().to_string(), ());
+            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{bucket}", "bucket"), ("{object}", "object"), ("{entity}", "entity")].iter() {
@@ -8706,7 +8958,7 @@ impl<'a, C, NC, A> ObjectAccessControlGetCall<'a, C, NC, A> where NC: hyper::net
         
         if params.len() > 0 {
             url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
+            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_ref()))));
         }
 
 
@@ -8724,7 +8976,7 @@ impl<'a, C, NC, A> ObjectAccessControlGetCall<'a, C, NC, A> where NC: hyper::net
                                                              access_token: token.unwrap().access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_slice())
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_ref())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -8735,7 +8987,7 @@ impl<'a, C, NC, A> ObjectAccessControlGetCall<'a, C, NC, A> where NC: hyper::net
             match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
+                        sleep_ms(d.num_milliseconds() as u32);
                         continue;
                     }
                     dlg.finished(false);
@@ -8746,7 +8998,7 @@ impl<'a, C, NC, A> ObjectAccessControlGetCall<'a, C, NC, A> where NC: hyper::net
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
-                            sleep(d);
+                            sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
@@ -8839,8 +9091,8 @@ impl<'a, C, NC, A> ObjectAccessControlGetCall<'a, C, NC, A> where NC: hyper::net
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> ObjectAccessControlGetCall<'a, C, NC, A>
-                                                        where T: Str {
-        self._additional_params.insert(name.as_slice().to_string(), value.as_slice().to_string());
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
     }
 
@@ -8856,8 +9108,8 @@ impl<'a, C, NC, A> ObjectAccessControlGetCall<'a, C, NC, A> where NC: hyper::net
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T>(mut self, scope: T) -> ObjectAccessControlGetCall<'a, C, NC, A> 
-                                                        where T: Str {
-        self._scopes.insert(scope.as_slice().to_string(), ());
+                                                        where T: AsRef<str> {
+        self._scopes.insert(scope.as_ref().to_string(), ());
         self
     }
 }
@@ -8874,8 +9126,8 @@ impl<'a, C, NC, A> ObjectAccessControlGetCall<'a, C, NC, A> where NC: hyper::net
 ///
 /// ```test_harness,no_run
 /// # extern crate hyper;
-/// # extern crate "yup-oauth2" as oauth2;
-/// # extern crate "google-storage1" as storage1;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_storage1 as storage1;
 /// use storage1::ObjectAccessControl;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
@@ -8896,7 +9148,7 @@ impl<'a, C, NC, A> ObjectAccessControlGetCall<'a, C, NC, A> where NC: hyper::net
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.object_access_controls().insert(&req, "bucket", "object")
-///              .generation("aliquyam")
+///              .generation("voluptua.")
 ///              .doit();
 /// # }
 /// ```
@@ -8949,7 +9201,7 @@ impl<'a, C, NC, A> ObjectAccessControlInsertCall<'a, C, NC, A> where NC: hyper::
 
         let mut url = "https://www.googleapis.com/storage/v1/b/{bucket}/o/{object}/acl".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::CloudPlatform.as_slice().to_string(), ());
+            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{bucket}", "bucket"), ("{object}", "object")].iter() {
@@ -8979,7 +9231,7 @@ impl<'a, C, NC, A> ObjectAccessControlInsertCall<'a, C, NC, A> where NC: hyper::
         
         if params.len() > 0 {
             url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
+            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_ref()))));
         }
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
@@ -9002,7 +9254,7 @@ impl<'a, C, NC, A> ObjectAccessControlInsertCall<'a, C, NC, A> where NC: hyper::
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.as_slice())
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.as_ref())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -9016,7 +9268,7 @@ impl<'a, C, NC, A> ObjectAccessControlInsertCall<'a, C, NC, A> where NC: hyper::
             match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
+                        sleep_ms(d.num_milliseconds() as u32);
                         continue;
                     }
                     dlg.finished(false);
@@ -9027,7 +9279,7 @@ impl<'a, C, NC, A> ObjectAccessControlInsertCall<'a, C, NC, A> where NC: hyper::
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
-                            sleep(d);
+                            sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
@@ -9119,8 +9371,8 @@ impl<'a, C, NC, A> ObjectAccessControlInsertCall<'a, C, NC, A> where NC: hyper::
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> ObjectAccessControlInsertCall<'a, C, NC, A>
-                                                        where T: Str {
-        self._additional_params.insert(name.as_slice().to_string(), value.as_slice().to_string());
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
     }
 
@@ -9136,8 +9388,8 @@ impl<'a, C, NC, A> ObjectAccessControlInsertCall<'a, C, NC, A> where NC: hyper::
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T>(mut self, scope: T) -> ObjectAccessControlInsertCall<'a, C, NC, A> 
-                                                        where T: Str {
-        self._scopes.insert(scope.as_slice().to_string(), ());
+                                                        where T: AsRef<str> {
+        self._scopes.insert(scope.as_ref().to_string(), ());
         self
     }
 }
@@ -9154,8 +9406,8 @@ impl<'a, C, NC, A> ObjectAccessControlInsertCall<'a, C, NC, A> where NC: hyper::
 ///
 /// ```test_harness,no_run
 /// # extern crate hyper;
-/// # extern crate "yup-oauth2" as oauth2;
-/// # extern crate "google-storage1" as storage1;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_storage1 as storage1;
 /// use storage1::ObjectAccessControl;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
@@ -9176,7 +9428,7 @@ impl<'a, C, NC, A> ObjectAccessControlInsertCall<'a, C, NC, A> where NC: hyper::
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.object_access_controls().patch(&req, "bucket", "object", "entity")
-///              .generation("ut")
+///              .generation("ea")
 ///              .doit();
 /// # }
 /// ```
@@ -9231,7 +9483,7 @@ impl<'a, C, NC, A> ObjectAccessControlPatchCall<'a, C, NC, A> where NC: hyper::n
 
         let mut url = "https://www.googleapis.com/storage/v1/b/{bucket}/o/{object}/acl/{entity}".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::CloudPlatform.as_slice().to_string(), ());
+            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{bucket}", "bucket"), ("{object}", "object"), ("{entity}", "entity")].iter() {
@@ -9261,7 +9513,7 @@ impl<'a, C, NC, A> ObjectAccessControlPatchCall<'a, C, NC, A> where NC: hyper::n
         
         if params.len() > 0 {
             url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
+            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_ref()))));
         }
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
@@ -9284,7 +9536,7 @@ impl<'a, C, NC, A> ObjectAccessControlPatchCall<'a, C, NC, A> where NC: hyper::n
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Patch, url.as_slice())
+                let mut req = client.borrow_mut().request(hyper::method::Method::Patch, url.as_ref())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -9298,7 +9550,7 @@ impl<'a, C, NC, A> ObjectAccessControlPatchCall<'a, C, NC, A> where NC: hyper::n
             match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
+                        sleep_ms(d.num_milliseconds() as u32);
                         continue;
                     }
                     dlg.finished(false);
@@ -9309,7 +9561,7 @@ impl<'a, C, NC, A> ObjectAccessControlPatchCall<'a, C, NC, A> where NC: hyper::n
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
-                            sleep(d);
+                            sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
@@ -9411,8 +9663,8 @@ impl<'a, C, NC, A> ObjectAccessControlPatchCall<'a, C, NC, A> where NC: hyper::n
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> ObjectAccessControlPatchCall<'a, C, NC, A>
-                                                        where T: Str {
-        self._additional_params.insert(name.as_slice().to_string(), value.as_slice().to_string());
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
     }
 
@@ -9428,8 +9680,8 @@ impl<'a, C, NC, A> ObjectAccessControlPatchCall<'a, C, NC, A> where NC: hyper::n
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T>(mut self, scope: T) -> ObjectAccessControlPatchCall<'a, C, NC, A> 
-                                                        where T: Str {
-        self._scopes.insert(scope.as_slice().to_string(), ());
+                                                        where T: AsRef<str> {
+        self._scopes.insert(scope.as_ref().to_string(), ());
         self
     }
 }
@@ -9446,8 +9698,8 @@ impl<'a, C, NC, A> ObjectAccessControlPatchCall<'a, C, NC, A> where NC: hyper::n
 ///
 /// ```test_harness,no_run
 /// # extern crate hyper;
-/// # extern crate "yup-oauth2" as oauth2;
-/// # extern crate "google-storage1" as storage1;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_storage1 as storage1;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -9462,7 +9714,7 @@ impl<'a, C, NC, A> ObjectAccessControlPatchCall<'a, C, NC, A> where NC: hyper::n
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.object_access_controls().list("bucket", "object")
-///              .generation("amet")
+///              .generation("dolor")
 ///              .doit();
 /// # }
 /// ```
@@ -9514,7 +9766,7 @@ impl<'a, C, NC, A> ObjectAccessControlListCall<'a, C, NC, A> where NC: hyper::ne
 
         let mut url = "https://www.googleapis.com/storage/v1/b/{bucket}/o/{object}/acl".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::CloudPlatform.as_slice().to_string(), ());
+            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{bucket}", "bucket"), ("{object}", "object")].iter() {
@@ -9544,7 +9796,7 @@ impl<'a, C, NC, A> ObjectAccessControlListCall<'a, C, NC, A> where NC: hyper::ne
         
         if params.len() > 0 {
             url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
+            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_ref()))));
         }
 
 
@@ -9562,7 +9814,7 @@ impl<'a, C, NC, A> ObjectAccessControlListCall<'a, C, NC, A> where NC: hyper::ne
                                                              access_token: token.unwrap().access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_slice())
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_ref())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -9573,7 +9825,7 @@ impl<'a, C, NC, A> ObjectAccessControlListCall<'a, C, NC, A> where NC: hyper::ne
             match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
+                        sleep_ms(d.num_milliseconds() as u32);
                         continue;
                     }
                     dlg.finished(false);
@@ -9584,7 +9836,7 @@ impl<'a, C, NC, A> ObjectAccessControlListCall<'a, C, NC, A> where NC: hyper::ne
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
-                            sleep(d);
+                            sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
@@ -9667,8 +9919,8 @@ impl<'a, C, NC, A> ObjectAccessControlListCall<'a, C, NC, A> where NC: hyper::ne
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> ObjectAccessControlListCall<'a, C, NC, A>
-                                                        where T: Str {
-        self._additional_params.insert(name.as_slice().to_string(), value.as_slice().to_string());
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
     }
 
@@ -9684,8 +9936,8 @@ impl<'a, C, NC, A> ObjectAccessControlListCall<'a, C, NC, A> where NC: hyper::ne
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T>(mut self, scope: T) -> ObjectAccessControlListCall<'a, C, NC, A> 
-                                                        where T: Str {
-        self._scopes.insert(scope.as_slice().to_string(), ());
+                                                        where T: AsRef<str> {
+        self._scopes.insert(scope.as_ref().to_string(), ());
         self
     }
 }
@@ -9702,8 +9954,8 @@ impl<'a, C, NC, A> ObjectAccessControlListCall<'a, C, NC, A> where NC: hyper::ne
 ///
 /// ```test_harness,no_run
 /// # extern crate hyper;
-/// # extern crate "yup-oauth2" as oauth2;
-/// # extern crate "google-storage1" as storage1;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_storage1 as storage1;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -9718,7 +9970,7 @@ impl<'a, C, NC, A> ObjectAccessControlListCall<'a, C, NC, A> where NC: hyper::ne
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.object_access_controls().delete("bucket", "object", "entity")
-///              .generation("justo")
+///              .generation("rebum.")
 ///              .doit();
 /// # }
 /// ```
@@ -9771,7 +10023,7 @@ impl<'a, C, NC, A> ObjectAccessControlDeleteCall<'a, C, NC, A> where NC: hyper::
 
         let mut url = "https://www.googleapis.com/storage/v1/b/{bucket}/o/{object}/acl/{entity}".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::CloudPlatform.as_slice().to_string(), ());
+            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{bucket}", "bucket"), ("{object}", "object"), ("{entity}", "entity")].iter() {
@@ -9801,7 +10053,7 @@ impl<'a, C, NC, A> ObjectAccessControlDeleteCall<'a, C, NC, A> where NC: hyper::
         
         if params.len() > 0 {
             url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
+            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_ref()))));
         }
 
 
@@ -9819,7 +10071,7 @@ impl<'a, C, NC, A> ObjectAccessControlDeleteCall<'a, C, NC, A> where NC: hyper::
                                                              access_token: token.unwrap().access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Delete, url.as_slice())
+                let mut req = client.borrow_mut().request(hyper::method::Method::Delete, url.as_ref())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -9830,7 +10082,7 @@ impl<'a, C, NC, A> ObjectAccessControlDeleteCall<'a, C, NC, A> where NC: hyper::
             match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
+                        sleep_ms(d.num_milliseconds() as u32);
                         continue;
                     }
                     dlg.finished(false);
@@ -9841,7 +10093,7 @@ impl<'a, C, NC, A> ObjectAccessControlDeleteCall<'a, C, NC, A> where NC: hyper::
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
-                            sleep(d);
+                            sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
@@ -9924,8 +10176,8 @@ impl<'a, C, NC, A> ObjectAccessControlDeleteCall<'a, C, NC, A> where NC: hyper::
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> ObjectAccessControlDeleteCall<'a, C, NC, A>
-                                                        where T: Str {
-        self._additional_params.insert(name.as_slice().to_string(), value.as_slice().to_string());
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
     }
 
@@ -9941,8 +10193,8 @@ impl<'a, C, NC, A> ObjectAccessControlDeleteCall<'a, C, NC, A> where NC: hyper::
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T>(mut self, scope: T) -> ObjectAccessControlDeleteCall<'a, C, NC, A> 
-                                                        where T: Str {
-        self._scopes.insert(scope.as_slice().to_string(), ());
+                                                        where T: AsRef<str> {
+        self._scopes.insert(scope.as_ref().to_string(), ());
         self
     }
 }
@@ -9959,8 +10211,8 @@ impl<'a, C, NC, A> ObjectAccessControlDeleteCall<'a, C, NC, A> where NC: hyper::
 ///
 /// ```test_harness,no_run
 /// # extern crate hyper;
-/// # extern crate "yup-oauth2" as oauth2;
-/// # extern crate "google-storage1" as storage1;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_storage1 as storage1;
 /// use storage1::ObjectAccessControl;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
@@ -9981,7 +10233,7 @@ impl<'a, C, NC, A> ObjectAccessControlDeleteCall<'a, C, NC, A> where NC: hyper::
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.object_access_controls().update(&req, "bucket", "object", "entity")
-///              .generation("ut")
+///              .generation("eirmod")
 ///              .doit();
 /// # }
 /// ```
@@ -10036,7 +10288,7 @@ impl<'a, C, NC, A> ObjectAccessControlUpdateCall<'a, C, NC, A> where NC: hyper::
 
         let mut url = "https://www.googleapis.com/storage/v1/b/{bucket}/o/{object}/acl/{entity}".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::CloudPlatform.as_slice().to_string(), ());
+            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{bucket}", "bucket"), ("{object}", "object"), ("{entity}", "entity")].iter() {
@@ -10066,7 +10318,7 @@ impl<'a, C, NC, A> ObjectAccessControlUpdateCall<'a, C, NC, A> where NC: hyper::
         
         if params.len() > 0 {
             url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
+            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_ref()))));
         }
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
@@ -10089,7 +10341,7 @@ impl<'a, C, NC, A> ObjectAccessControlUpdateCall<'a, C, NC, A> where NC: hyper::
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Put, url.as_slice())
+                let mut req = client.borrow_mut().request(hyper::method::Method::Put, url.as_ref())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -10103,7 +10355,7 @@ impl<'a, C, NC, A> ObjectAccessControlUpdateCall<'a, C, NC, A> where NC: hyper::
             match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
+                        sleep_ms(d.num_milliseconds() as u32);
                         continue;
                     }
                     dlg.finished(false);
@@ -10114,7 +10366,7 @@ impl<'a, C, NC, A> ObjectAccessControlUpdateCall<'a, C, NC, A> where NC: hyper::
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
-                            sleep(d);
+                            sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
@@ -10216,8 +10468,8 @@ impl<'a, C, NC, A> ObjectAccessControlUpdateCall<'a, C, NC, A> where NC: hyper::
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> ObjectAccessControlUpdateCall<'a, C, NC, A>
-                                                        where T: Str {
-        self._additional_params.insert(name.as_slice().to_string(), value.as_slice().to_string());
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
     }
 
@@ -10233,8 +10485,8 @@ impl<'a, C, NC, A> ObjectAccessControlUpdateCall<'a, C, NC, A> where NC: hyper::
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T>(mut self, scope: T) -> ObjectAccessControlUpdateCall<'a, C, NC, A> 
-                                                        where T: Str {
-        self._scopes.insert(scope.as_slice().to_string(), ());
+                                                        where T: AsRef<str> {
+        self._scopes.insert(scope.as_ref().to_string(), ());
         self
     }
 }
@@ -10251,8 +10503,8 @@ impl<'a, C, NC, A> ObjectAccessControlUpdateCall<'a, C, NC, A> where NC: hyper::
 ///
 /// ```test_harness,no_run
 /// # extern crate hyper;
-/// # extern crate "yup-oauth2" as oauth2;
-/// # extern crate "google-storage1" as storage1;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_storage1 as storage1;
 /// use storage1::Bucket;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
@@ -10273,11 +10525,11 @@ impl<'a, C, NC, A> ObjectAccessControlUpdateCall<'a, C, NC, A> where NC: hyper::
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.buckets().update(&req, "bucket")
-///              .projection("eos")
-///              .predefined_default_object_acl("voluptua.")
-///              .predefined_acl("duo")
-///              .if_metageneration_not_match("sed")
-///              .if_metageneration_match("aliquyam")
+///              .projection("consetetur")
+///              .predefined_default_object_acl("et")
+///              .predefined_acl("sed")
+///              .if_metageneration_not_match("sit")
+///              .if_metageneration_match("takimata")
 ///              .doit();
 /// # }
 /// ```
@@ -10344,7 +10596,7 @@ impl<'a, C, NC, A> BucketUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkC
 
         let mut url = "https://www.googleapis.com/storage/v1/b/{bucket}".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::CloudPlatform.as_slice().to_string(), ());
+            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{bucket}", "bucket")].iter() {
@@ -10374,7 +10626,7 @@ impl<'a, C, NC, A> BucketUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkC
         
         if params.len() > 0 {
             url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
+            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_ref()))));
         }
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
@@ -10397,7 +10649,7 @@ impl<'a, C, NC, A> BucketUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkC
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Put, url.as_slice())
+                let mut req = client.borrow_mut().request(hyper::method::Method::Put, url.as_ref())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -10411,7 +10663,7 @@ impl<'a, C, NC, A> BucketUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkC
             match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
+                        sleep_ms(d.num_milliseconds() as u32);
                         continue;
                     }
                     dlg.finished(false);
@@ -10422,7 +10674,7 @@ impl<'a, C, NC, A> BucketUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkC
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
-                            sleep(d);
+                            sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
@@ -10536,8 +10788,8 @@ impl<'a, C, NC, A> BucketUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> BucketUpdateCall<'a, C, NC, A>
-                                                        where T: Str {
-        self._additional_params.insert(name.as_slice().to_string(), value.as_slice().to_string());
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
     }
 
@@ -10553,8 +10805,8 @@ impl<'a, C, NC, A> BucketUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T>(mut self, scope: T) -> BucketUpdateCall<'a, C, NC, A> 
-                                                        where T: Str {
-        self._scopes.insert(scope.as_slice().to_string(), ());
+                                                        where T: AsRef<str> {
+        self._scopes.insert(scope.as_ref().to_string(), ());
         self
     }
 }
@@ -10571,8 +10823,8 @@ impl<'a, C, NC, A> BucketUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkC
 ///
 /// ```test_harness,no_run
 /// # extern crate hyper;
-/// # extern crate "yup-oauth2" as oauth2;
-/// # extern crate "google-storage1" as storage1;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_storage1 as storage1;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -10587,9 +10839,9 @@ impl<'a, C, NC, A> BucketUpdateCall<'a, C, NC, A> where NC: hyper::net::NetworkC
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.buckets().get("bucket")
-///              .projection("ea")
-///              .if_metageneration_not_match("et")
-///              .if_metageneration_match("dolor")
+///              .projection("nonumy")
+///              .if_metageneration_not_match("rebum.")
+///              .if_metageneration_match("Lorem")
 ///              .doit();
 /// # }
 /// ```
@@ -10647,7 +10899,7 @@ impl<'a, C, NC, A> BucketGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
 
         let mut url = "https://www.googleapis.com/storage/v1/b/{bucket}".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::CloudPlatform.as_slice().to_string(), ());
+            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{bucket}", "bucket")].iter() {
@@ -10677,7 +10929,7 @@ impl<'a, C, NC, A> BucketGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
         
         if params.len() > 0 {
             url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
+            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_ref()))));
         }
 
 
@@ -10695,7 +10947,7 @@ impl<'a, C, NC, A> BucketGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
                                                              access_token: token.unwrap().access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_slice())
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_ref())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -10706,7 +10958,7 @@ impl<'a, C, NC, A> BucketGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
             match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
+                        sleep_ms(d.num_milliseconds() as u32);
                         continue;
                     }
                     dlg.finished(false);
@@ -10717,7 +10969,7 @@ impl<'a, C, NC, A> BucketGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
-                            sleep(d);
+                            sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
@@ -10806,8 +11058,8 @@ impl<'a, C, NC, A> BucketGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> BucketGetCall<'a, C, NC, A>
-                                                        where T: Str {
-        self._additional_params.insert(name.as_slice().to_string(), value.as_slice().to_string());
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
     }
 
@@ -10823,8 +11075,8 @@ impl<'a, C, NC, A> BucketGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T>(mut self, scope: T) -> BucketGetCall<'a, C, NC, A> 
-                                                        where T: Str {
-        self._scopes.insert(scope.as_slice().to_string(), ());
+                                                        where T: AsRef<str> {
+        self._scopes.insert(scope.as_ref().to_string(), ());
         self
     }
 }
@@ -10841,8 +11093,8 @@ impl<'a, C, NC, A> BucketGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
 ///
 /// ```test_harness,no_run
 /// # extern crate hyper;
-/// # extern crate "yup-oauth2" as oauth2;
-/// # extern crate "google-storage1" as storage1;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_storage1 as storage1;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -10857,8 +11109,8 @@ impl<'a, C, NC, A> BucketGetCall<'a, C, NC, A> where NC: hyper::net::NetworkConn
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.buckets().delete("bucket")
-///              .if_metageneration_not_match("kasd")
-///              .if_metageneration_match("invidunt")
+///              .if_metageneration_not_match("diam")
+///              .if_metageneration_match("ut")
 ///              .doit();
 /// # }
 /// ```
@@ -10911,7 +11163,7 @@ impl<'a, C, NC, A> BucketDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkC
 
         let mut url = "https://www.googleapis.com/storage/v1/b/{bucket}".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::CloudPlatform.as_slice().to_string(), ());
+            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{bucket}", "bucket")].iter() {
@@ -10941,7 +11193,7 @@ impl<'a, C, NC, A> BucketDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkC
         
         if params.len() > 0 {
             url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
+            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_ref()))));
         }
 
 
@@ -10959,7 +11211,7 @@ impl<'a, C, NC, A> BucketDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkC
                                                              access_token: token.unwrap().access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Delete, url.as_slice())
+                let mut req = client.borrow_mut().request(hyper::method::Method::Delete, url.as_ref())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -10970,7 +11222,7 @@ impl<'a, C, NC, A> BucketDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkC
             match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
+                        sleep_ms(d.num_milliseconds() as u32);
                         continue;
                     }
                     dlg.finished(false);
@@ -10981,7 +11233,7 @@ impl<'a, C, NC, A> BucketDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkC
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
-                            sleep(d);
+                            sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
@@ -11052,8 +11304,8 @@ impl<'a, C, NC, A> BucketDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> BucketDeleteCall<'a, C, NC, A>
-                                                        where T: Str {
-        self._additional_params.insert(name.as_slice().to_string(), value.as_slice().to_string());
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
     }
 
@@ -11069,8 +11321,8 @@ impl<'a, C, NC, A> BucketDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T>(mut self, scope: T) -> BucketDeleteCall<'a, C, NC, A> 
-                                                        where T: Str {
-        self._scopes.insert(scope.as_slice().to_string(), ());
+                                                        where T: AsRef<str> {
+        self._scopes.insert(scope.as_ref().to_string(), ());
         self
     }
 }
@@ -11087,8 +11339,8 @@ impl<'a, C, NC, A> BucketDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkC
 ///
 /// ```test_harness,no_run
 /// # extern crate hyper;
-/// # extern crate "yup-oauth2" as oauth2;
-/// # extern crate "google-storage1" as storage1;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_storage1 as storage1;
 /// use storage1::Bucket;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
@@ -11109,9 +11361,9 @@ impl<'a, C, NC, A> BucketDeleteCall<'a, C, NC, A> where NC: hyper::net::NetworkC
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.buckets().insert(&req, "project")
-///              .projection("Lorem")
-///              .predefined_default_object_acl("clita")
-///              .predefined_acl("invidunt")
+///              .projection("amet.")
+///              .predefined_default_object_acl("ipsum")
+///              .predefined_acl("ut")
 ///              .doit();
 /// # }
 /// ```
@@ -11170,13 +11422,13 @@ impl<'a, C, NC, A> BucketInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkC
 
         let mut url = "https://www.googleapis.com/storage/v1/b".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::CloudPlatform.as_slice().to_string(), ());
+            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
 
         
         if params.len() > 0 {
             url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
+            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_ref()))));
         }
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
@@ -11199,7 +11451,7 @@ impl<'a, C, NC, A> BucketInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkC
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.as_slice())
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.as_ref())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -11213,7 +11465,7 @@ impl<'a, C, NC, A> BucketInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkC
             match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
+                        sleep_ms(d.num_milliseconds() as u32);
                         continue;
                     }
                     dlg.finished(false);
@@ -11224,7 +11476,7 @@ impl<'a, C, NC, A> BucketInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkC
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
-                            sleep(d);
+                            sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
@@ -11322,8 +11574,8 @@ impl<'a, C, NC, A> BucketInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> BucketInsertCall<'a, C, NC, A>
-                                                        where T: Str {
-        self._additional_params.insert(name.as_slice().to_string(), value.as_slice().to_string());
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
     }
 
@@ -11339,8 +11591,8 @@ impl<'a, C, NC, A> BucketInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkC
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T>(mut self, scope: T) -> BucketInsertCall<'a, C, NC, A> 
-                                                        where T: Str {
-        self._scopes.insert(scope.as_slice().to_string(), ());
+                                                        where T: AsRef<str> {
+        self._scopes.insert(scope.as_ref().to_string(), ());
         self
     }
 }
@@ -11357,8 +11609,8 @@ impl<'a, C, NC, A> BucketInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkC
 ///
 /// ```test_harness,no_run
 /// # extern crate hyper;
-/// # extern crate "yup-oauth2" as oauth2;
-/// # extern crate "google-storage1" as storage1;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_storage1 as storage1;
 /// use storage1::Bucket;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
@@ -11379,11 +11631,11 @@ impl<'a, C, NC, A> BucketInsertCall<'a, C, NC, A> where NC: hyper::net::NetworkC
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.buckets().patch(&req, "bucket")
-///              .projection("At")
-///              .predefined_default_object_acl("consetetur")
-///              .predefined_acl("et")
-///              .if_metageneration_not_match("sed")
-///              .if_metageneration_match("sit")
+///              .projection("sea")
+///              .predefined_default_object_acl("ut")
+///              .predefined_acl("eirmod")
+///              .if_metageneration_not_match("sanctus")
+///              .if_metageneration_match("voluptua.")
 ///              .doit();
 /// # }
 /// ```
@@ -11450,7 +11702,7 @@ impl<'a, C, NC, A> BucketPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
 
         let mut url = "https://www.googleapis.com/storage/v1/b/{bucket}".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::CloudPlatform.as_slice().to_string(), ());
+            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{bucket}", "bucket")].iter() {
@@ -11480,7 +11732,7 @@ impl<'a, C, NC, A> BucketPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
         
         if params.len() > 0 {
             url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
+            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_ref()))));
         }
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
@@ -11503,7 +11755,7 @@ impl<'a, C, NC, A> BucketPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Patch, url.as_slice())
+                let mut req = client.borrow_mut().request(hyper::method::Method::Patch, url.as_ref())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -11517,7 +11769,7 @@ impl<'a, C, NC, A> BucketPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
             match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
+                        sleep_ms(d.num_milliseconds() as u32);
                         continue;
                     }
                     dlg.finished(false);
@@ -11528,7 +11780,7 @@ impl<'a, C, NC, A> BucketPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
-                            sleep(d);
+                            sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
@@ -11642,8 +11894,8 @@ impl<'a, C, NC, A> BucketPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> BucketPatchCall<'a, C, NC, A>
-                                                        where T: Str {
-        self._additional_params.insert(name.as_slice().to_string(), value.as_slice().to_string());
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
     }
 
@@ -11659,8 +11911,8 @@ impl<'a, C, NC, A> BucketPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T>(mut self, scope: T) -> BucketPatchCall<'a, C, NC, A> 
-                                                        where T: Str {
-        self._scopes.insert(scope.as_slice().to_string(), ());
+                                                        where T: AsRef<str> {
+        self._scopes.insert(scope.as_ref().to_string(), ());
         self
     }
 }
@@ -11677,8 +11929,8 @@ impl<'a, C, NC, A> BucketPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
 ///
 /// ```test_harness,no_run
 /// # extern crate hyper;
-/// # extern crate "yup-oauth2" as oauth2;
-/// # extern crate "google-storage1" as storage1;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_storage1 as storage1;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -11693,10 +11945,10 @@ impl<'a, C, NC, A> BucketPatchCall<'a, C, NC, A> where NC: hyper::net::NetworkCo
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.buckets().list("project")
-///              .projection("elitr")
-///              .prefix("nonumy")
-///              .page_token("rebum.")
-///              .max_results(95)
+///              .projection("et")
+///              .prefix("et")
+///              .page_token("vero")
+///              .max_results(65)
 ///              .doit();
 /// # }
 /// ```
@@ -11758,13 +12010,13 @@ impl<'a, C, NC, A> BucketListCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
 
         let mut url = "https://www.googleapis.com/storage/v1/b".to_string();
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::CloudPlatform.as_slice().to_string(), ());
+            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
 
         
         if params.len() > 0 {
             url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_slice()))));
+            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_ref()))));
         }
 
 
@@ -11782,7 +12034,7 @@ impl<'a, C, NC, A> BucketListCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
                                                              access_token: token.unwrap().access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_slice())
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_ref())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -11793,7 +12045,7 @@ impl<'a, C, NC, A> BucketListCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
             match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
+                        sleep_ms(d.num_milliseconds() as u32);
                         continue;
                     }
                     dlg.finished(false);
@@ -11804,7 +12056,7 @@ impl<'a, C, NC, A> BucketListCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
-                            sleep(d);
+                            sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
@@ -11901,8 +12153,8 @@ impl<'a, C, NC, A> BucketListCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> BucketListCall<'a, C, NC, A>
-                                                        where T: Str {
-        self._additional_params.insert(name.as_slice().to_string(), value.as_slice().to_string());
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
     }
 
@@ -11918,8 +12170,8 @@ impl<'a, C, NC, A> BucketListCall<'a, C, NC, A> where NC: hyper::net::NetworkCon
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T>(mut self, scope: T) -> BucketListCall<'a, C, NC, A> 
-                                                        where T: Str {
-        self._scopes.insert(scope.as_slice().to_string(), ());
+                                                        where T: AsRef<str> {
+        self._scopes.insert(scope.as_ref().to_string(), ());
         self
     }
 }

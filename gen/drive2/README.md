@@ -5,7 +5,7 @@ DO NOT EDIT !
 -->
 The `google-drive2` library allows access to all features of the *Google drive* service.
 
-This documentation was generated from *drive* crate version *0.1.2+20150108*, where *20150108* is the exact revision of the *drive:v2* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.2*.
+This documentation was generated from *drive* crate version *0.1.2+20150326*, where *20150326* is the exact revision of the *drive:v2* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.2*.
 
 Everything else about the *drive* *v2* API can be found at the
 [official documentation site](https://developers.google.com/drive/).
@@ -125,8 +125,8 @@ google-drive2 = "*"
 
 ```Rust
 extern crate hyper;
-extern crate "yup-oauth2" as oauth2;
-extern crate "google-drive2" as drive2;
+extern crate yup_oauth2 as oauth2;
+extern crate google_drive2 as drive2;
 use drive2::File;
 use drive2::{Result, Error};
 use std::default::Default;

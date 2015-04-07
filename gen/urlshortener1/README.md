@@ -5,7 +5,7 @@ DO NOT EDIT !
 -->
 The `google-urlshortener1` library allows access to all features of the *Google urlshortener* service.
 
-This documentation was generated from *urlshortener* crate version *0.1.2+20150219*, where *20150219* is the exact revision of the *urlshortener:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.2*.
+This documentation was generated from *urlshortener* crate version *0.1.2+20150319*, where *20150319* is the exact revision of the *urlshortener:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.2*.
 
 Everything else about the *urlshortener* *v1* API can be found at the
 [official documentation site](https://developers.google.com/url-shortener/v1/getting_started).
@@ -71,8 +71,8 @@ google-urlshortener1 = "*"
 
 ```Rust
 extern crate hyper;
-extern crate "yup-oauth2" as oauth2;
-extern crate "google-urlshortener1" as urlshortener1;
+extern crate yup_oauth2 as oauth2;
+extern crate google_urlshortener1 as urlshortener1;
 use urlshortener1::{Result, Error};
 use std::default::Default;
 use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};

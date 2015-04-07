@@ -5,7 +5,7 @@ DO NOT EDIT !
 -->
 The `google-dataflow1_b4` library allows access to all features of the *Google dataflow* service.
 
-This documentation was generated from *dataflow* crate version *0.1.2+20150130*, where *20150130* is the exact revision of the *dataflow:v1b4* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.2*.
+This documentation was generated from *dataflow* crate version *0.1.2+20150401*, where *20150401* is the exact revision of the *dataflow:v1b4* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.2*.
 # Features
 
 It seems there is nothing you can do here ... .
@@ -60,8 +60,8 @@ google-dataflow1_b4 = "*"
 
 ```Rust
 extern crate hyper;
-extern crate "yup-oauth2" as oauth2;
-extern crate "google-dataflow1_b4" as dataflow1_b4;
+extern crate yup_oauth2 as oauth2;
+extern crate google_dataflow1_b4 as dataflow1_b4;
 
 use std::default::Default;
 use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};

@@ -5,7 +5,7 @@ DO NOT EDIT !
 -->
 The `google-container1_beta1` library allows access to all features of the *Google container* service.
 
-This documentation was generated from *container* crate version *0.1.2+20150316*, where *20150316* is the exact revision of the *container:v1beta1* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.2*.
+This documentation was generated from *container* crate version *0.1.2+20150318*, where *20150318* is the exact revision of the *container:v1beta1* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.2*.
 
 Everything else about the *container* *v1_beta1* API can be found at the
 [official documentation site](https://cloud.google.com/container-engine/docs/v1beta1/).
@@ -72,8 +72,8 @@ google-container1_beta1 = "*"
 
 ```Rust
 extern crate hyper;
-extern crate "yup-oauth2" as oauth2;
-extern crate "google-container1_beta1" as container1_beta1;
+extern crate yup_oauth2 as oauth2;
+extern crate google_container1_beta1 as container1_beta1;
 use container1_beta1::{Result, Error};
 use std::default::Default;
 use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};

@@ -5,7 +5,7 @@ DO NOT EDIT !
 -->
 The `google-adsense1d4` library allows access to all features of the *Google AdSense* service.
 
-This documentation was generated from *AdSense* crate version *0.1.2+20150303*, where *20150303* is the exact revision of the *adsense:v1.4* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.2*.
+This documentation was generated from *AdSense* crate version *0.1.2+20150326*, where *20150326* is the exact revision of the *adsense:v1.4* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.2*.
 
 Everything else about the *AdSense* *v1d4* API can be found at the
 [official documentation site](https://developers.google.com/adsense/management/).
@@ -111,8 +111,8 @@ google-adsense1d4 = "*"
 
 ```Rust
 extern crate hyper;
-extern crate "yup-oauth2" as oauth2;
-extern crate "google-adsense1d4" as adsense1d4;
+extern crate yup_oauth2 as oauth2;
+extern crate google_adsense1d4 as adsense1d4;
 use adsense1d4::{Result, Error};
 use std::default::Default;
 use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};

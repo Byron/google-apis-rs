@@ -5,7 +5,7 @@ DO NOT EDIT !
 -->
 The `google-compute1` library allows access to all features of the *Google compute* service.
 
-This documentation was generated from *compute* crate version *0.1.2+20150302*, where *20150302* is the exact revision of the *compute:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.2*.
+This documentation was generated from *compute* crate version *0.1.2+20150326*, where *20150326* is the exact revision of the *compute:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.2*.
 
 Everything else about the *compute* *v1* API can be found at the
 [official documentation site](https://developers.google.com/compute/docs/reference/latest/).
@@ -61,8 +61,12 @@ Handle the following *Resources* with ease from the central [hub](http://byron.g
  * [*aggregated list*](http://byron.github.io/google-apis-rs/google-compute1/struct.TargetInstanceAggregatedListCall.html), [*delete*](http://byron.github.io/google-apis-rs/google-compute1/struct.TargetInstanceDeleteCall.html), [*get*](http://byron.github.io/google-apis-rs/google-compute1/struct.TargetInstanceGetCall.html), [*insert*](http://byron.github.io/google-apis-rs/google-compute1/struct.TargetInstanceInsertCall.html) and [*list*](http://byron.github.io/google-apis-rs/google-compute1/struct.TargetInstanceListCall.html)
 * [target pools](http://byron.github.io/google-apis-rs/google-compute1/struct.TargetPool.html)
  * [*add health check*](http://byron.github.io/google-apis-rs/google-compute1/struct.TargetPoolAddHealthCheckCall.html), [*add instance*](http://byron.github.io/google-apis-rs/google-compute1/struct.TargetPoolAddInstanceCall.html), [*aggregated list*](http://byron.github.io/google-apis-rs/google-compute1/struct.TargetPoolAggregatedListCall.html), [*delete*](http://byron.github.io/google-apis-rs/google-compute1/struct.TargetPoolDeleteCall.html), [*get*](http://byron.github.io/google-apis-rs/google-compute1/struct.TargetPoolGetCall.html), [*get health*](http://byron.github.io/google-apis-rs/google-compute1/struct.TargetPoolGetHealthCall.html), [*insert*](http://byron.github.io/google-apis-rs/google-compute1/struct.TargetPoolInsertCall.html), [*list*](http://byron.github.io/google-apis-rs/google-compute1/struct.TargetPoolListCall.html), [*remove health check*](http://byron.github.io/google-apis-rs/google-compute1/struct.TargetPoolRemoveHealthCheckCall.html), [*remove instance*](http://byron.github.io/google-apis-rs/google-compute1/struct.TargetPoolRemoveInstanceCall.html) and [*set backup*](http://byron.github.io/google-apis-rs/google-compute1/struct.TargetPoolSetBackupCall.html)
+* [target vpn gateways](http://byron.github.io/google-apis-rs/google-compute1/struct.TargetVpnGateway.html)
+ * [*aggregated list*](http://byron.github.io/google-apis-rs/google-compute1/struct.TargetVpnGatewayAggregatedListCall.html), [*delete*](http://byron.github.io/google-apis-rs/google-compute1/struct.TargetVpnGatewayDeleteCall.html), [*get*](http://byron.github.io/google-apis-rs/google-compute1/struct.TargetVpnGatewayGetCall.html), [*insert*](http://byron.github.io/google-apis-rs/google-compute1/struct.TargetVpnGatewayInsertCall.html) and [*list*](http://byron.github.io/google-apis-rs/google-compute1/struct.TargetVpnGatewayListCall.html)
 * [url maps](http://byron.github.io/google-apis-rs/google-compute1/struct.UrlMap.html)
  * [*delete*](http://byron.github.io/google-apis-rs/google-compute1/struct.UrlMapDeleteCall.html), [*get*](http://byron.github.io/google-apis-rs/google-compute1/struct.UrlMapGetCall.html), [*insert*](http://byron.github.io/google-apis-rs/google-compute1/struct.UrlMapInsertCall.html), [*list*](http://byron.github.io/google-apis-rs/google-compute1/struct.UrlMapListCall.html), [*patch*](http://byron.github.io/google-apis-rs/google-compute1/struct.UrlMapPatchCall.html), [*update*](http://byron.github.io/google-apis-rs/google-compute1/struct.UrlMapUpdateCall.html) and [*validate*](http://byron.github.io/google-apis-rs/google-compute1/struct.UrlMapValidateCall.html)
+* [vpn tunnels](http://byron.github.io/google-apis-rs/google-compute1/struct.VpnTunnel.html)
+ * [*aggregated list*](http://byron.github.io/google-apis-rs/google-compute1/struct.VpnTunnelAggregatedListCall.html), [*delete*](http://byron.github.io/google-apis-rs/google-compute1/struct.VpnTunnelDeleteCall.html), [*get*](http://byron.github.io/google-apis-rs/google-compute1/struct.VpnTunnelGetCall.html), [*insert*](http://byron.github.io/google-apis-rs/google-compute1/struct.VpnTunnelInsertCall.html) and [*list*](http://byron.github.io/google-apis-rs/google-compute1/struct.VpnTunnelListCall.html)
 * zone operations
  * [*delete*](http://byron.github.io/google-apis-rs/google-compute1/struct.ZoneOperationDeleteCall.html), [*get*](http://byron.github.io/google-apis-rs/google-compute1/struct.ZoneOperationGetCall.html) and [*list*](http://byron.github.io/google-apis-rs/google-compute1/struct.ZoneOperationListCall.html)
 * [zones](http://byron.github.io/google-apis-rs/google-compute1/struct.Zone.html)
@@ -117,6 +121,7 @@ let r = hub.projects().set_usage_export_bucket(...).doit()
 let r = hub.url_maps().update(...).doit()
 let r = hub.instance_templates().insert(...).doit()
 let r = hub.firewalls().patch(...).doit()
+let r = hub.vpn_tunnels().delete(...).doit()
 let r = hub.firewalls().delete(...).doit()
 let r = hub.instances().detach_disk(...).doit()
 let r = hub.instances().delete_access_config(...).doit()
@@ -125,8 +130,10 @@ let r = hub.instances().insert(...).doit()
 let r = hub.global_forwarding_rules().set_target(...).doit()
 let r = hub.url_maps().insert(...).doit()
 let r = hub.instances().add_access_config(...).doit()
+let r = hub.target_vpn_gateways().delete(...).doit()
 let r = hub.region_operations().get(...).doit()
 let r = hub.backend_services().insert(...).doit()
+let r = hub.global_operations().get(...).doit()
 let r = hub.disks().insert(...).doit()
 let r = hub.instance_templates().delete(...).doit()
 let r = hub.global_forwarding_rules().delete(...).doit()
@@ -137,7 +144,7 @@ let r = hub.projects().set_common_instance_metadata(...).doit()
 let r = hub.target_pools().insert(...).doit()
 let r = hub.target_http_proxies().delete(...).doit()
 let r = hub.networks().delete(...).doit()
-let r = hub.global_operations().get(...).doit()
+let r = hub.target_vpn_gateways().insert(...).doit()
 let r = hub.url_maps().delete(...).doit()
 let r = hub.instances().set_scheduling(...).doit()
 let r = hub.instances().attach_disk(...).doit()
@@ -163,6 +170,7 @@ let r = hub.forwarding_rules().delete(...).doit()
 let r = hub.projects().move_instance(...).doit()
 let r = hub.forwarding_rules().set_target(...).doit()
 let r = hub.projects().move_disk(...).doit()
+let r = hub.vpn_tunnels().insert(...).doit()
 let r = hub.firewalls().insert(...).doit()
 let r = hub.target_pools().remove_instance(...).doit()
 let r = hub.instances().delete(...).doit()
@@ -192,8 +200,8 @@ google-compute1 = "*"
 
 ```Rust
 extern crate hyper;
-extern crate "yup-oauth2" as oauth2;
-extern crate "google-compute1" as compute1;
+extern crate yup_oauth2 as oauth2;
+extern crate google_compute1 as compute1;
 use compute1::{Result, Error};
 use std::default::Default;
 use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};

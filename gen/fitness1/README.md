@@ -73,8 +73,8 @@ google-fitness1 = "*"
 
 ```Rust
 extern crate hyper;
-extern crate "yup-oauth2" as oauth2;
-extern crate "google-fitness1" as fitness1;
+extern crate yup_oauth2 as oauth2;
+extern crate google_fitness1 as fitness1;
 use fitness1::DataSource;
 use fitness1::{Result, Error};
 use std::default::Default;

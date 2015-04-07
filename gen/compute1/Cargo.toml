@@ -4,7 +4,7 @@
 [package]
 
 name = "google-compute1"
-version = "0.1.2+20150302"
+version = "0.1.2+20150326"
 authors = ["Sebastian Thiel <byronimo@gmail>"]
 description = "A complete library to interact with compute (protocol v1)"
 repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/compute1"

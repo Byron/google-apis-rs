@@ -5,7 +5,7 @@ DO NOT EDIT !
 -->
 The `google-pubsub1_beta2` library allows access to all features of the *Google pubsub* service.
 
-This documentation was generated from *pubsub* crate version *0.1.2+20150213*, where *20150213* is the exact revision of the *pubsub:v1beta2* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.2*.
+This documentation was generated from *pubsub* crate version *0.1.2+20150326*, where *20150326* is the exact revision of the *pubsub:v1beta2* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.2*.
 # Features
 
 Handle the following *Resources* with ease from the central [hub](http://byron.github.io/google-apis-rs/google-pubsub1_beta2/struct.Pubsub.html) ... 
@@ -71,8 +71,8 @@ google-pubsub1_beta2 = "*"
 
 ```Rust
 extern crate hyper;
-extern crate "yup-oauth2" as oauth2;
-extern crate "google-pubsub1_beta2" as pubsub1_beta2;
+extern crate yup_oauth2 as oauth2;
+extern crate google_pubsub1_beta2 as pubsub1_beta2;
 use pubsub1_beta2::AcknowledgeRequest;
 use pubsub1_beta2::{Result, Error};
 use std::default::Default;
