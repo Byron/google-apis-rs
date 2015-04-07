@@ -5,7 +5,7 @@ DO NOT EDIT !
 -->
 The `google-genomics1_beta2` library allows access to all features of the *Google genomics* service.
 
-This documentation was generated from *genomics* crate version *0.1.2+20150326*, where *20150326* is the exact revision of the *genomics:v1beta2* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.2*.
+This documentation was generated from *genomics* crate version *0.1.3+20150326*, where *20150326* is the exact revision of the *genomics:v1beta2* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.3*.
 
 Everything else about the *genomics* *v1_beta2* API can be found at the
 [official documentation site](https://developers.google.com/genomics/v1beta2/reference).

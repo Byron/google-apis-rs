@@ -4,7 +4,7 @@
 [package]
 
 name = "google-webmasters3"
-version = "0.1.2+20140908"
+version = "0.1.3+20140908"
 authors = ["Sebastian Thiel <byronimo@gmail>"]
 description = "A complete library to interact with webmasters (protocol v3)"
 repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/webmasters3"

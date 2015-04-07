@@ -5,7 +5,7 @@ DO NOT EDIT !
 -->
 The `google-dns1_beta1` library allows access to all features of the *Google dns* service.
 
-This documentation was generated from *dns* crate version *0.1.2+20150114*, where *20150114* is the exact revision of the *dns:v1beta1* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.2*.
+This documentation was generated from *dns* crate version *0.1.3+20150114*, where *20150114* is the exact revision of the *dns:v1beta1* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.3*.
 
 Everything else about the *dns* *v1_beta1* API can be found at the
 [official documentation site](https://developers.google.com/cloud-dns).

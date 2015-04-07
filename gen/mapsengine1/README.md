@@ -5,7 +5,7 @@ DO NOT EDIT !
 -->
 The `google-mapsengine1` library allows access to all features of the *Google Maps Engine* service.
 
-This documentation was generated from *Maps Engine* crate version *0.1.2+20150225*, where *20150225* is the exact revision of the *mapsengine:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.2*.
+This documentation was generated from *Maps Engine* crate version *0.1.3+20150225*, where *20150225* is the exact revision of the *mapsengine:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.3*.
 
 Everything else about the *Maps Engine* *v1* API can be found at the
 [official documentation site](https://developers.google.com/maps-engine/).

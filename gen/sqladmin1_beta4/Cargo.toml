@@ -4,7 +4,7 @@
 [package]
 
 name = "google-sqladmin1_beta4"
-version = "0.1.2+20150305"
+version = "0.1.3+20150305"
 authors = ["Sebastian Thiel <byronimo@gmail>"]
 description = "A complete library to interact with SQL Admin (protocol v1beta4)"
 repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/sqladmin1_beta4"

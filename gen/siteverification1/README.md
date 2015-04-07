@@ -5,7 +5,7 @@ DO NOT EDIT !
 -->
 The `google-siteverification1` library allows access to all features of the *Google siteVerification* service.
 
-This documentation was generated from *siteVerification* crate version *0.1.2+20131007*, where *20131007* is the exact revision of the *siteVerification:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.2*.
+This documentation was generated from *siteVerification* crate version *0.1.3+20131007*, where *20131007* is the exact revision of the *siteVerification:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.3*.
 
 Everything else about the *siteVerification* *v1* API can be found at the
 [official documentation site](https://developers.google.com/site-verification/).
